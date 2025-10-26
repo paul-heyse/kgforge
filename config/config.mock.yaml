@@ -1,0 +1,13 @@
+
+harvest:
+  provider: pyalex
+  base_urls:
+    openalex: "http://localhost:8998"
+    unpaywall: "http://localhost:8997"
+    pdf_host: "http://localhost:8999"
+  per_page: 2
+  max_works: 2
+  years: ">=2018"
+  concurrency: 2
+  timeout_sec: 30
+  retries: 3

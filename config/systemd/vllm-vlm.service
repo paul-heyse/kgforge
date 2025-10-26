@@ -1,0 +1,1 @@
+[Unit]\nDescription=vLLM Granite-Docling\n[Service]\nExecStart=/usr/bin/vllm serve ...\n

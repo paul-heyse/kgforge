@@ -1,0 +1,20 @@
+[
+  {
+    "chunk_id": "chunk:1",
+    "title": "Neural retrieval for concept42",
+    "section": "Methods",
+    "text": "We discuss concept42 and dense retrieval."
+  },
+  {
+    "chunk_id": "chunk:2",
+    "title": "BM25 baselines",
+    "section": "Results",
+    "text": "Classical BM25 scoring provides strong sparse retrieval."
+  },
+  {
+    "chunk_id": "chunk:3",
+    "title": "Graph boosts",
+    "section": "Discussion",
+    "text": "Concept99 connected to concept42 can provide boosts."
+  }
+]

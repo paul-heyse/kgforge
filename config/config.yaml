@@ -1,0 +1,39 @@
+system:
+  parquet_root: /data/parquet
+  duckdb_path: /data/catalog/catalog.duckdb
+  os: ubuntu-24.04
+runtime:
+  python: '3.13'
+  cuda: '13.0'
+  torch: '2.9'
+  duckdb_min: 1.4.1
+search:
+  sparse_backend: lucene   # 'lucene' or 'pure'
+  k: 10
+  dense_candidates: 200
+  sparse_candidates: 200
+  rrf_k: 60
+  mmr_lambda: 0.7
+  kg_boosts:
+    direct: 0.08
+    one_hop: 0.04
+dense_embedding:
+  model: Qwen/Qwen3-Embedding-4B
+  output_dim: 2560
+sparse_embedding:
+  bm25:
+    index_dir: ./_indices/bm25
+    k1: 0.9
+    b: 0.4
+    field_boosts:
+      title: 2.0
+      section: 1.2
+      body: 1.0
+  splade:
+    index_dir: ./_indices/splade_impact
+    topk: 256
+faiss:
+  gpu: true
+  cuvs: true
+  index_factory: OPQ64,IVF8192,PQ64
+  nprobe: 64
