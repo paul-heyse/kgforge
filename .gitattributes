@@ -1,0 +1,4 @@
+# Never LFS vectors/indices; keep them out of the repo entirely
+*.parquet -diff -merge
+*.faiss   -diff -merge
+*.ids     -diff -merge
