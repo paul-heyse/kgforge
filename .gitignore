@@ -1,0 +1,26 @@
+# local data and generated artifacts (single-box runtime only)
+data/
+data/**/*
+/data/
+/.parquet-cache/
+/.faiss/
+/lucene/
+/neo4j/
+/catalog.duckdb
+*.parquet
+*.faiss
+*.ids
+
+# envs & build junk
+.venv/
+.mypy_cache/
+.pytest_cache/
+__pycache__/
+dist/
+build/
+.wheelhouse/
+KGForge.egg-info/
+
+# IDE
+.vscode/
+.idea/
