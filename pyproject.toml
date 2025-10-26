@@ -209,18 +209,23 @@ docs = [
     "sphobjinv>=2.3.1.3",
     "graphviz>=0.21",
     "griffe",
+]
+docs-agent = [
     "doq",               # generate docstring skeletons
     "pyment",            # fill/convert to preferred style (Google/NumPy/reST)
     "interrogate",       # enforce docstring coverage
     "pydocstyle",        # PEP-257 lint
     "docformatter",      # format docstrings
     "import-linter",     # enforce layered architecture
+]
+docs-mkdocs = [
     "mkdocs",
     "mkdocs-material",
     "mkdocstrings[python]",
     "mkdocs-gen-files",
     "mkdocs-literate-nav",
     "mkdocs-section-index",
+    "griffe",
 ]
 
 [project.scripts]

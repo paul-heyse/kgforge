@@ -1,5 +1,5 @@
 
-.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture
+.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings readmes html json symbols watch
 
 VENV := .venv
 PY := $(VENV)/bin/python
@@ -7,6 +7,8 @@ PIP := $(VENV)/bin/pip
 UVICORN := $(VENV)/bin/uvicorn
 PYTEST := $(VENV)/bin/pytest
 PRECOMMIT := $(VENV)/bin/pre-commit
+PKG := $(shell python tools/detect_pkg.py)
+PKGS := $(shell python tools/detect_pkg.py --all)
 
 bootstrap:
 	python3 -m venv $(VENV)
@@ -41,3 +43,29 @@ mock:
 
 fixture:
 	$(PY) -m kgforge.orchestration.fixture_flow
+
+docstrings:
+	@for pkg in $(PKGS); do \
+		echo "Updating docstrings for $$pkg"; \
+		doq -d google -r src/$$pkg; \
+		pyment -w -o numpydoc -r src/$$pkg; \
+	done
+	pydocstyle src
+	docformatter -r -i src
+	interrogate -i src --fail-under 90
+
+readmes:
+	python tools/gen_readmes.py
+	-which doctoc >/dev/null 2>&1 && doctoc src/$(PKG) || echo "Install doctoc to auto-update TOCs."
+
+html:
+	sphinx-build -W -b html docs docs/_build/html
+
+json:
+	sphinx-build -W -b json docs docs/_build/json
+
+symbols:
+	python docs/_scripts/build_symbol_index.py
+
+watch:
+	sphinx-autobuild docs docs/_build/html

@@ -1,3 +1,23 @@
-# KGForge Docs
+# KGForge Documentation
 
-This documentation site will evolve as features are implemented. See ADRs for decisions.
+Welcome to the KGForge documentation set. Use the sections below to find onboarding guides, deep dives, API reference material, and architecture decisions.
+
+```{toctree}
+:maxdepth: 2
+:caption: Guide
+getting-started
+how-to/index
+```
+
+```{toctree}
+:maxdepth: 2
+:caption: Explanations
+explanations/index
+```
+
+```{toctree}
+:maxdepth: 2
+:caption: Reference
+api/index
+architecture/index
+```

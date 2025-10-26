@@ -1,0 +1,32 @@
+repos:
+  - repo: https://github.com/PyCQA/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        args: [ "src" ]
+
+  - repo: https://github.com/PyCQA/docformatter
+    rev: 1.7.5
+    hooks:
+      - id: docformatter
+        args: [ "-r", "-i", "src" ]
+
+  - repo: local
+    hooks:
+      - id: interrogate
+        name: interrogate (docstring coverage)
+        entry: bash -c "interrogate -i src/$(python tools/detect_pkg.py) --fail-under 90"
+        language: system
+        pass_filenames: false
+      - id: doq-skeletons
+        name: doq (generate docstring skeletons - run manually)
+        entry: doq -d google -r src/$(python tools/detect_pkg.py)
+        language: system
+        stages: [manual]
+        pass_filenames: false
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
