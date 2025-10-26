@@ -1,0 +1,10 @@
+[importlinter]
+root_package = kgforge_common
+
+[importlinter:contract:layers]
+name = Respect layered architecture
+type = layers
+layers =
+    kgforge_common.presentation
+    kgforge_common.domain
+    kgforge_common.infrastructure

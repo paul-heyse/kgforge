@@ -1,0 +1,40 @@
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+
+
+def _candidate_names():
+    names = set()
+    if SRC.exists():
+        names.update(p.parent.name for p in SRC.glob("*/__init__.py"))
+    names.update(
+        p.parent.name
+        for p in ROOT.glob("*/__init__.py")
+        if p.parent.name not in {"docs", "tools", "optional"}
+    )
+    if not names:
+        raise SystemExit(1)
+    names.discard("src")
+    return sorted(names)
+
+
+def detect_packages():
+    lowers = [c for c in _candidate_names() if c.islower()]
+    base = lowers or _candidate_names()
+    preferred = [c for c in base if "kgforge" in c]
+    return preferred + [c for c in base if c not in preferred]
+
+
+def detect_primary():
+    packages = detect_packages()
+    return packages[0]
+
+
+if __name__ == "__main__":
+    if "--all" in sys.argv:
+        for name in detect_packages():
+            print(name)
+    else:
+        print(detect_primary())

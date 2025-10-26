@@ -1,10 +1,27 @@
 site_name: KGForge
+docs_dir: docs
 theme:
   name: material
-nav:
-  - Home: index.md
-  - ADRs:
-    - 0001-record-architecture-decisions.md
+  features:
+    - navigation.indexes
 plugins:
   - search
-  - mkdocstrings
+  - gen-files:
+      scripts:
+        - docs/_scripts/mkdocs_gen_api.py
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            show_source: true
+  - literate-nav
+  - section-index
+nav:
+  - Home: index.md
+  - Guides:
+      - Getting Started: getting-started.md
+      - How-to: how-to/index.md
+  - Explanations: explanations/index.md
+  - Architecture: architecture/index.md
+  - API: api/index.md
