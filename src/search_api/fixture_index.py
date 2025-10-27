@@ -21,11 +21,15 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 def tokenize(text: str) -> list[str]:
     """Tokenize.
 
-    Args:
-        text (str): TODO.
+    Parameters
+    ----------
+    text : str
+        TODO.
 
-    Returns:
-        List[str]: TODO.
+    Returns
+    -------
+    List[str]
+        TODO.
     """
     return [t.lower() for t in TOKEN_RE.findall(text or "")]
 
@@ -44,12 +48,15 @@ class FixtureDoc:
 class FixtureIndex:
     """Fixtureindex."""
 
-    def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb"):
+    def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb") -> None:
         """Init.
 
-        Args:
-            root (str): TODO.
-            db_path (str): TODO.
+        Parameters
+        ----------
+        root : str
+            TODO.
+        db_path : str
+            TODO.
         """
         self.root = Path(root)
         self.db_path = db_path
@@ -61,8 +68,10 @@ class FixtureIndex:
     def _load_from_duckdb(self) -> None:
         """Load from duckdb.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         if not Path(self.db_path).exists():
             return
@@ -106,8 +115,10 @@ class FixtureIndex:
     def _build_lex(self) -> None:
         """Build lex.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         self.tf.clear()
         self.df.clear()
@@ -124,12 +135,17 @@ class FixtureIndex:
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
         """Search.
 
-        Args:
-            query (str): TODO.
-            k (int): TODO.
+        Parameters
+        ----------
+        query : str
+            TODO.
+        k : int
+            TODO.
 
-        Returns:
-            List[Tuple[int, float]]: TODO.
+        Returns
+        -------
+        List[Tuple[int, float]]
+            TODO.
         """
         if getattr(self, "N", 0) == 0:
             return []
@@ -151,10 +167,14 @@ class FixtureIndex:
     def doc(self, idx: int) -> FixtureDoc:
         """Doc.
 
-        Args:
-            idx (int): TODO.
+        Parameters
+        ----------
+        idx : int
+            TODO.
 
-        Returns:
-            FixtureDoc: TODO.
+        Returns
+        -------
+        FixtureDoc
+            TODO.
         """
         return self.docs[idx]

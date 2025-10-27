@@ -19,5 +19,4 @@ class DenseEmbedder(Protocol):
 
     def embed_texts(self, texts: list[str]) -> np.ndarray:
         """Return embeddings for the supplied texts."""
-
         ...

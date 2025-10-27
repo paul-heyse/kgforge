@@ -2,7 +2,7 @@
 
 NavMap:
 - JsonFormatter: Jsonformatter.
-- setup_logging: Setup logging.
+- setup_logging: Configure logging with a structured JSON formatter.
 """
 
 import json
@@ -16,11 +16,15 @@ class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         """Format.
 
-        Args:
-            record (logging.LogRecord): TODO.
+        Parameters
+        ----------
+        record : logging.LogRecord
+            TODO.
 
-        Returns:
-            str: TODO.
+        Returns
+        -------
+        str
+            TODO.
         """
         data = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
@@ -36,13 +40,17 @@ class JsonFormatter(logging.Formatter):
 
 
 def setup_logging(level: int = logging.INFO) -> None:
-    """Setup logging.
+    """Configure logging with a structured JSON formatter.
 
-    Args:
-        level (int): TODO.
+    Parameters
+    ----------
+    level : int
+        TODO.
 
-    Returns:
-        None: TODO.
+    Returns
+    -------
+    None
+        TODO.
     """
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())

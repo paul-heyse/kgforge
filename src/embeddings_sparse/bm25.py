@@ -43,14 +43,19 @@ class PurePythonBM25:
         k1: float = 0.9,
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
-    ):
+    ) -> None:
         """Init.
 
-        Args:
-            index_dir (str): TODO.
-            k1 (float): TODO.
-            b (float): TODO.
-            field_boosts (Optional[Dict[str, float]]): TODO.
+        Parameters
+        ----------
+        index_dir : str
+            TODO.
+        k1 : float
+            TODO.
+        b : float
+            TODO.
+        field_boosts : Optional[Dict[str, float]]
+            TODO.
         """
         self.index_dir = index_dir
         self.k1 = k1
@@ -66,22 +71,30 @@ class PurePythonBM25:
     def _tokenize(text: str) -> list[str]:
         """Tokenize.
 
-        Args:
-            text (str): TODO.
+        Parameters
+        ----------
+        text : str
+            TODO.
 
-        Returns:
-            List[str]: TODO.
+        Returns
+        -------
+        List[str]
+            TODO.
         """
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Build.
 
-        Args:
-            docs_iterable (Iterable[Tuple[str, Dict]]): TODO.
+        Parameters
+        ----------
+        docs_iterable : Iterable[Tuple[str, Dict]]
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
@@ -132,8 +145,10 @@ class PurePythonBM25:
     def load(self) -> None:
         """Load.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         path = os.path.join(self.index_dir, "pure_bm25.pkl")
         with open(path, "rb") as f:
@@ -150,11 +165,15 @@ class PurePythonBM25:
     def _idf(self, term: str) -> float:
         """Idf.
 
-        Args:
-            term (str): TODO.
+        Parameters
+        ----------
+        term : str
+            TODO.
 
-        Returns:
-            float: TODO.
+        Returns
+        -------
+        float
+            TODO.
         """
         n_t = self.df.get(term, 0)
         if n_t == 0:
@@ -167,13 +186,19 @@ class PurePythonBM25:
     ) -> list[tuple[str, float]]:
         """Search.
 
-        Args:
-            query (str): TODO.
-            k (int): TODO.
-            fields (Dict | None): TODO.
+        Parameters
+        ----------
+        query : str
+            TODO.
+        k : int
+            TODO.
+        fields : Dict | None
+            TODO.
 
-        Returns:
-            List[Tuple[str, float]]: TODO.
+        Returns
+        -------
+        List[Tuple[str, float]]
+            TODO.
         """
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
@@ -189,8 +214,7 @@ class PurePythonBM25:
                 denom = tf + self.k1 * (1 - self.b + self.b * (dl / self.avgdl))
                 contrib = idf * ((tf * (self.k1 + 1)) / (denom))
                 scores[doc_id] += contrib
-        ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:k]
-        return ranked
+        return sorted(scores.items(), key=lambda x: x[1], reverse=True)[:k]
 
 
 class LuceneBM25:
@@ -205,14 +229,19 @@ class LuceneBM25:
         k1: float = 0.9,
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
-    ):
+    ) -> None:
         """Init.
 
-        Args:
-            index_dir (str): TODO.
-            k1 (float): TODO.
-            b (float): TODO.
-            field_boosts (Optional[Dict[str,float]]): TODO.
+        Parameters
+        ----------
+        index_dir : str
+            TODO.
+        k1 : float
+            TODO.
+        b : float
+            TODO.
+        field_boosts : Optional[Dict[str,float]]
+            TODO.
         """
         self.index_dir = index_dir
         self.k1 = k1
@@ -223,17 +252,22 @@ class LuceneBM25:
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Build.
 
-        Args:
-            docs_iterable (Iterable[Tuple[str, Dict]]): TODO.
+        Parameters
+        ----------
+        docs_iterable : Iterable[Tuple[str, Dict]]
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         try:
             from pyserini.analysis import get_lucene_analyzer
             from pyserini.index import IndexWriter
-        except Exception as e:
-            raise RuntimeError("Pyserini/Lucene not available") from e
+        except Exception as exc:
+            message = "Pyserini/Lucene not available"
+            raise RuntimeError(message) from exc
         os.makedirs(self.index_dir, exist_ok=True)
         analyzer = get_lucene_analyzer(stemmer="english", stopwords=True)
         writer = IndexWriter(self.index_dir, analyzer=analyzer, keep_stopwords=False)
@@ -266,33 +300,49 @@ class LuceneBM25:
     ) -> list[tuple[str, float]]:
         """Search.
 
-        Args:
-            query (str): TODO.
-            k (int): TODO.
-            fields (Dict | None): TODO.
+        Parameters
+        ----------
+        query : str
+            TODO.
+        k : int
+            TODO.
+        fields : Dict | None
+            TODO.
 
-        Returns:
-            List[Tuple[str, float]]: TODO.
+        Returns
+        -------
+        List[Tuple[str, float]]
+            TODO.
         """
         self._ensure_searcher()
         if self._searcher is None:
-            raise RuntimeError("Lucene searcher not initialized")
+            message = "Lucene searcher not initialized"
+            raise RuntimeError(message)
         hits = self._searcher.search(query, k=k)
         return [(h.docid, float(h.score)) for h in hits]
 
 
-def get_bm25(backend: str, index_dir: str, **kwargs: Any) -> PurePythonBM25 | LuceneBM25:
+def get_bm25(
+    backend: str,
+    index_dir: str,
+    *,
+    k1: float = 0.9,
+    b: float = 0.4,
+    field_boosts: dict[str, float] | None = None,
+) -> PurePythonBM25 | LuceneBM25:
     """Get bm25.
 
-    Args:
-        backend (str): TODO.
-        index_dir (str): TODO.
-        kwargs: TODO.
+    Parameters
+    ----------
+    backend : str
+        TODO.
+    index_dir : str
+        TODO.
     """
     if backend == "lucene":
         try:
-            return LuceneBM25(index_dir, **kwargs)
+            return LuceneBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)
         except Exception:
             # allow fallback creation
             pass
-    return PurePythonBM25(index_dir, **kwargs)
+    return PurePythonBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)

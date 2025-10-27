@@ -24,14 +24,19 @@ class FaissGpuIndex:
         nprobe: int = 64,
         gpu: bool = True,
         cuvs: bool = True,
-    ):
+    ) -> None:
         """Init.
 
-        Args:
-            factory (str): TODO.
-            nprobe (int): TODO.
-            gpu (bool): TODO.
-            cuvs (bool): TODO.
+        Parameters
+        ----------
+        factory : str
+            TODO.
+        nprobe : int
+            TODO.
+        gpu : bool
+            TODO.
+        cuvs : bool
+            TODO.
         """
         self.factory = factory
         self.nprobe = nprobe
@@ -62,12 +67,17 @@ class FaissGpuIndex:
     def train(self, train_vectors: np.ndarray, *, seed: int = 42) -> None:
         """Train.
 
-        Args:
-            train_vectors (np.ndarray): TODO.
-            seed (int): TODO.
+        Parameters
+        ----------
+        train_vectors : np.ndarray
+            TODO.
+        seed : int
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         if self._faiss is None:
             # no-op in fallback; brute force doesn't need training
@@ -99,12 +109,17 @@ class FaissGpuIndex:
     def add(self, keys: list[str], vectors: np.ndarray) -> None:
         """Add.
 
-        Args:
-            keys (List[str]): TODO.
-            vectors (np.ndarray): TODO.
+        Parameters
+        ----------
+        keys : List[str]
+            TODO.
+        vectors : np.ndarray
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         if self._faiss is None:
             # fallback: keep matrix and id map for brute-force
@@ -116,7 +131,8 @@ class FaissGpuIndex:
             return
         faiss = self._faiss
         if self._index is None:
-            raise RuntimeError("FAISS index not initialized; call train() before add().")
+            message = "FAISS index not initialized; call train() before add()."
+            raise RuntimeError(message)
         faiss.normalize_L2(vectors)
         if isinstance(self._index, faiss.IndexIDMap2):
             self._index.add_with_ids(vectors, np.array(keys, dtype="int64"))
@@ -131,12 +147,17 @@ class FaissGpuIndex:
     def search(self, query: np.ndarray, k: int) -> list[tuple[str, float]]:
         """Search.
 
-        Args:
-            query (np.ndarray): TODO.
-            k (int): TODO.
+        Parameters
+        ----------
+        query : np.ndarray
+            TODO.
+        k : int
+            TODO.
 
-        Returns:
-            List[Tuple[str, float]]: TODO.
+        Returns
+        -------
+        List[Tuple[str, float]]
+            TODO.
         """
         q = query.astype("float32", copy=True)
         # normalize for cosine/IP
@@ -149,7 +170,8 @@ class FaissGpuIndex:
             idx = np.argsort(-sims)[:k]
             return [(str(self._idmap[i]), float(sims[i])) for i in idx.tolist()]
         if self._idmap is None:
-            raise RuntimeError("ID map not loaded; cannot resolve FAISS results.")
+            message = "ID map not loaded; cannot resolve FAISS results."
+            raise RuntimeError(message)
         distances, indices = self._index.search(q.reshape(1, -1), k)
         # map IDs to strings if using IDMap; else cast ints
         ids = indices[0]
@@ -159,12 +181,17 @@ class FaissGpuIndex:
     def save(self, index_uri: str, idmap_uri: str) -> None:
         """Save.
 
-        Args:
-            index_uri (str): TODO.
-            idmap_uri (str): TODO.
+        Parameters
+        ----------
+        index_uri : str
+            TODO.
+        idmap_uri : str
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         if self._faiss is None or self._index is None:
             # save fallback matrix
@@ -173,19 +200,25 @@ class FaissGpuIndex:
             return
         faiss = self._faiss
         if faiss is None:
-            raise RuntimeError("FAISS not available")
+            message = "FAISS not available"
+            raise RuntimeError(message)
         target_index = faiss.index_gpu_to_cpu(self._index) if self.gpu else self._index
         faiss.write_index(target_index, index_uri)
 
     def load(self, index_uri: str, idmap_uri: str | None = None) -> None:
         """Load.
 
-        Args:
-            index_uri (str): TODO.
-            idmap_uri (str | None): TODO.
+        Parameters
+        ----------
+        index_uri : str
+            TODO.
+        idmap_uri : str | None
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         if self._faiss is None:
             # load fallback matrix
@@ -196,7 +229,8 @@ class FaissGpuIndex:
             return
         faiss = self._faiss
         if faiss is None:
-            raise RuntimeError("FAISS not available")
+            message = "FAISS not available"
+            raise RuntimeError(message)
         cpu_index = faiss.read_index(index_uri)
         self._ensure_resources()
         if self.gpu:

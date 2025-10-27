@@ -1,5 +1,5 @@
-"""
-Generate package-level README.md files that:
+"""Generate package-level README.md files for public APIs.
+
 - List top-level classes/functions
 - Provide deep links to their start line
 - Are compatible with local editor links or GitHub permalinks
@@ -10,6 +10,8 @@ import os
 import subprocess
 from collections.abc import Iterable
 from pathlib import Path
+
+from griffe import Object
 
 try:
     from griffe.loader import GriffeLoader
@@ -25,7 +27,8 @@ EDITOR = os.environ.get("DOCS_EDITOR", "vscode")
 ENV_PKGS = os.environ.get("DOCS_PKG")
 
 
-def git_sha():
+def git_sha() -> str:
+    """Return the commit SHA used for GitHub permalinks."""
     try:
         return subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=str(ROOT), text=True
@@ -40,11 +43,41 @@ SHA = git_sha()
 
 
 def gh_url(rel: str, start: int, end: int | None) -> str:
+    """Return a GitHub permalink for the given repository path.
+
+    Parameters
+    ----------
+    rel : str
+        Repository-relative path to the file.
+    start : int
+        Starting line number (1-based).
+    end : int | None
+        Optional ending line number (inclusive).
+
+    Returns
+    -------
+    str
+        GitHub URL pointing at the selected lines.
+    """
     rng = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel}{rng}"
 
 
 def editor_url(abs_path: Path, start: int) -> str | None:
+    """Return an editor deeplink for the configured local editor.
+
+    Parameters
+    ----------
+    abs_path : Path
+        Absolute file path.
+    start : int
+        Starting line number (1-based).
+
+    Returns
+    -------
+    str | None
+        Editor URL or ``None`` if no handler exists.
+    """
     if EDITOR == "vscode":
         return f"vscode://file/{abs_path}:{start}:1"
     if EDITOR == "pycharm":
@@ -52,7 +85,8 @@ def editor_url(abs_path: Path, start: int) -> str | None:
     return None
 
 
-def iter_packages():
+def iter_packages() -> list[str]:
+    """Return the packages to document (respecting DOCS_PKG overrides)."""
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     return detect_packages() or [detect_primary()]
@@ -61,7 +95,8 @@ def iter_packages():
 loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
 
 
-def summarize(node) -> str:
+def summarize(node: Object) -> str:
+    """Return the first sentence of the node docstring, if available."""
     doc = getattr(node, "docstring", None)
     if doc and getattr(doc, "value", None):
         summary = doc.value.strip().splitlines()[0].strip()
@@ -69,12 +104,14 @@ def summarize(node) -> str:
     return ""
 
 
-def is_public(node) -> bool:
+def is_public(node: Object) -> bool:
+    """Return True when the node name does not start with an underscore."""
     name = getattr(node, "name", "")
     return not name.startswith("_")
 
 
-def get_source_url(node) -> str | None:
+def get_source_url(node: Object) -> str | None:
+    """Return an external permalink for the given node."""
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -88,7 +125,8 @@ def get_source_url(node) -> str | None:
     return editor_url(abs_path, start)
 
 
-def get_relative_url(node, readme_dir: Path) -> str | None:
+def get_relative_url(node: Object, readme_dir: Path) -> str | None:
+    """Return a repository-relative link that works inside the README."""
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -104,12 +142,26 @@ def get_relative_url(node, readme_dir: Path) -> str | None:
     return f"{relative.as_posix()}{anchor}"
 
 
-def iter_public_members(node) -> Iterable:
+def iter_public_members(node: Object) -> Iterable[Object]:
+    """Yield public members of a module or class (skipping private names)."""
     members = getattr(node, "members", {})
     return sorted([m for m in members.values() if is_public(m)], key=lambda child: child.name)
 
 
-def render_member(node, *, indent: int, lines: list[str], readme_dir: Path) -> None:
+def render_member(node: Object, *, indent: int, lines: list[str], readme_dir: Path) -> None:
+    """Append a formatted bullet for the given node to the README contents.
+
+    Parameters
+    ----------
+    node : Object
+        Symbol to render.
+    indent : int
+        Current bullet indentation width.
+    lines : list[str]
+        Accumulated README lines.
+    readme_dir : Path
+        Directory that will contain the README (used for relative links).
+    """
     url = get_source_url(node)
     rel_url = get_relative_url(node, readme_dir)
     if not url and not rel_url:
@@ -140,7 +192,8 @@ def render_member(node, *, indent: int, lines: list[str], readme_dir: Path) -> N
             render_member(child, indent=indent + 2, lines=lines, readme_dir=readme_dir)
 
 
-def write_readme(node):
+def write_readme(node: Object) -> None:
+    """Generate or overwrite the README for the given package node."""
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"
     lines = [

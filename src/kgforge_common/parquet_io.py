@@ -26,11 +26,15 @@ class ParquetVectorWriter:
     def dense_schema(dim: int) -> pa.schema:
         """Dense schema.
 
-        Args:
-            dim (int): TODO.
+        Parameters
+        ----------
+        dim : int
+            TODO.
 
-        Returns:
-            pa.schema: TODO.
+        Returns
+        -------
+        pa.schema
+            TODO.
         """
         return pa.schema(
             [
@@ -44,11 +48,13 @@ class ParquetVectorWriter:
             ]
         )
 
-    def __init__(self, root: str):
+    def __init__(self, root: str) -> None:
         """Init.
 
-        Args:
-            root (str): TODO.
+        Parameters
+        ----------
+        root : str
+            TODO.
         """
         self.root = Path(root)
 
@@ -62,15 +68,23 @@ class ParquetVectorWriter:
     ) -> str:
         """Write dense.
 
-        Args:
-            model (str): TODO.
-            run_id (str): TODO.
-            dim (int): TODO.
-            records (Iterable[Tuple[str, List[float], float]]): TODO.
-            shard (int): TODO.
+        Parameters
+        ----------
+        model : str
+            TODO.
+        run_id : str
+            TODO.
+        dim : int
+            TODO.
+        records : Iterable[Tuple[str, List[float], float]]
+            TODO.
+        shard : int
+            TODO.
 
-        Returns:
-            str: TODO.
+        Returns
+        -------
+        str
+            TODO.
         """
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
@@ -101,8 +115,10 @@ class ParquetVectorWriter:
     def splade_schema() -> pa.schema:
         """Splade schema.
 
-        Returns:
-            pa.schema: TODO.
+        Returns
+        -------
+        pa.schema
+            TODO.
         """
         return pa.schema(
             [
@@ -125,14 +141,21 @@ class ParquetVectorWriter:
     ) -> str:
         """Write splade.
 
-        Args:
-            model (str): TODO.
-            run_id (str): TODO.
-            records (Iterable[Tuple[str, List[int], List[float]]]): TODO.
-            shard (int): TODO.
+        Parameters
+        ----------
+        model : str
+            TODO.
+        run_id : str
+            TODO.
+        records : Iterable[Tuple[str, List[int], List[float]]]
+            TODO.
+        shard : int
+            TODO.
 
-        Returns:
-            str: TODO.
+        Returns
+        -------
+        str
+            TODO.
         """
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
@@ -167,8 +190,10 @@ class ParquetChunkWriter:
     def chunk_schema() -> pa.schema:
         """Chunk schema.
 
-        Returns:
-            pa.schema: TODO.
+        Returns
+        -------
+        pa.schema
+            TODO.
         """
         return pa.schema(
             [
@@ -193,13 +218,17 @@ class ParquetChunkWriter:
             ]
         )
 
-    def __init__(self, root: str, model: str = "docling_hybrid", run_id: str = "dev"):
+    def __init__(self, root: str, model: str = "docling_hybrid", run_id: str = "dev") -> None:
         """Init.
 
-        Args:
-            root (str): TODO.
-            model (str): TODO.
-            run_id (str): TODO.
+        Parameters
+        ----------
+        root : str
+            TODO.
+        model : str
+            TODO.
+        run_id : str
+            TODO.
         """
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
@@ -207,11 +236,15 @@ class ParquetChunkWriter:
     def write(self, rows: Iterable[dict[str, Any]]) -> str:
         """Write.
 
-        Args:
-            rows (Iterable[Dict[str, Any]]): TODO.
+        Parameters
+        ----------
+        rows : Iterable[Dict[str, Any]]
+            TODO.
 
-        Returns:
-            str: TODO.
+        Returns
+        -------
+        str
+            TODO.
         """
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(

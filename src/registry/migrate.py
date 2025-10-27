@@ -2,7 +2,7 @@
 
 NavMap:
 - apply: Apply.
-- main: Main.
+- main: Run the CLI entry point for migration commands.
 """
 
 from __future__ import annotations
@@ -16,12 +16,17 @@ import duckdb
 def apply(db: str, migrations_dir: str) -> None:
     """Apply.
 
-    Args:
-        db (str): TODO.
-        migrations_dir (str): TODO.
+    Parameters
+    ----------
+    db : str
+        TODO.
+    migrations_dir : str
+        TODO.
 
-    Returns:
-        None: TODO.
+    Returns
+    -------
+    None
+        TODO.
     """
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
@@ -30,7 +35,7 @@ def apply(db: str, migrations_dir: str) -> None:
 
 
 def main() -> None:
-    """Main."""
+    """Run the CLI entry point for migration commands."""
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
     a = sp.add_parser("apply")

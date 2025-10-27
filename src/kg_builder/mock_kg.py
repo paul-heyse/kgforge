@@ -19,42 +19,56 @@ class MockKG:
         self.neighbors: dict[str, set[str]] = {}
 
     def add_mention(self, chunk_id: str, concept_id: str) -> None:
-        """Add mention.
+        """Add a mention linking a chunk to a concept.
 
-        Args:
-            chunk_id (str): TODO.
-            concept_id (str): TODO.
+        Parameters
+        ----------
+        chunk_id : str
+            TODO.
+        concept_id : str
+            TODO.
         """
         self.chunk2concepts.setdefault(chunk_id, set()).add(concept_id)
 
     def add_edge(self, a: str, b: str) -> None:
-        """Add edge.
+        """Add an undirected edge between two concepts.
 
-        Args:
-            a (str): TODO.
-            b (str): TODO.
+        Parameters
+        ----------
+        a : str
+            TODO.
+        b : str
+            TODO.
         """
         self.neighbors.setdefault(a, set()).add(b)
         self.neighbors.setdefault(b, set()).add(a)
 
     def linked_concepts(self, chunk_id: str) -> list[str]:
-        """Linked concepts.
+        """Return the concepts linked to a chunk identifier.
 
-        Args:
-            chunk_id (str): TODO.
+        Parameters
+        ----------
+        chunk_id : str
+            TODO.
 
-        Returns:
-            List[str]: TODO.
+        Returns
+        -------
+        list[str]
+            TODO.
         """
         return sorted(self.chunk2concepts.get(chunk_id, set()))
 
     def one_hop(self, concept_id: str) -> list[str]:
-        """One hop.
+        """Return one-hop neighbours for a concept identifier.
 
-        Args:
-            concept_id (str): TODO.
+        Parameters
+        ----------
+        concept_id : str
+            TODO.
 
-        Returns:
-            List[str]: TODO.
+        Returns
+        -------
+        list[str]
+            TODO.
         """
         return sorted(self.neighbors.get(concept_id, set()))

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-python3.13 -m venv .venv
-source .venv/bin/activate
+python3.13 -m venv .kgforge-venv
+source .kgforge-venv/bin/activate
 pip install --upgrade pip wheel
 pip install -e ".[search,docs]"
 

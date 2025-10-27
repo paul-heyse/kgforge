@@ -1,7 +1,5 @@
 """Module for observability.metrics."""
 
-from typing import Any
-
 try:
     from prometheus_client import Counter, Gauge, Histogram
 except Exception:  # pragma: no cover - minimal no-op fallbacks
@@ -9,25 +7,21 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
     class _Noop:
         """Minimal stand-in when Prometheus client is unavailable."""
 
-        def labels(self, *args: Any, **kwargs: Any) -> "_Noop":
+        def labels(self, *args: object, **kwargs: object) -> "_Noop":
             """Return self to mimic the Prometheus API."""
-
             return self
 
-        def observe(self, *args: Any, **kwargs: Any) -> None:
+        def observe(self, *args: object, **kwargs: object) -> None:
             """Ignore observation calls."""
+            return
 
-            return None
-
-        def inc(self, *args: Any, **kwargs: Any) -> None:
+        def inc(self, *args: object, **kwargs: object) -> None:
             """Ignore counter increments."""
+            return
 
-            return None
-
-        def set(self, *args: Any, **kwargs: Any) -> None:
+        def set(self, *args: object, **kwargs: object) -> None:
             """Ignore gauge updates."""
-
-            return None
+            return
 
     Counter = Histogram = Gauge = _Noop
 

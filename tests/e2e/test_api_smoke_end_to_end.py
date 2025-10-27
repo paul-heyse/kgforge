@@ -7,7 +7,6 @@ from kgforge.search_client import KGForgeClient
 
 
 def test_fixture_and_api_smoke():
-
     os.environ["KGF_FIXTURE_ROOT"] = "/tmp/kgf_fixture"
     os.environ["KGF_FIXTURE_DB"] = "/tmp/kgf_fixture/catalog.duckdb"
     fixture_pipeline(root="/tmp/kgf_fixture", db_path="/tmp/kgf_fixture/catalog.duckdb")

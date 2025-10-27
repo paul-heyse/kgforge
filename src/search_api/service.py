@@ -13,21 +13,26 @@ def rrf_fuse(
     dense: list[tuple[str, float]], sparse: list[tuple[str, float]], k: int = 60
 ) -> list[tuple[str, float]]:
     """Reciprocal Rank Fusion skeleton."""
-    # TODO: implement stable RRF across rankers
+    # NOTE: implement stable RRF across rankers when ranker outputs are wired
     return []
 
 
 def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[str, float]]:
     """Apply kg boosts.
 
-    Args:
-        fused (List[Tuple[str, float]]): TODO.
-        query (str): TODO.
+    Parameters
+    ----------
+    fused : List[Tuple[str, float]]
+        TODO.
+    query : str
+        TODO.
 
-    Returns:
-        List[Tuple[str, float]]: TODO.
+    Returns
+    -------
+    List[Tuple[str, float]]
+        TODO.
     """
-    # TODO: apply boosts for direct & one-hop concept matches
+    # NOTE: apply boosts for direct & one-hop concept matches once KG signals exist
     return fused
 
 
@@ -36,12 +41,17 @@ def mmr_deduplicate(
 ) -> list[tuple[str, float]]:
     """Mmr deduplicate.
 
-    Args:
-        results (List[Tuple[str, float]]): TODO.
-        lambda_ (float): TODO.
+    Parameters
+    ----------
+    results : List[Tuple[str, float]]
+        TODO.
+    lambda_ : float
+        TODO.
 
-    Returns:
-        List[Tuple[str, float]]: TODO.
+    Returns
+    -------
+    List[Tuple[str, float]]
+        TODO.
     """
-    # TODO: diversity via MMR at doc-level
+    # NOTE: add doc-level diversity via MMR when result scoring is available
     return results

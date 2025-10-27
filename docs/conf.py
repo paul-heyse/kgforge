@@ -1,11 +1,12 @@
-"""
-Agent-first Sphinx configuration
+"""Agent-first Sphinx configuration.
+
 - Static API docs via AutoAPI (no imports)
 - Markdown via MyST
 - Per-symbol "open in editor" links (linkcode + Griffe)
 - Viewable source with line numbers (viewcode)
 - JSON builder for machine-readable output
-This file is robust to different repo shapes (src/PKG or PKG at root).
+
+This file is robust to different repo shapes (``src/<pkg>`` or ``<pkg>`` at root).
 """
 
 import collections
@@ -13,12 +14,15 @@ import inspect
 import os
 import subprocess
 import sys
+from collections.abc import Callable, Mapping
 from pathlib import Path
 
 from astroid import builder as astroid_builder
 from astroid import manager as astroid_manager
-from autoapi import _parser as autoapi_parser  # type: ignore
-from sphinxcontrib.serializinghtml import jsonimpl  # type: ignore
+from astroid.nodes import Module as AstroidModule
+from autoapi import _parser as autoapi_parser  # type: ignore[attr-defined]
+from griffe import Module as GriffeModule
+from sphinxcontrib.serializinghtml import jsonimpl  # type: ignore[attr-defined]
 
 # --- Project metadata (override via env if you like)
 project = os.environ.get("PROJECT_NAME", "KGForge")
@@ -31,14 +35,15 @@ SRC_DIR = ROOT / "src"
 TOOLS_DIR = ROOT / "tools"
 
 
-def _detect_pkg():
-    # pick the first package dir that has an __init__.py, preferring src/
-    candidates = []
+def _detect_pkg() -> str:
+    """Return the primary package name, preferring ``src/`` packages."""
+    candidates: list[str] = []
     if SRC_DIR.exists():
         candidates += [p.parent.name for p in SRC_DIR.glob("*/__init__.py")]
     candidates += [p.parent.name for p in ROOT.glob("*/__init__.py") if p.parent.name != "docs"]
     if not candidates:
-        raise RuntimeError("No Python package found under src/ or project root")
+        message = "No Python package found under src/ or project root"
+        raise RuntimeError(message)
     # Prefer lowercase names if any; else first found
     lowers = [c for c in candidates if c.islower()]
     return lowers[0] if lowers else candidates[0]
@@ -77,6 +82,9 @@ extensions = [
     "sphinxcontrib.mermaid",
 ]
 
+napoleon_google_docstring = False
+napoleon_numpy_docstring = True
+
 # Use whatever theme you prefer; pydata_sphinx_theme is widely used.
 html_theme = os.environ.get("SPHINX_THEME", "pydata_sphinx_theme")
 
@@ -100,7 +108,9 @@ autoapi_options = [
 autoapi_ignore: list[str] = []
 
 
-def _autoapi_parse_file(self, file_path, condition):  # pragma: no cover - compatibility shim
+def _autoapi_parse_file(
+    self: autoapi_parser.Parser, file_path: str, condition: Callable[[str], bool]
+) -> AstroidModule:  # pragma: no cover - compatibility shim
     directory, filename = os.path.split(file_path)
     module_parts = []
     if filename not in {"__init__.py", "__init__.pyi"}:
@@ -138,7 +148,7 @@ suppress_warnings = ["myst.header", "misc.restructuredtext"]
 _json_default = jsonimpl.json.JSONEncoder.default
 
 
-def _json_safe_default(self, obj):  # pragma: no cover - builder patch
+def _json_safe_default(self: jsonimpl.json.JSONEncoder, obj: object) -> object:  # pragma: no cover
     if obj.__class__.__name__ == "_lru_cache_wrapper":
         return repr(obj)
     return _json_default(self, obj)
@@ -153,11 +163,11 @@ except ImportError:  # pragma: no cover - compatibility shim
     from griffe import GriffeLoader  # type: ignore[attr-defined]
 
 _loader = GriffeLoader(search_paths=[str(SRC_DIR if SRC_DIR.exists() else ROOT)])
-_MODULE_CACHE = {}
+_MODULE_CACHE: dict[str, GriffeModule | None] = {}
 PKG = _PACKAGES[0]
 
 
-def _get_root(module: str | None):
+def _get_root(module: str | None) -> GriffeModule | None:
     top = module.split(".", 1)[0] if module else PKG
     if top not in _MODULE_CACHE:
         try:
@@ -167,8 +177,8 @@ def _get_root(module: str | None):
     return _MODULE_CACHE[top]
 
 
-def _lookup(module: str, fullname: str):
-    """Return (abs_path, start, end) of a symbol via Griffe; None if not found."""
+def _lookup(module: str, fullname: str) -> tuple[str, int, int] | None:
+    """Return ``(abs_path, start, end)`` for the requested symbol."""
     root = _get_root(module)
     if root is None:
         return None
@@ -203,7 +213,7 @@ LINK_MODE = os.environ.get("DOCS_LINK_MODE", "editor").lower()
 EDITOR = os.environ.get("DOCS_EDITOR", "vscode")
 
 
-def _git_sha():
+def _git_sha() -> str:
     try:
         return subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=str(ROOT), text=True
@@ -212,7 +222,7 @@ def _git_sha():
         return os.environ.get("DOCS_GITHUB_SHA", "main")
 
 
-def _github_url(relpath, start, end):
+def _github_url(relpath: str, start: int, end: int | None) -> str:
     org = os.environ.get("DOCS_GITHUB_ORG", "your-org")
     repo = os.environ.get("DOCS_GITHUB_REPO", "your-repo")
     sha = _git_sha()
@@ -220,20 +230,21 @@ def _github_url(relpath, start, end):
     return f"https://github.com/{org}/{repo}/blob/{sha}/{relpath}{rng}"
 
 
-def linkcode_resolve(domain, info):
-    if domain != "py" or not info.get("module"):
+def linkcode_resolve(domain: str, info: Mapping[str, str | None]) -> str | None:
+    """Resolve Sphinx linkcode directives to editor or GitHub URLs."""
+    module_name = info.get("module")
+    if domain != "py" or not module_name:
         return None
-    res = _lookup(info["module"], info.get("fullname", ""))
+    fullname = info.get("fullname", "")
+    res = _lookup(module_name, fullname)
     if not res:
         return None
     abs_path, start, end = res
     if LINK_MODE == "github":
-        # compute relative path from repo root
         rel = os.path.relpath(abs_path, ROOT)
         return _github_url(rel, start, end)
-    # default: open in editor
     if EDITOR == "vscode":
         return f"vscode://file/{abs_path}:{start}:1"
-    elif EDITOR == "pycharm":
+    if EDITOR == "pycharm":
         return f"pycharm://open?file={abs_path}&line={start}"
     return None

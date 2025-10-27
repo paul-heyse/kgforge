@@ -17,6 +17,8 @@ import textwrap
 from collections.abc import Iterable
 from pathlib import Path
 
+from griffe import Object
+
 try:  # Prefer modern import path; fall back for older Griffe.
     from griffe.loader import GriffeLoader
 except ImportError:  # pragma: no cover - compatibility shim
@@ -29,6 +31,7 @@ SRC = ROOT / "src"
 
 
 def iter_packages() -> list[str]:
+    """Iterate packages specified via environment or auto-detected."""
     env_pkgs = os.environ.get("DOCS_PKG")
     if env_pkgs:
         return [pkg.strip() for pkg in env_pkgs.split(",") if pkg.strip()]
@@ -38,7 +41,8 @@ def iter_packages() -> list[str]:
     return [detect_primary()]
 
 
-def summarize(node) -> str:
+def summarize(node: Object) -> str:
+    """Return a truncated first sentence from the node docstring."""
     doc = getattr(node, "docstring", None)
     if doc and getattr(doc, "value", None):
         first = doc.value.strip().splitlines()[0].strip()
@@ -47,12 +51,14 @@ def summarize(node) -> str:
     return ""
 
 
-def iter_public_members(node) -> Iterable:
+def iter_public_members(node: Object) -> Iterable[Object]:
+    """Yield public members for the provided module node."""
     members = getattr(node, "members", {})
     return [m for m in members.values() if not getattr(m, "name", "").startswith("_")]
 
 
-def build_nav_lines(module) -> list[str]:
+def build_nav_lines(module: Object) -> list[str]:
+    """Construct nav-map docstring lines for a module."""
     lines = [f"Module for {module.path}."]
     entries: list[str] = []
     for member in iter_public_members(module):
@@ -73,6 +79,20 @@ def build_nav_lines(module) -> list[str]:
 
 
 def rewrite_docstring(file_path: Path, nav_lines: list[str]) -> None:
+    """Rewrite Docstring.
+
+    Parameters
+    ----------
+    file_path : Path
+        TODO.
+    nav_lines : list[str]
+        TODO.
+
+    Returns
+    -------
+    None
+        TODO.
+    """
     text = file_path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if not tree.body:
@@ -94,7 +114,8 @@ def rewrite_docstring(file_path: Path, nav_lines: list[str]) -> None:
         file_path.write_text(new_text, encoding="utf-8")
 
 
-def update_module_doc(module) -> None:
+def update_module_doc(module: Object) -> None:
+    """Rewrite the module docstring with a nav map if we can locate the file."""
     rel = getattr(module, "relative_package_filepath", None)
     if not rel:
         return
@@ -107,6 +128,7 @@ def update_module_doc(module) -> None:
 
 
 def main() -> None:
+    """Run the nav-map regeneration entry point."""
     search_root = SRC if SRC.exists() else ROOT
     loader = GriffeLoader(search_paths=[str(search_root)])
     for pkg in iter_packages():

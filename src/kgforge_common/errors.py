@@ -4,10 +4,10 @@ NavMap:
 - DownloadError: Raised when an external download fails.
 - UnsupportedMIMEError: Raised when an unsupported MIME type is encountered.
 - DoclingError: Base Docling processing error.
-- OCRTimeout: Raised when OCR operations exceed time limits.
+- OCRTimeoutError: Raised when OCR operations exceed time limits.
 - ChunkingError: Raised when chunk generation fails.
 - EmbeddingError: Raised when embedding generation fails.
-- SpladeOOM: Raised when SPLADE runs out of memory.
+- SpladeOOMError: Raised when SPLADE runs out of memory.
 - IndexBuildError: Raised when index construction fails.
 - OntologyParseError: Raised when ontology parsing fails.
 - LinkerCalibrationError: Raised when linker calibration cannot be performed.
@@ -33,7 +33,7 @@ class DoclingError(Exception):
     ...
 
 
-class OCRTimeout(Exception):
+class OCRTimeoutError(Exception):
     """Raised when OCR operations exceed time limits."""
 
     ...
@@ -51,7 +51,7 @@ class EmbeddingError(Exception):
     ...
 
 
-class SpladeOOM(Exception):
+class SpladeOOMError(Exception):
     """Raised when SPLADE runs out of memory."""
 
     ...

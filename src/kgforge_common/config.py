@@ -14,11 +14,15 @@ import yaml
 def load_config(path: str) -> dict[str, Any]:
     """Load config.
 
-    Args:
-        path (str): TODO.
+    Parameters
+    ----------
+    path : str
+        TODO.
 
-    Returns:
-        Dict[str, Any]: TODO.
+    Returns
+    -------
+    Dict[str, Any]
+        TODO.
     """
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f)

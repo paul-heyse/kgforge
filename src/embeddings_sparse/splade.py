@@ -31,14 +31,19 @@ class SPLADEv3Encoder:
         device: str = "cuda",
         topk: int = 256,
         max_seq_len: int = 512,
-    ):
+    ) -> None:
         """Init.
 
-        Args:
-            model_id (str): TODO.
-            device (str): TODO.
-            topk (int): TODO.
-            max_seq_len (int): TODO.
+        Parameters
+        ----------
+        model_id : str
+            TODO.
+        device : str
+            TODO.
+        topk : int
+            TODO.
+        max_seq_len : int
+            TODO.
         """
         self.model_id = model_id
         self.device = device
@@ -48,18 +53,23 @@ class SPLADEv3Encoder:
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
         """Encode.
 
-        Args:
-            texts (List[str]): TODO.
+        Parameters
+        ----------
+        texts : List[str]
+            TODO.
 
-        Returns:
-            List[Tuple[list[int], list[float]]]: TODO.
+        Returns
+        -------
+        List[Tuple[list[int], list[float]]]
+            TODO.
         """
         # Placeholder in this skeleton. Real impl would run the HF model and build
         # top-k (token_id, weight) pairs from the encoder output.
-        raise NotImplementedError(
+        message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
         )
+        raise NotImplementedError(message)
 
 
 class PureImpactIndex:
@@ -69,11 +79,13 @@ class PureImpactIndex:
     - Substitutes a simple tokenizer plus weighting scheme for the neural encoder.
     """
 
-    def __init__(self, index_dir: str):
+    def __init__(self, index_dir: str) -> None:
         """Init.
 
-        Args:
-            index_dir (str): TODO.
+        Parameters
+        ----------
+        index_dir : str
+            TODO.
         """
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
@@ -84,43 +96,51 @@ class PureImpactIndex:
     def _tokenize(text: str) -> list[str]:
         """Tokenize.
 
-        Args:
-            text (str): TODO.
+        Parameters
+        ----------
+        text : str
+            TODO.
 
-        Returns:
-            List[str]: TODO.
+        Returns
+        -------
+        List[str]
+            TODO.
         """
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Build.
 
-        Args:
-            docs_iterable (Iterable[Tuple[str, Dict]]): TODO.
+        Parameters
+        ----------
+        docs_iterable : Iterable[Tuple[str, Dict]]
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
-        N = 0
+        doc_count = 0
         for doc_id, fields in docs_iterable:
             text = " ".join(
                 [fields.get("title", ""), fields.get("section", ""), fields.get("body", "")]
             )
             toks = self._tokenize(text)
-            N += 1
+            doc_count += 1
             c = Counter(toks)
             for tok, tf in c.items():
                 df[tok] += 1
                 postings[tok][doc_id] = math.log1p(tf)
         # compute idf and impact weights
-        self.N = N
+        self.N = doc_count
         self.df = dict(df)
         self.postings = {
             tok: {
-                doc: w * math.log((N - df[tok] + 0.5) / (df[tok] + 0.5) + 1.0)
+                doc: w * math.log((doc_count - df[tok] + 0.5) / (df[tok] + 0.5) + 1.0)
                 for doc, w in docs.items()
             }
             for tok, docs in postings.items()
@@ -135,8 +155,10 @@ class PureImpactIndex:
     def load(self) -> None:
         """Load.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         with open(os.path.join(self.index_dir, "impact.pkl"), "rb") as f:
             data = pickle.load(f)
@@ -147,12 +169,17 @@ class PureImpactIndex:
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
         """Search.
 
-        Args:
-            query (str): TODO.
-            k (int): TODO.
+        Parameters
+        ----------
+        query : str
+            TODO.
+        k : int
+            TODO.
 
-        Returns:
-            List[Tuple[str, float]]: TODO.
+        Returns
+        -------
+        List[Tuple[str, float]]
+            TODO.
         """
         toks = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -171,11 +198,13 @@ class LuceneImpactIndex:
     Requires Pyserini build step that writes an impact index on disk.
     """
 
-    def __init__(self, index_dir: str):
+    def __init__(self, index_dir: str) -> None:
         """Init.
 
-        Args:
-            index_dir (str): TODO.
+        Parameters
+        ----------
+        index_dir : str
+            TODO.
         """
         self.index_dir = index_dir
         self._searcher: Any | None = None
@@ -186,23 +215,30 @@ class LuceneImpactIndex:
             return
         try:
             from pyserini.search.lucene import LuceneImpactSearcher
-        except Exception as e:
-            raise RuntimeError("Pyserini not available for SPLADE impact search") from e
+        except Exception as exc:
+            message = "Pyserini not available for SPLADE impact search"
+            raise RuntimeError(message) from exc
         self._searcher = LuceneImpactSearcher(self.index_dir)
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
         """Search.
 
-        Args:
-            query (str): TODO.
-            k (int): TODO.
+        Parameters
+        ----------
+        query : str
+            TODO.
+        k : int
+            TODO.
 
-        Returns:
-            List[Tuple[str, float]]: TODO.
+        Returns
+        -------
+        List[Tuple[str, float]]
+            TODO.
         """
         self._ensure()
         if self._searcher is None:
-            raise RuntimeError("Lucene impact searcher not initialized")
+            message = "Lucene impact searcher not initialized"
+            raise RuntimeError(message)
         hits = self._searcher.search(query, k=k)  # expects query to be SPLADE-encoded string
         return [(h.docid, float(h.score)) for h in hits]
 
@@ -210,9 +246,12 @@ class LuceneImpactIndex:
 def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIndex:
     """Get splade.
 
-    Args:
-        backend (str): TODO.
-        index_dir (str): TODO.
+    Parameters
+    ----------
+    backend : str
+        TODO.
+    index_dir : str
+        TODO.
     """
     if backend == "lucene":
         try:

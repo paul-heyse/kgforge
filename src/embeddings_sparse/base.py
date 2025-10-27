@@ -18,7 +18,6 @@ class SparseEncoder(Protocol):
 
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
         """Return sparse encodings for the given texts."""
-
         ...
 
 
@@ -27,12 +26,10 @@ class SparseIndex(Protocol):
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Build the index from the supplied documents."""
-
         ...
 
     def search(
         self, query: str, k: int, fields: Mapping[str, str] | None = None
     ) -> list[tuple[str, float]]:
         """Search the index and return (id, score) tuples."""
-
         ...

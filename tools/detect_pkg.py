@@ -1,3 +1,7 @@
+"""Utilities to detect package names for documentation generation."""
+
+from __future__ import annotations
+
 import sys
 from pathlib import Path
 
@@ -5,8 +9,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 
 
-def _candidate_names():
-    names = set()
+def _candidate_names() -> list[str]:
+    """Collect potential top-level package names."""
+    names: set[str] = set()
     if SRC.exists():
         names.update(p.parent.name for p in SRC.glob("*/__init__.py"))
     names.update(
@@ -20,14 +25,17 @@ def _candidate_names():
     return sorted(names)
 
 
-def detect_packages():
-    lowers = [c for c in _candidate_names() if c.islower()]
-    base = lowers or _candidate_names()
+def detect_packages() -> list[str]:
+    """Return package names ordered with a KGForge-first preference."""
+    candidates = _candidate_names()
+    lowers = [c for c in candidates if c.islower()]
+    base = lowers or candidates
     preferred = [c for c in base if "kgforge" in c]
     return preferred + [c for c in base if c not in preferred]
 
 
-def detect_primary():
+def detect_primary() -> str:
+    """Return the primary package name (first from detect_packages)."""
     packages = detect_packages()
     return packages[0]
 

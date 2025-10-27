@@ -16,18 +16,21 @@ def canonicalize_text(blocks: list[str]) -> str:
     def norm(s: str) -> str:
         """Norm.
 
-        Args:
-            s (str): TODO.
+        Parameters
+        ----------
+        s : str
+            TODO.
 
-        Returns:
-            str: TODO.
+        Returns
+        -------
+        str
+            TODO.
         """
         s = unicodedata.normalize("NFC", s)
         s = s.replace("\r\n", "\n").replace("\r", "\n")
         s = re.sub(r"[\u2022\u25E6\u2013]", "-", s)  # bullets/dashes
         s = re.sub(r"[\x00-\x1F]", " ", s)
-        s = re.sub(r"\s+", " ", s).strip()
-        return s
+        return re.sub(r"\s+", " ", s).strip()
 
     normed = [norm(b) for b in blocks if b.strip()]
     return "\n".join(normed)

@@ -1,7 +1,7 @@
 [project]
-name = "KGForge"
+name = "kgforge"
 version = "0.1.0"
-description = "KGForge"
+description = "kgforge"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -236,10 +236,104 @@ target-version = ["py312"]  # black currently supports up to py312; code runs on
 [tool.ruff]
 line-length = 100
 target-version = "py313"
+required-version = ">=0.14.2"
+output-format = "grouped"
+src = ["src"]
+extend-exclude = [
+    "docs/_build/**",
+    "site/**",
+    "src/KGForge.egg-info/**",
+    "KGForge.egg-info/**",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B", "UP", "SIM"]
-ignore = ["E203"]
+select = [
+    "F",
+    "E4",
+    "E7",
+    "E9",
+    "I",
+    "N",
+    "UP",
+    "SIM",
+    "C4",
+    "B",
+    "RUF",
+    "ANN",
+    "D",
+    "RET",
+    "RSE",
+    "TRY",
+    "EM",
+    "G",
+    "LOG",
+    "ISC",
+    "TID",
+    "ICN",
+    "TD",
+    "ERA",
+    "PGH",
+    "C90",
+    "PLR",
+]
+ignore = ["Q", "E203"]
+preview = false
+extend-select = ["RUF100"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-branches = 12
+max-returns = 6
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "ANN001",
+    "ANN201",
+    "PLR2004",
+    "N806",
+    "C401",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "docling",
+    "download",
+    "embeddings_dense",
+    "embeddings_sparse",
+    "kg_builder",
+    "kgforge_common",
+    "linking",
+    "observability",
+    "ontology",
+    "orchestration",
+    "registry",
+    "search_api",
+    "search_client",
+    "vectorstore_faiss",
+]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.flake8-import-conventions.aliases]
+numpy = "np"
+pandas = "pd"
+"matplotlib.pyplot" = "plt"
 
 [tool.docs.extensions]
 enabled = [
@@ -328,6 +422,7 @@ emit-build-options    = true  # include only/no-binary flags if you use them
 
 
 [tool.pydocstyle]
+convention = "numpy"
 add-ignore = [
     "D200",
     "D202",
