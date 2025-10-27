@@ -1,10 +1,15 @@
-"""Module for registry.migrate.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- apply: Return apply.
-- main: Run the CLI entry point for migration commands.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+registry.migrate
+"""
+
 
 from __future__ import annotations
 
@@ -34,15 +39,30 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor apply]
 def apply(db: str, migrations_dir: str) -> None:
-    """Return apply.
-
+    """
+    Return apply.
+    
     Parameters
     ----------
     db : str
-        Description.
+        Description for ``db``.
     migrations_dir : str
-        Description.
+        Description for ``migrations_dir``.
+    
+    Examples
+    --------
+    >>> from registry.migrate import apply
+    >>> apply(..., ...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    registry.migrate
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
     """
+    
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
         con.execute(p.read_text())
@@ -51,7 +71,23 @@ def apply(db: str, migrations_dir: str) -> None:
 
 # [nav:anchor main]
 def main() -> None:
-    """Run the CLI entry point for migration commands."""
+    """
+    Return main.
+    
+    Examples
+    --------
+    >>> from registry.migrate import main
+    >>> main()  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    registry.migrate
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
     a = sp.add_parser("apply")

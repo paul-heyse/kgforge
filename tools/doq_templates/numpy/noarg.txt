@@ -1,1 +1,11 @@
-"""Return {{ name|replace('_', ' ') }}."""
+"""Return {{ name|replace('_', ' ') }}.
+
+Returns
+-------
+Any
+    Description.
+
+Examples
+--------
+>>> {{ name }}()
+"""

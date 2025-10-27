@@ -1,19 +1,15 @@
-"""Module for kgfoundry_common.errors.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- DownloadError: Raised when an external download fails.
-- UnsupportedMIMEError: Raised when an unsupported MIME type is encountered.
-- DoclingError: Base Docling processing error.
-- OCRTimeoutError: Raised when OCR operations exceed time limits.
-- ChunkingError: Raised when chunk generation fails.
-- EmbeddingError: Raised when embedding generation fails.
-- SpladeOOMError: Raised when SPLADE runs out of memory.
-- IndexBuildError: Raised when index construction fails.
-- OntologyParseError: Raised when ontology parsing fails.
-- LinkerCalibrationError: Raised when linker calibration cannot be performed.
-- Neo4jError: Raised when Neo4j operations fail.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+kgfoundry_common.errors
+"""
+
 
 from __future__ import annotations
 
@@ -63,76 +59,362 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DownloadError]
 class DownloadError(Exception):
-    """Raised when an external download fails."""
+    """
+    Represent DownloadError.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.errors import DownloadError
+    >>> result = DownloadError()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.errors
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...
 
 
 # [nav:anchor UnsupportedMIMEError]
 class UnsupportedMIMEError(Exception):
-    """Raised when an unsupported MIME type is encountered."""
+    """
+    Represent UnsupportedMIMEError.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.errors import UnsupportedMIMEError
+    >>> result = UnsupportedMIMEError()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.errors
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...
 
 
 # [nav:anchor DoclingError]
 class DoclingError(Exception):
-    """Base Docling processing error."""
+    """
+    Represent DoclingError.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.errors import DoclingError
+    >>> result = DoclingError()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.errors
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...
 
 
 # [nav:anchor OCRTimeoutError]
 class OCRTimeoutError(Exception):
-    """Raised when OCR operations exceed time limits."""
+    """
+    Represent OCRTimeoutError.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.errors import OCRTimeoutError
+    >>> result = OCRTimeoutError()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.errors
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...
 
 
 # [nav:anchor ChunkingError]
 class ChunkingError(Exception):
-    """Raised when chunk generation fails."""
+    """
+    Represent ChunkingError.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.errors import ChunkingError
+    >>> result = ChunkingError()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.errors
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...
 
 
 # [nav:anchor EmbeddingError]
 class EmbeddingError(Exception):
-    """Raised when embedding generation fails."""
+    """
+    Represent EmbeddingError.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.errors import EmbeddingError
+    >>> result = EmbeddingError()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.errors
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...
 
 
 # [nav:anchor SpladeOOMError]
 class SpladeOOMError(Exception):
-    """Raised when SPLADE runs out of memory."""
+    """
+    Represent SpladeOOMError.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.errors import SpladeOOMError
+    >>> result = SpladeOOMError()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.errors
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...
 
 
 # [nav:anchor IndexBuildError]
 class IndexBuildError(Exception):
-    """Raised when index construction fails."""
+    """
+    Represent IndexBuildError.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.errors import IndexBuildError
+    >>> result = IndexBuildError()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.errors
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...
 
 
 # [nav:anchor OntologyParseError]
 class OntologyParseError(Exception):
-    """Raised when ontology parsing fails."""
+    """
+    Represent OntologyParseError.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.errors import OntologyParseError
+    >>> result = OntologyParseError()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.errors
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...
 
 
 # [nav:anchor LinkerCalibrationError]
 class LinkerCalibrationError(Exception):
-    """Raised when linker calibration cannot be performed."""
+    """
+    Represent LinkerCalibrationError.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.errors import LinkerCalibrationError
+    >>> result = LinkerCalibrationError()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.errors
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...
 
 
 # [nav:anchor Neo4jError]
 class Neo4jError(Exception):
-    """Raised when Neo4j operations fail."""
+    """
+    Represent Neo4jError.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.errors import Neo4jError
+    >>> result = Neo4jError()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.errors
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...

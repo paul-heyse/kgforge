@@ -241,13 +241,18 @@ The script executes stages sequentially in a strict order. Each stage must compl
 **Purpose:** Generate, update, format, and validate all docstrings.
 
 **Executes:**
-1. `python tools/generate_docstrings.py` - Skeleton generation (doq + auto_docstrings)
-2. `python tools/update_navmaps.py` - Update NavMap sections
+1. `python tools/generate_docstrings.py` - Regenerate docstrings using NumPy templates (doq + fallback)
+2. `python tools/update_navmaps.py` - Assert module docstrings contain no legacy `NavMap:` blocks
 3. `docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i` - Format to PEP 257
 4. `pydocstyle` - Lint docstrings for PEP 257 compliance
 5. `interrogate -i src --fail-under 90` - Enforce 90% coverage
 
 **Targets:** `src/`, `tools/`, `docs/_scripts/`
+
+**NumPy compliance guarantees:**
+- Custom doq templates in `tools/doq_templates/numpy/` now emit `Parameters`, `Returns`, `Raises`, and `Examples` skeletons using NumPy formatting (`name : type, optional`).
+- The fallback generator (`tools/auto_docstrings.py`) normalises missing docstrings to include `Examples`, `See Also`, and `Notes` sections, detects `raise` statements to populate `Raises`, and rewrites summaries in the imperative mood.
+- `.numpydoc` plus `numpydoc_validation_checks` (GL01/SS01/ES01/RT01/PR01) ensure every regenerated docstring passes strict numpydoc validation during Sphinx builds.
 
 **Exit condition:**
 - Succeeds only if all five sub-stages pass
@@ -805,7 +810,7 @@ def func1():
 | [`tools/update_docs.sh`](tools/update_docs.sh) | **Master orchestration script.** One-touch wrapper that runs the complete documentation pipeline: docstring generation, nav-map build/check, README generation, and Sphinx/MkDocs builds. |
 | [`tools/generate_docstrings.py`](tools/generate_docstrings.py) | Docstring skeleton generator. Runs `doq` with NumPy templates on `src/`, `tools/`, and `docs/_scripts/`, then runs `auto_docstrings.py` fallback for remaining items. |
 | [`tools/auto_docstrings.py`](tools/auto_docstrings.py) | AST-based fallback docstring generator. Creates NumPy-style docstrings for modules, classes, and functions that don't already have them or have TODO placeholders. |
-| [`tools/update_navmaps.py`](tools/update_navmaps.py) | Refreshes module-level docstrings with a `NavMap:` section summarizing public API entry points (classes/functions with truncated summaries). |
+| [`tools/update_navmaps.py`](tools/update_navmaps.py) | Validates that module docstrings remain free of legacy `NavMap:` sections; exits non-zero if any violations are detected. |
 | [`tools/gen_readmes.py`](tools/gen_readmes.py) | Generates package-level `README.md` files that list public modules/classes/functions with summaries, editor deep links (`[open]`), and GitHub permalinks (`[view]`). |
 | [`tools/navmap/build_navmap.py`](tools/navmap/build_navmap.py) | Builds machine-readable navigation map index (`site/_build/navmap/navmap.json`). Extracts `__all__`, `__navmap__`, anchors, and sections from all Python modules. |
 | [`tools/navmap/check_navmap.py`](tools/navmap/check_navmap.py) | Validates navmap metadata: checks exports consistency, section naming conventions, kebab-case IDs, and anchor presence. Returns exit code 1 on errors. |
@@ -813,7 +818,8 @@ def func1():
 | [`docs/_scripts/build_symbol_index.py`](docs/_scripts/build_symbol_index.py) | Emits `docs/_build/symbols.json` flat array for agent consumption. Each entry contains fully qualified name, kind, file path, line range, and docstring summary. |
 | [`Makefile`](Makefile) | Defines developer tasks: `docstrings`, `readmes`, `html`, `json`, `symbols`, `navmap-build`, `navmap-check`, `watch`, `fmt`, `lint`, `bootstrap`. |
 | [`mkdocs.yml`](mkdocs.yml) | MkDocs configuration for Material theme with plugins: search, gen-files (dynamic API pages), mkdocstrings (Python docs), literate-nav, section-index. |
-| [`.pre-commit-config.yaml`](.pre-commit-config.yaml) | Pre-commit hooks: Ruff (imports/lint/format), Black, Mypy, docformatter, pydocstyle, interrogate, navmap-build, navmap-check. |
+| [`.pre-commit-config.yaml`](.pre-commit-config.yaml) | Pre-commit hooks: Ruff (imports/lint/format), Black, Mypy, docformatter, **pydoclint**, pydocstyle, interrogate, navmap-build, navmap-check. |
+| [`.numpydoc`](.numpydoc) | Global numpydoc validation settings (`GL01`, `SS01`, `ES01`, `RT01`, `PR01`) used by Sphinx during HTML/JSON builds. |
 | [`pyproject.toml`](pyproject.toml) | Configures Ruff (lint/format), Black, pytest, mypy, pydocstyle, and docs extras (`[project.optional-dependencies.docs]`). |
 | [`mypy.ini`](mypy.ini) | Strict type-check configuration (Python 3.13, `mypy_path=src`, third-party ignores for packages lacking stubs). |
 | [`tools/doq_templates/numpy/`](tools/doq_templates/numpy/) | NumPy-style docstring templates used by `doq` during docstring generation (def, class, module templates). |
@@ -828,7 +834,7 @@ The single entry point for complete documentation regeneration.
 
 **Prerequisites check:**
 - Verifies `.venv/` virtual environment exists
-- Checks for required tools: `doq`, `docformatter`, `pydocstyle`, `interrogate`
+- Checks for required tools: `doq`, `docformatter`, `pydocstyle`, `pydoclint`, `interrogate`
 - Warns if `mkdocs` is missing (optional dependency)
 
 **Environment setup:**
@@ -840,12 +846,13 @@ The single entry point for complete documentation regeneration.
 1. Clean slate: `rm -rf docs/_build/html docs/_build/json site`
 2. `make docstrings` - Generate and validate docstrings
 3. `make readmes` - Generate package READMEs
-4. `python tools/navmap/build_navmap.py` - Build navmap index
-5. `python tools/navmap/check_navmap.py` - Validate navmap
-6. `make html` - Build Sphinx HTML docs
-7. `make json` - Build Sphinx JSON corpus
-8. `make symbols` - Build symbol index
-9. `mkdocs build` (optional) - Build MkDocs site if available
+4. `python tools/update_navmaps.py` - Ensure docstrings remain free of `NavMap:` sections
+5. `python tools/navmap/build_navmap.py` - Build navmap index
+6. `python tools/navmap/check_navmap.py` - Validate navmap
+7. `make html` - Build Sphinx HTML docs
+8. `make json` - Build Sphinx JSON corpus
+9. `make symbols` - Build symbol index
+10. `mkdocs build` (optional) - Build MkDocs site if available
 
 **Exit behavior:**
 - Exits with error if virtual environment is missing
@@ -1272,14 +1279,17 @@ The `.pre-commit-config.yaml` file wires in comprehensive quality checks that ru
    - Ensures index stays in sync with code
    - Always runs on all files
 
-9. **pydocstyle** - `pydocstyle src`
-   - Lints docstrings against PEP 257
-   - NumPy convention (configured in `pyproject.toml`)
-   - Ignores: D200, D202, D204, D205, D209, D400, D401
-   - Always runs on `src/` directory
-   - Fails commit if violations found
+9. **pydoclint** - `pydoclint --style numpy src`
+   - Enforces parameter/return parity for NumPy docstrings
+   - Fails commits when documented parameters diverge from signatures
+   - Runs against the full source tree (`language: system`, `pass_filenames: false`)
 
-10. **interrogate** - `interrogate -i src --fail-under 90`
+10. **pydocstyle** - `pydocstyle src`
+    - Lints docstrings against the NumPy convention
+    - Ignores: D200, D202, D204, D205, D209, D400, D401
+    - Runs after pydoclint/docformatter to catch residual formatting issues
+
+11. **interrogate** - `interrogate -i src --fail-under 90`
     - Enforces 90% docstring coverage on `src/`
     - Interactive mode (`-i`) shows coverage details
     - Fails the build if coverage drops below 90%

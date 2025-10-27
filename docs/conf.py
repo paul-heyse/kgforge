@@ -80,10 +80,26 @@ extensions = [
     "sphinx.ext.inheritance_diagram",
     "autoapi.extension",  # static API docs (no import)
     "sphinxcontrib.mermaid",
+    "numpydoc",
+    "numpydoc_validation",
 ]
 
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
+napoleon_use_param = True
+napoleon_use_rtype = False
+
+# Treat missing references as hard failures so documentation stays healthy.
+nitpicky = True
+
+# Enforce strict NumPy validation across the codebase.
+numpydoc_validation_checks = {
+    "GL01",
+    "SS01",
+    "ES01",
+    "RT01",
+    "PR01",
+}
 
 # Use whatever theme you prefer; pydata_sphinx_theme is widely used.
 html_theme = os.environ.get("SPHINX_THEME", "pydata_sphinx_theme")

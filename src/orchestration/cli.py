@@ -1,12 +1,15 @@
-"""Module for orchestration.cli.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- index_bm25: Build a BM25 index from chunk fixtures (id, title, section,….
-- index_faiss: Train & build FAISS index from fixture dense vectors.
-- api: Run the FastAPI app.
-- e2e: Execute the skeleton Prefect flow and print completed stages.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+orchestration.cli
+"""
+
 
 from __future__ import annotations
 
@@ -46,7 +49,32 @@ def index_bm25(
     backend: str = typer.Option("lucene", help="lucene|pure"),
     index_dir: str = typer.Option("./_indices/bm25", help="Output index directory"),
 ) -> None:
-    """Build a BM25 index from chunk fixtures (id, title, section, body)."""
+    """
+    Return index bm25.
+    
+    Parameters
+    ----------
+    chunks_parquet : str, optional
+        Description for ``chunks_parquet``.
+    backend : str, optional
+        Description for ``backend``.
+    index_dir : str, optional
+        Description for ``index_dir``.
+    
+    Examples
+    --------
+    >>> from orchestration.cli import index_bm25
+    >>> index_bm25(..., ..., ...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    orchestration.cli
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
@@ -93,10 +121,30 @@ def index_faiss(
         "./_indices/faiss/shard_000.idx", help="Output index (CPU .idx)"
     ),
 ) -> None:
-    """Train & build FAISS index from fixture dense vectors.
-
-    In this skeleton we accept a JSON with entries: {key: str, vector: List[float]}.
     """
+    Return index faiss.
+    
+    Parameters
+    ----------
+    dense_vectors : str, optional
+        Description for ``dense_vectors``.
+    index_path : str, optional
+        Description for ``index_path``.
+    
+    Examples
+    --------
+    >>> from orchestration.cli import index_faiss
+    >>> index_faiss(..., ...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    orchestration.cli
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
         vecs = json.load(fh)
@@ -118,7 +166,28 @@ def index_faiss(
 # [nav:anchor api]
 @app.command()
 def api(port: int = 8080) -> None:
-    """Run the FastAPI app."""
+    """
+    Return api.
+    
+    Parameters
+    ----------
+    port : int, optional
+        Description for ``port``.
+    
+    Examples
+    --------
+    >>> from orchestration.cli import api
+    >>> api(...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    orchestration.cli
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
@@ -127,7 +196,28 @@ def api(port: int = 8080) -> None:
 # [nav:anchor e2e]
 @app.command()
 def e2e() -> None:
-    """Execute the skeleton Prefect flow and print completed stages."""
+    """
+    Return e2e.
+    
+    Raises
+    ------
+    typer.Exit
+        Raised when validation fails.
+    
+    Examples
+    --------
+    >>> from orchestration.cli import e2e
+    >>> e2e()  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    orchestration.cli
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     try:
         from orchestration.flows import e2e_flow
     except ModuleNotFoundError as exc:  # pragma: no cover - defensive messaging

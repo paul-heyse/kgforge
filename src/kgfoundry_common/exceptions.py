@@ -1,10 +1,15 @@
-"""Module for kgfoundry_common.exceptions.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- DownloadError: Raised when an external download fails.
-- UnsupportedMIMEError: Raised when a MIME type is unsupported.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+kgfoundry_common.exceptions
+"""
+
 
 from __future__ import annotations
 
@@ -30,13 +35,65 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DownloadError]
 class DownloadError(Exception):
-    """Raised when an external download fails."""
+    """
+    Represent DownloadError.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.exceptions import DownloadError
+    >>> result = DownloadError()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.exceptions
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...
 
 
 # [nav:anchor UnsupportedMIMEError]
 class UnsupportedMIMEError(Exception):
-    """Raised when a MIME type is unsupported."""
+    """
+    Represent UnsupportedMIMEError.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.exceptions import UnsupportedMIMEError
+    >>> result = UnsupportedMIMEError()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.exceptions
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...

@@ -1,9 +1,15 @@
-"""Module for download.cli.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- harvest: Harvest OA metadata and download PDFs (skeleton).
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+download.cli
+"""
+
 
 from __future__ import annotations
 
@@ -34,7 +40,32 @@ app = typer.Typer(help="Downloader & harvester CLI (skeleton).")
 # [nav:anchor harvest]
 @app.command()
 def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
-    """Harvest OA metadata and download PDFs (skeleton)."""
+    """
+    Return harvest.
+    
+    Parameters
+    ----------
+    topic : str
+        Description for ``topic``.
+    years : str, optional
+        Description for ``years``.
+    max_works : int, optional
+        Description for ``max_works``.
+    
+    Examples
+    --------
+    >>> from download.cli import harvest
+    >>> harvest(..., ..., ...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    download.cli
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     typer.echo(f"[dry-run] would harvest topic={topic!r}, years={years}, max_works={max_works}")
 
 
