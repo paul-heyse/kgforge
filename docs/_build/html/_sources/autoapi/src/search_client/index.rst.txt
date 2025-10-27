@@ -8,7 +8,7 @@ src.search_client
    Module for search_client.
 
    NavMap:
-   - KGFoundryClient: Minimal synchronous client for the kgfoundry search API.
+   - NavMap: Structure describing a module navmap.
 
 
 
@@ -20,4 +20,11 @@ Submodules
 
    /autoapi/src/search_client/client/index
 
+
+
+
+Package Contents
+----------------
+
+.. py:data:: KGFoundryClient
 

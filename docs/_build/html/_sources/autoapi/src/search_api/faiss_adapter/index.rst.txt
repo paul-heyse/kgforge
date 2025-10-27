@@ -8,6 +8,7 @@ src.search_api.faiss_adapter
    Module for search_api.faiss_adapter.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - DenseVecs: Densevecs.
    - FaissAdapter: Faissadapter.
 

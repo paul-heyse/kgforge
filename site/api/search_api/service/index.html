@@ -400,30 +400,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="apply_kg_boosts">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#search_api.service.apply_kg_boosts--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      Parameters
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#search_api.service.apply_kg_boosts--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -432,30 +408,6 @@
       mmr_deduplicate
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="mmr_deduplicate">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#search_api.service.mmr_deduplicate--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      Parameters
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#search_api.service.mmr_deduplicate--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -496,9 +448,10 @@
 
         <p>Module for search_api.service.</p>
 <p>NavMap:
-- rrf_fuse: Reciprocal Rank Fusion skeleton.
-- apply_kg_boosts: Apply kg boosts.
-- mmr_deduplicate: Mmr deduplicate.</p>
+- NavMap: Structure describing a module navmap.
+- rrf_fuse: Fuse dense and sparse rankings via reciprocal rank fusion.
+- apply_kg_boosts: Apply knowledge-graph based boosts to fused search results.
+- mmr_deduplicate: De-duplicate search results using maximal marginal….</p>
 
 
 
@@ -531,50 +484,16 @@
 
     <div class="doc doc-contents ">
 
-        <p>Apply kg boosts.</p>
-<h4 id="search_api.service.apply_kg_boosts--parameters">Parameters</h4>
-<p>fused : List[Tuple[str, float]]
-    TODO.
-query : str
-    TODO.</p>
-<h4 id="search_api.service.apply_kg_boosts--returns">Returns</h4>
-<p>List[Tuple[str, float]]
-    TODO.</p>
+        <p>Apply knowledge-graph based boosts to fused search results.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/service.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_kg_boosts</span><span class="p">(</span><span class="n">fused</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply kg boosts.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    fused : List[Tuple[str, float]]</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    query : str</span>
-<span class="sd">        TODO.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    List[Tuple[str, float]]</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_kg_boosts</span><span class="p">(</span><span class="n">fused</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply knowledge-graph based boosts to fused search results.&quot;&quot;&quot;</span>
     <span class="c1"># NOTE: apply boosts for direct &amp; one-hop concept matches once KG signals exist</span>
     <span class="k">return</span> <span class="n">fused</span>
 </code></pre></div></td></tr></table></div>
@@ -594,54 +513,20 @@ query : str
 
     <div class="doc doc-contents ">
 
-        <p>Mmr deduplicate.</p>
-<h4 id="search_api.service.mmr_deduplicate--parameters">Parameters</h4>
-<p>results : List[Tuple[str, float]]
-    TODO.
-lambda_ : float
-    TODO.</p>
-<h4 id="search_api.service.mmr_deduplicate--returns">Returns</h4>
-<p>List[Tuple[str, float]]
-    TODO.</p>
+        <p>De-duplicate search results using maximal marginal relevance heuristics.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/service.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mmr_deduplicate</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mmr_deduplicate</span><span class="p">(</span>
     <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="n">lambda_</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mmr deduplicate.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    results : List[Tuple[str, float]]</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    lambda_ : float</span>
-<span class="sd">        TODO.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    List[Tuple[str, float]]</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;De-duplicate search results using maximal marginal relevance heuristics.&quot;&quot;&quot;</span>
     <span class="c1"># NOTE: add doc-level diversity via MMR when result scoring is available</span>
     <span class="k">return</span> <span class="n">results</span>
 </code></pre></div></td></tr></table></div>
@@ -661,20 +546,20 @@ lambda_ : float
 
     <div class="doc doc-contents ">
 
-        <p>Reciprocal Rank Fusion skeleton.</p>
+        <p>Fuse dense and sparse rankings via reciprocal rank fusion.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/service.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rrf_fuse</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rrf_fuse</span><span class="p">(</span>
     <span class="n">dense</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="n">sparse</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reciprocal Rank Fusion skeleton.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fuse dense and sparse rankings via reciprocal rank fusion.&quot;&quot;&quot;</span>
     <span class="c1"># NOTE: implement stable RRF across rankers when ranker outputs are wired</span>
     <span class="k">return</span> <span class="p">[]</span>
 </code></pre></div></td></tr></table></div>

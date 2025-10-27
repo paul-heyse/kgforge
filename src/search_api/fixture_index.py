@@ -1,9 +1,9 @@
-"""Module for search_api.fixture_index.
+"""Lightweight lexical index used by the fixture search API.
 
 NavMap:
-- tokenize: Tokenize.
-- FixtureDoc: Fixturedoc.
-- FixtureIndex: Fixtureindex.
+- tokenize: Tokenise text for the fixture BM25-lite scorer.
+- FixtureDoc: Minimal record describing a chunked document.
+- FixtureIndex: Build and query an in-memory lexical index sourced from DuckDB.
 """
 
 from __future__ import annotations
@@ -12,31 +12,40 @@ import math
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Final
 
 import duckdb
+
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["FixtureDoc", "FixtureIndex", "tokenize"]
+
+__navmap__: Final[NavMap] = {
+    "title": "search_api.fixture_index",
+    "synopsis": "Tiny lexical index backed by DuckDB parquet fixtures.",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["tokenize", "FixtureDoc", "FixtureIndex"],
+        },
+    ],
+}
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
 
+# [nav:anchor tokenize]
 def tokenize(text: str) -> list[str]:
-    """Tokenize.
-
-    Parameters
-    ----------
-    text : str
-        TODO.
-
-    Returns
-    -------
-    List[str]
-        TODO.
-    """
-    return [t.lower() for t in TOKEN_RE.findall(text or "")]
+    """Tokenise ``text`` into lowercase alphanumeric tokens."""
+    return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
+# [nav:anchor FixtureDoc]
 @dataclass
 class FixtureDoc:
-    """Fixturedoc."""
+    """Chunk-level document representation used by the lexical index."""
 
     chunk_id: str
     doc_id: str
@@ -45,19 +54,12 @@ class FixtureDoc:
     text: str
 
 
+# [nav:anchor FixtureIndex]
 class FixtureIndex:
-    """Fixtureindex."""
+    """Materialise a lexical index from DuckDB parquet exports."""
 
     def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb") -> None:
-        """Init.
-
-        Parameters
-        ----------
-        root : str
-            TODO.
-        db_path : str
-            TODO.
-        """
+        """Initialise the index and eagerly load chunk metadata."""
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []
@@ -66,18 +68,12 @@ class FixtureIndex:
         self._load_from_duckdb()
 
     def _load_from_duckdb(self) -> None:
-        """Load from duckdb.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Read the latest chunk dataset and populate the document list."""
         if not Path(self.db_path).exists():
             return
         con = duckdb.connect(self.db_path)
         try:
-            ds = con.execute(
+            dataset = con.execute(
                 """
               SELECT parquet_root FROM datasets
               WHERE kind='chunks'
@@ -85,9 +81,9 @@ class FixtureIndex:
               LIMIT 1
             """
             ).fetchone()
-            if not ds:
+            if not dataset:
                 return
-            root = ds[0]
+            root = dataset[0]
             rows = con.execute(
                 f"""
                 SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text,
@@ -113,40 +109,21 @@ class FixtureIndex:
         self._build_lex()
 
     def _build_lex(self) -> None:
-        """Build lex.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Build term-frequency and document-frequency statistics."""
         self.tf.clear()
         self.df.clear()
         for doc in self.docs:
-            toks = tokenize(doc.text)
+            tokens = tokenize(doc.text)
             tf_counts: dict[str, int] = {}
-            for t in toks:
-                tf_counts[t] = tf_counts.get(t, 0) + 1
+            for token in tokens:
+                tf_counts[token] = tf_counts.get(token, 0) + 1
             self.tf.append(tf_counts)
-            for t in set(toks):
-                self.df[t] = self.df.get(t, 0) + 1
+            for token in set(tokens):
+                self.df[token] = self.df.get(token, 0) + 1
         self.N = len(self.docs)
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Search.
-
-        Parameters
-        ----------
-        query : str
-            TODO.
-        k : int
-            TODO.
-
-        Returns
-        -------
-        List[Tuple[int, float]]
-            TODO.
-        """
+        """Score documents for ``query`` using a simple TF-IDF variant."""
         if getattr(self, "N", 0) == 0:
             return []
         qtoks = tokenize(query)
@@ -154,27 +131,16 @@ class FixtureIndex:
             return []
         scores = [0.0] * self.N
         for i, tf in enumerate(self.tf):
-            s = 0.0
-            for t in qtoks:
-                if t not in self.df:
+            score = 0.0
+            for token in qtoks:
+                if token not in self.df:
                     continue
-                idf = math.log((self.N + 1) / (self.df[t] + 0.5) + 1.0)
-                s += idf * tf.get(t, 0)
-            scores[i] = s
-        ranked = sorted(enumerate(scores), key=lambda x: x[1], reverse=True)
-        return [(i, s) for i, s in ranked[:k] if s > 0.0]
+                idf = math.log((self.N + 1) / (self.df[token] + 0.5) + 1.0)
+                score += idf * tf.get(token, 0)
+            scores[i] = score
+        ranked = sorted(enumerate(scores), key=lambda item: item[1], reverse=True)
+        return [(index, score) for index, score in ranked[:k] if score > 0.0]
 
-    def doc(self, idx: int) -> FixtureDoc:
-        """Doc.
-
-        Parameters
-        ----------
-        idx : int
-            TODO.
-
-        Returns
-        -------
-        FixtureDoc
-            TODO.
-        """
-        return self.docs[idx]
+    def doc(self, index: int) -> FixtureDoc:
+        """Return the :class:`FixtureDoc` at ``index``."""
+        return self.docs[index]

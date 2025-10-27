@@ -8,9 +8,10 @@ src.search_api.service
    Module for search_api.service.
 
    NavMap:
-   - rrf_fuse: Reciprocal Rank Fusion skeleton.
-   - apply_kg_boosts: Apply kg boosts.
-   - mmr_deduplicate: Mmr deduplicate.
+   - NavMap: Structure describing a module navmap.
+   - rrf_fuse: Fuse dense and sparse rankings via reciprocal rank fusion.
+   - apply_kg_boosts: Apply knowledge-graph based boosts to fused search results.
+   - mmr_deduplicate: De-duplicate search results using maximal marginal….
 
 
 
@@ -21,32 +22,16 @@ Module Contents
 
 .. py:function:: rrf_fuse(dense, sparse, k = 60)
 
-   Reciprocal Rank Fusion skeleton.
+   Fuse dense and sparse rankings via reciprocal rank fusion.
 
 
 .. py:function:: apply_kg_boosts(fused, query)
 
-   Apply kg boosts.
-
-   :param fused: TODO.
-   :type fused: List[Tuple[str, float]]
-   :param query: TODO.
-   :type query: str
-
-   :returns: TODO.
-   :rtype: List[Tuple[str, float]]
+   Apply knowledge-graph based boosts to fused search results.
 
 
 .. py:function:: mmr_deduplicate(results, lambda_ = 0.7)
 
-   Mmr deduplicate.
-
-   :param results: TODO.
-   :type results: List[Tuple[str, float]]
-   :param lambda_: TODO.
-   :type lambda_: float
-
-   :returns: TODO.
-   :rtype: List[Tuple[str, float]]
+   De-duplicate search results using maximal marginal relevance heuristics.
 
 

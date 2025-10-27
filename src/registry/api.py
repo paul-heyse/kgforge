@@ -1,17 +1,36 @@
 """Module for registry.api.
 
 NavMap:
+- NavMap: Structure describing a module navmap.
 - Registry: Registry protocol describing persistence operations.
 """
 
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Protocol
+from typing import Final, Protocol
 
 from kgfoundry.kgfoundry_common.models import Doc, DoctagsAsset
 
+from kgfoundry_common.navmap_types import NavMap
 
+__all__ = ["Registry"]
+
+__navmap__: Final[NavMap] = {
+    "title": "registry.api",
+    "synopsis": "Module for registry.api",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["Registry"],
+        },
+    ],
+}
+
+
+# [nav:anchor Registry]
 class Registry(Protocol):
     """Registry protocol describing persistence operations."""
 

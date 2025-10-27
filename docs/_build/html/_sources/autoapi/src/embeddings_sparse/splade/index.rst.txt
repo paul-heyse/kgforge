@@ -8,6 +8,7 @@ src.embeddings_sparse.splade
    Module for embeddings_sparse.splade.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - SPLADEv3Encoder: Spladev3encoder.
    - PureImpactIndex: Toy 'impact' index that approximates SPLADE with IDF/log….
    - LuceneImpactIndex: Pyserini SPLADE impact index wrapper.
@@ -19,12 +20,8 @@ src.embeddings_sparse.splade
 
 
 
-
-
 Module Contents
 ---------------
-
-.. py:data:: TOKEN_RE
 
 .. py:class:: SPLADEv3Encoder(model_id = 'naver/splade-v3-distilbert', device = 'cuda', topk = 256, max_seq_len = 512)
 

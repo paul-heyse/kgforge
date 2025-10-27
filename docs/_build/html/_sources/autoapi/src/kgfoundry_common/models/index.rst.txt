@@ -8,6 +8,7 @@ src.kgfoundry_common.models
    Module for kgfoundry_common.models.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - Doc: Doc.
    - DoctagsAsset: Doctagsasset.
    - Chunk: Chunk.
@@ -17,12 +18,8 @@ src.kgfoundry_common.models
 
 
 
-
-
 Module Contents
 ---------------
-
-.. py:data:: Id
 
 .. py:class:: Doc(/, **data)
 

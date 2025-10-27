@@ -1,7 +1,7 @@
-"""Module for registry.helper.
+"""Convenience layer for inserting artefacts into the DuckDB registry.
 
 NavMap:
-- DuckDBRegistryHelper: Duckdbregistryhelper.
+- DuckDBRegistryHelper: Handy helper for opening short-lived DuckDB connections.
 """
 
 from __future__ import annotations
@@ -9,26 +9,39 @@ from __future__ import annotations
 import json
 import uuid
 from collections.abc import Mapping
+from typing import Final
 
 import duckdb
 from kgfoundry.kgfoundry_common.models import Doc, DoctagsAsset
 
+from kgfoundry_common.navmap_types import NavMap
 
+__all__ = ["DuckDBRegistryHelper"]
+
+__navmap__: Final[NavMap] = {
+    "title": "registry.helper",
+    "synopsis": "Helper utilities that simplify writing records into the DuckDB registry.",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["DuckDBRegistryHelper"],
+        },
+    ],
+}
+
+
+# [nav:anchor DuckDBRegistryHelper]
 class DuckDBRegistryHelper:
-    """Duckdbregistryhelper."""
+    """Open short-lived DuckDB connections for registry operations."""
 
     def __init__(self, db_path: str) -> None:
-        """Init.
-
-        Parameters
-        ----------
-        db_path : str
-            TODO.
-        """
+        """Store the DuckDB catalog location."""
         self.db_path = db_path
 
     def _con(self) -> duckdb.DuckDBPyConnection:
-        """Con."""
+        """Return a fresh DuckDB connection."""
         return duckdb.connect(self.db_path)
 
     def new_run(
@@ -38,24 +51,7 @@ class DuckDBRegistryHelper:
         revision: str | None,
         config: Mapping[str, object],
     ) -> str:
-        """Create a new registry run.
-
-        Parameters
-        ----------
-        purpose : str
-            TODO.
-        model_id : Optional[str]
-            TODO.
-        revision : Optional[str]
-            TODO.
-        config : dict
-            TODO.
-
-        Returns
-        -------
-        str
-            TODO.
-        """
+        """Create a new run record and return its identifier."""
         run_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -70,22 +66,7 @@ class DuckDBRegistryHelper:
         return run_id
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
-        """Close run.
-
-        Parameters
-        ----------
-        run_id : str
-            TODO.
-        success : bool
-            TODO.
-        notes : Optional[str]
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Mark a run as finished and emit a pipeline event."""
         con = self._con()
         con.execute("UPDATE runs SET finished_at=CURRENT_TIMESTAMP WHERE run_id=?", [run_id])
         con.execute(
@@ -100,20 +81,7 @@ class DuckDBRegistryHelper:
         con.close()
 
     def begin_dataset(self, kind: str, run_id: str) -> str:
-        """Begin dataset.
-
-        Parameters
-        ----------
-        kind : str
-            TODO.
-        run_id : str
-            TODO.
-
-        Returns
-        -------
-        str
-            TODO.
-        """
+        """Create a dataset placeholder associated with ``run_id``."""
         dataset_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -128,22 +96,7 @@ class DuckDBRegistryHelper:
         return dataset_id
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
-        """Commit dataset.
-
-        Parameters
-        ----------
-        dataset_id : str
-            TODO.
-        parquet_root : str
-            TODO.
-        rows : int
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Persist parquet location metadata and emit a commit event."""
         con = self._con()
         con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
@@ -160,18 +113,7 @@ class DuckDBRegistryHelper:
         con.close()
 
     def rollback_dataset(self, dataset_id: str) -> None:
-        """Rollback dataset.
-
-        Parameters
-        ----------
-        dataset_id : str
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Delete a dataset and record a rollback event."""
         con = self._con()
         con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
         con.execute(
@@ -181,81 +123,51 @@ class DuckDBRegistryHelper:
         con.close()
 
     def register_documents(self, docs: list[Doc]) -> None:
-        """Register documents.
-
-        Parameters
-        ----------
-        docs : List[Doc]
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Insert or update document metadata rows."""
         con = self._con()
-        for d in docs:
+        for doc in docs:
             con.execute(
                 """INSERT OR REPLACE INTO documents
                 (doc_id, openalex_id, doi, arxiv_id, pmcid, title, authors, pub_date, license,
                  language, pdf_uri, source, content_hash, created_at)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP)""",
                 [
-                    d.id,
-                    d.openalex_id,
-                    d.doi,
-                    d.arxiv_id,
-                    d.pmcid,
-                    d.title,
-                    json.dumps(d.authors),
-                    d.pub_date,
-                    d.license,
-                    d.language,
-                    d.pdf_uri,
-                    d.source,
-                    d.content_hash or "",
+                    doc.id,
+                    doc.openalex_id,
+                    doc.doi,
+                    doc.arxiv_id,
+                    doc.pmcid,
+                    doc.title,
+                    json.dumps(doc.authors),
+                    doc.pub_date,
+                    doc.license,
+                    doc.language,
+                    doc.pdf_uri,
+                    doc.source,
+                    doc.content_hash or "",
                 ],
             )
         con.close()
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
-        """Register doctags.
-
-        Parameters
-        ----------
-        assets : List[DoctagsAsset]
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Insert doctag metadata rows for VLM artefacts."""
         con = self._con()
-        for a in assets:
+        for asset in assets:
             con.execute(
                 "INSERT OR REPLACE INTO doctags VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)",
-                [a.doc_id, a.doctags_uri, a.pages, a.vlm_model, a.vlm_revision, a.avg_logprob],
+                [
+                    asset.doc_id,
+                    asset.doctags_uri,
+                    asset.pages,
+                    asset.vlm_model,
+                    asset.vlm_revision,
+                    asset.avg_logprob,
+                ],
             )
         con.close()
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
-        """Emit event.
-
-        Parameters
-        ----------
-        event_name : str
-            TODO.
-        subject_id : str
-            TODO.
-        payload : Dict
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Emit an ad-hoc event into the pipeline events table."""
         con = self._con()
         con.execute(
             "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",

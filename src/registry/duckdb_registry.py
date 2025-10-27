@@ -1,7 +1,7 @@
-"""Module for registry.duckdb_registry.
+"""DuckDB-backed registry implementation used by the fixture pipeline.
 
 NavMap:
-- DuckDBRegistry: Minimal DuckDB-backed registry (skeleton).
+- DuckDBRegistry: Minimal registry wrapper for DuckDB-backed artefacts.
 """
 
 from __future__ import annotations
@@ -9,86 +9,66 @@ from __future__ import annotations
 import json
 import uuid
 from collections.abc import Mapping
+from typing import Final
 
 import duckdb
 from kgfoundry.kgfoundry_common.models import Doc, DoctagsAsset
 
+from kgfoundry_common.navmap_types import NavMap
 
+__all__ = ["DuckDBRegistry"]
+
+__navmap__: Final[NavMap] = {
+    "title": "registry.duckdb_registry",
+    "synopsis": "Minimal registry wrapper storing pipeline artefacts in DuckDB.",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["DuckDBRegistry"],
+        },
+    ],
+}
+
+
+# [nav:anchor DuckDBRegistry]
 class DuckDBRegistry:
-    """Minimal DuckDB-backed registry (skeleton)."""
+    """Persist pipeline artefacts and events inside a DuckDB catalog."""
 
     def __init__(self, db_path: str) -> None:
-        """Init.
+        """Open a DuckDB connection, creating the database if required.
 
         Parameters
         ----------
         db_path : str
-            TODO.
+            Filesystem path to the DuckDB catalog.
         """
         self.db_path = db_path
         self.con = duckdb.connect(db_path, read_only=False)
         self.con.execute("PRAGMA threads=14")
 
     def begin_dataset(self, kind: str, run_id: str) -> str:
-        """Begin dataset.
-
-        Parameters
-        ----------
-        kind : str
-            TODO.
-        run_id : str
-            TODO.
-
-        Returns
-        -------
-        str
-            TODO.
-        """
-        dsid = str(uuid.uuid4())
+        """Create a dataset placeholder linked to an in-flight run."""
+        dataset_id = str(uuid.uuid4())
         self.con.execute(
             (
                 "INSERT INTO datasets("
                 "dataset_id, kind, parquet_root, run_id, created_at"
                 ") VALUES (?, ?, '', ?, now())"
             ),
-            [dsid, kind, run_id],
+            [dataset_id, kind, run_id],
         )
-        return dsid
+        return dataset_id
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
-        """Commit dataset.
-
-        Parameters
-        ----------
-        dataset_id : str
-            TODO.
-        parquet_root : str
-            TODO.
-        rows : int
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Finalize the dataset by recording its parquet root."""
         self.con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
         )
 
     def rollback_dataset(self, dataset_id: str) -> None:
-        """Rollback dataset.
-
-        Parameters
-        ----------
-        dataset_id : str
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Discard a dataset that failed to materialise."""
         self.con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
 
     def insert_run(
@@ -98,24 +78,7 @@ class DuckDBRegistry:
         revision: str | None,
         config: Mapping[str, object],
     ) -> str:
-        """Insert run.
-
-        Parameters
-        ----------
-        purpose : str
-            TODO.
-        model_id : str | None
-            TODO.
-        revision : str | None
-            TODO.
-        config : dict
-            TODO.
-
-        Returns
-        -------
-        str
-            TODO.
-        """
+        """Record a new pipeline run and return its identifier."""
         run_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -128,38 +91,14 @@ class DuckDBRegistry:
         return run_id
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
-        """Close run.
-
-        Parameters
-        ----------
-        run_id : str
-            TODO.
-        success : bool
-            TODO.
-        notes : str | None
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Mark a run as finished, optionally storing completion notes."""
+        _ = success  # placeholder until success flag/notes are persisted
+        _ = notes
         self.con.execute("UPDATE runs SET finished_at=now() WHERE run_id=?", [run_id])
 
     def register_documents(self, docs: list[Doc]) -> None:
-        """Register documents.
-
-        Parameters
-        ----------
-        docs : List[Doc]
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
-        for d in docs:
+        """Insert or update document metadata rows."""
+        for doc in docs:
             self.con.execute(
                 (
                     "INSERT OR REPLACE INTO documents("
@@ -168,62 +107,43 @@ class DuckDBRegistry:
                     ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now())"
                 ),
                 [
-                    d.id,
-                    d.openalex_id,
-                    d.doi,
-                    d.arxiv_id,
-                    d.pmcid,
-                    d.title,
-                    json.dumps(d.authors),
-                    d.pub_date,
-                    d.license,
-                    d.language,
-                    d.pdf_uri,
-                    d.source,
-                    d.content_hash,
+                    doc.id,
+                    doc.openalex_id,
+                    doc.doi,
+                    doc.arxiv_id,
+                    doc.pmcid,
+                    doc.title,
+                    json.dumps(doc.authors),
+                    doc.pub_date,
+                    doc.license,
+                    doc.language,
+                    doc.pdf_uri,
+                    doc.source,
+                    doc.content_hash,
                 ],
             )
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
-        """Register doctags.
-
-        Parameters
-        ----------
-        assets : List[DoctagsAsset]
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
-        for a in assets:
+        """Persist doctag asset metadata for downstream retrieval."""
+        for asset in assets:
             self.con.execute(
                 (
                     "INSERT OR REPLACE INTO doctags("
                     "doc_id, doctags_uri, pages, vlm_model, vlm_revision, avg_logprob, created_at"
                     ") VALUES (?, ?, ?, ?, ?, ?, now())"
                 ),
-                [a.doc_id, a.doctags_uri, a.pages, a.vlm_model, a.vlm_revision, a.avg_logprob],
+                [
+                    asset.doc_id,
+                    asset.doctags_uri,
+                    asset.pages,
+                    asset.vlm_model,
+                    asset.vlm_revision,
+                    asset.avg_logprob,
+                ],
             )
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
-        """Emit event.
-
-        Parameters
-        ----------
-        event_name : str
-            TODO.
-        subject_id : str
-            TODO.
-        payload : Dict
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Append a pipeline event row for observability."""
         self.con.execute(
             (
                 "INSERT INTO pipeline_events("
@@ -234,24 +154,7 @@ class DuckDBRegistry:
         )
 
     def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
-        """Incident.
-
-        Parameters
-        ----------
-        event : str
-            TODO.
-        subject_id : str
-            TODO.
-        error_class : str
-            TODO.
-        message : str
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Record an incident with lightweight context for debugging."""
         self.con.execute(
             (
                 "INSERT INTO incidents("

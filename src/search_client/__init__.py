@@ -1,9 +1,27 @@
 """Module for search_client.
 
 NavMap:
-- KGFoundryClient: Minimal synchronous client for the kgfoundry search API.
+- NavMap: Structure describing a module navmap.
 """
 
-from search_client.client import KGFoundryClient
+from kgfoundry_common.navmap_types import NavMap
+from search_client.client import KGFoundryClient as _KGFoundryClient
 
 __all__ = ["KGFoundryClient"]
+
+__navmap__: NavMap = {
+    "title": "search_client.__init__",
+    "synopsis": "Module for search_client",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["KGFoundryClient"],
+        },
+    ],
+}
+
+
+# [nav:anchor KGFoundryClient]
+KGFoundryClient = _KGFoundryClient

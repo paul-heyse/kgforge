@@ -330,6 +330,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/ids/index.html">src.kgfoundry_common.ids</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/logging/index.html">src.kgfoundry_common.logging</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/models/index.html">src.kgfoundry_common.models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/navmap_types/index.html">src.kgfoundry_common.navmap_types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/parquet_io/index.html">src.kgfoundry_common.parquet_io</a></li>
 </ul>
 </details></li>
@@ -452,15 +453,16 @@
 <span id="src-search-api-service"></span><h1>src.search_api.service<a class="headerlink" href="#module-src.search_api.service" title="Link to this heading">#</a></h1>
 <p>Module for search_api.service.</p>
 <p>NavMap:
-- rrf_fuse: Reciprocal Rank Fusion skeleton.
-- apply_kg_boosts: Apply kg boosts.
-- mmr_deduplicate: Mmr deduplicate.</p>
+- NavMap: Structure describing a module navmap.
+- rrf_fuse: Fuse dense and sparse rankings via reciprocal rank fusion.
+- apply_kg_boosts: Apply knowledge-graph based boosts to fused search results.
+- mmr_deduplicate: De-duplicate search results using maximal marginal….</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.search_api.service.rrf_fuse">
-<span class="sig-prename descclassname"><span class="pre">src.search_api.service.</span></span><span class="sig-name descname"><span class="pre">rrf_fuse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/service.html#rrf_fuse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/service.py:12:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.service.rrf_fuse" title="Link to this definition">#</a></dt>
-<dd><p>Reciprocal Rank Fusion skeleton.</p>
+<span class="sig-prename descclassname"><span class="pre">src.search_api.service.</span></span><span class="sig-name descname"><span class="pre">rrf_fuse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/service.html#rrf_fuse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/service.py:59:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.service.rrf_fuse" title="Link to this definition">#</a></dt>
+<dd><p>Fuse dense and sparse rankings via reciprocal rank fusion.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -477,41 +479,34 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.search_api.service.apply_kg_boosts">
-<span class="sig-prename descclassname"><span class="pre">src.search_api.service.</span></span><span class="sig-name descname"><span class="pre">apply_kg_boosts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fused</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/service.html#apply_kg_boosts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/service.py:20:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.service.apply_kg_boosts" title="Link to this definition">#</a></dt>
-<dd><p>Apply kg boosts.</p>
+<span class="sig-prename descclassname"><span class="pre">src.search_api.service.</span></span><span class="sig-name descname"><span class="pre">apply_kg_boosts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fused</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/service.html#apply_kg_boosts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/service.py:68:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.service.apply_kg_boosts" title="Link to this definition">#</a></dt>
+<dd><p>Apply knowledge-graph based boosts to fused search results.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fused</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>]</em>) – TODO.</p></li>
-<li><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p></li>
+<li><p><strong>fused</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>]</em>)</p></li>
+<li><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[Tuple[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.search_api.service.mmr_deduplicate">
-<span class="sig-prename descclassname"><span class="pre">src.search_api.service.</span></span><span class="sig-name descname"><span class="pre">mmr_deduplicate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/service.html#mmr_deduplicate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/service.py:39:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.service.mmr_deduplicate" title="Link to this definition">#</a></dt>
-<dd><p>Mmr deduplicate.</p>
+<span class="sig-prename descclassname"><span class="pre">src.search_api.service.</span></span><span class="sig-name descname"><span class="pre">mmr_deduplicate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/service.html#mmr_deduplicate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/service.py:75:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.service.mmr_deduplicate" title="Link to this definition">#</a></dt>
+<dd><p>De-duplicate search results using maximal marginal relevance heuristics.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>results</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>]</em>) – TODO.</p></li>
-<li><p><strong>lambda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – TODO.</p></li>
+<li><p><strong>results</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>]</em>)</p></li>
 <li><p><strong>lambda_</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[Tuple[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]</p>
 </dd>
 </dl>
 </dd></dl>

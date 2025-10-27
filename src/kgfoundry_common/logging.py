@@ -1,31 +1,41 @@
-"""Module for kgfoundry_common.logging.
+"""Structured logging helpers shared across kgfoundry services.
 
 NavMap:
-- JsonFormatter: Jsonformatter.
-- setup_logging: Configure logging with a structured JSON formatter.
+- JsonFormatter: Emit log records as structured JSON.
+- setup_logging: Configure the root logger with JSON formatting.
 """
+
+from __future__ import annotations
 
 import json
 import logging
 import sys
+from typing import Final
+
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["JsonFormatter", "setup_logging"]
+
+__navmap__: Final[NavMap] = {
+    "title": "kgfoundry_common.logging",
+    "synopsis": "Structured logging helpers shared across kgfoundry",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["JsonFormatter", "setup_logging"],
+        },
+    ],
+}
 
 
+# [nav:anchor JsonFormatter]
 class JsonFormatter(logging.Formatter):
-    """Jsonformatter."""
+    """Format log records as compact JSON payloads."""
 
     def format(self, record: logging.LogRecord) -> str:
-        """Format.
-
-        Parameters
-        ----------
-        record : logging.LogRecord
-            TODO.
-
-        Returns
-        -------
-        str
-            TODO.
-        """
+        """Serialise a log record into a JSON string."""
         data = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
             "level": record.levelname,
@@ -39,18 +49,14 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(data)
 
 
+# [nav:anchor setup_logging]
 def setup_logging(level: int = logging.INFO) -> None:
-    """Configure logging with a structured JSON formatter.
+    """Configure the root logger with JSON formatting.
 
     Parameters
     ----------
-    level : int
-        TODO.
-
-    Returns
-    -------
-    None
-        TODO.
+    level : int, optional
+        Minimum log level to emit, defaults to :data:`logging.INFO`.
     """
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())

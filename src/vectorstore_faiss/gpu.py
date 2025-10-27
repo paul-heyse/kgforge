@@ -1,29 +1,42 @@
-"""Module for vectorstore_faiss.gpu.
+"""GPU-accelerated FAISS index wrapper with a numpy fallback.
 
 NavMap:
-- FaissGpuIndex: FAISS GPU/cuVS wrapper.
+- FaissGpuIndex: Manage FAISS lifecycle and provide brute-force fallbacks.
 """
 
 from __future__ import annotations
 
 import os
-from typing import Any, cast
+from typing import Any, Final, cast
 
 import numpy as np
 from numpy.typing import NDArray
+
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["FaissGpuIndex"]
+
+__navmap__: Final[NavMap] = {
+    "title": "vectorstore_faiss.gpu",
+    "synopsis": "FAISS index wrapper with optional cuVS acceleration and numpy fallback.",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["FaissGpuIndex"],
+        },
+    ],
+}
 
 type FloatArray = NDArray[np.float32]
 type IntArray = NDArray[np.int64]
 type StrArray = NDArray[np.str_]
 
-__all__ = ["FaissGpuIndex"]
 
-
+# [nav:anchor FaissGpuIndex]
 class FaissGpuIndex:
-    """FAISS GPU/cuVS wrapper.
-
-    Provides a brute-force cosine search fallback when FAISS is unavailable at runtime.
-    """
+    """Wrap a FAISS vector index and provide numpy-based fallbacks."""
 
     def __init__(
         self,
@@ -32,19 +45,7 @@ class FaissGpuIndex:
         gpu: bool = True,
         cuvs: bool = True,
     ) -> None:
-        """Init.
-
-        Parameters
-        ----------
-        factory : str
-            TODO.
-        nprobe : int
-            TODO.
-        gpu : bool
-            TODO.
-        cuvs : bool
-            TODO.
-        """
+        """Set up index configuration and attempt to import FAISS."""
         self.factory = factory
         self.nprobe = nprobe
         self.gpu = gpu
@@ -53,88 +54,55 @@ class FaissGpuIndex:
         self._res: Any | None = None
         self._index: Any | None = None
         self._idmap: StrArray | None = None
-        self._xb: FloatArray | None = None  # fallback matrix for brute force
-        # try import faiss
+        self._xb: FloatArray | None = None
         try:
             import faiss
 
             self._faiss = faiss
-        except Exception:
+        except Exception:  # pragma: no cover - environment without FAISS
             self._faiss = None
 
     def _ensure_resources(self) -> None:
-        """Ensure resources."""
+        """Initialise GPU resources if FAISS and GPU support are available."""
         if not self._faiss or not self.gpu:
             return
         if self._res is None:
             faiss = self._faiss
             self._res = faiss.StandardGpuResources()
-            # memory knobs can be tuned by caller later
 
     def train(self, train_vectors: FloatArray, *, seed: int = 42) -> None:
-        """Train.
-
-        Parameters
-        ----------
-        train_vectors : np.ndarray
-            TODO.
-        seed : int
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Train the underlying FAISS index when FAISS is available."""
         if self._faiss is None:
-            # no-op in fallback; brute force doesn't need training
             return
         train_mat = cast(FloatArray, np.asarray(train_vectors, dtype=np.float32, order="C"))
         faiss = self._faiss
-        d = train_mat.shape[1]
-        cpu_index = faiss.index_factory(d, self.factory, faiss.METRIC_INNER_PRODUCT)
+        dimension = train_mat.shape[1]
+        cpu_index = faiss.index_factory(dimension, self.factory, faiss.METRIC_INNER_PRODUCT)
         faiss.normalize_L2(train_mat)
         cpu_index.train(train_mat)
         self._ensure_resources()
         if self.gpu:
-            co = faiss.GpuClonerOptions()
-            if hasattr(co, "use_cuvs"):
-                co.use_cuvs = bool(self.cuvs)
+            options = faiss.GpuClonerOptions()
+            if hasattr(options, "use_cuvs"):
+                options.use_cuvs = bool(self.cuvs)
             try:
-                self._index = faiss.index_cpu_to_gpu(self._res, 0, cpu_index, co)
-            except Exception:
-                # fallback without cuVS
+                self._index = faiss.index_cpu_to_gpu(self._res, 0, cpu_index, options)
+            except Exception:  # pragma: no cover - fallback without cuVS
                 self._index = faiss.index_cpu_to_gpu(self._res, 0, cpu_index)
         else:
             self._index = cpu_index
-        # set nprobe
         try:
-            ps = faiss.GpuParameterSpace() if self.gpu else faiss.ParameterSpace()
-            ps.set_index_parameter(self._index, "nprobe", self.nprobe)
+            params = faiss.GpuParameterSpace() if self.gpu else faiss.ParameterSpace()
+            params.set_index_parameter(self._index, "nprobe", self.nprobe)
         except Exception:
             pass
 
     def add(self, keys: list[str], vectors: FloatArray) -> None:
-        """Add.
-
-        Parameters
-        ----------
-        keys : List[str]
-            TODO.
-        vectors : np.ndarray
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Add ``vectors`` identified by ``keys`` to the index."""
         vec_array = cast(FloatArray, np.asarray(vectors, dtype=np.float32, order="C"))
         if self._faiss is None:
-            # fallback: keep matrix and id map for brute-force
             self._xb = cast(FloatArray, np.array(vec_array, copy=True))
             self._idmap = cast(StrArray, np.asarray(keys, dtype=str))
-            # normalize for cosine/IP
             norms = np.linalg.norm(self._xb, axis=1, keepdims=True) + 1e-12
             self._xb /= norms
             return
@@ -147,7 +115,6 @@ class FaissGpuIndex:
             idmap_array = cast(IntArray, np.asarray(keys, dtype="int64"))
             self._index.add_with_ids(vec_array, idmap_array)
         elif hasattr(faiss, "IndexIDMap2"):
-            # wrap once
             idmap = faiss.IndexIDMap2(self._index)
             idmap_array = cast(IntArray, np.asarray(keys, dtype="int64"))
             idmap.add_with_ids(vec_array, idmap_array)
@@ -156,57 +123,27 @@ class FaissGpuIndex:
             self._index.add(vec_array)
 
     def search(self, query: FloatArray, k: int) -> list[tuple[str, float]]:
-        """Search.
-
-        Parameters
-        ----------
-        query : np.ndarray
-            TODO.
-        k : int
-            TODO.
-
-        Returns
-        -------
-        List[Tuple[str, float]]
-            TODO.
-        """
+        """Return the top ``k`` results for ``query`` using FAISS or brute force."""
         q = cast(FloatArray, np.asarray(query, dtype=np.float32, order="C"))
-        # normalize for cosine/IP
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12
         if self._faiss is None or self._index is None:
-            # brute-force cosine over self._xb
             if self._xb is None or self._idmap is None:
                 return []
             sims_matrix = self._xb @ q.T
             sims = np.asarray(sims_matrix, dtype=np.float32).squeeze()
-            idx = np.argsort(-sims)[:k]
-            return [(str(self._idmap[i]), float(sims[i])) for i in idx.tolist()]
+            indices = np.argsort(-sims)[:k]
+            return [(str(self._idmap[i]), float(sims[i])) for i in indices.tolist()]
         if self._idmap is None:
             message = "ID map not loaded; cannot resolve FAISS results."
             raise RuntimeError(message)
         distances, indices = self._index.search(q.reshape(1, -1), k)
-        # map IDs to strings if using IDMap; else cast ints
         ids = indices[0]
         scores = distances[0]
         return [(str(ids[i]), float(scores[i])) for i in range(len(ids)) if ids[i] != -1]
 
-    def save(self, index_uri: str, idmap_uri: str) -> None:
-        """Save.
-
-        Parameters
-        ----------
-        index_uri : str
-            TODO.
-        idmap_uri : str
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+    def save(self, index_uri: str, idmap_uri: str | None = None) -> None:
+        """Persist the index or numpy fallback arrays to disk."""
         if self._faiss is None or self._index is None:
-            # save fallback matrix
             if self._xb is not None and self._idmap is not None:
                 np.savez(index_uri, xb=self._xb, ids=self._idmap)
             return
@@ -218,22 +155,8 @@ class FaissGpuIndex:
         faiss.write_index(target_index, index_uri)
 
     def load(self, index_uri: str, idmap_uri: str | None = None) -> None:
-        """Load.
-
-        Parameters
-        ----------
-        index_uri : str
-            TODO.
-        idmap_uri : str | None
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Load an index from disk, supporting numpy fallbacks."""
         if self._faiss is None:
-            # load fallback matrix
             if os.path.exists(index_uri + ".npz"):
                 data = np.load(index_uri + ".npz", allow_pickle=True)
                 self._xb = data["xb"]
@@ -246,11 +169,11 @@ class FaissGpuIndex:
         cpu_index = faiss.read_index(index_uri)
         self._ensure_resources()
         if self.gpu:
-            co = faiss.GpuClonerOptions()
-            if hasattr(co, "use_cuvs"):
-                co.use_cuvs = bool(self.cuvs)
+            options = faiss.GpuClonerOptions()
+            if hasattr(options, "use_cuvs"):
+                options.use_cuvs = bool(self.cuvs)
             try:
-                self._index = faiss.index_cpu_to_gpu(self._res, 0, cpu_index, co)
+                self._index = faiss.index_cpu_to_gpu(self._res, 0, cpu_index, options)
             except Exception:
                 self._index = faiss.index_cpu_to_gpu(self._res, 0, cpu_index)
         else:

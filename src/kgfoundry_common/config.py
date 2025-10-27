@@ -1,28 +1,46 @@
-"""Module for kgfoundry_common.config.
+"""Configuration helpers shared across kgfoundry components.
 
 NavMap:
-- load_config: Load config.
+- load_config: Load the application configuration from disk.
 """
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Final
 
 import yaml
 
+from kgfoundry_common.navmap_types import NavMap
 
+__all__ = ["load_config"]
+
+__navmap__: Final[NavMap] = {
+    "title": "kgfoundry_common.config",
+    "synopsis": "Configuration helpers shared across kgfoundry",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["load_config"],
+        },
+    ],
+}
+
+
+# [nav:anchor load_config]
 def load_config(path: str) -> dict[str, Any]:
-    """Load config.
+    """Load a YAML configuration file from ``path``.
 
     Parameters
     ----------
     path : str
-        TODO.
+        Path to the configuration file on disk.
 
     Returns
     -------
-    Dict[str, Any]
-        TODO.
+    dict[str, Any]
+        Parsed configuration values.
     """
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f)

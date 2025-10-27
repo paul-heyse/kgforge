@@ -8,6 +8,7 @@ src.ontology.catalog
    Module for ontology.catalog.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - OntologyCatalog: Ontologycatalog.
 
 

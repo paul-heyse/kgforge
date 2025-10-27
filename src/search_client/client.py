@@ -1,14 +1,27 @@
-"""Module for search_client.client.
-
-NavMap:
-- KGFoundryClient: Minimal synchronous client for the kgfoundry search API.
-"""
+"""Client SDK for interacting with the kgfoundry search API."""
 
 from __future__ import annotations
 
-from typing import Any, Protocol
+from typing import Any, Final, Protocol
 
 import requests
+
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["KGFoundryClient"]
+
+__navmap__: Final[NavMap] = {
+    "title": "search_client.client",
+    "synopsis": "Client SDK for interacting with the kgfoundry search API",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["KGFoundryClient"],
+        },
+    ],
+}
 
 
 class _SupportsResponse(Protocol):
@@ -38,6 +51,7 @@ class _SupportsHttp(Protocol):
         """Post."""
 
 
+# [nav:anchor KGFoundryClient]
 class KGFoundryClient:
     """Minimal synchronous client for the kgfoundry search API."""
 

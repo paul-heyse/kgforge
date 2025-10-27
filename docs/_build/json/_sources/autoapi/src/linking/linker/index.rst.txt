@@ -8,6 +8,7 @@ src.linking.linker
    Module for linking.linker.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - Linker: Abstract linker contract implemented by production pipelines.
 
 

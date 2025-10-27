@@ -1,17 +1,17 @@
-"""{{ name|replace('_', ' ')|title }}.{% if params or return_type %}
+"""Return {{ name|replace('_', ' ') }}.{% if params or return_type %}
 
 {% if params %}Parameters
 ----------
 {%- for p in params %}
 {{ p.argument }}{% if p.annotation %} : {{ p.annotation }}{% endif %}
-    TODO.
+    Description.
 {%- endfor %}
 {% endif -%}
 {% if return_type %}
 Returns
 -------
 {{ return_type }}
-    TODO.
+    Description.
 {% endif -%}
 {% endif -%}
 """

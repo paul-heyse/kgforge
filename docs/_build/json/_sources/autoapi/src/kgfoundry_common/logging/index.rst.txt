@@ -8,6 +8,7 @@ src.kgfoundry_common.logging
    Module for kgfoundry_common.logging.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - JsonFormatter: Jsonformatter.
    - setup_logging: Configure logging with a structured JSON formatter.
 

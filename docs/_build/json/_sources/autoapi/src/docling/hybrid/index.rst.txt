@@ -8,6 +8,7 @@ src.docling.hybrid
    Module for docling.hybrid.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - HybridChunker: Placeholder hybrid chunker for Docling outputs.
 
 

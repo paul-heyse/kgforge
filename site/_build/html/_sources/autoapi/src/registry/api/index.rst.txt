@@ -8,6 +8,7 @@ src.registry.api
    Module for registry.api.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - Registry: Registry protocol describing persistence operations.
 
 

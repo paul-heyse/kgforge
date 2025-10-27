@@ -8,6 +8,7 @@ src.kgfoundry_common.config
    Module for kgfoundry_common.config.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - load_config: Load config.
 
 

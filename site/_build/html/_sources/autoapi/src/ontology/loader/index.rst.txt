@@ -8,6 +8,7 @@ src.ontology.loader
    Module for ontology.loader.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - OntologyLoader: Placeholder loader for ontology metadata.
 
 

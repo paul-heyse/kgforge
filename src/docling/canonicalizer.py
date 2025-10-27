@@ -1,31 +1,39 @@
-"""Module for docling.canonicalizer.
+"""String canonicalisation utilities used by docling preprocessing.
 
 NavMap:
-- canonicalize_text: Apply NFC, normalize whitespace and bullets, preserve….
+- canonicalize_text: Apply NFC, normalise whitespace, and standardise bullets.
 """
 
 from __future__ import annotations
 
 import re
 import unicodedata
+from typing import Final
+
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["canonicalize_text"]
+
+__navmap__: Final[NavMap] = {
+    "title": "docling.canonicalizer",
+    "synopsis": "String canonicalisation utilities for docling preprocessing",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["canonicalize_text"],
+        },
+    ],
+}
 
 
+# [nav:anchor canonicalize_text]
 def canonicalize_text(blocks: list[str]) -> str:
     """Apply NFC, normalize whitespace and bullets, preserve single newlines between blocks."""
 
     def norm(s: str) -> str:
-        """Norm.
-
-        Parameters
-        ----------
-        s : str
-            TODO.
-
-        Returns
-        -------
-        str
-            TODO.
-        """
+        """Normalise a single text block to a canonical representation."""
         s = unicodedata.normalize("NFC", s)
         s = s.replace("\r\n", "\n").replace("\r", "\n")
         s = re.sub(r"[\u2022\u25E6\u2013]", "-", s)  # bullets/dashes

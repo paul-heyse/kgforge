@@ -1,8 +1,8 @@
-"""Module for kgfoundry_common.parquet_io.
+"""Utilities for writing embedding vectors and chunks to Parquet.
 
 NavMap:
-- ParquetVectorWriter: Parquetvectorwriter.
-- ParquetChunkWriter: Parquetchunkwriter.
+- ParquetVectorWriter: Write dense and sparse embedding vectors to Parquet.
+- ParquetChunkWriter: Write chunk metadata and text to Parquet.
 """
 
 from __future__ import annotations
@@ -10,31 +10,49 @@ from __future__ import annotations
 import datetime as dt
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
+from typing import Any, Final
 
 import pyarrow as pa
 import pyarrow.parquet as pq
+
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["ParquetChunkWriter", "ParquetVectorWriter"]
+
+__navmap__: Final[NavMap] = {
+    "title": "kgfoundry_common.parquet_io",
+    "synopsis": "Utilities for writing embedding vectors and chunks to Parquet",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["ParquetVectorWriter", "ParquetChunkWriter"],
+        },
+    ],
+}
 
 ZSTD_LEVEL = 6
 ROW_GROUP_SIZE = 4096
 
 
+# [nav:anchor ParquetVectorWriter]
 class ParquetVectorWriter:
-    """Parquetvectorwriter."""
+    """Persist embedding vectors into partitioned Parquet datasets."""
 
     @staticmethod
     def dense_schema(dim: int) -> pa.schema:
-        """Dense schema.
+        """Return the schema used for dense embedding Parquet files.
 
         Parameters
         ----------
         dim : int
-            TODO.
+            Number of dimensions in each dense vector.
 
         Returns
         -------
         pa.schema
-            TODO.
+            Arrow schema describing the dense vector rows.
         """
         return pa.schema(
             [
@@ -49,13 +67,7 @@ class ParquetVectorWriter:
         )
 
     def __init__(self, root: str) -> None:
-        """Init.
-
-        Parameters
-        ----------
-        root : str
-            TODO.
-        """
+        """Initialise the writer with a root output directory."""
         self.root = Path(root)
 
     def write_dense(
@@ -66,25 +78,25 @@ class ParquetVectorWriter:
         records: Iterable[tuple[str, list[float], float]],
         shard: int = 0,
     ) -> str:
-        """Write dense.
+        """Write dense embedding vectors to a Parquet shard.
 
         Parameters
         ----------
         model : str
-            TODO.
+            Identifier for the embedding model.
         run_id : str
-            TODO.
+            Identifier for the batch or run that produced the embeddings.
         dim : int
-            TODO.
-        records : Iterable[Tuple[str, List[float], float]]
-            TODO.
-        shard : int
-            TODO.
+            Number of dimensions in the embedding vectors.
+        records : Iterable[tuple[str, list[float], float]]
+            Sequence of ``(chunk_id, vector, l2_norm)`` rows.
+        shard : int, optional
+            Shard partition to write, defaults to ``0``.
 
         Returns
         -------
         str
-            TODO.
+            Root directory path as a string.
         """
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
@@ -113,12 +125,12 @@ class ParquetVectorWriter:
 
     @staticmethod
     def splade_schema() -> pa.schema:
-        """Splade schema.
+        """Return the schema used for SPLADE sparse vector Parquet files.
 
         Returns
         -------
         pa.schema
-            TODO.
+            Arrow schema describing sparse vocab ids and weights.
         """
         return pa.schema(
             [
@@ -139,23 +151,23 @@ class ParquetVectorWriter:
         records: Iterable[tuple[str, list[int], list[float]]],
         shard: int = 0,
     ) -> str:
-        """Write splade.
+        """Write SPLADE sparse vector data to a Parquet shard.
 
         Parameters
         ----------
         model : str
-            TODO.
+            Identifier for the sparse embedding model.
         run_id : str
-            TODO.
-        records : Iterable[Tuple[str, List[int], List[float]]]
-            TODO.
-        shard : int
-            TODO.
+            Identifier for the batch or run that produced the embeddings.
+        records : Iterable[tuple[str, list[int], list[float]]]
+            Sequence of ``(chunk_id, vocab_ids, weights)`` rows.
+        shard : int, optional
+            Shard partition to write, defaults to ``0``.
 
         Returns
         -------
         str
-            TODO.
+            Root directory path as a string.
         """
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
@@ -183,17 +195,18 @@ class ParquetVectorWriter:
         return str(self.root)
 
 
+# [nav:anchor ParquetChunkWriter]
 class ParquetChunkWriter:
-    """Parquetchunkwriter."""
+    """Persist chunk metadata and text into Parquet files."""
 
     @staticmethod
     def chunk_schema() -> pa.schema:
-        """Chunk schema.
+        """Return the schema describing chunk metadata rows.
 
         Returns
         -------
         pa.schema
-            TODO.
+            Arrow schema describing chunk metadata and text columns.
         """
         return pa.schema(
             [
@@ -210,7 +223,7 @@ class ParquetChunkWriter:
                             pa.field("start", pa.int32()),
                             pa.field("end", pa.int32()),
                         ]
-                    ),
+                    ).with_nullable(True),
                 ),
                 pa.field("text", pa.string()),
                 pa.field("tokens", pa.int32()),
@@ -219,32 +232,32 @@ class ParquetChunkWriter:
         )
 
     def __init__(self, root: str, model: str = "docling_hybrid", run_id: str = "dev") -> None:
-        """Init.
+        """Initialise the writer with a target directory and identifiers.
 
         Parameters
         ----------
         root : str
-            TODO.
-        model : str
-            TODO.
-        run_id : str
-            TODO.
+            Base directory where chunk Parquet files are written.
+        model : str, optional
+            Name of the chunking model, defaults to ``"docling_hybrid"``.
+        run_id : str, optional
+            Identifier for the batch or run, defaults to ``"dev"``.
         """
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
     def write(self, rows: Iterable[dict[str, Any]]) -> str:
-        """Write.
+        """Write chunk rows to Parquet and return the run directory.
 
         Parameters
         ----------
-        rows : Iterable[Dict[str, Any]]
-            TODO.
+        rows : Iterable[dict[str, Any]]
+            Sequence of dictionaries matching :meth:`chunk_schema`.
 
         Returns
         -------
         str
-            TODO.
+            Path (as string) to the containing run directory.
         """
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(

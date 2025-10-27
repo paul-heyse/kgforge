@@ -1,6 +1,7 @@
 """Module for orchestration.cli.
 
 NavMap:
+- NavMap: Structure describing a module navmap.
 - index_bm25: Build a BM25 index from chunk fixtures (id, title, section,….
 - index_faiss: Train & build FAISS index from fixture dense vectors.
 - api: Run the FastAPI app.
@@ -11,15 +12,34 @@ from __future__ import annotations
 
 import json
 import os
+from typing import Final
 
 import numpy as np
 import typer
 from kgfoundry.embeddings_sparse.bm25 import get_bm25
 from kgfoundry.vectorstore_faiss.gpu import FaissGpuIndex
 
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["api", "e2e", "index_bm25", "index_faiss"]
+
+__navmap__: Final[NavMap] = {
+    "title": "orchestration.cli",
+    "synopsis": "Module for orchestration.cli",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["index_bm25", "index_faiss", "api", "e2e"],
+        },
+    ],
+}
+
 app = typer.Typer(help="kgfoundry orchestration CLI")
 
 
+# [nav:anchor index_bm25]
 @app.command()
 def index_bm25(
     chunks_parquet: str = typer.Argument(..., help="Path to Parquet/JSONL with chunks"),
@@ -65,6 +85,7 @@ def index_bm25(
     typer.echo(f"BM25 index built at {index_dir} using backend={backend} ({type(idx).__name__})")
 
 
+# [nav:anchor index_faiss]
 @app.command()
 def index_faiss(
     dense_vectors: str = typer.Argument(..., help="Path to dense vectors JSON (skeleton)"),
@@ -94,6 +115,7 @@ def index_faiss(
         vs.save(index_path, None)
 
 
+# [nav:anchor api]
 @app.command()
 def api(port: int = 8080) -> None:
     """Run the FastAPI app."""
@@ -102,6 +124,7 @@ def api(port: int = 8080) -> None:
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
 
 
+# [nav:anchor e2e]
 @app.command()
 def e2e() -> None:
     """Execute the skeleton Prefect flow and print completed stages."""

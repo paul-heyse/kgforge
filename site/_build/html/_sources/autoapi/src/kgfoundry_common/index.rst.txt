@@ -21,6 +21,7 @@ Submodules
    /autoapi/src/kgfoundry_common/ids/index
    /autoapi/src/kgfoundry_common/logging/index
    /autoapi/src/kgfoundry_common/models/index
+   /autoapi/src/kgfoundry_common/navmap_types/index
    /autoapi/src/kgfoundry_common/parquet_io/index
 
 

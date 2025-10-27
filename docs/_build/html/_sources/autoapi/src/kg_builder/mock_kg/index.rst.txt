@@ -8,6 +8,7 @@ src.kg_builder.mock_kg
    Module for kg_builder.mock_kg.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - MockKG: A tiny in-memory KG for demo.
 
 

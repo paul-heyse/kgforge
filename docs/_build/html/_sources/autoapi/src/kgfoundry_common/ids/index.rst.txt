@@ -8,6 +8,7 @@ src.kgfoundry_common.ids
    Module for kgfoundry_common.ids.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - urn_doc_from_text: Urn doc from text.
    - urn_chunk: Urn chunk.
 

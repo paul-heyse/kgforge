@@ -1,5 +1,5 @@
 
-.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings readmes html json symbols watch
+.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings readmes html json symbols watch navmap-build navmap-check
 
 VENV := .venv
 PY := $(VENV)/bin/python
@@ -10,6 +10,9 @@ PRECOMMIT := $(VENV)/bin/pre-commit
 PKG := $(shell python tools/detect_pkg.py)
 PKGS := $(shell python tools/detect_pkg.py --all)
 WATCH_PORT := $(if $(SPHINX_AUTOBUILD_PORT),$(SPHINX_AUTOBUILD_PORT),8000)
+DOCSTRING_DIRS := src tools docs/_scripts
+FMT_TARGETS := src tests tools docs/_scripts
+LINT_TARGETS := $(FMT_TARGETS)
 
 bootstrap:
 	python3 -m venv $(VENV)
@@ -30,15 +33,15 @@ test:
 	$(PYTEST) -q
 
 fmt:
-	$(VENV)/bin/ruff check --select I --fix src tests
-	$(VENV)/bin/ruff check --fix src tests
-	$(VENV)/bin/ruff format src tests
-	$(VENV)/bin/black src tests
+	$(VENV)/bin/ruff check --select I --fix $(FMT_TARGETS)
+	$(VENV)/bin/ruff check --fix $(FMT_TARGETS)
+	$(VENV)/bin/ruff format $(FMT_TARGETS)
+	$(VENV)/bin/black $(FMT_TARGETS)
 
 lint:
-	$(VENV)/bin/ruff check --select I src tests
-	$(VENV)/bin/ruff check src tests
-	$(VENV)/bin/ruff format --check src tests
+	$(VENV)/bin/ruff check --select I $(LINT_TARGETS)
+	$(VENV)/bin/ruff check $(LINT_TARGETS)
+	$(VENV)/bin/ruff format --check $(FMT_TARGETS)
 	$(VENV)/bin/mypy src
 
 clean:
@@ -51,13 +54,10 @@ fixture:
 	$(PY) -m kgfoundry.orchestration.fixture_flow
 
 docstrings:
-	@for pkg in $(PKGS); do \
-		echo "Updating docstrings for $$pkg"; \
-	$(VENV)/bin/doq --formatter numpy -t tools/doq_templates/numpy -w -r -d src/$$pkg; \
-	done
+	$(PY) tools/generate_docstrings.py
 	$(PY) tools/update_navmaps.py
-	$(VENV)/bin/docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i src || true
-	$(VENV)/bin/pydocstyle src
+	$(VENV)/bin/docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i $(DOCSTRING_DIRS) || true
+	$(VENV)/bin/pydocstyle $(DOCSTRING_DIRS)
 	$(VENV)/bin/interrogate -i src --fail-under 90
 
 readmes:
@@ -73,6 +73,12 @@ json:
 
 symbols:
 	$(PY) docs/_scripts/build_symbol_index.py
+
+navmap-build:
+	$(PY) tools/navmap/build_navmap.py
+
+navmap-check:
+	$(PY) tools/navmap/check_navmap.py
 
 watch:
 	PYTHONPATH=src $(PY) -m sphinx_autobuild --port $(WATCH_PORT) docs docs/_build/html
