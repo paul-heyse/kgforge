@@ -1,32 +1,29 @@
 repos:
+  - repo: https://github.com/PyCQA/docformatter
+    rev: v1.7.5
+    hooks:
+      - id: docformatter
+        args:
+          - --in-place
+          - --wrap-summaries=120
+          - --wrap-descriptions=120
+        files: "^src/.*\\.py$"
+
   - repo: https://github.com/PyCQA/pydocstyle
     rev: 6.3.0
     hooks:
       - id: pydocstyle
-        args: [ "src" ]
+        files: "^src/.*\\.py$"
 
-  - repo: https://github.com/PyCQA/docformatter
-    rev: 1.7.5
-    hooks:
-      - id: docformatter
-        args: [ "-r", "-i", "src" ]
-
-  - repo: local
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.5.0
     hooks:
       - id: interrogate
-        name: interrogate (docstring coverage)
-        entry: bash -c "interrogate -i src/$(python tools/detect_pkg.py) --fail-under 90"
-        language: system
         pass_filenames: false
-      - id: doq-skeletons
-        name: doq (generate docstring skeletons - run manually)
-        entry: doq -d google -r src/$(python tools/detect_pkg.py)
-        language: system
-        stages: [manual]
-        pass_filenames: false
-
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
-    hooks:
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
+        additional_dependencies:
+          - setuptools
+        args:
+          - -i
+          - src
+          - --fail-under
+          - "90"

@@ -12,7 +12,10 @@ import os
 import sys
 from pathlib import Path
 
-from griffe import GriffeLoader
+try:
+    from griffe.loader import GriffeLoader
+except ImportError:  # pragma: no cover - compatibility shim
+    from griffe import GriffeLoader  # type: ignore[attr-defined]
 
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS_DIR = ROOT / "tools"

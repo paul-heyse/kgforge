@@ -2,7 +2,11 @@ from pathlib import Path
 import sys
 
 import mkdocs_gen_files
-from griffe import GriffeLoader
+
+try:
+    from griffe.loader import GriffeLoader
+except ImportError:  # pragma: no cover - compatibility shim
+    from griffe import GriffeLoader  # type: ignore[attr-defined]
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
