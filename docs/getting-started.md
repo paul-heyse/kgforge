@@ -2,7 +2,7 @@
 
 This guide walks you through the documentation workflow for KGForge.
 
-1. Install the documentation extras once: `pip install -e ".[docs,docs-agent]"`.
+1. Install the documentation extras once: `pip install -e ".[docs]"`.
 2. Generate docstrings and normalize formatting with `make docstrings`.
 3. Refresh package READMEs with deep links via `make readmes` (optionally set `DOCS_LINK_MODE` before running).
 4. Build the docs corpus with `make html`, `make json`, and `make symbols` as needed.
