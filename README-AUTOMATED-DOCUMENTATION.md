@@ -25,6 +25,8 @@ if you need to adjust behavior.
 | [`.pre-commit-config.yaml`](.pre-commit-config.yaml) | Pre-commit hooks for Ruff, Black, Mypy, docformatter, pydocstyle, and interrogate. |
 | [`docs/_scripts/build_symbol_index.py`](docs/_scripts/build_symbol_index.py) | Emits `docs/_build/symbols.json` for agent consumption. |
 | [`tools/detect_pkg.py`](tools/detect_pkg.py) | Detects primary/all packages for doc generation (used by Sphinx/Makefile/tools). |
+| [`pyproject.toml`](pyproject.toml) | Configures Ruff (lint/format), Black, pytest, and docs extras. |
+| [`mypy.ini`](mypy.ini) | Strict type-check configuration (Python 3.13, `mypy_path=src`, third‑party ignores). |
 
 ---
 
@@ -138,6 +140,7 @@ Because these run on every commit, local commands like `tools/update_docs.sh` ma
 - Line length is 100 in both Ruff and Black; docformatter also wraps at 100.
 - Ruff’s formatter is authoritative; Black acts as a safety net and should be a no-op.
 - Mypy targets Python 3.13 with strict options; `mypy_path = src` for imports.
+- Ruff formatting uses double quotes and space indentation.
 
 ---
 
@@ -156,7 +159,7 @@ Because these run on every commit, local commands like `tools/update_docs.sh` ma
    - `DOCS_LINK_MODE=github` + `DOCS_GITHUB_ORG/REPO` produce commit-stable permalinks.
 2. **Nav Maps**
    - Only modules with existing docstrings are rewritten; others are left untouched.
-   - Summaries are truncated to fit Ruff’s 100-character line limit.
+   - Summaries are truncated (~60 chars) in generator to fit the 100-character line limit.
 3. **README Links**
    - Each entry includes both an editor link (`open`) and a relative Markdown link (`view`).
    - Run Doctoc after regeneration if you want actual TOC entries populated.
@@ -190,6 +193,12 @@ make watch
 # formatting & linting
 make fmt
 make lint
+
+# direct CLI (optional)
+ruff check --fix src tests
+ruff format src tests
+black src tests
+mypy src
 ```
 
 For questions or modifications, see the comments inside each tooling script.
