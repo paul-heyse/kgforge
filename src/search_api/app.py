@@ -1,12 +1,13 @@
-"""REST endpoints and helper utilities for the kgfoundry search service.
+"""Module for search_api.app.
 
 NavMap:
-- SearchRequest: Schema describing the search request payload.
-- SearchResult: Schema describing a single ranked search result.
-- auth: Validate the bearer-token header for protected endpoints.
-- healthz: Report the health status for core dependencies.
-- rrf_fuse: Fuse ranked results using reciprocal rank fusion.
-- apply_kg_boosts: Apply knowledge-graph boosting heuristics.
+- NavMap: Structure describing a module navmap.
+- SearchRequest: Searchrequest.
+- SearchResult: Searchresult.
+- auth: Validate the bearer token supplied in the ``Authorization``….
+- healthz: Return a summary of dependency health for readiness checks.
+- rrf_fuse: Fuse ranked result lists using reciprocal rank fusion (RRF).
+- apply_kg_boosts: Apply knowledge-graph boosting heuristics to ranked….
 - search: Execute a search request across dense and sparse indices.
 - graph_concepts: Return KG concepts that match the provided query fragment.
 """

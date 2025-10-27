@@ -1,7 +1,8 @@
-"""Structured logging helpers shared across kgfoundry services.
+"""Module for kgfoundry_common.logging.
 
 NavMap:
-- JsonFormatter: Emit log records as structured JSON.
+- NavMap: Structure describing a module navmap.
+- JsonFormatter: Format log records as compact JSON payloads.
 - setup_logging: Configure the root logger with JSON formatting.
 """
 

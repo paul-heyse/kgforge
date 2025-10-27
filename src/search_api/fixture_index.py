@@ -1,9 +1,10 @@
-"""Lightweight lexical index used by the fixture search API.
+"""Module for search_api.fixture_index.
 
 NavMap:
-- tokenize: Tokenise text for the fixture BM25-lite scorer.
-- FixtureDoc: Minimal record describing a chunked document.
-- FixtureIndex: Build and query an in-memory lexical index sourced from DuckDB.
+- NavMap: Structure describing a module navmap.
+- tokenize: Tokenise ``text`` into lowercase alphanumeric tokens.
+- FixtureDoc: Chunk-level document representation used by the lexical….
+- FixtureIndex: Materialise a lexical index from DuckDB parquet exports.
 """
 
 from __future__ import annotations

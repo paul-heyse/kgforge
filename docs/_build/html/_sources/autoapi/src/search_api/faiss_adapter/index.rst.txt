@@ -9,8 +9,8 @@ src.search_api.faiss_adapter
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - DenseVecs: Densevecs.
-   - FaissAdapter: Faissadapter.
+   - DenseVecs: Dense vector matrix paired with chunk identifiers.
+   - FaissAdapter: Load dense vectors from DuckDB and expose FAISS search….
 
 
 
@@ -21,7 +21,7 @@ Module Contents
 
 .. py:class:: DenseVecs
 
-   Densevecs.
+   Dense vector matrix paired with chunk identifiers.
 
 
    .. py:attribute:: ids
@@ -34,7 +34,7 @@ Module Contents
 
 .. py:class:: FaissAdapter(db_path, factory = 'OPQ64,IVF8192,PQ64', metric = 'ip')
 
-   Faissadapter.
+   Load dense vectors from DuckDB and expose FAISS search utilities.
 
 
    .. py:attribute:: db_path
@@ -70,36 +70,19 @@ Module Contents
 
    .. py:method:: build()
 
-      Build.
-
-      :returns: TODO.
-      :rtype: None
+      Load dense vectors and build a GPU-backed FAISS index when available.
 
 
 
    .. py:method:: load_or_build(cpu_index_path = None)
 
-      Load or build.
-
-      :param cpu_index_path: TODO.
-      :type cpu_index_path: Optional[str]
-
-      :returns: TODO.
-      :rtype: None
+      Load a pre-built FAISS index or build one on demand.
 
 
 
    .. py:method:: search(qvec, k = 10)
 
-      Search.
-
-      :param qvec: TODO.
-      :type qvec: np.ndarray
-      :param k: TODO.
-      :type k: int
-
-      :returns: TODO.
-      :rtype: List[Tuple[str, float]]
+      Return the top ``k`` chunk identifiers most similar to ``qvec``.
 
 
 

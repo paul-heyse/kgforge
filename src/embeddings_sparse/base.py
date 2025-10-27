@@ -1,4 +1,10 @@
-"""Abstract interface for sparse embedding models used in kgfoundry."""
+"""Module for embeddings_sparse.base.
+
+NavMap:
+- NavMap: Structure describing a module navmap.
+- SparseEncoder: Protocol for sparse text encoders.
+- SparseIndex: Protocol describing sparse index interactions.
+"""
 
 from __future__ import annotations
 

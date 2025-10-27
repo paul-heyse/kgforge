@@ -1,4 +1,12 @@
-"""SPLADE-based sparse embedding helpers for kgfoundry."""
+"""Module for embeddings_sparse.splade.
+
+NavMap:
+- NavMap: Structure describing a module navmap.
+- SPLADEv3Encoder: Describe the SPLADE configuration used for neural encoding.
+- PureImpactIndex: Approximate SPLADE indexing with TF/IDF-style impact….
+- LuceneImpactIndex: Bridge to a Pyserini SPLADE impact index stored on disk.
+- get_splade: Construct a SPLADE impact index for the requested backend.
+"""
 
 from __future__ import annotations
 

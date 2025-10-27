@@ -9,8 +9,8 @@ src.kgfoundry_common.parquet_io
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - ParquetVectorWriter: Parquetvectorwriter.
-   - ParquetChunkWriter: Parquetchunkwriter.
+   - ParquetVectorWriter: Persist embedding vectors into partitioned Parquet datasets.
+   - ParquetChunkWriter: Persist chunk metadata and text into Parquet files.
 
 
 
@@ -21,19 +21,19 @@ Module Contents
 
 .. py:class:: ParquetVectorWriter(root)
 
-   Parquetvectorwriter.
+   Persist embedding vectors into partitioned Parquet datasets.
 
 
    .. py:method:: dense_schema(dim)
       :staticmethod:
 
 
-      Dense schema.
+      Return the schema used for dense embedding Parquet files.
 
-      :param dim: TODO.
+      :param dim: Number of dimensions in each dense vector.
       :type dim: int
 
-      :returns: TODO.
+      :returns: Arrow schema describing the dense vector rows.
       :rtype: pa.schema
 
 
@@ -43,20 +43,20 @@ Module Contents
 
    .. py:method:: write_dense(model, run_id, dim, records, shard = 0)
 
-      Write dense.
+      Write dense embedding vectors to a Parquet shard.
 
-      :param model: TODO.
+      :param model: Identifier for the embedding model.
       :type model: str
-      :param run_id: TODO.
+      :param run_id: Identifier for the batch or run that produced the embeddings.
       :type run_id: str
-      :param dim: TODO.
+      :param dim: Number of dimensions in the embedding vectors.
       :type dim: int
-      :param records: TODO.
-      :type records: Iterable[Tuple[str, List[float], float]]
-      :param shard: TODO.
-      :type shard: int
+      :param records: Sequence of ``(chunk_id, vector, l2_norm)`` rows.
+      :type records: Iterable[tuple[str, list[float], float]]
+      :param shard: Shard partition to write, defaults to ``0``.
+      :type shard: int, optional
 
-      :returns: TODO.
+      :returns: Root directory path as a string.
       :rtype: str
 
 
@@ -65,43 +65,43 @@ Module Contents
       :staticmethod:
 
 
-      Splade schema.
+      Return the schema used for SPLADE sparse vector Parquet files.
 
-      :returns: TODO.
+      :returns: Arrow schema describing sparse vocab ids and weights.
       :rtype: pa.schema
 
 
 
    .. py:method:: write_splade(model, run_id, records, shard = 0)
 
-      Write splade.
+      Write SPLADE sparse vector data to a Parquet shard.
 
-      :param model: TODO.
+      :param model: Identifier for the sparse embedding model.
       :type model: str
-      :param run_id: TODO.
+      :param run_id: Identifier for the batch or run that produced the embeddings.
       :type run_id: str
-      :param records: TODO.
-      :type records: Iterable[Tuple[str, List[int], List[float]]]
-      :param shard: TODO.
-      :type shard: int
+      :param records: Sequence of ``(chunk_id, vocab_ids, weights)`` rows.
+      :type records: Iterable[tuple[str, list[int], list[float]]]
+      :param shard: Shard partition to write, defaults to ``0``.
+      :type shard: int, optional
 
-      :returns: TODO.
+      :returns: Root directory path as a string.
       :rtype: str
 
 
 
 .. py:class:: ParquetChunkWriter(root, model = 'docling_hybrid', run_id = 'dev')
 
-   Parquetchunkwriter.
+   Persist chunk metadata and text into Parquet files.
 
 
    .. py:method:: chunk_schema()
       :staticmethod:
 
 
-      Chunk schema.
+      Return the schema describing chunk metadata rows.
 
-      :returns: TODO.
+      :returns: Arrow schema describing chunk metadata and text columns.
       :rtype: pa.schema
 
 
@@ -111,12 +111,12 @@ Module Contents
 
    .. py:method:: write(rows)
 
-      Write.
+      Write chunk rows to Parquet and return the run directory.
 
-      :param rows: TODO.
-      :type rows: Iterable[Dict[str, Any]]
+      :param rows: Sequence of dictionaries matching :meth:`chunk_schema`.
+      :type rows: Iterable[dict[str, Any]]
 
-      :returns: TODO.
+      :returns: Path (as string) to the containing run directory.
       :rtype: str
 
 

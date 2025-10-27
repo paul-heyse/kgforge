@@ -1,7 +1,8 @@
-"""Hybrid document-processing pipeline combining layout and text cues.
+"""Module for docling.hybrid.
 
 NavMap:
-- process_document: Run the hybrid docling pipeline over a document payload.
+- NavMap: Structure describing a module navmap.
+- HybridChunker: Placeholder hybrid chunker for Docling outputs.
 """
 
 from __future__ import annotations

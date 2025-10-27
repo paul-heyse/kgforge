@@ -1,7 +1,8 @@
-"""Configuration helpers shared across kgfoundry components.
+"""Module for kgfoundry_common.config.
 
 NavMap:
-- load_config: Load the application configuration from disk.
+- NavMap: Structure describing a module navmap.
+- load_config: Load a YAML configuration file from ``path``.
 """
 
 from __future__ import annotations

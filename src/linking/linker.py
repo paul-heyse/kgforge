@@ -1,4 +1,9 @@
-"""Knowledge-graph linking heuristics and utilities used by kgfoundry."""
+"""Module for linking.linker.
+
+NavMap:
+- NavMap: Structure describing a module navmap.
+- Linker: Abstract linker contract implemented by production pipelines.
+"""
 
 from __future__ import annotations
 

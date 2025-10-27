@@ -9,12 +9,12 @@ src.orchestration.fixture_flow
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - t_prepare_dirs: T prepare dirs.
-   - t_write_fixture_chunks: T write fixture chunks.
-   - t_write_fixture_dense: T write fixture dense.
-   - t_write_fixture_splade: T write fixture splade.
-   - t_register_in_duckdb: T register in duckdb.
-   - fixture_pipeline: Run the end-to-end fixture pipeline.
+   - t_prepare_dirs: Create the directory layout consumed by subsequent fixture….
+   - t_write_fixture_chunks: Write a minimal chunk parquet dataset for fixture usage.
+   - t_write_fixture_dense: Write dense embedding vectors for the fixture chunk.
+   - t_write_fixture_splade: Write SPLADE-style sparse vectors for the fixture chunk.
+   - t_register_in_duckdb: Insert generated fixture runs and datasets into the DuckDB….
+   - fixture_pipeline: Run the full fixture pipeline and register the generated….
 
 
 
@@ -25,69 +25,37 @@ Module Contents
 
 .. py:function:: t_prepare_dirs(root)
 
-   T prepare dirs.
+   Create the directory layout consumed by subsequent fixture tasks.
 
-   :param root: TODO.
+   :param root: Base directory where fixture artefacts should be written.
    :type root: str
 
-   :returns: TODO.
-   :rtype: dict
+   :returns: A trivial acknowledgement used by downstream tasks.
+   :rtype: dict[str, bool]
 
 
 .. py:function:: t_write_fixture_chunks(chunks_root)
 
-   T write fixture chunks.
-
-   :param chunks_root: TODO.
-   :type chunks_root: str
-
-   :returns: TODO.
-   :rtype: tuple[str, int]
+   Write a minimal chunk parquet dataset for fixture usage.
 
 
 .. py:function:: t_write_fixture_dense(dense_root)
 
-   T write fixture dense.
-
-   :param dense_root: TODO.
-   :type dense_root: str
-
-   :returns: TODO.
-   :rtype: tuple[str, int]
+   Write dense embedding vectors for the fixture chunk.
 
 
 .. py:function:: t_write_fixture_splade(sparse_root)
 
-   T write fixture splade.
-
-   :param sparse_root: TODO.
-   :type sparse_root: str
-
-   :returns: TODO.
-   :rtype: tuple[str, int]
+   Write SPLADE-style sparse vectors for the fixture chunk.
 
 
 .. py:function:: t_register_in_duckdb(db_path, chunks_info, dense_info, sparse_info)
 
-   T register in duckdb.
-
-   :param db_path: TODO.
-                   chunks_info: TODO.
-                   dense_info: TODO.
-                   sparse_info: TODO.
-   :type db_path: str
-
-   :returns: TODO.
-   :rtype: dict
+   Insert generated fixture runs and datasets into the DuckDB registry.
 
 
 .. py:function:: fixture_pipeline(root = '/data', db_path = '/data/catalog/catalog.duckdb')
 
-   Run the end-to-end fixture pipeline.
-
-   :param root: TODO.
-   :type root: str, default="/data"
-   :param db_path: TODO.
-   :type db_path: str, default="/data/catalog/catalog.duckdb"
+   Run the full fixture pipeline and register the generated artefacts.
 
 

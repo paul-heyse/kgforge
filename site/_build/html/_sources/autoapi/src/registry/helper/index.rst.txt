@@ -9,7 +9,7 @@ src.registry.helper
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - DuckDBRegistryHelper: Duckdbregistryhelper.
+   - DuckDBRegistryHelper: Open short-lived DuckDB connections for registry operations.
 
 
 
@@ -20,7 +20,7 @@ Module Contents
 
 .. py:class:: DuckDBRegistryHelper(db_path)
 
-   Duckdbregistryhelper.
+   Open short-lived DuckDB connections for registry operations.
 
 
    .. py:attribute:: db_path
@@ -28,117 +28,49 @@ Module Contents
 
    .. py:method:: new_run(purpose, model_id, revision, config)
 
-      Create a new registry run.
-
-      :param purpose: TODO.
-      :type purpose: str
-      :param model_id: TODO.
-      :type model_id: Optional[str]
-      :param revision: TODO.
-      :type revision: Optional[str]
-      :param config: TODO.
-      :type config: dict
-
-      :returns: TODO.
-      :rtype: str
+      Create a new run record and return its identifier.
 
 
 
    .. py:method:: close_run(run_id, success, notes = None)
 
-      Close run.
-
-      :param run_id: TODO.
-      :type run_id: str
-      :param success: TODO.
-      :type success: bool
-      :param notes: TODO.
-      :type notes: Optional[str]
-
-      :returns: TODO.
-      :rtype: None
+      Mark a run as finished and emit a pipeline event.
 
 
 
    .. py:method:: begin_dataset(kind, run_id)
 
-      Begin dataset.
-
-      :param kind: TODO.
-      :type kind: str
-      :param run_id: TODO.
-      :type run_id: str
-
-      :returns: TODO.
-      :rtype: str
+      Create a dataset placeholder associated with ``run_id``.
 
 
 
    .. py:method:: commit_dataset(dataset_id, parquet_root, rows)
 
-      Commit dataset.
-
-      :param dataset_id: TODO.
-      :type dataset_id: str
-      :param parquet_root: TODO.
-      :type parquet_root: str
-      :param rows: TODO.
-      :type rows: int
-
-      :returns: TODO.
-      :rtype: None
+      Persist parquet location metadata and emit a commit event.
 
 
 
    .. py:method:: rollback_dataset(dataset_id)
 
-      Rollback dataset.
-
-      :param dataset_id: TODO.
-      :type dataset_id: str
-
-      :returns: TODO.
-      :rtype: None
+      Delete a dataset and record a rollback event.
 
 
 
    .. py:method:: register_documents(docs)
 
-      Register documents.
-
-      :param docs: TODO.
-      :type docs: List[Doc]
-
-      :returns: TODO.
-      :rtype: None
+      Insert or update document metadata rows.
 
 
 
    .. py:method:: register_doctags(assets)
 
-      Register doctags.
-
-      :param assets: TODO.
-      :type assets: List[DoctagsAsset]
-
-      :returns: TODO.
-      :rtype: None
+      Insert doctag metadata rows for VLM artefacts.
 
 
 
    .. py:method:: emit_event(event_name, subject_id, payload)
 
-      Emit event.
-
-      :param event_name: TODO.
-      :type event_name: str
-      :param subject_id: TODO.
-      :type subject_id: str
-      :param payload: TODO.
-      :type payload: Dict
-
-      :returns: TODO.
-      :rtype: None
+      Emit an ad-hoc event into the pipeline events table.
 
 
 

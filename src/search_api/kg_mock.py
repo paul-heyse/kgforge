@@ -1,4 +1,12 @@
-"""Mock knowledge-graph lookups used by the search API for demos."""
+"""Module for search_api.kg_mock.
+
+NavMap:
+- NavMap: Structure describing a module navmap.
+- ConceptMeta: Metadata describing a mock concept and its keyword matches.
+- detect_query_concepts: Extract concept identifiers from ``query`` using simple….
+- linked_concepts_for_text: Derive concept URNs mentioned in a chunk of indexed text.
+- kg_boost: Return a boost weight when query and chunk share a concept.
+"""
 
 from __future__ import annotations
 

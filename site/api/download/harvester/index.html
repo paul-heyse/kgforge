@@ -455,6 +455,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#download.harvester.OpenAccessHarvester.download_pdf--raises" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -592,8 +601,10 @@
 
         <p>Module for download.harvester.</p>
 <p>NavMap:
+- DownloadError: Raised when an external download fails.
+- UnsupportedMIMEError: Raised when an unsupported MIME type is encountered.
 - NavMap: Structure describing a module navmap.
-- OpenAccessHarvester: Openaccessharvester.</p>
+- OpenAccessHarvester: Coordinate OpenAlex and Unpaywall lookups to persist open-….</p>
 
 
 
@@ -628,7 +639,7 @@
     <div class="doc doc-contents ">
 
 
-        <p>Openaccessharvester.</p>
+        <p>Coordinate OpenAlex and Unpaywall lookups to persist open-access PDFs.</p>
 
 
 
@@ -639,9 +650,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>src/download/harvester.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 39</span>
-<span class="normal"> 40</span>
-<span class="normal"> 41</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 41</span>
 <span class="normal"> 42</span>
 <span class="normal"> 43</span>
 <span class="normal"> 44</span>
@@ -808,8 +817,19 @@
 <span class="normal">205</span>
 <span class="normal">206</span>
 <span class="normal">207</span>
-<span class="normal">208</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">OpenAccessHarvester</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Openaccessharvester.&quot;&quot;&quot;</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">OpenAccessHarvester</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coordinate OpenAlex and Unpaywall lookups to persist open-access PDFs.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913 - parameters mirror external API options</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -820,22 +840,22 @@
         <span class="n">pdf_host_base</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/data/pdfs&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the harvester with API endpoints and storage options.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        user_agent : str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            User agent string advertised to OpenAlex and downstream APIs.</span>
 <span class="sd">        contact_email : str</span>
-<span class="sd">            TODO.</span>
-<span class="sd">        openalex_base : str</span>
-<span class="sd">            TODO.</span>
-<span class="sd">        unpaywall_base : str</span>
-<span class="sd">            TODO.</span>
-<span class="sd">        pdf_host_base : Optional[str]</span>
-<span class="sd">            TODO.</span>
-<span class="sd">        out_dir : str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Contact address required by Unpaywall for polite usage.</span>
+<span class="sd">        openalex_base : str, optional</span>
+<span class="sd">            Base URL for OpenAlex API requests.</span>
+<span class="sd">        unpaywall_base : str, optional</span>
+<span class="sd">            Base URL for Unpaywall API lookups.</span>
+<span class="sd">        pdf_host_base : str | None, optional</span>
+<span class="sd">            Optional fallback host that mirrors PDFs by DOI.</span>
+<span class="sd">        out_dir : str, optional</span>
+<span class="sd">            Directory where downloaded PDFs will be stored.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ua</span> <span class="o">=</span> <span class="n">user_agent</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="n">contact_email</span>
@@ -848,21 +868,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ua</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">email</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">})</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">years</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_works</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Search.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Search OpenAlex for works matching the provided topic and year window.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        topic : str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            OpenAlex topic identifier or free-form search term.</span>
 <span class="sd">        years : str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Publication-year filter expressed in the OpenAlex filter syntax.</span>
 <span class="sd">        max_works : int</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Maximum number of works to retrieve.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        list[dict]</span>
-<span class="sd">            TODO.</span>
+<span class="sd">        list[dict[str, Any]]</span>
+<span class="sd">            Work payloads returned by the OpenAlex API.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">openalex</span><span class="si">}</span><span class="s2">/works&quot;</span>
         <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
@@ -870,38 +890,40 @@
             <span class="s2">&quot;per_page&quot;</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">max_works</span><span class="p">),</span>
             <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-        <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">years</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">years</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;results&quot;</span><span class="p">,</span> <span class="p">[])[:</span><span class="n">max_works</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">resolve_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">work</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve pdf.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a PDF URL for an OpenAlex work using API metadata and fallbacks.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        work : dict</span>
-<span class="sd">            TODO.</span>
+<span class="sd">        work : dict[str, Any]</span>
+<span class="sd">            Work record returned from :meth:`search`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Optional[str]</span>
-<span class="sd">            TODO.</span>
+<span class="sd">        str | None</span>
+<span class="sd">            Direct PDF URL if one can be resolved; otherwise ``None``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">best</span> <span class="o">=</span> <span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;best_oa_location&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">best</span> <span class="ow">and</span> <span class="n">best</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">best</span><span class="p">[</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;locations&quot;</span><span class="p">,</span> <span class="p">[]):</span>
-            <span class="k">if</span> <span class="n">loc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">loc</span><span class="p">[</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">location</span> <span class="ow">in</span> <span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;locations&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">if</span> <span class="n">location</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">location</span><span class="p">[</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">]</span>
         <span class="n">doi</span> <span class="o">=</span> <span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">doi</span><span class="p">:</span>
-            <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">unpaywall</span><span class="si">}</span><span class="s2">/v2/</span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">email</span><span class="p">},</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span>
             <span class="p">)</span>
-            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
-                <span class="n">j</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-                <span class="n">url</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;best_oa_location&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url_for_pdf&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
+                <span class="n">payload</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="p">(</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;best_oa_location&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url_for_pdf&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">url</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">url</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf_host</span> <span class="ow">and</span> <span class="n">doi</span><span class="p">:</span>
@@ -909,70 +931,77 @@
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">download_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Download pdf.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Download a PDF to the given path and validate the content type.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        url : str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Direct URL to the PDF.</span>
 <span class="sd">        target_path : str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Absolute path on disk where the PDF should be written.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Path to the stored PDF.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        kgfoundry_common.errors.DownloadError</span>
+<span class="sd">            Raised when the response code indicates a failure.</span>
+<span class="sd">        kgfoundry_common.errors.UnsupportedMIMEError</span>
+<span class="sd">            Raised when the response is not a PDF-like MIME type.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">HTTP_OK</span><span class="p">:</span>
-            <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Bad status </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">HTTP_OK</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Bad status </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">raise</span> <span class="n">DownloadError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-        <span class="n">ctype</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s2">&quot;application/pdf&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ctype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;application/&quot;</span><span class="p">):</span>
-            <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Not a PDF-like content-type: </span><span class="si">{</span><span class="n">ctype</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">content_type</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s2">&quot;application/pdf&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;application/&quot;</span><span class="p">):</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Not a PDF-like content type: </span><span class="si">{</span><span class="n">content_type</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">raise</span> <span class="n">UnsupportedMIMEError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">target_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">target_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
+            <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">target_path</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">years</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_works</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Doc</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Harvest PDFs for matching works and build :class:`Doc` records.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        topic : str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Topic identifier or search term forwarded to :meth:`search`.</span>
 <span class="sd">        years : str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Publication-year filter string forwarded to :meth:`search`.</span>
 <span class="sd">        max_works : int</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Maximum number of works to process.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        List[Doc]</span>
-<span class="sd">            TODO.</span>
+<span class="sd">        list[Doc]</span>
+<span class="sd">            Documents referencing the downloaded PDFs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">docs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Doc</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">works</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">years</span><span class="p">,</span> <span class="n">max_works</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">works</span><span class="p">:</span>
-            <span class="n">pdf_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve_pdf</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">work</span> <span class="ow">in</span> <span class="n">works</span><span class="p">:</span>
+            <span class="n">pdf_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve_pdf</span><span class="p">(</span><span class="n">work</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">pdf_url</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">filename</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">w</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="p">(</span><span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
                 <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span>
             <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.pdf&quot;</span>
-            <span class="n">dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">download_pdf</span><span class="p">(</span><span class="n">pdf_url</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
+            <span class="n">destination</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">download_pdf</span><span class="p">(</span><span class="n">pdf_url</span><span class="p">,</span> <span class="n">destination</span><span class="p">)</span>
             <span class="n">doc</span> <span class="o">=</span> <span class="n">Doc</span><span class="p">(</span>
-                <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;urn:doc:source:openalex:</span><span class="si">{</span><span class="n">w</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="n">openalex_id</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">),</span>
-                <span class="n">doi</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">),</span>
-                <span class="n">title</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;urn:doc:source:openalex:</span><span class="si">{</span><span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">openalex_id</span><span class="o">=</span><span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">),</span>
+                <span class="n">doi</span><span class="o">=</span><span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">),</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
                 <span class="n">authors</span><span class="o">=</span><span class="p">[],</span>
                 <span class="n">pub_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">license</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">language</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span>
-                <span class="n">pdf_uri</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span>
+                <span class="n">pdf_uri</span><span class="o">=</span><span class="n">destination</span><span class="p">,</span>
                 <span class="n">source</span><span class="o">=</span><span class="s2">&quot;openalex&quot;</span><span class="p">,</span>
                 <span class="n">content_hash</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="p">)</span>
@@ -1005,27 +1034,25 @@
 
     <div class="doc doc-contents ">
 
-        <p>Init.</p>
+        <p>Initialize the harvester with API endpoints and storage options.</p>
 <h5 id="download.harvester.OpenAccessHarvester.__init__--parameters">Parameters</h5>
 <p>user_agent : str
-    TODO.
+    User agent string advertised to OpenAlex and downstream APIs.
 contact_email : str
-    TODO.
-openalex_base : str
-    TODO.
-unpaywall_base : str
-    TODO.
-pdf_host_base : Optional[str]
-    TODO.
-out_dir : str
-    TODO.</p>
+    Contact address required by Unpaywall for polite usage.
+openalex_base : str, optional
+    Base URL for OpenAlex API requests.
+unpaywall_base : str, optional
+    Base URL for Unpaywall API lookups.
+pdf_host_base : str | None, optional
+    Optional fallback host that mirrors PDFs by DOI.
+out_dir : str, optional
+    Directory where downloaded PDFs will be stored.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/download/harvester.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">44</span>
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
@@ -1057,7 +1084,9 @@ out_dir : str
 <span class="normal">73</span>
 <span class="normal">74</span>
 <span class="normal">75</span>
-<span class="normal">76</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913 - parameters mirror external API options</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913 - parameters mirror external API options</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">user_agent</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">contact_email</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1066,22 +1095,22 @@ out_dir : str
     <span class="n">pdf_host_base</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/data/pdfs&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Init.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the harvester with API endpoints and storage options.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    user_agent : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        User agent string advertised to OpenAlex and downstream APIs.</span>
 <span class="sd">    contact_email : str</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    openalex_base : str</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    unpaywall_base : str</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    pdf_host_base : Optional[str]</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    out_dir : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Contact address required by Unpaywall for polite usage.</span>
+<span class="sd">    openalex_base : str, optional</span>
+<span class="sd">        Base URL for OpenAlex API requests.</span>
+<span class="sd">    unpaywall_base : str, optional</span>
+<span class="sd">        Base URL for Unpaywall API lookups.</span>
+<span class="sd">    pdf_host_base : str | None, optional</span>
+<span class="sd">        Optional fallback host that mirrors PDFs by DOI.</span>
+<span class="sd">    out_dir : str, optional</span>
+<span class="sd">        Directory where downloaded PDFs will be stored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">ua</span> <span class="o">=</span> <span class="n">user_agent</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="n">contact_email</span>
@@ -1109,24 +1138,25 @@ out_dir : str
 
     <div class="doc doc-contents ">
 
-        <p>Download pdf.</p>
+        <p>Download a PDF to the given path and validate the content type.</p>
 <h5 id="download.harvester.OpenAccessHarvester.download_pdf--parameters">Parameters</h5>
 <p>url : str
-    TODO.
+    Direct URL to the PDF.
 target_path : str
-    TODO.</p>
+    Absolute path on disk where the PDF should be written.</p>
 <h5 id="download.harvester.OpenAccessHarvester.download_pdf--returns">Returns</h5>
 <p>str
-    TODO.</p>
+    Path to the stored PDF.</p>
+<h5 id="download.harvester.OpenAccessHarvester.download_pdf--raises">Raises</h5>
+<p>kgfoundry_common.errors.DownloadError
+    Raised when the response code indicates a failure.
+kgfoundry_common.errors.UnsupportedMIMEError
+    Raised when the response is not a PDF-like MIME type.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/download/harvester.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">143</span>
 <span class="normal">144</span>
 <span class="normal">145</span>
 <span class="normal">146</span>
@@ -1147,31 +1177,49 @@ target_path : str
 <span class="normal">161</span>
 <span class="normal">162</span>
 <span class="normal">163</span>
-<span class="normal">164</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">download_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download pdf.</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">download_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download a PDF to the given path and validate the content type.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    url : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Direct URL to the PDF.</span>
 <span class="sd">    target_path : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Absolute path on disk where the PDF should be written.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Path to the stored PDF.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    kgfoundry_common.errors.DownloadError</span>
+<span class="sd">        Raised when the response code indicates a failure.</span>
+<span class="sd">    kgfoundry_common.errors.UnsupportedMIMEError</span>
+<span class="sd">        Raised when the response is not a PDF-like MIME type.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">HTTP_OK</span><span class="p">:</span>
-        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Bad status </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">HTTP_OK</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Bad status </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">raise</span> <span class="n">DownloadError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-    <span class="n">ctype</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s2">&quot;application/pdf&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">ctype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;application/&quot;</span><span class="p">):</span>
-        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Not a PDF-like content-type: </span><span class="si">{</span><span class="n">ctype</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">content_type</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s2">&quot;application/pdf&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;application/&quot;</span><span class="p">):</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Not a PDF-like content type: </span><span class="si">{</span><span class="n">content_type</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">raise</span> <span class="n">UnsupportedMIMEError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">target_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">target_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
+        <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">target_path</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -1190,22 +1238,18 @@ target_path : str
 
     <div class="doc doc-contents ">
 
-        <p>Resolve pdf.</p>
+        <p>Resolve a PDF URL for an OpenAlex work using API metadata and fallbacks.</p>
 <h5 id="download.harvester.OpenAccessHarvester.resolve_pdf--parameters">Parameters</h5>
-<p>work : dict
-    TODO.</p>
+<p>work : dict[str, Any]
+    Work record returned from :meth:<code>search</code>.</p>
 <h5 id="download.harvester.OpenAccessHarvester.resolve_pdf--returns">Returns</h5>
-<p>Optional[str]
-    TODO.</p>
+<p>str | None
+    Direct PDF URL if one can be resolved; otherwise <code>None</code>.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/download/harvester.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">110</span>
 <span class="normal">111</span>
 <span class="normal">112</span>
 <span class="normal">113</span>
@@ -1232,33 +1276,37 @@ target_path : str
 <span class="normal">134</span>
 <span class="normal">135</span>
 <span class="normal">136</span>
-<span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resolve_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">work</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve pdf.</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resolve_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">work</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a PDF URL for an OpenAlex work using API metadata and fallbacks.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    work : dict</span>
-<span class="sd">        TODO.</span>
+<span class="sd">    work : dict[str, Any]</span>
+<span class="sd">        Work record returned from :meth:`search`.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    Optional[str]</span>
-<span class="sd">        TODO.</span>
+<span class="sd">    str | None</span>
+<span class="sd">        Direct PDF URL if one can be resolved; otherwise ``None``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">best</span> <span class="o">=</span> <span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;best_oa_location&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">best</span> <span class="ow">and</span> <span class="n">best</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">best</span><span class="p">[</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;locations&quot;</span><span class="p">,</span> <span class="p">[]):</span>
-        <span class="k">if</span> <span class="n">loc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">loc</span><span class="p">[</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">location</span> <span class="ow">in</span> <span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;locations&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="k">if</span> <span class="n">location</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">location</span><span class="p">[</span><span class="s2">&quot;pdf_url&quot;</span><span class="p">]</span>
     <span class="n">doi</span> <span class="o">=</span> <span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">doi</span><span class="p">:</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">unpaywall</span><span class="si">}</span><span class="s2">/v2/</span><span class="si">{</span><span class="n">doi</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">email</span><span class="p">},</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
-            <span class="n">j</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-            <span class="n">url</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;best_oa_location&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url_for_pdf&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="p">(</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;best_oa_location&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url_for_pdf&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">url</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">url</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf_host</span> <span class="ow">and</span> <span class="n">doi</span><span class="p">:</span>
@@ -1281,33 +1329,22 @@ target_path : str
 
     <div class="doc doc-contents ">
 
-        <p>Run.</p>
+        <p>Harvest PDFs for matching works and build :class:<code>Doc</code> records.</p>
 <h5 id="download.harvester.OpenAccessHarvester.run--parameters">Parameters</h5>
 <p>topic : str
-    TODO.
+    Topic identifier or search term forwarded to :meth:<code>search</code>.
 years : str
-    TODO.
+    Publication-year filter string forwarded to :meth:<code>search</code>.
 max_works : int
-    TODO.</p>
+    Maximum number of works to process.</p>
 <h5 id="download.harvester.OpenAccessHarvester.run--returns">Returns</h5>
-<p>List[Doc]
-    TODO.</p>
+<p>list[Doc]
+    Documents referencing the downloaded PDFs.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/download/harvester.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">177</span>
 <span class="normal">178</span>
 <span class="normal">179</span>
 <span class="normal">180</span>
@@ -1338,44 +1375,55 @@ max_works : int
 <span class="normal">205</span>
 <span class="normal">206</span>
 <span class="normal">207</span>
-<span class="normal">208</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">years</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_works</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Doc</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run.</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">years</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_works</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Doc</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Harvest PDFs for matching works and build :class:`Doc` records.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    topic : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Topic identifier or search term forwarded to :meth:`search`.</span>
 <span class="sd">    years : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Publication-year filter string forwarded to :meth:`search`.</span>
 <span class="sd">    max_works : int</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Maximum number of works to process.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    List[Doc]</span>
-<span class="sd">        TODO.</span>
+<span class="sd">    list[Doc]</span>
+<span class="sd">        Documents referencing the downloaded PDFs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">docs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Doc</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">works</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">years</span><span class="p">,</span> <span class="n">max_works</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">works</span><span class="p">:</span>
-        <span class="n">pdf_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve_pdf</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">work</span> <span class="ow">in</span> <span class="n">works</span><span class="p">:</span>
+        <span class="n">pdf_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve_pdf</span><span class="p">(</span><span class="n">work</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">pdf_url</span><span class="p">:</span>
             <span class="k">continue</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">w</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="p">(</span><span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
             <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span>
         <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.pdf&quot;</span>
-        <span class="n">dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">download_pdf</span><span class="p">(</span><span class="n">pdf_url</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
+        <span class="n">destination</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_pdf</span><span class="p">(</span><span class="n">pdf_url</span><span class="p">,</span> <span class="n">destination</span><span class="p">)</span>
         <span class="n">doc</span> <span class="o">=</span> <span class="n">Doc</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;urn:doc:source:openalex:</span><span class="si">{</span><span class="n">w</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">openalex_id</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">),</span>
-            <span class="n">doi</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">),</span>
-            <span class="n">title</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;urn:doc:source:openalex:</span><span class="si">{</span><span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">openalex_id</span><span class="o">=</span><span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">),</span>
+            <span class="n">doi</span><span class="o">=</span><span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doi&quot;</span><span class="p">),</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">work</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
             <span class="n">authors</span><span class="o">=</span><span class="p">[],</span>
             <span class="n">pub_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">license</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">language</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span>
-            <span class="n">pdf_uri</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span>
+            <span class="n">pdf_uri</span><span class="o">=</span><span class="n">destination</span><span class="p">,</span>
             <span class="n">source</span><span class="o">=</span><span class="s2">&quot;openalex&quot;</span><span class="p">,</span>
             <span class="n">content_hash</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
@@ -1398,24 +1446,22 @@ max_works : int
 
     <div class="doc doc-contents ">
 
-        <p>Search.</p>
+        <p>Search OpenAlex for works matching the provided topic and year window.</p>
 <h5 id="download.harvester.OpenAccessHarvester.search--parameters">Parameters</h5>
 <p>topic : str
-    TODO.
+    OpenAlex topic identifier or free-form search term.
 years : str
-    TODO.
+    Publication-year filter expressed in the OpenAlex filter syntax.
 max_works : int
-    TODO.</p>
+    Maximum number of works to retrieve.</p>
 <h5 id="download.harvester.OpenAccessHarvester.search--returns">Returns</h5>
-<p>list[dict]
-    TODO.</p>
+<p>list[dict[str, Any]]
+    Work payloads returned by the OpenAlex API.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/download/harvester.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 78</span>
-<span class="normal"> 79</span>
-<span class="normal"> 80</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 80</span>
 <span class="normal"> 81</span>
 <span class="normal"> 82</span>
 <span class="normal"> 83</span>
@@ -1439,22 +1485,26 @@ max_works : int
 <span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span>
-<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">years</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_works</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search.</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">years</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_works</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search OpenAlex for works matching the provided topic and year window.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    topic : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        OpenAlex topic identifier or free-form search term.</span>
 <span class="sd">    years : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Publication-year filter expressed in the OpenAlex filter syntax.</span>
 <span class="sd">    max_works : int</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Maximum number of works to retrieve.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    list[dict]</span>
-<span class="sd">        TODO.</span>
+<span class="sd">    list[dict[str, Any]]</span>
+<span class="sd">        Work payloads returned by the OpenAlex API.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">openalex</span><span class="si">}</span><span class="s2">/works&quot;</span>
     <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
@@ -1462,9 +1512,11 @@ max_works : int
         <span class="s2">&quot;per_page&quot;</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">max_works</span><span class="p">),</span>
         <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
     <span class="p">}</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-    <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">years</span><span class="p">:</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">years</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;results&quot;</span><span class="p">,</span> <span class="p">[])[:</span><span class="n">max_works</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>

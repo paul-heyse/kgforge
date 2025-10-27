@@ -9,9 +9,10 @@ src.search_api.kg_mock
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - detect_query_concepts: Detect query concepts.
-   - linked_concepts_for_text: Linked concepts for text.
-   - kg_boost: Kg boost.
+   - ConceptMeta: Metadata describing a mock concept and its keyword matches.
+   - detect_query_concepts: Extract concept identifiers from ``query`` using simple….
+   - linked_concepts_for_text: Derive concept URNs mentioned in a chunk of indexed text.
+   - kg_boost: Return a boost weight when query and chunk share a concept.
 
 
 
@@ -22,40 +23,16 @@ Module Contents
 
 .. py:function:: detect_query_concepts(query)
 
-   Detect query concepts.
-
-   :param query: TODO.
-   :type query: str
-
-   :returns: TODO.
-   :rtype: List[str]
+   Extract concept identifiers from ``query`` using simple heuristics.
 
 
 .. py:function:: linked_concepts_for_text(text)
 
-   Linked concepts for text.
-
-   :param text: TODO.
-   :type text: str
-
-   :returns: TODO.
-   :rtype: List[str]
+   Derive concept URNs mentioned in a chunk of indexed text.
 
 
 .. py:function:: kg_boost(query_concepts, chunk_concepts, direct = 0.08, one_hop = 0.04)
 
-   Kg boost.
-
-   :param query_concepts: TODO.
-   :type query_concepts: List[str]
-   :param chunk_concepts: TODO.
-   :type chunk_concepts: List[str]
-   :param direct: TODO.
-   :type direct: float
-   :param one_hop: TODO.
-   :type one_hop: float
-
-   :returns: TODO.
-   :rtype: float
+   Return a boost weight when query and chunk share a concept.
 
 

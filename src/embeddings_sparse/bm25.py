@@ -1,4 +1,12 @@
-"""BM25 helpers providing pure Python and Lucene-backed sparse retrieval."""
+"""Module for embeddings_sparse.bm25.
+
+NavMap:
+- NavMap: Structure describing a module navmap.
+- BM25Doc: Serialized representation of a BM25 indexed document.
+- PurePythonBM25: Pure-Python BM25 builder and searcher for sparse retrieval.
+- LuceneBM25: Pyserini-backed Lucene BM25 adapter lazily importing Lucene….
+- get_bm25: Construct a BM25 implementation for the requested backend.
+"""
 
 from __future__ import annotations
 

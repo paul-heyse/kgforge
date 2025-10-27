@@ -1,7 +1,8 @@
-"""Helpers for the MockKG in-memory knowledge graph used in demos.
+"""Module for kg_builder.mock_kg.
 
 NavMap:
-- MockKG: Tiny graph leveraged by fixtures and walkthroughs.
+- NavMap: Structure describing a module navmap.
+- MockKG: A tiny in-memory KG for demo.
 """
 
 from __future__ import annotations

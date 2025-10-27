@@ -1,4 +1,11 @@
-"""Ranking utilities composing the kgfoundry search service pipeline."""
+"""Module for search_api.service.
+
+NavMap:
+- NavMap: Structure describing a module navmap.
+- rrf_fuse: Fuse dense and sparse rankings via reciprocal rank fusion.
+- apply_kg_boosts: Apply knowledge-graph based boosts to fused search results.
+- mmr_deduplicate: De-duplicate search results using maximal marginal….
+"""
 
 from __future__ import annotations
 

@@ -1,9 +1,10 @@
-"""In-memory BM25 index used by the fixture search API implementation.
+"""Module for search_api.bm25_index.
 
 NavMap:
-- toks: Tokenise raw text for BM25 scoring.
-- BM25Doc: Lightweight document representation tracked by the index.
-- BM25Index: Build, persist, and query a BM25 index sourced from DuckDB.
+- NavMap: Structure describing a module navmap.
+- toks: Tokenise ``text`` into lowercase alphanumeric terms.
+- BM25Doc: Container storing fields required for BM25 scoring.
+- BM25Index: Construct, persist, and query a BM25 index.
 """
 
 from __future__ import annotations

@@ -1,4 +1,9 @@
-"""Reciprocal rank fusion helpers used by the search API."""
+"""Module for search_api.fusion.
+
+NavMap:
+- NavMap: Structure describing a module navmap.
+- rrf_fuse: Fuse ranked lists using reciprocal rank fusion (RRF).
+"""
 
 from __future__ import annotations
 

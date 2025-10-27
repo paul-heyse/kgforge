@@ -488,8 +488,8 @@
         <p>Module for kgfoundry_common.ids.</p>
 <p>NavMap:
 - NavMap: Structure describing a module navmap.
-- urn_doc_from_text: Urn doc from text.
-- urn_chunk: Urn chunk.</p>
+- urn_doc_from_text: Return a normalized document URN derived from <code>text</code>.
+- urn_chunk: Return a chunk URN derived from document hash and offsets.</p>
 
 
 
@@ -522,23 +522,22 @@
 
     <div class="doc doc-contents ">
 
-        <p>Urn chunk.</p>
+        <p>Return a chunk URN derived from document hash and offsets.</p>
 <h4 id="kgfoundry_common.ids.urn_chunk--parameters">Parameters</h4>
 <p>doc_hash : str
-    TODO.
+    Document-level URN or hash prefix.
 start : int
-    TODO.
+    Inclusive character offset for the chunk start.
 end : int
-    TODO.</p>
+    Exclusive character offset for the chunk end.</p>
 <h4 id="kgfoundry_common.ids.urn_chunk--returns">Returns</h4>
 <p>str
-    TODO.</p>
+    Deterministic chunk URN joining the document hash with offsets.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kgfoundry_common/ids.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">52</span>
-<span class="normal">53</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">53</span>
 <span class="normal">54</span>
 <span class="normal">55</span>
 <span class="normal">56</span>
@@ -554,22 +553,23 @@ end : int
 <span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
-<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">urn_chunk</span><span class="p">(</span><span class="n">doc_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Urn chunk.</span>
+<span class="normal">69</span>
+<span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">urn_chunk</span><span class="p">(</span><span class="n">doc_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a chunk URN derived from document hash and offsets.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    doc_hash : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Document-level URN or hash prefix.</span>
 <span class="sd">    start : int</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Inclusive character offset for the chunk start.</span>
 <span class="sd">    end : int</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Exclusive character offset for the chunk end.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Deterministic chunk URN joining the document hash with offsets.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;urn:chunk:</span><span class="si">{</span><span class="n">doc_hash</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span>
 </code></pre></div></td></tr></table></div>
@@ -589,19 +589,18 @@ end : int
 
     <div class="doc doc-contents ">
 
-        <p>Urn doc from text.</p>
+        <p>Return a normalized document URN derived from <code>text</code>.</p>
 <h4 id="kgfoundry_common.ids.urn_doc_from_text--parameters">Parameters</h4>
 <p>text : str
-    TODO.</p>
+    Raw document text to hash.</p>
 <h4 id="kgfoundry_common.ids.urn_doc_from_text--returns">Returns</h4>
 <p>str
-    TODO.</p>
+    Deterministic URN containing the truncated SHA-256 hash.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kgfoundry_common/ids.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
-<span class="normal">34</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
 <span class="normal">37</span>
@@ -615,18 +614,19 @@ end : int
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
-<span class="normal">48</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">urn_doc_from_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Urn doc from text.</span>
+<span class="normal">48</span>
+<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">urn_doc_from_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a normalized document URN derived from ``text``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    text : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Raw document text to hash.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Deterministic URN containing the truncated SHA-256 hash.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">16</span><span class="p">]</span>
     <span class="n">b32</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b32encode</span><span class="p">(</span><span class="n">h</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>

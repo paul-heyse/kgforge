@@ -9,7 +9,7 @@ src.embeddings_dense.base
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - DenseEmbedder: Protocol describing a dense embedding provider.
+   - DenseEmbeddingModel: Protocol describing dense embedding encoders used in….
 
 
 
@@ -18,25 +18,17 @@ src.embeddings_dense.base
 Module Contents
 ---------------
 
-.. py:class:: DenseEmbedder
+.. py:class:: DenseEmbeddingModel
 
    Bases: :py:obj:`Protocol`
 
 
-   Protocol describing a dense embedding provider.
+   Protocol describing dense embedding encoders used in kgfoundry.
 
 
-   .. py:attribute:: name
-      :type:  str
+   .. py:method:: encode(texts)
 
-
-   .. py:attribute:: dim
-      :type:  int
-
-
-   .. py:method:: embed_texts(texts)
-
-      Return embeddings for the supplied texts.
+      Encode ``texts`` into a dense floating-point representation.
 
 
 

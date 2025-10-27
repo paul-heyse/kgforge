@@ -1,6 +1,7 @@
-"""Legacy exception aliases maintained for backwards compatibility.
+"""Module for kgfoundry_common.exceptions.
 
 NavMap:
+- NavMap: Structure describing a module navmap.
 - DownloadError: Raised when an external download fails.
 - UnsupportedMIMEError: Raised when a MIME type is unsupported.
 """

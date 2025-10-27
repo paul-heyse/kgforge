@@ -1,4 +1,10 @@
-"""Prefect orchestration flows used in kgfoundry demos."""
+"""Module for orchestration.flows.
+
+NavMap:
+- NavMap: Structure describing a module navmap.
+- t_echo: Return ``msg`` unmodified; handy for flow scaffolding and….
+- e2e_flow: Run the high-level kgfoundry demo flow and return step names.
+"""
 
 from __future__ import annotations
 

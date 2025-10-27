@@ -394,35 +394,20 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#search_api.kg_mock.ConceptMeta" class="md-nav__link">
+    <span class="md-ellipsis">
+      ConceptMeta
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#search_api.kg_mock.detect_query_concepts" class="md-nav__link">
     <span class="md-ellipsis">
       detect_query_concepts
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="detect_query_concepts">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#search_api.kg_mock.detect_query_concepts--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      Parameters
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#search_api.kg_mock.detect_query_concepts--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -433,30 +418,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="kg_boost">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#search_api.kg_mock.kg_boost--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      Parameters
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#search_api.kg_mock.kg_boost--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -465,30 +426,6 @@
       linked_concepts_for_text
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="linked_concepts_for_text">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#search_api.kg_mock.linked_concepts_for_text--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      Parameters
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#search_api.kg_mock.linked_concepts_for_text--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -521,9 +458,10 @@
         <p>Module for search_api.kg_mock.</p>
 <p>NavMap:
 - NavMap: Structure describing a module navmap.
-- detect_query_concepts: Detect query concepts.
-- linked_concepts_for_text: Linked concepts for text.
-- kg_boost: Kg boost.</p>
+- ConceptMeta: Metadata describing a mock concept and its keyword matches.
+- detect_query_concepts: Extract concept identifiers from <code>query</code> using simple….
+- linked_concepts_for_text: Derive concept URNs mentioned in a chunk of indexed text.
+- kg_boost: Return a boost weight when query and chunk share a concept.</p>
 
 
 
@@ -544,6 +482,66 @@
 
 
 
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="search_api.kg_mock.ConceptMeta" class="doc doc-heading">
+            <code>ConceptMeta</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+
+
+        <p>Metadata describing a mock concept and its keyword matches.</p>
+
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/search_api/kg_mock.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ConceptMeta</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Metadata describing a mock concept and its keyword matches.&quot;&quot;&quot;</span>
+
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">keywords</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
 
 <div class="doc doc-object doc-function">
 
@@ -556,53 +554,25 @@
 
     <div class="doc doc-contents ">
 
-        <p>Detect query concepts.</p>
-<h4 id="search_api.kg_mock.detect_query_concepts--parameters">Parameters</h4>
-<p>query : str
-    TODO.</p>
-<h4 id="search_api.kg_mock.detect_query_concepts--returns">Returns</h4>
-<p>List[str]
-    TODO.</p>
+        <p>Extract concept identifiers from <code>query</code> using simple heuristics.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/kg_mock.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">53</span>
 <span class="normal">54</span>
 <span class="normal">55</span>
 <span class="normal">56</span>
 <span class="normal">57</span>
 <span class="normal">58</span>
 <span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">detect_query_concepts</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detect query concepts.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    query : str</span>
-<span class="sd">        TODO.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    List[str]</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">q</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="n">hits</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">_CONCEPTS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">kw</span> <span class="ow">in</span> <span class="n">q</span> <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;keywords&quot;</span><span class="p">]):</span>
-            <span class="n">hits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cid</span><span class="p">)</span>
+<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">detect_query_concepts</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract concept identifiers from ``query`` using simple heuristics.&quot;&quot;&quot;</span>
+    <span class="n">lowered</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">hits</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">concept_id</span><span class="p">,</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">CONCEPTS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">keyword</span> <span class="ow">in</span> <span class="n">lowered</span> <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;keywords&quot;</span><span class="p">]):</span>
+            <span class="n">hits</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">concept_id</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">hits</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -621,71 +591,27 @@
 
     <div class="doc doc-contents ">
 
-        <p>Kg boost.</p>
-<h4 id="search_api.kg_mock.kg_boost--parameters">Parameters</h4>
-<p>query_concepts : List[str]
-    TODO.
-chunk_concepts : List[str]
-    TODO.
-direct : float
-    TODO.
-one_hop : float
-    TODO.</p>
-<h4 id="search_api.kg_mock.kg_boost--returns">Returns</h4>
-<p>float
-    TODO.</p>
+        <p>Return a boost weight when query and chunk share a concept.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/kg_mock.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kg_boost</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kg_boost</span><span class="p">(</span>
     <span class="n">query_concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">chunk_concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">direct</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.08</span><span class="p">,</span>
     <span class="n">one_hop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.04</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Kg boost.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    query_concepts : List[str]</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    chunk_concepts : List[str]</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    direct : float</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    one_hop : float</span>
-<span class="sd">        TODO.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    float</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a boost weight when query and chunk share a concept.&quot;&quot;&quot;</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">one_hop</span>  <span class="c1"># placeholder for future graph traversal heuristics</span>
     <span class="k">return</span> <span class="n">direct</span> <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">query_concepts</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">chunk_concepts</span><span class="p">)</span> <span class="k">else</span> <span class="mf">0.0</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -704,53 +630,25 @@ one_hop : float
 
     <div class="doc doc-contents ">
 
-        <p>Linked concepts for text.</p>
-<h4 id="search_api.kg_mock.linked_concepts_for_text--parameters">Parameters</h4>
-<p>text : str
-    TODO.</p>
-<h4 id="search_api.kg_mock.linked_concepts_for_text--returns">Returns</h4>
-<p>List[str]
-    TODO.</p>
+        <p>Derive concept URNs mentioned in a chunk of indexed text.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/kg_mock.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">66</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
 <span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">linked_concepts_for_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Linked concepts for text.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    text : str</span>
-<span class="sd">        TODO.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    List[str]</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">linked_concepts_for_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Derive concept URNs mentioned in a chunk of indexed text.&quot;&quot;&quot;</span>
+    <span class="n">lowered</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="n">hits</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">_CONCEPTS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">kw</span> <span class="ow">in</span> <span class="n">t</span> <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;keywords&quot;</span><span class="p">]):</span>
-            <span class="n">hits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cid</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">concept_id</span><span class="p">,</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">CONCEPTS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">keyword</span> <span class="ow">in</span> <span class="n">lowered</span> <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;keywords&quot;</span><span class="p">]):</span>
+            <span class="n">hits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">concept_id</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">hits</span>
 </code></pre></div></td></tr></table></div>
             </details>

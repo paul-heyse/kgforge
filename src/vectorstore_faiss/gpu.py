@@ -1,7 +1,8 @@
-"""GPU-accelerated FAISS index wrapper with a numpy fallback.
+"""Module for vectorstore_faiss.gpu.
 
 NavMap:
-- FaissGpuIndex: Manage FAISS lifecycle and provide brute-force fallbacks.
+- NavMap: Structure describing a module navmap.
+- FaissGpuIndex: Wrap a FAISS vector index and provide numpy-based fallbacks.
 """
 
 from __future__ import annotations

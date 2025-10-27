@@ -1,7 +1,8 @@
-"""String canonicalisation utilities used by docling preprocessing.
+"""Module for docling.canonicalizer.
 
 NavMap:
-- canonicalize_text: Apply NFC, normalise whitespace, and standardise bullets.
+- NavMap: Structure describing a module navmap.
+- canonicalize_text: Apply NFC, normalize whitespace and bullets, preserve….
 """
 
 from __future__ import annotations

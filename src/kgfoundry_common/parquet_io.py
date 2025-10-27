@@ -1,8 +1,9 @@
-"""Utilities for writing embedding vectors and chunks to Parquet.
+"""Module for kgfoundry_common.parquet_io.
 
 NavMap:
-- ParquetVectorWriter: Write dense and sparse embedding vectors to Parquet.
-- ParquetChunkWriter: Write chunk metadata and text to Parquet.
+- NavMap: Structure describing a module navmap.
+- ParquetVectorWriter: Persist embedding vectors into partitioned Parquet datasets.
+- ParquetChunkWriter: Persist chunk metadata and text into Parquet files.
 """
 
 from __future__ import annotations

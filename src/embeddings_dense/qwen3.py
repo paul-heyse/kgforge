@@ -1,4 +1,9 @@
-"""Adapter for the Qwen-3 dense embedding model used in kgfoundry."""
+"""Module for embeddings_dense.qwen3.
+
+NavMap:
+- NavMap: Structure describing a module navmap.
+- Qwen3Embedder: Adapter for Qwen3 dense embedding checkpoints.
+"""
 
 from __future__ import annotations
 

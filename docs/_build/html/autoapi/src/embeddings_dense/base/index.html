@@ -454,31 +454,21 @@
 <p>Module for embeddings_dense.base.</p>
 <p>NavMap:
 - NavMap: Structure describing a module navmap.
-- DenseEmbedder: Protocol describing a dense embedding provider.</p>
+- DenseEmbeddingModel: Protocol describing dense embedding encoders used in….</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="src.embeddings_dense.base.DenseEmbedder">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.embeddings_dense.base.</span></span><span class="sig-name descname"><span class="pre">DenseEmbedder</span></span><a class="reference internal" href="../../../../_modules/src/embeddings_dense/base.html#DenseEmbedder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/embeddings_dense/base.py:33:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.embeddings_dense.base.DenseEmbedder" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="src.embeddings_dense.base.DenseEmbeddingModel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.embeddings_dense.base.</span></span><span class="sig-name descname"><span class="pre">DenseEmbeddingModel</span></span><a class="reference internal" href="../../../../_modules/src/embeddings_dense/base.html#DenseEmbeddingModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/embeddings_dense/base.py:35:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.embeddings_dense.base.DenseEmbeddingModel" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Protocol</span></code></p>
-<p>Protocol describing a dense embedding provider.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.embeddings_dense.base.DenseEmbedder.name">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/embeddings_dense/base.html#DenseEmbedder.name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/embeddings_dense/base.py:36:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.embeddings_dense.base.DenseEmbedder.name" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.embeddings_dense.base.DenseEmbedder.dim">
-<span class="sig-name descname"><span class="pre">dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/src/embeddings_dense/base.html#DenseEmbedder.dim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/embeddings_dense/base.py:37:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.embeddings_dense.base.DenseEmbedder.dim" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
+<p>Protocol describing dense embedding encoders used in kgfoundry.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="src.embeddings_dense.base.DenseEmbedder.embed_texts">
-<span class="sig-name descname"><span class="pre">embed_texts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">texts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/embeddings_dense/base.html#DenseEmbedder.embed_texts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/embeddings_dense/base.py:39:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.embeddings_dense.base.DenseEmbedder.embed_texts" title="Link to this definition">#</a></dt>
-<dd><p>Return embeddings for the supplied texts.</p>
+<dt class="sig sig-object py" id="src.embeddings_dense.base.DenseEmbeddingModel.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">texts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/embeddings_dense/base.html#DenseEmbeddingModel.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/embeddings_dense/base.py:38:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.embeddings_dense.base.DenseEmbeddingModel.encode" title="Link to this definition">#</a></dt>
+<dd><p>Encode <code class="docutils literal notranslate"><span class="pre">texts</span></code> into a dense floating-point representation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>texts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>)</p>
+<dd class="field-odd"><p><strong>texts</strong> (<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><em>collections.abc.Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>)</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>numpy.typing.NDArray[numpy.float32]</p>
@@ -539,10 +529,8 @@
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.embeddings_dense.base.DenseEmbedder"><code class="docutils literal notranslate"><span class="pre">DenseEmbedder</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.embeddings_dense.base.DenseEmbedder.name"><code class="docutils literal notranslate"><span class="pre">DenseEmbedder.name</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.embeddings_dense.base.DenseEmbedder.dim"><code class="docutils literal notranslate"><span class="pre">DenseEmbedder.dim</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.embeddings_dense.base.DenseEmbedder.embed_texts"><code class="docutils literal notranslate"><span class="pre">DenseEmbedder.embed_texts()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.embeddings_dense.base.DenseEmbeddingModel"><code class="docutils literal notranslate"><span class="pre">DenseEmbeddingModel</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.embeddings_dense.base.DenseEmbeddingModel.encode"><code class="docutils literal notranslate"><span class="pre">DenseEmbeddingModel.encode()</span></code></a></li>
 </ul>
 </li>
 </ul>

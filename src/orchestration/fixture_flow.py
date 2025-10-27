@@ -1,4 +1,14 @@
-"""Prefect flow scaffolding used to generate fixture data for kgfoundry."""
+"""Module for orchestration.fixture_flow.
+
+NavMap:
+- NavMap: Structure describing a module navmap.
+- t_prepare_dirs: Create the directory layout consumed by subsequent fixture….
+- t_write_fixture_chunks: Write a minimal chunk parquet dataset for fixture usage.
+- t_write_fixture_dense: Write dense embedding vectors for the fixture chunk.
+- t_write_fixture_splade: Write SPLADE-style sparse vectors for the fixture chunk.
+- t_register_in_duckdb: Insert generated fixture runs and datasets into the DuckDB….
+- fixture_pipeline: Run the full fixture pipeline and register the generated….
+"""
 
 from __future__ import annotations
 

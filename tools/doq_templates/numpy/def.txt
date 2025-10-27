@@ -1,4 +1,4 @@
-"""Return {{ name|replace('_', ' ') }}.{% if params or return_type %}
+"""{{ name|replace('_', ' ')|capitalize }}.{% if params or return_type %}
 
 {% if params %}Parameters
 ----------

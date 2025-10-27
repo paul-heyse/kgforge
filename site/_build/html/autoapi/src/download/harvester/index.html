@@ -453,14 +453,16 @@
 <span id="src-download-harvester"></span><h1>src.download.harvester<a class="headerlink" href="#module-src.download.harvester" title="Link to this heading">#</a></h1>
 <p>Module for download.harvester.</p>
 <p>NavMap:
+- DownloadError: Raised when an external download fails.
+- UnsupportedMIMEError: Raised when an unsupported MIME type is encountered.
 - NavMap: Structure describing a module navmap.
-- OpenAccessHarvester: Openaccessharvester.</p>
+- OpenAccessHarvester: Coordinate OpenAlex and Unpaywall lookups to persist open-….</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.download.harvester.OpenAccessHarvester">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.download.harvester.</span></span><span class="sig-name descname"><span class="pre">OpenAccessHarvester</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_agent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">openalex_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://api.openalex.org'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unpaywall_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://api.unpaywall.org'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdf_host_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/data/pdfs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:39:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester" title="Link to this definition">#</a></dt>
-<dd><p>Openaccessharvester.</p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.download.harvester.</span></span><span class="sig-name descname"><span class="pre">OpenAccessHarvester</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_agent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">openalex_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://api.openalex.org'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unpaywall_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://api.unpaywall.org'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdf_host_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/data/pdfs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:41:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester" title="Link to this definition">#</a></dt>
+<dd><p>Coordinate OpenAlex and Unpaywall lookups to persist open-access PDFs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -475,114 +477,120 @@
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.download.harvester.OpenAccessHarvester.ua">
-<span class="sig-name descname"><span class="pre">ua</span></span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.ua"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:68:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.ua" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">ua</span></span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.ua"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:70:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.ua" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.download.harvester.OpenAccessHarvester.email">
-<span class="sig-name descname"><span class="pre">email</span></span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.email"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:69:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.email" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">email</span></span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.email"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:71:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.email" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.download.harvester.OpenAccessHarvester.openalex">
-<span class="sig-name descname"><span class="pre">openalex</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.openalex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:70:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.openalex" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">openalex</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.openalex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:72:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.openalex" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.download.harvester.OpenAccessHarvester.unpaywall">
-<span class="sig-name descname"><span class="pre">unpaywall</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.unpaywall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:71:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.unpaywall" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">unpaywall</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.unpaywall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:73:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.unpaywall" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.download.harvester.OpenAccessHarvester.pdf_host">
-<span class="sig-name descname"><span class="pre">pdf_host</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.pdf_host"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:72:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.pdf_host" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">pdf_host</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.pdf_host"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:74:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.pdf_host" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.download.harvester.OpenAccessHarvester.out_dir">
-<span class="sig-name descname"><span class="pre">out_dir</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/data/pdfs'</span></em><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.out_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:73:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.out_dir" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">out_dir</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/data/pdfs'</span></em><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.out_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:75:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.out_dir" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.download.harvester.OpenAccessHarvester.session">
-<span class="sig-name descname"><span class="pre">session</span></span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:75:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.session" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">session</span></span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:77:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.session" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.download.harvester.OpenAccessHarvester.search">
-<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_works</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:78:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.search" title="Link to this definition">#</a></dt>
-<dd><p>Search.</p>
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_works</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:80:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.search" title="Link to this definition">#</a></dt>
+<dd><p>Search OpenAlex for works matching the provided topic and year window.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>topic</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p></li>
-<li><p><strong>years</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p></li>
-<li><p><strong>max_works</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – TODO.</p></li>
+<li><p><strong>topic</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – OpenAlex topic identifier or free-form search term.</p></li>
+<li><p><strong>years</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Publication-year filter expressed in the OpenAlex filter syntax.</p></li>
+<li><p><strong>max_works</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Maximum number of works to retrieve.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
+<dd class="field-even"><p>Work payloads returned by the OpenAlex API.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, Any]]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.download.harvester.OpenAccessHarvester.resolve_pdf">
-<span class="sig-name descname"><span class="pre">resolve_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">work</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.resolve_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:106:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.resolve_pdf" title="Link to this definition">#</a></dt>
-<dd><p>Resolve pdf.</p>
+<span class="sig-name descname"><span class="pre">resolve_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">work</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.resolve_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:110:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.resolve_pdf" title="Link to this definition">#</a></dt>
+<dd><p>Resolve a PDF URL for an OpenAlex work using API metadata and fallbacks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>work</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – TODO.</p>
+<dd class="field-odd"><p><strong>work</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) – Work record returned from <a class="reference internal" href="#src.download.harvester.OpenAccessHarvester.search" title="src.download.harvester.OpenAccessHarvester.search"><code class="xref py py-meth docutils literal notranslate"><span class="pre">search()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
+<dd class="field-even"><p>Direct PDF URL if one can be resolved; otherwise <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Optional[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a> | None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.download.harvester.OpenAccessHarvester.download_pdf">
-<span class="sig-name descname"><span class="pre">download_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.download_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:139:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.download_pdf" title="Link to this definition">#</a></dt>
-<dd><p>Download pdf.</p>
+<span class="sig-name descname"><span class="pre">download_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.download_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:143:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.download_pdf" title="Link to this definition">#</a></dt>
+<dd><p>Download a PDF to the given path and validate the content type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p></li>
-<li><p><strong>target_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p></li>
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Direct URL to the PDF.</p></li>
+<li><p><strong>target_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Absolute path on disk where the PDF should be written.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
+<dd class="field-even"><p>Path to the stored PDF.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="../../kgfoundry_common/errors/index.html#src.kgfoundry_common.errors.DownloadError" title="src.kgfoundry_common.errors.DownloadError"><strong>kgfoundry_common.errors.DownloadError</strong></a> – Raised when the response code indicates a failure.</p></li>
+<li><p><a class="reference internal" href="../../kgfoundry_common/errors/index.html#src.kgfoundry_common.errors.UnsupportedMIMEError" title="src.kgfoundry_common.errors.UnsupportedMIMEError"><strong>kgfoundry_common.errors.UnsupportedMIMEError</strong></a> – Raised when the response is not a PDF-like MIME type.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.download.harvester.OpenAccessHarvester.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_works</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:166:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.run" title="Link to this definition">#</a></dt>
-<dd><p>Run.</p>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_works</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/download/harvester.html#OpenAccessHarvester.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/download/harvester.py:177:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.download.harvester.OpenAccessHarvester.run" title="Link to this definition">#</a></dt>
+<dd><p>Harvest PDFs for matching works and build <code class="xref py py-class docutils literal notranslate"><span class="pre">Doc</span></code> records.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>topic</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p></li>
-<li><p><strong>years</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p></li>
-<li><p><strong>max_works</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – TODO.</p></li>
+<li><p><strong>topic</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Topic identifier or search term forwarded to <a class="reference internal" href="#src.download.harvester.OpenAccessHarvester.search" title="src.download.harvester.OpenAccessHarvester.search"><code class="xref py py-meth docutils literal notranslate"><span class="pre">search()</span></code></a>.</p></li>
+<li><p><strong>years</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Publication-year filter string forwarded to <a class="reference internal" href="#src.download.harvester.OpenAccessHarvester.search" title="src.download.harvester.OpenAccessHarvester.search"><code class="xref py py-meth docutils literal notranslate"><span class="pre">search()</span></code></a>.</p></li>
+<li><p><strong>max_works</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Maximum number of works to process.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
+<dd class="field-even"><p>Documents referencing the downloaded PDFs.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="../../kgfoundry_common/models/index.html#src.kgfoundry_common.models.Doc" title="src.kgfoundry_common.models.Doc">Doc</a>]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference internal" href="../../kgfoundry_common/models/index.html#src.kgfoundry_common.models.Doc" title="src.kgfoundry_common.models.Doc">Doc</a>]</p>
 </dd>
 </dl>
 </dd></dl>

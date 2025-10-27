@@ -9,8 +9,8 @@ src.kgfoundry_common.logging
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - JsonFormatter: Jsonformatter.
-   - setup_logging: Configure logging with a structured JSON formatter.
+   - JsonFormatter: Format log records as compact JSON payloads.
+   - setup_logging: Configure the root logger with JSON formatting.
 
 
 
@@ -26,29 +26,20 @@ Module Contents
    Bases: :py:obj:`logging.Formatter`
 
 
-   Jsonformatter.
+   Format log records as compact JSON payloads.
 
 
    .. py:method:: format(record)
 
-      Format.
-
-      :param record: TODO.
-      :type record: logging.LogRecord
-
-      :returns: TODO.
-      :rtype: str
+      Serialise a log record into a JSON string.
 
 
 
 .. py:function:: setup_logging(level = logging.INFO)
 
-   Configure logging with a structured JSON formatter.
+   Configure the root logger with JSON formatting.
 
-   :param level: TODO.
-   :type level: int
-
-   :returns: TODO.
-   :rtype: None
+   :param level: Minimum log level to emit, defaults to :data:`logging.INFO`.
+   :type level: int, optional
 
 

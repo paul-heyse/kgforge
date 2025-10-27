@@ -9,7 +9,7 @@ src.ontology.catalog
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - OntologyCatalog: Ontologycatalog.
+   - OntologyCatalog: In-memory view of ontology concepts and relationships.
 
 
 
@@ -20,7 +20,7 @@ Module Contents
 
 .. py:class:: OntologyCatalog(concepts)
 
-   Ontologycatalog.
+   In-memory view of ontology concepts and relationships.
 
 
    .. py:attribute:: by_id
@@ -28,15 +28,13 @@ Module Contents
 
    .. py:method:: neighbors(concept_id, depth = 1)
 
-      Neighbors.
+      Return neighbour concept identifiers up to ``depth`` hops.
 
-      :param concept_id: TODO.
-      :type concept_id: str
-      :param depth: TODO.
-      :type depth: int
 
-      :returns: TODO.
-      :rtype: List[str]
+
+   .. py:method:: hydrate(concept_id)
+
+      Load the full concept record for ``concept_id``.
 
 
 
