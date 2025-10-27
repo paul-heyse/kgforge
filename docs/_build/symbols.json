@@ -4416,14 +4416,6 @@
     "doc": ""
   },
   {
-    "path": "search_api.faiss_adapter.TypeAlias",
-    "kind": "alias",
-    "file": null,
-    "lineno": null,
-    "endlineno": null,
-    "doc": ""
-  },
-  {
     "path": "search_api.faiss_adapter.cast",
     "kind": "alias",
     "file": null,
@@ -4481,7 +4473,7 @@
   },
   {
     "path": "search_api.faiss_adapter.VecArray",
-    "kind": "attribute",
+    "kind": "type alias",
     "file": "search_api/faiss_adapter.py",
     "lineno": 33,
     "endlineno": 33,
@@ -4489,7 +4481,7 @@
   },
   {
     "path": "search_api.faiss_adapter.IndexArray",
-    "kind": "attribute",
+    "kind": "type alias",
     "file": "search_api/faiss_adapter.py",
     "lineno": 34,
     "endlineno": 34,
@@ -5152,14 +5144,6 @@
     "doc": ""
   },
   {
-    "path": "vectorstore_faiss.gpu.TypeAlias",
-    "kind": "alias",
-    "file": null,
-    "lineno": null,
-    "endlineno": null,
-    "doc": ""
-  },
-  {
     "path": "vectorstore_faiss.gpu.cast",
     "kind": "alias",
     "file": null,
@@ -5185,7 +5169,7 @@
   },
   {
     "path": "vectorstore_faiss.gpu.FloatArray",
-    "kind": "attribute",
+    "kind": "type alias",
     "file": "vectorstore_faiss/gpu.py",
     "lineno": 15,
     "endlineno": 15,
@@ -5193,7 +5177,7 @@
   },
   {
     "path": "vectorstore_faiss.gpu.IntArray",
-    "kind": "attribute",
+    "kind": "type alias",
     "file": "vectorstore_faiss/gpu.py",
     "lineno": 16,
     "endlineno": 16,
@@ -5201,7 +5185,7 @@
   },
   {
     "path": "vectorstore_faiss.gpu.StrArray",
-    "kind": "attribute",
+    "kind": "type alias",
     "file": "vectorstore_faiss/gpu.py",
     "lineno": 17,
     "endlineno": 17,

@@ -358,7 +358,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">  9</span>
 <span class="linenos"> 10</span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="linenos"> 11</span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="linenos"> 12</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypeAlias</span><span class="p">,</span> <span class="n">cast</span>
+<span class="linenos"> 12</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">cast</span>
 <span class="linenos"> 13</span>
 <span class="linenos"> 14</span><span class="kn">import</span><span class="w"> </span><span class="nn">duckdb</span>
 <span class="linenos"> 15</span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -379,8 +379,8 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos"> 30</span>    <span class="n">HAVE_FAISS</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="linenos"> 31</span>
 <span class="linenos"> 32</span>
-<span class="linenos"> 33</span><span class="n">VecArray</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">]</span>
-<span class="linenos"> 34</span><span class="n">IndexArray</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]</span>
+<span class="linenos"> 33</span><span class="nb">type</span> <span class="n">VecArray</span> <span class="o">=</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">]</span>
+<span class="linenos"> 34</span><span class="nb">type</span> <span class="n">IndexArray</span> <span class="o">=</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]</span>
 <span class="linenos"> 35</span>
 <span class="linenos"> 36</span>
 <span class="linenos"> 37</span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;DenseVecs&quot;</span><span class="p">,</span> <span class="s2">&quot;FaissAdapter&quot;</span><span class="p">]</span>
