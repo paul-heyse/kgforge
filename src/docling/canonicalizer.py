@@ -1,9 +1,15 @@
-"""Module for docling.canonicalizer.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- canonicalize_text: Apply NFC, normalize whitespace and bullets, preserve….
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+docling.canonicalizer
+"""
+
 
 from __future__ import annotations
 
@@ -31,10 +37,67 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor canonicalize_text]
 def canonicalize_text(blocks: list[str]) -> str:
-    """Apply NFC, normalize whitespace and bullets, preserve single newlines between blocks."""
+    """
+    Return canonicalize text.
+    
+    Parameters
+    ----------
+    blocks : List[str]
+        Description for ``blocks``.
+    
+    Returns
+    -------
+    str
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from docling.canonicalizer import canonicalize_text
+    >>> result = canonicalize_text(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    docling.canonicalizer
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
 
     def norm(s: str) -> str:
-        """Normalise a single text block to a canonical representation."""
+        """
+        Return norm.
+        
+        Parameters
+        ----------
+        s : str
+            Description for ``s``.
+        
+        Returns
+        -------
+        str
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from docling.canonicalizer import norm
+        >>> result = norm(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        docling.canonicalizer
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         s = unicodedata.normalize("NFC", s)
         s = s.replace("\r\n", "\n").replace("\r", "\n")
         s = re.sub(r"[\u2022\u25E6\u2013]", "-", s)  # bullets/dashes

@@ -84,6 +84,7 @@ dependencies = [
     "types-PyYAML>=6.0.12.20240917",
     "black>=25.9.0",
     "ruff>=0.14.2",
+    "pydoclint>=0.4.0",
     "prefect>=3.4.25",
 
     # ============================================================================
@@ -203,6 +204,7 @@ docs = [
     "sphinxcontrib-mermaid>=0.7.1",
     "sphinx-issues>=5.0.1",
     "sphinxcontrib-spelling>=7.7.0",
+    "numpydoc>=1.7.0",
     "pyenchant>=3.3.0",
     "linkify-it-py>=2.0.3",
     "sphinxcontrib-typer>=0.6.2",
@@ -218,6 +220,7 @@ docs = [
     "doq",               # generate docstring skeletons
     "pyment",            # fill/convert to preferred style (Google/NumPy/reST)
     "interrogate",       # enforce docstring coverage
+    "pydoclint>=0.4.0",  # enforce numpy-style parameter/return parity
     "pydocstyle",        # PEP-257 lint
     "docformatter",      # format docstrings
     "import-linter",     # enforce layered architecture
@@ -292,7 +295,7 @@ select = [
 ]
 ignore = ["Q", "E203", "D203", "D213"]
 preview = false
-extend-select = ["RUF100"]
+extend-select = ["RUF100", "D401", "D417"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10

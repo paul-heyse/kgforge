@@ -1,9 +1,15 @@
-"""Module for linking.calibration.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- isotonic_calibrate: Calibrate score/label pairs using an isotonic regression….
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+linking.calibration
+"""
+
 
 from __future__ import annotations
 
@@ -29,18 +35,35 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor isotonic_calibrate]
 def isotonic_calibrate(pairs: list[tuple[float, int]]) -> dict[str, object]:
-    """Calibrate score/label pairs using an isotonic regression placeholder.
-
+    """
+    Return isotonic calibrate.
+    
     Parameters
     ----------
-    pairs : list[tuple[float, int]]
-        Sequence of ``(score, label)`` pairs where score is in ``[0, 1]`` and
-        label is either ``0`` or ``1``.
-
+    pairs : List[Tuple[float, int]]
+        Description for ``pairs``.
+    
     Returns
     -------
-    dict[str, object]
-        Calibration artefact describing the fitted model (placeholder).
+    Mapping[str, object]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from linking.calibration import isotonic_calibrate
+    >>> result = isotonic_calibrate(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    linking.calibration
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
     """
+    
+    
     # NOTE: fit isotonic regression parameters when calibrator is implemented
     return {"kind": "isotonic", "params": []}

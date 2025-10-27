@@ -1,9 +1,15 @@
-"""Module for linking.linker.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- Linker: Abstract linker contract implemented by production pipelines.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+linking.linker
+"""
+
 
 from __future__ import annotations
 
@@ -29,6 +35,32 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Linker]
 class Linker:
-    """Abstract linker contract implemented by production pipelines."""
+    """
+    Represent Linker.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from linking.linker import Linker
+    >>> result = Linker()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    linking.linker
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...

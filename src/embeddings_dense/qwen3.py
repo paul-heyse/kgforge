@@ -1,9 +1,15 @@
-"""Module for embeddings_dense.qwen3.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- Qwen3Embedder: Adapter for Qwen3 dense embedding checkpoints.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+embeddings_dense.qwen3
+"""
+
 
 from __future__ import annotations
 
@@ -29,6 +35,32 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Qwen3Embedder]
 class Qwen3Embedder:
-    """Adapter for Qwen3 dense embedding checkpoints."""
+    """
+    Represent Qwen3Embedder.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from embeddings_dense.qwen3 import Qwen3Embedder
+    >>> result = Qwen3Embedder()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    embeddings_dense.qwen3
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...

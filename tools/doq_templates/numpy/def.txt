@@ -13,5 +13,13 @@ Returns
 {{ return_type }}
     Description.
 {% endif -%}
+Raises
+------
+Exception
+    Description.
+
+Examples
+--------
+>>> {{ name }}(...)
 {% endif -%}
 """

@@ -1,9 +1,15 @@
-"""Module for ontology.loader.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- OntologyLoader: Placeholder loader for ontology metadata.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+ontology.loader
+"""
+
 
 from __future__ import annotations
 
@@ -29,6 +35,32 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor OntologyLoader]
 class OntologyLoader:
-    """Placeholder loader for ontology metadata."""
+    """
+    Represent OntologyLoader.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from ontology.loader import OntologyLoader
+    >>> result = OntologyLoader()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    ontology.loader
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...

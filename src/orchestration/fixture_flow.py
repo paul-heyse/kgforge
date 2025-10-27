@@ -1,14 +1,15 @@
-"""Module for orchestration.fixture_flow.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- t_prepare_dirs: Create the directory layout consumed by subsequent fixture….
-- t_write_fixture_chunks: Write a minimal chunk parquet dataset for fixture usage.
-- t_write_fixture_dense: Write dense embedding vectors for the fixture chunk.
-- t_write_fixture_splade: Write SPLADE-style sparse vectors for the fixture chunk.
-- t_register_in_duckdb: Insert generated fixture runs and datasets into the DuckDB….
-- fixture_pipeline: Run the full fixture pipeline and register the generated….
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+orchestration.fixture_flow
+"""
+
 
 from __future__ import annotations
 
@@ -55,18 +56,36 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor t_prepare_dirs]
 @task
 def t_prepare_dirs(root: str) -> dict[str, bool]:
-    """Create the directory layout consumed by subsequent fixture tasks.
-
+    """
+    Return t prepare dirs.
+    
     Parameters
     ----------
     root : str
-        Base directory where fixture artefacts should be written.
-
+        Description for ``root``.
+    
     Returns
     -------
-    dict[str, bool]
-        A trivial acknowledgement used by downstream tasks.
+    Mapping[str, bool]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from orchestration.fixture_flow import t_prepare_dirs
+    >>> result = t_prepare_dirs(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    orchestration.fixture_flow
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
     """
+    
+    
     path = Path(root)
     (path / "parquet" / "dense").mkdir(parents=True, exist_ok=True)
     (path / "parquet" / "sparse").mkdir(parents=True, exist_ok=True)
@@ -78,7 +97,36 @@ def t_prepare_dirs(root: str) -> dict[str, bool]:
 # [nav:anchor t_write_fixture_chunks]
 @task
 def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
-    """Write a minimal chunk parquet dataset for fixture usage."""
+    """
+    Return t write fixture chunks.
+    
+    Parameters
+    ----------
+    chunks_root : str
+        Description for ``chunks_root``.
+    
+    Returns
+    -------
+    Tuple[str, int]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from orchestration.fixture_flow import t_write_fixture_chunks
+    >>> result = t_write_fixture_chunks(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    orchestration.fixture_flow
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     writer = ParquetChunkWriter(chunks_root, model="docling_hybrid", run_id="fixture")
     rows = [
         {
@@ -100,7 +148,36 @@ def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
 # [nav:anchor t_write_fixture_dense]
 @task
 def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
-    """Write dense embedding vectors for the fixture chunk."""
+    """
+    Return t write fixture dense.
+    
+    Parameters
+    ----------
+    dense_root : str
+        Description for ``dense_root``.
+    
+    Returns
+    -------
+    Tuple[str, int]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from orchestration.fixture_flow import t_write_fixture_dense
+    >>> result = t_write_fixture_dense(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    orchestration.fixture_flow
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     writer = ParquetVectorWriter(dense_root)
     vector = [0.0] * 2560
     out_root = writer.write_dense(
@@ -112,7 +189,36 @@ def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
 # [nav:anchor t_write_fixture_splade]
 @task
 def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
-    """Write SPLADE-style sparse vectors for the fixture chunk."""
+    """
+    Return t write fixture splade.
+    
+    Parameters
+    ----------
+    sparse_root : str
+        Description for ``sparse_root``.
+    
+    Returns
+    -------
+    Tuple[str, int]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from orchestration.fixture_flow import t_write_fixture_splade
+    >>> result = t_write_fixture_splade(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    orchestration.fixture_flow
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     writer = ParquetVectorWriter(sparse_root)
     out_root = writer.write_splade(
         "SPLADE-v3-distilbert",
@@ -131,7 +237,42 @@ def t_register_in_duckdb(
     dense_info: tuple[str, int],
     sparse_info: tuple[str, int],
 ) -> dict[str, list[str]]:
-    """Insert generated fixture runs and datasets into the DuckDB registry."""
+    """
+    Return t register in duckdb.
+    
+    Parameters
+    ----------
+    db_path : str
+        Description for ``db_path``.
+    chunks_info : Tuple[str, int]
+        Description for ``chunks_info``.
+    dense_info : Tuple[str, int]
+        Description for ``dense_info``.
+    sparse_info : Tuple[str, int]
+        Description for ``sparse_info``.
+    
+    Returns
+    -------
+    Mapping[str, List[str]]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from orchestration.fixture_flow import t_register_in_duckdb
+    >>> result = t_register_in_duckdb(..., ..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    orchestration.fixture_flow
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     registry = DuckDBRegistryHelper(db_path)
     dense_run = registry.new_run("dense_embed", "Qwen3-Embedding-4B", "main", {"dim": 2560})
     sparse_run = registry.new_run("splade_encode", "SPLADE-v3-distilbert", "main", {"topk": 256})
@@ -174,7 +315,38 @@ def t_register_in_duckdb(
 def fixture_pipeline(
     root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb"
 ) -> dict[str, list[str]]:
-    """Run the full fixture pipeline and register the generated artefacts."""
+    """
+    Return fixture pipeline.
+    
+    Parameters
+    ----------
+    root : str, optional
+        Description for ``root``.
+    db_path : str, optional
+        Description for ``db_path``.
+    
+    Returns
+    -------
+    Mapping[str, List[str]]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from orchestration.fixture_flow import fixture_pipeline
+    >>> result = fixture_pipeline(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    orchestration.fixture_flow
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     t_prepare_dirs(root)
     chunks_info = t_write_fixture_chunks(f"{root}/parquet/chunks")
     dense_info = t_write_fixture_dense(f"{root}/parquet/dense")

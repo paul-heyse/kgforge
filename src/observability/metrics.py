@@ -1,4 +1,15 @@
-"""Module for observability.metrics."""
+"""
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+observability.metrics
+"""
+
 
 from __future__ import annotations
 
@@ -25,26 +36,190 @@ try:
 except Exception:  # pragma: no cover - minimal no-op fallbacks
 
     class _NoopMetric:
-        """Minimal stand-in when Prometheus client is unavailable."""
+        """
+        Represent NoopMetric.
+        
+        Attributes
+        ----------
+        None
+            No public attributes documented.
+        
+        Methods
+        -------
+        labels()
+            Method description.
+        observe()
+            Method description.
+        inc()
+            Method description.
+        set()
+            Method description.
+        
+        Examples
+        --------
+        >>> from observability.metrics import _NoopMetric
+        >>> result = _NoopMetric()
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        observability.metrics
+        
+        Notes
+        -----
+        Document class invariants and lifecycle details here.
+        """
+        
+        
 
         def labels(self, *args: object, **kwargs: object) -> _NoopMetric:
-            """Return self to mimic the Prometheus API."""
+            """
+            Return labels.
+            
+            Parameters
+            ----------
+            *args : Any, optional
+                Description for ``*args``.
+            **kwargs : Any, optional
+                Description for ``**kwargs``.
+            
+            Returns
+            -------
+            _NoopMetric
+                Description of return value.
+            
+            Examples
+            --------
+            >>> from observability.metrics import labels
+            >>> result = labels()
+            >>> result  # doctest: +ELLIPSIS
+            ...
+            
+            See Also
+            --------
+            observability.metrics
+            
+            Notes
+            -----
+            Provide usage considerations, constraints, or complexity notes.
+            """
+            
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
-            """Ignore observation calls."""
+            """
+            Return observe.
+            
+            Parameters
+            ----------
+            *args : Any, optional
+                Description for ``*args``.
+            **kwargs : Any, optional
+                Description for ``**kwargs``.
+            
+            Examples
+            --------
+            >>> from observability.metrics import observe
+            >>> observe()  # doctest: +ELLIPSIS
+            
+            See Also
+            --------
+            observability.metrics
+            
+            Notes
+            -----
+            Provide usage considerations, constraints, or complexity notes.
+            """
+            
             return
 
         def inc(self, *args: object, **kwargs: object) -> None:
-            """Ignore counter increments."""
+            """
+            Return inc.
+            
+            Parameters
+            ----------
+            *args : Any, optional
+                Description for ``*args``.
+            **kwargs : Any, optional
+                Description for ``**kwargs``.
+            
+            Examples
+            --------
+            >>> from observability.metrics import inc
+            >>> inc()  # doctest: +ELLIPSIS
+            
+            See Also
+            --------
+            observability.metrics
+            
+            Notes
+            -----
+            Provide usage considerations, constraints, or complexity notes.
+            """
+            
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
-            """Ignore gauge updates."""
+            """
+            Return set.
+            
+            Parameters
+            ----------
+            *args : Any, optional
+                Description for ``*args``.
+            **kwargs : Any, optional
+                Description for ``**kwargs``.
+            
+            Examples
+            --------
+            >>> from observability.metrics import set
+            >>> set()  # doctest: +ELLIPSIS
+            
+            See Also
+            --------
+            observability.metrics
+            
+            Notes
+            -----
+            Provide usage considerations, constraints, or complexity notes.
+            """
+            
             return
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:
-        """Return a no-op metric when Prometheus is unavailable."""
+        """
+        Return make noop metric.
+        
+        Parameters
+        ----------
+        *args : Any, optional
+            Description for ``*args``.
+        **kwargs : Any, optional
+            Description for ``**kwargs``.
+        
+        Returns
+        -------
+        _NoopMetric
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from observability.metrics import _make_noop_metric
+        >>> result = _make_noop_metric()
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        observability.metrics
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         return _NoopMetric()
 
     Counter = cast(CounterFactory, _make_noop_metric)

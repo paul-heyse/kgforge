@@ -24,7 +24,7 @@ run() {
 
 ensure_tools() {
   local missing=0
-  for tool in doq docformatter pydocstyle interrogate; do
+  for tool in doq docformatter pydocstyle pydoclint interrogate; do
     if [[ ! -x "$BIN/$tool" ]]; then
       echo "error: missing '$tool'; install docs extras via 'pip install -e \".[docs]\"' (inside .venv)." >&2
       missing=1
@@ -49,6 +49,7 @@ rm -rf docs/_build/html docs/_build/json site
 
 run make docstrings
 run make readmes
+run "$PY" tools/update_navmaps.py
 run "$PY" tools/navmap/build_navmap.py
 run "$PY" tools/navmap/check_navmap.py
 run make html

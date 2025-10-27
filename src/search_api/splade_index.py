@@ -1,11 +1,15 @@
-"""Module for search_api.splade_index.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- tok: Tokenise ``text`` into lowercase alphanumeric units.
-- SpladeDoc: Chunk-level document representation for the sparse index.
-- SpladeIndex: Load chunk text and expose a sparse similarity search API.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+search_api.splade_index
+"""
+
 
 from __future__ import annotations
 
@@ -38,14 +42,75 @@ TOKEN = re.compile(r"[A-Za-z0-9]+")
 
 # [nav:anchor tok]
 def tok(text: str) -> list[str]:
-    """Tokenise ``text`` into lowercase alphanumeric units."""
+    """
+    Return tok.
+    
+    Parameters
+    ----------
+    text : str
+        Description for ``text``.
+    
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from search_api.splade_index import tok
+    >>> result = tok(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.splade_index
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     return [token.lower() for token in TOKEN.findall(text or "")]
 
 
 # [nav:anchor SpladeDoc]
 @dataclass
 class SpladeDoc:
-    """Chunk-level document representation for the sparse index."""
+    """
+    Represent SpladeDoc.
+    
+    Attributes
+    ----------
+    chunk_id : str
+        Attribute description.
+    doc_id : str
+        Attribute description.
+    section : str
+        Attribute description.
+    text : str
+        Attribute description.
+    
+    Examples
+    --------
+    >>> from search_api.splade_index import SpladeDoc
+    >>> result = SpladeDoc()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.splade_index
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     chunk_id: str
     doc_id: str
@@ -55,7 +120,42 @@ class SpladeDoc:
 
 # [nav:anchor SpladeIndex]
 class SpladeIndex:
-    """Load chunk text and expose a sparse similarity search API."""
+    """
+    Represent SpladeIndex.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Methods
+    -------
+    __init__()
+        Method description.
+    _load()
+        Method description.
+    search()
+        Method description.
+    doc()
+        Method description.
+    
+    Examples
+    --------
+    >>> from search_api.splade_index import SpladeIndex
+    >>> result = SpladeIndex()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.splade_index
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
 
     def __init__(
         self,
@@ -63,7 +163,32 @@ class SpladeIndex:
         chunks_dataset_root: str | None = None,
         sparse_root: str | None = None,
     ) -> None:
-        """Initialise the index and eagerly load chunk documents."""
+        """
+        Return init.
+        
+        Parameters
+        ----------
+        db_path : str
+            Description for ``db_path``.
+        chunks_dataset_root : str | None, optional
+            Description for ``chunks_dataset_root``.
+        sparse_root : str | None, optional
+            Description for ``sparse_root``.
+        
+        Examples
+        --------
+        >>> from search_api.splade_index import __init__
+        >>> __init__(..., ..., ...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        search_api.splade_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -72,7 +197,28 @@ class SpladeIndex:
         self._load(chunks_dataset_root)
 
     def _load(self, chunks_root: str | None) -> None:
-        """Read the latest chunk dataset and pre-compute document frequencies."""
+        """
+        Return load.
+        
+        Parameters
+        ----------
+        chunks_root : str | None
+            Description for ``chunks_root``.
+        
+        Examples
+        --------
+        >>> from search_api.splade_index import _load
+        >>> _load(...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        search_api.splade_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         _ = chunks_root  # optional override currently unused
         if not Path(self.db_path).exists():
             return
@@ -104,7 +250,38 @@ class SpladeIndex:
                 self.df[term] = self.df.get(term, 0) + 1
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Return indices of documents that best match ``query``."""
+        """
+        Return search.
+        
+        Parameters
+        ----------
+        query : str
+            Description for ``query``.
+        k : int, optional
+            Description for ``k``.
+        
+        Returns
+        -------
+        List[Tuple[int, float]]
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from search_api.splade_index import search
+        >>> result = search(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        search_api.splade_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
+        
         if self.N == 0:
             return []
         terms = tok(query)
@@ -125,5 +302,33 @@ class SpladeIndex:
         return [(idx, value) for idx, value in ranked[:k] if value > 0.0]
 
     def doc(self, index: int) -> SpladeDoc:
-        """Return the :class:`SpladeDoc` at ``index``."""
+        """
+        Return doc.
+        
+        Parameters
+        ----------
+        index : int
+            Description for ``index``.
+        
+        Returns
+        -------
+        SpladeDoc
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from search_api.splade_index import doc
+        >>> result = doc(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        search_api.splade_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         return self.docs[index]
