@@ -2,6 +2,7 @@
 Create a .importlinter file with a default layered-architecture contract.
 Detects the root package automatically (prefers src/<pkg>).
 """
+
 from pathlib import Path
 
 from detect_pkg import detect_primary

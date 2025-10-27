@@ -1,12 +1,14 @@
 """Module for ontology.catalog."""
 
 from __future__ import annotations
-from typing import List
+
 from kgforge.kgforge_common.models import Concept
+
 
 class OntologyCatalog:
     """Ontologycatalog."""
-    def __init__(self, concepts: List[Concept]):
+
+    def __init__(self, concepts: list[Concept]):
         """Init.
 
         Args:
@@ -14,7 +16,7 @@ class OntologyCatalog:
         """
         self.by_id = {c.id: c for c in concepts}
 
-    def neighbors(self, concept_id: str, depth: int = 1) -> List[str]:
+    def neighbors(self, concept_id: str, depth: int = 1) -> list[str]:
         """Neighbors.
 
         Args:

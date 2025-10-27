@@ -1,10 +1,14 @@
 """Module for docling.canonicalizer."""
 
 from __future__ import annotations
-import re, unicodedata
+
+import re
+import unicodedata
+
 
 def canonicalize_text(blocks: list[str]) -> str:
     """Apply NFC, normalize whitespace and bullets, preserve single newlines between blocks."""
+
     def norm(s: str) -> str:
         """Norm.
 
@@ -20,5 +24,6 @@ def canonicalize_text(blocks: list[str]) -> str:
         s = re.sub(r"[\x00-\x1F]", " ", s)
         s = re.sub(r"\s+", " ", s).strip()
         return s
+
     normed = [norm(b) for b in blocks if b.strip()]
     return "\n".join(normed)

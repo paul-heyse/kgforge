@@ -73,6 +73,12 @@ dependencies = [
     "typer>=0.19.2",
     "rich>=14.2.0",
     "tqdm>=4.67.1",
+    "mypy>=1.11.0",
+    "mypy-extensions>=1.0.0",
+    "types-requests>=2.32.0.20241016",
+    "types-PyYAML>=6.0.12.20240917",
+    "black",
+    "ruff",
 
     # ============================================================================
     # Utilities
@@ -171,12 +177,7 @@ gpu = [
     
 ] 
 
-dev = [
-    "mypy>=1.11.0",
-    "mypy-extensions>=1.0.0",
-    "types-requests>=2.32.0.20241016",
-    "types-PyYAML>=6.0.12.20240917",
-]
+
 docs = [
     "sphinx>=8.2.3",
     "myst-parser>=3.0.1",
@@ -234,7 +235,7 @@ docstokg-hybrid-validation = "DocsToKG.HybridSearch.validation:main"
 
 [tool.black]
 line-length = 100
-target-version = ["py313"]
+target-version = ["py312"]  # black currently supports up to py312; code runs on py313
 
 [tool.ruff]
 line-length = 100
@@ -329,10 +330,6 @@ emit-index-annotation = true
 emit-index-url        = true
 emit-build-options    = true  # include only/no-binary flags if you use them
 
-[dependency-groups]
-dev = [
-    "ruff>=0.14.1",
-]
 
 [tool.pydocstyle]
 add-ignore = [

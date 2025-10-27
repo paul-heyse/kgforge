@@ -1,5 +1,12 @@
-
 import importlib
+
+import pytest
+
+try:
+    from fastapi.testclient import TestClient
+except ModuleNotFoundError:  # pragma: no cover
+    TestClient = None  # type: ignore[assignment]
+
 
 def test_imports():
     for mod in [
@@ -19,9 +26,13 @@ def test_imports():
     ]:
         importlib.import_module(mod)
 
+
 def test_api_skeleton():
-    from fastapi.testclient import TestClient
+    if TestClient is None:  # pragma: no cover - optional dependency missing
+        pytest.skip("fastapi is required for API skeleton test")
+
     from search_api.app import app
+
     client = TestClient(app)
     r = client.get("/healthz")
     assert r.status_code == 200

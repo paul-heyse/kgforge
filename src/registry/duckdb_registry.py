@@ -1,12 +1,18 @@
 """Module for registry.duckdb_registry."""
 
 from __future__ import annotations
-import duckdb, os, time, json, uuid
-from typing import List, Dict
+
+import json
+import uuid
+from collections.abc import Mapping
+
+import duckdb
 from kgforge.kgforge_common.models import Doc, DoctagsAsset
+
 
 class DuckDBRegistry:
     """Minimal DuckDB-backed registry (skeleton)."""
+
     def __init__(self, db_path: str):
         """Init.
 
@@ -28,8 +34,14 @@ class DuckDBRegistry:
             str: TODO.
         """
         dsid = str(uuid.uuid4())
-        self.con.execute("INSERT INTO datasets(dataset_id, kind, parquet_root, run_id, created_at) VALUES (?, ?, '', ?, now())",
-                         [dsid, kind, run_id])
+        self.con.execute(
+            (
+                "INSERT INTO datasets("
+                "dataset_id, kind, parquet_root, run_id, created_at"
+                ") VALUES (?, ?, '', ?, now())"
+            ),
+            [dsid, kind, run_id],
+        )
         return dsid
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
@@ -43,7 +55,9 @@ class DuckDBRegistry:
         Returns:
             None: TODO.
         """
-        self.con.execute("UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id])
+        self.con.execute(
+            "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
+        )
 
     def rollback_dataset(self, dataset_id: str) -> None:
         """Rollback dataset.
@@ -56,7 +70,13 @@ class DuckDBRegistry:
         """
         self.con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
 
-    def insert_run(self, purpose: str, model_id: str | None, revision: str | None, config: dict) -> str:
+    def insert_run(
+        self,
+        purpose: str,
+        model_id: str | None,
+        revision: str | None,
+        config: Mapping[str, object],
+    ) -> str:
         """Insert run.
 
         Args:
@@ -69,8 +89,14 @@ class DuckDBRegistry:
             str: TODO.
         """
         run_id = str(uuid.uuid4())
-        self.con.execute("INSERT INTO runs(run_id, purpose, model_id, revision, started_at, config) VALUES (?, ?, ?, ?, now(), ?)",
-                         [run_id, purpose, model_id, revision, json.dumps(config)])
+        self.con.execute(
+            (
+                "INSERT INTO runs("
+                "run_id, purpose, model_id, revision, started_at, config"
+                ") VALUES (?, ?, ?, ?, now(), ?)"
+            ),
+            [run_id, purpose, model_id, revision, json.dumps(config)],
+        )
         return run_id
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
@@ -86,7 +112,7 @@ class DuckDBRegistry:
         """
         self.con.execute("UPDATE runs SET finished_at=now() WHERE run_id=?", [run_id])
 
-    def register_documents(self, docs: List[Doc]) -> None:
+    def register_documents(self, docs: list[Doc]) -> None:
         """Register documents.
 
         Args:
@@ -97,12 +123,30 @@ class DuckDBRegistry:
         """
         for d in docs:
             self.con.execute(
-                "INSERT OR REPLACE INTO documents(doc_id, openalex_id, doi, arxiv_id, pmcid, title, authors, pub_date, license, language, pdf_uri, source, content_hash, created_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now())",
-                [d.id, d.openalex_id, d.doi, d.arxiv_id, d.pmcid, d.title, json.dumps(d.authors), d.pub_date, d.license, d.language, d.pdf_uri, d.source, d.content_hash]
+                (
+                    "INSERT OR REPLACE INTO documents("
+                    "doc_id, openalex_id, doi, arxiv_id, pmcid, title, authors, "
+                    "pub_date, license, language, pdf_uri, source, content_hash, created_at"
+                    ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now())"
+                ),
+                [
+                    d.id,
+                    d.openalex_id,
+                    d.doi,
+                    d.arxiv_id,
+                    d.pmcid,
+                    d.title,
+                    json.dumps(d.authors),
+                    d.pub_date,
+                    d.license,
+                    d.language,
+                    d.pdf_uri,
+                    d.source,
+                    d.content_hash,
+                ],
             )
 
-    def register_doctags(self, assets: List[DoctagsAsset]) -> None:
+    def register_doctags(self, assets: list[DoctagsAsset]) -> None:
         """Register doctags.
 
         Args:
@@ -113,11 +157,15 @@ class DuckDBRegistry:
         """
         for a in assets:
             self.con.execute(
-                "INSERT OR REPLACE INTO doctags(doc_id, doctags_uri, pages, vlm_model, vlm_revision, avg_logprob, created_at) VALUES (?, ?, ?, ?, ?, ?, now())",
-                [a.doc_id, a.doctags_uri, a.pages, a.vlm_model, a.vlm_revision, a.avg_logprob]
+                (
+                    "INSERT OR REPLACE INTO doctags("
+                    "doc_id, doctags_uri, pages, vlm_model, vlm_revision, avg_logprob, created_at"
+                    ") VALUES (?, ?, ?, ?, ?, ?, now())"
+                ),
+                [a.doc_id, a.doctags_uri, a.pages, a.vlm_model, a.vlm_revision, a.avg_logprob],
             )
 
-    def emit_event(self, event_name: str, subject_id: str, payload: Dict) -> None:
+    def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
         """Emit event.
 
         Args:
@@ -129,8 +177,12 @@ class DuckDBRegistry:
             None: TODO.
         """
         self.con.execute(
-            "INSERT INTO pipeline_events(event_id, event_name, subject_id, payload, created_at) VALUES (gen_random_uuid(), ?, ?, ?, now())",
-            [event_name, subject_id, json.dumps(payload)]
+            (
+                "INSERT INTO pipeline_events("
+                "event_id, event_name, subject_id, payload, created_at"
+                ") VALUES (gen_random_uuid(), ?, ?, ?, now())"
+            ),
+            [event_name, subject_id, json.dumps(payload)],
         )
 
     def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
@@ -146,6 +198,10 @@ class DuckDBRegistry:
             None: TODO.
         """
         self.con.execute(
-            "INSERT INTO incidents(id, event, subject_id, error_class, message, created_at) VALUES (gen_random_uuid(), ?, ?, ?, ?, now())",
-            [event, subject_id, error_class, message]
+            (
+                "INSERT INTO incidents("
+                "id, event, subject_id, error_class, message, created_at"
+                ") VALUES (gen_random_uuid(), ?, ?, ?, ?, now())"
+            ),
+            [event, subject_id, error_class, message],
         )

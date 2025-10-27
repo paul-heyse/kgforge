@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Protocol
+from collections.abc import Mapping
+from typing import Protocol
 
 from kgforge.kgforge_common.models import Doc, DoctagsAsset
 
@@ -25,7 +26,13 @@ class Registry(Protocol):
 
         ...
 
-    def insert_run(self, purpose: str, model_id: str | None, revision: str | None, config: dict) -> str:
+    def insert_run(
+        self,
+        purpose: str,
+        model_id: str | None,
+        revision: str | None,
+        config: Mapping[str, object],
+    ) -> str:
         """Register a new processing run."""
 
         ...
@@ -35,17 +42,17 @@ class Registry(Protocol):
 
         ...
 
-    def register_documents(self, docs: List[Doc]) -> None:
+    def register_documents(self, docs: list[Doc]) -> None:
         """Register document metadata with the registry."""
 
         ...
 
-    def register_doctags(self, assets: List[DoctagsAsset]) -> None:
+    def register_doctags(self, assets: list[DoctagsAsset]) -> None:
         """Register DocTags assets with the registry."""
 
         ...
 
-    def emit_event(self, event_name: str, subject_id: str, payload: Dict) -> None:
+    def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
         """Emit an audit event for monitoring."""
 
         ...

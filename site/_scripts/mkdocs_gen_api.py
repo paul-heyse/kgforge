@@ -1,5 +1,5 @@
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import mkdocs_gen_files
 
@@ -14,7 +14,7 @@ TOOLS_DIR = ROOT / "tools"
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-from detect_pkg import detect_packages, detect_primary
+from detect_pkg import detect_packages, detect_primary  # noqa: E402
 
 out = Path("api")
 with mkdocs_gen_files.open(out / "index.md", "w") as f:

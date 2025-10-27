@@ -89,7 +89,7 @@ def need_docstring(node) -> bool:
 
 
 def action_for_node(node, lines):
-    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+    if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
         return actions_for_function(node, lines)
     if isinstance(node, ast.ClassDef):
         return actions_for_class(node, lines)
@@ -182,7 +182,7 @@ def gather_actions(path: Path, lines: list[str]) -> list[tuple[str, int, str]]:
     stack = [tree]
     while stack:
         node = stack.pop()
-        if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+        if isinstance(node, ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef):
             actions.extend(action_for_node(node, lines))
         for child in ast.iter_child_nodes(node):
             stack.append(child)

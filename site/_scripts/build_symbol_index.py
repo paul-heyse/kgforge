@@ -7,6 +7,7 @@ Build a machine-friendly symbol index for AI agents:
 - first-line summary doc
 Writes: docs/_build/symbols.json
 """
+
 import json
 import os
 import sys
@@ -22,7 +23,8 @@ TOOLS_DIR = ROOT / "tools"
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-from detect_pkg import detect_packages, detect_primary
+from detect_pkg import detect_packages, detect_primary  # noqa: E402
+
 SRC = ROOT / "src"
 ENV_PKGS = os.environ.get("DOCS_PKG")
 

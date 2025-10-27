@@ -1,19 +1,28 @@
 """Module for download.harvester."""
 
-
 from __future__ import annotations
-from typing import List, Optional
-import os, time, requests
-from kgforge.kgforge_common.models import Doc
+
+import os
+import time
+from typing import Any
+
+import requests
 from kgforge.kgforge_common.exceptions import DownloadError, UnsupportedMIMEError
+from kgforge.kgforge_common.models import Doc
+
 
 class OpenAccessHarvester:
     """Openaccessharvester."""
-    def __init__(self, user_agent: str, contact_email: str,
-                 openalex_base: str = "https://api.openalex.org",
-                 unpaywall_base: str = "https://api.unpaywall.org",
-                 pdf_host_base: Optional[str] = None,
-                 out_dir: str = "/data/pdfs"):
+
+    def __init__(
+        self,
+        user_agent: str,
+        contact_email: str,
+        openalex_base: str = "https://api.openalex.org",
+        unpaywall_base: str = "https://api.unpaywall.org",
+        pdf_host_base: str | None = None,
+        out_dir: str = "/data/pdfs",
+    ):
         """Init.
 
         Args:
@@ -34,7 +43,7 @@ class OpenAccessHarvester:
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": f"{self.ua} ({self.email})"})
 
-    def search(self, topic: str, years: str, max_works: int) -> list[dict]:
+    def search(self, topic: str, years: str, max_works: int) -> list[dict[str, Any]]:
         """Search.
 
         Args:
@@ -52,7 +61,7 @@ class OpenAccessHarvester:
         data = r.json()
         return data.get("results", [])[:max_works]
 
-    def resolve_pdf(self, work: dict) -> Optional[str]:
+    def resolve_pdf(self, work: dict[str, Any]) -> str | None:
         """Resolve pdf.
 
         Args:
@@ -61,7 +70,7 @@ class OpenAccessHarvester:
         Returns:
             Optional[str]: TODO.
         """
-        best = (work.get("best_oa_location") or {})
+        best = work.get("best_oa_location") or {}
         if best and best.get("pdf_url"):
             return best["pdf_url"]
         for loc in work.get("locations", []):
@@ -69,10 +78,12 @@ class OpenAccessHarvester:
                 return loc["pdf_url"]
         doi = work.get("doi")
         if doi:
-            r = self.session.get(f"{self.unpaywall}/v2/{doi}", params={"email": self.email}, timeout=15)
+            r = self.session.get(
+                f"{self.unpaywall}/v2/{doi}", params={"email": self.email}, timeout=15
+            )
             if r.ok:
                 j = r.json()
-                url = ((j.get("best_oa_location") or {}).get("url_for_pdf"))
+                url = (j.get("best_oa_location") or {}).get("url_for_pdf")
                 if url:
                     return url
         if self.pdf_host and doi:
@@ -99,7 +110,7 @@ class OpenAccessHarvester:
             f.write(r.content)
         return target_path
 
-    def run(self, topic: str, years: str, max_works: int) -> List[Doc]:
+    def run(self, topic: str, years: str, max_works: int) -> list[Doc]:
         """Run.
 
         Args:
@@ -110,21 +121,29 @@ class OpenAccessHarvester:
         Returns:
             List[Doc]: TODO.
         """
-        docs: List[Doc] = []
+        docs: list[Doc] = []
         works = self.search(topic, years, max_works)
         for w in works:
             pdf_url = self.resolve_pdf(w)
             if not pdf_url:
                 continue
-            filename = (w.get("doi") or w.get("id") or str(int(time.time()*1000))).replace("/", "_") + ".pdf"
+            filename = (w.get("doi") or w.get("id") or str(int(time.time() * 1000))).replace(
+                "/", "_"
+            ) + ".pdf"
             dest = os.path.join(self.out_dir, filename)
             self.download_pdf(pdf_url, dest)
             doc = Doc(
                 id=f"urn:doc:source:openalex:{w.get('id','unknown')}",
-                openalex_id=w.get("id"), doi=w.get("doi"),
-                title=w.get("title",""),
-                authors=[], pub_date=None, license=None,
-                language="en", pdf_uri=dest, source="openalex", content_hash=None
+                openalex_id=w.get("id"),
+                doi=w.get("doi"),
+                title=w.get("title", ""),
+                authors=[],
+                pub_date=None,
+                license=None,
+                language="en",
+                pdf_uri=dest,
+                source="openalex",
+                content_hash=None,
             )
             docs.append(doc)
         return docs

@@ -51,7 +51,7 @@ docstrings:
 		echo "Updating docstrings for $$pkg"; \
 		$(VENV)/bin/doq --formatter google -t tools/doq_templates/google -w -r -d src/$$pkg; \
 	done
-	$(VENV)/bin/docformatter -r -i src
+	$(VENV)/bin/docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i src
 	$(VENV)/bin/pydocstyle src
 	$(VENV)/bin/interrogate -i src --fail-under 90
 

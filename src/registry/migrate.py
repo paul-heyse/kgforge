@@ -1,8 +1,12 @@
 """Module for registry.migrate."""
 
-
 from __future__ import annotations
-import argparse, duckdb, pathlib
+
+import argparse
+import pathlib
+
+import duckdb
+
 
 def apply(db: str, migrations_dir: str) -> None:
     """Apply.
@@ -19,7 +23,8 @@ def apply(db: str, migrations_dir: str) -> None:
         con.execute(p.read_text())
     con.close()
 
-def main():
+
+def main() -> None:
     """Main."""
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
@@ -29,6 +34,7 @@ def main():
     ns = ap.parse_args()
     if ns.cmd == "apply":
         apply(ns.db, ns.migrations)
+
 
 if __name__ == "__main__":
     main()
