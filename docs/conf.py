@@ -81,6 +81,8 @@ autoapi_add_toctree_entry = True
 autoapi_options = [
     "members", "undoc-members", "show-inheritance", "special-members", "imported-members"
 ]
+# Include package __init__ modules so AutoAPI emits package-level toctrees.
+autoapi_ignore: list[str] = []
 
 from autoapi import _parser as autoapi_parser  # type: ignore
 from astroid import builder as astroid_builder, manager as astroid_manager

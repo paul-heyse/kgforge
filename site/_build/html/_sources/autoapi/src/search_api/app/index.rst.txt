@@ -71,7 +71,7 @@ Module Contents
    :rtype: Dict[str, float]
 
 
-.. py:function:: apply_kg_boosts(cands, query, direct=0.08, one_hop=0.04)
+.. py:function:: apply_kg_boosts(cands, query, direct = 0.08, one_hop = 0.04)
 
    Apply kg boosts.
 
@@ -86,7 +86,7 @@ Module Contents
    :rtype: Dict[str, float]
 
 
-.. py:function:: search(req, _=Depends(auth))
+.. py:function:: search(req, _ = Depends(auth))
 
    Search.
 
@@ -95,7 +95,7 @@ Module Contents
    :param _: TODO.
 
 
-.. py:function:: graph_concepts(body, _=Depends(auth))
+.. py:function:: graph_concepts(body, _ = Depends(auth))
 
    Graph concepts.
 

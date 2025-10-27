@@ -75,7 +75,12 @@ def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
     return out_root, 1
 
 @task
-def t_register_in_duckdb(db_path: str, chunks_info, dense_info, sparse_info) -> dict:
+def t_register_in_duckdb(
+    db_path: str,
+    chunks_info: tuple[str, int],
+    dense_info: tuple[str, int],
+    sparse_info: tuple[str, int],
+) -> dict:
     """T register in duckdb.
 
     Args:
