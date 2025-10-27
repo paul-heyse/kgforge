@@ -41,14 +41,14 @@
     },
 
     // ——— Python: symbols, typing, tests ———
-    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "python.defaultInterpreterPath": "${workspaceFolder:kgfoundry}/.venv/bin/python",
     "python.analysis.indexing": true,
     "python.analysis.userFileIndexingLimit": 12000,
     "python.analysis.typeCheckingMode": "strict",
-    "python.analysis.extraPaths": ["${workspaceFolder}/src"],
-    "python.envFile": "${workspaceFolder}/.env",
+    "python.analysis.extraPaths": ["${workspaceFolder:kgfoundry}/src"],
+    "python.envFile": "${workspaceFolder:kgfoundry}/.env",
     "python.testing.pytestEnabled": true,
-    "python.testing.cwd": "${workspaceFolder}",
+    "python.testing.cwd": "${workspaceFolder:kgfoundry}",
     "python.testing.pytestArgs": ["-q"],
 
     // ——— Single source of truth: Ruff ———
@@ -63,7 +63,7 @@
     },
 
     // ——— Docs ergonomics (Sphinx under /site) ———
-    "restructuredtext.confPath": "${workspaceFolder}/site",
+    "restructuredtext.confPath": "${workspaceFolder:kgfoundry}/site",
     "markdown.preview.breaks": false,
 
     // ——— Quality-of-life for agents & humans ———
@@ -111,14 +111,14 @@
         "type": "python",
         "request": "launch",
         "module": "search_api.service",
-        "cwd": "${workspaceFolder}",
-        "envFile": "${workspaceFolder}/.env"
+        "cwd": "${workspaceFolder:kgfoundry}",
+        "envFile": "${workspaceFolder:kgfoundry}/.env"
       },
       {
         "name": "Run tests/mock_servers/run_all.py",
         "type": "python",
         "request": "launch",
-        "program": "${workspaceFolder}/tests/mock_servers/run_all.py",
+        "program": "${workspaceFolder:kgfoundry}/tests/mock_servers/run_all.py",
         "console": "integratedTerminal"
       }
     ]
@@ -131,14 +131,14 @@
         "label": "env: setup (uv)",
         "type": "shell",
         "command": "uv venv .venv && uv pip install -e . && uv pip install -e .[docs]",
-        "options": { "cwd": "${workspaceFolder}" },
+        "options": { "cwd": "${workspaceFolder:kgfoundry}" },
         "problemMatcher": []
       },
       {
         "label": "env: setup (micromamba)",
         "type": "shell",
         "command": "micromamba create -y -p ./.venv -f environment.yml && micromamba run -p ./.venv pip install -e .[dev,docs]",
-        "options": { "cwd": "${workspaceFolder}" },
+        "options": { "cwd": "${workspaceFolder:kgfoundry}" },
         "problemMatcher": []
       },
       {

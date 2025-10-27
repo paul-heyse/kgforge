@@ -1,0 +1,73 @@
+# --- Docs build artifacts ---
+site/_build/**
+docs/_build/**
+site/api/**
+
+# --- Python build/packaging artifacts ---
+build/**
+dist/**
+src/**/*.egg-info/**
+.wheels/**
+*.whl
+
+# --- Caches & transient ---
+**/__pycache__/**
+**/.ruff_cache/**
+**/.mypy_cache/**
+**/.pytest_cache/**
+**/.cache/**
+**/.ipynb_checkpoints/**
+.sphinx/**
+
+# --- Virtual envs & package managers ---
+.venv/**
+.mamba/**
+.micromamba/**
+.conda/**
+env/**
+venv/**
+
+# --- Large/local data & artifacts ---
+data/**
+datasets/**
+artifacts/**
+models/**
+vectors/**
+cache/**
+downloads/**
+tmp/**
+logs/**
+**/*.log
+
+# --- Node / frontend (if present) ---
+node_modules/**
+
+# --- Coverage & reports ---
+.coverage
+htmlcov/**
+coverage.xml
+pytest-report.xml
+artifacts/**/*.xml
+artifacts/**/*.json
+
+# --- OS / editor cruft ---
+.DS_Store
+.idea/**
+.vscode/**
+Thumbs.db
+
+# --- Binaries (don’t help the AI index) ---
+**/*.so
+**/*.dylib
+**/*.dll
+**/*.o
+**/*.a
+**/*.bin
+**/*.pt
+**/*.onnx
+**/*.npy
+**/*.npz
+**/*.pkl
+
+# --- Repo-specific ---
+sphinx-warn.log

@@ -119,54 +119,36 @@ def is_public(node: Object) -> bool:
     return not name.startswith("_")
 
 
-def get_open_link(node: Object) -> str | None:
-    """Return a repository-root relative link for the "open" action."""
+def get_open_link(node: Object, readme_dir: Path) -> str | None:
+    """Return a relative colon-style link for opening locally."""
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
     base = SRC if SRC.exists() else ROOT
     abs_path = (base / rel_path).resolve()
-    start = int(getattr(node, "lineno", 1) or 1)
-    end = getattr(node, "endlineno", None)
-    if LINK_MODE == "github":
-        try:
-            rel = abs_path.relative_to(ROOT)
-        except ValueError:
-            return None
-        return gh_url(str(rel).replace("\\", "/"), start, end)
-    if EDITOR == "vscode":
-        return f"vscode://file{abs_path.as_posix()}?line={start}&column=1"
-    if EDITOR == "pycharm":
-        return f"pycharm://open?file={abs_path.as_posix()}&line={start}"
     try:
-        rel_root = abs_path.relative_to(ROOT).as_posix()
+        relative = abs_path.relative_to(readme_dir).as_posix()
     except ValueError:
-        rel_root = abs_path.as_posix().lstrip("/")
-    anchor = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
-    return f"{ROOT.name}/{rel_root}{anchor}"
+        return None
+    start = int(getattr(node, "lineno", 1) or 1)
+    col = 1
+    return f"./{relative}:{start}:{col}"
 
 
 def get_view_link(node: Object, readme_dir: Path) -> str | None:
-    """Return a repository-relative Markdown link for use within the README."""
+    """Return a GitHub permalink pinned to the current commit."""
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
     base = SRC if SRC.exists() else ROOT
     abs_path = (base / rel_path).resolve()
-    start = int(getattr(node, "lineno", 1) or 1)
-    end = getattr(node, "endlineno", None)
-    if LINK_MODE == "github":
-        try:
-            rel = abs_path.relative_to(ROOT)
-        except ValueError:
-            return None
-        return gh_url(str(rel).replace("\\", "/"), start, end)
     try:
-        relative = abs_path.relative_to(readme_dir)
+        rel = abs_path.relative_to(ROOT)
     except ValueError:
         return None
-    anchor = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
-    return f"./{relative.as_posix()}{anchor}"
+    start = int(getattr(node, "lineno", 1) or 1)
+    end = getattr(node, "endlineno", None)
+    return gh_url(str(rel).replace("\\", "/"), start, end)
 
 
 def iter_public_members(node: Object) -> Iterable[Object]:
@@ -189,7 +171,7 @@ def render_member(node: Object, *, indent: int, lines: list[str], readme_dir: Pa
     readme_dir : Path
         Directory that will contain the README (used for relative links).
     """
-    open_link = get_open_link(node)
+    open_link = get_open_link(node, readme_dir)
     view_link = get_view_link(node, readme_dir)
     if not open_link and not view_link:
         return

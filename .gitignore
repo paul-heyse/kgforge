@@ -12,7 +12,7 @@ data/**/*
 *.ids
 
 # envs & build junk
-.kgforge-venv/
+.venv/
 .mypy_cache/
 .ruff_cache/
 .pytest_cache/
