@@ -1,4 +1,9 @@
-"""Module for search_api.schemas."""
+"""Module for search_api.schemas.
+
+NavMap:
+- SearchRequest: Searchrequest.
+- SearchResult: Searchresult.
+"""
 
 from __future__ import annotations
 

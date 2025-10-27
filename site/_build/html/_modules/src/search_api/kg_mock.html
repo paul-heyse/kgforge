@@ -347,82 +347,88 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for src.search_api.kg_mock</h1><div class="highlight"><pre>
-<span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Module for search_api.kg_mock.&quot;&quot;&quot;</span>
+<span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Module for search_api.kg_mock.</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-<span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="n">_CONCEPTS</span> <span class="o">=</span> <span class="p">{</span>
-<span class="linenos"> 6</span>    <span class="s2">&quot;urn:concept:toy:LLM&quot;</span><span class="p">:</span> <span class="p">{</span>
-<span class="linenos"> 7</span>        <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Large Language Model&quot;</span><span class="p">,</span>
-<span class="linenos"> 8</span>        <span class="s2">&quot;keywords&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;llm&quot;</span><span class="p">,</span> <span class="s2">&quot;language model&quot;</span><span class="p">,</span> <span class="s2">&quot;transformer&quot;</span><span class="p">],</span>
-<span class="linenos"> 9</span>    <span class="p">},</span>
-<span class="linenos">10</span>    <span class="s2">&quot;urn:concept:toy:Alignment&quot;</span><span class="p">:</span> <span class="p">{</span>
-<span class="linenos">11</span>        <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Alignment&quot;</span><span class="p">,</span>
-<span class="linenos">12</span>        <span class="s2">&quot;keywords&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;alignment&quot;</span><span class="p">,</span> <span class="s2">&quot;safety&quot;</span><span class="p">,</span> <span class="s2">&quot;rlhf&quot;</span><span class="p">],</span>
-<span class="linenos">13</span>    <span class="p">},</span>
-<span class="linenos">14</span><span class="p">}</span>
-<span class="linenos">15</span>
-<span class="linenos">16</span>
+<span class="linenos"> 3</span><span class="sd">NavMap:</span>
+<span class="linenos"> 4</span><span class="sd">- detect_query_concepts: Detect query concepts.</span>
+<span class="linenos"> 5</span><span class="sd">- linked_concepts_for_text: Linked concepts for text.</span>
+<span class="linenos"> 6</span><span class="sd">- kg_boost: Kg boost.</span>
+<span class="linenos"> 7</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span><span class="n">_CONCEPTS</span> <span class="o">=</span> <span class="p">{</span>
+<span class="linenos">12</span>    <span class="s2">&quot;urn:concept:toy:LLM&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="linenos">13</span>        <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Large Language Model&quot;</span><span class="p">,</span>
+<span class="linenos">14</span>        <span class="s2">&quot;keywords&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;llm&quot;</span><span class="p">,</span> <span class="s2">&quot;language model&quot;</span><span class="p">,</span> <span class="s2">&quot;transformer&quot;</span><span class="p">],</span>
+<span class="linenos">15</span>    <span class="p">},</span>
+<span class="linenos">16</span>    <span class="s2">&quot;urn:concept:toy:Alignment&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="linenos">17</span>        <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Alignment&quot;</span><span class="p">,</span>
+<span class="linenos">18</span>        <span class="s2">&quot;keywords&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;alignment&quot;</span><span class="p">,</span> <span class="s2">&quot;safety&quot;</span><span class="p">,</span> <span class="s2">&quot;rlhf&quot;</span><span class="p">],</span>
+<span class="linenos">19</span>    <span class="p">},</span>
+<span class="linenos">20</span><span class="p">}</span>
+<span class="linenos">21</span>
+<span class="linenos">22</span>
 <div class="viewcode-block" id="detect_query_concepts">
 <a class="viewcode-back" href="../../../autoapi/src/search_api/kg_mock/index.html#src.search_api.kg_mock.detect_query_concepts">[docs]</a>
-<span class="linenos">17</span><span class="k">def</span><span class="w"> </span><span class="nf">detect_query_concepts</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="linenos">18</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Detect query concepts.</span>
-<span class="linenos">19</span>
-<span class="linenos">20</span><span class="sd">    Args:</span>
-<span class="linenos">21</span><span class="sd">        query (str): TODO.</span>
-<span class="linenos">22</span>
-<span class="linenos">23</span><span class="sd">    Returns:</span>
-<span class="linenos">24</span><span class="sd">        List[str]: TODO.</span>
-<span class="linenos">25</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">26</span>    <span class="n">q</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<span class="linenos">27</span>    <span class="n">hits</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="linenos">28</span>    <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">_CONCEPTS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<span class="linenos">29</span>        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">kw</span> <span class="ow">in</span> <span class="n">q</span> <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;keywords&quot;</span><span class="p">]):</span>
-<span class="linenos">30</span>            <span class="n">hits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cid</span><span class="p">)</span>
-<span class="linenos">31</span>    <span class="k">return</span> <span class="n">hits</span></div>
+<span class="linenos">23</span><span class="k">def</span><span class="w"> </span><span class="nf">detect_query_concepts</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="linenos">24</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Detect query concepts.</span>
+<span class="linenos">25</span>
+<span class="linenos">26</span><span class="sd">    Args:</span>
+<span class="linenos">27</span><span class="sd">        query (str): TODO.</span>
+<span class="linenos">28</span>
+<span class="linenos">29</span><span class="sd">    Returns:</span>
+<span class="linenos">30</span><span class="sd">        List[str]: TODO.</span>
+<span class="linenos">31</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">32</span>    <span class="n">q</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="linenos">33</span>    <span class="n">hits</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">34</span>    <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">_CONCEPTS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="linenos">35</span>        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">kw</span> <span class="ow">in</span> <span class="n">q</span> <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;keywords&quot;</span><span class="p">]):</span>
+<span class="linenos">36</span>            <span class="n">hits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cid</span><span class="p">)</span>
+<span class="linenos">37</span>    <span class="k">return</span> <span class="n">hits</span></div>
 
-<span class="linenos">32</span>
-<span class="linenos">33</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span>
 <div class="viewcode-block" id="linked_concepts_for_text">
 <a class="viewcode-back" href="../../../autoapi/src/search_api/kg_mock/index.html#src.search_api.kg_mock.linked_concepts_for_text">[docs]</a>
-<span class="linenos">34</span><span class="k">def</span><span class="w"> </span><span class="nf">linked_concepts_for_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="linenos">35</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Linked concepts for text.</span>
-<span class="linenos">36</span>
-<span class="linenos">37</span><span class="sd">    Args:</span>
-<span class="linenos">38</span><span class="sd">        text (str): TODO.</span>
-<span class="linenos">39</span>
-<span class="linenos">40</span><span class="sd">    Returns:</span>
-<span class="linenos">41</span><span class="sd">        List[str]: TODO.</span>
-<span class="linenos">42</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">43</span>    <span class="n">t</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<span class="linenos">44</span>    <span class="n">hits</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="linenos">45</span>    <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">_CONCEPTS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<span class="linenos">46</span>        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">kw</span> <span class="ow">in</span> <span class="n">t</span> <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;keywords&quot;</span><span class="p">]):</span>
-<span class="linenos">47</span>            <span class="n">hits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cid</span><span class="p">)</span>
-<span class="linenos">48</span>    <span class="k">return</span> <span class="n">hits</span></div>
+<span class="linenos">40</span><span class="k">def</span><span class="w"> </span><span class="nf">linked_concepts_for_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="linenos">41</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Linked concepts for text.</span>
+<span class="linenos">42</span>
+<span class="linenos">43</span><span class="sd">    Args:</span>
+<span class="linenos">44</span><span class="sd">        text (str): TODO.</span>
+<span class="linenos">45</span>
+<span class="linenos">46</span><span class="sd">    Returns:</span>
+<span class="linenos">47</span><span class="sd">        List[str]: TODO.</span>
+<span class="linenos">48</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">49</span>    <span class="n">t</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="linenos">50</span>    <span class="n">hits</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">51</span>    <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">_CONCEPTS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="linenos">52</span>        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">kw</span> <span class="ow">in</span> <span class="n">t</span> <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;keywords&quot;</span><span class="p">]):</span>
+<span class="linenos">53</span>            <span class="n">hits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cid</span><span class="p">)</span>
+<span class="linenos">54</span>    <span class="k">return</span> <span class="n">hits</span></div>
 
-<span class="linenos">49</span>
-<span class="linenos">50</span>
+<span class="linenos">55</span>
+<span class="linenos">56</span>
 <div class="viewcode-block" id="kg_boost">
 <a class="viewcode-back" href="../../../autoapi/src/search_api/kg_mock/index.html#src.search_api.kg_mock.kg_boost">[docs]</a>
-<span class="linenos">51</span><span class="k">def</span><span class="w"> </span><span class="nf">kg_boost</span><span class="p">(</span>
-<span class="linenos">52</span>    <span class="n">query_concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-<span class="linenos">53</span>    <span class="n">chunk_concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-<span class="linenos">54</span>    <span class="n">direct</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.08</span><span class="p">,</span>
-<span class="linenos">55</span>    <span class="n">one_hop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.04</span><span class="p">,</span>
-<span class="linenos">56</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="linenos">57</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Kg boost.</span>
-<span class="linenos">58</span>
-<span class="linenos">59</span><span class="sd">    Args:</span>
-<span class="linenos">60</span><span class="sd">        query_concepts (List[str]): TODO.</span>
-<span class="linenos">61</span><span class="sd">        chunk_concepts (List[str]): TODO.</span>
-<span class="linenos">62</span><span class="sd">        direct (float): TODO.</span>
-<span class="linenos">63</span><span class="sd">        one_hop (float): TODO.</span>
+<span class="linenos">57</span><span class="k">def</span><span class="w"> </span><span class="nf">kg_boost</span><span class="p">(</span>
+<span class="linenos">58</span>    <span class="n">query_concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="linenos">59</span>    <span class="n">chunk_concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="linenos">60</span>    <span class="n">direct</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.08</span><span class="p">,</span>
+<span class="linenos">61</span>    <span class="n">one_hop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.04</span><span class="p">,</span>
+<span class="linenos">62</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="linenos">63</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Kg boost.</span>
 <span class="linenos">64</span>
-<span class="linenos">65</span><span class="sd">    Returns:</span>
-<span class="linenos">66</span><span class="sd">        float: TODO.</span>
-<span class="linenos">67</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">68</span>    <span class="k">return</span> <span class="n">direct</span> <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">query_concepts</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">chunk_concepts</span><span class="p">)</span> <span class="k">else</span> <span class="mf">0.0</span></div>
+<span class="linenos">65</span><span class="sd">    Args:</span>
+<span class="linenos">66</span><span class="sd">        query_concepts (List[str]): TODO.</span>
+<span class="linenos">67</span><span class="sd">        chunk_concepts (List[str]): TODO.</span>
+<span class="linenos">68</span><span class="sd">        direct (float): TODO.</span>
+<span class="linenos">69</span><span class="sd">        one_hop (float): TODO.</span>
+<span class="linenos">70</span>
+<span class="linenos">71</span><span class="sd">    Returns:</span>
+<span class="linenos">72</span><span class="sd">        float: TODO.</span>
+<span class="linenos">73</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">74</span>    <span class="k">return</span> <span class="n">direct</span> <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">query_concepts</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">chunk_concepts</span><span class="p">)</span> <span class="k">else</span> <span class="mf">0.0</span></div>
 
 </pre></div>
 

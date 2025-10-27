@@ -347,43 +347,47 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for src.ontology.catalog</h1><div class="highlight"><pre>
-<span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Module for ontology.catalog.&quot;&quot;&quot;</span>
+<span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Module for ontology.catalog.</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-<span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="kn">from</span><span class="w"> </span><span class="nn">kgforge.kgforge_common.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Concept</span>
+<span class="linenos"> 3</span><span class="sd">NavMap:</span>
+<span class="linenos"> 4</span><span class="sd">- OntologyCatalog: Ontologycatalog.</span>
+<span class="linenos"> 5</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span>
+<span class="linenos"> 7</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="kn">from</span><span class="w"> </span><span class="nn">kgforge.kgforge_common.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Concept</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span>
 <div class="viewcode-block" id="OntologyCatalog">
 <a class="viewcode-back" href="../../../autoapi/src/ontology/catalog/index.html#src.ontology.catalog.OntologyCatalog">[docs]</a>
-<span class="linenos"> 8</span><span class="k">class</span><span class="w"> </span><span class="nc">OntologyCatalog</span><span class="p">:</span>
-<span class="linenos"> 9</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Ontologycatalog.&quot;&quot;&quot;</span>
-<span class="linenos">10</span>
-<span class="linenos">11</span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Concept</span><span class="p">]):</span>
-<span class="linenos">12</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Init.</span>
-<span class="linenos">13</span>
-<span class="linenos">14</span><span class="sd">        Args:</span>
-<span class="linenos">15</span><span class="sd">            concepts (List[Concept]): TODO.</span>
-<span class="linenos">16</span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos">12</span><span class="k">class</span><span class="w"> </span><span class="nc">OntologyCatalog</span><span class="p">:</span>
+<span class="linenos">13</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Ontologycatalog.&quot;&quot;&quot;</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Concept</span><span class="p">]):</span>
+<span class="linenos">16</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Init.</span>
+<span class="linenos">17</span>
+<span class="linenos">18</span><span class="sd">        Args:</span>
+<span class="linenos">19</span><span class="sd">            concepts (List[Concept]): TODO.</span>
+<span class="linenos">20</span><span class="sd">        &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="OntologyCatalog.by_id">
 <a class="viewcode-back" href="../../../autoapi/src/ontology/catalog/index.html#src.ontology.catalog.OntologyCatalog.by_id">[docs]</a>
-<span class="linenos">17</span>        <span class="bp">self</span><span class="o">.</span><span class="n">by_id</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">concepts</span><span class="p">}</span></div>
+<span class="linenos">21</span>        <span class="bp">self</span><span class="o">.</span><span class="n">by_id</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">concepts</span><span class="p">}</span></div>
 
-<span class="linenos">18</span>
+<span class="linenos">22</span>
 <div class="viewcode-block" id="OntologyCatalog.neighbors">
 <a class="viewcode-back" href="../../../autoapi/src/ontology/catalog/index.html#src.ontology.catalog.OntologyCatalog.neighbors">[docs]</a>
-<span class="linenos">19</span>    <span class="k">def</span><span class="w"> </span><span class="nf">neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="linenos">20</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Neighbors.</span>
-<span class="linenos">21</span>
-<span class="linenos">22</span><span class="sd">        Args:</span>
-<span class="linenos">23</span><span class="sd">            concept_id (str): TODO.</span>
-<span class="linenos">24</span><span class="sd">            depth (int): TODO.</span>
+<span class="linenos">23</span>    <span class="k">def</span><span class="w"> </span><span class="nf">neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="linenos">24</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Neighbors.</span>
 <span class="linenos">25</span>
-<span class="linenos">26</span><span class="sd">        Returns:</span>
-<span class="linenos">27</span><span class="sd">            List[str]: TODO.</span>
-<span class="linenos">28</span><span class="sd">        &quot;&quot;&quot;</span>
-<span class="linenos">29</span>        <span class="c1"># TODO: return neighbor concept IDs up to depth.</span>
-<span class="linenos">30</span>        <span class="k">return</span> <span class="p">[]</span></div>
+<span class="linenos">26</span><span class="sd">        Args:</span>
+<span class="linenos">27</span><span class="sd">            concept_id (str): TODO.</span>
+<span class="linenos">28</span><span class="sd">            depth (int): TODO.</span>
+<span class="linenos">29</span>
+<span class="linenos">30</span><span class="sd">        Returns:</span>
+<span class="linenos">31</span><span class="sd">            List[str]: TODO.</span>
+<span class="linenos">32</span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos">33</span>        <span class="c1"># TODO: return neighbor concept IDs up to depth.</span>
+<span class="linenos">34</span>        <span class="k">return</span> <span class="p">[]</span></div>
 </div>
 
 </pre></div>

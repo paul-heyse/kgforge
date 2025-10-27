@@ -1,1 +1,1 @@
-"""Module for embeddings_dense.__init__."""
+"""Module for embeddings_dense."""

@@ -7,6 +7,10 @@ src.search_api.schemas
 
    Module for search_api.schemas.
 
+   NavMap:
+   - SearchRequest: Searchrequest.
+   - SearchResult: Searchresult.
+
 
 
 

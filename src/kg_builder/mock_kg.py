@@ -1,4 +1,8 @@
-"""Module for kg_builder.mock_kg."""
+"""Module for kg_builder.mock_kg.
+
+NavMap:
+- MockKG: A tiny in-memory KG for demo.
+"""
 
 from __future__ import annotations
 

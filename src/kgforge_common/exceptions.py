@@ -1,4 +1,9 @@
-"""Module for kgforge_common.exceptions."""
+"""Module for kgforge_common.exceptions.
+
+NavMap:
+- DownloadError: Raised when an external download fails.
+- UnsupportedMIMEError: Raised when a MIME type is unsupported.
+"""
 
 
 class DownloadError(Exception):

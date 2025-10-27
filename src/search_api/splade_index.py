@@ -1,4 +1,10 @@
-"""Module for search_api.splade_index."""
+"""Module for search_api.splade_index.
+
+NavMap:
+- tok: Tok.
+- SpladeDoc: Spladedoc.
+- SpladeIndex: Spladeindex.
+"""
 
 from __future__ import annotations
 

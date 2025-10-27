@@ -1,1 +1,1 @@
-"""Module for registry.__init__."""
+"""Module for registry."""

@@ -7,6 +7,10 @@ src.embeddings_sparse.base
 
    Module for embeddings_sparse.base.
 
+   NavMap:
+   - SparseEncoder: Protocol for sparse text encoders.
+   - SparseIndex: Protocol describing sparse index interactions.
+
 
 
 

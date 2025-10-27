@@ -1,4 +1,11 @@
-"""Module for embeddings_sparse.bm25."""
+"""Module for embeddings_sparse.bm25.
+
+NavMap:
+- BM25Doc: Bm25doc.
+- PurePythonBM25: Simple offline BM25 builder & searcher (Okapi BM25).
+- LuceneBM25: Pyserini-backed Lucene BM25 adapter.
+- get_bm25: Get bm25.
+"""
 
 from __future__ import annotations
 

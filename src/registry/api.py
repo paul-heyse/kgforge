@@ -1,4 +1,8 @@
-"""Module for registry.api."""
+"""Module for registry.api.
+
+NavMap:
+- Registry: Registry protocol describing persistence operations.
+"""
 
 from __future__ import annotations
 

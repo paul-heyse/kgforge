@@ -1,1 +1,1 @@
-"""Module for download.__init__."""
+"""Module for download."""

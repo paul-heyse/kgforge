@@ -1,1 +1,1 @@
-"""Module for linking.__init__."""
+"""Module for linking."""

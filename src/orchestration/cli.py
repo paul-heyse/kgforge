@@ -1,4 +1,10 @@
-"""Module for orchestration.cli."""
+"""Module for orchestration.cli.
+
+NavMap:
+- index_bm25: Build a BM25 index from chunk fixtures (id, title, section,….
+- index_faiss: Train & build FAISS index from fixture dense vectors.
+- api: Run the FastAPI app.
+"""
 
 from __future__ import annotations
 

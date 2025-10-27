@@ -1,4 +1,8 @@
-"""Module for search_client.client."""
+"""Module for search_client.client.
+
+NavMap:
+- KGForgeClient: Kgforgeclient.
+"""
 
 from __future__ import annotations
 

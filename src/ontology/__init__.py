@@ -1,1 +1,1 @@
-"""Module for ontology.__init__."""
+"""Module for ontology."""

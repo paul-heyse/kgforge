@@ -1,3 +1,3 @@
-"""Module for observability.__init__."""
+"""Module for observability."""
 
 # observability package

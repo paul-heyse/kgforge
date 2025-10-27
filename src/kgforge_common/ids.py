@@ -1,4 +1,9 @@
-"""Module for kgforge_common.ids."""
+"""Module for kgforge_common.ids.
+
+NavMap:
+- urn_doc_from_text: Urn doc from text.
+- urn_chunk: Urn chunk.
+"""
 
 from __future__ import annotations
 

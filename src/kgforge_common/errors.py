@@ -1,4 +1,18 @@
-"""Module for kgforge_common.errors."""
+"""Module for kgforge_common.errors.
+
+NavMap:
+- DownloadError: Raised when an external download fails.
+- UnsupportedMIMEError: Raised when an unsupported MIME type is encountered.
+- DoclingError: Base Docling processing error.
+- OCRTimeout: Raised when OCR operations exceed time limits.
+- ChunkingError: Raised when chunk generation fails.
+- EmbeddingError: Raised when embedding generation fails.
+- SpladeOOM: Raised when SPLADE runs out of memory.
+- IndexBuildError: Raised when index construction fails.
+- OntologyParseError: Raised when ontology parsing fails.
+- LinkerCalibrationError: Raised when linker calibration cannot be performed.
+- Neo4jError: Raised when Neo4j operations fail.
+"""
 
 
 class DownloadError(Exception):

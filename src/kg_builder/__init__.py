@@ -1,1 +1,1 @@
-"""Module for kg_builder.__init__."""
+"""Module for kg_builder."""

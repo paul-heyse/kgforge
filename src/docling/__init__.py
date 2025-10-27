@@ -1,1 +1,1 @@
-"""Module for docling.__init__."""
+"""Module for docling."""

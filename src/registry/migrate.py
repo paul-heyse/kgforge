@@ -1,4 +1,9 @@
-"""Module for registry.migrate."""
+"""Module for registry.migrate.
+
+NavMap:
+- apply: Apply.
+- main: Main.
+"""
 
 from __future__ import annotations
 

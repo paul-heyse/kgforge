@@ -49,9 +49,10 @@ fixture:
 docstrings:
 	@for pkg in $(PKGS); do \
 		echo "Updating docstrings for $$pkg"; \
-		$(VENV)/bin/doq --formatter google -t tools/doq_templates/google -w -r -d src/$$pkg; \
+	$(VENV)/bin/doq --formatter google -t tools/doq_templates/google -w -r -d src/$$pkg; \
 	done
-	$(VENV)/bin/docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i src
+	$(PY) tools/update_navmaps.py
+	$(VENV)/bin/docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i src || true
 	$(VENV)/bin/pydocstyle src
 	$(VENV)/bin/interrogate -i src --fail-under 90
 

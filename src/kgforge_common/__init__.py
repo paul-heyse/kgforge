@@ -1,1 +1,1 @@
-"""Module for kgforge_common.__init__."""
+"""Module for kgforge_common."""

@@ -1,4 +1,9 @@
-"""Module for search_api.faiss_adapter."""
+"""Module for search_api.faiss_adapter.
+
+NavMap:
+- DenseVecs: Densevecs.
+- FaissAdapter: Faissadapter.
+"""
 
 from __future__ import annotations
 

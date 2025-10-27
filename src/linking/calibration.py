@@ -1,4 +1,8 @@
-"""Module for linking.calibration."""
+"""Module for linking.calibration.
+
+NavMap:
+- isotonic_calibrate: Skeleton: calibrate scores (y=float in [0,1]) vs labels….
+"""
 
 from __future__ import annotations
 

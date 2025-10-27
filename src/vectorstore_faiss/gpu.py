@@ -1,4 +1,8 @@
-"""Module for vectorstore_faiss.gpu."""
+"""Module for vectorstore_faiss.gpu.
+
+NavMap:
+- FaissGpuIndex: FAISS GPU/cuVS wrapper.
+"""
 
 from __future__ import annotations
 

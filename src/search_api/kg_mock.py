@@ -1,4 +1,10 @@
-"""Module for search_api.kg_mock."""
+"""Module for search_api.kg_mock.
+
+NavMap:
+- detect_query_concepts: Detect query concepts.
+- linked_concepts_for_text: Linked concepts for text.
+- kg_boost: Kg boost.
+"""
 
 from __future__ import annotations
 

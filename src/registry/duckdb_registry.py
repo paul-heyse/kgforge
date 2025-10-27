@@ -1,4 +1,8 @@
-"""Module for registry.duckdb_registry."""
+"""Module for registry.duckdb_registry.
+
+NavMap:
+- DuckDBRegistry: Minimal DuckDB-backed registry (skeleton).
+"""
 
 from __future__ import annotations
 

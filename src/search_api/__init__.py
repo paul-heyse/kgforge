@@ -1,1 +1,1 @@
-"""Module for search_api.__init__."""
+"""Module for search_api."""

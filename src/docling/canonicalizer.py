@@ -1,4 +1,8 @@
-"""Module for docling.canonicalizer."""
+"""Module for docling.canonicalizer.
+
+NavMap:
+- canonicalize_text: Apply NFC, normalize whitespace and bullets, preserve….
+"""
 
 from __future__ import annotations
 
