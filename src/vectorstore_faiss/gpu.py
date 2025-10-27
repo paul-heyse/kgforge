@@ -9,8 +9,7 @@ import numpy as np
 class FaissGpuIndex:
     """FAISS GPU/cuVS wrapper.
 
-    If FAISS is unavailable at runtime, falls back to brute-force cosine
-    search over a provided matrix.
+    If FAISS is unavailable at runtime, falls back to brute-force cosine search over a provided matrix.
     """
     def __init__(self, factory: str = "OPQ64,IVF8192,PQ64", nprobe: int = 64, gpu: bool = True, cuvs: bool = True):
         """Init.

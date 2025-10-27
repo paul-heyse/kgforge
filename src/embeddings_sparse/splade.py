@@ -37,11 +37,9 @@ class SPLADEv3Encoder:
         raise NotImplementedError("SPLADE encoding is not implemented in the skeleton. Use Lucene impact index if available.")
 
 class PureImpactIndex:
-    """Toy 'impact' index that approximates SPLADE using IDF*log(1+tf) weights
-    over a simple tokenizer.
+    """Toy 'impact' index that approximates SPLADE using IDF*log(1+tf) weights over a simple tokenizer.
 
-    This is *not* a neural encoder; it exists to keep the pipeline
-    runnable without GPUs or Pyserini.
+    This is *not* a neural encoder; it exists to keep the pipeline runnable without GPUs or Pyserini.
     """
     def __init__(self, index_dir: str):
         """Init.
