@@ -1,1 +1,16 @@
-"""Represent {{ name|replace('_', ' ') }}."""
+"""Represent {{ name|replace('_', ' ') }}.
+
+Attributes
+----------
+attribute : type
+    Description.
+
+Methods
+-------
+method()
+    Description.
+
+Examples
+--------
+>>> {{ name }}(...)
+"""

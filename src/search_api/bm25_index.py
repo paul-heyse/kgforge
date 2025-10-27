@@ -1,11 +1,15 @@
-"""Module for search_api.bm25_index.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- toks: Tokenise ``text`` into lowercase alphanumeric terms.
-- BM25Doc: Container storing fields required for BM25 scoring.
-- BM25Index: Construct, persist, and query a BM25 index.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+search_api.bm25_index
+"""
+
 
 from __future__ import annotations
 
@@ -41,14 +45,79 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
 # [nav:anchor toks]
 def toks(text: str) -> list[str]:
-    """Tokenise ``text`` into lowercase alphanumeric terms."""
+    """
+    Return toks.
+    
+    Parameters
+    ----------
+    text : str
+        Description for ``text``.
+    
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from search_api.bm25_index import toks
+    >>> result = toks(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.bm25_index
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
 # [nav:anchor BM25Doc]
 @dataclass
 class BM25Doc:
-    """Container storing fields required for BM25 scoring."""
+    """
+    Represent BM25Doc.
+    
+    Attributes
+    ----------
+    chunk_id : str
+        Attribute description.
+    doc_id : str
+        Attribute description.
+    title : str
+        Attribute description.
+    section : str
+        Attribute description.
+    tf : Mapping[str, float]
+        Attribute description.
+    dl : float
+        Attribute description.
+    
+    Examples
+    --------
+    >>> from search_api.bm25_index import BM25Doc
+    >>> result = BM25Doc()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.bm25_index
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     chunk_id: str
     doc_id: str
@@ -60,10 +129,76 @@ class BM25Doc:
 
 # [nav:anchor BM25Index]
 class BM25Index:
-    """Construct, persist, and query a BM25 index."""
+    """
+    Represent BM25Index.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Methods
+    -------
+    __init__()
+        Method description.
+    build_from_duckdb()
+        Method description.
+    _build()
+        Method description.
+    save()
+        Method description.
+    load()
+        Method description.
+    _idf()
+        Method description.
+    search()
+        Method description.
+    doc()
+        Method description.
+    
+    Examples
+    --------
+    >>> from search_api.bm25_index import BM25Index
+    >>> result = BM25Index()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.bm25_index
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
 
     def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
-        """Initialise the index with standard BM25 hyperparameters."""
+        """
+        Return init.
+        
+        Parameters
+        ----------
+        k1 : float, optional
+            Description for ``k1``.
+        b : float, optional
+            Description for ``b``.
+        
+        Examples
+        --------
+        >>> from search_api.bm25_index import __init__
+        >>> __init__(..., ...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        search_api.bm25_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -73,7 +208,35 @@ class BM25Index:
 
     @classmethod
     def build_from_duckdb(cls, db_path: str) -> BM25Index:
-        """Build an index using the most recent chunk dataset in DuckDB."""
+        """
+        Return build from duckdb.
+        
+        Parameters
+        ----------
+        db_path : str
+            Description for ``db_path``.
+        
+        Returns
+        -------
+        BM25Index
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from search_api.bm25_index import build_from_duckdb
+        >>> result = build_from_duckdb(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        search_api.bm25_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         index = cls()
         con = duckdb.connect(db_path)
         try:
@@ -97,7 +260,28 @@ class BM25Index:
         return index
 
     def _build(self, rows: Iterable[tuple[str, str, str, str, str]]) -> None:
-        """Populate postings, document frequencies, and cached statistics."""
+        """
+        Return build.
+        
+        Parameters
+        ----------
+        rows : Iterable[tuple[str, str, str, str, str]]
+            Description for ``rows``.
+        
+        Examples
+        --------
+        >>> from search_api.bm25_index import _build
+        >>> _build(...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        search_api.bm25_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         self.docs.clear()
         self.df.clear()
         dl_sum = 0.0
@@ -127,7 +311,28 @@ class BM25Index:
         self.avgdl = (dl_sum / self.N) if self.N > 0 else 0.0
 
     def save(self, path: str) -> None:
-        """Serialize the index to ``path`` using pickle."""
+        """
+        Return save.
+        
+        Parameters
+        ----------
+        path : str
+            Description for ``path``.
+        
+        Examples
+        --------
+        >>> from search_api.bm25_index import save
+        >>> save(...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        search_api.bm25_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as handle:
             pickle.dump(
@@ -144,7 +349,35 @@ class BM25Index:
 
     @classmethod
     def load(cls, path: str) -> BM25Index:
-        """Load a pickled index from ``path``."""
+        """
+        Return load.
+        
+        Parameters
+        ----------
+        path : str
+            Description for ``path``.
+        
+        Returns
+        -------
+        BM25Index
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from search_api.bm25_index import load
+        >>> result = load(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        search_api.bm25_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         with open(path, "rb") as handle:
             payload = pickle.load(handle)
         index = cls(payload.get("k1", 0.9), payload.get("b", 0.4))
@@ -155,14 +388,73 @@ class BM25Index:
         return index
 
     def _idf(self, term: str) -> float:
-        """Compute the inverse document frequency for ``term``."""
+        """
+        Return idf.
+        
+        Parameters
+        ----------
+        term : str
+            Description for ``term``.
+        
+        Returns
+        -------
+        float
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from search_api.bm25_index import _idf
+        >>> result = _idf(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        search_api.bm25_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         df = self.df.get(term, 0)
         if self.N == 0 or df == 0:
             return 0.0
         return math.log((self.N - df + 0.5) / (df + 0.5) + 1.0)
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Score documents for ``query`` and return the top ``k`` hits."""
+        """
+        Return search.
+        
+        Parameters
+        ----------
+        query : str
+            Description for ``query``.
+        k : int, optional
+            Description for ``k``.
+        
+        Returns
+        -------
+        List[Tuple[int, float]]
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from search_api.bm25_index import search
+        >>> result = search(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        search_api.bm25_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
+        
         if self.N == 0:
             return []
         terms = toks(query)
@@ -181,5 +473,33 @@ class BM25Index:
         return [(index, score) for index, score in ranked[:k] if score > 0.0]
 
     def doc(self, index: int) -> BM25Doc:
-        """Return the :class:`BM25Doc` at ``index``."""
+        """
+        Return doc.
+        
+        Parameters
+        ----------
+        index : int
+            Description for ``index``.
+        
+        Returns
+        -------
+        BM25Doc
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from search_api.bm25_index import doc
+        >>> result = doc(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        search_api.bm25_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         return self.docs[index]

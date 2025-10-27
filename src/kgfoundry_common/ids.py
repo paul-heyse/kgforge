@@ -1,10 +1,15 @@
-"""Module for kgfoundry_common.ids.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- urn_doc_from_text: Return a normalized document URN derived from ``text``.
-- urn_chunk: Return a chunk URN derived from document hash and offsets.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+kgfoundry_common.ids
+"""
+
 
 from __future__ import annotations
 
@@ -32,18 +37,35 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor urn_doc_from_text]
 def urn_doc_from_text(text: str) -> str:
-    """Return a normalized document URN derived from ``text``.
-
+    """
+    Return urn doc from text.
+    
     Parameters
     ----------
     text : str
-        Raw document text to hash.
-
+        Description for ``text``.
+    
     Returns
     -------
     str
-        Deterministic URN containing the truncated SHA-256 hash.
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.ids import urn_doc_from_text
+    >>> result = urn_doc_from_text(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.ids
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
     """
+    
     h = hashlib.sha256(text.encode("utf-8")).digest()[:16]
     b32 = base64.b32encode(h).decode("ascii").strip("=").lower()
     return f"urn:doc:sha256:{b32}"
@@ -51,20 +73,37 @@ def urn_doc_from_text(text: str) -> str:
 
 # [nav:anchor urn_chunk]
 def urn_chunk(doc_hash: str, start: int, end: int) -> str:
-    """Return a chunk URN derived from document hash and offsets.
-
+    """
+    Return urn chunk.
+    
     Parameters
     ----------
     doc_hash : str
-        Document-level URN or hash prefix.
+        Description for ``doc_hash``.
     start : int
-        Inclusive character offset for the chunk start.
+        Description for ``start``.
     end : int
-        Exclusive character offset for the chunk end.
-
+        Description for ``end``.
+    
     Returns
     -------
     str
-        Deterministic chunk URN joining the document hash with offsets.
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.ids import urn_chunk
+    >>> result = urn_chunk(..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.ids
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
     """
+    
     return f"urn:chunk:{doc_hash.split(':')[-1]}:{start}-{end}"

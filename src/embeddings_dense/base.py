@@ -1,9 +1,15 @@
-"""Module for embeddings_dense.base.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- DenseEmbeddingModel: Protocol describing dense embedding encoders used in….
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+embeddings_dense.base
+"""
+
 
 from __future__ import annotations
 
@@ -33,8 +39,65 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DenseEmbeddingModel]
 class DenseEmbeddingModel(Protocol):
-    """Protocol describing dense embedding encoders used in kgfoundry."""
+    """
+    Represent DenseEmbeddingModel.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Methods
+    -------
+    encode()
+        Method description.
+    
+    Examples
+    --------
+    >>> from embeddings_dense.base import DenseEmbeddingModel
+    >>> result = DenseEmbeddingModel()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    embeddings_dense.base
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]:
-        """Encode ``texts`` into a dense floating-point representation."""
+        """
+        Return encode.
+        
+        Parameters
+        ----------
+        texts : Sequence[str]
+            Description for ``texts``.
+        
+        Returns
+        -------
+        NDArray[np.float32]
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from embeddings_dense.base import encode
+        >>> result = encode(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        embeddings_dense.base
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         ...

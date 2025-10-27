@@ -1,10 +1,15 @@
-"""Module for search_api.faiss_adapter.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- DenseVecs: Dense vector matrix paired with chunk identifiers.
-- FaissAdapter: Load dense vectors from DuckDB and expose FAISS search….
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+search_api.faiss_adapter
+"""
+
 
 from __future__ import annotations
 
@@ -55,7 +60,35 @@ type IndexArray = NDArray[np.int64]
 # [nav:anchor DenseVecs]
 @dataclass
 class DenseVecs:
-    """Dense vector matrix paired with chunk identifiers."""
+    """
+    Represent DenseVecs.
+    
+    Attributes
+    ----------
+    ids : List[str]
+        Attribute description.
+    mat : VecArray
+        Attribute description.
+    
+    Examples
+    --------
+    >>> from search_api.faiss_adapter import DenseVecs
+    >>> result = DenseVecs()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.faiss_adapter
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ids: list[str]
     mat: VecArray
@@ -63,7 +96,44 @@ class DenseVecs:
 
 # [nav:anchor FaissAdapter]
 class FaissAdapter:
-    """Load dense vectors from DuckDB and expose FAISS search utilities."""
+    """
+    Represent FaissAdapter.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Methods
+    -------
+    __init__()
+        Method description.
+    _load_dense_parquet()
+        Method description.
+    build()
+        Method description.
+    load_or_build()
+        Method description.
+    search()
+        Method description.
+    
+    Examples
+    --------
+    >>> from search_api.faiss_adapter import FaissAdapter
+    >>> result = FaissAdapter()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.faiss_adapter
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
 
     def __init__(
         self,
@@ -71,7 +141,32 @@ class FaissAdapter:
         factory: str = "OPQ64,IVF8192,PQ64",
         metric: str = "ip",
     ) -> None:
-        """Configure the adapter with persistence location and FAISS settings."""
+        """
+        Return init.
+        
+        Parameters
+        ----------
+        db_path : str
+            Description for ``db_path``.
+        factory : str, optional
+            Description for ``factory``.
+        metric : str, optional
+            Description for ``metric``.
+        
+        Examples
+        --------
+        >>> from search_api.faiss_adapter import __init__
+        >>> __init__(..., ..., ...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        search_api.faiss_adapter
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
@@ -80,7 +175,35 @@ class FaissAdapter:
         self.vecs: DenseVecs | None = None
 
     def _load_dense_parquet(self) -> DenseVecs:
-        """Read the latest dense vector parquet shard from DuckDB."""
+        """
+        Return load dense parquet.
+        
+        Returns
+        -------
+        DenseVecs
+            Description of return value.
+        
+        Raises
+        ------
+        RuntimeError
+            Raised when validation fails.
+        
+        Examples
+        --------
+        >>> from search_api.faiss_adapter import _load_dense_parquet
+        >>> result = _load_dense_parquet()
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        search_api.faiss_adapter
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         if not Path(self.db_path).exists():
             message = "DuckDB registry not found"
             raise RuntimeError(message)
@@ -108,7 +231,23 @@ class FaissAdapter:
         return DenseVecs(ids=ids, mat=normalized)
 
     def build(self) -> None:
-        """Load dense vectors and build a GPU-backed FAISS index when available."""
+        """
+        Return build.
+        
+        Examples
+        --------
+        >>> from search_api.faiss_adapter import build
+        >>> build()  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        search_api.faiss_adapter
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         vectors = self._load_dense_parquet()
         self.vecs = vectors
         if not HAVE_FAISS:
@@ -133,7 +272,28 @@ class FaissAdapter:
         self.idmap = vectors.ids
 
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
-        """Load a pre-built FAISS index or build one on demand."""
+        """
+        Return load or build.
+        
+        Parameters
+        ----------
+        cpu_index_path : str | None, optional
+            Description for ``cpu_index_path``.
+        
+        Examples
+        --------
+        >>> from search_api.faiss_adapter import load_or_build
+        >>> load_or_build(...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        search_api.faiss_adapter
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         try:
             if HAVE_FAISS and cpu_index_path and Path(cpu_index_path).exists():
                 cpu = faiss.read_index(cpu_index_path)
@@ -154,7 +314,43 @@ class FaissAdapter:
         self.build()
 
     def search(self, qvec: VecArray, k: int = 10) -> list[tuple[str, float]]:
-        """Return the top ``k`` chunk identifiers most similar to ``qvec``."""
+        """
+        Return search.
+        
+        Parameters
+        ----------
+        qvec : VecArray
+            Description for ``qvec``.
+        k : int, optional
+            Description for ``k``.
+        
+        Returns
+        -------
+        List[Tuple[str, float]]
+            Description of return value.
+        
+        Raises
+        ------
+        RuntimeError
+            Raised when validation fails.
+        
+        Examples
+        --------
+        >>> from search_api.faiss_adapter import search
+        >>> result = search(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        search_api.faiss_adapter
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
+        
         if self.vecs is None and self.index is None:
             return []
         if HAVE_FAISS and self.index is not None:

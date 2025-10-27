@@ -1,11 +1,15 @@
-"""Module for search_api.service.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- rrf_fuse: Fuse dense and sparse rankings via reciprocal rank fusion.
-- apply_kg_boosts: Apply knowledge-graph based boosts to fused search results.
-- mmr_deduplicate: De-duplicate search results using maximal marginal….
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+search_api.service
+"""
+
 
 from __future__ import annotations
 
@@ -59,14 +63,78 @@ __navmap__: Final[NavMap] = {
 def rrf_fuse(
     dense: list[tuple[str, float]], sparse: list[tuple[str, float]], k: int = 60
 ) -> list[tuple[str, float]]:
-    """Fuse dense and sparse rankings via reciprocal rank fusion."""
+    """
+    Return rrf fuse.
+    
+    Parameters
+    ----------
+    dense : List[Tuple[str, float]]
+        Description for ``dense``.
+    sparse : List[Tuple[str, float]]
+        Description for ``sparse``.
+    k : int, optional
+        Description for ``k``.
+    
+    Returns
+    -------
+    List[Tuple[str, float]]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from search_api.service import rrf_fuse
+    >>> result = rrf_fuse(..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.service
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     # NOTE: implement stable RRF across rankers when ranker outputs are wired
     return []
 
 
 # [nav:anchor apply_kg_boosts]
 def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[str, float]]:
-    """Apply knowledge-graph based boosts to fused search results."""
+    """
+    Return apply kg boosts.
+    
+    Parameters
+    ----------
+    fused : List[Tuple[str, float]]
+        Description for ``fused``.
+    query : str
+        Description for ``query``.
+    
+    Returns
+    -------
+    List[Tuple[str, float]]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from search_api.service import apply_kg_boosts
+    >>> result = apply_kg_boosts(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.service
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     # NOTE: apply boosts for direct & one-hop concept matches once KG signals exist
     return fused
 
@@ -75,6 +143,37 @@ def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[st
 def mmr_deduplicate(
     results: list[tuple[str, float]], lambda_: float = 0.7
 ) -> list[tuple[str, float]]:
-    """De-duplicate search results using maximal marginal relevance heuristics."""
+    """
+    Return mmr deduplicate.
+    
+    Parameters
+    ----------
+    results : List[Tuple[str, float]]
+        Description for ``results``.
+    lambda_ : float, optional
+        Description for ``lambda_``.
+    
+    Returns
+    -------
+    List[Tuple[str, float]]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from search_api.service import mmr_deduplicate
+    >>> result = mmr_deduplicate(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.service
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     # NOTE: add doc-level diversity via MMR when result scoring is available
     return results

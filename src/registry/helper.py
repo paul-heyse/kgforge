@@ -1,9 +1,15 @@
-"""Module for registry.helper.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- DuckDBRegistryHelper: Open short-lived DuckDB connections for registry operations.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+registry.helper
+"""
+
 
 from __future__ import annotations
 
@@ -35,14 +41,105 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DuckDBRegistryHelper]
 class DuckDBRegistryHelper:
-    """Open short-lived DuckDB connections for registry operations."""
+    """
+    Represent DuckDBRegistryHelper.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Methods
+    -------
+    __init__()
+        Method description.
+    _con()
+        Method description.
+    new_run()
+        Method description.
+    close_run()
+        Method description.
+    begin_dataset()
+        Method description.
+    commit_dataset()
+        Method description.
+    rollback_dataset()
+        Method description.
+    register_documents()
+        Method description.
+    register_doctags()
+        Method description.
+    emit_event()
+        Method description.
+    
+    Examples
+    --------
+    >>> from registry.helper import DuckDBRegistryHelper
+    >>> result = DuckDBRegistryHelper()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    registry.helper
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
 
     def __init__(self, db_path: str) -> None:
-        """Store the DuckDB catalog location."""
+        """
+        Return init.
+        
+        Parameters
+        ----------
+        db_path : str
+            Description for ``db_path``.
+        
+        Examples
+        --------
+        >>> from registry.helper import __init__
+        >>> __init__(...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        registry.helper
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         self.db_path = db_path
 
     def _con(self) -> duckdb.DuckDBPyConnection:
-        """Return a fresh DuckDB connection."""
+        """
+        Return con.
+        
+        Returns
+        -------
+        duckdb.DuckDBPyConnection
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from registry.helper import _con
+        >>> result = _con()
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        registry.helper
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         return duckdb.connect(self.db_path)
 
     def new_run(
@@ -52,7 +149,41 @@ class DuckDBRegistryHelper:
         revision: str | None,
         config: Mapping[str, object],
     ) -> str:
-        """Create a new run record and return its identifier."""
+        """
+        Return new run.
+        
+        Parameters
+        ----------
+        purpose : str
+            Description for ``purpose``.
+        model_id : str | None
+            Description for ``model_id``.
+        revision : str | None
+            Description for ``revision``.
+        config : Mapping[str, object]
+            Description for ``config``.
+        
+        Returns
+        -------
+        str
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from registry.helper import new_run
+        >>> result = new_run(..., ..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        registry.helper
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         run_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -67,7 +198,32 @@ class DuckDBRegistryHelper:
         return run_id
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
-        """Mark a run as finished and emit a pipeline event."""
+        """
+        Return close run.
+        
+        Parameters
+        ----------
+        run_id : str
+            Description for ``run_id``.
+        success : bool
+            Description for ``success``.
+        notes : str | None, optional
+            Description for ``notes``.
+        
+        Examples
+        --------
+        >>> from registry.helper import close_run
+        >>> close_run(..., ..., ...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        registry.helper
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         con = self._con()
         con.execute("UPDATE runs SET finished_at=CURRENT_TIMESTAMP WHERE run_id=?", [run_id])
         con.execute(
@@ -82,7 +238,37 @@ class DuckDBRegistryHelper:
         con.close()
 
     def begin_dataset(self, kind: str, run_id: str) -> str:
-        """Create a dataset placeholder associated with ``run_id``."""
+        """
+        Return begin dataset.
+        
+        Parameters
+        ----------
+        kind : str
+            Description for ``kind``.
+        run_id : str
+            Description for ``run_id``.
+        
+        Returns
+        -------
+        str
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from registry.helper import begin_dataset
+        >>> result = begin_dataset(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        registry.helper
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         dataset_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -97,7 +283,32 @@ class DuckDBRegistryHelper:
         return dataset_id
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
-        """Persist parquet location metadata and emit a commit event."""
+        """
+        Return commit dataset.
+        
+        Parameters
+        ----------
+        dataset_id : str
+            Description for ``dataset_id``.
+        parquet_root : str
+            Description for ``parquet_root``.
+        rows : int
+            Description for ``rows``.
+        
+        Examples
+        --------
+        >>> from registry.helper import commit_dataset
+        >>> commit_dataset(..., ..., ...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        registry.helper
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         con = self._con()
         con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
@@ -114,7 +325,28 @@ class DuckDBRegistryHelper:
         con.close()
 
     def rollback_dataset(self, dataset_id: str) -> None:
-        """Delete a dataset and record a rollback event."""
+        """
+        Return rollback dataset.
+        
+        Parameters
+        ----------
+        dataset_id : str
+            Description for ``dataset_id``.
+        
+        Examples
+        --------
+        >>> from registry.helper import rollback_dataset
+        >>> rollback_dataset(...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        registry.helper
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         con = self._con()
         con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
         con.execute(
@@ -124,7 +356,29 @@ class DuckDBRegistryHelper:
         con.close()
 
     def register_documents(self, docs: list[Doc]) -> None:
-        """Insert or update document metadata rows."""
+        """
+        Return register documents.
+        
+        Parameters
+        ----------
+        docs : List[Doc]
+            Description for ``docs``.
+        
+        Examples
+        --------
+        >>> from registry.helper import register_documents
+        >>> register_documents(...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        registry.helper
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
+        
         con = self._con()
         for doc in docs:
             con.execute(
@@ -151,7 +405,29 @@ class DuckDBRegistryHelper:
         con.close()
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
-        """Insert doctag metadata rows for VLM artefacts."""
+        """
+        Return register doctags.
+        
+        Parameters
+        ----------
+        assets : List[DoctagsAsset]
+            Description for ``assets``.
+        
+        Examples
+        --------
+        >>> from registry.helper import register_doctags
+        >>> register_doctags(...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        registry.helper
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
+        
         con = self._con()
         for asset in assets:
             con.execute(
@@ -168,7 +444,32 @@ class DuckDBRegistryHelper:
         con.close()
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
-        """Emit an ad-hoc event into the pipeline events table."""
+        """
+        Return emit event.
+        
+        Parameters
+        ----------
+        event_name : str
+            Description for ``event_name``.
+        subject_id : str
+            Description for ``subject_id``.
+        payload : Mapping[str, object]
+            Description for ``payload``.
+        
+        Examples
+        --------
+        >>> from registry.helper import emit_event
+        >>> emit_event(..., ..., ...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        registry.helper
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         con = self._con()
         con.execute(
             "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",

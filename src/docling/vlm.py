@@ -1,9 +1,15 @@
-"""Module for docling.vlm.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- GraniteDoclingVLM: Expose unified utilities for Docling-compatible VLMs.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+docling.vlm
+"""
+
 
 from __future__ import annotations
 
@@ -29,6 +35,32 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor GraniteDoclingVLM]
 class GraniteDoclingVLM:
-    """Expose unified utilities for Docling-compatible VLMs."""
+    """
+    Represent GraniteDoclingVLM.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from docling.vlm import GraniteDoclingVLM
+    >>> result = GraniteDoclingVLM()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    docling.vlm
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...

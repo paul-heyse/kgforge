@@ -1,0 +1,2 @@
+[numpydoc_validation]
+checks = GL01,SS01,ES01,RT01,PR01

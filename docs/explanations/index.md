@@ -6,4 +6,5 @@ Deep dives into kgfoundry architecture and design decisions.
 :maxdepth: 1
 251025_HighLevelArchitecture
 251025_FAISS_whl_overview
+numpy-docstring-migration
 ```

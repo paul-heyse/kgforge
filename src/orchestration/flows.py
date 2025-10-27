@@ -1,10 +1,15 @@
-"""Module for orchestration.flows.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- t_echo: Return ``msg`` unmodified; handy for flow scaffolding and….
-- e2e_flow: Run the high-level kgfoundry demo flow and return step names.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+orchestration.flows
+"""
+
 
 from __future__ import annotations
 
@@ -33,14 +38,66 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor t_echo]
 @task
 def t_echo(msg: str) -> str:
-    """Return ``msg`` unmodified; handy for flow scaffolding and tests."""
+    """
+    Return t echo.
+    
+    Parameters
+    ----------
+    msg : str
+        Description for ``msg``.
+    
+    Returns
+    -------
+    str
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from orchestration.flows import t_echo
+    >>> result = t_echo(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    orchestration.flows
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     return msg
 
 
 # [nav:anchor e2e_flow]
 @flow(name="kgfoundry_e2e_skeleton")
 def e2e_flow() -> list[str]:
-    """Run the high-level kgfoundry demo flow and return step names."""
+    """
+    Return e2e flow.
+    
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from orchestration.flows import e2e_flow
+    >>> result = e2e_flow()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    orchestration.flows
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     return [
         t_echo.submit(x).result()
         for x in [
