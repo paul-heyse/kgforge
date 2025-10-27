@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 import os, yaml, math
-from typing import Optional, Dict, List, Tuple
+from typing import Optional, Dict, List, Tuple, Any
 from fastapi import FastAPI, HTTPException, Depends, Header
 from .schemas import SearchRequest, SearchResult
 from kgforge.embeddings_sparse.bm25 import get_bm25, PurePythonBM25
@@ -102,7 +102,12 @@ def rrf_fuse(lists: List[List[Tuple[str, float]]], k_rrf: int) -> Dict[str, floa
             scores[doc_id] = scores.get(doc_id, 0.0) + 1.0 / (k_rrf + rank)
     return scores
 
-def apply_kg_boosts(cands: Dict[str, float], query: str, direct=0.08, one_hop=0.04) -> Dict[str, float]:
+def apply_kg_boosts(
+    cands: Dict[str, float],
+    query: str,
+    direct: float = 0.08,
+    one_hop: float = 0.04,
+) -> Dict[str, float]:
     """Apply kg boosts.
 
     Args:
@@ -134,7 +139,7 @@ def apply_kg_boosts(cands: Dict[str, float], query: str, direct=0.08, one_hop=0.
     return out
 
 @app.post("/search", response_model=dict)
-def search(req: SearchRequest, _=Depends(auth)):
+def search(req: SearchRequest, _: None = Depends(auth)) -> dict:
     """Search.
 
     Args:
@@ -174,7 +179,7 @@ def search(req: SearchRequest, _=Depends(auth)):
     return {"results": results}
 
 @app.post("/graph/concepts", response_model=dict)
-def graph_concepts(body: dict, _=Depends(auth)):
+def graph_concepts(body: dict[str, Any], _: None = Depends(auth)) -> dict:
     """Graph concepts.
 
     Args:

@@ -19,6 +19,10 @@ plugins:
             - "sys.path.insert(0, str(Path('src').resolve()))"
           options:
             show_source: true
+            docstring_options:
+              google:
+                warnings: false
+                warn_missing_types: false
   - literate-nav
   - section-index
 nav:

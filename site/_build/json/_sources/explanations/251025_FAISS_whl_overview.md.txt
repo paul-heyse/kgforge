@@ -249,8 +249,6 @@ print("Index should_use_cuvs:", faiss.should_use_cuvs(cfg))  # True → set cfg/
 
 # addendum, base content on faiss gpu library
 
----
-
 ## 0) What changed vs. the prior wheel (and how to think about it)
 
 **Hardware/ABI**

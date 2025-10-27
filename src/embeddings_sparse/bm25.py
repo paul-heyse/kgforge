@@ -5,7 +5,7 @@ from __future__ import annotations
 import math, os, re, json, pickle
 from dataclasses import dataclass
 from collections import defaultdict, Counter
-from typing import Iterable, Dict, Tuple, List, Optional
+from typing import Iterable, Dict, Tuple, List, Optional, Any
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 
@@ -221,7 +221,7 @@ class LuceneBM25:
         hits = self._searcher.search(query, k=k)
         return [(h.docid, float(h.score)) for h in hits]
 
-def get_bm25(backend: str, index_dir: str, **kwargs):
+def get_bm25(backend: str, index_dir: str, **kwargs: Any) -> PurePythonBM25 | LuceneBM25:
     """Get bm25.
 
     Args:

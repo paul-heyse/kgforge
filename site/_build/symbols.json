@@ -1808,6 +1808,14 @@
     "doc": ""
   },
   {
+    "path": "embeddings_sparse.bm25.Any",
+    "kind": "alias",
+    "file": null,
+    "lineno": null,
+    "endlineno": null,
+    "doc": ""
+  },
+  {
     "path": "embeddings_sparse.bm25.TOKEN_RE",
     "kind": "attribute",
     "file": "embeddings_sparse/bm25.py",
@@ -2620,15 +2628,15 @@
     "kind": "function",
     "file": "orchestration/fixture_flow.py",
     "lineno": 77,
-    "endlineno": 104,
+    "endlineno": 109,
     "doc": "T register in duckdb."
   },
   {
     "path": "orchestration.fixture_flow.fixture_pipeline",
     "kind": "function",
     "file": "orchestration/fixture_flow.py",
-    "lineno": 106,
-    "endlineno": 119,
+    "lineno": 111,
+    "endlineno": 124,
     "doc": "Fixture pipeline."
   },
   {
@@ -3816,6 +3824,14 @@
     "doc": ""
   },
   {
+    "path": "search_api.app.Any",
+    "kind": "alias",
+    "file": null,
+    "lineno": null,
+    "endlineno": null,
+    "doc": ""
+  },
+  {
     "path": "search_api.app.FastAPI",
     "kind": "alias",
     "file": null,
@@ -4124,23 +4140,23 @@
     "kind": "function",
     "file": "search_api/app.py",
     "lineno": 105,
-    "endlineno": 134,
+    "endlineno": 139,
     "doc": "Apply kg boosts."
   },
   {
     "path": "search_api.app.search",
     "kind": "function",
     "file": "search_api/app.py",
-    "lineno": 136,
-    "endlineno": 174,
+    "lineno": 141,
+    "endlineno": 179,
     "doc": "Search."
   },
   {
     "path": "search_api.app.graph_concepts",
     "kind": "function",
     "file": "search_api/app.py",
-    "lineno": 176,
-    "endlineno": 187,
+    "lineno": 181,
+    "endlineno": 192,
     "doc": "Graph concepts."
   },
   {
