@@ -233,7 +233,10 @@ docs = [
 docstokg-hybrid-validation = "DocsToKG.HybridSearch.validation:main"
 
 [tool.hatch.build.targets.wheel]
-packages = [{ include = "kgfoundry", from = "src" }]
+packages = ["src/kgfoundry"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.black]
 line-length = 100

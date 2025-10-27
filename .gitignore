@@ -19,7 +19,10 @@ data/**/*
 __pycache__/
 dist/
 build/
-.wheelhouse/
+/.wheelhouse/
+.env
+.envrc.local
+site/_build/
 KGForge.egg-info/
 
 # IDE

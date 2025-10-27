@@ -1,5 +1,5 @@
 {
-  "commit": "aa6e561916bee72f0f387d36c17d3c9ae31db704",
+  "commit": "7ad10c666d67021a3ffd5f11ffcd33b436cfea16",
   "modules": {
     "kg_builder.mock_kg": {
       "path": "src/kg_builder/mock_kg.py",

@@ -1,3 +1,24 @@
+## Environment Setup (Preferred Order)
+
+1. **direnv (default approach)**
+   - Install `direnv` (`sudo apt install direnv` or `brew install direnv`) and add the hook for your shell (`eval "$(direnv hook bash)"` or `eval "$(direnv hook zsh)"`).
+   - Ensure `uv` is installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`).
+   - From the repo root run `direnv allow` once. The committed `.envrc` will:
+     - create/sync `.venv/` with `uv sync --frozen --extra docs`
+     - activate the environment automatically
+     - install pre-commit hooks on first load.
+
+2. **Bootstrap script (for shells without direnv)**
+   - Run `bash scripts/bootstrap.sh`.
+   - Mirrors the `.envrc` workflow; supports overrides (`OFFLINE=1`, `USE_WHEELHOUSE=1`, `EXTRAS="docs,extra"`, `ALLOW_GPU=1`).
+
+3. **Manual uv commands (CI/manual fallback)**
+   - `uv python pin 3.13`
+   - `uv venv`
+   - `uv sync --frozen --extra docs`
+   - `uvx pre-commit install -t pre-commit -t pre-push`
+   - Activate with `. .venv/bin/activate` or run tools via `uv run` / `uvx`.
+
 # OpenSpec Instructions
 
 Instructions for AI coding assistants using OpenSpec for spec-driven development.
@@ -87,6 +108,15 @@ After deployment, create separate PR to:
 - Full-text search (use ripgrep): `rg -n "Requirement:|Scenario:" openspec/specs`
 
 ## Quick Start
+
+Daily commands after setup (choose any method above):
+
+```bash
+uvx ruff check --fix && uvx ruff format
+uvx mypy --strict src
+uv run pytest -q
+uv run sphinx-build -b html docs docs/_build/html
+```
 
 ### CLI Commands
 

@@ -2,12 +2,14 @@
 site/_build/**
 docs/_build/**
 site/api/**
+.env
+.envrc.local
 
 # --- Python build/packaging artifacts ---
 build/**
 dist/**
 src/**/*.egg-info/**
-.wheels/**
+/.wheelhouse/**
 *.whl
 
 # --- Caches & transient ---
