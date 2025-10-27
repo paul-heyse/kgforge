@@ -1,7 +1,7 @@
-
 from fastapi.testclient import TestClient
 from kgforge.search_api.app import app
 from kgforge.search_client import KGForgeClient
+
 
 def test_client_calls_api():
     client = TestClient(app)

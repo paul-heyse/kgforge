@@ -1,14 +1,20 @@
 """Module for search_api.kg_mock."""
 
-
 from __future__ import annotations
-from typing import List
 
 _CONCEPTS = {
-  "urn:concept:toy:LLM": {"label":"Large Language Model", "keywords":["llm","language model","transformer"]},
-  "urn:concept:toy:Alignment": {"label":"Alignment", "keywords":["alignment","safety","rlhf"]},
+    "urn:concept:toy:LLM": {
+        "label": "Large Language Model",
+        "keywords": ["llm", "language model", "transformer"],
+    },
+    "urn:concept:toy:Alignment": {
+        "label": "Alignment",
+        "keywords": ["alignment", "safety", "rlhf"],
+    },
 }
-def detect_query_concepts(query: str) -> List[str]:
+
+
+def detect_query_concepts(query: str) -> list[str]:
     """Detect query concepts.
 
     Args:
@@ -23,7 +29,9 @@ def detect_query_concepts(query: str) -> List[str]:
         if any(kw in q for kw in meta["keywords"]):
             hits.append(cid)
     return hits
-def linked_concepts_for_text(text: str) -> List[str]:
+
+
+def linked_concepts_for_text(text: str) -> list[str]:
     """Linked concepts for text.
 
     Args:
@@ -32,11 +40,20 @@ def linked_concepts_for_text(text: str) -> List[str]:
     Returns:
         List[str]: TODO.
     """
-    t = text.lower(); hits = []
+    t = text.lower()
+    hits = []
     for cid, meta in _CONCEPTS.items():
-        if any(kw in t for kw in meta["keywords"]): hits.append(cid)
+        if any(kw in t for kw in meta["keywords"]):
+            hits.append(cid)
     return hits
-def kg_boost(query_concepts: List[str], chunk_concepts: List[str], direct: float=0.08, one_hop: float=0.04) -> float:
+
+
+def kg_boost(
+    query_concepts: list[str],
+    chunk_concepts: list[str],
+    direct: float = 0.08,
+    one_hop: float = 0.04,
+) -> float:
     """Kg boost.
 
     Args:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Agent-first Sphinx configuration
 - Static API docs via AutoAPI (no imports)
@@ -8,19 +7,29 @@ Agent-first Sphinx configuration
 - JSON builder for machine-readable output
 This file is robust to different repo shapes (src/PKG or PKG at root).
 """
+
 import collections
-import os, sys, subprocess
+import inspect
+import os
+import subprocess
+import sys
 from pathlib import Path
+
+from astroid import builder as astroid_builder
+from astroid import manager as astroid_manager
+from autoapi import _parser as autoapi_parser  # type: ignore
+from sphinxcontrib.serializinghtml import jsonimpl  # type: ignore
 
 # --- Project metadata (override via env if you like)
 project = os.environ.get("PROJECT_NAME", "KGForge")
-author  = os.environ.get("PROJECT_AUTHOR", "KGForge Maintainers")
+author = os.environ.get("PROJECT_AUTHOR", "KGForge Maintainers")
 
 # --- Paths
 DOCS_DIR = Path(__file__).resolve().parent
-ROOT     = DOCS_DIR.parent
-SRC_DIR  = ROOT / "src"
+ROOT = DOCS_DIR.parent
+SRC_DIR = ROOT / "src"
 TOOLS_DIR = ROOT / "tools"
+
 
 def _detect_pkg():
     # pick the first package dir that has an __init__.py, preferring src/
@@ -32,7 +41,8 @@ def _detect_pkg():
         raise RuntimeError("No Python package found under src/ or project root")
     # Prefer lowercase names if any; else first found
     lowers = [c for c in candidates if c.islower()]
-    return (lowers[0] if lowers else candidates[0])
+    return lowers[0] if lowers else candidates[0]
+
 
 PKG = os.environ.get("DOCS_PKG", _detect_pkg())
 
@@ -43,6 +53,7 @@ if TOOLS_DIR.exists() and str(TOOLS_DIR) not in sys.path:
 
 try:
     from detect_pkg import detect_packages, detect_primary
+
     _PACKAGES = []
     if os.environ.get("DOCS_PKG"):
         _PACKAGES = [pkg.strip() for pkg in os.environ["DOCS_PKG"].split(",") if pkg.strip()]
@@ -62,7 +73,7 @@ extensions = [
     "sphinx.ext.linkcode",
     "sphinx.ext.graphviz",
     "sphinx.ext.inheritance_diagram",
-    "autoapi.extension",            # static API docs (no import)
+    "autoapi.extension",  # static API docs (no import)
     "sphinxcontrib.mermaid",
 ]
 
@@ -79,14 +90,14 @@ autoapi_root = "autoapi"
 autoapi_output_dir = "autoapi"
 autoapi_add_toctree_entry = True
 autoapi_options = [
-    "members", "undoc-members", "show-inheritance", "special-members", "imported-members"
+    "members",
+    "undoc-members",
+    "show-inheritance",
+    "special-members",
+    "imported-members",
 ]
 # Include package __init__ modules so AutoAPI emits package-level toctrees.
 autoapi_ignore: list[str] = []
-
-from autoapi import _parser as autoapi_parser  # type: ignore
-from astroid import builder as astroid_builder, manager as astroid_manager
-import inspect
 
 
 def _autoapi_parse_file(self, file_path, condition):  # pragma: no cover - compatibility shim
@@ -123,7 +134,6 @@ viewcode_line_numbers = True
 suppress_warnings = ["myst.header", "misc.restructuredtext"]
 
 # Ensure JSON builder can serialize lru_cache wrappers
-from sphinxcontrib.serializinghtml import jsonimpl  # type: ignore
 
 _json_default = jsonimpl.json.JSONEncoder.default
 
@@ -146,14 +156,16 @@ _loader = GriffeLoader(search_paths=[str(SRC_DIR if SRC_DIR.exists() else ROOT)]
 _MODULE_CACHE = {}
 PKG = _PACKAGES[0]
 
+
 def _get_root(module: str | None):
-    top = (module.split(".", 1)[0] if module else PKG)
+    top = module.split(".", 1)[0] if module else PKG
     if top not in _MODULE_CACHE:
         try:
             _MODULE_CACHE[top] = _loader.load(top)
         except Exception:
             _MODULE_CACHE[top] = None
     return _MODULE_CACHE[top]
+
 
 def _lookup(module: str, fullname: str):
     """Return (abs_path, start, end) of a symbol via Griffe; None if not found."""
@@ -183,24 +195,30 @@ def _lookup(module: str, fullname: str):
     abs_path = base / file_rel
     return str(abs_path.resolve()), int(start), int(end or start)
 
+
 # Link modes:
 #   DOCS_LINK_MODE=editor (default): vscode://file/<abs>:line:col
 #   DOCS_LINK_MODE=github: https://github.com/<org>/<repo>/blob/<sha>/<rel>#Lstart-Lend
 LINK_MODE = os.environ.get("DOCS_LINK_MODE", "editor").lower()
 EDITOR = os.environ.get("DOCS_EDITOR", "vscode")
 
+
 def _git_sha():
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(ROOT), text=True).strip()
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=str(ROOT), text=True
+        ).strip()
     except Exception:
         return os.environ.get("DOCS_GITHUB_SHA", "main")
 
+
 def _github_url(relpath, start, end):
-    org  = os.environ.get("DOCS_GITHUB_ORG", "your-org")
+    org = os.environ.get("DOCS_GITHUB_ORG", "your-org")
     repo = os.environ.get("DOCS_GITHUB_REPO", "your-repo")
-    sha  = _git_sha()
-    rng  = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
+    sha = _git_sha()
+    rng = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{org}/{repo}/blob/{sha}/{relpath}{rng}"
+
 
 def linkcode_resolve(domain, info):
     if domain != "py" or not info.get("module"):

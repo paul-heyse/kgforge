@@ -1,7 +1,6 @@
-
-import os
-import numpy as np
 import pathlib
+
+import numpy as np
 import pytest
 
 duckdb = pytest.importorskip("duckdb")
@@ -11,7 +10,8 @@ DENSE = str(FIXTURES / "dense_qwen3.parquet")
 
 # Prefer the API adapter if present (uses FAISS+cuVS if available)
 try:
-    from kgforge.search_api.faiss_adapter import FaissAdapter, HAVE_FAISS
+    from kgforge.search_api.faiss_adapter import HAVE_FAISS, FaissAdapter
+
     HAVE_ADAPTER = True
 except Exception:
     HAVE_ADAPTER = False
@@ -20,16 +20,24 @@ except Exception:
 # Fallback: vectorstore_faiss (provides CPU/GPU + brute-force fallback)
 try:
     from kgforge.vectorstore_faiss.gpu import FaissGpuIndex as VSFaiss
+
     HAVE_VS = True
 except Exception:
     HAVE_VS = False
 
+
 @pytest.mark.skipif(not (HAVE_ADAPTER or HAVE_VS), reason="FAISS adapters not importable")
 def test_dense_search_top1_is_self(tmp_path):
     # Load first vector and id from parquet
-    con = duckdb.connect(database=':memory:')
+    con = duckdb.connect(database=":memory:")
     try:
-        row = con.execute(f"SELECT chunk_id, vector FROM read_parquet('{DENSE}', union_by_name=true) LIMIT 1").fetchone()
+        row = con.execute(
+            f"""
+            SELECT chunk_id, vector
+            FROM read_parquet('{DENSE}', union_by_name=true)
+            LIMIT 1
+            """
+        ).fetchone()
     finally:
         con.close()
     assert row is not None
@@ -49,9 +57,15 @@ def test_dense_search_top1_is_self(tmp_path):
     elif HAVE_VS:
         # Build an in-memory FAISS or fallback brute-force index
         # Load more vectors for a small index
-        con = duckdb.connect(database=':memory:')
+        con = duckdb.connect(database=":memory:")
         try:
-            rows = con.execute(f"SELECT chunk_id, vector FROM read_parquet('{DENSE}', union_by_name=true) LIMIT 1000").fetchall()
+            rows = con.execute(
+                f"""
+                SELECT chunk_id, vector
+                FROM read_parquet('{DENSE}', union_by_name=true)
+                LIMIT 1000
+                """
+            ).fetchall()
         finally:
             con.close()
         ids = [r[0] for r in rows]

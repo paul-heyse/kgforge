@@ -96,7 +96,6 @@ jobs:
 
       - name: Verify clean tree
         run: |
-          rm -rf docs/_build site
           git status --short
           git diff --exit-code
           if [ -n "$(git ls-files --others --exclude-standard)" ]; then

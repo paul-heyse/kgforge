@@ -1,13 +1,17 @@
 """Module for search_api.splade_index."""
 
-
 from __future__ import annotations
+
+import re
 from dataclasses import dataclass
-from typing import Dict, List, Tuple, Optional
-import re, math, duckdb
 from pathlib import Path
+
+import duckdb
+
 TOKEN = re.compile(r"[A-Za-z0-9]+")
-def tok(s: str) -> List[str]:
+
+
+def tok(s: str) -> list[str]:
     """Tok.
 
     Args:
@@ -18,17 +22,26 @@ def tok(s: str) -> List[str]:
     """
     return [t.lower() for t in TOKEN.findall(s or "")]
 
+
 @dataclass
 class SpladeDoc:
     """Spladedoc."""
+
     chunk_id: str
     doc_id: str
     section: str
     text: str
 
+
 class SpladeIndex:
     """Spladeindex."""
-    def __init__(self, db_path: str, chunks_dataset_root: Optional[str] = None, sparse_root: Optional[str] = None):
+
+    def __init__(
+        self,
+        db_path: str,
+        chunks_dataset_root: str | None = None,
+        sparse_root: str | None = None,
+    ):
         """Init.
 
         Args:
@@ -37,12 +50,12 @@ class SpladeIndex:
             sparse_root (Optional[str]): TODO.
         """
         self.db_path = db_path
-        self.docs: List[SpladeDoc] = []
-        self.df: Dict[str, int] = {}
+        self.docs: list[SpladeDoc] = []
+        self.df: dict[str, int] = {}
         self.N = 0
         self._load(chunks_dataset_root)
 
-    def _load(self, chunks_root: Optional[str]):
+    def _load(self, chunks_root: str | None) -> None:
         """Load.
 
         Args:
@@ -52,24 +65,29 @@ class SpladeIndex:
             return
         con = duckdb.connect(self.db_path)
         try:
-            ds = con.execute("""
-                SELECT parquet_root FROM datasets WHERE kind='chunks' ORDER BY created_at DESC LIMIT 1
-            """).fetchone()
+            ds = con.execute(
+                "SELECT parquet_root FROM datasets "
+                "WHERE kind='chunks' ORDER BY created_at DESC LIMIT 1"
+            ).fetchone()
             if ds:
-                rows = con.execute(f"""
-                    SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text
-                    FROM read_parquet('{ds[0]}/*/*.parquet', union_by_name=true) AS c
-                """).fetchall()
+                rows = con.execute(
+                    "SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text "
+                    f"FROM read_parquet('{ds[0]}/*/*.parquet', union_by_name=true) AS c"
+                ).fetchall()
                 for r in rows:
-                    self.docs.append(SpladeDoc(chunk_id=r[0], doc_id=r[1] or "urn:doc:fixture", section=r[2], text=r[3]))
+                    self.docs.append(
+                        SpladeDoc(
+                            chunk_id=r[0], doc_id=r[1] or "urn:doc:fixture", section=r[2], text=r[3]
+                        )
+                    )
         finally:
             con.close()
         self.N = len(self.docs)
         for d in self.docs:
             for t in set(tok(d.text)):
-                self.df[t] = self.df.get(t,0)+1
+                self.df[t] = self.df.get(t, 0) + 1
 
-    def search(self, query: str, k: int=10) -> List[Tuple[int, float]]:
+    def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
         """Search.
 
         Args:
@@ -79,21 +97,24 @@ class SpladeIndex:
         Returns:
             List[Tuple[int, float]]: TODO.
         """
-        if self.N == 0: return []
+        if self.N == 0:
+            return []
         q = tok(query)
-        if not q: return []
-        scores = [0.0]*self.N
+        if not q:
+            return []
+        scores = [0.0] * self.N
         for i, d in enumerate(self.docs):
-            tf = {}
-            for t in tok(d.text): tf[t] = tf.get(t,0)+1
+            tf: dict[str, int] = {}
+            for t in tok(d.text):
+                tf[t] = tf.get(t, 0) + 1
             s = 0.0
             for t in q:
                 if t in self.df:
-                    idf = (self.N+1)/(self.df[t]+0.5)
-                    s += (tf.get(t,0)) * idf
-            scores[i]=s
+                    idf = (self.N + 1) / (self.df[t] + 0.5)
+                    s += (tf.get(t, 0)) * idf
+            scores[i] = s
         ranked = sorted(enumerate(scores), key=lambda x: x[1], reverse=True)
-        return [(i,s) for i,s in ranked[:k] if s>0.0]
+        return [(i, s) for i, s in ranked[:k] if s > 0.0]
 
     def doc(self, i: int) -> SpladeDoc:
         """Doc.

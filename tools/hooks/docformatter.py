@@ -16,14 +16,12 @@ def git_diff_names() -> set[str]:
 
 
 def main() -> int:
-    repo = (
-        subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            check=True,
-            capture_output=True,
-            text=True,
-        ).stdout.strip()
-    )
+    repo = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
     before = git_diff_names()
 
     cmd = [
@@ -31,8 +29,8 @@ def main() -> int:
         "-m",
         "docformatter",
         "--in-place",
-        "--wrap-summaries=120",
-        "--wrap-descriptions=120",
+        "--wrap-summaries=100",
+        "--wrap-descriptions=100",
         "-r",
         "src",
     ]

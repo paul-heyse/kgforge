@@ -5,6 +5,7 @@ Generate package-level README.md files that:
 - Are compatible with local editor links or GitHub permalinks
 After generation, run 'doctoc src/<pkg>' to update TOCs.
 """
+
 import os
 import subprocess
 from pathlib import Path
@@ -25,7 +26,9 @@ ENV_PKGS = os.environ.get("DOCS_PKG")
 
 def git_sha():
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(ROOT), text=True).strip()
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=str(ROOT), text=True
+        ).strip()
     except Exception:
         return os.environ.get("DOCS_GITHUB_SHA", "main")
 

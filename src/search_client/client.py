@@ -1,13 +1,21 @@
 """Module for search_client.client."""
 
-
 from __future__ import annotations
-from typing import Optional, Dict, Any
+
+from typing import Any
+
 import requests
+
 
 class KGForgeClient:
     """Kgforgeclient."""
-    def __init__(self, base_url: str = "http://localhost:8080", api_key: Optional[str] = None, timeout: float = 30.0):
+
+    def __init__(
+        self,
+        base_url: str = "http://localhost:8080",
+        api_key: str | None = None,
+        timeout: float = 30.0,
+    ):
         """Init.
 
         Args:
@@ -19,7 +27,7 @@ class KGForgeClient:
         self.api_key = api_key
         self.timeout = timeout
 
-    def _headers(self) -> Dict[str, str]:
+    def _headers(self) -> dict[str, str]:
         """Headers.
 
         Returns:
@@ -30,7 +38,7 @@ class KGForgeClient:
             h["Authorization"] = f"Bearer {self.api_key}"
         return h
 
-    def healthz(self) -> Dict[str, Any]:
+    def healthz(self) -> dict[str, Any]:
         """Healthz.
 
         Returns:
@@ -40,7 +48,13 @@ class KGForgeClient:
         r.raise_for_status()
         return r.json()
 
-    def search(self, query: str, k: int = 10, filters: Optional[Dict[str, Any]] = None, explain: bool = False) -> Dict[str, Any]:
+    def search(
+        self,
+        query: str,
+        k: int = 10,
+        filters: dict[str, Any] | None = None,
+        explain: bool = False,
+    ) -> dict[str, Any]:
         """Search.
 
         Args:
@@ -53,11 +67,13 @@ class KGForgeClient:
             Dict[str, Any]: TODO.
         """
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
-        r = requests.post(f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout)
+        r = requests.post(
+            f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout
+        )
         r.raise_for_status()
         return r.json()
 
-    def concepts(self, q: str, limit: int = 50) -> Dict[str, Any]:
+    def concepts(self, q: str, limit: int = 50) -> dict[str, Any]:
         """Concepts.
 
         Args:
@@ -67,6 +83,11 @@ class KGForgeClient:
         Returns:
             Dict[str, Any]: TODO.
         """
-        r = requests.post(f"{self.base_url}/graph/concepts", json={"q": q, "limit": limit}, headers=self._headers(), timeout=self.timeout)
+        r = requests.post(
+            f"{self.base_url}/graph/concepts",
+            json={"q": q, "limit": limit},
+            headers=self._headers(),
+            timeout=self.timeout,
+        )
         r.raise_for_status()
         return r.json()
