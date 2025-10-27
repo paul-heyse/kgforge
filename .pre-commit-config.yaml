@@ -3,17 +3,21 @@ repos:
     rev: v1.7.5
     hooks:
       - id: docformatter
+        pass_filenames: false
         args:
           - --in-place
           - --wrap-summaries=120
           - --wrap-descriptions=120
-        files: "^src/.*\\.py$"
+          - -r
+          - src
 
   - repo: https://github.com/PyCQA/pydocstyle
     rev: 6.3.0
     hooks:
       - id: pydocstyle
-        files: "^src/.*\\.py$"
+        pass_filenames: false
+        args:
+          - src
 
   - repo: https://github.com/econchick/interrogate
     rev: 1.5.0
