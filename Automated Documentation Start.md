@@ -67,10 +67,10 @@ unzip agent-docs-kit.zip -d .
 ```bash
 # pip
 pip install -U pip
-pip install -e ".[docs,docs-agent]"
+pip install -e ".[docs]"
 
 # or uv (if you use it)
-uv pip install -e ".[docs,docs-agent]"
+uv pip install -e ".[docs]"
 ```
 
 3. **(Optional)** Create Import Linter contracts (for layers)
@@ -127,65 +127,7 @@ make watch
 
 ## 4) pyproject.toml updates (minimal, safe changes)
 
-I inspected your attached `pyproject.toml`. Below are the **only changes** you need to make. (You already have an excellent Sphinx stack and AutoAPI defined in your `docs` extra.) 
-
-**A. extend your `[project.optional-dependencies].docs`** to add the static parser + (optional) Graphviz Python package:
-
-```toml
-[project.optional-dependencies]
-docs = [
-  # ... keep everything you already have ...
-  "griffe",            # static analysis for linkcode & symbol index
-  "graphviz",          # only if you plan to use sphinx.ext.graphviz/inheritance_diagram
-]
-```
-
-**B. add a new extra for docstring automation & architecture enforcement:**
-
-```toml
-[project.optional-dependencies]
-docs-agent = [
-  "doq",               # generate docstring skeletons
-  "pyment",            # fill/convert to preferred style (Google/NumPy/reST)
-  "interrogate",       # enforce docstring coverage
-  "pydocstyle",        # PEP-257 lint
-  "docformatter",      # format docstrings
-  "import-linter",     # enforce layered architecture
-]
-```
-
-**C. (optional) if you want the MkDocs site variant too:**
-
-```toml
-[project.optional-dependencies]
-docs-mkdocs = [
-  "mkdocs",
-  "mkdocs-material",
-  "mkdocstrings[python]",
-  "mkdocs-gen-files",
-  "mkdocs-literate-nav",
-  "mkdocs-section-index",
-  "griffe",
-]
-```
-
-**D. (optional) enable Graphviz & inheritance diagrams in your Sphinx extension list**
-You already maintain an extension list in `[tool.docs.extensions]`. If you plan to use Graphviz/diagrams, ensure these are present:
-
-```toml
-[tool.docs.extensions]
-enabled = [
-  # ... keep your current list ...
-  "sphinx.ext.graphviz",
-  "sphinx.ext.inheritance_diagram",
-  "sphinxcontrib.mermaid",
-]
-```
-
-> Notes
->
-> * Your current `docs` extra already includes: `sphinx>=7`, `myst-parser`, `sphinx-autoapi`, `sphinx-autobuild`, `sphinx-autodoc-typehints`, and more. The **only must‑add** for this system is **`griffe`**, because the supplied `conf.py` uses Griffe to compute line‑precise locations **without importing your package**. 
-> * If you use `sphinx.ext.graphviz` / `inheritance_diagram`, you’ll also need the **Graphviz system binary** installed (in addition to the Python `graphviz` package).
+I inspected your attached `pyproject.toml`. You already consolidated the documentation tooling into the single `docs` extra, so no other extras are required. Just make sure `griffe` (for static parsing) and any optional packages such as `graphviz` are included under `[project.optional-dependencies].docs`. If you use Graphviz or inheritance diagrams, remember to install the Graphviz system binary in addition to the Python package.
 
 ---
 
@@ -259,7 +201,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.13" }
-      - run: pip install -U pip && pip install -e ".[docs,docs-agent]"
+      - run: pip install -U pip && pip install -e ".[docs]"
       - run: python tools/gen_readmes.py
       - run: sphinx-build -W -b html docs docs/_build/html
       - run: sphinx-build -W -b json docs docs/_build/json
@@ -292,7 +234,7 @@ jobs:
 
 ```bash
 unzip agent-docs-kit.zip -d .
-pip install -e ".[docs,docs-agent]"
+pip install -e ".[docs]"
 make docstrings readmes html json symbols
 ```
 

@@ -26,7 +26,7 @@ ensure_tools() {
   local missing=0
   for tool in doq docformatter pydocstyle interrogate; do
     if [[ ! -x "$BIN/$tool" ]]; then
-      echo "error: missing '$tool'; install docs extras via 'pip install -e \".[docs,docs-agent]\"' (inside .venv)." >&2
+      echo "error: missing '$tool'; install docs extras via 'pip install -e \".[docs]\"' (inside .venv)." >&2
       missing=1
     fi
   done
