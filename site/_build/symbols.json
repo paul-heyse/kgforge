@@ -2656,6 +2656,14 @@
     "doc": ""
   },
   {
+    "path": "download.harvester.Doc",
+    "kind": "alias",
+    "file": null,
+    "lineno": null,
+    "endlineno": null,
+    "doc": ""
+  },
+  {
     "path": "download.harvester.DownloadError",
     "kind": "class",
     "file": "kgfoundry_common/errors.py",
@@ -2670,14 +2678,6 @@
     "lineno": 72,
     "endlineno": 75,
     "doc": "Raised when an unsupported MIME type is encountered."
-  },
-  {
-    "path": "download.harvester.Doc",
-    "kind": "alias",
-    "file": null,
-    "lineno": null,
-    "endlineno": null,
-    "doc": ""
   },
   {
     "path": "download.harvester.NavMap",
