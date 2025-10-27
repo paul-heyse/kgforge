@@ -9,7 +9,10 @@ import os
 import subprocess
 from pathlib import Path
 
-from griffe import GriffeLoader
+try:
+    from griffe.loader import GriffeLoader
+except ImportError:  # pragma: no cover - compatibility shim
+    from griffe import GriffeLoader  # type: ignore[attr-defined]
 
 from detect_pkg import detect_packages, detect_primary
 

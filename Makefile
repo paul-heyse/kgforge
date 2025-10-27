@@ -14,7 +14,8 @@ WATCH_PORT := $(if $(SPHINX_AUTOBUILD_PORT),$(SPHINX_AUTOBUILD_PORT),8000)
 bootstrap:
 	python3 -m venv $(VENV)
 	$(PIP) install -U pip wheel
-	$(PIP) install -U -r requirements-dev.txt
+	$(PIP) install -U -e ".[dev,docs,docs-agent,docs-mkdocs]"
+	$(PIP) install -U pre-commit
 	$(PRECOMMIT) install
 	$(PY) -m kgforge.registry.migrate apply --db /data/catalog/catalog.duckdb --migrations registry/migrations
 

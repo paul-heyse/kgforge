@@ -137,7 +137,10 @@ def _json_safe_default(self, obj):  # pragma: no cover - builder patch
 jsonimpl.json.JSONEncoder.default = _json_safe_default
 
 # --- Build deep links per symbol without importing your code (use Griffe)
-from griffe import GriffeLoader
+try:  #  griffe >=0.45 exposes loader module; fallback for current layout.
+    from griffe.loader import GriffeLoader
+except ImportError:  # pragma: no cover - compatibility shim
+    from griffe import GriffeLoader  # type: ignore[attr-defined]
 
 _loader = GriffeLoader(search_paths=[str(SRC_DIR if SRC_DIR.exists() else ROOT)])
 _MODULE_CACHE = {}
