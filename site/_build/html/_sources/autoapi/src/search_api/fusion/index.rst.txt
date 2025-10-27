@@ -9,7 +9,7 @@ src.search_api.fusion
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - rrf_fuse: Rrf fuse.
+   - rrf_fuse: Fuse ranked lists using reciprocal rank fusion (RRF).
 
 
 
@@ -20,14 +20,6 @@ Module Contents
 
 .. py:function:: rrf_fuse(rankers, k = 60)
 
-   Rrf fuse.
-
-   :param rankers: TODO.
-   :type rankers: List[List[Tuple[str, float]]]
-   :param k: TODO.
-   :type k: int
-
-   :returns: TODO.
-   :rtype: Dict[str, float]
+   Fuse ranked lists using reciprocal rank fusion (RRF).
 
 

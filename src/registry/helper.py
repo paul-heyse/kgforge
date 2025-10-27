@@ -1,7 +1,8 @@
-"""Convenience layer for inserting artefacts into the DuckDB registry.
+"""Module for registry.helper.
 
 NavMap:
-- DuckDBRegistryHelper: Handy helper for opening short-lived DuckDB connections.
+- NavMap: Structure describing a module navmap.
+- DuckDBRegistryHelper: Open short-lived DuckDB connections for registry operations.
 """
 
 from __future__ import annotations

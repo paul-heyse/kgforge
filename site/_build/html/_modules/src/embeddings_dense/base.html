@@ -351,53 +351,46 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos"> 2</span>
 <span class="linenos"> 3</span><span class="sd">NavMap:</span>
 <span class="linenos"> 4</span><span class="sd">- NavMap: Structure describing a module navmap.</span>
-<span class="linenos"> 5</span><span class="sd">- DenseEmbedder: Protocol describing a dense embedding provider.</span>
+<span class="linenos"> 5</span><span class="sd">- DenseEmbeddingModel: Protocol describing dense embedding encoders used in….</span>
 <span class="linenos"> 6</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="linenos"> 7</span>
 <span class="linenos"> 8</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 <span class="linenos"> 9</span>
-<span class="linenos">10</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Protocol</span>
-<span class="linenos">11</span>
-<span class="linenos">12</span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="linenos">13</span><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
-<span class="linenos">14</span>
-<span class="linenos">15</span><span class="kn">from</span><span class="w"> </span><span class="nn">kgfoundry_common.navmap_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NavMap</span>
-<span class="linenos">16</span>
-<span class="linenos">17</span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;DenseEmbedder&quot;</span><span class="p">]</span>
-<span class="linenos">18</span>
-<span class="linenos">19</span><span class="n">__navmap__</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">NavMap</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-<span class="linenos">20</span>    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;embeddings_dense.base&quot;</span><span class="p">,</span>
-<span class="linenos">21</span>    <span class="s2">&quot;synopsis&quot;</span><span class="p">:</span> <span class="s2">&quot;Module for embeddings_dense.base&quot;</span><span class="p">,</span>
-<span class="linenos">22</span>    <span class="s2">&quot;exports&quot;</span><span class="p">:</span> <span class="n">__all__</span><span class="p">,</span>
-<span class="linenos">23</span>    <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[</span>
-<span class="linenos">24</span>        <span class="p">{</span>
-<span class="linenos">25</span>            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;public-api&quot;</span><span class="p">,</span>
-<span class="linenos">26</span>            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Public API&quot;</span><span class="p">,</span>
-<span class="linenos">27</span>            <span class="s2">&quot;symbols&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;DenseEmbedder&quot;</span><span class="p">],</span>
-<span class="linenos">28</span>        <span class="p">},</span>
-<span class="linenos">29</span>    <span class="p">],</span>
-<span class="linenos">30</span><span class="p">}</span>
-<span class="linenos">31</span>
-<span class="linenos">32</span><span class="c1"># [nav:anchor DenseEmbedder]</span>
-<div class="viewcode-block" id="DenseEmbedder">
-<a class="viewcode-back" href="../../../autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbedder">[docs]</a>
-<span class="linenos">33</span><span class="k">class</span><span class="w"> </span><span class="nc">DenseEmbedder</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="linenos">34</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Protocol describing a dense embedding provider.&quot;&quot;&quot;</span>
-<span class="linenos">35</span>
-<div class="viewcode-block" id="DenseEmbedder.name">
-<a class="viewcode-back" href="../../../autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbedder.name">[docs]</a>
-<span class="linenos">36</span>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span></div>
-
-<div class="viewcode-block" id="DenseEmbedder.dim">
-<a class="viewcode-back" href="../../../autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbedder.dim">[docs]</a>
-<span class="linenos">37</span>    <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span></div>
-
-<span class="linenos">38</span>
-<div class="viewcode-block" id="DenseEmbedder.embed_texts">
-<a class="viewcode-back" href="../../../autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbedder.embed_texts">[docs]</a>
-<span class="linenos">39</span>    <span class="k">def</span><span class="w"> </span><span class="nf">embed_texts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">texts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">]:</span>
-<span class="linenos">40</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return embeddings for the supplied texts.&quot;&quot;&quot;</span>
-<span class="linenos">41</span>        <span class="o">...</span></div>
+<span class="linenos">10</span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="linenos">11</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Protocol</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="linenos">14</span><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span><span class="kn">from</span><span class="w"> </span><span class="nn">kgfoundry_common.navmap_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NavMap</span>
+<span class="linenos">17</span>
+<span class="linenos">18</span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;DenseEmbeddingModel&quot;</span><span class="p">]</span>
+<span class="linenos">19</span>
+<span class="linenos">20</span><span class="n">__navmap__</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">NavMap</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+<span class="linenos">21</span>    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;embeddings_dense.base&quot;</span><span class="p">,</span>
+<span class="linenos">22</span>    <span class="s2">&quot;synopsis&quot;</span><span class="p">:</span> <span class="s2">&quot;Protocols describing dense embedding providers&quot;</span><span class="p">,</span>
+<span class="linenos">23</span>    <span class="s2">&quot;exports&quot;</span><span class="p">:</span> <span class="n">__all__</span><span class="p">,</span>
+<span class="linenos">24</span>    <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[</span>
+<span class="linenos">25</span>        <span class="p">{</span>
+<span class="linenos">26</span>            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;public-api&quot;</span><span class="p">,</span>
+<span class="linenos">27</span>            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Public API&quot;</span><span class="p">,</span>
+<span class="linenos">28</span>            <span class="s2">&quot;symbols&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;DenseEmbeddingModel&quot;</span><span class="p">],</span>
+<span class="linenos">29</span>        <span class="p">},</span>
+<span class="linenos">30</span>    <span class="p">],</span>
+<span class="linenos">31</span><span class="p">}</span>
+<span class="linenos">32</span>
+<span class="linenos">33</span>
+<span class="linenos">34</span><span class="c1"># [nav:anchor DenseEmbeddingModel]</span>
+<div class="viewcode-block" id="DenseEmbeddingModel">
+<a class="viewcode-back" href="../../../autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbeddingModel">[docs]</a>
+<span class="linenos">35</span><span class="k">class</span><span class="w"> </span><span class="nc">DenseEmbeddingModel</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="linenos">36</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Protocol describing dense embedding encoders used in kgfoundry.&quot;&quot;&quot;</span>
+<span class="linenos">37</span>
+<div class="viewcode-block" id="DenseEmbeddingModel.encode">
+<a class="viewcode-back" href="../../../autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbeddingModel.encode">[docs]</a>
+<span class="linenos">38</span>    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">texts</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">]:</span>
+<span class="linenos">39</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Encode ``texts`` into a dense floating-point representation.&quot;&quot;&quot;</span>
+<span class="linenos">40</span>        <span class="o">...</span></div>
 </div>
 
 </pre></div>

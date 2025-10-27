@@ -9,7 +9,7 @@ src.vectorstore_faiss.gpu
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - FaissGpuIndex: FAISS GPU/cuVS wrapper.
+   - FaissGpuIndex: Wrap a FAISS vector index and provide numpy-based fallbacks.
 
 
 
@@ -20,9 +20,7 @@ Module Contents
 
 .. py:class:: FaissGpuIndex(factory = 'OPQ64,IVF8192,PQ64', nprobe = 64, gpu = True, cuvs = True)
 
-   FAISS GPU/cuVS wrapper.
-
-   Provides a brute-force cosine search fallback when FAISS is unavailable at runtime.
+   Wrap a FAISS vector index and provide numpy-based fallbacks.
 
 
    .. py:attribute:: factory
@@ -47,71 +45,31 @@ Module Contents
 
    .. py:method:: train(train_vectors, *, seed = 42)
 
-      Train.
-
-      :param train_vectors: TODO.
-      :type train_vectors: np.ndarray
-      :param seed: TODO.
-      :type seed: int
-
-      :returns: TODO.
-      :rtype: None
+      Train the underlying FAISS index when FAISS is available.
 
 
 
    .. py:method:: add(keys, vectors)
 
-      Add.
-
-      :param keys: TODO.
-      :type keys: List[str]
-      :param vectors: TODO.
-      :type vectors: np.ndarray
-
-      :returns: TODO.
-      :rtype: None
+      Add ``vectors`` identified by ``keys`` to the index.
 
 
 
    .. py:method:: search(query, k)
 
-      Search.
-
-      :param query: TODO.
-      :type query: np.ndarray
-      :param k: TODO.
-      :type k: int
-
-      :returns: TODO.
-      :rtype: List[Tuple[str, float]]
+      Return the top ``k`` results for ``query`` using FAISS or brute force.
 
 
 
-   .. py:method:: save(index_uri, idmap_uri)
+   .. py:method:: save(index_uri, idmap_uri = None)
 
-      Save.
-
-      :param index_uri: TODO.
-      :type index_uri: str
-      :param idmap_uri: TODO.
-      :type idmap_uri: str
-
-      :returns: TODO.
-      :rtype: None
+      Persist the index or numpy fallback arrays to disk.
 
 
 
    .. py:method:: load(index_uri, idmap_uri = None)
 
-      Load.
-
-      :param index_uri: TODO.
-      :type index_uri: str
-      :param idmap_uri: TODO.
-      :type idmap_uri: str | None
-
-      :returns: TODO.
-      :rtype: None
+      Load an index from disk, supporting numpy fallbacks.
 
 
 

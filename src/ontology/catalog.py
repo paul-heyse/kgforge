@@ -1,7 +1,8 @@
-"""Lightweight helpers for working with ontology concepts.
+"""Module for ontology.catalog.
 
 NavMap:
-- OntologyCatalog: Provide concept lookups and neighbour discovery helpers.
+- NavMap: Structure describing a module navmap.
+- OntologyCatalog: In-memory view of ontology concepts and relationships.
 """
 
 from __future__ import annotations

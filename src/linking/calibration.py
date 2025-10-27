@@ -1,7 +1,8 @@
-"""Placeholder calibration utilities for the linking package.
+"""Module for linking.calibration.
 
 NavMap:
-- isotonic_calibrate: Skeleton: calibrate scores ``y`` against labels.
+- NavMap: Structure describing a module navmap.
+- isotonic_calibrate: Calibrate score/label pairs using an isotonic regression….
 """
 
 from __future__ import annotations

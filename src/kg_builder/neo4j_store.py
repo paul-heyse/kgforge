@@ -1,6 +1,7 @@
-"""Placeholder interface for a Neo4j-backed store used in demos.
+"""Module for kg_builder.neo4j_store.
 
 NavMap:
+- NavMap: Structure describing a module navmap.
 - Neo4jStore: Placeholder interface for a Neo4j-backed store.
 """
 

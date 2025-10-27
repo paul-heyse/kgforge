@@ -9,9 +9,9 @@ src.search_api.splade_index
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - tok: Tok.
-   - SpladeDoc: Spladedoc.
-   - SpladeIndex: Spladeindex.
+   - tok: Tokenise ``text`` into lowercase alphanumeric units.
+   - SpladeDoc: Chunk-level document representation for the sparse index.
+   - SpladeIndex: Load chunk text and expose a sparse similarity search API.
 
 
 
@@ -22,20 +22,14 @@ src.search_api.splade_index
 Module Contents
 ---------------
 
-.. py:function:: tok(s)
+.. py:function:: tok(text)
 
-   Tok.
-
-   :param s: TODO.
-   :type s: str
-
-   :returns: TODO.
-   :rtype: List[str]
+   Tokenise ``text`` into lowercase alphanumeric units.
 
 
 .. py:class:: SpladeDoc
 
-   Spladedoc.
+   Chunk-level document representation for the sparse index.
 
 
    .. py:attribute:: chunk_id
@@ -56,7 +50,7 @@ Module Contents
 
 .. py:class:: SpladeIndex(db_path, chunks_dataset_root = None, sparse_root = None)
 
-   Spladeindex.
+   Load chunk text and expose a sparse similarity search API.
 
 
    .. py:attribute:: db_path
@@ -79,27 +73,13 @@ Module Contents
 
    .. py:method:: search(query, k = 10)
 
-      Search.
-
-      :param query: TODO.
-      :type query: str
-      :param k: TODO.
-      :type k: int
-
-      :returns: TODO.
-      :rtype: List[Tuple[int, float]]
+      Return indices of documents that best match ``query``.
 
 
 
-   .. py:method:: doc(i)
+   .. py:method:: doc(index)
 
-      Doc.
-
-      :param i: TODO.
-      :type i: int
-
-      :returns: TODO.
-      :rtype: SpladeDoc
+      Return the :class:`SpladeDoc` at ``index``.
 
 
 

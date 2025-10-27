@@ -446,9 +446,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#search_api.app.auth--returns" class="md-nav__link">
+  <a href="#search_api.app.auth--raises" class="md-nav__link">
     <span class="md-ellipsis">
-      Returns
+      Raises
     </span>
   </a>
   
@@ -473,6 +473,15 @@
   <a href="#search_api.app.graph_concepts--parameters" class="md-nav__link">
     <span class="md-ellipsis">
       Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search_api.app.graph_concepts--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
     </span>
   </a>
   
@@ -544,6 +553,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#search_api.app.search--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -580,10 +598,10 @@
 - NavMap: Structure describing a module navmap.
 - SearchRequest: Searchrequest.
 - SearchResult: Searchresult.
-- auth: Validate the bearer-token header for protected endpoints.
-- healthz: Healthz.
-- rrf_fuse: Fuse ranked lists using reciprocal rank fusion.
-- apply_kg_boosts: Apply knowledge-graph boosting heuristics.
+- auth: Validate the bearer token supplied in the <code>Authorization</code>….
+- healthz: Return a summary of dependency health for readiness checks.
+- rrf_fuse: Fuse ranked result lists using reciprocal rank fusion (RRF).
+- apply_kg_boosts: Apply knowledge-graph boosting heuristics to ranked….
 - search: Execute a search request across dense and sparse indices.
 - graph_concepts: Return KG concepts that match the provided query fragment.</p>
 
@@ -618,19 +636,19 @@
 
     <div class="doc doc-contents ">
 
-        <p>Apply knowledge-graph boosting heuristics.</p>
+        <p>Apply knowledge-graph boosting heuristics to ranked candidates.</p>
 <h4 id="search_api.app.apply_kg_boosts--parameters">Parameters</h4>
 <p>cands : dict[str, float]
-    TODO.
+    Baseline scores keyed by chunk identifier.
 query : str
-    TODO.
-direct : float, default=0.08
-    TODO.
-one_hop : float, default=0.04
-    TODO.</p>
+    Original search query used to infer concept mentions.
+direct : float, optional
+    Boost to apply when a chunk links directly to a concept in the query.
+one_hop : float, optional
+    Boost to apply when a chunk links to a neighbour of a concept.</p>
 <h4 id="search_api.app.apply_kg_boosts--returns">Returns</h4>
 <p>dict[str, float]
-    TODO.</p>
+    Adjusted scores that include the knowledge-graph boosts.</p>
 
 
             <details class="quote">
@@ -675,32 +693,30 @@ one_hop : float, default=0.04
 <span class="normal">221</span>
 <span class="normal">222</span>
 <span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_kg_boosts</span><span class="p">(</span>
+<span class="normal">224</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_kg_boosts</span><span class="p">(</span>
     <span class="n">cands</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">direct</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.08</span><span class="p">,</span>
     <span class="n">one_hop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.04</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply knowledge-graph boosting heuristics.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply knowledge-graph boosting heuristics to ranked candidates.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    cands : dict[str, float]</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Baseline scores keyed by chunk identifier.</span>
 <span class="sd">    query : str</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    direct : float, default=0.08</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    one_hop : float, default=0.04</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Original search query used to infer concept mentions.</span>
+<span class="sd">    direct : float, optional</span>
+<span class="sd">        Boost to apply when a chunk links directly to a concept in the query.</span>
+<span class="sd">    one_hop : float, optional</span>
+<span class="sd">        Boost to apply when a chunk links to a neighbour of a concept.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict[str, float]</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Adjusted scores that include the knowledge-graph boosts.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># toy: map words &#39;concept42&#39; to concept id</span>
     <span class="n">q_concepts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;concept&quot;</span><span class="p">):</span>
@@ -735,13 +751,13 @@ one_hop : float, default=0.04
 
     <div class="doc doc-contents ">
 
-        <p>Validate the bearer-token header for protected endpoints.</p>
+        <p>Validate the bearer token supplied in the <code>Authorization</code> header.</p>
 <h4 id="search_api.app.auth--parameters">Parameters</h4>
 <p>authorization : str | None, optional
-    TODO.</p>
-<h4 id="search_api.app.auth--returns">Returns</h4>
-<p>None
-    TODO.</p>
+    Authorization header value in the form <code>"Bearer &lt;token&gt;"</code>.</p>
+<h4 id="search_api.app.auth--raises">Raises</h4>
+<p>HTTPException
+    Raised when authentication is enabled and the token is invalid.</p>
 
 
             <details class="quote">
@@ -766,17 +782,17 @@ one_hop : float, default=0.04
 <span class="normal">139</span>
 <span class="normal">140</span>
 <span class="normal">141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">auth</span><span class="p">(</span><span class="n">authorization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Header</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the bearer-token header for protected endpoints.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the bearer token supplied in the ``Authorization`` header.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    authorization : str | None, optional</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Authorization header value in the form ``&quot;Bearer &lt;token&gt;&quot;``.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    None</span>
-<span class="sd">        TODO.</span>
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    HTTPException</span>
+<span class="sd">        Raised when authentication is enabled and the token is invalid.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">API_KEYS</span><span class="p">:</span>
         <span class="k">return</span>  <span class="c1"># disabled in skeleton</span>
@@ -805,18 +821,17 @@ one_hop : float, default=0.04
         <p>Return KG concepts that match the provided query fragment.</p>
 <h4 id="search_api.app.graph_concepts--parameters">Parameters</h4>
 <p>body : Mapping[str, Any]
-    TODO.
+    Request payload optionally containing <code>q</code> and <code>limit</code> keys.
 _ : None
-    TODO.</p>
+    Dependency injection hook used to enforce authentication.</p>
+<h4 id="search_api.app.graph_concepts--returns">Returns</h4>
+<p>dict[str, Any]
+    Concepts whose identifiers match the provided fragment.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/app.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">298</span>
-<span class="normal">299</span>
-<span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">302</span>
 <span class="normal">303</span>
 <span class="normal">304</span>
 <span class="normal">305</span>
@@ -830,16 +845,30 @@ _ : None
 <span class="normal">313</span>
 <span class="normal">314</span>
 <span class="normal">315</span>
-<span class="normal">316</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/graph/concepts&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/graph/concepts&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">graph_concepts</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">_</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">auth</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return KG concepts that match the provided query fragment.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    body : Mapping[str, Any]</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Request payload optionally containing ``q`` and ``limit`` keys.</span>
 <span class="sd">    _ : None</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Dependency injection hook used to enforce authentication.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict[str, Any]</span>
+<span class="sd">        Concepts whose identifiers match the provided fragment.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="n">body</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="c1"># toy: return nodes that contain the query substring</span>
@@ -866,7 +895,7 @@ _ : None
 
     <div class="doc doc-contents ">
 
-        <p>Healthz.</p>
+        <p>Return a summary of dependency health for readiness checks.</p>
 
 
             <details class="quote">
@@ -885,7 +914,7 @@ _ : None
 <span class="normal">156</span>
 <span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/healthz&quot;</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">healthz</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Healthz.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a summary of dependency health for readiness checks.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span><span class="p">,</span>
         <span class="s2">&quot;components&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -913,15 +942,15 @@ _ : None
 
     <div class="doc doc-contents ">
 
-        <p>Fuse ranked lists using reciprocal rank fusion.</p>
+        <p>Fuse ranked result lists using reciprocal rank fusion (RRF).</p>
 <h4 id="search_api.app.rrf_fuse--parameters">Parameters</h4>
 <p>lists : list[list[tuple[str, float]]]
-    TODO.
+    Ranked lists where each entry is a <code>(document_id, score)</code> pair.
 k_rrf : int
-    TODO.</p>
+    Constant controlling how quickly contribution decays with rank.</p>
 <h4 id="search_api.app.rrf_fuse--returns">Returns</h4>
 <p>dict[str, float]
-    TODO.</p>
+    Combined scores keyed by document identifier.</p>
 
 
             <details class="quote">
@@ -946,19 +975,19 @@ k_rrf : int
 <span class="normal">178</span>
 <span class="normal">179</span>
 <span class="normal">180</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rrf_fuse</span><span class="p">(</span><span class="n">lists</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span> <span class="n">k_rrf</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fuse ranked lists using reciprocal rank fusion.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fuse ranked result lists using reciprocal rank fusion (RRF).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    lists : list[list[tuple[str, float]]]</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Ranked lists where each entry is a ``(document_id, score)`` pair.</span>
 <span class="sd">    k_rrf : int</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Constant controlling how quickly contribution decays with rank.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict[str, float]</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Combined scores keyed by document identifier.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">scores</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">hits</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">:</span>
@@ -985,14 +1014,18 @@ k_rrf : int
         <p>Execute a search request across dense and sparse indices.</p>
 <h4 id="search_api.app.search--parameters">Parameters</h4>
 <p>req : SearchRequest
-    TODO.
+    Request payload describing the query and ranking preferences.
 _ : None
-    TODO.</p>
+    Dependency injection hook used to enforce authentication.</p>
+<h4 id="search_api.app.search--returns">Returns</h4>
+<p>dict[str, Any]
+    Serialized response containing the ranked search results.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/app.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">229</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">228</span>
+<span class="normal">229</span>
 <span class="normal">230</span>
 <span class="normal">231</span>
 <span class="normal">232</span>
@@ -1057,16 +1090,25 @@ _ : None
 <span class="normal">291</span>
 <span class="normal">292</span>
 <span class="normal">293</span>
-<span class="normal">294</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/search&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/search&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="n">req</span><span class="p">:</span> <span class="n">SearchRequest</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">auth</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute a search request across dense and sparse indices.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    req : SearchRequest</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Request payload describing the query and ranking preferences.</span>
 <span class="sd">    _ : None</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Dependency injection hook used to enforce authentication.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict[str, Any]</span>
+<span class="sd">        Serialized response containing the ranked search results.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Retrieve from each channel</span>
     <span class="c1"># We don&#39;t have a query embedder here; fallback to empty or demo vector</span>

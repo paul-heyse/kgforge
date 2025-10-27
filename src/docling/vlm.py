@@ -1,7 +1,8 @@
-"""Vision-language model helpers used by docling for page-level tagging.
+"""Module for docling.vlm.
 
 NavMap:
-- generate_page_tags: Produce VLM tags for document pages.
+- NavMap: Structure describing a module navmap.
+- GraniteDoclingVLM: Expose unified utilities for Docling-compatible VLMs.
 """
 
 from __future__ import annotations

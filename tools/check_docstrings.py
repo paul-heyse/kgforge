@@ -66,9 +66,9 @@ def check_placeholders() -> int:
 
 def main() -> None:
     """Execute ruff docstring checks for all targets."""
-    args = parse_args()
+    options = parse_args()
 
-    args = [
+    cmd = [
         sys.executable,
         "-m",
         "ruff",
@@ -77,9 +77,9 @@ def main() -> None:
         "D",
         *(str(path) for path in TARGETS if path.exists()),
     ]
-    subprocess.run(args, check=True)
+    subprocess.run(cmd, check=True)
 
-    if args.no_todo:
+    if options.no_todo:
         raise SystemExit(check_placeholders())
 
 

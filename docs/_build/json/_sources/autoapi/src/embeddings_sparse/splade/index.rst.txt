@@ -9,10 +9,10 @@ src.embeddings_sparse.splade
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - SPLADEv3Encoder: Spladev3encoder.
-   - PureImpactIndex: Toy 'impact' index that approximates SPLADE with IDF/log….
-   - LuceneImpactIndex: Pyserini SPLADE impact index wrapper.
-   - get_splade: Get splade.
+   - SPLADEv3Encoder: Describe the SPLADE configuration used for neural encoding.
+   - PureImpactIndex: Approximate SPLADE indexing with TF/IDF-style impact….
+   - LuceneImpactIndex: Bridge to a Pyserini SPLADE impact index stored on disk.
+   - get_splade: Construct a SPLADE impact index for the requested backend.
 
 
 
@@ -25,7 +25,7 @@ Module Contents
 
 .. py:class:: SPLADEv3Encoder(model_id = 'naver/splade-v3-distilbert', device = 'cuda', topk = 256, max_seq_len = 512)
 
-   Spladev3encoder.
+   Describe the SPLADE configuration used for neural encoding.
 
 
    .. py:attribute:: name
@@ -55,22 +55,24 @@ Module Contents
 
    .. py:method:: encode(texts)
 
-      Encode.
+      Generate sparse impact vectors for each input text.
 
-      :param texts: TODO.
-      :type texts: List[str]
+      :param texts: Raw text segments to encode.
+      :type texts: list[str]
 
-      :returns: TODO.
-      :rtype: List[Tuple[list[int], list[float]]]
+      :returns: Pairs of token identifiers and weights describing the sparse vector.
+      :rtype: list[tuple[list[int], list[float]]]
+
+      :raises NotImplementedError: Always raised because the skeleton does not ship a neural encoder.
 
 
 
 .. py:class:: PureImpactIndex(index_dir)
 
-   Toy 'impact' index that approximates SPLADE with IDF/log weighting.
+   Approximate SPLADE indexing with TF/IDF-style impact weighting.
 
-   - Keeps the pipeline runnable without GPUs or Pyserini.
-   - Substitutes a simple tokenizer plus weighting scheme for the neural encoder.
+   Keeps the retrieval path runnable without Pyserini or GPU resources by using a simple tokenizer
+   and log-scaled weights.
 
 
    .. py:attribute:: index_dir
@@ -91,44 +93,25 @@ Module Contents
 
    .. py:method:: build(docs_iterable)
 
-      Build.
-
-      :param docs_iterable: TODO.
-      :type docs_iterable: Iterable[Tuple[str, Dict]]
-
-      :returns: TODO.
-      :rtype: None
+      Construct the impact index from an iterable of documents.
 
 
 
    .. py:method:: load()
 
-      Load.
-
-      :returns: TODO.
-      :rtype: None
+      Load an existing impact index from disk.
 
 
 
    .. py:method:: search(query, k)
 
-      Search.
-
-      :param query: TODO.
-      :type query: str
-      :param k: TODO.
-      :type k: int
-
-      :returns: TODO.
-      :rtype: List[Tuple[str, float]]
+      Score documents with impact weights and return the top ``k`` hits.
 
 
 
 .. py:class:: LuceneImpactIndex(index_dir)
 
-   Pyserini SPLADE impact index wrapper.
-
-   Requires Pyserini build step that writes an impact index on disk.
+   Bridge to a Pyserini SPLADE impact index stored on disk.
 
 
    .. py:attribute:: index_dir
@@ -136,25 +119,12 @@ Module Contents
 
    .. py:method:: search(query, k)
 
-      Search.
-
-      :param query: TODO.
-      :type query: str
-      :param k: TODO.
-      :type k: int
-
-      :returns: TODO.
-      :rtype: List[Tuple[str, float]]
+      Execute a SPLADE impact search against the Lucene index.
 
 
 
 .. py:function:: get_splade(backend, index_dir)
 
-   Get splade.
-
-   :param backend: TODO.
-   :type backend: str
-   :param index_dir: TODO.
-   :type index_dir: str
+   Construct a SPLADE impact index for the requested backend.
 
 

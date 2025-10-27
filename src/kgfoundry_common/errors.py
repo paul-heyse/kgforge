@@ -1,6 +1,7 @@
-"""Common error types shared across kgfoundry components.
+"""Module for kgfoundry_common.errors.
 
 NavMap:
+- NavMap: Structure describing a module navmap.
 - DownloadError: Raised when an external download fails.
 - UnsupportedMIMEError: Raised when an unsupported MIME type is encountered.
 - DoclingError: Base Docling processing error.

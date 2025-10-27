@@ -9,7 +9,7 @@ src.registry.migrate
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - apply: Apply.
+   - apply: Return apply.
    - main: Run the CLI entry point for migration commands.
 
 
@@ -21,15 +21,12 @@ Module Contents
 
 .. py:function:: apply(db, migrations_dir)
 
-   Apply.
+   Return apply.
 
-   :param db: TODO.
+   :param db: Description.
    :type db: str
-   :param migrations_dir: TODO.
+   :param migrations_dir: Description.
    :type migrations_dir: str
-
-   :returns: TODO.
-   :rtype: None
 
 
 .. py:function:: main()

@@ -9,9 +9,9 @@ src.search_api.bm25_index
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - toks: Toks.
-   - BM25Doc: Bm25doc.
-   - BM25Index: Bm25index.
+   - toks: Tokenise ``text`` into lowercase alphanumeric terms.
+   - BM25Doc: Container storing fields required for BM25 scoring.
+   - BM25Index: Construct, persist, and query a BM25 index.
 
 
 
@@ -22,20 +22,14 @@ src.search_api.bm25_index
 Module Contents
 ---------------
 
-.. py:function:: toks(s)
+.. py:function:: toks(text)
 
-   Toks.
-
-   :param s: TODO.
-   :type s: str
-
-   :returns: TODO.
-   :rtype: List[str]
+   Tokenise ``text`` into lowercase alphanumeric terms.
 
 
 .. py:class:: BM25Doc
 
-   Bm25doc.
+   Container storing fields required for BM25 scoring.
 
 
    .. py:attribute:: chunk_id
@@ -64,7 +58,7 @@ Module Contents
 
 .. py:class:: BM25Index(k1 = 0.9, b = 0.4)
 
-   Bm25index.
+   Construct, persist, and query a BM25 index.
 
 
    .. py:attribute:: k1
@@ -101,25 +95,13 @@ Module Contents
       :classmethod:
 
 
-      Build from duckdb.
-
-      :param db_path: TODO.
-      :type db_path: str
-
-      :returns: TODO.
-      :rtype: "BM25Index"
+      Build an index using the most recent chunk dataset in DuckDB.
 
 
 
    .. py:method:: save(path)
 
-      Save.
-
-      :param path: TODO.
-      :type path: str
-
-      :returns: TODO.
-      :rtype: None
+      Serialize the index to ``path`` using pickle.
 
 
 
@@ -127,36 +109,19 @@ Module Contents
       :classmethod:
 
 
-      Load.
-
-      :param path: TODO.
-      :type path: str
-
-      :returns: TODO.
-      :rtype: "BM25Index"
+      Load a pickled index from ``path``.
 
 
 
    .. py:method:: search(query, k = 10)
 
-      Search.
-
-      :param query: TODO.
-      :type query: str
-      :param k: TODO.
-      :type k: int
+      Score documents for ``query`` and return the top ``k`` hits.
 
 
 
-   .. py:method:: doc(idx)
+   .. py:method:: doc(index)
 
-      Doc.
-
-      :param idx: TODO.
-      :type idx: int
-
-      :returns: TODO.
-      :rtype: BM25Doc
+      Return the :class:`BM25Doc` at ``index``.
 
 
 

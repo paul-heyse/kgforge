@@ -9,9 +9,9 @@ src.search_api.fixture_index
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - tokenize: Tokenize.
-   - FixtureDoc: Fixturedoc.
-   - FixtureIndex: Fixtureindex.
+   - tokenize: Tokenise ``text`` into lowercase alphanumeric tokens.
+   - FixtureDoc: Chunk-level document representation used by the lexical….
+   - FixtureIndex: Materialise a lexical index from DuckDB parquet exports.
 
 
 
@@ -24,18 +24,12 @@ Module Contents
 
 .. py:function:: tokenize(text)
 
-   Tokenize.
-
-   :param text: TODO.
-   :type text: str
-
-   :returns: TODO.
-   :rtype: List[str]
+   Tokenise ``text`` into lowercase alphanumeric tokens.
 
 
 .. py:class:: FixtureDoc
 
-   Fixturedoc.
+   Chunk-level document representation used by the lexical index.
 
 
    .. py:attribute:: chunk_id
@@ -60,7 +54,7 @@ Module Contents
 
 .. py:class:: FixtureIndex(root = '/data', db_path = '/data/catalog/catalog.duckdb')
 
-   Fixtureindex.
+   Materialise a lexical index from DuckDB parquet exports.
 
 
    .. py:attribute:: root
@@ -89,27 +83,13 @@ Module Contents
 
    .. py:method:: search(query, k = 10)
 
-      Search.
-
-      :param query: TODO.
-      :type query: str
-      :param k: TODO.
-      :type k: int
-
-      :returns: TODO.
-      :rtype: List[Tuple[int, float]]
+      Score documents for ``query`` using a simple TF-IDF variant.
 
 
 
-   .. py:method:: doc(idx)
+   .. py:method:: doc(index)
 
-      Doc.
-
-      :param idx: TODO.
-      :type idx: int
-
-      :returns: TODO.
-      :rtype: FixtureDoc
+      Return the :class:`FixtureDoc` at ``index``.
 
 
 

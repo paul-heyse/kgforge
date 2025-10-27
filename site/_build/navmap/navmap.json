@@ -1,5 +1,5 @@
 {
-  "commit": "98bc876ceda60da4a9d9e9a3642946ff0b0447e3",
+  "commit": "88ccab0c57ccecf30fc5b8829a70ebdc05634b35",
   "modules": {
     "kg_builder.mock_kg": {
       "path": "src/kg_builder/mock_kg.py",
@@ -17,7 +17,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "MockKG": 29
+        "MockKG": 30
       },
       "links": {
         "source": "vscode://file/src/kg_builder/mock_kg.py"
@@ -59,7 +59,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "Neo4jStore": 29
+        "Neo4jStore": 30
       },
       "links": {
         "source": "vscode://file/src/kg_builder/neo4j_store.py"
@@ -86,7 +86,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "Linker": 25
+        "Linker": 30
       },
       "links": {
         "source": "vscode://file/src/linking/linker.py"
@@ -113,7 +113,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "isotonic_calibrate": 29
+        "isotonic_calibrate": 30
       },
       "links": {
         "source": "vscode://file/src/linking/calibration.py"
@@ -170,7 +170,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "DenseEmbeddingModel": 29
+        "DenseEmbeddingModel": 34
       },
       "links": {
         "source": "vscode://file/src/embeddings_dense/base.py"
@@ -197,7 +197,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "Qwen3Embedder": 25
+        "Qwen3Embedder": 30
       },
       "links": {
         "source": "vscode://file/src/embeddings_dense/qwen3.py"
@@ -249,12 +249,12 @@
       ],
       "section_lines": {},
       "anchors": {
-        "t_prepare_dirs": 45,
-        "t_write_fixture_chunks": 68,
-        "t_write_fixture_dense": 90,
-        "t_write_fixture_splade": 102,
-        "t_register_in_duckdb": 116,
-        "fixture_pipeline": 162
+        "t_prepare_dirs": 55,
+        "t_write_fixture_chunks": 78,
+        "t_write_fixture_dense": 100,
+        "t_write_fixture_splade": 112,
+        "t_register_in_duckdb": 126,
+        "fixture_pipeline": 172
       },
       "links": {
         "source": "vscode://file/src/orchestration/fixture_flow.py"
@@ -319,8 +319,8 @@
       ],
       "section_lines": {},
       "anchors": {
-        "t_echo": 27,
-        "e2e_flow": 34
+        "t_echo": 33,
+        "e2e_flow": 40
       },
       "links": {
         "source": "vscode://file/src/orchestration/flows.py"
@@ -362,7 +362,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "GraniteDoclingVLM": 29
+        "GraniteDoclingVLM": 30
       },
       "links": {
         "source": "vscode://file/src/docling/vlm.py"
@@ -389,7 +389,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "HybridChunker": 29
+        "HybridChunker": 30
       },
       "links": {
         "source": "vscode://file/src/docling/hybrid.py"
@@ -416,7 +416,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "canonicalize_text": 31
+        "canonicalize_text": 32
       },
       "links": {
         "source": "vscode://file/src/docling/canonicalizer.py"
@@ -462,9 +462,9 @@
       ],
       "section_lines": {},
       "anchors": {
-        "toks": 41,
-        "BM25Doc": 47,
-        "BM25Index": 60
+        "toks": 42,
+        "BM25Doc": 48,
+        "BM25Index": 61
       },
       "links": {
         "source": "vscode://file/src/search_api/bm25_index.py"
@@ -501,12 +501,12 @@
       ],
       "section_lines": {},
       "anchors": {
-        "auth": 120,
-        "healthz": 143,
-        "rrf_fuse": 159,
-        "apply_kg_boosts": 182,
-        "search": 226,
-        "graph_concepts": 300
+        "auth": 121,
+        "healthz": 144,
+        "rrf_fuse": 160,
+        "apply_kg_boosts": 183,
+        "search": 227,
+        "graph_concepts": 301
       },
       "links": {
         "source": "vscode://file/src/search_api/app.py"
@@ -567,9 +567,9 @@
       ],
       "section_lines": {},
       "anchors": {
-        "tok": 38,
-        "SpladeDoc": 44,
-        "SpladeIndex": 55
+        "tok": 39,
+        "SpladeDoc": 45,
+        "SpladeIndex": 56
       },
       "links": {
         "source": "vscode://file/src/search_api/splade_index.py"
@@ -600,9 +600,9 @@
       ],
       "section_lines": {},
       "anchors": {
-        "rrf_fuse": 51,
-        "apply_kg_boosts": 60,
-        "mmr_deduplicate": 67
+        "rrf_fuse": 58,
+        "apply_kg_boosts": 67,
+        "mmr_deduplicate": 74
       },
       "links": {
         "source": "vscode://file/src/search_api/service.py"
@@ -664,9 +664,9 @@
       ],
       "section_lines": {},
       "anchors": {
-        "detect_query_concepts": 44,
-        "linked_concepts_for_text": 55,
-        "kg_boost": 66
+        "detect_query_concepts": 52,
+        "linked_concepts_for_text": 63,
+        "kg_boost": 74
       },
       "links": {
         "source": "vscode://file/src/search_api/kg_mock.py"
@@ -693,7 +693,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "rrf_fuse": 25
+        "rrf_fuse": 30
       },
       "links": {
         "source": "vscode://file/src/search_api/fusion.py"
@@ -722,8 +722,8 @@
       ],
       "section_lines": {},
       "anchors": {
-        "DenseVecs": 54,
-        "FaissAdapter": 63
+        "DenseVecs": 55,
+        "FaissAdapter": 64
       },
       "links": {
         "source": "vscode://file/src/search_api/faiss_adapter.py"
@@ -769,9 +769,9 @@
       ],
       "section_lines": {},
       "anchors": {
-        "tokenize": 39,
-        "FixtureDoc": 45,
-        "FixtureIndex": 57
+        "tokenize": 40,
+        "FixtureDoc": 46,
+        "FixtureIndex": 58
       },
       "links": {
         "source": "vscode://file/src/search_api/fixture_index.py"
@@ -798,7 +798,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "OntologyLoader": 25
+        "OntologyLoader": 30
       },
       "links": {
         "source": "vscode://file/src/ontology/loader.py"
@@ -825,7 +825,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "OntologyCatalog": 31
+        "OntologyCatalog": 32
       },
       "links": {
         "source": "vscode://file/src/ontology/catalog.py"
@@ -899,8 +899,8 @@
       ],
       "section_lines": {},
       "anchors": {
-        "SparseEncoder": 26,
-        "SparseIndex": 37
+        "SparseEncoder": 32,
+        "SparseIndex": 43
       },
       "links": {
         "source": "vscode://file/src/embeddings_sparse/base.py"
@@ -933,10 +933,10 @@
       ],
       "section_lines": {},
       "anchors": {
-        "SPLADEv3Encoder": 38,
-        "PureImpactIndex": 94,
-        "LuceneImpactIndex": 167,
-        "get_splade": 197
+        "SPLADEv3Encoder": 46,
+        "PureImpactIndex": 102,
+        "LuceneImpactIndex": 175,
+        "get_splade": 205
       },
       "links": {
         "source": "vscode://file/src/embeddings_sparse/splade.py"
@@ -969,10 +969,10 @@
       ],
       "section_lines": {},
       "anchors": {
-        "BM25Doc": 63,
-        "PurePythonBM25": 73,
-        "LuceneBM25": 191,
-        "get_bm25": 256
+        "BM25Doc": 71,
+        "PurePythonBM25": 81,
+        "LuceneBM25": 199,
+        "get_bm25": 264
       },
       "links": {
         "source": "vscode://file/src/embeddings_sparse/bm25.py"
@@ -1053,7 +1053,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "FaissGpuIndex": 37
+        "FaissGpuIndex": 38
       },
       "links": {
         "source": "vscode://file/src/vectorstore_faiss/gpu.py"
@@ -1095,7 +1095,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "DuckDBRegistry": 35
+        "DuckDBRegistry": 36
       },
       "links": {
         "source": "vscode://file/src/registry/duckdb_registry.py"
@@ -1149,7 +1149,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "DuckDBRegistryHelper": 35
+        "DuckDBRegistryHelper": 36
       },
       "links": {
         "source": "vscode://file/src/registry/helper.py"
@@ -1221,7 +1221,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "KGFoundryClient": 54
+        "KGFoundryClient": 59
       },
       "links": {
         "source": "vscode://file/src/search_client/client.py"
@@ -1302,7 +1302,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "OpenAccessHarvester": 38
+        "OpenAccessHarvester": 40
       },
       "links": {
         "source": "vscode://file/src/download/harvester.py"
@@ -1346,8 +1346,8 @@
       ],
       "section_lines": {},
       "anchors": {
-        "ParquetVectorWriter": 39,
-        "ParquetChunkWriter": 198
+        "ParquetVectorWriter": 40,
+        "ParquetChunkWriter": 199
       },
       "links": {
         "source": "vscode://file/src/kgfoundry_common/parquet_io.py"
@@ -1410,7 +1410,7 @@
       ],
       "section_lines": {},
       "anchors": {
-        "load_config": 31
+        "load_config": 32
       },
       "links": {
         "source": "vscode://file/src/kgfoundry_common/config.py"
@@ -1439,8 +1439,8 @@
       ],
       "section_lines": {},
       "anchors": {
-        "urn_doc_from_text": 32,
-        "urn_chunk": 51
+        "urn_doc_from_text": 33,
+        "urn_chunk": 52
       },
       "links": {
         "source": "vscode://file/src/kgfoundry_common/ids.py"
@@ -1469,8 +1469,8 @@
       ],
       "section_lines": {},
       "anchors": {
-        "JsonFormatter": 33,
-        "setup_logging": 52
+        "JsonFormatter": 34,
+        "setup_logging": 53
       },
       "links": {
         "source": "vscode://file/src/kgfoundry_common/logging.py"
@@ -1532,17 +1532,17 @@
       ],
       "section_lines": {},
       "anchors": {
-        "DownloadError": 63,
-        "UnsupportedMIMEError": 70,
-        "DoclingError": 77,
-        "OCRTimeoutError": 84,
-        "ChunkingError": 91,
-        "EmbeddingError": 98,
-        "SpladeOOMError": 105,
-        "IndexBuildError": 112,
-        "OntologyParseError": 119,
-        "LinkerCalibrationError": 126,
-        "Neo4jError": 133
+        "DownloadError": 64,
+        "UnsupportedMIMEError": 71,
+        "DoclingError": 78,
+        "OCRTimeoutError": 85,
+        "ChunkingError": 92,
+        "EmbeddingError": 99,
+        "SpladeOOMError": 106,
+        "IndexBuildError": 113,
+        "OntologyParseError": 120,
+        "LinkerCalibrationError": 127,
+        "Neo4jError": 134
       },
       "links": {
         "source": "vscode://file/src/kgfoundry_common/errors.py"
@@ -1586,8 +1586,8 @@
       ],
       "section_lines": {},
       "anchors": {
-        "DownloadError": 30,
-        "UnsupportedMIMEError": 37
+        "DownloadError": 31,
+        "UnsupportedMIMEError": 38
       },
       "links": {
         "source": "vscode://file/src/kgfoundry_common/exceptions.py"

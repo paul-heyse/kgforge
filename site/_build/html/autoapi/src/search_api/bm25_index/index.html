@@ -454,68 +454,65 @@
 <p>Module for search_api.bm25_index.</p>
 <p>NavMap:
 - NavMap: Structure describing a module navmap.
-- toks: Toks.
-- BM25Doc: Bm25doc.
-- BM25Index: Bm25index.</p>
+- toks: Tokenise <code class="docutils literal notranslate"><span class="pre">text</span></code> into lowercase alphanumeric terms.
+- BM25Doc: Container storing fields required for BM25 scoring.
+- BM25Index: Construct, persist, and query a BM25 index.</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.toks">
-<span class="sig-prename descclassname"><span class="pre">src.search_api.bm25_index.</span></span><span class="sig-name descname"><span class="pre">toks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#toks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:43:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.toks" title="Link to this definition">#</a></dt>
-<dd><p>Toks.</p>
+<span class="sig-prename descclassname"><span class="pre">src.search_api.bm25_index.</span></span><span class="sig-name descname"><span class="pre">toks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#toks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:43:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.toks" title="Link to this definition">#</a></dt>
+<dd><p>Tokenise <code class="docutils literal notranslate"><span class="pre">text</span></code> into lowercase alphanumeric terms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p>
+<dd class="field-odd"><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Doc">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.search_api.bm25_index.</span></span><span class="sig-name descname"><span class="pre">BM25Doc</span></span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:60:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc" title="Link to this definition">#</a></dt>
-<dd><p>Bm25doc.</p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.search_api.bm25_index.</span></span><span class="sig-name descname"><span class="pre">BM25Doc</span></span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:49:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc" title="Link to this definition">#</a></dt>
+<dd><p>Container storing fields required for BM25 scoring.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Doc.chunk_id">
-<span class="sig-name descname"><span class="pre">chunk_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc.chunk_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:64:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc.chunk_id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">chunk_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc.chunk_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:53:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc.chunk_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Doc.doc_id">
-<span class="sig-name descname"><span class="pre">doc_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc.doc_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:65:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc.doc_id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">doc_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc.doc_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:54:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc.doc_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Doc.title">
-<span class="sig-name descname"><span class="pre">title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc.title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:66:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc.title" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc.title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:55:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc.title" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Doc.section">
-<span class="sig-name descname"><span class="pre">section</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc.section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:67:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc.section" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">section</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc.section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:56:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc.section" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Doc.tf">
-<span class="sig-name descname"><span class="pre">tf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc.tf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:68:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc.tf" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">tf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc.tf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:57:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc.tf" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Doc.dl">
-<span class="sig-name descname"><span class="pre">dl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc.dl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:69:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc.dl" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">dl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Doc.dl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:58:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Doc.dl" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Index">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.search_api.bm25_index.</span></span><span class="sig-name descname"><span class="pre">BM25Index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:73:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index" title="Link to this definition">#</a></dt>
-<dd><p>Bm25index.</p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.search_api.bm25_index.</span></span><span class="sig-name descname"><span class="pre">BM25Index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:62:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index" title="Link to this definition">#</a></dt>
+<dd><p>Construct, persist, and query a BM25 index.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -526,94 +523,85 @@
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Index.k1">
-<span class="sig-name descname"><span class="pre">k1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.9</span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.k1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:86:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.k1" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">k1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.9</span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.k1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:67:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.k1" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Index.b">
-<span class="sig-name descname"><span class="pre">b</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.4</span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.b"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:87:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.b" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">b</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.4</span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.b"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:68:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.b" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Index.docs">
-<span class="sig-name descname"><span class="pre">docs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#src.search_api.bm25_index.BM25Doc" title="src.search_api.bm25_index.BM25Doc"><span class="pre">BM25Doc</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.docs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:88:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.docs" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">docs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#src.search_api.bm25_index.BM25Doc" title="src.search_api.bm25_index.BM25Doc"><span class="pre">BM25Doc</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.docs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:69:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.docs" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Index.df">
-<span class="sig-name descname"><span class="pre">df</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:89:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.df" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">df</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:70:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.df" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Index.N">
-<span class="sig-name descname"><span class="pre">N</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.N"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:90:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.N" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">N</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.N"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:71:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.N" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Index.avgdl">
-<span class="sig-name descname"><span class="pre">avgdl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.avgdl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:91:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.avgdl" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">avgdl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.avgdl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:72:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.avgdl" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Index.build_from_duckdb">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build_from_duckdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.build_from_duckdb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:93:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.build_from_duckdb" title="Link to this definition">#</a></dt>
-<dd><p>Build from duckdb.</p>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build_from_duckdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.build_from_duckdb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:74:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.build_from_duckdb" title="Link to this definition">#</a></dt>
+<dd><p>Build an index using the most recent chunk dataset in DuckDB.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p>
+<dd class="field-odd"><p><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>“BM25Index”</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#src.search_api.bm25_index.BM25Index" title="src.search_api.bm25_index.BM25Index">BM25Index</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Index.save">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:164:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.save" title="Link to this definition">#</a></dt>
-<dd><p>Save.</p>
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:129:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.save" title="Link to this definition">#</a></dt>
+<dd><p>Serialize the index to <code class="docutils literal notranslate"><span class="pre">path</span></code> using pickle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Index.load">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:191:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.load" title="Link to this definition">#</a></dt>
-<dd><p>Load.</p>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:145:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.load" title="Link to this definition">#</a></dt>
+<dd><p>Load a pickled index from <code class="docutils literal notranslate"><span class="pre">path</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>“BM25Index”</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#src.search_api.bm25_index.BM25Index" title="src.search_api.bm25_index.BM25Index">BM25Index</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Index.search">
-<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:230:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.search" title="Link to this definition">#</a></dt>
-<dd><p>Search.</p>
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:164:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.search" title="Link to this definition">#</a></dt>
+<dd><p>Score documents for <code class="docutils literal notranslate"><span class="pre">query</span></code> and return the top <code class="docutils literal notranslate"><span class="pre">k</span></code> hits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p></li>
-<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – TODO.</p></li>
+<li><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -624,17 +612,14 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.search_api.bm25_index.BM25Index.doc">
-<span class="sig-name descname"><span class="pre">doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:257:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.doc" title="Link to this definition">#</a></dt>
-<dd><p>Doc.</p>
+<span class="sig-name descname"><span class="pre">doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/bm25_index.html#BM25Index.doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/bm25_index.py:183:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.bm25_index.BM25Index.doc" title="Link to this definition">#</a></dt>
+<dd><p>Return the <a class="reference internal" href="#src.search_api.bm25_index.BM25Doc" title="src.search_api.bm25_index.BM25Doc"><code class="xref py py-class docutils literal notranslate"><span class="pre">BM25Doc</span></code></a> at <code class="docutils literal notranslate"><span class="pre">index</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>idx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – TODO.</p>
+<dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#src.search_api.bm25_index.BM25Doc" title="src.search_api.bm25_index.BM25Doc">BM25Doc</a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#src.search_api.bm25_index.BM25Doc" title="src.search_api.bm25_index.BM25Doc">BM25Doc</a></p>
 </dd>
 </dl>
 </dd></dl>

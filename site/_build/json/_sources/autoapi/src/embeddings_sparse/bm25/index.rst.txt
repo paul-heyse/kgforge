@@ -12,7 +12,7 @@ src.embeddings_sparse.bm25
    - BM25Doc: Serialized representation of a BM25 indexed document.
    - PurePythonBM25: Pure-Python BM25 builder and searcher for sparse retrieval.
    - LuceneBM25: Pyserini-backed Lucene BM25 adapter lazily importing Lucene….
-   - get_bm25: Return a backend-specific BM25 implementation.
+   - get_bm25: Construct a BM25 implementation for the requested backend.
 
 
 
@@ -136,6 +136,6 @@ Module Contents
 
 .. py:function:: get_bm25(backend, index_dir, *, k1 = 0.9, b = 0.4, field_boosts = None)
 
-   Return a backend-specific BM25 implementation.
+   Construct a BM25 implementation for the requested backend.
 
 

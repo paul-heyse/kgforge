@@ -378,79 +378,80 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">29</span>    <span class="p">],</span>
 <span class="linenos">30</span><span class="p">}</span>
 <span class="linenos">31</span>
-<span class="linenos">32</span><span class="c1"># [nav:anchor Registry]</span>
+<span class="linenos">32</span>
+<span class="linenos">33</span><span class="c1"># [nav:anchor Registry]</span>
 <div class="viewcode-block" id="Registry">
 <a class="viewcode-back" href="../../../autoapi/src/registry/api/index.html#src.registry.api.Registry">[docs]</a>
-<span class="linenos">33</span><span class="k">class</span><span class="w"> </span><span class="nc">Registry</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="linenos">34</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Registry protocol describing persistence operations.&quot;&quot;&quot;</span>
-<span class="linenos">35</span>
+<span class="linenos">34</span><span class="k">class</span><span class="w"> </span><span class="nc">Registry</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="linenos">35</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Registry protocol describing persistence operations.&quot;&quot;&quot;</span>
+<span class="linenos">36</span>
 <div class="viewcode-block" id="Registry.begin_dataset">
 <a class="viewcode-back" href="../../../autoapi/src/registry/api/index.html#src.registry.api.Registry.begin_dataset">[docs]</a>
-<span class="linenos">36</span>    <span class="k">def</span><span class="w"> </span><span class="nf">begin_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="linenos">37</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Begin tracking a dataset build for the given run.&quot;&quot;&quot;</span>
-<span class="linenos">38</span>        <span class="o">...</span></div>
+<span class="linenos">37</span>    <span class="k">def</span><span class="w"> </span><span class="nf">begin_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos">38</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Begin tracking a dataset build for the given run.&quot;&quot;&quot;</span>
+<span class="linenos">39</span>        <span class="o">...</span></div>
 
-<span class="linenos">39</span>
+<span class="linenos">40</span>
 <div class="viewcode-block" id="Registry.commit_dataset">
 <a class="viewcode-back" href="../../../autoapi/src/registry/api/index.html#src.registry.api.Registry.commit_dataset">[docs]</a>
-<span class="linenos">40</span>    <span class="k">def</span><span class="w"> </span><span class="nf">commit_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parquet_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="linenos">41</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Finalize a dataset build.&quot;&quot;&quot;</span>
-<span class="linenos">42</span>        <span class="o">...</span></div>
+<span class="linenos">41</span>    <span class="k">def</span><span class="w"> </span><span class="nf">commit_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parquet_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">42</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Finalize a dataset build.&quot;&quot;&quot;</span>
+<span class="linenos">43</span>        <span class="o">...</span></div>
 
-<span class="linenos">43</span>
+<span class="linenos">44</span>
 <div class="viewcode-block" id="Registry.rollback_dataset">
 <a class="viewcode-back" href="../../../autoapi/src/registry/api/index.html#src.registry.api.Registry.rollback_dataset">[docs]</a>
-<span class="linenos">44</span>    <span class="k">def</span><span class="w"> </span><span class="nf">rollback_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="linenos">45</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Rollback a dataset build after failure.&quot;&quot;&quot;</span>
-<span class="linenos">46</span>        <span class="o">...</span></div>
+<span class="linenos">45</span>    <span class="k">def</span><span class="w"> </span><span class="nf">rollback_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">46</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Rollback a dataset build after failure.&quot;&quot;&quot;</span>
+<span class="linenos">47</span>        <span class="o">...</span></div>
 
-<span class="linenos">47</span>
+<span class="linenos">48</span>
 <div class="viewcode-block" id="Registry.insert_run">
 <a class="viewcode-back" href="../../../autoapi/src/registry/api/index.html#src.registry.api.Registry.insert_run">[docs]</a>
-<span class="linenos">48</span>    <span class="k">def</span><span class="w"> </span><span class="nf">insert_run</span><span class="p">(</span>
-<span class="linenos">49</span>        <span class="bp">self</span><span class="p">,</span>
-<span class="linenos">50</span>        <span class="n">purpose</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<span class="linenos">51</span>        <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<span class="linenos">52</span>        <span class="n">revision</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<span class="linenos">53</span>        <span class="n">config</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
-<span class="linenos">54</span>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="linenos">55</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Register a new processing run.&quot;&quot;&quot;</span>
-<span class="linenos">56</span>        <span class="o">...</span></div>
+<span class="linenos">49</span>    <span class="k">def</span><span class="w"> </span><span class="nf">insert_run</span><span class="p">(</span>
+<span class="linenos">50</span>        <span class="bp">self</span><span class="p">,</span>
+<span class="linenos">51</span>        <span class="n">purpose</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="linenos">52</span>        <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos">53</span>        <span class="n">revision</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos">54</span>        <span class="n">config</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
+<span class="linenos">55</span>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos">56</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Register a new processing run.&quot;&quot;&quot;</span>
+<span class="linenos">57</span>        <span class="o">...</span></div>
 
-<span class="linenos">57</span>
+<span class="linenos">58</span>
 <div class="viewcode-block" id="Registry.close_run">
 <a class="viewcode-back" href="../../../autoapi/src/registry/api/index.html#src.registry.api.Registry.close_run">[docs]</a>
-<span class="linenos">58</span>    <span class="k">def</span><span class="w"> </span><span class="nf">close_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">notes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="linenos">59</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Mark a run as complete.&quot;&quot;&quot;</span>
-<span class="linenos">60</span>        <span class="o">...</span></div>
+<span class="linenos">59</span>    <span class="k">def</span><span class="w"> </span><span class="nf">close_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">notes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">60</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Mark a run as complete.&quot;&quot;&quot;</span>
+<span class="linenos">61</span>        <span class="o">...</span></div>
 
-<span class="linenos">61</span>
+<span class="linenos">62</span>
 <div class="viewcode-block" id="Registry.register_documents">
 <a class="viewcode-back" href="../../../autoapi/src/registry/api/index.html#src.registry.api.Registry.register_documents">[docs]</a>
-<span class="linenos">62</span>    <span class="k">def</span><span class="w"> </span><span class="nf">register_documents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Doc</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="linenos">63</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Register document metadata with the registry.&quot;&quot;&quot;</span>
-<span class="linenos">64</span>        <span class="o">...</span></div>
+<span class="linenos">63</span>    <span class="k">def</span><span class="w"> </span><span class="nf">register_documents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Doc</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">64</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Register document metadata with the registry.&quot;&quot;&quot;</span>
+<span class="linenos">65</span>        <span class="o">...</span></div>
 
-<span class="linenos">65</span>
+<span class="linenos">66</span>
 <div class="viewcode-block" id="Registry.register_doctags">
 <a class="viewcode-back" href="../../../autoapi/src/registry/api/index.html#src.registry.api.Registry.register_doctags">[docs]</a>
-<span class="linenos">66</span>    <span class="k">def</span><span class="w"> </span><span class="nf">register_doctags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DoctagsAsset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="linenos">67</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Register DocTags assets with the registry.&quot;&quot;&quot;</span>
-<span class="linenos">68</span>        <span class="o">...</span></div>
+<span class="linenos">67</span>    <span class="k">def</span><span class="w"> </span><span class="nf">register_doctags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DoctagsAsset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">68</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Register DocTags assets with the registry.&quot;&quot;&quot;</span>
+<span class="linenos">69</span>        <span class="o">...</span></div>
 
-<span class="linenos">69</span>
+<span class="linenos">70</span>
 <div class="viewcode-block" id="Registry.emit_event">
 <a class="viewcode-back" href="../../../autoapi/src/registry/api/index.html#src.registry.api.Registry.emit_event">[docs]</a>
-<span class="linenos">70</span>    <span class="k">def</span><span class="w"> </span><span class="nf">emit_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="linenos">71</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit an audit event for monitoring.&quot;&quot;&quot;</span>
-<span class="linenos">72</span>        <span class="o">...</span></div>
+<span class="linenos">71</span>    <span class="k">def</span><span class="w"> </span><span class="nf">emit_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">72</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit an audit event for monitoring.&quot;&quot;&quot;</span>
+<span class="linenos">73</span>        <span class="o">...</span></div>
 
-<span class="linenos">73</span>
+<span class="linenos">74</span>
 <div class="viewcode-block" id="Registry.incident">
 <a class="viewcode-back" href="../../../autoapi/src/registry/api/index.html#src.registry.api.Registry.incident">[docs]</a>
-<span class="linenos">74</span>    <span class="k">def</span><span class="w"> </span><span class="nf">incident</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="linenos">75</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Record an incident for visibility.&quot;&quot;&quot;</span>
-<span class="linenos">76</span>        <span class="o">...</span></div>
+<span class="linenos">75</span>    <span class="k">def</span><span class="w"> </span><span class="nf">incident</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">76</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Record an incident for visibility.&quot;&quot;&quot;</span>
+<span class="linenos">77</span>        <span class="o">...</span></div>
 </div>
 
 </pre></div>

@@ -506,21 +506,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="__init__">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#kgfoundry_common.parquet_io.ParquetVectorWriter.__init__--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      Parameters
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -680,8 +665,8 @@
         <p>Module for kgfoundry_common.parquet_io.</p>
 <p>NavMap:
 - NavMap: Structure describing a module navmap.
-- ParquetVectorWriter: Parquetvectorwriter.
-- ParquetChunkWriter: Parquetchunkwriter.</p>
+- ParquetVectorWriter: Persist embedding vectors into partitioned Parquet datasets.
+- ParquetChunkWriter: Persist chunk metadata and text into Parquet files.</p>
 
 
 
@@ -716,7 +701,7 @@
     <div class="doc doc-contents ">
 
 
-        <p>Parquetchunkwriter.</p>
+        <p>Persist chunk metadata and text into Parquet files.</p>
 
 
 
@@ -727,7 +712,13 @@
 
               <details class="quote">
                 <summary>Source code in <code>src/kgfoundry_common/parquet_io.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">206</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
 <span class="normal">207</span>
 <span class="normal">208</span>
 <span class="normal">209</span>
@@ -792,23 +783,17 @@
 <span class="normal">268</span>
 <span class="normal">269</span>
 <span class="normal">270</span>
-<span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span>
-<span class="normal">275</span>
-<span class="normal">276</span>
-<span class="normal">277</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ParquetChunkWriter</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parquetchunkwriter.&quot;&quot;&quot;</span>
+<span class="normal">271</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ParquetChunkWriter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Persist chunk metadata and text into Parquet files.&quot;&quot;&quot;</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">chunk_schema</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Chunk schema.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the schema describing chunk metadata rows.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        pa.schema</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Arrow schema describing chunk metadata and text columns.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span>
             <span class="p">[</span>
@@ -825,7 +810,7 @@
                             <span class="n">pa</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">()),</span>
                             <span class="n">pa</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">()),</span>
                         <span class="p">]</span>
-                    <span class="p">),</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">with_nullable</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
                 <span class="p">),</span>
                 <span class="n">pa</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">()),</span>
                 <span class="n">pa</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s2">&quot;tokens&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">()),</span>
@@ -834,32 +819,32 @@
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;docling_hybrid&quot;</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dev&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialise the writer with a target directory and identifiers.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        root : str</span>
-<span class="sd">            TODO.</span>
-<span class="sd">        model : str</span>
-<span class="sd">            TODO.</span>
-<span class="sd">        run_id : str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Base directory where chunk Parquet files are written.</span>
+<span class="sd">        model : str, optional</span>
+<span class="sd">            Name of the chunking model, defaults to ``&quot;docling_hybrid&quot;``.</span>
+<span class="sd">        run_id : str, optional</span>
+<span class="sd">            Identifier for the batch or run, defaults to ``&quot;dev&quot;``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;model=</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;run_id=</span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="s2">&quot;shard=00000&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write chunk rows to Parquet and return the run directory.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        rows : Iterable[Dict[str, Any]]</span>
-<span class="sd">            TODO.</span>
+<span class="sd">        rows : Iterable[dict[str, Any]]</span>
+<span class="sd">            Sequence of dictionaries matching :meth:`chunk_schema`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Path (as string) to the containing run directory.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">table</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_pylist</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span> <span class="n">schema</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk_schema</span><span class="p">())</span>
         <span class="n">pq</span><span class="o">.</span><span class="n">write_table</span><span class="p">(</span>
@@ -897,42 +882,42 @@
 
     <div class="doc doc-contents ">
 
-        <p>Init.</p>
+        <p>Initialise the writer with a target directory and identifiers.</p>
 <h5 id="kgfoundry_common.parquet_io.ParquetChunkWriter.__init__--parameters">Parameters</h5>
 <p>root : str
-    TODO.
-model : str
-    TODO.
-run_id : str
-    TODO.</p>
+    Base directory where chunk Parquet files are written.
+model : str, optional
+    Name of the chunking model, defaults to <code>"docling_hybrid"</code>.
+run_id : str, optional
+    Identifier for the batch or run, defaults to <code>"dev"</code>.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kgfoundry_common/parquet_io.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">241</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
 <span class="normal">242</span>
 <span class="normal">243</span>
 <span class="normal">244</span>
 <span class="normal">245</span>
 <span class="normal">246</span>
 <span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;docling_hybrid&quot;</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dev&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Init.</span>
+<span class="normal">248</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;docling_hybrid&quot;</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dev&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialise the writer with a target directory and identifiers.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    root : str</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    model : str</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    run_id : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Base directory where chunk Parquet files are written.</span>
+<span class="sd">    model : str, optional</span>
+<span class="sd">        Name of the chunking model, defaults to ``&quot;docling_hybrid&quot;``.</span>
+<span class="sd">    run_id : str, optional</span>
+<span class="sd">        Identifier for the batch or run, defaults to ``&quot;dev&quot;``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;model=</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;run_id=</span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="s2">&quot;shard=00000&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -957,15 +942,21 @@ run_id : str
 
     <div class="doc doc-contents ">
 
-        <p>Chunk schema.</p>
+        <p>Return the schema describing chunk metadata rows.</p>
 <h5 id="kgfoundry_common.parquet_io.ParquetChunkWriter.chunk_schema--returns">Returns</h5>
 <p>pa.schema
-    TODO.</p>
+    Arrow schema describing chunk metadata and text columns.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kgfoundry_common/parquet_io.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">209</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
 <span class="normal">210</span>
 <span class="normal">211</span>
 <span class="normal">212</span>
@@ -989,20 +980,14 @@ run_id : str
 <span class="normal">230</span>
 <span class="normal">231</span>
 <span class="normal">232</span>
-<span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="normal">233</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">chunk_schema</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Chunk schema.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the schema describing chunk metadata rows.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    pa.schema</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Arrow schema describing chunk metadata and text columns.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span>
         <span class="p">[</span>
@@ -1019,7 +1004,7 @@ run_id : str
                         <span class="n">pa</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">()),</span>
                         <span class="n">pa</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">()),</span>
                     <span class="p">]</span>
-                <span class="p">),</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">with_nullable</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
             <span class="p">),</span>
             <span class="n">pa</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">()),</span>
             <span class="n">pa</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s2">&quot;tokens&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">()),</span>
@@ -1043,18 +1028,24 @@ run_id : str
 
     <div class="doc doc-contents ">
 
-        <p>Write.</p>
+        <p>Write chunk rows to Parquet and return the run directory.</p>
 <h5 id="kgfoundry_common.parquet_io.ParquetChunkWriter.write--parameters">Parameters</h5>
-<p>rows : Iterable[Dict[str, Any]]
-    TODO.</p>
+<p>rows : Iterable[dict[str, Any]]
+    Sequence of dictionaries matching :meth:<code>chunk_schema</code>.</p>
 <h5 id="kgfoundry_common.parquet_io.ParquetChunkWriter.write--returns">Returns</h5>
 <p>str
-    TODO.</p>
+    Path (as string) to the containing run directory.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kgfoundry_common/parquet_io.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">256</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
 <span class="normal">257</span>
 <span class="normal">258</span>
 <span class="normal">259</span>
@@ -1069,24 +1060,18 @@ run_id : str
 <span class="normal">268</span>
 <span class="normal">269</span>
 <span class="normal">270</span>
-<span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span>
-<span class="normal">275</span>
-<span class="normal">276</span>
-<span class="normal">277</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write.</span>
+<span class="normal">271</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write chunk rows to Parquet and return the run directory.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    rows : Iterable[Dict[str, Any]]</span>
-<span class="sd">        TODO.</span>
+<span class="sd">    rows : Iterable[dict[str, Any]]</span>
+<span class="sd">        Sequence of dictionaries matching :meth:`chunk_schema`.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Path (as string) to the containing run directory.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">table</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_pylist</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span> <span class="n">schema</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk_schema</span><span class="p">())</span>
     <span class="n">pq</span><span class="o">.</span><span class="n">write_table</span><span class="p">(</span>
@@ -1125,7 +1110,7 @@ run_id : str
     <div class="doc doc-contents ">
 
 
-        <p>Parquetvectorwriter.</p>
+        <p>Persist embedding vectors into partitioned Parquet datasets.</p>
 
 
 
@@ -1291,28 +1276,22 @@ run_id : str
 <span class="normal">193</span>
 <span class="normal">194</span>
 <span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ParquetVectorWriter</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parquetvectorwriter.&quot;&quot;&quot;</span>
+<span class="normal">196</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ParquetVectorWriter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Persist embedding vectors into partitioned Parquet datasets.&quot;&quot;&quot;</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dense_schema</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dense schema.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the schema used for dense embedding Parquet files.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        dim : int</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Number of dimensions in each dense vector.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        pa.schema</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Arrow schema describing the dense vector rows.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span>
             <span class="p">[</span>
@@ -1327,13 +1306,7 @@ run_id : str
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        root : str</span>
-<span class="sd">            TODO.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialise the writer with a root output directory.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">write_dense</span><span class="p">(</span>
@@ -1344,25 +1317,25 @@ run_id : str
         <span class="n">records</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]],</span>
         <span class="n">shard</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write dense.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write dense embedding vectors to a Parquet shard.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        model : str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Identifier for the embedding model.</span>
 <span class="sd">        run_id : str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Identifier for the batch or run that produced the embeddings.</span>
 <span class="sd">        dim : int</span>
-<span class="sd">            TODO.</span>
-<span class="sd">        records : Iterable[Tuple[str, List[float], float]]</span>
-<span class="sd">            TODO.</span>
-<span class="sd">        shard : int</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Number of dimensions in the embedding vectors.</span>
+<span class="sd">        records : Iterable[tuple[str, list[float], float]]</span>
+<span class="sd">            Sequence of ``(chunk_id, vector, l2_norm)`` rows.</span>
+<span class="sd">        shard : int, optional</span>
+<span class="sd">            Shard partition to write, defaults to ``0``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Root directory path as a string.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">part_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;model=</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;run_id=</span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;shard=</span><span class="si">{</span><span class="n">shard</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">part_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1391,12 +1364,12 @@ run_id : str
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">splade_schema</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Splade schema.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the schema used for SPLADE sparse vector Parquet files.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        pa.schema</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Arrow schema describing sparse vocab ids and weights.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span>
             <span class="p">[</span>
@@ -1417,23 +1390,23 @@ run_id : str
         <span class="n">records</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]],</span>
         <span class="n">shard</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write splade.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write SPLADE sparse vector data to a Parquet shard.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        model : str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Identifier for the sparse embedding model.</span>
 <span class="sd">        run_id : str</span>
-<span class="sd">            TODO.</span>
-<span class="sd">        records : Iterable[Tuple[str, List[int], List[float]]]</span>
-<span class="sd">            TODO.</span>
-<span class="sd">        shard : int</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Identifier for the batch or run that produced the embeddings.</span>
+<span class="sd">        records : Iterable[tuple[str, list[int], list[float]]]</span>
+<span class="sd">            Sequence of ``(chunk_id, vocab_ids, weights)`` rows.</span>
+<span class="sd">        shard : int, optional</span>
+<span class="sd">            Shard partition to write, defaults to ``0``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
-<span class="sd">            TODO.</span>
+<span class="sd">            Root directory path as a string.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">part_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;model=</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;run_id=</span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;shard=</span><span class="si">{</span><span class="n">shard</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">part_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1486,30 +1459,15 @@ run_id : str
 
     <div class="doc doc-contents ">
 
-        <p>Init.</p>
-<h5 id="kgfoundry_common.parquet_io.ParquetVectorWriter.__init__--parameters">Parameters</h5>
-<p>root : str
-    TODO.</p>
+        <p>Initialise the writer with a root output directory.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kgfoundry_common/parquet_io.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">70</span>
 <span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Init.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    root : str</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialise the writer with a root output directory.&quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -1532,13 +1490,13 @@ run_id : str
 
     <div class="doc doc-contents ">
 
-        <p>Dense schema.</p>
+        <p>Return the schema used for dense embedding Parquet files.</p>
 <h5 id="kgfoundry_common.parquet_io.ParquetVectorWriter.dense_schema--parameters">Parameters</h5>
 <p>dim : int
-    TODO.</p>
+    Number of dimensions in each dense vector.</p>
 <h5 id="kgfoundry_common.parquet_io.ParquetVectorWriter.dense_schema--returns">Returns</h5>
 <p>pa.schema
-    TODO.</p>
+    Arrow schema describing the dense vector rows.</p>
 
 
             <details class="quote">
@@ -1569,17 +1527,17 @@ run_id : str
 <span class="normal">67</span>
 <span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">dense_schema</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dense schema.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the schema used for dense embedding Parquet files.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dim : int</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Number of dimensions in each dense vector.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    pa.schema</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Arrow schema describing the dense vector rows.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span>
         <span class="p">[</span>
@@ -1613,15 +1571,21 @@ run_id : str
 
     <div class="doc doc-contents ">
 
-        <p>Splade schema.</p>
+        <p>Return the schema used for SPLADE sparse vector Parquet files.</p>
 <h5 id="kgfoundry_common.parquet_io.ParquetVectorWriter.splade_schema--returns">Returns</h5>
 <p>pa.schema
-    TODO.</p>
+    Arrow schema describing sparse vocab ids and weights.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kgfoundry_common/parquet_io.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">133</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
 <span class="normal">134</span>
 <span class="normal">135</span>
 <span class="normal">136</span>
@@ -1634,20 +1598,14 @@ run_id : str
 <span class="normal">143</span>
 <span class="normal">144</span>
 <span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">splade_schema</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Splade schema.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the schema used for SPLADE sparse vector Parquet files.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    pa.schema</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Arrow schema describing sparse vocab ids and weights.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span>
         <span class="p">[</span>
@@ -1677,26 +1635,32 @@ run_id : str
 
     <div class="doc doc-contents ">
 
-        <p>Write dense.</p>
+        <p>Write dense embedding vectors to a Parquet shard.</p>
 <h5 id="kgfoundry_common.parquet_io.ParquetVectorWriter.write_dense--parameters">Parameters</h5>
 <p>model : str
-    TODO.
+    Identifier for the embedding model.
 run_id : str
-    TODO.
+    Identifier for the batch or run that produced the embeddings.
 dim : int
-    TODO.
-records : Iterable[Tuple[str, List[float], float]]
-    TODO.
-shard : int
-    TODO.</p>
+    Number of dimensions in the embedding vectors.
+records : Iterable[tuple[str, list[float], float]]
+    Sequence of <code>(chunk_id, vector, l2_norm)</code> rows.
+shard : int, optional
+    Shard partition to write, defaults to <code>0</code>.</p>
 <h5 id="kgfoundry_common.parquet_io.ParquetVectorWriter.write_dense--returns">Returns</h5>
 <p>str
-    TODO.</p>
+    Root directory path as a string.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kgfoundry_common/parquet_io.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 80</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
 <span class="normal"> 81</span>
 <span class="normal"> 82</span>
 <span class="normal"> 83</span>
@@ -1741,13 +1705,7 @@ shard : int
 <span class="normal">122</span>
 <span class="normal">123</span>
 <span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">write_dense</span><span class="p">(</span>
+<span class="normal">125</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">write_dense</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1755,25 +1713,25 @@ shard : int
     <span class="n">records</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]],</span>
     <span class="n">shard</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write dense.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write dense embedding vectors to a Parquet shard.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    model : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Identifier for the embedding model.</span>
 <span class="sd">    run_id : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Identifier for the batch or run that produced the embeddings.</span>
 <span class="sd">    dim : int</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    records : Iterable[Tuple[str, List[float], float]]</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    shard : int</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Number of dimensions in the embedding vectors.</span>
+<span class="sd">    records : Iterable[tuple[str, list[float], float]]</span>
+<span class="sd">        Sequence of ``(chunk_id, vector, l2_norm)`` rows.</span>
+<span class="sd">    shard : int, optional</span>
+<span class="sd">        Shard partition to write, defaults to ``0``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Root directory path as a string.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">part_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;model=</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;run_id=</span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;shard=</span><span class="si">{</span><span class="n">shard</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">part_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1816,24 +1774,30 @@ shard : int
 
     <div class="doc doc-contents ">
 
-        <p>Write splade.</p>
+        <p>Write SPLADE sparse vector data to a Parquet shard.</p>
 <h5 id="kgfoundry_common.parquet_io.ParquetVectorWriter.write_splade--parameters">Parameters</h5>
 <p>model : str
-    TODO.
+    Identifier for the sparse embedding model.
 run_id : str
-    TODO.
-records : Iterable[Tuple[str, List[int], List[float]]]
-    TODO.
-shard : int
-    TODO.</p>
+    Identifier for the batch or run that produced the embeddings.
+records : Iterable[tuple[str, list[int], list[float]]]
+    Sequence of <code>(chunk_id, vocab_ids, weights)</code> rows.
+shard : int, optional
+    Shard partition to write, defaults to <code>0</code>.</p>
 <h5 id="kgfoundry_common.parquet_io.ParquetVectorWriter.write_splade--returns">Returns</h5>
 <p>str
-    TODO.</p>
+    Root directory path as a string.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kgfoundry_common/parquet_io.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">154</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
 <span class="normal">155</span>
 <span class="normal">156</span>
 <span class="normal">157</span>
@@ -1875,36 +1839,30 @@ shard : int
 <span class="normal">193</span>
 <span class="normal">194</span>
 <span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">write_splade</span><span class="p">(</span>
+<span class="normal">196</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">write_splade</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">records</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]],</span>
     <span class="n">shard</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write splade.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write SPLADE sparse vector data to a Parquet shard.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    model : str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Identifier for the sparse embedding model.</span>
 <span class="sd">    run_id : str</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    records : Iterable[Tuple[str, List[int], List[float]]]</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    shard : int</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Identifier for the batch or run that produced the embeddings.</span>
+<span class="sd">    records : Iterable[tuple[str, list[int], list[float]]]</span>
+<span class="sd">        Sequence of ``(chunk_id, vocab_ids, weights)`` rows.</span>
+<span class="sd">    shard : int, optional</span>
+<span class="sd">        Shard partition to write, defaults to ``0``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
-<span class="sd">        TODO.</span>
+<span class="sd">        Root directory path as a string.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">part_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;model=</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;run_id=</span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;shard=</span><span class="si">{</span><span class="n">shard</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">part_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

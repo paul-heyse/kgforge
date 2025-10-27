@@ -454,28 +454,25 @@
 <p>Module for kgfoundry_common.logging.</p>
 <p>NavMap:
 - NavMap: Structure describing a module navmap.
-- JsonFormatter: Jsonformatter.
-- setup_logging: Configure logging with a structured JSON formatter.</p>
+- JsonFormatter: Format log records as compact JSON payloads.
+- setup_logging: Configure the root logger with JSON formatting.</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.kgfoundry_common.logging.JsonFormatter">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.logging.</span></span><span class="sig-name descname"><span class="pre">JsonFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/logging.html#JsonFormatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/logging.py:34:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.logging.JsonFormatter" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.logging.</span></span><span class="sig-name descname"><span class="pre">JsonFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/logging.html#JsonFormatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/logging.py:35:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.logging.JsonFormatter" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Formatter" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logging.Formatter</span></code></a></p>
-<p>Jsonformatter.</p>
+<p>Format log records as compact JSON payloads.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.kgfoundry_common.logging.JsonFormatter.format">
-<span class="sig-name descname"><span class="pre">format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/logging.html#JsonFormatter.format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/logging.py:37:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.logging.JsonFormatter.format" title="Link to this definition">#</a></dt>
-<dd><p>Format.</p>
+<span class="sig-name descname"><span class="pre">format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/logging.html#JsonFormatter.format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/logging.py:38:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.logging.JsonFormatter.format" title="Link to this definition">#</a></dt>
+<dd><p>Serialise a log record into a JSON string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>record</strong> (<a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.LogRecord" title="(in Python v3.14)"><em>logging.LogRecord</em></a>) – TODO.</p>
+<dd class="field-odd"><p><strong>record</strong> (<a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.LogRecord" title="(in Python v3.14)"><em>logging.LogRecord</em></a>)</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -484,17 +481,14 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.kgfoundry_common.logging.setup_logging">
-<span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.logging.</span></span><span class="sig-name descname"><span class="pre">setup_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">logging.INFO</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/logging.html#setup_logging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/logging.py:64:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.logging.setup_logging" title="Link to this definition">#</a></dt>
-<dd><p>Configure logging with a structured JSON formatter.</p>
+<span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.logging.</span></span><span class="sig-name descname"><span class="pre">setup_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">logging.INFO</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/logging.html#setup_logging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/logging.py:54:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.logging.setup_logging" title="Link to this definition">#</a></dt>
+<dd><p>Configure the root logger with JSON formatting.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – TODO.</p>
+<dd class="field-odd"><p><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Minimum log level to emit, defaults to <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.INFO" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">logging.INFO</span></code></a>.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>

@@ -1,9 +1,10 @@
-"""Sparse SPLADE-inspired index used by the fixture search API.
+"""Module for search_api.splade_index.
 
 NavMap:
-- tok: Tokenise text for sparse SPLADE scoring.
-- SpladeDoc: Minimal payload tracked by the sparse index.
-- SpladeIndex: Load chunk documents and serve sparse similarity queries.
+- NavMap: Structure describing a module navmap.
+- tok: Tokenise ``text`` into lowercase alphanumeric units.
+- SpladeDoc: Chunk-level document representation for the sparse index.
+- SpladeIndex: Load chunk text and expose a sparse similarity search API.
 """
 
 from __future__ import annotations

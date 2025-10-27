@@ -351,8 +351,8 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos"> 2</span>
 <span class="linenos"> 3</span><span class="sd">NavMap:</span>
 <span class="linenos"> 4</span><span class="sd">- NavMap: Structure describing a module navmap.</span>
-<span class="linenos"> 5</span><span class="sd">- urn_doc_from_text: Urn doc from text.</span>
-<span class="linenos"> 6</span><span class="sd">- urn_chunk: Urn chunk.</span>
+<span class="linenos"> 5</span><span class="sd">- urn_doc_from_text: Return a normalized document URN derived from ``text``.</span>
+<span class="linenos"> 6</span><span class="sd">- urn_chunk: Return a chunk URN derived from document hash and offsets.</span>
 <span class="linenos"> 7</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="linenos"> 8</span>
 <span class="linenos"> 9</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
@@ -367,7 +367,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">18</span>
 <span class="linenos">19</span><span class="n">__navmap__</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">NavMap</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
 <span class="linenos">20</span>    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;kgfoundry_common.ids&quot;</span><span class="p">,</span>
-<span class="linenos">21</span>    <span class="s2">&quot;synopsis&quot;</span><span class="p">:</span> <span class="s2">&quot;Module for kgfoundry_common.ids&quot;</span><span class="p">,</span>
+<span class="linenos">21</span>    <span class="s2">&quot;synopsis&quot;</span><span class="p">:</span> <span class="s2">&quot;Helpers for generating deterministic URNs&quot;</span><span class="p">,</span>
 <span class="linenos">22</span>    <span class="s2">&quot;exports&quot;</span><span class="p">:</span> <span class="n">__all__</span><span class="p">,</span>
 <span class="linenos">23</span>    <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[</span>
 <span class="linenos">24</span>        <span class="p">{</span>
@@ -378,49 +378,50 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">29</span>    <span class="p">],</span>
 <span class="linenos">30</span><span class="p">}</span>
 <span class="linenos">31</span>
-<span class="linenos">32</span><span class="c1"># [nav:anchor urn_doc_from_text]</span>
+<span class="linenos">32</span>
+<span class="linenos">33</span><span class="c1"># [nav:anchor urn_doc_from_text]</span>
 <div class="viewcode-block" id="urn_doc_from_text">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/ids/index.html#src.kgfoundry_common.ids.urn_doc_from_text">[docs]</a>
-<span class="linenos">33</span><span class="k">def</span><span class="w"> </span><span class="nf">urn_doc_from_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="linenos">34</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Urn doc from text.</span>
-<span class="linenos">35</span>
-<span class="linenos">36</span><span class="sd">    Parameters</span>
-<span class="linenos">37</span><span class="sd">    ----------</span>
-<span class="linenos">38</span><span class="sd">    text : str</span>
-<span class="linenos">39</span><span class="sd">        TODO.</span>
-<span class="linenos">40</span>
-<span class="linenos">41</span><span class="sd">    Returns</span>
-<span class="linenos">42</span><span class="sd">    -------</span>
-<span class="linenos">43</span><span class="sd">    str</span>
-<span class="linenos">44</span><span class="sd">        TODO.</span>
-<span class="linenos">45</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">46</span>    <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">16</span><span class="p">]</span>
-<span class="linenos">47</span>    <span class="n">b32</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b32encode</span><span class="p">(</span><span class="n">h</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<span class="linenos">48</span>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;urn:doc:sha256:</span><span class="si">{</span><span class="n">b32</span><span class="si">}</span><span class="s2">&quot;</span></div>
+<span class="linenos">34</span><span class="k">def</span><span class="w"> </span><span class="nf">urn_doc_from_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos">35</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a normalized document URN derived from ``text``.</span>
+<span class="linenos">36</span>
+<span class="linenos">37</span><span class="sd">    Parameters</span>
+<span class="linenos">38</span><span class="sd">    ----------</span>
+<span class="linenos">39</span><span class="sd">    text : str</span>
+<span class="linenos">40</span><span class="sd">        Raw document text to hash.</span>
+<span class="linenos">41</span>
+<span class="linenos">42</span><span class="sd">    Returns</span>
+<span class="linenos">43</span><span class="sd">    -------</span>
+<span class="linenos">44</span><span class="sd">    str</span>
+<span class="linenos">45</span><span class="sd">        Deterministic URN containing the truncated SHA-256 hash.</span>
+<span class="linenos">46</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">47</span>    <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">16</span><span class="p">]</span>
+<span class="linenos">48</span>    <span class="n">b32</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b32encode</span><span class="p">(</span><span class="n">h</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="linenos">49</span>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;urn:doc:sha256:</span><span class="si">{</span><span class="n">b32</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
-<span class="linenos">49</span>
 <span class="linenos">50</span>
-<span class="linenos">51</span><span class="c1"># [nav:anchor urn_chunk]</span>
+<span class="linenos">51</span>
+<span class="linenos">52</span><span class="c1"># [nav:anchor urn_chunk]</span>
 <div class="viewcode-block" id="urn_chunk">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/ids/index.html#src.kgfoundry_common.ids.urn_chunk">[docs]</a>
-<span class="linenos">52</span><span class="k">def</span><span class="w"> </span><span class="nf">urn_chunk</span><span class="p">(</span><span class="n">doc_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="linenos">53</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Urn chunk.</span>
-<span class="linenos">54</span>
-<span class="linenos">55</span><span class="sd">    Parameters</span>
-<span class="linenos">56</span><span class="sd">    ----------</span>
-<span class="linenos">57</span><span class="sd">    doc_hash : str</span>
-<span class="linenos">58</span><span class="sd">        TODO.</span>
-<span class="linenos">59</span><span class="sd">    start : int</span>
-<span class="linenos">60</span><span class="sd">        TODO.</span>
-<span class="linenos">61</span><span class="sd">    end : int</span>
-<span class="linenos">62</span><span class="sd">        TODO.</span>
-<span class="linenos">63</span>
-<span class="linenos">64</span><span class="sd">    Returns</span>
-<span class="linenos">65</span><span class="sd">    -------</span>
-<span class="linenos">66</span><span class="sd">    str</span>
-<span class="linenos">67</span><span class="sd">        TODO.</span>
-<span class="linenos">68</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">69</span>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;urn:chunk:</span><span class="si">{</span><span class="n">doc_hash</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span></div>
+<span class="linenos">53</span><span class="k">def</span><span class="w"> </span><span class="nf">urn_chunk</span><span class="p">(</span><span class="n">doc_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos">54</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a chunk URN derived from document hash and offsets.</span>
+<span class="linenos">55</span>
+<span class="linenos">56</span><span class="sd">    Parameters</span>
+<span class="linenos">57</span><span class="sd">    ----------</span>
+<span class="linenos">58</span><span class="sd">    doc_hash : str</span>
+<span class="linenos">59</span><span class="sd">        Document-level URN or hash prefix.</span>
+<span class="linenos">60</span><span class="sd">    start : int</span>
+<span class="linenos">61</span><span class="sd">        Inclusive character offset for the chunk start.</span>
+<span class="linenos">62</span><span class="sd">    end : int</span>
+<span class="linenos">63</span><span class="sd">        Exclusive character offset for the chunk end.</span>
+<span class="linenos">64</span>
+<span class="linenos">65</span><span class="sd">    Returns</span>
+<span class="linenos">66</span><span class="sd">    -------</span>
+<span class="linenos">67</span><span class="sd">    str</span>
+<span class="linenos">68</span><span class="sd">        Deterministic chunk URN joining the document hash with offsets.</span>
+<span class="linenos">69</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">70</span>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;urn:chunk:</span><span class="si">{</span><span class="n">doc_hash</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
 </pre></div>
 

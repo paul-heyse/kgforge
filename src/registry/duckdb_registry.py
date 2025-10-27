@@ -1,7 +1,8 @@
-"""DuckDB-backed registry implementation used by the fixture pipeline.
+"""Module for registry.duckdb_registry.
 
 NavMap:
-- DuckDBRegistry: Minimal registry wrapper for DuckDB-backed artefacts.
+- NavMap: Structure describing a module navmap.
+- DuckDBRegistry: Persist pipeline artefacts and events inside a DuckDB….
 """
 
 from __future__ import annotations

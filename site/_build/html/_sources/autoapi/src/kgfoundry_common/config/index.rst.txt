@@ -9,7 +9,7 @@ src.kgfoundry_common.config
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - load_config: Load config.
+   - load_config: Load a YAML configuration file from ``path``.
 
 
 
@@ -20,12 +20,12 @@ Module Contents
 
 .. py:function:: load_config(path)
 
-   Load config.
+   Load a YAML configuration file from ``path``.
 
-   :param path: TODO.
+   :param path: Path to the configuration file on disk.
    :type path: str
 
-   :returns: TODO.
-   :rtype: Dict[str, Any]
+   :returns: Parsed configuration values.
+   :rtype: dict[str, Any]
 
 

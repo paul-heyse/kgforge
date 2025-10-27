@@ -1,4 +1,9 @@
-"""Utilities for loading ontology catalog data into the registry."""
+"""Module for ontology.loader.
+
+NavMap:
+- NavMap: Structure describing a module navmap.
+- OntologyLoader: Placeholder loader for ontology metadata.
+"""
 
 from __future__ import annotations
 

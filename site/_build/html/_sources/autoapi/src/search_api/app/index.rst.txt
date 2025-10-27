@@ -11,10 +11,10 @@ src.search_api.app
    - NavMap: Structure describing a module navmap.
    - SearchRequest: Searchrequest.
    - SearchResult: Searchresult.
-   - auth: Validate the bearer-token header for protected endpoints.
-   - healthz: Healthz.
-   - rrf_fuse: Fuse ranked lists using reciprocal rank fusion.
-   - apply_kg_boosts: Apply knowledge-graph boosting heuristics.
+   - auth: Validate the bearer token supplied in the ``Authorization``….
+   - healthz: Return a summary of dependency health for readiness checks.
+   - rrf_fuse: Fuse ranked result lists using reciprocal rank fusion (RRF).
+   - apply_kg_boosts: Apply knowledge-graph boosting heuristics to ranked….
    - search: Execute a search request across dense and sparse indices.
    - graph_concepts: Return KG concepts that match the provided query fragment.
 
@@ -27,47 +27,46 @@ Module Contents
 
 .. py:function:: auth(authorization = Header(default=None))
 
-   Validate the bearer-token header for protected endpoints.
+   Validate the bearer token supplied in the ``Authorization`` header.
 
-   :param authorization: TODO.
+   :param authorization: Authorization header value in the form ``"Bearer <token>"``.
    :type authorization: str | None, optional
 
-   :returns: TODO.
-   :rtype: None
+   :raises HTTPException: Raised when authentication is enabled and the token is invalid.
 
 
 .. py:function:: healthz()
 
-   Healthz.
+   Return a summary of dependency health for readiness checks.
 
 
 .. py:function:: rrf_fuse(lists, k_rrf)
 
-   Fuse ranked lists using reciprocal rank fusion.
+   Fuse ranked result lists using reciprocal rank fusion (RRF).
 
-   :param lists: TODO.
+   :param lists: Ranked lists where each entry is a ``(document_id, score)`` pair.
    :type lists: list[list[tuple[str, float]]]
-   :param k_rrf: TODO.
+   :param k_rrf: Constant controlling how quickly contribution decays with rank.
    :type k_rrf: int
 
-   :returns: TODO.
+   :returns: Combined scores keyed by document identifier.
    :rtype: dict[str, float]
 
 
 .. py:function:: apply_kg_boosts(cands, query, direct = 0.08, one_hop = 0.04)
 
-   Apply knowledge-graph boosting heuristics.
+   Apply knowledge-graph boosting heuristics to ranked candidates.
 
-   :param cands: TODO.
+   :param cands: Baseline scores keyed by chunk identifier.
    :type cands: dict[str, float]
-   :param query: TODO.
+   :param query: Original search query used to infer concept mentions.
    :type query: str
-   :param direct: TODO.
-   :type direct: float, default=0.08
-   :param one_hop: TODO.
-   :type one_hop: float, default=0.04
+   :param direct: Boost to apply when a chunk links directly to a concept in the query.
+   :type direct: float, optional
+   :param one_hop: Boost to apply when a chunk links to a neighbour of a concept.
+   :type one_hop: float, optional
 
-   :returns: TODO.
+   :returns: Adjusted scores that include the knowledge-graph boosts.
    :rtype: dict[str, float]
 
 
@@ -75,19 +74,25 @@ Module Contents
 
    Execute a search request across dense and sparse indices.
 
-   :param req: TODO.
+   :param req: Request payload describing the query and ranking preferences.
    :type req: SearchRequest
-   :param _: TODO.
+   :param _: Dependency injection hook used to enforce authentication.
    :type _: None
+
+   :returns: Serialized response containing the ranked search results.
+   :rtype: dict[str, Any]
 
 
 .. py:function:: graph_concepts(body, _ = Depends(auth))
 
    Return KG concepts that match the provided query fragment.
 
-   :param body: TODO.
+   :param body: Request payload optionally containing ``q`` and ``limit`` keys.
    :type body: Mapping[str, Any]
-   :param _: TODO.
+   :param _: Dependency injection hook used to enforce authentication.
    :type _: None
+
+   :returns: Concepts whose identifiers match the provided fragment.
+   :rtype: dict[str, Any]
 
 

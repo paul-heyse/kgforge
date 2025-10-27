@@ -1,4 +1,9 @@
-"""Client SDK for interacting with the kgfoundry search API."""
+"""Module for search_client.client.
+
+NavMap:
+- NavMap: Structure describing a module navmap.
+- KGFoundryClient: Minimal synchronous client for the kgfoundry search API.
+"""
 
 from __future__ import annotations
 

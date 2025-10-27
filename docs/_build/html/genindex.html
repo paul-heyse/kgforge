@@ -540,7 +540,7 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       <li><a href="autoapi/src/kgfoundry_common/parquet_io/index.html#src.kgfoundry_common.parquet_io.ParquetVectorWriter.dense_schema">dense_schema() (src.kgfoundry_common.parquet_io.ParquetVectorWriter static method)</a>
 </li>
-      <li><a href="autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbedder">DenseEmbedder (class in src.embeddings_dense.base)</a>
+      <li><a href="autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbeddingModel">DenseEmbeddingModel (class in src.embeddings_dense.base)</a>
 </li>
       <li><a href="autoapi/src/search_api/faiss_adapter/index.html#src.search_api.faiss_adapter.DenseVecs">DenseVecs (class in src.search_api.faiss_adapter)</a>
 </li>
@@ -566,14 +566,10 @@ window.addEventListener("load", () => mermaid.run());
         <li><a href="autoapi/src/search_api/splade_index/index.html#src.search_api.splade_index.SpladeIndex.df">(src.search_api.splade_index.SpladeIndex attribute)</a>
 </li>
       </ul></li>
-      <li><a href="autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbedder.dim">dim (src.embeddings_dense.base.DenseEmbedder attribute)</a>
-</li>
       <li><a href="autoapi/src/search_api/bm25_index/index.html#src.search_api.bm25_index.BM25Doc.dl">dl (src.search_api.bm25_index.BM25Doc attribute)</a>
 </li>
       <li><a href="autoapi/src/kgfoundry_common/models/index.html#src.kgfoundry_common.models.Doc">Doc (class in src.kgfoundry_common.models)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/src/search_api/bm25_index/index.html#src.search_api.bm25_index.BM25Index.doc">doc() (src.search_api.bm25_index.BM25Index method)</a>
 
       <ul>
@@ -582,6 +578,8 @@ window.addEventListener("load", () => mermaid.run());
         <li><a href="autoapi/src/search_api/splade_index/index.html#src.search_api.splade_index.SpladeIndex.doc">(src.search_api.splade_index.SpladeIndex method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/src/embeddings_sparse/bm25/index.html#src.embeddings_sparse.bm25.BM25Doc.doc_id">doc_id (src.embeddings_sparse.bm25.BM25Doc attribute)</a>
 
       <ul>
@@ -640,8 +638,6 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       <li><a href="autoapi/src/download/harvester/index.html#src.download.harvester.OpenAccessHarvester.email">email (src.download.harvester.OpenAccessHarvester attribute)</a>
 </li>
-      <li><a href="autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbedder.embed_texts">embed_texts() (src.embeddings_dense.base.DenseEmbedder method)</a>
-</li>
       <li><a href="autoapi/src/kgfoundry_common/errors/index.html#src.kgfoundry_common.errors.EmbeddingError">EmbeddingError</a>
 </li>
       <li><a href="autoapi/src/registry/api/index.html#src.registry.api.Registry.emit_event">emit_event() (src.registry.api.Registry method)</a>
@@ -654,9 +650,11 @@ window.addEventListener("load", () => mermaid.run());
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/src/embeddings_sparse/base/index.html#src.embeddings_sparse.base.SparseEncoder.encode">encode() (src.embeddings_sparse.base.SparseEncoder method)</a>
+      <li><a href="autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbeddingModel.encode">encode() (src.embeddings_dense.base.DenseEmbeddingModel method)</a>
 
       <ul>
+        <li><a href="autoapi/src/embeddings_sparse/base/index.html#src.embeddings_sparse.base.SparseEncoder.encode">(src.embeddings_sparse.base.SparseEncoder method)</a>
+</li>
         <li><a href="autoapi/src/embeddings_sparse/splade/index.html#src.embeddings_sparse.splade.SPLADEv3Encoder.encode">(src.embeddings_sparse.splade.SPLADEv3Encoder method)</a>
 </li>
       </ul></li>
@@ -743,6 +741,8 @@ window.addEventListener("load", () => mermaid.run());
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/src/docling/hybrid/index.html#src.docling.hybrid.HybridChunker">HybridChunker (class in src.docling.hybrid)</a>
+</li>
+      <li><a href="autoapi/src/ontology/catalog/index.html#src.ontology.catalog.OntologyCatalog.hydrate">hydrate() (src.ontology.catalog.OntologyCatalog method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1033,18 +1033,16 @@ window.addEventListener("load", () => mermaid.run());
         <li><a href="autoapi/src/search_api/splade_index/index.html#src.search_api.splade_index.SpladeIndex.N">(src.search_api.splade_index.SpladeIndex attribute)</a>
 </li>
       </ul></li>
-      <li><a href="autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbedder.name">name (src.embeddings_dense.base.DenseEmbedder attribute)</a>
+      <li><a href="autoapi/src/embeddings_sparse/base/index.html#src.embeddings_sparse.base.SparseEncoder.name">name (src.embeddings_sparse.base.SparseEncoder attribute)</a>
 
       <ul>
-        <li><a href="autoapi/src/embeddings_sparse/base/index.html#src.embeddings_sparse.base.SparseEncoder.name">(src.embeddings_sparse.base.SparseEncoder attribute)</a>
-</li>
         <li><a href="autoapi/src/embeddings_sparse/splade/index.html#src.embeddings_sparse.splade.SPLADEv3Encoder.name">(src.embeddings_sparse.splade.SPLADEv3Encoder attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavMap">NavMap (class in src.kgfoundry_common.navmap_types)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavSection">NavSection (class in src.kgfoundry_common.navmap_types)</a>
 </li>
       <li><a href="autoapi/src/kg_builder/mock_kg/index.html#src.kg_builder.mock_kg.MockKG.neighbors">neighbors (src.kg_builder.mock_kg.MockKG attribute)</a>

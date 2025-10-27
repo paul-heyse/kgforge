@@ -1,8 +1,9 @@
-"""FAISS-backed dense retrieval adapter used by the fixture search API.
+"""Module for search_api.faiss_adapter.
 
 NavMap:
-- DenseVecs: Hold chunk identifiers and their dense vector representations.
-- FaissAdapter: Build or load a FAISS index backed by DuckDB parquet exports.
+- NavMap: Structure describing a module navmap.
+- DenseVecs: Dense vector matrix paired with chunk identifiers.
+- FaissAdapter: Load dense vectors from DuckDB and expose FAISS search….
 """
 
 from __future__ import annotations

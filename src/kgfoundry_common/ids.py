@@ -1,8 +1,9 @@
-"""Helpers for generating deterministic URNs used across kgfoundry.
+"""Module for kgfoundry_common.ids.
 
 NavMap:
-- urn_doc_from_text: Create a document URN derived from textual content.
-- urn_chunk: Create a chunk URN derived from offsets within a document.
+- NavMap: Structure describing a module navmap.
+- urn_doc_from_text: Return a normalized document URN derived from ``text``.
+- urn_chunk: Return a chunk URN derived from document hash and offsets.
 """
 
 from __future__ import annotations

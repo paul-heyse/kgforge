@@ -9,8 +9,8 @@ src.orchestration.flows
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - t_echo: T echo.
-   - e2e_flow: E2e flow.
+   - t_echo: Return ``msg`` unmodified; handy for flow scaffolding and….
+   - e2e_flow: Run the high-level kgfoundry demo flow and return step names.
 
 
 
@@ -21,17 +21,11 @@ Module Contents
 
 .. py:function:: t_echo(msg)
 
-   T echo.
-
-   :param msg: TODO.
-   :type msg: str
-
-   :returns: TODO.
-   :rtype: str
+   Return ``msg`` unmodified; handy for flow scaffolding and tests.
 
 
 .. py:function:: e2e_flow()
 
-   E2e flow.
+   Run the high-level kgfoundry demo flow and return step names.
 
 

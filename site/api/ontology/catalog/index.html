@@ -428,35 +428,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ontology.catalog.OntologyCatalog.hydrate" class="md-nav__link">
+    <span class="md-ellipsis">
+      hydrate
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ontology.catalog.OntologyCatalog.neighbors" class="md-nav__link">
     <span class="md-ellipsis">
       neighbors
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="neighbors">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ontology.catalog.OntologyCatalog.neighbors--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      Parameters
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ontology.catalog.OntologyCatalog.neighbors--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -494,7 +479,7 @@
         <p>Module for ontology.catalog.</p>
 <p>NavMap:
 - NavMap: Structure describing a module navmap.
-- OntologyCatalog: Ontologycatalog.</p>
+- OntologyCatalog: In-memory view of ontology concepts and relationships.</p>
 
 
 
@@ -529,7 +514,7 @@
     <div class="doc doc-contents ">
 
 
-        <p>Ontologycatalog.</p>
+        <p>In-memory view of ontology concepts and relationships.</p>
 
 
 
@@ -540,8 +525,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>src/ontology/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">32</span>
-<span class="normal">33</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
 <span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
@@ -561,44 +545,27 @@
 <span class="normal">50</span>
 <span class="normal">51</span>
 <span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">OntologyCatalog</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ontologycatalog.&quot;&quot;&quot;</span>
+<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">OntologyCatalog</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;In-memory view of ontology concepts and relationships.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Concept</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Index concepts by identifier for rapid lookup.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        concepts : List[Concept]</span>
-<span class="sd">            TODO.</span>
+<span class="sd">        concepts : list[Concept]</span>
+<span class="sd">            Concepts loaded from the backing ontology source.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">by_id</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">concepts</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">by_id</span> <span class="o">=</span> <span class="p">{</span><span class="n">concept</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">concept</span> <span class="k">for</span> <span class="n">concept</span> <span class="ow">in</span> <span class="n">concepts</span><span class="p">}</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Neighbors.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        concept_id : str</span>
-<span class="sd">            TODO.</span>
-<span class="sd">        depth : int</span>
-<span class="sd">            TODO.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        List[str]</span>
-<span class="sd">            TODO.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return neighbour concept identifiers up to ``depth`` hops.&quot;&quot;&quot;</span>
         <span class="c1"># NOTE: return neighbor concept IDs up to depth when ontology data is wired</span>
-        <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">hydrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the full concept record for ``concept_id``.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{}</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -626,31 +593,58 @@
 
     <div class="doc doc-contents ">
 
-        <p>Init.</p>
+        <p>Index concepts by identifier for rapid lookup.</p>
 <h5 id="ontology.catalog.OntologyCatalog.__init__--parameters">Parameters</h5>
-<p>concepts : List[Concept]
-    TODO.</p>
+<p>concepts : list[Concept]
+    Concepts loaded from the backing ontology source.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/ontology/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">35</span>
-<span class="normal">36</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">36</span>
 <span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
 <span class="normal">42</span>
-<span class="normal">43</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Concept</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Init.</span>
+<span class="normal">43</span>
+<span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Concept</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Index concepts by identifier for rapid lookup.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    concepts : List[Concept]</span>
-<span class="sd">        TODO.</span>
+<span class="sd">    concepts : list[Concept]</span>
+<span class="sd">        Concepts loaded from the backing ontology source.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">by_id</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">concepts</span><span class="p">}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">by_id</span> <span class="o">=</span> <span class="p">{</span><span class="n">concept</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">concept</span> <span class="k">for</span> <span class="n">concept</span> <span class="ow">in</span> <span class="n">concepts</span><span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ontology.catalog.OntologyCatalog.hydrate" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">hydrate</span><span class="p">(</span><span class="n">concept_id</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Load the full concept record for <code>concept_id</code>.</p>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/ontology/catalog.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hydrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load the full concept record for ``concept_id``.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{}</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -668,52 +662,18 @@
 
     <div class="doc doc-contents ">
 
-        <p>Neighbors.</p>
-<h5 id="ontology.catalog.OntologyCatalog.neighbors--parameters">Parameters</h5>
-<p>concept_id : str
-    TODO.
-depth : int
-    TODO.</p>
-<h5 id="ontology.catalog.OntologyCatalog.neighbors--returns">Returns</h5>
-<p>List[str]
-    TODO.</p>
+        <p>Return neighbour concept identifiers up to <code>depth</code> hops.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/ontology/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">45</span>
-<span class="normal">46</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Neighbors.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    concept_id : str</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    depth : int</span>
-<span class="sd">        TODO.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    List[str]</span>
-<span class="sd">        TODO.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return neighbour concept identifiers up to ``depth`` hops.&quot;&quot;&quot;</span>
     <span class="c1"># NOTE: return neighbor concept IDs up to depth when ontology data is wired</span>
-    <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

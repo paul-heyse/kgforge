@@ -1,8 +1,10 @@
-"""Harvest open-access documents from OpenAlex and Unpaywall.
+"""Module for download.harvester.
 
 NavMap:
-- OpenAccessHarvester: Coordinate OpenAlex lookups, Unpaywall fallbacks, and
-  local persistence.
+- DownloadError: Raised when an external download fails.
+- UnsupportedMIMEError: Raised when an unsupported MIME type is encountered.
+- NavMap: Structure describing a module navmap.
+- OpenAccessHarvester: Coordinate OpenAlex and Unpaywall lookups to persist open-….
 """
 
 from __future__ import annotations
@@ -12,9 +14,9 @@ import time
 from typing import Any, Final
 
 import requests
-from kgfoundry.kgfoundry_common.exceptions import DownloadError, UnsupportedMIMEError
 from kgfoundry.kgfoundry_common.models import Doc
 
+from kgfoundry_common.errors import DownloadError, UnsupportedMIMEError
 from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["OpenAccessHarvester"]
@@ -155,9 +157,9 @@ class OpenAccessHarvester:
 
         Raises
         ------
-        DownloadError
+        kgfoundry_common.errors.DownloadError
             Raised when the response code indicates a failure.
-        UnsupportedMIMEError
+        kgfoundry_common.errors.UnsupportedMIMEError
             Raised when the response is not a PDF-like MIME type.
         """
         response = self.session.get(url, timeout=60)

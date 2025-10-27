@@ -9,7 +9,7 @@ src.linking.calibration
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - isotonic_calibrate: Skeleton: calibrate scores (y=float in [0,1]) vs labels….
+   - isotonic_calibrate: Calibrate score/label pairs using an isotonic regression….
 
 
 
@@ -20,6 +20,13 @@ Module Contents
 
 .. py:function:: isotonic_calibrate(pairs)
 
-   Skeleton: calibrate scores (y=float in [0,1]) vs labels (0/1).
+   Calibrate score/label pairs using an isotonic regression placeholder.
+
+   :param pairs: Sequence of ``(score, label)`` pairs where score is in ``[0, 1]`` and
+                 label is either ``0`` or ``1``.
+   :type pairs: list[tuple[float, int]]
+
+   :returns: Calibration artefact describing the fitted model (placeholder).
+   :rtype: dict[str, object]
 
 

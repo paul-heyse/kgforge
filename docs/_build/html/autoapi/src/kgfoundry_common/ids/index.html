@@ -454,20 +454,20 @@
 <p>Module for kgfoundry_common.ids.</p>
 <p>NavMap:
 - NavMap: Structure describing a module navmap.
-- urn_doc_from_text: Urn doc from text.
-- urn_chunk: Urn chunk.</p>
+- urn_doc_from_text: Return a normalized document URN derived from <code class="docutils literal notranslate"><span class="pre">text</span></code>.
+- urn_chunk: Return a chunk URN derived from document hash and offsets.</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.kgfoundry_common.ids.urn_doc_from_text">
-<span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.ids.</span></span><span class="sig-name descname"><span class="pre">urn_doc_from_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/ids.html#urn_doc_from_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/ids.py:33:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.ids.urn_doc_from_text" title="Link to this definition">#</a></dt>
-<dd><p>Urn doc from text.</p>
+<span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.ids.</span></span><span class="sig-name descname"><span class="pre">urn_doc_from_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/ids.html#urn_doc_from_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/ids.py:34:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.ids.urn_doc_from_text" title="Link to this definition">#</a></dt>
+<dd><p>Return a normalized document URN derived from <code class="docutils literal notranslate"><span class="pre">text</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p>
+<dd class="field-odd"><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Raw document text to hash.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
+<dd class="field-even"><p>Deterministic URN containing the truncated SHA-256 hash.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
@@ -477,18 +477,18 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.kgfoundry_common.ids.urn_chunk">
-<span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.ids.</span></span><span class="sig-name descname"><span class="pre">urn_chunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_hash</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/ids.html#urn_chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/ids.py:52:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.ids.urn_chunk" title="Link to this definition">#</a></dt>
-<dd><p>Urn chunk.</p>
+<span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.ids.</span></span><span class="sig-name descname"><span class="pre">urn_chunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_hash</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/ids.html#urn_chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/ids.py:53:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.ids.urn_chunk" title="Link to this definition">#</a></dt>
+<dd><p>Return a chunk URN derived from document hash and offsets.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>doc_hash</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – TODO.</p></li>
-<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – TODO.</p></li>
-<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – TODO.</p></li>
+<li><p><strong>doc_hash</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Document-level URN or hash prefix.</p></li>
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Inclusive character offset for the chunk start.</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Exclusive character offset for the chunk end.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>TODO.</p>
+<dd class="field-even"><p>Deterministic chunk URN joining the document hash with offsets.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>

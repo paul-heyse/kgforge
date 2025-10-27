@@ -1,4 +1,9 @@
-"""Protocol definitions for dense embedding providers."""
+"""Module for embeddings_dense.base.
+
+NavMap:
+- NavMap: Structure describing a module navmap.
+- DenseEmbeddingModel: Protocol describing dense embedding encoders used in….
+"""
 
 from __future__ import annotations
 

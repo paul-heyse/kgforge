@@ -9,8 +9,8 @@ src.kgfoundry_common.ids
 
    NavMap:
    - NavMap: Structure describing a module navmap.
-   - urn_doc_from_text: Urn doc from text.
-   - urn_chunk: Urn chunk.
+   - urn_doc_from_text: Return a normalized document URN derived from ``text``.
+   - urn_chunk: Return a chunk URN derived from document hash and offsets.
 
 
 
@@ -21,27 +21,27 @@ Module Contents
 
 .. py:function:: urn_doc_from_text(text)
 
-   Urn doc from text.
+   Return a normalized document URN derived from ``text``.
 
-   :param text: TODO.
+   :param text: Raw document text to hash.
    :type text: str
 
-   :returns: TODO.
+   :returns: Deterministic URN containing the truncated SHA-256 hash.
    :rtype: str
 
 
 .. py:function:: urn_chunk(doc_hash, start, end)
 
-   Urn chunk.
+   Return a chunk URN derived from document hash and offsets.
 
-   :param doc_hash: TODO.
+   :param doc_hash: Document-level URN or hash prefix.
    :type doc_hash: str
-   :param start: TODO.
+   :param start: Inclusive character offset for the chunk start.
    :type start: int
-   :param end: TODO.
+   :param end: Exclusive character offset for the chunk end.
    :type end: int
 
-   :returns: TODO.
+   :returns: Deterministic chunk URN joining the document hash with offsets.
    :rtype: str
 
 
