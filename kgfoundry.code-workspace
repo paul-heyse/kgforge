@@ -11,7 +11,7 @@
     // ——— keep search/symbol scans lean ———
     "files.exclude": {
       "**/.git": true,
-      "**/.venv": true,
+      "**/.venv": false,
       "**/__pycache__": true,
       "**/.ruff_cache": true,
       "**/.mypy_cache": true,
