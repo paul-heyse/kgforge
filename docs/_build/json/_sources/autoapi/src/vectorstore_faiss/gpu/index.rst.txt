@@ -1,0 +1,106 @@
+src.vectorstore_faiss.gpu
+=========================
+
+.. py:module:: src.vectorstore_faiss.gpu
+
+.. autoapi-nested-parse::
+
+   Module for vectorstore_faiss.gpu.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: FaissGpuIndex(factory = 'OPQ64,IVF8192,PQ64', nprobe = 64, gpu = True, cuvs = True)
+
+   FAISS GPU/cuVS wrapper.
+
+   If FAISS is unavailable at runtime, falls back to brute-force cosine
+   search over a provided matrix.
+
+
+   .. py:attribute:: factory
+
+
+   .. py:attribute:: nprobe
+
+
+   .. py:attribute:: gpu
+
+
+   .. py:attribute:: cuvs
+
+
+   .. py:method:: train(train_vectors, *, seed = 42)
+
+      Train.
+
+      :param train_vectors: TODO.
+      :type train_vectors: np.ndarray
+      :param seed: TODO.
+      :type seed: int
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: add(keys, vectors)
+
+      Add.
+
+      :param keys: TODO.
+      :type keys: List[str]
+      :param vectors: TODO.
+      :type vectors: np.ndarray
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: search(query, k)
+
+      Search.
+
+      :param query: TODO.
+      :type query: np.ndarray
+      :param k: TODO.
+      :type k: int
+
+      :returns: TODO.
+      :rtype: List[Tuple[str, float]]
+
+
+
+   .. py:method:: save(index_uri, idmap_uri)
+
+      Save.
+
+      :param index_uri: TODO.
+      :type index_uri: str
+      :param idmap_uri: TODO.
+      :type idmap_uri: str
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: load(index_uri, idmap_uri = None)
+
+      Load.
+
+      :param index_uri: TODO.
+      :type index_uri: str
+      :param idmap_uri: TODO.
+      :type idmap_uri: str | None
+
+      :returns: TODO.
+      :rtype: None
+
+
+

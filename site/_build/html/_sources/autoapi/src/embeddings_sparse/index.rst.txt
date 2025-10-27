@@ -1,0 +1,22 @@
+src.embeddings_sparse
+=====================
+
+.. py:module:: src.embeddings_sparse
+
+.. autoapi-nested-parse::
+
+   Module for embeddings_sparse.__init__.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/src/embeddings_sparse/base/index
+   /autoapi/src/embeddings_sparse/bm25/index
+   /autoapi/src/embeddings_sparse/splade/index
+
+

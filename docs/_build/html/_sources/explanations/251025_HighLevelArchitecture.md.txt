@@ -1,3 +1,5 @@
+# Implementation-Grade Architecture Overview
+
 Below is the **fully elaborated, implementation‑grade architecture** for your end‑to‑end, single‑machine system. It updates **every topic** from the original plan and adds all **new constraints** you set:
 
 * **OS/Host**: Ubuntu 24.04 (single box, no external servers).

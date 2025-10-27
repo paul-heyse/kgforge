@@ -1,0 +1,21 @@
+src.kg_builder
+==============
+
+.. py:module:: src.kg_builder
+
+.. autoapi-nested-parse::
+
+   Module for kg_builder.__init__.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/src/kg_builder/mock_kg/index
+   /autoapi/src/kg_builder/neo4j_store/index
+
+

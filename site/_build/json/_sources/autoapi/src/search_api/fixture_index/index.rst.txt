@@ -1,0 +1,111 @@
+src.search_api.fixture_index
+============================
+
+.. py:module:: src.search_api.fixture_index
+
+.. autoapi-nested-parse::
+
+   Module for search_api.fixture_index.
+
+
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: TOKEN_RE
+
+.. py:function:: tokenize(text)
+
+   Tokenize.
+
+   :param text: TODO.
+   :type text: str
+
+   :returns: TODO.
+   :rtype: List[str]
+
+
+.. py:class:: FixtureDoc
+
+   Fixturedoc.
+
+
+   .. py:attribute:: chunk_id
+      :type:  str
+
+
+   .. py:attribute:: doc_id
+      :type:  str
+
+
+   .. py:attribute:: title
+      :type:  str
+
+
+   .. py:attribute:: section
+      :type:  str
+
+
+   .. py:attribute:: text
+      :type:  str
+
+
+.. py:class:: FixtureIndex(root = '/data', db_path = '/data/catalog/catalog.duckdb')
+
+   Fixtureindex.
+
+
+   .. py:attribute:: root
+
+
+   .. py:attribute:: db_path
+
+
+   .. py:attribute:: docs
+      :type:  List[FixtureDoc]
+      :value: []
+
+
+
+   .. py:attribute:: df
+      :type:  Dict[str, int]
+
+
+   .. py:attribute:: tf
+      :type:  List[Dict[str, int]]
+      :value: []
+
+
+
+   .. py:method:: search(query, k = 10)
+
+      Search.
+
+      :param query: TODO.
+      :type query: str
+      :param k: TODO.
+      :type k: int
+
+      :returns: TODO.
+      :rtype: List[Tuple[int, float]]
+
+
+
+   .. py:method:: doc(idx)
+
+      Doc.
+
+      :param idx: TODO.
+      :type idx: int
+
+      :returns: TODO.
+      :rtype: FixtureDoc
+
+
+

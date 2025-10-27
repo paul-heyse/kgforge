@@ -1,0 +1,55 @@
+src.search_api.kg_mock
+======================
+
+.. py:module:: src.search_api.kg_mock
+
+.. autoapi-nested-parse::
+
+   Module for search_api.kg_mock.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: detect_query_concepts(query)
+
+   Detect query concepts.
+
+   :param query: TODO.
+   :type query: str
+
+   :returns: TODO.
+   :rtype: List[str]
+
+
+.. py:function:: linked_concepts_for_text(text)
+
+   Linked concepts for text.
+
+   :param text: TODO.
+   :type text: str
+
+   :returns: TODO.
+   :rtype: List[str]
+
+
+.. py:function:: kg_boost(query_concepts, chunk_concepts, direct = 0.08, one_hop = 0.04)
+
+   Kg boost.
+
+   :param query_concepts: TODO.
+   :type query_concepts: List[str]
+   :param chunk_concepts: TODO.
+   :type chunk_concepts: List[str]
+   :param direct: TODO.
+   :type direct: float
+   :param one_hop: TODO.
+   :type one_hop: float
+
+   :returns: TODO.
+   :rtype: float
+
+

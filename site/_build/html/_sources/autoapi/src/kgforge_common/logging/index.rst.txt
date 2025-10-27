@@ -1,0 +1,49 @@
+src.kgforge_common.logging
+==========================
+
+.. py:module:: src.kgforge_common.logging
+
+.. autoapi-nested-parse::
+
+   Module for kgforge_common.logging.
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: JsonFormatter
+
+   Bases: :py:obj:`logging.Formatter`
+
+
+   Jsonformatter.
+
+
+   .. py:method:: format(record)
+
+      Format.
+
+      :param record: TODO.
+      :type record: logging.LogRecord
+
+      :returns: TODO.
+      :rtype: str
+
+
+
+.. py:function:: setup_logging(level = logging.INFO)
+
+   Setup logging.
+
+   :param level: TODO.
+   :type level: int
+
+   :returns: TODO.
+   :rtype: None
+
+

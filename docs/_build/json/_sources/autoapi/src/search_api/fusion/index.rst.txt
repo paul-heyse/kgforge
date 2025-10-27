@@ -1,0 +1,29 @@
+src.search_api.fusion
+=====================
+
+.. py:module:: src.search_api.fusion
+
+.. autoapi-nested-parse::
+
+   Module for search_api.fusion.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: rrf_fuse(rankers, k = 60)
+
+   Rrf fuse.
+
+   :param rankers: TODO.
+   :type rankers: List[List[Tuple[str, float]]]
+   :param k: TODO.
+   :type k: int
+
+   :returns: TODO.
+   :rtype: Dict[str, float]
+
+

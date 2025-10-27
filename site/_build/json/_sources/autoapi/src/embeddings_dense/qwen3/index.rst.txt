@@ -1,0 +1,21 @@
+src.embeddings_dense.qwen3
+==========================
+
+.. py:module:: src.embeddings_dense.qwen3
+
+.. autoapi-nested-parse::
+
+   Module for embeddings_dense.qwen3.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: Qwen3Embedder
+
+   Adapter for Qwen3 dense embedding checkpoints.
+
+

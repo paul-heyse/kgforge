@@ -1,0 +1,103 @@
+src.search_api.splade_index
+===========================
+
+.. py:module:: src.search_api.splade_index
+
+.. autoapi-nested-parse::
+
+   Module for search_api.splade_index.
+
+
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: TOKEN
+
+.. py:function:: tok(s)
+
+   Tok.
+
+   :param s: TODO.
+   :type s: str
+
+   :returns: TODO.
+   :rtype: List[str]
+
+
+.. py:class:: SpladeDoc
+
+   Spladedoc.
+
+
+   .. py:attribute:: chunk_id
+      :type:  str
+
+
+   .. py:attribute:: doc_id
+      :type:  str
+
+
+   .. py:attribute:: section
+      :type:  str
+
+
+   .. py:attribute:: text
+      :type:  str
+
+
+.. py:class:: SpladeIndex(db_path, chunks_dataset_root = None, sparse_root = None)
+
+   Spladeindex.
+
+
+   .. py:attribute:: db_path
+
+
+   .. py:attribute:: docs
+      :type:  List[SpladeDoc]
+      :value: []
+
+
+
+   .. py:attribute:: df
+      :type:  Dict[str, int]
+
+
+   .. py:attribute:: N
+      :value: 0
+
+
+
+   .. py:method:: search(query, k = 10)
+
+      Search.
+
+      :param query: TODO.
+      :type query: str
+      :param k: TODO.
+      :type k: int
+
+      :returns: TODO.
+      :rtype: List[Tuple[int, float]]
+
+
+
+   .. py:method:: doc(i)
+
+      Doc.
+
+      :param i: TODO.
+      :type i: int
+
+      :returns: TODO.
+      :rtype: SpladeDoc
+
+
+

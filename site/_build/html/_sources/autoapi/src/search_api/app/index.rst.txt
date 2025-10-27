@@ -1,0 +1,106 @@
+src.search_api.app
+==================
+
+.. py:module:: src.search_api.app
+
+.. autoapi-nested-parse::
+
+   Module for search_api.app.
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: API_KEYS
+
+.. py:data:: app
+
+.. py:data:: CFG_PATH
+
+.. py:data:: CFG
+
+.. py:data:: SPARSE_BACKEND
+
+.. py:data:: BM25_DIR
+
+.. py:data:: SPLADE_DIR
+
+.. py:data:: FAISS_PATH
+   :value: './_indices/faiss/shard_000.idx'
+
+
+.. py:data:: bm25
+
+.. py:data:: splade
+
+.. py:data:: faiss
+
+.. py:data:: kg
+
+.. py:function:: auth(authorization = Header(default=None))
+
+   Auth.
+
+   :param authorization: TODO.
+   :type authorization: Optional[str]
+
+   :returns: TODO.
+   :rtype: None
+
+
+.. py:function:: healthz()
+
+   Healthz.
+
+
+.. py:function:: rrf_fuse(lists, k_rrf)
+
+   Rrf fuse.
+
+   :param lists: TODO.
+   :type lists: List[List[Tuple[str, float]]]
+   :param k_rrf: TODO.
+   :type k_rrf: int
+
+   :returns: TODO.
+   :rtype: Dict[str, float]
+
+
+.. py:function:: apply_kg_boosts(cands, query, direct=0.08, one_hop=0.04)
+
+   Apply kg boosts.
+
+   :param cands: TODO.
+   :type cands: Dict[str, float]
+   :param query: TODO.
+   :type query: str
+   :param direct: TODO.
+   :param one_hop: TODO.
+
+   :returns: TODO.
+   :rtype: Dict[str, float]
+
+
+.. py:function:: search(req, _=Depends(auth))
+
+   Search.
+
+   :param req: TODO.
+   :type req: SearchRequest
+   :param _: TODO.
+
+
+.. py:function:: graph_concepts(body, _=Depends(auth))
+
+   Graph concepts.
+
+   :param body: TODO.
+   :type body: dict
+   :param _: TODO.
+
+

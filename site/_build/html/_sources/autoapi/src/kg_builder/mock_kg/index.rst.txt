@@ -1,0 +1,77 @@
+src.kg_builder.mock_kg
+======================
+
+.. py:module:: src.kg_builder.mock_kg
+
+.. autoapi-nested-parse::
+
+   Module for kg_builder.mock_kg.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: MockKG
+
+   A tiny in-memory KG for demo.
+
+   Maps chunk_id -> set(concept_id) and concept adjacency.
+
+
+   .. py:attribute:: chunk2concepts
+      :type:  Dict[str, Set[str]]
+
+
+   .. py:attribute:: neighbors
+      :type:  Dict[str, Set[str]]
+
+
+   .. py:method:: add_mention(chunk_id, concept_id)
+
+      Add mention.
+
+      :param chunk_id: TODO.
+      :type chunk_id: str
+      :param concept_id: TODO.
+      :type concept_id: str
+
+
+
+   .. py:method:: add_edge(a, b)
+
+      Add edge.
+
+      :param a: TODO.
+      :type a: str
+      :param b: TODO.
+      :type b: str
+
+
+
+   .. py:method:: linked_concepts(chunk_id)
+
+      Linked concepts.
+
+      :param chunk_id: TODO.
+      :type chunk_id: str
+
+      :returns: TODO.
+      :rtype: List[str]
+
+
+
+   .. py:method:: one_hop(concept_id)
+
+      One hop.
+
+      :param concept_id: TODO.
+      :type concept_id: str
+
+      :returns: TODO.
+      :rtype: List[str]
+
+
+

@@ -9,6 +9,7 @@ PYTEST := $(VENV)/bin/pytest
 PRECOMMIT := $(VENV)/bin/pre-commit
 PKG := $(shell python tools/detect_pkg.py)
 PKGS := $(shell python tools/detect_pkg.py --all)
+WATCH_PORT := $(if $(SPHINX_AUTOBUILD_PORT),$(SPHINX_AUTOBUILD_PORT),8000)
 
 bootstrap:
 	python3 -m venv $(VENV)
@@ -61,10 +62,11 @@ html:
 	$(PY) -m sphinx -b html docs docs/_build/html
 
 json:
+	rm -rf docs/_build/json
 	$(PY) -m sphinx -b json docs docs/_build/json
 
 symbols:
 	$(PY) docs/_scripts/build_symbol_index.py
 
 watch:
-	$(PY) -m sphinx_autobuild docs docs/_build/html
+	PYTHONPATH=src $(PY) -m sphinx_autobuild --port $(WATCH_PORT) docs docs/_build/html
