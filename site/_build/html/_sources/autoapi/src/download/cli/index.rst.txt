@@ -1,0 +1,25 @@
+src.download.cli
+================
+
+.. py:module:: src.download.cli
+
+.. autoapi-nested-parse::
+
+   Module for download.cli.
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: app
+
+.. py:function:: harvest(topic, years = '>=2018', max_works = 20000)
+
+   Harvest OA metadata and download PDFs (skeleton).
+
+

@@ -1,0 +1,37 @@
+src.orchestration.cli
+=====================
+
+.. py:module:: src.orchestration.cli
+
+.. autoapi-nested-parse::
+
+   Module for orchestration.cli.
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: app
+
+.. py:function:: index_bm25(chunks_parquet = typer.Argument(..., help='Path to Parquet/JSONL with chunks'), backend = typer.Option('lucene', help='lucene|pure'), index_dir = typer.Option('./_indices/bm25', help='Output index directory'))
+
+   Build a BM25 index from chunk fixtures (id, title, section, body).
+
+
+.. py:function:: index_faiss(dense_vectors = typer.Argument(..., help='Path to dense vectors JSON (skeleton)'), index_path = typer.Option('./_indices/faiss/shard_000.idx', help='Output index (CPU .idx)'))
+
+   Train & build FAISS index from fixture dense vectors.
+
+   In this skeleton we accept a JSON with entries: {key: str, vector: List[float]}.
+
+
+.. py:function:: api(port = 8080)
+
+   Run the FastAPI app.
+
+

@@ -1,0 +1,22 @@
+src.docling
+===========
+
+.. py:module:: src.docling
+
+.. autoapi-nested-parse::
+
+   Module for docling.__init__.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/src/docling/canonicalizer/index
+   /autoapi/src/docling/hybrid/index
+   /autoapi/src/docling/vlm/index
+
+

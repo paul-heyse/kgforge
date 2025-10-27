@@ -1,0 +1,100 @@
+src.download.harvester
+======================
+
+.. py:module:: src.download.harvester
+
+.. autoapi-nested-parse::
+
+   Module for download.harvester.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: OpenAccessHarvester(user_agent, contact_email, openalex_base = 'https://api.openalex.org', unpaywall_base = 'https://api.unpaywall.org', pdf_host_base = None, out_dir = '/data/pdfs')
+
+   Openaccessharvester.
+
+
+   .. py:attribute:: ua
+
+
+   .. py:attribute:: email
+
+
+   .. py:attribute:: openalex
+
+
+   .. py:attribute:: unpaywall
+
+
+   .. py:attribute:: pdf_host
+
+
+   .. py:attribute:: out_dir
+
+
+   .. py:attribute:: session
+
+
+   .. py:method:: search(topic, years, max_works)
+
+      Search.
+
+      :param topic: TODO.
+      :type topic: str
+      :param years: TODO.
+      :type years: str
+      :param max_works: TODO.
+      :type max_works: int
+
+      :returns: TODO.
+      :rtype: list[dict]
+
+
+
+   .. py:method:: resolve_pdf(work)
+
+      Resolve pdf.
+
+      :param work: TODO.
+      :type work: dict
+
+      :returns: TODO.
+      :rtype: Optional[str]
+
+
+
+   .. py:method:: download_pdf(url, target_path)
+
+      Download pdf.
+
+      :param url: TODO.
+      :type url: str
+      :param target_path: TODO.
+      :type target_path: str
+
+      :returns: TODO.
+      :rtype: str
+
+
+
+   .. py:method:: run(topic, years, max_works)
+
+      Run.
+
+      :param topic: TODO.
+      :type topic: str
+      :param years: TODO.
+      :type years: str
+      :param max_works: TODO.
+      :type max_works: int
+
+      :returns: TODO.
+      :rtype: List[Doc]
+
+
+

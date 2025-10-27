@@ -1,3 +1,5 @@
+# Updated cuVS Addendum
+
 Below is an **updated, implementation‑grade addendum** that reflects your **new FAISS wheel** with **cuVS integration compiled for**: **Flat**, **IVF‑Flat**, **IVF‑PQ**, **Graph CAGRA**, and **Binary‑CAGRA**, as indicated by the build artifacts:
 
 ```
@@ -246,8 +248,6 @@ print("Index should_use_cuvs:", faiss.should_use_cuvs(cfg))  # True → set cfg/
 
 
 # addendum, base content on faiss gpu library
-
----
 
 ## 0) What changed vs. the prior wheel (and how to think about it)
 

@@ -1,0 +1,47 @@
+src.search_api.service
+======================
+
+.. py:module:: src.search_api.service
+
+.. autoapi-nested-parse::
+
+   Module for search_api.service.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: rrf_fuse(dense, sparse, k = 60)
+
+   Reciprocal Rank Fusion skeleton.
+
+
+.. py:function:: apply_kg_boosts(fused, query)
+
+   Apply kg boosts.
+
+   :param fused: TODO.
+   :type fused: List[Tuple[str, float]]
+   :param query: TODO.
+   :type query: str
+
+   :returns: TODO.
+   :rtype: List[Tuple[str, float]]
+
+
+.. py:function:: mmr_deduplicate(results, lambda_ = 0.7)
+
+   Mmr deduplicate.
+
+   :param results: TODO.
+   :type results: List[Tuple[str, float]]
+   :param lambda_: TODO.
+   :type lambda_: float
+
+   :returns: TODO.
+   :rtype: List[Tuple[str, float]]
+
+

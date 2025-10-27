@@ -1,0 +1,34 @@
+src.registry.migrate
+====================
+
+.. py:module:: src.registry.migrate
+
+.. autoapi-nested-parse::
+
+   Module for registry.migrate.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: apply(db, migrations_dir)
+
+   Apply.
+
+   :param db: TODO.
+   :type db: str
+   :param migrations_dir: TODO.
+   :type migrations_dir: str
+
+   :returns: TODO.
+   :rtype: None
+
+
+.. py:function:: main()
+
+   Main.
+
+

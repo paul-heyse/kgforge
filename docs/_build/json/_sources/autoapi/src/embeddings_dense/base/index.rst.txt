@@ -1,0 +1,38 @@
+src.embeddings_dense.base
+=========================
+
+.. py:module:: src.embeddings_dense.base
+
+.. autoapi-nested-parse::
+
+   Module for embeddings_dense.base.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: DenseEmbedder
+
+   Bases: :py:obj:`Protocol`
+
+
+   Protocol describing a dense embedding provider.
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: dim
+      :type:  int
+
+
+   .. py:method:: embed_texts(texts)
+
+      Return embeddings for the supplied texts.
+
+
+

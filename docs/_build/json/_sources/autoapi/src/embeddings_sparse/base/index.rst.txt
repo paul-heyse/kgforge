@@ -1,0 +1,54 @@
+src.embeddings_sparse.base
+==========================
+
+.. py:module:: src.embeddings_sparse.base
+
+.. autoapi-nested-parse::
+
+   Module for embeddings_sparse.base.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: SparseEncoder
+
+   Bases: :py:obj:`Protocol`
+
+
+   Protocol for sparse text encoders.
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:method:: encode(texts)
+
+      Return sparse encodings for the given texts.
+
+
+
+.. py:class:: SparseIndex
+
+   Bases: :py:obj:`Protocol`
+
+
+   Protocol describing sparse index interactions.
+
+
+   .. py:method:: build(docs_iterable)
+
+      Build the index from the supplied documents.
+
+
+
+   .. py:method:: search(query, k, fields = None)
+
+      Search the index and return (id, score) tuples.
+
+
+

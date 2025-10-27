@@ -1,0 +1,78 @@
+src.registry.api
+================
+
+.. py:module:: src.registry.api
+
+.. autoapi-nested-parse::
+
+   Module for registry.api.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: Registry
+
+   Bases: :py:obj:`Protocol`
+
+
+   Registry protocol describing persistence operations.
+
+
+   .. py:method:: begin_dataset(kind, run_id)
+
+      Begin tracking a dataset build for the given run.
+
+
+
+   .. py:method:: commit_dataset(dataset_id, parquet_root, rows)
+
+      Finalize a dataset build.
+
+
+
+   .. py:method:: rollback_dataset(dataset_id)
+
+      Rollback a dataset build after failure.
+
+
+
+   .. py:method:: insert_run(purpose, model_id, revision, config)
+
+      Register a new processing run.
+
+
+
+   .. py:method:: close_run(run_id, success, notes = None)
+
+      Mark a run as complete.
+
+
+
+   .. py:method:: register_documents(docs)
+
+      Register document metadata with the registry.
+
+
+
+   .. py:method:: register_doctags(assets)
+
+      Register DocTags assets with the registry.
+
+
+
+   .. py:method:: emit_event(event_name, subject_id, payload)
+
+      Emit an audit event for monitoring.
+
+
+
+   .. py:method:: incident(event, subject_id, error_class, message)
+
+      Record an incident for visibility.
+
+
+

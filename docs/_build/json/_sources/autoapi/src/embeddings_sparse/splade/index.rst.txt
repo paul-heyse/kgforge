@@ -1,0 +1,152 @@
+src.embeddings_sparse.splade
+============================
+
+.. py:module:: src.embeddings_sparse.splade
+
+.. autoapi-nested-parse::
+
+   Module for embeddings_sparse.splade.
+
+
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: TOKEN_RE
+
+.. py:class:: SPLADEv3Encoder(model_id = 'naver/splade-v3-distilbert', device = 'cuda', topk = 256, max_seq_len = 512)
+
+   Spladev3encoder.
+
+
+   .. py:attribute:: name
+      :value: 'SPLADE-v3-distilbert'
+
+
+
+   .. py:attribute:: model_id
+
+
+   .. py:attribute:: device
+
+
+   .. py:attribute:: topk
+
+
+   .. py:attribute:: max_seq_len
+
+
+   .. py:method:: encode(texts)
+      :abstractmethod:
+
+
+      Encode.
+
+      :param texts: TODO.
+      :type texts: List[str]
+
+      :returns: TODO.
+      :rtype: List[Tuple[list[int], list[float]]]
+
+
+
+.. py:class:: PureImpactIndex(index_dir)
+
+   Toy 'impact' index that approximates SPLADE using IDF*log(1+tf) weights
+   over a simple tokenizer.
+
+   This is *not* a neural encoder; it exists to keep the pipeline
+   runnable without GPUs or Pyserini.
+
+
+   .. py:attribute:: index_dir
+
+
+   .. py:attribute:: df
+      :type:  Dict[str, int]
+
+
+   .. py:attribute:: N
+      :value: 0
+
+
+
+   .. py:attribute:: postings
+      :type:  Dict[str, Dict[str, float]]
+
+
+   .. py:method:: build(docs_iterable)
+
+      Build.
+
+      :param docs_iterable: TODO.
+      :type docs_iterable: Iterable[Tuple[str, Dict]]
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: load()
+
+      Load.
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: search(query, k)
+
+      Search.
+
+      :param query: TODO.
+      :type query: str
+      :param k: TODO.
+      :type k: int
+
+      :returns: TODO.
+      :rtype: List[Tuple[str, float]]
+
+
+
+.. py:class:: LuceneImpactIndex(index_dir)
+
+   Pyserini SPLADE impact index wrapper.
+
+   Requires Pyserini build step that writes an impact index on disk.
+
+
+   .. py:attribute:: index_dir
+
+
+   .. py:method:: search(query, k)
+
+      Search.
+
+      :param query: TODO.
+      :type query: str
+      :param k: TODO.
+      :type k: int
+
+      :returns: TODO.
+      :rtype: List[Tuple[str, float]]
+
+
+
+.. py:function:: get_splade(backend, index_dir)
+
+   Get splade.
+
+   :param backend: TODO.
+   :type backend: str
+   :param index_dir: TODO.
+   :type index_dir: str
+
+

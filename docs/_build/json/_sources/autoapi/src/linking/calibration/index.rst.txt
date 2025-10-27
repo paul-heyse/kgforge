@@ -1,0 +1,21 @@
+src.linking.calibration
+=======================
+
+.. py:module:: src.linking.calibration
+
+.. autoapi-nested-parse::
+
+   Module for linking.calibration.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: isotonic_calibrate(pairs)
+
+   Skeleton: calibrate scores (y=float in [0,1]) vs labels (0/1).
+
+

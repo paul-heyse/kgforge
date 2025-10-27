@@ -1,0 +1,21 @@
+src.docling.hybrid
+==================
+
+.. py:module:: src.docling.hybrid
+
+.. autoapi-nested-parse::
+
+   Module for docling.hybrid.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: HybridChunker
+
+   Placeholder hybrid chunker for Docling outputs.
+
+

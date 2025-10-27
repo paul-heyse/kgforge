@@ -1,0 +1,20 @@
+src.observability
+=================
+
+.. py:module:: src.observability
+
+.. autoapi-nested-parse::
+
+   Module for observability.__init__.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/src/observability/metrics/index
+
+

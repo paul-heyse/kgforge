@@ -1,0 +1,140 @@
+src.registry.helper
+===================
+
+.. py:module:: src.registry.helper
+
+.. autoapi-nested-parse::
+
+   Module for registry.helper.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: DuckDBRegistryHelper(db_path)
+
+   Duckdbregistryhelper.
+
+
+   .. py:attribute:: db_path
+
+
+   .. py:method:: new_run(purpose, model_id, revision, config)
+
+      New run.
+
+      :param purpose: TODO.
+      :type purpose: str
+      :param model_id: TODO.
+      :type model_id: Optional[str]
+      :param revision: TODO.
+      :type revision: Optional[str]
+      :param config: TODO.
+      :type config: dict
+
+      :returns: TODO.
+      :rtype: str
+
+
+
+   .. py:method:: close_run(run_id, success, notes = None)
+
+      Close run.
+
+      :param run_id: TODO.
+      :type run_id: str
+      :param success: TODO.
+      :type success: bool
+      :param notes: TODO.
+      :type notes: Optional[str]
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: begin_dataset(kind, run_id)
+
+      Begin dataset.
+
+      :param kind: TODO.
+      :type kind: str
+      :param run_id: TODO.
+      :type run_id: str
+
+      :returns: TODO.
+      :rtype: str
+
+
+
+   .. py:method:: commit_dataset(dataset_id, parquet_root, rows)
+
+      Commit dataset.
+
+      :param dataset_id: TODO.
+      :type dataset_id: str
+      :param parquet_root: TODO.
+      :type parquet_root: str
+      :param rows: TODO.
+      :type rows: int
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: rollback_dataset(dataset_id)
+
+      Rollback dataset.
+
+      :param dataset_id: TODO.
+      :type dataset_id: str
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: register_documents(docs)
+
+      Register documents.
+
+      :param docs: TODO.
+      :type docs: List[Doc]
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: register_doctags(assets)
+
+      Register doctags.
+
+      :param assets: TODO.
+      :type assets: List[DoctagsAsset]
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: emit_event(event_name, subject_id, payload)
+
+      Emit event.
+
+      :param event_name: TODO.
+      :type event_name: str
+      :param subject_id: TODO.
+      :type subject_id: str
+      :param payload: TODO.
+      :type payload: Dict
+
+      :returns: TODO.
+      :rtype: None
+
+
+

@@ -1,0 +1,176 @@
+src.embeddings_sparse.bm25
+==========================
+
+.. py:module:: src.embeddings_sparse.bm25
+
+.. autoapi-nested-parse::
+
+   Module for embeddings_sparse.bm25.
+
+
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: TOKEN_RE
+
+.. py:class:: BM25Doc
+
+   Bm25doc.
+
+
+   .. py:attribute:: doc_id
+      :type:  str
+
+
+   .. py:attribute:: length
+      :type:  int
+
+
+   .. py:attribute:: fields
+      :type:  Dict[str, str]
+
+
+.. py:class:: PurePythonBM25(index_dir, k1 = 0.9, b = 0.4, field_boosts = None)
+
+   Simple offline BM25 builder & searcher (Okapi BM25).
+
+   Persisted as a pickle.
+   Fields: title, section, body with configurable boosts.
+
+
+   .. py:attribute:: index_dir
+
+
+   .. py:attribute:: k1
+
+
+   .. py:attribute:: b
+
+
+   .. py:attribute:: field_boosts
+
+
+   .. py:attribute:: df
+      :type:  Dict[str, int]
+
+
+   .. py:attribute:: postings
+      :type:  Dict[str, Dict[str, int]]
+
+
+   .. py:attribute:: docs
+      :type:  Dict[str, BM25Doc]
+
+
+   .. py:attribute:: N
+      :value: 0
+
+
+
+   .. py:attribute:: avgdl
+      :value: 0.0
+
+
+
+   .. py:method:: build(docs_iterable)
+
+      Build.
+
+      :param docs_iterable: TODO.
+      :type docs_iterable: Iterable[Tuple[str, Dict]]
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: load()
+
+      Load.
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: search(query, k, fields = None)
+
+      Search.
+
+      :param query: TODO.
+      :type query: str
+      :param k: TODO.
+      :type k: int
+      :param fields: TODO.
+      :type fields: Dict | None
+
+      :returns: TODO.
+      :rtype: List[Tuple[str, float]]
+
+
+
+.. py:class:: LuceneBM25(index_dir, k1 = 0.9, b = 0.4, field_boosts = None)
+
+   Pyserini-backed Lucene BM25 adapter.
+
+   Lazily imported.
+
+
+   .. py:attribute:: index_dir
+
+
+   .. py:attribute:: k1
+
+
+   .. py:attribute:: b
+
+
+   .. py:attribute:: field_boosts
+
+
+   .. py:method:: build(docs_iterable)
+
+      Build.
+
+      :param docs_iterable: TODO.
+      :type docs_iterable: Iterable[Tuple[str, Dict]]
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: search(query, k, fields = None)
+
+      Search.
+
+      :param query: TODO.
+      :type query: str
+      :param k: TODO.
+      :type k: int
+      :param fields: TODO.
+      :type fields: Dict | None
+
+      :returns: TODO.
+      :rtype: List[Tuple[str, float]]
+
+
+
+.. py:function:: get_bm25(backend, index_dir, **kwargs)
+
+   Get bm25.
+
+   :param backend: TODO.
+   :type backend: str
+   :param index_dir: TODO.
+   :type index_dir: str
+   :param kwargs: TODO.
+
+

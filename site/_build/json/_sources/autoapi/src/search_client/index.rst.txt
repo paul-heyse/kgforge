@@ -1,0 +1,80 @@
+src.search_client
+=================
+
+.. py:module:: src.search_client
+
+.. autoapi-nested-parse::
+
+   Module for search_client.__init__.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/src/search_client/client/index
+
+
+
+
+Package Contents
+----------------
+
+.. py:class:: KGForgeClient(base_url = 'http://localhost:8080', api_key = None, timeout = 30.0)
+
+   Kgforgeclient.
+
+
+   .. py:attribute:: base_url
+
+
+   .. py:attribute:: api_key
+
+
+   .. py:attribute:: timeout
+
+
+   .. py:method:: healthz()
+
+      Healthz.
+
+      :returns: TODO.
+      :rtype: Dict[str, Any]
+
+
+
+   .. py:method:: search(query, k = 10, filters = None, explain = False)
+
+      Search.
+
+      :param query: TODO.
+      :type query: str
+      :param k: TODO.
+      :type k: int
+      :param filters: TODO.
+      :type filters: Optional[Dict[str, Any]]
+      :param explain: TODO.
+      :type explain: bool
+
+      :returns: TODO.
+      :rtype: Dict[str, Any]
+
+
+
+   .. py:method:: concepts(q, limit = 50)
+
+      Concepts.
+
+      :param q: TODO.
+      :type q: str
+      :param limit: TODO.
+      :type limit: int
+
+      :returns: TODO.
+      :rtype: Dict[str, Any]
+
+
+
