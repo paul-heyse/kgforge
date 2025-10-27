@@ -20,12 +20,7 @@ src/**/*.egg-info/**
 .sphinx/**
 
 # --- Virtual envs & package managers ---
-.venv/**
-.mamba/**
-.micromamba/**
-.conda/**
-env/**
-venv/**
+
 
 # --- Large/local data & artifacts ---
 data/**
@@ -53,7 +48,8 @@ artifacts/**/*.json
 # --- OS / editor cruft ---
 .DS_Store
 .idea/**
-.vscode/**
+.vscode/*
+!.vscode/settings.json
 Thumbs.db
 
 # --- Binaries (don’t help the AI index) ---
