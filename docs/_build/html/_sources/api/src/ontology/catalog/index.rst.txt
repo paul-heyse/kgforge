@@ -1,0 +1,38 @@
+src.ontology.catalog
+====================
+
+.. py:module:: src.ontology.catalog
+
+.. autoapi-nested-parse::
+
+   Module for ontology.catalog.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: OntologyCatalog(concepts)
+
+   Ontologycatalog.
+
+
+   .. py:attribute:: by_id
+
+
+   .. py:method:: neighbors(concept_id, depth = 1)
+
+      Neighbors.
+
+      :param concept_id: TODO.
+      :type concept_id: str
+      :param depth: TODO.
+      :type depth: int
+
+      :returns: TODO.
+      :rtype: List[str]
+
+
+

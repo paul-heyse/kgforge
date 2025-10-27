@@ -1,3 +1,5 @@
+"""Module for search_api.bm25_index."""
+
 
 from __future__ import annotations
 from dataclasses import dataclass
@@ -8,10 +10,19 @@ import re
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 def toks(s: str) -> List[str]:
+    """Toks.
+
+    Args:
+        s (str): TODO.
+
+    Returns:
+        List[str]: TODO.
+    """
     return [t.lower() for t in TOKEN_RE.findall(s or "")]
 
 @dataclass
 class BM25Doc:
+    """Bm25doc."""
     chunk_id: str
     doc_id: str
     title: str
@@ -20,7 +31,14 @@ class BM25Doc:
     dl: float
 
 class BM25Index:
+    """Bm25index."""
     def __init__(self, k1: float=0.9, b: float=0.4):
+        """Init.
+
+        Args:
+            k1 (float): TODO.
+            b (float): TODO.
+        """
         self.k1 = k1; self.b = b
         self.docs: List[BM25Doc] = []
         self.df: Dict[str,int] = {}
@@ -28,6 +46,14 @@ class BM25Index:
 
     @classmethod
     def build_from_duckdb(cls, db_path: str) -> "BM25Index":
+        """Build from duckdb.
+
+        Args:
+            db_path (str): TODO.
+
+        Returns:
+            "BM25Index": TODO.
+        """
         idx = cls()
         con = duckdb.connect(db_path)
         try:
@@ -45,6 +71,11 @@ class BM25Index:
         return idx
 
     def _build(self, rows):
+        """Build.
+
+        Args:
+            rows: TODO.
+        """
         self.docs.clear(); self.df.clear()
         dl_sum = 0.0
         for chunk_id, doc_id, section, body, title in rows:
@@ -61,6 +92,14 @@ class BM25Index:
         self.avgdl = (dl_sum / self.N) if self.N > 0 else 0.0
 
     def save(self, path: str) -> None:
+        """Save.
+
+        Args:
+            path (str): TODO.
+
+        Returns:
+            None: TODO.
+        """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         import pickle
         with open(path, "wb") as f:
@@ -68,6 +107,14 @@ class BM25Index:
 
     @classmethod
     def load(cls, path: str) -> "BM25Index":
+        """Load.
+
+        Args:
+            path (str): TODO.
+
+        Returns:
+            "BM25Index": TODO.
+        """
         with open(path, "rb") as f:
             d = pickle.load(f)
         idx = cls(d.get("k1",0.9), d.get("b",0.4))
@@ -75,10 +122,24 @@ class BM25Index:
         return idx
 
     def _idf(self, term: str) -> float:
+        """Idf.
+
+        Args:
+            term (str): TODO.
+
+        Returns:
+            float: TODO.
+        """
         df = self.df.get(term,0)
         return math.log((self.N - df + 0.5) / (df + 0.5) + 1.0) if self.N>0 and df>0 else 0.0
 
     def search(self, query: str, k: int=10):
+        """Search.
+
+        Args:
+            query (str): TODO.
+            k (int): TODO.
+        """
         if self.N == 0: return []
         terms = toks(query); scores = [0.0]*self.N
         for i, d in enumerate(self.docs):
@@ -94,4 +155,12 @@ class BM25Index:
         return [(i, s) for i, s in ranked[:k] if s>0.0]
 
     def doc(self, idx: int) -> BM25Doc:
+        """Doc.
+
+        Args:
+            idx (int): TODO.
+
+        Returns:
+            BM25Doc: TODO.
+        """
         return self.docs[idx]

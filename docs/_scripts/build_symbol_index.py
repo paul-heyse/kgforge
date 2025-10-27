@@ -12,7 +12,7 @@ import os
 import sys
 from pathlib import Path
 
-from griffe.loader import GriffeLoader
+from griffe import GriffeLoader
 
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS_DIR = ROOT / "tools"
@@ -36,22 +36,31 @@ def iter_packages():
 rows = []
 
 
+def safe_attr(node, attr, default=None):
+    try:
+        return getattr(node, attr)
+    except Exception:
+        return default
+
+
 def walk(node):
+    doc = safe_attr(node, "docstring")
+    file_rel = safe_attr(node, "relative_package_filepath")
     rows.append(
         {
             "path": node.path,
             "kind": node.kind.value,
-            "file": getattr(node, "relative_package_filepath", None),
-            "lineno": getattr(node, "lineno", None),
-            "endlineno": getattr(node, "endlineno", None),
-            "doc": (
-                node.docstring.value.split("\n\n")[0]
-                if getattr(node, "docstring", None)
-                else ""
-            ),
+            "file": str(file_rel) if file_rel else None,
+            "lineno": safe_attr(node, "lineno"),
+            "endlineno": safe_attr(node, "endlineno"),
+            "doc": (doc.value.split("\n\n")[0] if doc and getattr(doc, "value", None) else ""),
         }
     )
-    for member in node.members.values():
+    try:
+        members = list(node.members.values())
+    except Exception:
+        members = []
+    for member in members:
         walk(member)
 
 

@@ -1,13 +1,32 @@
+"""Module for observability.metrics."""
 
 from typing import Dict
+
 try:
     from prometheus_client import Counter, Histogram, Gauge  # type: ignore
-except Exception:  # minimal no-op fallbacks
+except Exception:  # pragma: no cover - minimal no-op fallbacks
     class _Noop:
-        def labels(self, *a, **k): return self
-        def observe(self, *a, **k): pass
-        def inc(self, *a, **k): pass
-        def set(self, *a, **k): pass
+        """Minimal stand-in when Prometheus client is unavailable."""
+
+        def labels(self, *args, **kwargs):
+            """Return self to mimic the Prometheus API."""
+            return self
+
+        def observe(self, *args, **kwargs):
+            """Ignore observation calls."""
+
+            return None
+
+        def inc(self, *args, **kwargs):
+            """Ignore counter increments."""
+
+            return None
+
+        def set(self, *args, **kwargs):
+            """Ignore gauge updates."""
+
+            return None
+
     Counter = Histogram = Gauge = _Noop  # type: ignore
 
 pdf_download_success_total = Counter('pdf_download_success_total', 'Successful OA PDF downloads')

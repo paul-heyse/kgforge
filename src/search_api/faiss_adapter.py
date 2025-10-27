@@ -1,3 +1,5 @@
+"""Module for search_api.faiss_adapter."""
+
 
 from __future__ import annotations
 from dataclasses import dataclass
@@ -18,11 +20,20 @@ except Exception:
 
 @dataclass
 class DenseVecs:
+    """Densevecs."""
     ids: List[str]
     mat: np.ndarray
 
 class FaissAdapter:
+    """Faissadapter."""
     def __init__(self, db_path: str, factory: str = "OPQ64,IVF8192,PQ64", metric: str = "ip"):
+        """Init.
+
+        Args:
+            db_path (str): TODO.
+            factory (str): TODO.
+            metric (str): TODO.
+        """
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
@@ -31,6 +42,11 @@ class FaissAdapter:
         self.vecs: Optional[DenseVecs] = None
 
     def _load_dense_parquet(self) -> DenseVecs:
+        """Load dense parquet.
+
+        Returns:
+            DenseVecs: TODO.
+        """
         if not Path(self.db_path).exists():
             raise RuntimeError("DuckDB registry not found")
         con = duckdb.connect(self.db_path)
@@ -52,6 +68,11 @@ class FaissAdapter:
         return DenseVecs(ids=ids, mat=mat)
 
     def build(self) -> None:
+        """Build.
+
+        Returns:
+            None: TODO.
+        """
         vecs = self._load_dense_parquet()
         self.vecs = vecs
         if not HAVE_FAISS:
@@ -75,6 +96,14 @@ class FaissAdapter:
         self.idmap = vecs.ids
 
     def load_or_build(self, cpu_index_path: Optional[str] = None) -> None:
+        """Load or build.
+
+        Args:
+            cpu_index_path (Optional[str]): TODO.
+
+        Returns:
+            None: TODO.
+        """
         try:
             if HAVE_FAISS and cpu_index_path and Path(cpu_index_path).exists():
                 cpu = faiss.read_index(cpu_index_path)
@@ -93,6 +122,15 @@ class FaissAdapter:
         self.build()
 
     def search(self, qvec: np.ndarray, k: int=10) -> List[Tuple[str, float]]:
+        """Search.
+
+        Args:
+            qvec (np.ndarray): TODO.
+            k (int): TODO.
+
+        Returns:
+            List[Tuple[str, float]]: TODO.
+        """
         if self.vecs is None and self.index is None:
             return []
         if HAVE_FAISS and self.index is not None:

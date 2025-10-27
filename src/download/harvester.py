@@ -1,3 +1,5 @@
+"""Module for download.harvester."""
+
 
 from __future__ import annotations
 from typing import List, Optional
@@ -6,11 +8,22 @@ from kgforge.kgforge_common.models import Doc
 from kgforge.kgforge_common.exceptions import DownloadError, UnsupportedMIMEError
 
 class OpenAccessHarvester:
+    """Openaccessharvester."""
     def __init__(self, user_agent: str, contact_email: str,
                  openalex_base: str = "https://api.openalex.org",
                  unpaywall_base: str = "https://api.unpaywall.org",
                  pdf_host_base: Optional[str] = None,
                  out_dir: str = "/data/pdfs"):
+        """Init.
+
+        Args:
+            user_agent (str): TODO.
+            contact_email (str): TODO.
+            openalex_base (str): TODO.
+            unpaywall_base (str): TODO.
+            pdf_host_base (Optional[str]): TODO.
+            out_dir (str): TODO.
+        """
         self.ua = user_agent
         self.email = contact_email
         self.openalex = openalex_base.rstrip("/")
@@ -22,6 +35,16 @@ class OpenAccessHarvester:
         self.session.headers.update({"User-Agent": f"{self.ua} ({self.email})"})
 
     def search(self, topic: str, years: str, max_works: int) -> list[dict]:
+        """Search.
+
+        Args:
+            topic (str): TODO.
+            years (str): TODO.
+            max_works (int): TODO.
+
+        Returns:
+            list[dict]: TODO.
+        """
         url = f"{self.openalex}/works"
         params = {"topic": topic, "per_page": min(200, max_works), "cursor": "*"}
         r = self.session.get(url, params=params, timeout=30)
@@ -30,6 +53,14 @@ class OpenAccessHarvester:
         return data.get("results", [])[:max_works]
 
     def resolve_pdf(self, work: dict) -> Optional[str]:
+        """Resolve pdf.
+
+        Args:
+            work (dict): TODO.
+
+        Returns:
+            Optional[str]: TODO.
+        """
         best = (work.get("best_oa_location") or {})
         if best and best.get("pdf_url"):
             return best["pdf_url"]
@@ -49,6 +80,15 @@ class OpenAccessHarvester:
         return None
 
     def download_pdf(self, url: str, target_path: str) -> str:
+        """Download pdf.
+
+        Args:
+            url (str): TODO.
+            target_path (str): TODO.
+
+        Returns:
+            str: TODO.
+        """
         r = self.session.get(url, timeout=60)
         if r.status_code != 200:
             raise DownloadError(f"Bad status {r.status_code} for {url}")
@@ -60,6 +100,16 @@ class OpenAccessHarvester:
         return target_path
 
     def run(self, topic: str, years: str, max_works: int) -> List[Doc]:
+        """Run.
+
+        Args:
+            topic (str): TODO.
+            years (str): TODO.
+            max_works (int): TODO.
+
+        Returns:
+            List[Doc]: TODO.
+        """
         docs: List[Doc] = []
         works = self.search(topic, years, max_works)
         for w in works:

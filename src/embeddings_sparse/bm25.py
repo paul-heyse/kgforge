@@ -1,3 +1,5 @@
+"""Module for embeddings_sparse.bm25."""
+
 
 from __future__ import annotations
 import math, os, re, json, pickle
@@ -9,14 +11,26 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 
 @dataclass
 class BM25Doc:
+    """Bm25doc."""
     doc_id: str
     length: int
     fields: Dict[str, str]
 
 class PurePythonBM25:
-    """Simple offline BM25 builder & searcher (Okapi BM25). Persisted as a pickle.
-    Fields: title, section, body with configurable boosts."""
+    """Simple offline BM25 builder & searcher (Okapi BM25).
+
+    Persisted as a pickle.
+    Fields: title, section, body with configurable boosts.
+    """
     def __init__(self, index_dir: str, k1: float = 0.9, b: float = 0.4, field_boosts: Optional[Dict[str, float]]=None):
+        """Init.
+
+        Args:
+            index_dir (str): TODO.
+            k1 (float): TODO.
+            b (float): TODO.
+            field_boosts (Optional[Dict[str, float]]): TODO.
+        """
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -29,9 +43,25 @@ class PurePythonBM25:
 
     @staticmethod
     def _tokenize(text: str) -> List[str]:
+        """Tokenize.
+
+        Args:
+            text (str): TODO.
+
+        Returns:
+            List[str]: TODO.
+        """
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[Tuple[str, Dict]]) -> None:
+        """Build.
+
+        Args:
+            docs_iterable (Iterable[Tuple[str, Dict]]): TODO.
+
+        Returns:
+            None: TODO.
+        """
         os.makedirs(self.index_dir, exist_ok=True)
         df = defaultdict(int)
         postings = defaultdict(lambda: defaultdict(int))
@@ -66,6 +96,11 @@ class PurePythonBM25:
             }, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def load(self) -> None:
+        """Load.
+
+        Returns:
+            None: TODO.
+        """
         path = os.path.join(self.index_dir, "pure_bm25.pkl")
         with open(path, "rb") as f:
             data = pickle.load(f)
@@ -74,6 +109,14 @@ class PurePythonBM25:
         self.N = data["N"]; self.avgdl = data["avgdl"]
 
     def _idf(self, term: str) -> float:
+        """Idf.
+
+        Args:
+            term (str): TODO.
+
+        Returns:
+            float: TODO.
+        """
         n_t = self.df.get(term, 0)
         if n_t == 0:
             return 0.0
@@ -81,6 +124,16 @@ class PurePythonBM25:
         return math.log( (self.N - n_t + 0.5) / (n_t + 0.5) + 1.0 )
 
     def search(self, query: str, k: int, fields: Dict | None = None) -> List[Tuple[str, float]]:
+        """Search.
+
+        Args:
+            query (str): TODO.
+            k (int): TODO.
+            fields (Dict | None): TODO.
+
+        Returns:
+            List[Tuple[str, float]]: TODO.
+        """
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
         scores = defaultdict(float)
@@ -99,14 +152,33 @@ class PurePythonBM25:
         return ranked
 
 class LuceneBM25:
-    """Pyserini-backed Lucene BM25 adapter. Lazily imported."""
+    """Pyserini-backed Lucene BM25 adapter.
+
+    Lazily imported.
+    """
     def __init__(self, index_dir: str, k1: float=0.9, b: float=0.4, field_boosts: Optional[Dict[str,float]]=None):
+        """Init.
+
+        Args:
+            index_dir (str): TODO.
+            k1 (float): TODO.
+            b (float): TODO.
+            field_boosts (Optional[Dict[str,float]]): TODO.
+        """
         self.index_dir = index_dir
         self.k1 = k1; self.b = b
         self.field_boosts = field_boosts or {"title":2.0, "section":1.2, "body":1.0}
         self._searcher = None
 
     def build(self, docs_iterable: Iterable[Tuple[str, Dict]]) -> None:
+        """Build.
+
+        Args:
+            docs_iterable (Iterable[Tuple[str, Dict]]): TODO.
+
+        Returns:
+            None: TODO.
+        """
         try:
             from pyserini.index import IndexWriter, JIndexer
             from pyserini.analysis import get_lucene_analyzer
@@ -127,6 +199,7 @@ class LuceneBM25:
         writer.close()
 
     def _ensure_searcher(self):
+        """Ensure searcher."""
         if self._searcher is not None:
             return
         from pyserini.search.lucene import LuceneSearcher
@@ -134,11 +207,28 @@ class LuceneBM25:
         self._searcher.set_bm25(self.k1, self.b)
 
     def search(self, query: str, k: int, fields: Dict | None = None) -> List[Tuple[str, float]]:
+        """Search.
+
+        Args:
+            query (str): TODO.
+            k (int): TODO.
+            fields (Dict | None): TODO.
+
+        Returns:
+            List[Tuple[str, float]]: TODO.
+        """
         self._ensure_searcher()
         hits = self._searcher.search(query, k=k)
         return [(h.docid, float(h.score)) for h in hits]
 
 def get_bm25(backend: str, index_dir: str, **kwargs):
+    """Get bm25.
+
+    Args:
+        backend (str): TODO.
+        index_dir (str): TODO.
+        kwargs: TODO.
+    """
     if backend == "lucene":
         try:
             return LuceneBM25(index_dir, **kwargs)

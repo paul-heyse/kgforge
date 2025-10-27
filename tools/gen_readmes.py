@@ -9,7 +9,7 @@ import os
 import subprocess
 from pathlib import Path
 
-from griffe.loader import GriffeLoader
+from griffe import GriffeLoader
 
 from detect_pkg import detect_packages, detect_primary
 

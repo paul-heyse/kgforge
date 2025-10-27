@@ -1,0 +1,128 @@
+src.kgforge_common.parquet_io
+=============================
+
+.. py:module:: src.kgforge_common.parquet_io
+
+.. autoapi-nested-parse::
+
+   Module for kgforge_common.parquet_io.
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: ZSTD_LEVEL
+   :value: 6
+
+
+.. py:data:: ROW_GROUP_SIZE
+   :value: 4096
+
+
+.. py:class:: ParquetVectorWriter(root)
+
+   Parquetvectorwriter.
+
+
+   .. py:method:: dense_schema(dim)
+      :staticmethod:
+
+
+      Dense schema.
+
+      :param dim: TODO.
+      :type dim: int
+
+      :returns: TODO.
+      :rtype: pa.schema
+
+
+
+   .. py:attribute:: root
+
+
+   .. py:method:: write_dense(model, run_id, dim, records, shard = 0)
+
+      Write dense.
+
+      :param model: TODO.
+      :type model: str
+      :param run_id: TODO.
+      :type run_id: str
+      :param dim: TODO.
+      :type dim: int
+      :param records: TODO.
+      :type records: Iterable[Tuple[str, List[float], float]]
+      :param shard: TODO.
+      :type shard: int
+
+      :returns: TODO.
+      :rtype: str
+
+
+
+   .. py:method:: splade_schema()
+      :staticmethod:
+
+
+      Splade schema.
+
+      :returns: TODO.
+      :rtype: pa.schema
+
+
+
+   .. py:method:: write_splade(model, run_id, records, shard = 0)
+
+      Write splade.
+
+      :param model: TODO.
+      :type model: str
+      :param run_id: TODO.
+      :type run_id: str
+      :param records: TODO.
+      :type records: Iterable[Tuple[str, List[int], List[float]]]
+      :param shard: TODO.
+      :type shard: int
+
+      :returns: TODO.
+      :rtype: str
+
+
+
+.. py:class:: ParquetChunkWriter(root, model = 'docling_hybrid', run_id = 'dev')
+
+   Parquetchunkwriter.
+
+
+   .. py:method:: chunk_schema()
+      :staticmethod:
+
+
+      Chunk schema.
+
+      :returns: TODO.
+      :rtype: pa.schema
+
+
+
+   .. py:attribute:: root
+
+
+   .. py:method:: write(rows)
+
+      Write.
+
+      :param rows: TODO.
+      :type rows: Iterable[Dict[str, Any]]
+
+      :returns: TODO.
+      :rtype: str
+
+
+

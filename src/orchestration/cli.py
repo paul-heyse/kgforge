@@ -1,3 +1,5 @@
+"""Module for orchestration.cli."""
+
 
 from __future__ import annotations
 import os, sys, json, math, glob, time, pickle
@@ -36,6 +38,7 @@ def index_bm25(chunks_parquet: str = typer.Argument(..., help="Path to Parquet/J
 def index_faiss(dense_vectors: str = typer.Argument(..., help="Path to dense vectors JSON (skeleton)"),
                 index_path: str = typer.Option("./_indices/faiss/shard_000.idx", help="Output index (CPU .idx)")):
     """Train & build FAISS index from fixture dense vectors.
+
     In this skeleton we accept a JSON with entries: {key: str, vector: List[float]}.
     """
     os.makedirs(os.path.dirname(index_path), exist_ok=True)

@@ -1,3 +1,5 @@
+"""Module for vectorstore_faiss.gpu."""
+
 
 from __future__ import annotations
 import os
@@ -5,9 +7,20 @@ from typing import List, Tuple, Optional
 import numpy as np
 
 class FaissGpuIndex:
-    \"""FAISS GPU/cuVS wrapper.
-    If FAISS is unavailable at runtime, falls back to brute-force cosine search over a provided matrix.\"""
+    """FAISS GPU/cuVS wrapper.
+
+    If FAISS is unavailable at runtime, falls back to brute-force cosine
+    search over a provided matrix.
+    """
     def __init__(self, factory: str = "OPQ64,IVF8192,PQ64", nprobe: int = 64, gpu: bool = True, cuvs: bool = True):
+        """Init.
+
+        Args:
+            factory (str): TODO.
+            nprobe (int): TODO.
+            gpu (bool): TODO.
+            cuvs (bool): TODO.
+        """
         self.factory = factory
         self.nprobe = nprobe
         self.gpu = gpu
@@ -25,6 +38,7 @@ class FaissGpuIndex:
             self._faiss = None
 
     def _ensure_resources(self):
+        """Ensure resources."""
         if not self._faiss or not self.gpu:
             return
         if self._res is None:
@@ -33,6 +47,15 @@ class FaissGpuIndex:
             # memory knobs can be tuned by caller later
 
     def train(self, train_vectors: np.ndarray, *, seed: int = 42) -> None:
+        """Train.
+
+        Args:
+            train_vectors (np.ndarray): TODO.
+            seed (int): TODO.
+
+        Returns:
+            None: TODO.
+        """
         if self._faiss is None:
             # no-op in fallback; brute force doesn't need training
             return
@@ -61,6 +84,15 @@ class FaissGpuIndex:
             pass
 
     def add(self, keys: List[str], vectors: np.ndarray) -> None:
+        """Add.
+
+        Args:
+            keys (List[str]): TODO.
+            vectors (np.ndarray): TODO.
+
+        Returns:
+            None: TODO.
+        """
         if self._faiss is None:
             # fallback: keep matrix and id map for brute-force
             self._xb = vectors.astype("float32", copy=True)
@@ -82,6 +114,15 @@ class FaissGpuIndex:
             self._index.add(vectors)
 
     def search(self, query: np.ndarray, k: int) -> List[Tuple[str, float]]:
+        """Search.
+
+        Args:
+            query (np.ndarray): TODO.
+            k (int): TODO.
+
+        Returns:
+            List[Tuple[str, float]]: TODO.
+        """
         q = query.astype("float32", copy=True)
         # normalize for cosine/IP
         q /= (np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12)
@@ -100,6 +141,15 @@ class FaissGpuIndex:
         return [(str(ids[i]), float(scores[i])) for i in range(len(ids)) if ids[i] != -1]
 
     def save(self, index_uri: str, idmap_uri: str) -> None:
+        """Save.
+
+        Args:
+            index_uri (str): TODO.
+            idmap_uri (str): TODO.
+
+        Returns:
+            None: TODO.
+        """
         if self._faiss is None or self._index is None:
             # save fallback matrix
             if self._xb is not None and self._idmap is not None:
@@ -109,6 +159,15 @@ class FaissGpuIndex:
         faiss.write_index(faiss.index_gpu_to_cpu(self._index) if self.gpu else self._index, index_uri)
 
     def load(self, index_uri: str, idmap_uri: str | None = None) -> None:
+        """Load.
+
+        Args:
+            index_uri (str): TODO.
+            idmap_uri (str | None): TODO.
+
+        Returns:
+            None: TODO.
+        """
         if self._faiss is None:
             # load fallback matrix
             if os.path.exists(index_uri + ".npz"):

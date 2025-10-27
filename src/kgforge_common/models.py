@@ -1,3 +1,5 @@
+"""Module for kgforge_common.models."""
+
 
 from __future__ import annotations
 from pydantic import BaseModel
@@ -6,6 +8,7 @@ from typing import Optional, List, Dict, Literal
 Id = str
 
 class Doc(BaseModel):
+    """Doc."""
     id: Id
     openalex_id: Optional[str] = None
     doi: Optional[str] = None
@@ -21,6 +24,7 @@ class Doc(BaseModel):
     content_hash: Optional[str] = None
 
 class DoctagsAsset(BaseModel):
+    """Doctagsasset."""
     doc_id: Id
     doctags_uri: str
     pages: int
@@ -29,6 +33,7 @@ class DoctagsAsset(BaseModel):
     avg_logprob: Optional[float] = None
 
 class Chunk(BaseModel):
+    """Chunk."""
     id: Id
     doc_id: Id
     section: Optional[str]
@@ -38,6 +43,7 @@ class Chunk(BaseModel):
     doctags_span: Dict[str, int]
 
 class LinkAssertion(BaseModel):
+    """Linkassertion."""
     id: Id
     chunk_id: Id
     concept_id: Id

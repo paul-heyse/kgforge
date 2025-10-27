@@ -2,7 +2,7 @@ from pathlib import Path
 import sys
 
 import mkdocs_gen_files
-from griffe.loader import GriffeLoader
+from griffe import GriffeLoader
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"

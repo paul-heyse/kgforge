@@ -1,0 +1,22 @@
+src.docling.canonicalizer
+=========================
+
+.. py:module:: src.docling.canonicalizer
+
+.. autoapi-nested-parse::
+
+   Module for docling.canonicalizer.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: canonicalize_text(blocks)
+
+   Apply NFC, normalize whitespace and bullets, preserve single newlines
+   between blocks.
+
+

@@ -1,0 +1,100 @@
+src.search_api.faiss_adapter
+============================
+
+.. py:module:: src.search_api.faiss_adapter
+
+.. autoapi-nested-parse::
+
+   Module for search_api.faiss_adapter.
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: HAVE_FAISS
+   :value: True
+
+
+.. py:class:: DenseVecs
+
+   Densevecs.
+
+
+   .. py:attribute:: ids
+      :type:  List[str]
+
+
+   .. py:attribute:: mat
+      :type:  numpy.ndarray
+
+
+.. py:class:: FaissAdapter(db_path, factory = 'OPQ64,IVF8192,PQ64', metric = 'ip')
+
+   Faissadapter.
+
+
+   .. py:attribute:: db_path
+
+
+   .. py:attribute:: factory
+
+
+   .. py:attribute:: metric
+
+
+   .. py:attribute:: index
+      :value: None
+
+
+
+   .. py:attribute:: idmap
+      :value: None
+
+
+
+   .. py:attribute:: vecs
+      :type:  Optional[DenseVecs]
+      :value: None
+
+
+
+   .. py:method:: build()
+
+      Build.
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: load_or_build(cpu_index_path = None)
+
+      Load or build.
+
+      :param cpu_index_path: TODO.
+      :type cpu_index_path: Optional[str]
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: search(qvec, k = 10)
+
+      Search.
+
+      :param qvec: TODO.
+      :type qvec: np.ndarray
+      :param k: TODO.
+      :type k: int
+
+      :returns: TODO.
+      :rtype: List[Tuple[str, float]]
+
+
+

@@ -1,0 +1,21 @@
+src.docling.vlm
+===============
+
+.. py:module:: src.docling.vlm
+
+.. autoapi-nested-parse::
+
+   Module for docling.vlm.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: GraniteDoclingVLM
+
+   Expose unified utilities for Docling-compatible VLMs.
+
+

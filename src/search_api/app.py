@@ -1,3 +1,5 @@
+"""Module for search_api.app."""
+
 
 from __future__ import annotations
 import os, yaml, math
@@ -59,6 +61,14 @@ kg.add_mention("chunk:1", "C:42")
 kg.add_edge("C:42", "C:99")
 
 def auth(authorization: Optional[str] = Header(default=None)) -> None:
+    """Auth.
+
+    Args:
+        authorization (Optional[str]): TODO.
+
+    Returns:
+        None: TODO.
+    """
     if not API_KEYS:
         return  # disabled in skeleton
     if not authorization or not authorization.startswith("Bearer "):
@@ -69,6 +79,7 @@ def auth(authorization: Optional[str] = Header(default=None)) -> None:
 
 @app.get("/healthz")
 def healthz():
+    """Healthz."""
     return {"status": "ok", "components": {"faiss": ("loaded" if faiss is not None else "missing"),
                                            "bm25": type(bm25).__name__,
                                            "splade": type(splade).__name__,
@@ -76,6 +87,15 @@ def healthz():
                                            "neo4j": "mocked"}}
 
 def rrf_fuse(lists: List[List[Tuple[str, float]]], k_rrf: int) -> Dict[str, float]:
+    """Rrf fuse.
+
+    Args:
+        lists (List[List[Tuple[str, float]]]): TODO.
+        k_rrf (int): TODO.
+
+    Returns:
+        Dict[str, float]: TODO.
+    """
     scores: Dict[str, float] = {}
     for hits in lists:
         for rank, (doc_id, _score) in enumerate(hits, start=1):
@@ -83,6 +103,17 @@ def rrf_fuse(lists: List[List[Tuple[str, float]]], k_rrf: int) -> Dict[str, floa
     return scores
 
 def apply_kg_boosts(cands: Dict[str, float], query: str, direct=0.08, one_hop=0.04) -> Dict[str, float]:
+    """Apply kg boosts.
+
+    Args:
+        cands (Dict[str, float]): TODO.
+        query (str): TODO.
+        direct: TODO.
+        one_hop: TODO.
+
+    Returns:
+        Dict[str, float]: TODO.
+    """
     # toy: map words 'concept42' to concept id
     q_concepts = set()
     for w in query.lower().split():
@@ -104,6 +135,12 @@ def apply_kg_boosts(cands: Dict[str, float], query: str, direct=0.08, one_hop=0.
 
 @app.post("/search", response_model=dict)
 def search(req: SearchRequest, _=Depends(auth)):
+    """Search.
+
+    Args:
+        req (SearchRequest): TODO.
+        _: TODO.
+    """
     # Retrieve from each channel
     dense_hits: List[Tuple[str, float]] = []  # we don't have a query embedder here; fallback to empty or demo vector
     # sparse via BM25 (preferred) and SPLADE
@@ -138,6 +175,12 @@ def search(req: SearchRequest, _=Depends(auth)):
 
 @app.post("/graph/concepts", response_model=dict)
 def graph_concepts(body: dict, _=Depends(auth)):
+    """Graph concepts.
+
+    Args:
+        body (dict): TODO.
+        _: TODO.
+    """
     q = (body or {}).get("q","").lower()
     # toy: return nodes that contain the query substring
     concepts = [{"concept_id": c, "label": c} for c in sorted({c for cs in kg.chunk2concepts.values() for c in cs}) if q in c.lower()][: body.get("limit", 50)]
