@@ -94,28 +94,6 @@ def gh_url(rel: str, start: int, end: int | None) -> str:
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel}{rng}"
 
 
-def editor_url(abs_path: Path, start: int) -> str | None:
-    """Return an editor deeplink for the configured local editor.
-
-    Parameters
-    ----------
-    abs_path : Path
-        Absolute file path.
-    start : int
-        Starting line number (1-based).
-
-    Returns
-    -------
-    str | None
-        Editor URL or ``None`` if no handler exists.
-    """
-    if EDITOR == "vscode":
-        return f"vscode://file/{abs_path}:{start}:1"
-    if EDITOR == "pycharm":
-        return f"pycharm://open?file={abs_path}&line={start}"
-    return None
-
-
 def iter_packages() -> list[str]:
     """Return the packages to document (respecting DOCS_PKG overrides)."""
     if ENV_PKGS:
@@ -141,21 +119,8 @@ def is_public(node: Object) -> bool:
     return not name.startswith("_")
 
 
-def get_editor_link(node: Object) -> str | None:
-    """Return an editor deep link when LINK_MODE requests it."""
-    if LINK_MODE != "editor":
-        return None
-    rel_path = getattr(node, "relative_package_filepath", None)
-    if not rel_path:
-        return None
-    base = SRC if SRC.exists() else ROOT
-    abs_path = (base / rel_path).resolve()
-    start = int(getattr(node, "lineno", 1) or 1)
-    return editor_url(abs_path, start)
-
-
-def get_github_link(node: Object) -> str | None:
-    """Return a GitHub permalink for the given node."""
+def get_open_link(node: Object) -> str | None:
+    """Return a repository-root relative link for the "open" action."""
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -163,11 +128,45 @@ def get_github_link(node: Object) -> str | None:
     abs_path = (base / rel_path).resolve()
     start = int(getattr(node, "lineno", 1) or 1)
     end = getattr(node, "endlineno", None)
+    if LINK_MODE == "github":
+        try:
+            rel = abs_path.relative_to(ROOT)
+        except ValueError:
+            return None
+        return gh_url(str(rel).replace("\\", "/"), start, end)
+    if EDITOR == "vscode":
+        return f"vscode://file{abs_path.as_posix()}?line={start}&column=1"
+    if EDITOR == "pycharm":
+        return f"pycharm://open?file={abs_path.as_posix()}&line={start}"
     try:
-        rel = abs_path.relative_to(ROOT)
+        rel_root = abs_path.relative_to(ROOT).as_posix()
+    except ValueError:
+        rel_root = abs_path.as_posix().lstrip("/")
+    anchor = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
+    return f"{ROOT.name}/{rel_root}{anchor}"
+
+
+def get_view_link(node: Object, readme_dir: Path) -> str | None:
+    """Return a repository-relative Markdown link for use within the README."""
+    rel_path = getattr(node, "relative_package_filepath", None)
+    if not rel_path:
+        return None
+    base = SRC if SRC.exists() else ROOT
+    abs_path = (base / rel_path).resolve()
+    start = int(getattr(node, "lineno", 1) or 1)
+    end = getattr(node, "endlineno", None)
+    if LINK_MODE == "github":
+        try:
+            rel = abs_path.relative_to(ROOT)
+        except ValueError:
+            return None
+        return gh_url(str(rel).replace("\\", "/"), start, end)
+    try:
+        relative = abs_path.relative_to(readme_dir)
     except ValueError:
         return None
-    return gh_url(str(rel).replace("\\", "/"), start, end)
+    anchor = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
+    return f"./{relative.as_posix()}{anchor}"
 
 
 def iter_public_members(node: Object) -> Iterable[Object]:
@@ -190,9 +189,9 @@ def render_member(node: Object, *, indent: int, lines: list[str], readme_dir: Pa
     readme_dir : Path
         Directory that will contain the README (used for relative links).
     """
-    editor = get_editor_link(node)
-    github = get_github_link(node)
-    if not editor and not github:
+    open_link = get_open_link(node)
+    view_link = get_view_link(node, readme_dir)
+    if not open_link and not view_link:
         return
     summary = summarize(node)
     bullet = " " * indent + "- "
@@ -200,13 +199,12 @@ def render_member(node: Object, *, indent: int, lines: list[str], readme_dir: Pa
     text = f"{bullet}{label}"
     if summary:
         text += f" — {summary}"
-    links: list[str] = []
-    if editor:
-        links.append(f"[open]({editor})")
-    if github:
-        links.append(f"[github]({github})")
-    if links:
-        text += " → " + " | ".join(links)
+    if open_link:
+        text += f" → [open]({open_link})"
+        if view_link:
+            text += f" | [view]({view_link})"
+    elif view_link:
+        text += f" → [view]({view_link})"
     text += "\n"
     lines.append(text)
 

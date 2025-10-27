@@ -1,8 +1,194 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {}
+  "folders": [
+    { "name": "kgfoundry", "path": "." },
+    { "name": "Site (Sphinx)", "path": "site" }
+  ],
+  "settings": {
+    "files.eol": "\n",
+    "editor.rulers": [100],
+    "workbench.editor.enablePreview": false,
+
+    // ——— keep search/symbol scans lean ———
+    "files.exclude": {
+      "**/.git": true,
+      "**/.venv": true,
+      "**/__pycache__": true,
+      "**/.ruff_cache": true,
+      "**/.mypy_cache": true,
+      "node_modules": true,
+      "build": true,
+      "dist": true,
+      "artifacts": true,
+      "data": true,
+      "models": true,
+      "vectors": true,
+      "docs/_build": true,
+      "site/_build": true
+    },
+    "search.exclude": {
+      "docs/_build/**": true,
+      "site/_build/**": true
+    },
+    "files.watcherExclude": {
+      "**/.git/**": true,
+      "**/node_modules/**": true,
+      "artifacts/**": true,
+      "data/**": true,
+      "models/**": true,
+      "vectors/**": true,
+      "docs/_build/**": true,
+      "site/_build/**": true
+    },
+
+    // ——— Python: symbols, typing, tests ———
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "python.analysis.indexing": true,
+    "python.analysis.userFileIndexingLimit": 12000,
+    "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.extraPaths": ["${workspaceFolder}/src"],
+    "python.envFile": "${workspaceFolder}/.env",
+    "python.testing.pytestEnabled": true,
+    "python.testing.cwd": "${workspaceFolder}",
+    "python.testing.pytestArgs": ["-q"],
+
+    // ——— Single source of truth: Ruff ———
+    "python.formatting.provider": "none",
+    "[python]": {
+      "editor.defaultFormatter": "charliermarsh.ruff",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit"
+      }
+    },
+
+    // ——— Docs ergonomics (Sphinx under /site) ———
+    "restructuredtext.confPath": "${workspaceFolder}/site",
+    "markdown.preview.breaks": false,
+
+    // ——— Quality-of-life for agents & humans ———
+    "breadcrumbs.enabled": true,
+    "outline.icons": true,
+    "cSpell.words": [
+      "AutoAPI","DocTags","Docling","OpenAlex","Qwen","SPLADE","FAISS",
+      "DuckDB","vLLM","PyLucene","cuVS","kgfoundry"
+    ]
+  },
+
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.vscode-pylance",
+      "charliermarsh.ruff",
+      "ms-python.mypy-type-checker",
+      "EditorConfig.EditorConfig",
+      "streetsidesoftware.code-spell-checker",
+      "tamasfe.even-better-toml",
+      "lextudio.restructuredtext",
+      "redhat.vscode-yaml"
+    ],
+    "unwantedRecommendations": [
+      "ms-python.autopep8",
+      "ms-python.isort",
+      "ms-python.black-formatter"
+    ]
+  },
+
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Pytest (debug current file)",
+        "type": "python",
+        "request": "launch",
+        "module": "pytest",
+        "args": ["-q", "${file}"],
+        "console": "integratedTerminal",
+        "purpose": ["debug-test"]
+      },
+      {
+        "name": "Run search_api.service",
+        "type": "python",
+        "request": "launch",
+        "module": "search_api.service",
+        "cwd": "${workspaceFolder}",
+        "envFile": "${workspaceFolder}/.env"
+      },
+      {
+        "name": "Run tests/mock_servers/run_all.py",
+        "type": "python",
+        "request": "launch",
+        "program": "${workspaceFolder}/tests/mock_servers/run_all.py",
+        "console": "integratedTerminal"
+      }
+    ]
+  },
+
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "env: setup (uv)",
+        "type": "shell",
+        "command": "uv venv .venv && uv pip install -e . && uv pip install -e .[docs]",
+        "options": { "cwd": "${workspaceFolder}" },
+        "problemMatcher": []
+      },
+      {
+        "label": "env: setup (micromamba)",
+        "type": "shell",
+        "command": "micromamba create -y -p ./.venv -f environment.yml && micromamba run -p ./.venv pip install -e .[dev,docs]",
+        "options": { "cwd": "${workspaceFolder}" },
+        "problemMatcher": []
+      },
+      {
+        "label": "pre-commit: install",
+        "type": "shell",
+        "command": "pre-commit install -t pre-commit -t pre-push",
+        "problemMatcher": []
+      },
+      {
+        "label": "lint: ruff (fix)",
+        "type": "shell",
+        "command": "ruff check --fix . && ruff format .",
+        "problemMatcher": []
+      },
+      {
+        "label": "type: mypy",
+        "type": "shell",
+        "command": "mypy .",
+        "problemMatcher": []
+      },
+      {
+        "label": "test: all",
+        "type": "shell",
+        "command": "pytest -q",
+        "problemMatcher": "$pytest"
+      },
+      {
+        "label": "test: smoke (search_api)",
+        "type": "shell",
+        "command": "pytest -q tests/smoke/test_search_api_smoke.py",
+        "problemMatcher": "$pytest"
+      },
+      {
+        "label": "docs: live (site)",
+        "type": "shell",
+        "command": "sphinx-autobuild site site/_build/html -a -j auto",
+        "problemMatcher": []
+      },
+      {
+        "label": "docs: build (site)",
+        "type": "shell",
+        "command": "sphinx-build -b html site site/_build/html",
+        "problemMatcher": []
+      },
+      {
+        "label": "docs: update script",
+        "type": "shell",
+        "command": "bash tools/update_docs.sh",
+        "problemMatcher": []
+      }
+    ]
+  }
 }
