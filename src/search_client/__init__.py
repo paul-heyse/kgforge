@@ -1,9 +1,9 @@
 """Module for search_client.
 
 NavMap:
-- KGForgeClient: Kgforgeclient.
+- KGFoundryClient: Minimal synchronous client for the kgfoundry search API.
 """
 
-from search_client.client import KGForgeClient
+from search_client.client import KGFoundryClient
 
-__all__ = ["KGForgeClient"]
+__all__ = ["KGFoundryClient"]

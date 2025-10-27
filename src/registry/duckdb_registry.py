@@ -11,7 +11,7 @@ import uuid
 from collections.abc import Mapping
 
 import duckdb
-from kgforge.kgforge_common.models import Doc, DoctagsAsset
+from kgfoundry.kgfoundry_common.models import Doc, DoctagsAsset
 
 
 class DuckDBRegistry:

@@ -28,6 +28,8 @@ Module Contents
 
    .. py:attribute:: query
       :type:  str
+      :value: None
+
 
 
    .. py:attribute:: k

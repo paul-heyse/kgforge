@@ -10,7 +10,7 @@ DENSE = str(FIXTURES / "dense_qwen3.parquet")
 
 # Prefer the API adapter if present (uses FAISS+cuVS if available)
 try:
-    from kgforge.search_api.faiss_adapter import HAVE_FAISS, FaissAdapter
+    from kgfoundry.search_api.faiss_adapter import HAVE_FAISS, FaissAdapter
 
     HAVE_ADAPTER = True
 except Exception:
@@ -19,7 +19,7 @@ except Exception:
 
 # Fallback: vectorstore_faiss (provides CPU/GPU + brute-force fallback)
 try:
-    from kgforge.vectorstore_faiss.gpu import FaissGpuIndex as VSFaiss
+    from kgfoundry.vectorstore_faiss.gpu import FaissGpuIndex as VSFaiss
 
     HAVE_VS = True
 except Exception:

@@ -13,22 +13,25 @@ NavMap:
 
 from __future__ import annotations
 
+import logging
 import os
 from collections.abc import Mapping
 from typing import Any
 
 import yaml
 from fastapi import Depends, FastAPI, Header, HTTPException
-from kgforge.embeddings_sparse.bm25 import PurePythonBM25, get_bm25
-from kgforge.embeddings_sparse.splade import get_splade
-from kgforge.kg_builder.mock_kg import MockKG
-from kgforge.vectorstore_faiss.gpu import FaissGpuIndex
+from kgfoundry.embeddings_sparse.bm25 import PurePythonBM25, get_bm25
+from kgfoundry.embeddings_sparse.splade import get_splade
+from kgfoundry.kg_builder.mock_kg import MockKG
+from kgfoundry.vectorstore_faiss.gpu import FaissGpuIndex
 
 from search_api.schemas import SearchRequest, SearchResult
 
+logger = logging.getLogger(__name__)
+
 API_KEYS: set[str] = set()  # NOTE: load from env SEARCH_API_KEYS when secrets wiring is ready
 
-app = FastAPI(title="KGForge Search API", version="0.2.0")
+app = FastAPI(title="kgfoundry Search API", version="0.2.0")
 
 # --- bootstrap lightweight dependencies from config ---
 CFG_PATH = os.environ.get(
@@ -202,7 +205,13 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     # We don't have a query embedder here; fallback to empty or demo vector
     dense_hits: list[tuple[str, float]] = []
     # sparse via BM25 (preferred) and SPLADE
-    bm25_hits = bm25.search(req.query, k=CFG["search"]["sparse_candidates"]) if bm25 else []
+    bm25_hits: list[tuple[str, float]] = []
+    if bm25:
+        try:
+            bm25_hits = bm25.search(req.query, k=CFG["search"]["sparse_candidates"])
+        except Exception as exc:  # pragma: no cover - defensive fallback for missing indices
+            logger.warning("BM25 search failed, falling back to empty results: %s", exc)
+            bm25_hits = []
     try:
         splade_hits = (
             splade.search(req.query, k=CFG["search"]["sparse_candidates"]) if splade else []

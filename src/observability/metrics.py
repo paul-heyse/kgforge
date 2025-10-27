@@ -1,13 +1,33 @@
 """Module for observability.metrics."""
 
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:  # pragma: no cover - import only for type checking
+    from prometheus_client import Counter as _CounterType
+    from prometheus_client import Gauge as _GaugeType
+    from prometheus_client import Histogram as _HistogramType
+
+    CounterFactory = Callable[..., _CounterType]
+    GaugeFactory = Callable[..., _GaugeType]
+    HistogramFactory = Callable[..., _HistogramType]
+else:  # pragma: no cover - runtime fallback types
+    CounterFactory = Callable[..., object]
+    GaugeFactory = Callable[..., object]
+    HistogramFactory = Callable[..., object]
+
 try:
-    from prometheus_client import Counter, Gauge, Histogram
+    from prometheus_client import Counter as _PromCounter
+    from prometheus_client import Gauge as _PromGauge
+    from prometheus_client import Histogram as _PromHistogram
 except Exception:  # pragma: no cover - minimal no-op fallbacks
 
-    class _Noop:
+    class _NoopMetric:
         """Minimal stand-in when Prometheus client is unavailable."""
 
-        def labels(self, *args: object, **kwargs: object) -> "_Noop":
+        def labels(self, *args: object, **kwargs: object) -> _NoopMetric:
             """Return self to mimic the Prometheus API."""
             return self
 
@@ -23,7 +43,17 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             """Ignore gauge updates."""
             return
 
-    Counter = Histogram = Gauge = _Noop
+    def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:
+        """Return a no-op metric when Prometheus is unavailable."""
+        return _NoopMetric()
+
+    Counter = cast(CounterFactory, _make_noop_metric)
+    Gauge = cast(GaugeFactory, _make_noop_metric)
+    Histogram = cast(HistogramFactory, _make_noop_metric)
+else:
+    Counter = cast(CounterFactory, _PromCounter)
+    Gauge = cast(GaugeFactory, _PromGauge)
+    Histogram = cast(HistogramFactory, _PromHistogram)
 
 pdf_download_success_total = Counter("pdf_download_success_total", "Successful OA PDF downloads")
 pdf_download_failure_total = Counter(

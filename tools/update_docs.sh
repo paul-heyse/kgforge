@@ -5,11 +5,11 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-VENV="$ROOT/.kgforge-venv"
+VENV="$ROOT/.venv"
 BIN="$VENV/bin"
 
 if [[ ! -x "$BIN/python" ]]; then
-  echo "error: missing virtual environment at .kgforge-venv/; run 'make bootstrap' first." >&2
+  echo "error: missing virtual environment at .venv/; run 'make bootstrap' first." >&2
   exit 1
 fi
 
@@ -26,7 +26,7 @@ ensure_tools() {
   local missing=0
   for tool in doq docformatter pydocstyle interrogate; do
     if [[ ! -x "$BIN/$tool" ]]; then
-      echo "error: missing '$tool'; install docs extras via 'pip install -e \".[docs]\"' (inside .kgforge-venv)." >&2
+      echo "error: missing '$tool'; install docs extras via 'pip install -e \".[docs]\"' (inside .venv)." >&2
       missing=1
     fi
   done

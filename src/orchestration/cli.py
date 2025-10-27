@@ -4,6 +4,7 @@ NavMap:
 - index_bm25: Build a BM25 index from chunk fixtures (id, title, section,….
 - index_faiss: Train & build FAISS index from fixture dense vectors.
 - api: Run the FastAPI app.
+- e2e: Execute the skeleton Prefect flow and print completed stages.
 """
 
 from __future__ import annotations
@@ -13,10 +14,10 @@ import os
 
 import numpy as np
 import typer
-from kgforge.embeddings_sparse.bm25 import get_bm25
-from kgforge.vectorstore_faiss.gpu import FaissGpuIndex
+from kgfoundry.embeddings_sparse.bm25 import get_bm25
+from kgfoundry.vectorstore_faiss.gpu import FaissGpuIndex
 
-app = typer.Typer(help="KGForge orchestration CLI")
+app = typer.Typer(help="kgfoundry orchestration CLI")
 
 
 @app.command()
@@ -99,6 +100,24 @@ def api(port: int = 8080) -> None:
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
+
+
+@app.command()
+def e2e() -> None:
+    """Execute the skeleton Prefect flow and print completed stages."""
+    try:
+        from orchestration.flows import e2e_flow
+    except ModuleNotFoundError as exc:  # pragma: no cover - defensive messaging
+        typer.echo(
+            "Prefect is required for the e2e pipeline command. "
+            "Install it via `pip install -e '.[gpu]'` or add `prefect` manually.",
+            err=True,
+        )
+        raise typer.Exit(code=1) from exc
+
+    stages = e2e_flow()
+    for step in stages:
+        typer.echo(step)
 
 
 if __name__ == "__main__":

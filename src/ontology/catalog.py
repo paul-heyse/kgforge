@@ -6,7 +6,7 @@ NavMap:
 
 from __future__ import annotations
 
-from kgforge.kgforge_common.models import Concept
+from kgfoundry.kgfoundry_common.models import Concept
 
 
 class OntologyCatalog:

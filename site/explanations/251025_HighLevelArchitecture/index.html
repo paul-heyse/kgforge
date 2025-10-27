@@ -16,7 +16,7 @@
     
     
       
-        <title>Implementation-Grade Architecture Overview - KGForge</title>
+        <title>Implementation-Grade Architecture Overview - kgfoundry</title>
       
     
     
@@ -76,7 +76,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="KGForge" class="md-header__button md-logo" aria-label="KGForge" data-md-component="logo">
+    <a href="../.." title="kgfoundry" class="md-header__button md-logo" aria-label="kgfoundry" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -90,7 +90,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            KGForge
+            kgfoundry
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -174,13 +174,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="KGForge" class="md-nav__button md-logo" aria-label="KGForge" data-md-component="logo">
+    <a href="../.." title="kgfoundry" class="md-nav__button md-logo" aria-label="kgfoundry" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    KGForge
+    kgfoundry
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -749,7 +749,7 @@
 <hr />
 <h2 id="2-repository-layout-monorepo-independently-ownable-packages">2) Repository layout (monorepo; independently ownable packages)</h2>
 <pre><code>/src
-  /kgforge_common            # contracts, IDs, hashing, config, utils
+  /kgfoundry_common            # contracts, IDs, hashing, config, utils
   /download                  # PyAlex harvester + OA PDF downloader + fallbacks
   /docling                   # VLM convert-to-DocTags + HybridChunker wrappers
   /embeddings_dense          # vLLM client, Qwen3-Embedding-4B (2560-d)
@@ -767,7 +767,7 @@
 /scripts                     # bootstrap &amp; build scripts (CUDA 13, FAISS+cuVS, vLLM)
 </code></pre>
 <p><strong>Packaging</strong>: <code>pyproject.toml</code> (Poetry or uv). <strong>Entry‑points</strong> register providers:</p>
-<pre><code class="language-toml">[project.entry-points.kgforge.plugins]
+<pre><code class="language-toml">[project.entry-points.kgfoundry.plugins]
 dense.qwen3 = &quot;embeddings_dense.qwen3:Qwen3Embedder&quot;
 sparse.splade_v3 = &quot;embeddings_sparse.splade:SPLADEv3Encoder&quot;
 sparse.bm25 = &quot;embeddings_sparse.bm25:BM25Index&quot;
@@ -782,7 +782,7 @@ ontology.loader = &quot;ontology.loader:OntologyLoader&quot;
 <blockquote>
 <p>Keep models lean. Payloads (large text, vectors) live in Parquet files; rows refer to them via IDs.</p>
 </blockquote>
-<pre><code class="language-python"># kgforge_common/models.py (Python 3.13, Pydantic v2)
+<pre><code class="language-python"># kgfoundry_common/models.py (Python 3.13, Pydantic v2)
 from pydantic import BaseModel, Field, AwareDatetime
 from typing import Optional, List, Dict, Literal
 from dataclasses import dataclass
@@ -1810,7 +1810,7 @@ def hybrid_search(query: str, k: int) -&gt; list[dict]:
 <p>Query compiled as AND of: <code>topic</code> (applied to <code>title</code>, <code>abstract_inverted_index</code>, <code>fulltext</code>), optional <code>year &gt;= from_year</code>, <code>is_oa=true OR has_oa_published_version=true OR has_oa_accepted_or_published_version=true</code>.</p>
 </li>
 <li>Pagination: <code>per_page=200</code>, resume with <code>cursor</code>, cap at <code>max_works</code>.</li>
-<li>HTTP timeout=30 s, retries=3 (exponential 1.0/2.0/4.0 s), <code>User-Agent: kgforge/1.0 (+contact@example.com)</code>.</li>
+<li>HTTP timeout=30 s, retries=3 (exponential 1.0/2.0/4.0 s), <code>User-Agent: kgfoundry/1.0 (+contact@example.com)</code>.</li>
 <li>
 <p><strong>Resolution priority</strong> (first success wins):</p>
 </li>
@@ -2287,7 +2287,7 @@ encode_splade_v3  ├── build_bm25_index ┐                    \
 <hr />
 <h2 id="part-f-sample-openapi-excerpt">PART F — SAMPLE OPENAPI (EXCERPT)</h2>
 <pre><code class="language-yaml">openapi: 3.1.0
-info: {title: KGForge Search API, version: 1.0.0}
+info: {title: kgfoundry Search API, version: 1.0.0}
 paths:
   /search:
     post:

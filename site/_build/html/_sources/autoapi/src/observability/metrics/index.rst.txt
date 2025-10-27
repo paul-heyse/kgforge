@@ -14,6 +14,8 @@ src.observability.metrics
 Module Contents
 ---------------
 
+.. py:data:: CounterFactory
+
 .. py:data:: pdf_download_success_total
 
 .. py:data:: pdf_download_failure_total

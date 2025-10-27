@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pyarrow as pa
 import pyarrow.parquet as pq
-from kgforge.kgforge_common.parquet_io import ParquetChunkWriter, ParquetVectorWriter
+from kgfoundry.kgfoundry_common.parquet_io import ParquetChunkWriter, ParquetVectorWriter
 
 
 def test_parquet_dense_write(tmp_path):

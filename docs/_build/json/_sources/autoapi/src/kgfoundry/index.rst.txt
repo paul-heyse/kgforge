@@ -1,0 +1,30 @@
+src.kgfoundry
+=============
+
+.. py:module:: src.kgfoundry
+
+.. autoapi-nested-parse::
+
+   Module for kgfoundry.
+
+
+
+
+
+
+
+Package Contents
+----------------
+
+.. py:data:: __all__
+
+.. py:function:: __getattr__(name)
+
+   Load a lazily requested submodule from the compatibility namespace.
+
+
+.. py:function:: __dir__()
+
+   Expose the known compatibility submodules for auto-complete.
+
+

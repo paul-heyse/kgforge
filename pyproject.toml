@@ -1,7 +1,7 @@
 [project]
-name = "kgforge"
+name = "kgfoundry"
 version = "0.1.0"
-description = "kgforge"
+description = "kgfoundry"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -59,6 +59,7 @@ dependencies = [
     # ML/Embeddings (lazy imports - consider making optional)
     # ============================================================================
     "transformers>=4.57.1",
+    "lupyne",
 
     # ============================================================================
     # Observability & Reliability
@@ -77,8 +78,9 @@ dependencies = [
     "mypy-extensions>=1.0.0",
     "types-requests>=2.32.0.20241016",
     "types-PyYAML>=6.0.12.20240917",
-    "black",
-    "ruff",
+    "black>=25.9.0",
+    "ruff>=0.14.2",
+    "prefect>=3.4.25",
 
     # ============================================================================
     # Utilities
@@ -173,10 +175,8 @@ gpu = [
     "triton-kernels @git+https://github.com/triton-lang/triton.git@v3.5.0#subdirectory=python/triton_kernels",
     "vllm",
     "faiss==1.12.0 ; python_version >= '3.13' and python_version < '3.14' and platform_system == 'Linux' and platform_machine == 'x86_64'",
-    "ray>=2.50.0",
-    
+    "ray>=2.50.0",    
 ] 
-
 
 docs = [
     "sphinx>=8.2.3",
@@ -225,7 +225,6 @@ docs = [
     "mkdocs-section-index",
 ]
 
-
 [project.scripts]
 docstokg-hybrid-validation = "DocsToKG.HybridSearch.validation:main"
 
@@ -242,8 +241,8 @@ src = ["src"]
 extend-exclude = [
     "docs/_build/**",
     "site/**",
-    "src/KGForge.egg-info/**",
-    "KGForge.egg-info/**",
+    "src/kgfoundry.egg-info/**",
+    "kgfoundry.egg-info/**",
 ]
 
 [tool.ruff.format]
@@ -316,7 +315,7 @@ known-first-party = [
     "embeddings_dense",
     "embeddings_sparse",
     "kg_builder",
-    "kgforge_common",
+    "kgfoundry_common",
     "linking",
     "observability",
     "ontology",

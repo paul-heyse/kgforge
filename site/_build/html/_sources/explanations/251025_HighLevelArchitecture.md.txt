@@ -54,7 +54,7 @@ Topic → (PyAlex) Harvest & OA PDF Download (with fallbacks)
 
 ```
 /src
-  /kgforge_common            # contracts, IDs, hashing, config, utils
+  /kgfoundry_common            # contracts, IDs, hashing, config, utils
   /download                  # PyAlex harvester + OA PDF downloader + fallbacks
   /docling                   # VLM convert-to-DocTags + HybridChunker wrappers
   /embeddings_dense          # vLLM client, Qwen3-Embedding-4B (2560-d)
@@ -75,7 +75,7 @@ Topic → (PyAlex) Harvest & OA PDF Download (with fallbacks)
 **Packaging**: `pyproject.toml` (Poetry or uv). **Entry‑points** register providers:
 
 ```toml
-[project.entry-points.kgforge.plugins]
+[project.entry-points.kgfoundry.plugins]
 dense.qwen3 = "embeddings_dense.qwen3:Qwen3Embedder"
 sparse.splade_v3 = "embeddings_sparse.splade:SPLADEv3Encoder"
 sparse.bm25 = "embeddings_sparse.bm25:BM25Index"
@@ -93,7 +93,7 @@ ontology.loader = "ontology.loader:OntologyLoader"
 > Keep models lean. Payloads (large text, vectors) live in Parquet files; rows refer to them via IDs.
 
 ```python
-# kgforge_common/models.py (Python 3.13, Pydantic v2)
+# kgfoundry_common/models.py (Python 3.13, Pydantic v2)
 from pydantic import BaseModel, Field, AwareDatetime
 from typing import Optional, List, Dict, Literal
 from dataclasses import dataclass
@@ -1037,7 +1037,7 @@ def hybrid_search(query: str, k: int) -> list[dict]:
 
   * Query compiled as AND of: `topic` (applied to `title`, `abstract_inverted_index`, `fulltext`), optional `year >= from_year`, `is_oa=true OR has_oa_published_version=true OR has_oa_accepted_or_published_version=true`.
   * Pagination: `per_page=200`, resume with `cursor`, cap at `max_works`.
-  * HTTP timeout=30 s, retries=3 (exponential 1.0/2.0/4.0 s), `User-Agent: kgforge/1.0 (+contact@example.com)`.
+  * HTTP timeout=30 s, retries=3 (exponential 1.0/2.0/4.0 s), `User-Agent: kgfoundry/1.0 (+contact@example.com)`.
 * **Resolution priority** (first success wins):
 
   1. `best_oa_location.pdf_url` (OpenAlex).
@@ -1522,7 +1522,7 @@ encode_splade_v3  ├── build_bm25_index ┐                    \
 
 ```yaml
 openapi: 3.1.0
-info: {title: KGForge Search API, version: 1.0.0}
+info: {title: kgfoundry Search API, version: 1.0.0}
 paths:
   /search:
     post:

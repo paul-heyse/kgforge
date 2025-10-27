@@ -37,7 +37,7 @@ def pick_query_token():
 @pytest.mark.smoke
 def test_search_endpoint_smoke():
     # Import app after optional env wiring (app uses fixtures by default).
-    from kgforge.search_api.app import app
+    from kgfoundry.search_api.app import app
 
     client = TestClient(app)
     q = pick_query_token()

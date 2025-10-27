@@ -35,15 +35,23 @@ Module Contents
 
 
    .. py:attribute:: openalex
+      :value: ''
+
 
 
    .. py:attribute:: unpaywall
+      :value: ''
+
 
 
    .. py:attribute:: pdf_host
+      :value: ''
+
 
 
    .. py:attribute:: out_dir
+      :value: '/data/pdfs'
+
 
 
    .. py:attribute:: session

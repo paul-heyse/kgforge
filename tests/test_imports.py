@@ -1,4 +1,4 @@
 def test_imports():
-    import kgforge.kgforge_common.models as m
+    import kgfoundry.kgfoundry_common.models as m
 
     assert hasattr(m, "Doc")

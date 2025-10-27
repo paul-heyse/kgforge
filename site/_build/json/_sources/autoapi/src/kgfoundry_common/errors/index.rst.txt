@@ -1,0 +1,117 @@
+src.kgfoundry_common.errors
+===========================
+
+.. py:module:: src.kgfoundry_common.errors
+
+.. autoapi-nested-parse::
+
+   Module for kgfoundry_common.errors.
+
+   NavMap:
+   - DownloadError: Raised when an external download fails.
+   - UnsupportedMIMEError: Raised when an unsupported MIME type is encountered.
+   - DoclingError: Base Docling processing error.
+   - OCRTimeoutError: Raised when OCR operations exceed time limits.
+   - ChunkingError: Raised when chunk generation fails.
+   - EmbeddingError: Raised when embedding generation fails.
+   - SpladeOOMError: Raised when SPLADE runs out of memory.
+   - IndexBuildError: Raised when index construction fails.
+   - OntologyParseError: Raised when ontology parsing fails.
+   - LinkerCalibrationError: Raised when linker calibration cannot be performed.
+   - Neo4jError: Raised when Neo4j operations fail.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:exception:: DownloadError
+
+   Bases: :py:obj:`Exception`
+
+
+   Raised when an external download fails.
+
+
+.. py:exception:: UnsupportedMIMEError
+
+   Bases: :py:obj:`Exception`
+
+
+   Raised when an unsupported MIME type is encountered.
+
+
+.. py:exception:: DoclingError
+
+   Bases: :py:obj:`Exception`
+
+
+   Base Docling processing error.
+
+
+.. py:exception:: OCRTimeoutError
+
+   Bases: :py:obj:`Exception`
+
+
+   Raised when OCR operations exceed time limits.
+
+
+.. py:exception:: ChunkingError
+
+   Bases: :py:obj:`Exception`
+
+
+   Raised when chunk generation fails.
+
+
+.. py:exception:: EmbeddingError
+
+   Bases: :py:obj:`Exception`
+
+
+   Raised when embedding generation fails.
+
+
+.. py:exception:: SpladeOOMError
+
+   Bases: :py:obj:`Exception`
+
+
+   Raised when SPLADE runs out of memory.
+
+
+.. py:exception:: IndexBuildError
+
+   Bases: :py:obj:`Exception`
+
+
+   Raised when index construction fails.
+
+
+.. py:exception:: OntologyParseError
+
+   Bases: :py:obj:`Exception`
+
+
+   Raised when ontology parsing fails.
+
+
+.. py:exception:: LinkerCalibrationError
+
+   Bases: :py:obj:`Exception`
+
+
+   Raised when linker calibration cannot be performed.
+
+
+.. py:exception:: Neo4jError
+
+   Bases: :py:obj:`Exception`
+
+
+   Raised when Neo4j operations fail.
+
+

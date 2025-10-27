@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>src.embeddings_dense.base &#8212; KGForge  documentation</title>
+    <title>src.embeddings_dense.base &#8212; kgfoundry  documentation</title>
   
   
   
@@ -116,7 +116,7 @@ window.addEventListener("load", () => mermaid.run());
   
   
   
-    <p class="title logo__title">KGForge  documentation</p>
+    <p class="title logo__title">kgfoundry  documentation</p>
   
 </a></div>
     
@@ -358,27 +358,28 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos"> 9</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span>
 <span class="linenos">10</span>
 <span class="linenos">11</span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="linenos">12</span>
+<span class="linenos">12</span><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 <span class="linenos">13</span>
+<span class="linenos">14</span>
 <div class="viewcode-block" id="DenseEmbedder">
 <a class="viewcode-back" href="../../../autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbedder">[docs]</a>
-<span class="linenos">14</span><span class="k">class</span><span class="w"> </span><span class="nc">DenseEmbedder</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="linenos">15</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Protocol describing a dense embedding provider.&quot;&quot;&quot;</span>
-<span class="linenos">16</span>
+<span class="linenos">15</span><span class="k">class</span><span class="w"> </span><span class="nc">DenseEmbedder</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="linenos">16</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Protocol describing a dense embedding provider.&quot;&quot;&quot;</span>
+<span class="linenos">17</span>
 <div class="viewcode-block" id="DenseEmbedder.name">
 <a class="viewcode-back" href="../../../autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbedder.name">[docs]</a>
-<span class="linenos">17</span>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span></div>
+<span class="linenos">18</span>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span></div>
 
 <div class="viewcode-block" id="DenseEmbedder.dim">
 <a class="viewcode-back" href="../../../autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbedder.dim">[docs]</a>
-<span class="linenos">18</span>    <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span></div>
+<span class="linenos">19</span>    <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span></div>
 
-<span class="linenos">19</span>
+<span class="linenos">20</span>
 <div class="viewcode-block" id="DenseEmbedder.embed_texts">
 <a class="viewcode-back" href="../../../autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbedder.embed_texts">[docs]</a>
-<span class="linenos">20</span>    <span class="k">def</span><span class="w"> </span><span class="nf">embed_texts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">texts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="linenos">21</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return embeddings for the supplied texts.&quot;&quot;&quot;</span>
-<span class="linenos">22</span>        <span class="o">...</span></div>
+<span class="linenos">21</span>    <span class="k">def</span><span class="w"> </span><span class="nf">embed_texts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">texts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">]:</span>
+<span class="linenos">22</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return embeddings for the supplied texts.&quot;&quot;&quot;</span>
+<span class="linenos">23</span>        <span class="o">...</span></div>
 </div>
 
 </pre></div>

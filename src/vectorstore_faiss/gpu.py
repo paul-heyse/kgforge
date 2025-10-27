@@ -7,9 +7,16 @@ NavMap:
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
+from numpy.typing import NDArray
+
+type FloatArray = NDArray[np.float32]
+type IntArray = NDArray[np.int64]
+type StrArray = NDArray[np.str_]
+
+__all__ = ["FaissGpuIndex"]
 
 
 class FaissGpuIndex:
@@ -45,8 +52,8 @@ class FaissGpuIndex:
         self._faiss: Any | None = None
         self._res: Any | None = None
         self._index: Any | None = None
-        self._idmap: np.ndarray | None = None
-        self._xb: np.ndarray | None = None  # fallback matrix for brute force
+        self._idmap: StrArray | None = None
+        self._xb: FloatArray | None = None  # fallback matrix for brute force
         # try import faiss
         try:
             import faiss
@@ -64,7 +71,7 @@ class FaissGpuIndex:
             self._res = faiss.StandardGpuResources()
             # memory knobs can be tuned by caller later
 
-    def train(self, train_vectors: np.ndarray, *, seed: int = 42) -> None:
+    def train(self, train_vectors: FloatArray, *, seed: int = 42) -> None:
         """Train.
 
         Parameters
@@ -82,11 +89,12 @@ class FaissGpuIndex:
         if self._faiss is None:
             # no-op in fallback; brute force doesn't need training
             return
+        train_mat = cast(FloatArray, np.asarray(train_vectors, dtype=np.float32, order="C"))
         faiss = self._faiss
-        d = train_vectors.shape[1]
+        d = train_mat.shape[1]
         cpu_index = faiss.index_factory(d, self.factory, faiss.METRIC_INNER_PRODUCT)
-        faiss.normalize_L2(train_vectors)
-        cpu_index.train(train_vectors)
+        faiss.normalize_L2(train_mat)
+        cpu_index.train(train_mat)
         self._ensure_resources()
         if self.gpu:
             co = faiss.GpuClonerOptions()
@@ -106,7 +114,7 @@ class FaissGpuIndex:
         except Exception:
             pass
 
-    def add(self, keys: list[str], vectors: np.ndarray) -> None:
+    def add(self, keys: list[str], vectors: FloatArray) -> None:
         """Add.
 
         Parameters
@@ -121,10 +129,11 @@ class FaissGpuIndex:
         None
             TODO.
         """
+        vec_array = cast(FloatArray, np.asarray(vectors, dtype=np.float32, order="C"))
         if self._faiss is None:
             # fallback: keep matrix and id map for brute-force
-            self._xb = vectors.astype("float32", copy=True)
-            self._idmap = np.array(keys)
+            self._xb = cast(FloatArray, np.array(vec_array, copy=True))
+            self._idmap = cast(StrArray, np.asarray(keys, dtype=str))
             # normalize for cosine/IP
             norms = np.linalg.norm(self._xb, axis=1, keepdims=True) + 1e-12
             self._xb /= norms
@@ -133,18 +142,20 @@ class FaissGpuIndex:
         if self._index is None:
             message = "FAISS index not initialized; call train() before add()."
             raise RuntimeError(message)
-        faiss.normalize_L2(vectors)
+        faiss.normalize_L2(vec_array)
         if isinstance(self._index, faiss.IndexIDMap2):
-            self._index.add_with_ids(vectors, np.array(keys, dtype="int64"))
+            idmap_array = cast(IntArray, np.asarray(keys, dtype="int64"))
+            self._index.add_with_ids(vec_array, idmap_array)
         elif hasattr(faiss, "IndexIDMap2"):
             # wrap once
             idmap = faiss.IndexIDMap2(self._index)
-            idmap.add_with_ids(vectors, np.array(keys, dtype="int64"))
+            idmap_array = cast(IntArray, np.asarray(keys, dtype="int64"))
+            idmap.add_with_ids(vec_array, idmap_array)
             self._index = idmap
         else:
-            self._index.add(vectors)
+            self._index.add(vec_array)
 
-    def search(self, query: np.ndarray, k: int) -> list[tuple[str, float]]:
+    def search(self, query: FloatArray, k: int) -> list[tuple[str, float]]:
         """Search.
 
         Parameters
@@ -159,14 +170,15 @@ class FaissGpuIndex:
         List[Tuple[str, float]]
             TODO.
         """
-        q = query.astype("float32", copy=True)
+        q = cast(FloatArray, np.asarray(query, dtype=np.float32, order="C"))
         # normalize for cosine/IP
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12
         if self._faiss is None or self._index is None:
             # brute-force cosine over self._xb
             if self._xb is None or self._idmap is None:
                 return []
-            sims = (self._xb @ q.T).squeeze()
+            sims_matrix = self._xb @ q.T
+            sims = np.asarray(sims_matrix, dtype=np.float32).squeeze()
             idx = np.argsort(-sims)[:k]
             return [(str(self._idmap[i]), float(sims[i])) for i in idx.tolist()]
         if self._idmap is None:

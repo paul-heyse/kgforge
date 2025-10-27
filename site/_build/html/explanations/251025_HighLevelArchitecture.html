@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Implementation-Grade Architecture Overview &#8212; KGForge  documentation</title>
+    <title>Implementation-Grade Architecture Overview &#8212; kgfoundry  documentation</title>
   
   
   
@@ -111,7 +111,7 @@
   
   
   
-    <p class="title logo__title">KGForge  documentation</p>
+    <p class="title logo__title">kgfoundry  documentation</p>
   
 </a></div>
     
@@ -412,7 +412,7 @@
 <section id="repository-layout-monorepo-independently-ownable-packages">
 <h2>2) Repository layout (monorepo; independently ownable packages)<a class="headerlink" href="#repository-layout-monorepo-independently-ownable-packages" title="Link to this heading">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">src</span>
-  <span class="o">/</span><span class="n">kgforge_common</span>            <span class="c1"># contracts, IDs, hashing, config, utils</span>
+  <span class="o">/</span><span class="n">kgfoundry_common</span>            <span class="c1"># contracts, IDs, hashing, config, utils</span>
   <span class="o">/</span><span class="n">download</span>                  <span class="c1"># PyAlex harvester + OA PDF downloader + fallbacks</span>
   <span class="o">/</span><span class="n">docling</span>                   <span class="c1"># VLM convert-to-DocTags + HybridChunker wrappers</span>
   <span class="o">/</span><span class="n">embeddings_dense</span>          <span class="c1"># vLLM client, Qwen3-Embedding-4B (2560-d)</span>
@@ -431,7 +431,7 @@
 </pre></div>
 </div>
 <p><strong>Packaging</strong>: <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> (Poetry or uv). <strong>Entry‑points</strong> register providers:</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[project.entry-points.kgforge.plugins]</span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[project.entry-points.kgfoundry.plugins]</span>
 <span class="n">dense</span><span class="p">.</span><span class="n">qwen3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;embeddings_dense.qwen3:Qwen3Embedder&quot;</span>
 <span class="n">sparse</span><span class="p">.</span><span class="n">splade_v3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;embeddings_sparse.splade:SPLADEv3Encoder&quot;</span>
 <span class="n">sparse</span><span class="p">.</span><span class="n">bm25</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;embeddings_sparse.bm25:BM25Index&quot;</span>
@@ -449,7 +449,7 @@
 <blockquote>
 <div><p>Keep models lean. Payloads (large text, vectors) live in Parquet files; rows refer to them via IDs.</p>
 </div></blockquote>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># kgforge_common/models.py (Python 3.13, Pydantic v2)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># kgfoundry_common/models.py (Python 3.13, Pydantic v2)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">AwareDatetime</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Literal</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
@@ -1524,7 +1524,7 @@ Returns top chunks &amp; doc rollups with dense/sparse scores, KG boosts, spans,
 <ul>
 <li><p>Query compiled as AND of: <code class="docutils literal notranslate"><span class="pre">topic</span></code> (applied to <code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">abstract_inverted_index</span></code>, <code class="docutils literal notranslate"><span class="pre">fulltext</span></code>), optional <code class="docutils literal notranslate"><span class="pre">year</span> <span class="pre">&gt;=</span> <span class="pre">from_year</span></code>, <code class="docutils literal notranslate"><span class="pre">is_oa=true</span> <span class="pre">OR</span> <span class="pre">has_oa_published_version=true</span> <span class="pre">OR</span> <span class="pre">has_oa_accepted_or_published_version=true</span></code>.</p></li>
 <li><p>Pagination: <code class="docutils literal notranslate"><span class="pre">per_page=200</span></code>, resume with <code class="docutils literal notranslate"><span class="pre">cursor</span></code>, cap at <code class="docutils literal notranslate"><span class="pre">max_works</span></code>.</p></li>
-<li><p>HTTP timeout=30 s, retries=3 (exponential 1.0/2.0/4.0 s), <code class="docutils literal notranslate"><span class="pre">User-Agent:</span> <span class="pre">kgforge/1.0</span> <span class="pre">(+contact&#64;example.com)</span></code>.</p></li>
+<li><p>HTTP timeout=30 s, retries=3 (exponential 1.0/2.0/4.0 s), <code class="docutils literal notranslate"><span class="pre">User-Agent:</span> <span class="pre">kgfoundry/1.0</span> <span class="pre">(+contact&#64;example.com)</span></code>.</p></li>
 </ul>
 </li>
 <li><p><strong>Resolution priority</strong> (first success wins):</p>
@@ -2082,7 +2082,7 @@ encode_splade_v3  ├── build_bm25_index ┐                    \
 <section id="part-f-sample-openapi-excerpt">
 <h2>PART F — SAMPLE OPENAPI (EXCERPT)<a class="headerlink" href="#part-f-sample-openapi-excerpt" title="Link to this heading">#</a></h2>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">openapi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.1.0</span>
-<span class="nt">info</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="nv">KGForge Search API</span><span class="p p-Indicator">,</span><span class="nt"> version</span><span class="p">:</span><span class="w"> </span><span class="nv">1.0.0</span><span class="p p-Indicator">}</span>
+<span class="nt">info</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="nv">kgfoundry Search API</span><span class="p p-Indicator">,</span><span class="nt"> version</span><span class="p">:</span><span class="w"> </span><span class="nv">1.0.0</span><span class="p p-Indicator">}</span>
 <span class="nt">paths</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">/search</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">post</span><span class="p">:</span>

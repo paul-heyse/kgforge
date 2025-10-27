@@ -10,14 +10,14 @@ CHUNKS = str(FIXTURES / "chunks.parquet")
 
 # Prefer the dedicated BM25 index used by the API if available
 try:
-    from kgforge.search_api.bm25_index import BM25Index
+    from kgfoundry.search_api.bm25_index import BM25Index
 
     HAVE_API_BM25 = True
 except Exception:  # module missing or incomplete
     HAVE_API_BM25 = False
 
 try:
-    from kgforge.embeddings_sparse.bm25 import PurePythonBM25
+    from kgfoundry.embeddings_sparse.bm25 import PurePythonBM25
 
     HAVE_PURE = True
 except Exception:

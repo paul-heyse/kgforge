@@ -11,8 +11,8 @@ import time
 from typing import Any
 
 import requests
-from kgforge.kgforge_common.exceptions import DownloadError, UnsupportedMIMEError
-from kgforge.kgforge_common.models import Doc
+from kgfoundry.kgfoundry_common.exceptions import DownloadError, UnsupportedMIMEError
+from kgfoundry.kgfoundry_common.models import Doc
 
 HTTP_OK = 200
 
@@ -74,7 +74,11 @@ class OpenAccessHarvester:
             TODO.
         """
         url = f"{self.openalex}/works"
-        params = {"topic": topic, "per_page": min(200, max_works), "cursor": "*"}
+        params: dict[str, str | int] = {
+            "topic": topic,
+            "per_page": min(200, max_works),
+            "cursor": "*",
+        }
         r = self.session.get(url, params=params, timeout=30)
         r.raise_for_status()
         data = r.json()

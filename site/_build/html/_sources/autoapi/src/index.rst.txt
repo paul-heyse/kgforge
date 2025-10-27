@@ -9,8 +9,8 @@ src
 
 
 
-Subpackages
------------
+Submodules
+----------
 
 .. toctree::
    :maxdepth: 1
@@ -20,7 +20,8 @@ Subpackages
    /autoapi/src/embeddings_dense/index
    /autoapi/src/embeddings_sparse/index
    /autoapi/src/kg_builder/index
-   /autoapi/src/kgforge_common/index
+   /autoapi/src/kgfoundry/index
+   /autoapi/src/kgfoundry_common/index
    /autoapi/src/linking/index
    /autoapi/src/observability/index
    /autoapi/src/ontology/index

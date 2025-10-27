@@ -64,7 +64,7 @@ if you need to adjust behavior.
 - `make readmes`: regenerates package READMEs.
 - `make html/json/symbols`: Sphinx builders for HTML, JSON corpus, and `docs/_build/symbols.json`.
 - `make watch`: runs `sphinx-autobuild` (auto rebuild+serve).
-- `make bootstrap`: creates `.kgforge-venv`, installs `pip install -e "[dev,docs]"`, sets up pre-commit.
+- `make bootstrap`: creates `.venv`, installs `pip install -e "[dev,docs]"`, sets up pre-commit.
 
 ---
 
