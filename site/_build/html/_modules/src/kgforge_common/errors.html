@@ -353,10 +353,10 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos"> 4</span><span class="sd">- DownloadError: Raised when an external download fails.</span>
 <span class="linenos"> 5</span><span class="sd">- UnsupportedMIMEError: Raised when an unsupported MIME type is encountered.</span>
 <span class="linenos"> 6</span><span class="sd">- DoclingError: Base Docling processing error.</span>
-<span class="linenos"> 7</span><span class="sd">- OCRTimeout: Raised when OCR operations exceed time limits.</span>
+<span class="linenos"> 7</span><span class="sd">- OCRTimeoutError: Raised when OCR operations exceed time limits.</span>
 <span class="linenos"> 8</span><span class="sd">- ChunkingError: Raised when chunk generation fails.</span>
 <span class="linenos"> 9</span><span class="sd">- EmbeddingError: Raised when embedding generation fails.</span>
-<span class="linenos">10</span><span class="sd">- SpladeOOM: Raised when SPLADE runs out of memory.</span>
+<span class="linenos">10</span><span class="sd">- SpladeOOMError: Raised when SPLADE runs out of memory.</span>
 <span class="linenos">11</span><span class="sd">- IndexBuildError: Raised when index construction fails.</span>
 <span class="linenos">12</span><span class="sd">- OntologyParseError: Raised when ontology parsing fails.</span>
 <span class="linenos">13</span><span class="sd">- LinkerCalibrationError: Raised when linker calibration cannot be performed.</span>
@@ -391,9 +391,9 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="linenos">34</span>
 <span class="linenos">35</span>
-<div class="viewcode-block" id="OCRTimeout">
-<a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.OCRTimeout">[docs]</a>
-<span class="linenos">36</span><span class="k">class</span><span class="w"> </span><span class="nc">OCRTimeout</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="OCRTimeoutError">
+<a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.OCRTimeoutError">[docs]</a>
+<span class="linenos">36</span><span class="k">class</span><span class="w"> </span><span class="nc">OCRTimeoutError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 <span class="linenos">37</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when OCR operations exceed time limits.&quot;&quot;&quot;</span>
 <span class="linenos">38</span>
 <span class="linenos">39</span>    <span class="o">...</span></div>
@@ -418,9 +418,9 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="linenos">52</span>
 <span class="linenos">53</span>
-<div class="viewcode-block" id="SpladeOOM">
-<a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.SpladeOOM">[docs]</a>
-<span class="linenos">54</span><span class="k">class</span><span class="w"> </span><span class="nc">SpladeOOM</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="SpladeOOMError">
+<a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.SpladeOOMError">[docs]</a>
+<span class="linenos">54</span><span class="k">class</span><span class="w"> </span><span class="nc">SpladeOOMError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 <span class="linenos">55</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when SPLADE runs out of memory.&quot;&quot;&quot;</span>
 <span class="linenos">56</span>
 <span class="linenos">57</span>    <span class="o">...</span></div>

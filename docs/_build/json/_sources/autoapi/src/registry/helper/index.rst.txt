@@ -27,7 +27,7 @@ Module Contents
 
    .. py:method:: new_run(purpose, model_id, revision, config)
 
-      New run.
+      Create a new registry run.
 
       :param purpose: TODO.
       :type purpose: str

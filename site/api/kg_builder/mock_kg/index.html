@@ -419,6 +419,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="add_edge">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kg_builder.mock_kg.MockKG.add_edge--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -427,6 +442,21 @@
       add_mention
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="add_mention">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kg_builder.mock_kg.MockKG.add_mention--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -437,6 +467,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="linked_concepts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kg_builder.mock_kg.MockKG.linked_concepts--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kg_builder.mock_kg.MockKG.linked_concepts--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -445,6 +499,30 @@
       one_hop
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="one_hop">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kg_builder.mock_kg.MockKG.one_hop--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kg_builder.mock_kg.MockKG.one_hop--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -578,7 +656,21 @@
 <span class="normal">57</span>
 <span class="normal">58</span>
 <span class="normal">59</span>
-<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MockKG</span><span class="p">:</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MockKG</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A tiny in-memory KG for demo.</span>
 
 <span class="sd">    Maps chunk_id -&gt; set(concept_id) and concept adjacency.</span>
@@ -590,43 +682,57 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">add_mention</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add mention.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a mention linking a chunk to a concept.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            chunk_id (str): TODO.</span>
-<span class="sd">            concept_id (str): TODO.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chunk_id : str</span>
+<span class="sd">            TODO.</span>
+<span class="sd">        concept_id : str</span>
+<span class="sd">            TODO.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chunk2concepts</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">chunk_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">concept_id</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">add_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add edge.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an undirected edge between two concepts.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            a (str): TODO.</span>
-<span class="sd">            b (str): TODO.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        a : str</span>
+<span class="sd">            TODO.</span>
+<span class="sd">        b : str</span>
+<span class="sd">            TODO.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">linked_concepts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Linked concepts.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the concepts linked to a chunk identifier.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            chunk_id (str): TODO.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chunk_id : str</span>
+<span class="sd">            TODO.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            List[str]: TODO.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[str]</span>
+<span class="sd">            TODO.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk2concepts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">chunk_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">one_hop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;One hop.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one-hop neighbours for a concept identifier.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            concept_id (str): TODO.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        concept_id : str</span>
+<span class="sd">            TODO.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            List[str]: TODO.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[str]</span>
+<span class="sd">            TODO.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">concept_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span>
 </code></pre></div></td></tr></table></div>
@@ -685,72 +791,36 @@
 
     <div class="doc doc-contents ">
 
-        <p>Add edge.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>a</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>b</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Add an undirected edge between two concepts.</p>
+<h5 id="kg_builder.mock_kg.MockKG.add_edge--parameters">Parameters</h5>
+<p>a : str
+    TODO.
+b : str
+    TODO.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kg_builder/mock_kg.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
 <span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
 <span class="normal">37</span>
-<span class="normal">38</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add edge.</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add an undirected edge between two concepts.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        a (str): TODO.</span>
-<span class="sd">        b (str): TODO.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    a : str</span>
+<span class="sd">        TODO.</span>
+<span class="sd">    b : str</span>
+<span class="sd">        TODO.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -771,54 +841,12 @@
 
     <div class="doc doc-contents ">
 
-        <p>Add mention.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>chunk_id</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>concept_id</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Add a mention linking a chunk to a concept.</p>
+<h5 id="kg_builder.mock_kg.MockKG.add_mention--parameters">Parameters</h5>
+<p>chunk_id : str
+    TODO.
+concept_id : str
+    TODO.</p>
 
 
             <details class="quote">
@@ -830,12 +858,18 @@
 <span class="normal">25</span>
 <span class="normal">26</span>
 <span class="normal">27</span>
-<span class="normal">28</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_mention</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add mention.</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_mention</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a mention linking a chunk to a concept.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        chunk_id (str): TODO.</span>
-<span class="sd">        concept_id (str): TODO.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    chunk_id : str</span>
+<span class="sd">        TODO.</span>
+<span class="sd">    concept_id : str</span>
+<span class="sd">        TODO.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">chunk2concepts</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">chunk_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">concept_id</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -855,82 +889,42 @@
 
     <div class="doc doc-contents ">
 
-        <p>Linked concepts.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>chunk_id</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="list">list</span>[<span title="str">str</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>List[str]: TODO.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Return the concepts linked to a chunk identifier.</p>
+<h5 id="kg_builder.mock_kg.MockKG.linked_concepts--parameters">Parameters</h5>
+<p>chunk_id : str
+    TODO.</p>
+<h5 id="kg_builder.mock_kg.MockKG.linked_concepts--returns">Returns</h5>
+<p>list[str]
+    TODO.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kg_builder/mock_kg.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
-<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">linked_concepts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Linked concepts.</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">linked_concepts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the concepts linked to a chunk identifier.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        chunk_id (str): TODO.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    chunk_id : str</span>
+<span class="sd">        TODO.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        List[str]: TODO.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list[str]</span>
+<span class="sd">        TODO.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk2concepts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">chunk_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span>
 </code></pre></div></td></tr></table></div>
@@ -950,82 +944,42 @@
 
     <div class="doc doc-contents ">
 
-        <p>One hop.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>concept_id</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="list">list</span>[<span title="str">str</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>List[str]: TODO.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Return one-hop neighbours for a concept identifier.</p>
+<h5 id="kg_builder.mock_kg.MockKG.one_hop--parameters">Parameters</h5>
+<p>concept_id : str
+    TODO.</p>
+<h5 id="kg_builder.mock_kg.MockKG.one_hop--returns">Returns</h5>
+<p>list[str]
+    TODO.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kg_builder/mock_kg.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">one_hop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;One hop.</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">one_hop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return one-hop neighbours for a concept identifier.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        concept_id (str): TODO.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    concept_id : str</span>
+<span class="sd">        TODO.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        List[str]: TODO.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list[str]</span>
+<span class="sd">        TODO.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">concept_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span>
 </code></pre></div></td></tr></table></div>

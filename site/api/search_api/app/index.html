@@ -400,6 +400,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="apply_kg_boosts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#search_api.app.apply_kg_boosts--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search_api.app.apply_kg_boosts--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -409,6 +433,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="auth">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#search_api.app.auth--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search_api.app.auth--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -417,6 +465,21 @@
       graph_concepts
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="graph_concepts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#search_api.app.graph_concepts--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -436,6 +499,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="rrf_fuse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#search_api.app.rrf_fuse--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search_api.app.rrf_fuse--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -444,6 +531,21 @@
       search
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="search">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#search_api.app.search--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -477,12 +579,12 @@
 <p>NavMap:
 - SearchRequest: Searchrequest.
 - SearchResult: Searchresult.
-- auth: Auth.
+- auth: Validate the bearer-token header for protected endpoints.
 - healthz: Healthz.
-- rrf_fuse: Rrf fuse.
-- apply_kg_boosts: Apply kg boosts.
-- search: Search.
-- graph_concepts: Graph concepts.</p>
+- rrf_fuse: Fuse ranked lists using reciprocal rank fusion.
+- apply_kg_boosts: Apply knowledge-graph boosting heuristics.
+- search: Execute a search request across dense and sparse indices.
+- graph_concepts: Return KG concepts that match the provided query fragment.</p>
 
 
 
@@ -515,123 +617,24 @@
 
     <div class="doc doc-contents ">
 
-        <p>Apply kg boosts.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>cands</code>
-            </td>
-            <td>
-                  <code><span title="Dict">Dict</span>[<span title="str">str</span>, <span title="float">float</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>query</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>direct</code>
-            </td>
-            <td>
-                  <code><span title="float">float</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                  <code>0.08</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>one_hop</code>
-            </td>
-            <td>
-                  <code><span title="float">float</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                  <code>0.04</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="float">float</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Dict[str, float]: TODO.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Apply knowledge-graph boosting heuristics.</p>
+<h4 id="search_api.app.apply_kg_boosts--parameters">Parameters</h4>
+<p>cands : dict[str, float]
+    TODO.
+query : str
+    TODO.
+direct : float, default=0.08
+    TODO.
+one_hop : float, default=0.04
+    TODO.</p>
+<h4 id="search_api.app.apply_kg_boosts--returns">Returns</h4>
+<p>dict[str, float]
+    TODO.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/app.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">146</span>
 <span class="normal">147</span>
 <span class="normal">148</span>
 <span class="normal">149</span>
@@ -656,28 +659,51 @@
 <span class="normal">168</span>
 <span class="normal">169</span>
 <span class="normal">170</span>
-<span class="normal">171</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_kg_boosts</span><span class="p">(</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_kg_boosts</span><span class="p">(</span>
     <span class="n">cands</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">direct</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.08</span><span class="p">,</span>
     <span class="n">one_hop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.04</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply kg boosts.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply knowledge-graph boosting heuristics.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        cands (Dict[str, float]): TODO.</span>
-<span class="sd">        query (str): TODO.</span>
-<span class="sd">        direct: TODO.</span>
-<span class="sd">        one_hop: TODO.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cands : dict[str, float]</span>
+<span class="sd">        TODO.</span>
+<span class="sd">    query : str</span>
+<span class="sd">        TODO.</span>
+<span class="sd">    direct : float, default=0.08</span>
+<span class="sd">        TODO.</span>
+<span class="sd">    one_hop : float, default=0.04</span>
+<span class="sd">        TODO.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        Dict[str, float]: TODO.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict[str, float]</span>
+<span class="sd">        TODO.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># toy: map words &#39;concept42&#39; to concept id</span>
     <span class="n">q_concepts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;concept&quot;</span><span class="p">):</span>
-            <span class="n">q_concepts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;C:</span><span class="si">{</span><span class="n">w</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;concept&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">q_concepts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;C:</span><span class="si">{</span><span class="n">w</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;concept&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cands</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">chunk_id</span><span class="p">,</span> <span class="n">base</span> <span class="ow">in</span> <span class="n">cands</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">linked</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kg</span><span class="o">.</span><span class="n">linked_concepts</span><span class="p">(</span><span class="n">chunk_id</span><span class="p">))</span>
@@ -708,61 +734,13 @@
 
     <div class="doc doc-contents ">
 
-        <p>Auth.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>authorization</code>
-            </td>
-            <td>
-                  <code><span title="Optional">Optional</span>[<span title="str">str</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                  <code><span title="fastapi.Header">Header</span>(default=None)</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>None</code></td>            <td>
-                  <code>None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Validate the bearer-token header for protected endpoints.</p>
+<h4 id="search_api.app.auth--parameters">Parameters</h4>
+<p>authorization : str | None, optional
+    TODO.</p>
+<h4 id="search_api.app.auth--returns">Returns</h4>
+<p>None
+    TODO.</p>
 
 
             <details class="quote">
@@ -782,14 +760,22 @@
 <span class="normal"> 99</span>
 <span class="normal">100</span>
 <span class="normal">101</span>
-<span class="normal">102</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">auth</span><span class="p">(</span><span class="n">authorization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Header</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Auth.</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">auth</span><span class="p">(</span><span class="n">authorization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Header</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the bearer-token header for protected endpoints.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        authorization (Optional[str]): TODO.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    authorization : str | None, optional</span>
+<span class="sd">        TODO.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        None: TODO.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        TODO.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">API_KEYS</span><span class="p">:</span>
         <span class="k">return</span>  <span class="c1"># disabled in skeleton</span>
@@ -815,80 +801,44 @@
 
     <div class="doc doc-contents ">
 
-        <p>Graph concepts.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>body</code>
-            </td>
-            <td>
-                  <code><span title="dict">dict</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>_</code>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                  <code><span title="fastapi.Depends">Depends</span>(<a class="autorefs autorefs-internal" title="auth(authorization=Header(default=None)) (search_api.app.auth)" href="#search_api.app.auth">auth</a>)</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Return KG concepts that match the provided query fragment.</p>
+<h4 id="search_api.app.graph_concepts--parameters">Parameters</h4>
+<p>body : Mapping[str, Any]
+    TODO.
+_ : None
+    TODO.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/app.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span>
-<span class="normal">240</span>
-<span class="normal">241</span>
-<span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/graph/concepts&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/graph/concepts&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">graph_concepts</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">_</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">auth</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Graph concepts.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return KG concepts that match the provided query fragment.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        body (dict): TODO.</span>
-<span class="sd">        _: TODO.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    body : Mapping[str, Any]</span>
+<span class="sd">        TODO.</span>
+<span class="sd">    _ : None</span>
+<span class="sd">        TODO.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="n">body</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="c1"># toy: return nodes that contain the query substring</span>
@@ -920,11 +870,7 @@
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/app.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">109</span>
 <span class="normal">110</span>
 <span class="normal">111</span>
 <span class="normal">112</span>
@@ -932,7 +878,11 @@
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
-<span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/healthz&quot;</span><span class="p">)</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/healthz&quot;</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">healthz</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Healthz.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">{</span>
@@ -962,86 +912,20 @@
 
     <div class="doc doc-contents ">
 
-        <p>Rrf fuse.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>lists</code>
-            </td>
-            <td>
-                  <code><span title="List">List</span>[<span title="List">List</span>[<span title="Tuple">Tuple</span>[<span title="str">str</span>, <span title="float">float</span>]]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>k_rrf</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="float">float</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Dict[str, float]: TODO.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Fuse ranked lists using reciprocal rank fusion.</p>
+<h4 id="search_api.app.rrf_fuse--parameters">Parameters</h4>
+<p>lists : list[list[tuple[str, float]]]
+    TODO.
+k_rrf : int
+    TODO.</p>
+<h4 id="search_api.app.rrf_fuse--returns">Returns</h4>
+<p>dict[str, float]
+    TODO.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/app.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
 <span class="normal">125</span>
 <span class="normal">126</span>
 <span class="normal">127</span>
@@ -1051,15 +935,29 @@
 <span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span>
-<span class="normal">134</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rrf_fuse</span><span class="p">(</span><span class="n">lists</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span> <span class="n">k_rrf</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rrf fuse.</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rrf_fuse</span><span class="p">(</span><span class="n">lists</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span> <span class="n">k_rrf</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fuse ranked lists using reciprocal rank fusion.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        lists (List[List[Tuple[str, float]]]): TODO.</span>
-<span class="sd">        k_rrf (int): TODO.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lists : list[list[tuple[str, float]]]</span>
+<span class="sd">        TODO.</span>
+<span class="sd">    k_rrf : int</span>
+<span class="sd">        TODO.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        Dict[str, float]: TODO.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict[str, float]</span>
+<span class="sd">        TODO.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">scores</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">hits</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">:</span>
@@ -1083,75 +981,17 @@
 
     <div class="doc doc-contents ">
 
-        <p>Search.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>req</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="SearchRequest (search_api.schemas.SearchRequest)" href="../schemas/#search_api.schemas.SearchRequest">SearchRequest</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>_</code>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>TODO.</p>
-              </div>
-            </td>
-            <td>
-                  <code><span title="fastapi.Depends">Depends</span>(<a class="autorefs autorefs-internal" title="auth(authorization=Header(default=None)) (search_api.app.auth)" href="#search_api.app.auth">auth</a>)</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Execute a search request across dense and sparse indices.</p>
+<h4 id="search_api.app.search--parameters">Parameters</h4>
+<p>req : SearchRequest
+    TODO.
+_ : None
+    TODO.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/app.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">190</span>
 <span class="normal">191</span>
 <span class="normal">192</span>
 <span class="normal">193</span>
@@ -1192,18 +1032,38 @@
 <span class="normal">228</span>
 <span class="normal">229</span>
 <span class="normal">230</span>
-<span class="normal">231</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/search&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/search&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="n">req</span><span class="p">:</span> <span class="n">SearchRequest</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">auth</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute a search request across dense and sparse indices.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        req (SearchRequest): TODO.</span>
-<span class="sd">        _: TODO.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    req : SearchRequest</span>
+<span class="sd">        TODO.</span>
+<span class="sd">    _ : None</span>
+<span class="sd">        TODO.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Retrieve from each channel</span>
-    <span class="n">dense_hits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="p">[]</span>
-    <span class="p">)</span>  <span class="c1"># we don&#39;t have a query embedder here; fallback to empty or demo vector</span>
+    <span class="c1"># We don&#39;t have a query embedder here; fallback to empty or demo vector</span>
+    <span class="n">dense_hits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1"># sparse via BM25 (preferred) and SPLADE</span>
     <span class="n">bm25_hits</span> <span class="o">=</span> <span class="n">bm25</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">CFG</span><span class="p">[</span><span class="s2">&quot;search&quot;</span><span class="p">][</span><span class="s2">&quot;sparse_candidates&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="n">bm25</span> <span class="k">else</span> <span class="p">[]</span>
     <span class="k">try</span><span class="p">:</span>

@@ -13,7 +13,7 @@ src.orchestration.fixture_flow
    - t_write_fixture_dense: T write fixture dense.
    - t_write_fixture_splade: T write fixture splade.
    - t_register_in_duckdb: T register in duckdb.
-   - fixture_pipeline: Fixture pipeline.
+   - fixture_pipeline: Run the end-to-end fixture pipeline.
 
 
 
@@ -71,10 +71,10 @@ Module Contents
    T register in duckdb.
 
    :param db_path: TODO.
+                   chunks_info: TODO.
+                   dense_info: TODO.
+                   sparse_info: TODO.
    :type db_path: str
-   :param chunks_info: TODO.
-   :param dense_info: TODO.
-   :param sparse_info: TODO.
 
    :returns: TODO.
    :rtype: dict
@@ -82,11 +82,11 @@ Module Contents
 
 .. py:function:: fixture_pipeline(root = '/data', db_path = '/data/catalog/catalog.duckdb')
 
-   Fixture pipeline.
+   Run the end-to-end fixture pipeline.
 
    :param root: TODO.
-   :type root: str
+   :type root: str, default="/data"
    :param db_path: TODO.
-   :type db_path: str
+   :type db_path: str, default="/data/catalog/catalog.duckdb"
 
 

@@ -34,7 +34,7 @@ Module Contents
 
    .. py:method:: add_mention(chunk_id, concept_id)
 
-      Add mention.
+      Add a mention linking a chunk to a concept.
 
       :param chunk_id: TODO.
       :type chunk_id: str
@@ -45,7 +45,7 @@ Module Contents
 
    .. py:method:: add_edge(a, b)
 
-      Add edge.
+      Add an undirected edge between two concepts.
 
       :param a: TODO.
       :type a: str
@@ -56,25 +56,25 @@ Module Contents
 
    .. py:method:: linked_concepts(chunk_id)
 
-      Linked concepts.
+      Return the concepts linked to a chunk identifier.
 
       :param chunk_id: TODO.
       :type chunk_id: str
 
       :returns: TODO.
-      :rtype: List[str]
+      :rtype: list[str]
 
 
 
    .. py:method:: one_hop(concept_id)
 
-      One hop.
+      Return one-hop neighbours for a concept identifier.
 
       :param concept_id: TODO.
       :type concept_id: str
 
       :returns: TODO.
-      :rtype: List[str]
+      :rtype: list[str]
 
 
 

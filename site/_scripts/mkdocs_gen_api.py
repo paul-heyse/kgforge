@@ -1,7 +1,12 @@
+"""Generate MkDocs API stub pages using Griffe."""
+
+from __future__ import annotations
+
 import sys
 from pathlib import Path
 
 import mkdocs_gen_files
+from griffe import Object
 
 try:
     from griffe.loader import GriffeLoader
@@ -21,7 +26,8 @@ with mkdocs_gen_files.open(out / "index.md", "w") as f:
     f.write("# API Reference\n")
 
 
-def iter_packages():
+def iter_packages() -> list[str]:
+    """Return the packages that should have API pages generated."""
     packages = detect_packages()
     return packages or [detect_primary()]
 
@@ -29,7 +35,8 @@ def iter_packages():
 loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
 
 
-def write_node(node):
+def write_node(node: Object) -> None:
+    """Write a MkDocs page for the provided Griffe node."""
     rel = node.path.replace(".", "/")
     page = out / rel / "index.md"
     with mkdocs_gen_files.open(page, "w") as f:

@@ -365,14 +365,18 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">14</span><span class="k">def</span><span class="w"> </span><span class="nf">load_config</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="linenos">15</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Load config.</span>
 <span class="linenos">16</span>
-<span class="linenos">17</span><span class="sd">    Args:</span>
-<span class="linenos">18</span><span class="sd">        path (str): TODO.</span>
-<span class="linenos">19</span>
-<span class="linenos">20</span><span class="sd">    Returns:</span>
-<span class="linenos">21</span><span class="sd">        Dict[str, Any]: TODO.</span>
-<span class="linenos">22</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">23</span>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-<span class="linenos">24</span>        <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
+<span class="linenos">17</span><span class="sd">    Parameters</span>
+<span class="linenos">18</span><span class="sd">    ----------</span>
+<span class="linenos">19</span><span class="sd">    path : str</span>
+<span class="linenos">20</span><span class="sd">        TODO.</span>
+<span class="linenos">21</span>
+<span class="linenos">22</span><span class="sd">    Returns</span>
+<span class="linenos">23</span><span class="sd">    -------</span>
+<span class="linenos">24</span><span class="sd">    Dict[str, Any]</span>
+<span class="linenos">25</span><span class="sd">        TODO.</span>
+<span class="linenos">26</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">27</span>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="linenos">28</span>        <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
 
 </pre></div>
 

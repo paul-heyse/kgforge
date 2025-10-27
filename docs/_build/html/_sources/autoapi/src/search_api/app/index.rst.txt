@@ -10,12 +10,12 @@ src.search_api.app
    NavMap:
    - SearchRequest: Searchrequest.
    - SearchResult: Searchresult.
-   - auth: Auth.
+   - auth: Validate the bearer-token header for protected endpoints.
    - healthz: Healthz.
-   - rrf_fuse: Rrf fuse.
-   - apply_kg_boosts: Apply kg boosts.
-   - search: Search.
-   - graph_concepts: Graph concepts.
+   - rrf_fuse: Fuse ranked lists using reciprocal rank fusion.
+   - apply_kg_boosts: Apply knowledge-graph boosting heuristics.
+   - search: Execute a search request across dense and sparse indices.
+   - graph_concepts: Return KG concepts that match the provided query fragment.
 
 
 
@@ -55,10 +55,10 @@ Module Contents
 
 .. py:function:: auth(authorization = Header(default=None))
 
-   Auth.
+   Validate the bearer-token header for protected endpoints.
 
    :param authorization: TODO.
-   :type authorization: Optional[str]
+   :type authorization: str | None, optional
 
    :returns: TODO.
    :rtype: None
@@ -71,47 +71,51 @@ Module Contents
 
 .. py:function:: rrf_fuse(lists, k_rrf)
 
-   Rrf fuse.
+   Fuse ranked lists using reciprocal rank fusion.
 
    :param lists: TODO.
-   :type lists: List[List[Tuple[str, float]]]
+   :type lists: list[list[tuple[str, float]]]
    :param k_rrf: TODO.
    :type k_rrf: int
 
    :returns: TODO.
-   :rtype: Dict[str, float]
+   :rtype: dict[str, float]
 
 
 .. py:function:: apply_kg_boosts(cands, query, direct = 0.08, one_hop = 0.04)
 
-   Apply kg boosts.
+   Apply knowledge-graph boosting heuristics.
 
    :param cands: TODO.
-   :type cands: Dict[str, float]
+   :type cands: dict[str, float]
    :param query: TODO.
    :type query: str
    :param direct: TODO.
+   :type direct: float, default=0.08
    :param one_hop: TODO.
+   :type one_hop: float, default=0.04
 
    :returns: TODO.
-   :rtype: Dict[str, float]
+   :rtype: dict[str, float]
 
 
 .. py:function:: search(req, _ = Depends(auth))
 
-   Search.
+   Execute a search request across dense and sparse indices.
 
    :param req: TODO.
    :type req: SearchRequest
    :param _: TODO.
+   :type _: None
 
 
 .. py:function:: graph_concepts(body, _ = Depends(auth))
 
-   Graph concepts.
+   Return KG concepts that match the provided query fragment.
 
    :param body: TODO.
-   :type body: dict
+   :type body: Mapping[str, Any]
    :param _: TODO.
+   :type _: None
 
 

@@ -9,7 +9,7 @@ src.registry.migrate
 
    NavMap:
    - apply: Apply.
-   - main: Main.
+   - main: Run the CLI entry point for migration commands.
 
 
 
@@ -33,6 +33,6 @@ Module Contents
 
 .. py:function:: main()
 
-   Main.
+   Run the CLI entry point for migration commands.
 
 
