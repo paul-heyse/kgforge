@@ -349,38 +349,43 @@ window.addEventListener("load", () => mermaid.run());
   <h1>Source code for src.kgforge_common.ids</h1><div class="highlight"><pre>
 <span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Module for kgforge_common.ids.&quot;&quot;&quot;</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-<span class="linenos"> 5</span><span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span><span class="o">,</span><span class="w"> </span><span class="nn">base64</span>
+<span class="linenos"> 3</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+<span class="linenos"> 6</span><span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span>
 <div class="viewcode-block" id="urn_doc_from_text">
 <a class="viewcode-back" href="../../../autoapi/src/kgforge_common/ids/index.html#src.kgforge_common.ids.urn_doc_from_text">[docs]</a>
-<span class="linenos"> 6</span><span class="k">def</span><span class="w"> </span><span class="nf">urn_doc_from_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="linenos"> 7</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Urn doc from text.</span>
-<span class="linenos"> 8</span>
-<span class="linenos"> 9</span><span class="sd">    Args:</span>
-<span class="linenos">10</span><span class="sd">        text (str): TODO.</span>
+<span class="linenos"> 9</span><span class="k">def</span><span class="w"> </span><span class="nf">urn_doc_from_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos">10</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Urn doc from text.</span>
 <span class="linenos">11</span>
-<span class="linenos">12</span><span class="sd">    Returns:</span>
-<span class="linenos">13</span><span class="sd">        str: TODO.</span>
-<span class="linenos">14</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">15</span>    <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">16</span><span class="p">]</span>
-<span class="linenos">16</span>    <span class="n">b32</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b32encode</span><span class="p">(</span><span class="n">h</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<span class="linenos">17</span>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;urn:doc:sha256:</span><span class="si">{</span><span class="n">b32</span><span class="si">}</span><span class="s2">&quot;</span></div>
+<span class="linenos">12</span><span class="sd">    Args:</span>
+<span class="linenos">13</span><span class="sd">        text (str): TODO.</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span><span class="sd">    Returns:</span>
+<span class="linenos">16</span><span class="sd">        str: TODO.</span>
+<span class="linenos">17</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">18</span>    <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">16</span><span class="p">]</span>
+<span class="linenos">19</span>    <span class="n">b32</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b32encode</span><span class="p">(</span><span class="n">h</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="linenos">20</span>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;urn:doc:sha256:</span><span class="si">{</span><span class="n">b32</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
+<span class="linenos">21</span>
+<span class="linenos">22</span>
 <div class="viewcode-block" id="urn_chunk">
 <a class="viewcode-back" href="../../../autoapi/src/kgforge_common/ids/index.html#src.kgforge_common.ids.urn_chunk">[docs]</a>
-<span class="linenos">18</span><span class="k">def</span><span class="w"> </span><span class="nf">urn_chunk</span><span class="p">(</span><span class="n">doc_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="linenos">19</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Urn chunk.</span>
-<span class="linenos">20</span>
-<span class="linenos">21</span><span class="sd">    Args:</span>
-<span class="linenos">22</span><span class="sd">        doc_hash (str): TODO.</span>
-<span class="linenos">23</span><span class="sd">        start (int): TODO.</span>
-<span class="linenos">24</span><span class="sd">        end (int): TODO.</span>
+<span class="linenos">23</span><span class="k">def</span><span class="w"> </span><span class="nf">urn_chunk</span><span class="p">(</span><span class="n">doc_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos">24</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Urn chunk.</span>
 <span class="linenos">25</span>
-<span class="linenos">26</span><span class="sd">    Returns:</span>
-<span class="linenos">27</span><span class="sd">        str: TODO.</span>
-<span class="linenos">28</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">29</span>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;urn:chunk:</span><span class="si">{</span><span class="n">doc_hash</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span></div>
+<span class="linenos">26</span><span class="sd">    Args:</span>
+<span class="linenos">27</span><span class="sd">        doc_hash (str): TODO.</span>
+<span class="linenos">28</span><span class="sd">        start (int): TODO.</span>
+<span class="linenos">29</span><span class="sd">        end (int): TODO.</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span><span class="sd">    Returns:</span>
+<span class="linenos">32</span><span class="sd">        str: TODO.</span>
+<span class="linenos">33</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">34</span>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;urn:chunk:</span><span class="si">{</span><span class="n">doc_hash</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
 </pre></div>
 

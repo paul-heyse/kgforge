@@ -17,6 +17,7 @@ Module Contents
 ---------------
 
 .. py:data:: API_KEYS
+   :type:  set[str]
 
 .. py:data:: app
 

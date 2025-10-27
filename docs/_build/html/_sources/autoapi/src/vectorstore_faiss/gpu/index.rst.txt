@@ -18,8 +18,7 @@ Module Contents
 
    FAISS GPU/cuVS wrapper.
 
-   If FAISS is unavailable at runtime, falls back to brute-force cosine
-   search over a provided matrix.
+   Provides a brute-force cosine search fallback when FAISS is unavailable at runtime.
 
 
    .. py:attribute:: factory

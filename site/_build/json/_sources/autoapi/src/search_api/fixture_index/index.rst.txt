@@ -68,17 +68,17 @@ Module Contents
 
 
    .. py:attribute:: docs
-      :type:  List[FixtureDoc]
+      :type:  list[FixtureDoc]
       :value: []
 
 
 
    .. py:attribute:: df
-      :type:  Dict[str, int]
+      :type:  dict[str, int]
 
 
    .. py:attribute:: tf
-      :type:  List[Dict[str, int]]
+      :type:  list[dict[str, int]]
       :value: []
 
 

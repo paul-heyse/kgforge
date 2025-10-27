@@ -33,7 +33,7 @@ Module Contents
 
 
    .. py:attribute:: filters
-      :type:  Optional[Dict[str, object]]
+      :type:  dict[str, object] | None
       :value: None
 
 
@@ -73,15 +73,15 @@ Module Contents
 
 
    .. py:attribute:: signals
-      :type:  Dict[str, float]
+      :type:  dict[str, float]
 
 
    .. py:attribute:: spans
-      :type:  Dict[str, int]
+      :type:  dict[str, int]
 
 
    .. py:attribute:: concepts
-      :type:  List[Dict[str, str]]
+      :type:  list[dict[str, str]]
       :value: []
 
 

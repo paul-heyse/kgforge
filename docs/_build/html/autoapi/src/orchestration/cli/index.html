@@ -454,7 +454,7 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py data">
 <dt class="sig sig-object py" id="src.orchestration.cli.app">
-<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">app</span></span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/orchestration/cli.py:14:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.app" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">app</span></span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/orchestration/cli.py:13:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.app" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -469,12 +469,15 @@
 <li><p><strong>index_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
 </ul>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.orchestration.cli.index_faiss">
-<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">index_faiss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dense_vectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Argument(...,</span> <span class="pre">help='Path</span> <span class="pre">to</span> <span class="pre">dense</span> <span class="pre">vectors</span> <span class="pre">JSON</span> <span class="pre">(skeleton)')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('./_indices/faiss/shard_000.idx',</span> <span class="pre">help='Output</span> <span class="pre">index</span> <span class="pre">(CPU</span> <span class="pre">.idx)')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#index_faiss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/orchestration/cli.py:37:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.index_faiss" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">index_faiss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dense_vectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Argument(...,</span> <span class="pre">help='Path</span> <span class="pre">to</span> <span class="pre">dense</span> <span class="pre">vectors</span> <span class="pre">JSON</span> <span class="pre">(skeleton)')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('./_indices/faiss/shard_000.idx',</span> <span class="pre">help='Output</span> <span class="pre">index</span> <span class="pre">(CPU</span> <span class="pre">.idx)')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#index_faiss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/orchestration/cli.py:61:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.index_faiss" title="Link to this definition">#</a></dt>
 <dd><p>Train &amp; build FAISS index from fixture dense vectors.</p>
 <p>In this skeleton we accept a JSON with entries: {key: str, vector: List[float]}.</p>
 <dl class="field-list simple">
@@ -484,16 +487,22 @@
 <li><p><strong>index_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
 </ul>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.orchestration.cli.api">
-<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8080</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#api"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/orchestration/cli.py:60:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.api" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8080</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#api"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/orchestration/cli.py:90:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.api" title="Link to this definition">#</a></dt>
 <dd><p>Run the FastAPI app.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>

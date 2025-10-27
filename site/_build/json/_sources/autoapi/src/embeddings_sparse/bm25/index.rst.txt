@@ -34,7 +34,7 @@ Module Contents
 
 
    .. py:attribute:: fields
-      :type:  Dict[str, str]
+      :type:  dict[str, str]
 
 
 .. py:class:: PurePythonBM25(index_dir, k1 = 0.9, b = 0.4, field_boosts = None)
@@ -58,15 +58,15 @@ Module Contents
 
 
    .. py:attribute:: df
-      :type:  Dict[str, int]
+      :type:  dict[str, int]
 
 
    .. py:attribute:: postings
-      :type:  Dict[str, Dict[str, int]]
+      :type:  dict[str, dict[str, int]]
 
 
    .. py:attribute:: docs
-      :type:  Dict[str, BM25Doc]
+      :type:  dict[str, BM25Doc]
 
 
    .. py:attribute:: N

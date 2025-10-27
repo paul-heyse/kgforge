@@ -16,7 +16,6 @@ Module Contents
 
 .. py:function:: canonicalize_text(blocks)
 
-   Apply NFC, normalize whitespace and bullets, preserve single newlines
-   between blocks.
+   Apply NFC, normalize whitespace and bullets, preserve single newlines between blocks.
 
 
