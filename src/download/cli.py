@@ -1,3 +1,5 @@
+"""Module for download.cli."""
+
 from __future__ import annotations
 import typer
 app = typer.Typer(help="Downloader & harvester CLI (skeleton).")

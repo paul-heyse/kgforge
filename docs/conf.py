@@ -79,20 +79,37 @@ autoapi_add_toctree_entry = True
 autoapi_options = [
     "members", "undoc-members", "show-inheritance", "special-members", "imported-members"
 ]
+autoapi_ignore = ["*/__init__.py"]
 
 # Show type hints nicely
 autodoc_typehints = "description"
 
 # Cross-link to Python stdlib docs
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", {"objects.inv": None}),
+    "python": ("https://docs.python.org/3", None),
 }
 
 # Show line numbers in rendered source pages (Sphinx >= 7.2)
 viewcode_line_numbers = True
 
+suppress_warnings = ["myst.header", "misc.restructuredtext"]
+
+# Ensure JSON builder can serialize lru_cache wrappers
+from sphinxcontrib.serializinghtml import jsonimpl  # type: ignore
+
+_json_default = jsonimpl.json.JSONEncoder.default
+
+
+def _json_safe_default(self, obj):  # pragma: no cover - builder patch
+    if obj.__class__.__name__ == "_lru_cache_wrapper":
+        return repr(obj)
+    return _json_default(self, obj)
+
+
+jsonimpl.json.JSONEncoder.default = _json_safe_default
+
 # --- Build deep links per symbol without importing your code (use Griffe)
-from griffe.loader import GriffeLoader
+from griffe import GriffeLoader
 
 _loader = GriffeLoader(search_paths=[str(SRC_DIR if SRC_DIR.exists() else ROOT)])
 _MODULE_CACHE = {}

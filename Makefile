@@ -47,25 +47,24 @@ fixture:
 docstrings:
 	@for pkg in $(PKGS); do \
 		echo "Updating docstrings for $$pkg"; \
-		doq -d google -r src/$$pkg; \
-		pyment -w -o numpydoc -r src/$$pkg; \
+		$(VENV)/bin/doq --formatter google -t tools/doq_templates/google -w -r -d src/$$pkg; \
 	done
-	pydocstyle src
-	docformatter -r -i src
-	interrogate -i src --fail-under 90
+	$(VENV)/bin/docformatter -r -i src
+	$(VENV)/bin/pydocstyle src
+	$(VENV)/bin/interrogate -i src --fail-under 90
 
 readmes:
-	python tools/gen_readmes.py
+	$(PY) tools/gen_readmes.py
 	-which doctoc >/dev/null 2>&1 && doctoc src/$(PKG) || echo "Install doctoc to auto-update TOCs."
 
 html:
-	sphinx-build -W -b html docs docs/_build/html
+	$(PY) -m sphinx -b html docs docs/_build/html
 
 json:
-	sphinx-build -W -b json docs docs/_build/json
+	$(PY) -m sphinx -b json docs docs/_build/json
 
 symbols:
-	python docs/_scripts/build_symbol_index.py
+	$(PY) docs/_scripts/build_symbol_index.py
 
 watch:
-	sphinx-autobuild docs docs/_build/html
+	$(PY) -m sphinx_autobuild docs docs/_build/html

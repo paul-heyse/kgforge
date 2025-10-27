@@ -1,0 +1,3 @@
+# `embeddings_dense`
+
+## API

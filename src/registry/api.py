@@ -1,16 +1,56 @@
+"""Module for registry.api."""
+
 from __future__ import annotations
-from typing import Protocol, List, Dict
+
+from typing import Dict, List, Protocol
+
 from kgforge.kgforge_common.models import Doc, DoctagsAsset
 
+
 class Registry(Protocol):
-    def begin_dataset(self, kind: str, run_id: str) -> str: ...
-    def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None: ...
-    def rollback_dataset(self, dataset_id: str) -> None: ...
+    """Registry protocol describing persistence operations."""
 
-    def insert_run(self, purpose: str, model_id: str | None, revision: str | None, config: dict) -> str: ...
-    def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None: ...
+    def begin_dataset(self, kind: str, run_id: str) -> str:
+        """Begin tracking a dataset build for the given run."""
 
-    def register_documents(self, docs: List[Doc]) -> None: ...
-    def register_doctags(self, assets: List[DoctagsAsset]) -> None: ...
-    def emit_event(self, event_name: str, subject_id: str, payload: Dict) -> None: ...
-    def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None: ...
+        ...
+
+    def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
+        """Finalize a dataset build."""
+
+        ...
+
+    def rollback_dataset(self, dataset_id: str) -> None:
+        """Rollback a dataset build after failure."""
+
+        ...
+
+    def insert_run(self, purpose: str, model_id: str | None, revision: str | None, config: dict) -> str:
+        """Register a new processing run."""
+
+        ...
+
+    def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
+        """Mark a run as complete."""
+
+        ...
+
+    def register_documents(self, docs: List[Doc]) -> None:
+        """Register document metadata with the registry."""
+
+        ...
+
+    def register_doctags(self, assets: List[DoctagsAsset]) -> None:
+        """Register DocTags assets with the registry."""
+
+        ...
+
+    def emit_event(self, event_name: str, subject_id: str, payload: Dict) -> None:
+        """Emit an audit event for monitoring."""
+
+        ...
+
+    def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
+        """Record an incident for visibility."""
+
+        ...

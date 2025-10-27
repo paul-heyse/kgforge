@@ -1,0 +1,156 @@
+src.search_api.bm25_index
+=========================
+
+.. py:module:: src.search_api.bm25_index
+
+.. autoapi-nested-parse::
+
+   Module for search_api.bm25_index.
+
+
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: TOKEN_RE
+
+.. py:function:: toks(s)
+
+   Toks.
+
+   :param s: TODO.
+   :type s: str
+
+   :returns: TODO.
+   :rtype: List[str]
+
+
+.. py:class:: BM25Doc
+
+   Bm25doc.
+
+
+   .. py:attribute:: chunk_id
+      :type:  str
+
+
+   .. py:attribute:: doc_id
+      :type:  str
+
+
+   .. py:attribute:: title
+      :type:  str
+
+
+   .. py:attribute:: section
+      :type:  str
+
+
+   .. py:attribute:: tf
+      :type:  Dict[str, float]
+
+
+   .. py:attribute:: dl
+      :type:  float
+
+
+.. py:class:: BM25Index(k1 = 0.9, b = 0.4)
+
+   Bm25index.
+
+
+   .. py:attribute:: k1
+
+
+   .. py:attribute:: b
+
+
+   .. py:attribute:: docs
+      :type:  List[BM25Doc]
+      :value: []
+
+
+
+   .. py:attribute:: df
+      :type:  Dict[str, int]
+
+
+   .. py:attribute:: N
+      :value: 0
+
+
+
+   .. py:attribute:: avgdl
+      :value: 0.0
+
+
+
+   .. py:method:: build_from_duckdb(db_path)
+      :classmethod:
+
+
+      Build from duckdb.
+
+      :param db_path: TODO.
+      :type db_path: str
+
+      :returns: TODO.
+      :rtype: "BM25Index"
+
+
+
+   .. py:method:: save(path)
+
+      Save.
+
+      :param path: TODO.
+      :type path: str
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: load(path)
+      :classmethod:
+
+
+      Load.
+
+      :param path: TODO.
+      :type path: str
+
+      :returns: TODO.
+      :rtype: "BM25Index"
+
+
+
+   .. py:method:: search(query, k = 10)
+
+      Search.
+
+      :param query: TODO.
+      :type query: str
+      :param k: TODO.
+      :type k: int
+
+
+
+   .. py:method:: doc(idx)
+
+      Doc.
+
+      :param idx: TODO.
+      :type idx: int
+
+      :returns: TODO.
+      :rtype: BM25Doc
+
+
+

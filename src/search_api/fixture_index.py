@@ -1,3 +1,5 @@
+"""Module for search_api.fixture_index."""
+
 
 from __future__ import annotations
 from dataclasses import dataclass
@@ -8,10 +10,19 @@ from pathlib import Path
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
 def tokenize(text: str) -> List[str]:
+    """Tokenize.
+
+    Args:
+        text (str): TODO.
+
+    Returns:
+        List[str]: TODO.
+    """
     return [t.lower() for t in TOKEN_RE.findall(text or "")]
 
 @dataclass
 class FixtureDoc:
+    """Fixturedoc."""
     chunk_id: str
     doc_id: str
     title: str
@@ -19,7 +30,14 @@ class FixtureDoc:
     text: str
 
 class FixtureIndex:
+    """Fixtureindex."""
     def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb"):
+        """Init.
+
+        Args:
+            root (str): TODO.
+            db_path (str): TODO.
+        """
         self.root = Path(root)
         self.db_path = db_path
         self.docs: List[FixtureDoc] = []
@@ -28,6 +46,11 @@ class FixtureIndex:
         self._load_from_duckdb()
 
     def _load_from_duckdb(self) -> None:
+        """Load from duckdb.
+
+        Returns:
+            None: TODO.
+        """
         if not Path(self.db_path).exists():
             return
         con = duckdb.connect(self.db_path)
@@ -56,6 +79,11 @@ class FixtureIndex:
         self._build_lex()
 
     def _build_lex(self) -> None:
+        """Build lex.
+
+        Returns:
+            None: TODO.
+        """
         self.tf.clear()
         self.df.clear()
         for doc in self.docs:
@@ -69,6 +97,15 @@ class FixtureIndex:
         self.N = len(self.docs)
 
     def search(self, query: str, k: int = 10) -> List[Tuple[int, float]]:
+        """Search.
+
+        Args:
+            query (str): TODO.
+            k (int): TODO.
+
+        Returns:
+            List[Tuple[int, float]]: TODO.
+        """
         if getattr(self, "N", 0) == 0:
             return []
         qtoks = tokenize(query)
@@ -87,4 +124,12 @@ class FixtureIndex:
         return [(i, s) for i, s in ranked[:k] if s > 0.0]
 
     def doc(self, idx: int) -> FixtureDoc:
+        """Doc.
+
+        Args:
+            idx (int): TODO.
+
+        Returns:
+            FixtureDoc: TODO.
+        """
         return self.docs[idx]

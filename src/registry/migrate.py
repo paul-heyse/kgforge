@@ -1,14 +1,26 @@
+"""Module for registry.migrate."""
+
 
 from __future__ import annotations
 import argparse, duckdb, pathlib
 
 def apply(db: str, migrations_dir: str) -> None:
+    """Apply.
+
+    Args:
+        db (str): TODO.
+        migrations_dir (str): TODO.
+
+    Returns:
+        None: TODO.
+    """
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
         con.execute(p.read_text())
     con.close()
 
 def main():
+    """Main."""
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
     a = sp.add_parser("apply")

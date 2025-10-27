@@ -1,3 +1,5 @@
+"""Module for orchestration.fixture_flow."""
+
 
 from __future__ import annotations
 from pathlib import Path
@@ -9,6 +11,14 @@ from kgforge.kgforge_common.models import Doc
 
 @task
 def t_prepare_dirs(root: str) -> dict:
+    """T prepare dirs.
+
+    Args:
+        root (str): TODO.
+
+    Returns:
+        dict: TODO.
+    """
     p = Path(root)
     (p / "parquet" / "dense").mkdir(parents=True, exist_ok=True)
     (p / "parquet" / "sparse").mkdir(parents=True, exist_ok=True)
@@ -18,6 +28,14 @@ def t_prepare_dirs(root: str) -> dict:
 
 @task
 def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
+    """T write fixture chunks.
+
+    Args:
+        chunks_root (str): TODO.
+
+    Returns:
+        tuple[str, int]: TODO.
+    """
     writer = ParquetChunkWriter(chunks_root, model="docling_hybrid", run_id="fixture")
     rows = [{
         "chunk_id":"urn:chunk:fixture:0-28","doc_id":"urn:doc:fixture:0001","section":"Intro",
@@ -29,6 +47,14 @@ def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
 
 @task
 def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
+    """T write fixture dense.
+
+    Args:
+        dense_root (str): TODO.
+
+    Returns:
+        tuple[str, int]: TODO.
+    """
     w = ParquetVectorWriter(dense_root)
     vec = [0.0]*2560
     out_root = w.write_dense("Qwen3-Embedding-4B","fixture",2560,[("urn:chunk:fixture:0-28",vec,1.0)], shard=0)
@@ -36,12 +62,31 @@ def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
 
 @task
 def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
+    """T write fixture splade.
+
+    Args:
+        sparse_root (str): TODO.
+
+    Returns:
+        tuple[str, int]: TODO.
+    """
     w = ParquetVectorWriter(sparse_root)
     out_root = w.write_splade("SPLADE-v3-distilbert","fixture",[("urn:chunk:fixture:0-28",[1,7,42],[0.3,0.2,0.1])], shard=0)
     return out_root, 1
 
 @task
 def t_register_in_duckdb(db_path: str, chunks_info, dense_info, sparse_info) -> dict:
+    """T register in duckdb.
+
+    Args:
+        db_path (str): TODO.
+        chunks_info: TODO.
+        dense_info: TODO.
+        sparse_info: TODO.
+
+    Returns:
+        dict: TODO.
+    """
     reg = DuckDBRegistryHelper(db_path)
     dense_run = reg.new_run("dense_embed","Qwen3-Embedding-4B","main",{"dim":2560})
     sparse_run = reg.new_run("splade_encode","SPLADE-v3-distilbert","main",{"topk":256})
@@ -60,6 +105,12 @@ def t_register_in_duckdb(db_path: str, chunks_info, dense_info, sparse_info) -> 
 
 @flow(name="kgforge_fixture_pipeline")
 def fixture_pipeline(root: str="/data", db_path: str="/data/catalog/catalog.duckdb"):
+    """Fixture pipeline.
+
+    Args:
+        root (str): TODO.
+        db_path (str): TODO.
+    """
     t_prepare_dirs(root)
     chunks_info = t_write_fixture_chunks(f"{root}/parquet/chunks")
     dense_info = t_write_fixture_dense(f"{root}/parquet/dense")

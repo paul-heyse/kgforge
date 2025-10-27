@@ -1,0 +1,161 @@
+src.registry.duckdb_registry
+============================
+
+.. py:module:: src.registry.duckdb_registry
+
+.. autoapi-nested-parse::
+
+   Module for registry.duckdb_registry.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: DuckDBRegistry(db_path)
+
+   Minimal DuckDB-backed registry (skeleton).
+
+
+   .. py:attribute:: db_path
+
+
+   .. py:attribute:: con
+
+
+   .. py:method:: begin_dataset(kind, run_id)
+
+      Begin dataset.
+
+      :param kind: TODO.
+      :type kind: str
+      :param run_id: TODO.
+      :type run_id: str
+
+      :returns: TODO.
+      :rtype: str
+
+
+
+   .. py:method:: commit_dataset(dataset_id, parquet_root, rows)
+
+      Commit dataset.
+
+      :param dataset_id: TODO.
+      :type dataset_id: str
+      :param parquet_root: TODO.
+      :type parquet_root: str
+      :param rows: TODO.
+      :type rows: int
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: rollback_dataset(dataset_id)
+
+      Rollback dataset.
+
+      :param dataset_id: TODO.
+      :type dataset_id: str
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: insert_run(purpose, model_id, revision, config)
+
+      Insert run.
+
+      :param purpose: TODO.
+      :type purpose: str
+      :param model_id: TODO.
+      :type model_id: str | None
+      :param revision: TODO.
+      :type revision: str | None
+      :param config: TODO.
+      :type config: dict
+
+      :returns: TODO.
+      :rtype: str
+
+
+
+   .. py:method:: close_run(run_id, success, notes = None)
+
+      Close run.
+
+      :param run_id: TODO.
+      :type run_id: str
+      :param success: TODO.
+      :type success: bool
+      :param notes: TODO.
+      :type notes: str | None
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: register_documents(docs)
+
+      Register documents.
+
+      :param docs: TODO.
+      :type docs: List[Doc]
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: register_doctags(assets)
+
+      Register doctags.
+
+      :param assets: TODO.
+      :type assets: List[DoctagsAsset]
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: emit_event(event_name, subject_id, payload)
+
+      Emit event.
+
+      :param event_name: TODO.
+      :type event_name: str
+      :param subject_id: TODO.
+      :type subject_id: str
+      :param payload: TODO.
+      :type payload: Dict
+
+      :returns: TODO.
+      :rtype: None
+
+
+
+   .. py:method:: incident(event, subject_id, error_class, message)
+
+      Incident.
+
+      :param event: TODO.
+      :type event: str
+      :param subject_id: TODO.
+      :type subject_id: str
+      :param error_class: TODO.
+      :type error_class: str
+      :param message: TODO.
+      :type message: str
+
+      :returns: TODO.
+      :rtype: None
+
+
+

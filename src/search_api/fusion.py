@@ -1,8 +1,19 @@
+"""Module for search_api.fusion."""
+
 
 from __future__ import annotations
 from typing import List, Tuple, Dict
 
 def rrf_fuse(rankers: List[List[Tuple[str, float]]], k: int = 60) -> Dict[str, float]:
+    """Rrf fuse.
+
+    Args:
+        rankers (List[List[Tuple[str, float]]]): TODO.
+        k (int): TODO.
+
+    Returns:
+        Dict[str, float]: TODO.
+    """
     agg: Dict[str, float] = {}
     for ranked in rankers:
         for r, (key, _score) in enumerate(ranked, start=1):

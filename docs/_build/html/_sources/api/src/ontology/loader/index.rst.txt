@@ -1,0 +1,21 @@
+src.ontology.loader
+===================
+
+.. py:module:: src.ontology.loader
+
+.. autoapi-nested-parse::
+
+   Module for ontology.loader.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: OntologyLoader
+
+   Placeholder loader for ontology metadata.
+
+
