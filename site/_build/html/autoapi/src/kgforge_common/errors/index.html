@@ -454,10 +454,10 @@
 - DownloadError: Raised when an external download fails.
 - UnsupportedMIMEError: Raised when an unsupported MIME type is encountered.
 - DoclingError: Base Docling processing error.
-- OCRTimeout: Raised when OCR operations exceed time limits.
+- OCRTimeoutError: Raised when OCR operations exceed time limits.
 - ChunkingError: Raised when chunk generation fails.
 - EmbeddingError: Raised when embedding generation fails.
-- SpladeOOM: Raised when SPLADE runs out of memory.
+- SpladeOOMError: Raised when SPLADE runs out of memory.
 - IndexBuildError: Raised when index construction fails.
 - OntologyParseError: Raised when ontology parsing fails.
 - LinkerCalibrationError: Raised when linker calibration cannot be performed.
@@ -486,8 +486,8 @@
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="src.kgforge_common.errors.OCRTimeout">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgforge_common.errors.</span></span><span class="sig-name descname"><span class="pre">OCRTimeout</span></span><a class="reference internal" href="../../../../_modules/src/kgforge_common/errors.html#OCRTimeout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/kgforge_common/errors.py:36:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgforge_common.errors.OCRTimeout" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="src.kgforge_common.errors.OCRTimeoutError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgforge_common.errors.</span></span><span class="sig-name descname"><span class="pre">OCRTimeoutError</span></span><a class="reference internal" href="../../../../_modules/src/kgforge_common/errors.html#OCRTimeoutError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/kgforge_common/errors.py:36:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgforge_common.errors.OCRTimeoutError" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when OCR operations exceed time limits.</p>
 </dd></dl>
@@ -507,8 +507,8 @@
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="src.kgforge_common.errors.SpladeOOM">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgforge_common.errors.</span></span><span class="sig-name descname"><span class="pre">SpladeOOM</span></span><a class="reference internal" href="../../../../_modules/src/kgforge_common/errors.html#SpladeOOM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/kgforge_common/errors.py:54:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgforge_common.errors.SpladeOOM" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="src.kgforge_common.errors.SpladeOOMError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgforge_common.errors.</span></span><span class="sig-name descname"><span class="pre">SpladeOOMError</span></span><a class="reference internal" href="../../../../_modules/src/kgforge_common/errors.html#SpladeOOMError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/kgforge_common/errors.py:54:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgforge_common.errors.SpladeOOMError" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when SPLADE runs out of memory.</p>
 </dd></dl>
@@ -595,10 +595,10 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgforge_common.errors.DownloadError"><code class="docutils literal notranslate"><span class="pre">DownloadError</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgforge_common.errors.UnsupportedMIMEError"><code class="docutils literal notranslate"><span class="pre">UnsupportedMIMEError</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgforge_common.errors.DoclingError"><code class="docutils literal notranslate"><span class="pre">DoclingError</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgforge_common.errors.OCRTimeout"><code class="docutils literal notranslate"><span class="pre">OCRTimeout</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgforge_common.errors.OCRTimeoutError"><code class="docutils literal notranslate"><span class="pre">OCRTimeoutError</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgforge_common.errors.ChunkingError"><code class="docutils literal notranslate"><span class="pre">ChunkingError</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgforge_common.errors.EmbeddingError"><code class="docutils literal notranslate"><span class="pre">EmbeddingError</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgforge_common.errors.SpladeOOM"><code class="docutils literal notranslate"><span class="pre">SpladeOOM</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgforge_common.errors.SpladeOOMError"><code class="docutils literal notranslate"><span class="pre">SpladeOOMError</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgforge_common.errors.IndexBuildError"><code class="docutils literal notranslate"><span class="pre">IndexBuildError</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgforge_common.errors.OntologyParseError"><code class="docutils literal notranslate"><span class="pre">OntologyParseError</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgforge_common.errors.LinkerCalibrationError"><code class="docutils literal notranslate"><span class="pre">LinkerCalibrationError</span></code></a></li>

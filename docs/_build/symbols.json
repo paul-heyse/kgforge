@@ -92,7 +92,7 @@
     "kind": "class",
     "file": "kgforge_common/parquet_io.py",
     "lineno": 22,
-    "endlineno": 160,
+    "endlineno": 183,
     "doc": "Parquetvectorwriter."
   },
   {
@@ -100,87 +100,87 @@
     "kind": "function",
     "file": "kgforge_common/parquet_io.py",
     "lineno": 25,
-    "endlineno": 45,
+    "endlineno": 49,
     "doc": "Dense schema."
   },
   {
     "path": "kgforge_common.parquet_io.ParquetVectorWriter.__init__",
     "kind": "function",
     "file": "kgforge_common/parquet_io.py",
-    "lineno": 47,
-    "endlineno": 53,
+    "lineno": 51,
+    "endlineno": 59,
     "doc": "Init."
   },
   {
     "path": "kgforge_common.parquet_io.ParquetVectorWriter.root",
     "kind": "attribute",
     "file": "kgforge_common/parquet_io.py",
-    "lineno": 53,
-    "endlineno": 53,
+    "lineno": 59,
+    "endlineno": 59,
     "doc": ""
   },
   {
     "path": "kgforge_common.parquet_io.ParquetVectorWriter.write_dense",
     "kind": "function",
     "file": "kgforge_common/parquet_io.py",
-    "lineno": 55,
-    "endlineno": 98,
+    "lineno": 61,
+    "endlineno": 112,
     "doc": "Write dense."
   },
   {
     "path": "kgforge_common.parquet_io.ParquetVectorWriter.splade_schema",
     "kind": "function",
     "file": "kgforge_common/parquet_io.py",
-    "lineno": 100,
-    "endlineno": 117,
+    "lineno": 114,
+    "endlineno": 133,
     "doc": "Splade schema."
   },
   {
     "path": "kgforge_common.parquet_io.ParquetVectorWriter.write_splade",
     "kind": "function",
     "file": "kgforge_common/parquet_io.py",
-    "lineno": 119,
-    "endlineno": 160,
+    "lineno": 135,
+    "endlineno": 183,
     "doc": "Write splade."
   },
   {
     "path": "kgforge_common.parquet_io.ParquetChunkWriter",
     "kind": "class",
     "file": "kgforge_common/parquet_io.py",
-    "lineno": 163,
-    "endlineno": 224,
+    "lineno": 186,
+    "endlineno": 257,
     "doc": "Parquetchunkwriter."
   },
   {
     "path": "kgforge_common.parquet_io.ParquetChunkWriter.chunk_schema",
     "kind": "function",
     "file": "kgforge_common/parquet_io.py",
-    "lineno": 166,
-    "endlineno": 194,
+    "lineno": 189,
+    "endlineno": 219,
     "doc": "Chunk schema."
   },
   {
     "path": "kgforge_common.parquet_io.ParquetChunkWriter.__init__",
     "kind": "function",
     "file": "kgforge_common/parquet_io.py",
-    "lineno": 196,
-    "endlineno": 205,
+    "lineno": 221,
+    "endlineno": 234,
     "doc": "Init."
   },
   {
     "path": "kgforge_common.parquet_io.ParquetChunkWriter.root",
     "kind": "attribute",
     "file": "kgforge_common/parquet_io.py",
-    "lineno": 204,
-    "endlineno": 204,
+    "lineno": 233,
+    "endlineno": 233,
     "doc": ""
   },
   {
     "path": "kgforge_common.parquet_io.ParquetChunkWriter.write",
     "kind": "function",
     "file": "kgforge_common/parquet_io.py",
-    "lineno": 207,
-    "endlineno": 224,
+    "lineno": 236,
+    "endlineno": 257,
     "doc": "Write."
   },
   {
@@ -564,7 +564,7 @@
     "kind": "function",
     "file": "kgforge_common/config.py",
     "lineno": 14,
-    "endlineno": 24,
+    "endlineno": 28,
     "doc": "Load config."
   },
   {
@@ -604,15 +604,15 @@
     "kind": "function",
     "file": "kgforge_common/ids.py",
     "lineno": 14,
-    "endlineno": 25,
+    "endlineno": 29,
     "doc": "Urn doc from text."
   },
   {
     "path": "kgforge_common.ids.urn_chunk",
     "kind": "function",
     "file": "kgforge_common/ids.py",
-    "lineno": 28,
-    "endlineno": 39,
+    "lineno": 32,
+    "endlineno": 49,
     "doc": "Urn chunk."
   },
   {
@@ -652,7 +652,7 @@
     "kind": "class",
     "file": "kgforge_common/logging.py",
     "lineno": 13,
-    "endlineno": 35,
+    "endlineno": 39,
     "doc": "Jsonformatter."
   },
   {
@@ -660,16 +660,16 @@
     "kind": "function",
     "file": "kgforge_common/logging.py",
     "lineno": 16,
-    "endlineno": 35,
+    "endlineno": 39,
     "doc": "Format."
   },
   {
     "path": "kgforge_common.logging.setup_logging",
     "kind": "function",
     "file": "kgforge_common/logging.py",
-    "lineno": 38,
-    "endlineno": 49,
-    "doc": "Setup logging."
+    "lineno": 42,
+    "endlineno": 57,
+    "doc": "Configure logging with a structured JSON formatter."
   },
   {
     "path": "kgforge_common.errors",
@@ -704,7 +704,7 @@
     "doc": "Base Docling processing error."
   },
   {
-    "path": "kgforge_common.errors.OCRTimeout",
+    "path": "kgforge_common.errors.OCRTimeoutError",
     "kind": "class",
     "file": "kgforge_common/errors.py",
     "lineno": 36,
@@ -728,7 +728,7 @@
     "doc": "Raised when embedding generation fails."
   },
   {
-    "path": "kgforge_common.errors.SpladeOOM",
+    "path": "kgforge_common.errors.SpladeOOMError",
     "kind": "class",
     "file": "kgforge_common/errors.py",
     "lineno": 54,
@@ -868,7 +868,7 @@
     "kind": "function",
     "file": "docling/canonicalizer.py",
     "lineno": 13,
-    "endlineno": 33,
+    "endlineno": 36,
     "doc": "Apply NFC, normalize whitespace and bullets, preserve single newlines between blocks."
   },
   {
@@ -992,107 +992,115 @@
     "doc": ""
   },
   {
+    "path": "download.harvester.HTTP_OK",
+    "kind": "attribute",
+    "file": "download/harvester.py",
+    "lineno": 17,
+    "endlineno": 17,
+    "doc": ""
+  },
+  {
     "path": "download.harvester.OpenAccessHarvester",
     "kind": "class",
     "file": "download/harvester.py",
-    "lineno": 18,
-    "endlineno": 153,
+    "lineno": 20,
+    "endlineno": 185,
     "doc": "Openaccessharvester."
   },
   {
     "path": "download.harvester.OpenAccessHarvester.__init__",
     "kind": "function",
     "file": "download/harvester.py",
-    "lineno": 21,
-    "endlineno": 48,
+    "lineno": 23,
+    "endlineno": 57,
     "doc": "Init."
   },
   {
     "path": "download.harvester.OpenAccessHarvester.ua",
     "kind": "attribute",
     "file": "download/harvester.py",
-    "lineno": 40,
-    "endlineno": 40,
+    "lineno": 49,
+    "endlineno": 49,
     "doc": ""
   },
   {
     "path": "download.harvester.OpenAccessHarvester.email",
     "kind": "attribute",
     "file": "download/harvester.py",
-    "lineno": 41,
-    "endlineno": 41,
+    "lineno": 50,
+    "endlineno": 50,
     "doc": ""
   },
   {
     "path": "download.harvester.OpenAccessHarvester.openalex",
     "kind": "attribute",
     "file": "download/harvester.py",
-    "lineno": 42,
-    "endlineno": 42,
+    "lineno": 51,
+    "endlineno": 51,
     "doc": ""
   },
   {
     "path": "download.harvester.OpenAccessHarvester.unpaywall",
     "kind": "attribute",
     "file": "download/harvester.py",
-    "lineno": 43,
-    "endlineno": 43,
+    "lineno": 52,
+    "endlineno": 52,
     "doc": ""
   },
   {
     "path": "download.harvester.OpenAccessHarvester.pdf_host",
     "kind": "attribute",
     "file": "download/harvester.py",
-    "lineno": 44,
-    "endlineno": 44,
+    "lineno": 53,
+    "endlineno": 53,
     "doc": ""
   },
   {
     "path": "download.harvester.OpenAccessHarvester.out_dir",
     "kind": "attribute",
     "file": "download/harvester.py",
-    "lineno": 45,
-    "endlineno": 45,
+    "lineno": 54,
+    "endlineno": 54,
     "doc": ""
   },
   {
     "path": "download.harvester.OpenAccessHarvester.session",
     "kind": "attribute",
     "file": "download/harvester.py",
-    "lineno": 47,
-    "endlineno": 47,
+    "lineno": 56,
+    "endlineno": 56,
     "doc": ""
   },
   {
     "path": "download.harvester.OpenAccessHarvester.search",
     "kind": "function",
     "file": "download/harvester.py",
-    "lineno": 50,
-    "endlineno": 66,
+    "lineno": 59,
+    "endlineno": 81,
     "doc": "Search."
   },
   {
     "path": "download.harvester.OpenAccessHarvester.resolve_pdf",
     "kind": "function",
     "file": "download/harvester.py",
-    "lineno": 68,
-    "endlineno": 95,
+    "lineno": 83,
+    "endlineno": 114,
     "doc": "Resolve pdf."
   },
   {
     "path": "download.harvester.OpenAccessHarvester.download_pdf",
     "kind": "function",
     "file": "download/harvester.py",
-    "lineno": 97,
-    "endlineno": 115,
+    "lineno": 116,
+    "endlineno": 141,
     "doc": "Download pdf."
   },
   {
     "path": "download.harvester.OpenAccessHarvester.run",
     "kind": "function",
     "file": "download/harvester.py",
-    "lineno": 117,
-    "endlineno": 153,
+    "lineno": 143,
+    "endlineno": 185,
     "doc": "Run."
   },
   {
@@ -1140,7 +1148,7 @@
     "kind": "class",
     "file": "embeddings_dense/base.py",
     "lineno": 14,
-    "endlineno": 23,
+    "endlineno": 22,
     "doc": "Protocol describing a dense embedding provider."
   },
   {
@@ -1164,7 +1172,7 @@
     "kind": "function",
     "file": "embeddings_dense/base.py",
     "lineno": 20,
-    "endlineno": 23,
+    "endlineno": 22,
     "doc": "Return embeddings for the supplied texts."
   },
   {
@@ -1236,7 +1244,7 @@
     "kind": "class",
     "file": "embeddings_sparse/base.py",
     "lineno": 14,
-    "endlineno": 22,
+    "endlineno": 21,
     "doc": "Protocol for sparse text encoders."
   },
   {
@@ -1252,31 +1260,31 @@
     "kind": "function",
     "file": "embeddings_sparse/base.py",
     "lineno": 19,
-    "endlineno": 22,
+    "endlineno": 21,
     "doc": "Return sparse encodings for the given texts."
   },
   {
     "path": "embeddings_sparse.base.SparseIndex",
     "kind": "class",
     "file": "embeddings_sparse/base.py",
-    "lineno": 25,
-    "endlineno": 38,
+    "lineno": 24,
+    "endlineno": 35,
     "doc": "Protocol describing sparse index interactions."
   },
   {
     "path": "embeddings_sparse.base.SparseIndex.build",
     "kind": "function",
     "file": "embeddings_sparse/base.py",
-    "lineno": 28,
-    "endlineno": 31,
+    "lineno": 27,
+    "endlineno": 29,
     "doc": "Build the index from the supplied documents."
   },
   {
     "path": "embeddings_sparse.base.SparseIndex.search",
     "kind": "function",
     "file": "embeddings_sparse/base.py",
-    "lineno": 33,
-    "endlineno": 38,
+    "lineno": 31,
+    "endlineno": 35,
     "doc": "Search the index and return (id, score) tuples."
   },
   {
@@ -1372,7 +1380,7 @@
     "kind": "class",
     "file": "embeddings_sparse/splade.py",
     "lineno": 23,
-    "endlineno": 62,
+    "endlineno": 72,
     "doc": "Spladev3encoder."
   },
   {
@@ -1388,183 +1396,183 @@
     "kind": "function",
     "file": "embeddings_sparse/splade.py",
     "lineno": 28,
-    "endlineno": 46,
+    "endlineno": 51,
     "doc": "Init."
   },
   {
     "path": "embeddings_sparse.splade.SPLADEv3Encoder.model_id",
     "kind": "attribute",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 43,
-    "endlineno": 43,
+    "lineno": 48,
+    "endlineno": 48,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.splade.SPLADEv3Encoder.device",
     "kind": "attribute",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 44,
-    "endlineno": 44,
+    "lineno": 49,
+    "endlineno": 49,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.splade.SPLADEv3Encoder.topk",
     "kind": "attribute",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 45,
-    "endlineno": 45,
+    "lineno": 50,
+    "endlineno": 50,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.splade.SPLADEv3Encoder.max_seq_len",
     "kind": "attribute",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 46,
-    "endlineno": 46,
+    "lineno": 51,
+    "endlineno": 51,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.splade.SPLADEv3Encoder.encode",
     "kind": "function",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 48,
-    "endlineno": 62,
+    "lineno": 53,
+    "endlineno": 72,
     "doc": "Encode."
   },
   {
     "path": "embeddings_sparse.splade.PureImpactIndex",
     "kind": "class",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 65,
-    "endlineno": 165,
+    "lineno": 75,
+    "endlineno": 192,
     "doc": "Toy 'impact' index that approximates SPLADE with IDF/log weighting."
   },
   {
     "path": "embeddings_sparse.splade.PureImpactIndex.__init__",
     "kind": "function",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 72,
-    "endlineno": 81,
+    "lineno": 82,
+    "endlineno": 93,
     "doc": "Init."
   },
   {
     "path": "embeddings_sparse.splade.PureImpactIndex.index_dir",
     "kind": "attribute",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 78,
-    "endlineno": 78,
+    "lineno": 90,
+    "endlineno": 90,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.splade.PureImpactIndex.df",
     "kind": "attribute",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 79,
-    "endlineno": 79,
+    "lineno": 91,
+    "endlineno": 91,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.splade.PureImpactIndex.N",
     "kind": "attribute",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 80,
-    "endlineno": 80,
+    "lineno": 92,
+    "endlineno": 92,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.splade.PureImpactIndex.postings",
     "kind": "attribute",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 81,
-    "endlineno": 81,
+    "lineno": 93,
+    "endlineno": 93,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.splade.PureImpactIndex._tokenize",
     "kind": "function",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 83,
-    "endlineno": 93,
+    "lineno": 95,
+    "endlineno": 109,
     "doc": "Tokenize."
   },
   {
     "path": "embeddings_sparse.splade.PureImpactIndex.build",
     "kind": "function",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 95,
-    "endlineno": 133,
+    "lineno": 111,
+    "endlineno": 153,
     "doc": "Build."
   },
   {
     "path": "embeddings_sparse.splade.PureImpactIndex.load",
     "kind": "function",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 135,
-    "endlineno": 145,
+    "lineno": 155,
+    "endlineno": 167,
     "doc": "Load."
   },
   {
     "path": "embeddings_sparse.splade.PureImpactIndex.search",
     "kind": "function",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 147,
-    "endlineno": 165,
+    "lineno": 169,
+    "endlineno": 192,
     "doc": "Search."
   },
   {
     "path": "embeddings_sparse.splade.LuceneImpactIndex",
     "kind": "class",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 168,
-    "endlineno": 207,
+    "lineno": 195,
+    "endlineno": 243,
     "doc": "Pyserini SPLADE impact index wrapper."
   },
   {
     "path": "embeddings_sparse.splade.LuceneImpactIndex.__init__",
     "kind": "function",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 174,
-    "endlineno": 181,
+    "lineno": 201,
+    "endlineno": 210,
     "doc": "Init."
   },
   {
     "path": "embeddings_sparse.splade.LuceneImpactIndex.index_dir",
     "kind": "attribute",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 180,
-    "endlineno": 180,
+    "lineno": 209,
+    "endlineno": 209,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.splade.LuceneImpactIndex._searcher",
     "kind": "attribute",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 181,
-    "endlineno": 181,
+    "lineno": 210,
+    "endlineno": 210,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.splade.LuceneImpactIndex._ensure",
     "kind": "function",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 183,
-    "endlineno": 191,
+    "lineno": 212,
+    "endlineno": 221,
     "doc": "Ensure."
   },
   {
     "path": "embeddings_sparse.splade.LuceneImpactIndex.search",
     "kind": "function",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 193,
-    "endlineno": 207,
+    "lineno": 223,
+    "endlineno": 243,
     "doc": "Search."
   },
   {
     "path": "embeddings_sparse.splade.get_splade",
     "kind": "function",
     "file": "embeddings_sparse/splade.py",
-    "lineno": 210,
-    "endlineno": 222,
+    "lineno": 246,
+    "endlineno": 261,
     "doc": "Get splade."
   },
   {
@@ -1708,7 +1716,7 @@
     "kind": "class",
     "file": "embeddings_sparse/bm25.py",
     "lineno": 33,
-    "endlineno": 193,
+    "endlineno": 217,
     "doc": "Simple offline BM25 builder & searcher (Okapi BM25)."
   },
   {
@@ -1716,51 +1724,11 @@
     "kind": "function",
     "file": "embeddings_sparse/bm25.py",
     "lineno": 40,
-    "endlineno": 63,
+    "endlineno": 68,
     "doc": "Init."
   },
   {
     "path": "embeddings_sparse.bm25.PurePythonBM25.index_dir",
-    "kind": "attribute",
-    "file": "embeddings_sparse/bm25.py",
-    "lineno": 55,
-    "endlineno": 55,
-    "doc": ""
-  },
-  {
-    "path": "embeddings_sparse.bm25.PurePythonBM25.k1",
-    "kind": "attribute",
-    "file": "embeddings_sparse/bm25.py",
-    "lineno": 56,
-    "endlineno": 56,
-    "doc": ""
-  },
-  {
-    "path": "embeddings_sparse.bm25.PurePythonBM25.b",
-    "kind": "attribute",
-    "file": "embeddings_sparse/bm25.py",
-    "lineno": 57,
-    "endlineno": 57,
-    "doc": ""
-  },
-  {
-    "path": "embeddings_sparse.bm25.PurePythonBM25.field_boosts",
-    "kind": "attribute",
-    "file": "embeddings_sparse/bm25.py",
-    "lineno": 58,
-    "endlineno": 58,
-    "doc": ""
-  },
-  {
-    "path": "embeddings_sparse.bm25.PurePythonBM25.df",
-    "kind": "attribute",
-    "file": "embeddings_sparse/bm25.py",
-    "lineno": 59,
-    "endlineno": 59,
-    "doc": ""
-  },
-  {
-    "path": "embeddings_sparse.bm25.PurePythonBM25.postings",
     "kind": "attribute",
     "file": "embeddings_sparse/bm25.py",
     "lineno": 60,
@@ -1768,7 +1736,7 @@
     "doc": ""
   },
   {
-    "path": "embeddings_sparse.bm25.PurePythonBM25.docs",
+    "path": "embeddings_sparse.bm25.PurePythonBM25.k1",
     "kind": "attribute",
     "file": "embeddings_sparse/bm25.py",
     "lineno": 61,
@@ -1776,7 +1744,7 @@
     "doc": ""
   },
   {
-    "path": "embeddings_sparse.bm25.PurePythonBM25.N",
+    "path": "embeddings_sparse.bm25.PurePythonBM25.b",
     "kind": "attribute",
     "file": "embeddings_sparse/bm25.py",
     "lineno": 62,
@@ -1784,7 +1752,7 @@
     "doc": ""
   },
   {
-    "path": "embeddings_sparse.bm25.PurePythonBM25.avgdl",
+    "path": "embeddings_sparse.bm25.PurePythonBM25.field_boosts",
     "kind": "attribute",
     "file": "embeddings_sparse/bm25.py",
     "lineno": 63,
@@ -1792,131 +1760,171 @@
     "doc": ""
   },
   {
+    "path": "embeddings_sparse.bm25.PurePythonBM25.df",
+    "kind": "attribute",
+    "file": "embeddings_sparse/bm25.py",
+    "lineno": 64,
+    "endlineno": 64,
+    "doc": ""
+  },
+  {
+    "path": "embeddings_sparse.bm25.PurePythonBM25.postings",
+    "kind": "attribute",
+    "file": "embeddings_sparse/bm25.py",
+    "lineno": 65,
+    "endlineno": 65,
+    "doc": ""
+  },
+  {
+    "path": "embeddings_sparse.bm25.PurePythonBM25.docs",
+    "kind": "attribute",
+    "file": "embeddings_sparse/bm25.py",
+    "lineno": 66,
+    "endlineno": 66,
+    "doc": ""
+  },
+  {
+    "path": "embeddings_sparse.bm25.PurePythonBM25.N",
+    "kind": "attribute",
+    "file": "embeddings_sparse/bm25.py",
+    "lineno": 67,
+    "endlineno": 67,
+    "doc": ""
+  },
+  {
+    "path": "embeddings_sparse.bm25.PurePythonBM25.avgdl",
+    "kind": "attribute",
+    "file": "embeddings_sparse/bm25.py",
+    "lineno": 68,
+    "endlineno": 68,
+    "doc": ""
+  },
+  {
     "path": "embeddings_sparse.bm25.PurePythonBM25._tokenize",
     "kind": "function",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 65,
-    "endlineno": 75,
+    "lineno": 70,
+    "endlineno": 84,
     "doc": "Tokenize."
   },
   {
     "path": "embeddings_sparse.bm25.PurePythonBM25.build",
     "kind": "function",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 77,
-    "endlineno": 130,
+    "lineno": 86,
+    "endlineno": 143,
     "doc": "Build."
   },
   {
     "path": "embeddings_sparse.bm25.PurePythonBM25.load",
     "kind": "function",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 132,
-    "endlineno": 148,
+    "lineno": 145,
+    "endlineno": 163,
     "doc": "Load."
   },
   {
     "path": "embeddings_sparse.bm25.PurePythonBM25._idf",
     "kind": "function",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 150,
-    "endlineno": 163,
+    "lineno": 165,
+    "endlineno": 182,
     "doc": "Idf."
   },
   {
     "path": "embeddings_sparse.bm25.PurePythonBM25.search",
     "kind": "function",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 165,
-    "endlineno": 193,
+    "lineno": 184,
+    "endlineno": 217,
     "doc": "Search."
   },
   {
     "path": "embeddings_sparse.bm25.LuceneBM25",
     "kind": "class",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 196,
-    "endlineno": 281,
+    "lineno": 220,
+    "endlineno": 322,
     "doc": "Pyserini-backed Lucene BM25 adapter."
   },
   {
     "path": "embeddings_sparse.bm25.LuceneBM25.__init__",
     "kind": "function",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 202,
-    "endlineno": 221,
+    "lineno": 226,
+    "endlineno": 250,
     "doc": "Init."
   },
   {
     "path": "embeddings_sparse.bm25.LuceneBM25.index_dir",
     "kind": "attribute",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 217,
-    "endlineno": 217,
+    "lineno": 246,
+    "endlineno": 246,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.bm25.LuceneBM25.k1",
     "kind": "attribute",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 218,
-    "endlineno": 218,
+    "lineno": 247,
+    "endlineno": 247,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.bm25.LuceneBM25.b",
     "kind": "attribute",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 219,
-    "endlineno": 219,
+    "lineno": 248,
+    "endlineno": 248,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.bm25.LuceneBM25.field_boosts",
     "kind": "attribute",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 220,
-    "endlineno": 220,
+    "lineno": 249,
+    "endlineno": 249,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.bm25.LuceneBM25._searcher",
     "kind": "attribute",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 221,
-    "endlineno": 221,
+    "lineno": 250,
+    "endlineno": 250,
     "doc": ""
   },
   {
     "path": "embeddings_sparse.bm25.LuceneBM25.build",
     "kind": "function",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 223,
-    "endlineno": 253,
+    "lineno": 252,
+    "endlineno": 287,
     "doc": "Build."
   },
   {
     "path": "embeddings_sparse.bm25.LuceneBM25._ensure_searcher",
     "kind": "function",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 255,
-    "endlineno": 262,
+    "lineno": 289,
+    "endlineno": 296,
     "doc": "Ensure searcher."
   },
   {
     "path": "embeddings_sparse.bm25.LuceneBM25.search",
     "kind": "function",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 264,
-    "endlineno": 281,
+    "lineno": 298,
+    "endlineno": 322,
     "doc": "Search."
   },
   {
     "path": "embeddings_sparse.bm25.get_bm25",
     "kind": "function",
     "file": "embeddings_sparse/bm25.py",
-    "lineno": 284,
-    "endlineno": 298,
+    "lineno": 325,
+    "endlineno": 348,
     "doc": "Get bm25."
   },
   {
@@ -1948,7 +1956,7 @@
     "kind": "class",
     "file": "kg_builder/mock_kg.py",
     "lineno": 10,
-    "endlineno": 60,
+    "endlineno": 74,
     "doc": "A tiny in-memory KG for demo."
   },
   {
@@ -1980,32 +1988,32 @@
     "kind": "function",
     "file": "kg_builder/mock_kg.py",
     "lineno": 21,
-    "endlineno": 28,
-    "doc": "Add mention."
+    "endlineno": 31,
+    "doc": "Add a mention linking a chunk to a concept."
   },
   {
     "path": "kg_builder.mock_kg.MockKG.add_edge",
     "kind": "function",
     "file": "kg_builder/mock_kg.py",
-    "lineno": 30,
-    "endlineno": 38,
-    "doc": "Add edge."
+    "lineno": 33,
+    "endlineno": 44,
+    "doc": "Add an undirected edge between two concepts."
   },
   {
     "path": "kg_builder.mock_kg.MockKG.linked_concepts",
     "kind": "function",
     "file": "kg_builder/mock_kg.py",
-    "lineno": 40,
-    "endlineno": 49,
-    "doc": "Linked concepts."
+    "lineno": 46,
+    "endlineno": 59,
+    "doc": "Return the concepts linked to a chunk identifier."
   },
   {
     "path": "kg_builder.mock_kg.MockKG.one_hop",
     "kind": "function",
     "file": "kg_builder/mock_kg.py",
-    "lineno": 51,
-    "endlineno": 60,
-    "doc": "One hop."
+    "lineno": 61,
+    "endlineno": 74,
+    "doc": "Return one-hop neighbours for a concept identifier."
   },
   {
     "path": "kg_builder.neo4j_store",
@@ -2088,14 +2096,6 @@
     "doc": "Module for observability.metrics."
   },
   {
-    "path": "observability.metrics.Any",
-    "kind": "alias",
-    "file": null,
-    "lineno": null,
-    "endlineno": null,
-    "doc": ""
-  },
-  {
     "path": "observability.metrics.Counter",
     "kind": "alias",
     "file": null,
@@ -2123,44 +2123,76 @@
     "path": "observability.metrics._Noop",
     "kind": "class",
     "file": "observability/metrics.py",
-    "lineno": 9,
-    "endlineno": 30,
+    "lineno": 7,
+    "endlineno": 24,
     "doc": "Minimal stand-in when Prometheus client is unavailable."
   },
   {
     "path": "observability.metrics._Noop.labels",
     "kind": "function",
     "file": "observability/metrics.py",
-    "lineno": 12,
-    "endlineno": 15,
+    "lineno": 10,
+    "endlineno": 12,
     "doc": "Return self to mimic the Prometheus API."
   },
   {
     "path": "observability.metrics._Noop.observe",
     "kind": "function",
     "file": "observability/metrics.py",
-    "lineno": 17,
-    "endlineno": 20,
+    "lineno": 14,
+    "endlineno": 16,
     "doc": "Ignore observation calls."
   },
   {
     "path": "observability.metrics._Noop.inc",
     "kind": "function",
     "file": "observability/metrics.py",
-    "lineno": 22,
-    "endlineno": 25,
+    "lineno": 18,
+    "endlineno": 20,
     "doc": "Ignore counter increments."
   },
   {
     "path": "observability.metrics._Noop.set",
     "kind": "function",
     "file": "observability/metrics.py",
-    "lineno": 27,
-    "endlineno": 30,
+    "lineno": 22,
+    "endlineno": 24,
     "doc": "Ignore gauge updates."
   },
   {
     "path": "observability.metrics.pdf_download_success_total",
+    "kind": "attribute",
+    "file": "observability/metrics.py",
+    "lineno": 28,
+    "endlineno": 28,
+    "doc": ""
+  },
+  {
+    "path": "observability.metrics.pdf_download_failure_total",
+    "kind": "attribute",
+    "file": "observability/metrics.py",
+    "lineno": 29,
+    "endlineno": 31,
+    "doc": ""
+  },
+  {
+    "path": "observability.metrics.search_total_latency_ms",
+    "kind": "attribute",
+    "file": "observability/metrics.py",
+    "lineno": 32,
+    "endlineno": 32,
+    "doc": ""
+  },
+  {
+    "path": "observability.metrics.faiss_search_latency_ms",
+    "kind": "attribute",
+    "file": "observability/metrics.py",
+    "lineno": 33,
+    "endlineno": 33,
+    "doc": ""
+  },
+  {
+    "path": "observability.metrics.bm25_queries_total",
     "kind": "attribute",
     "file": "observability/metrics.py",
     "lineno": 34,
@@ -2168,43 +2200,11 @@
     "doc": ""
   },
   {
-    "path": "observability.metrics.pdf_download_failure_total",
-    "kind": "attribute",
-    "file": "observability/metrics.py",
-    "lineno": 35,
-    "endlineno": 37,
-    "doc": ""
-  },
-  {
-    "path": "observability.metrics.search_total_latency_ms",
-    "kind": "attribute",
-    "file": "observability/metrics.py",
-    "lineno": 38,
-    "endlineno": 38,
-    "doc": ""
-  },
-  {
-    "path": "observability.metrics.faiss_search_latency_ms",
-    "kind": "attribute",
-    "file": "observability/metrics.py",
-    "lineno": 39,
-    "endlineno": 39,
-    "doc": ""
-  },
-  {
-    "path": "observability.metrics.bm25_queries_total",
-    "kind": "attribute",
-    "file": "observability/metrics.py",
-    "lineno": 40,
-    "endlineno": 40,
-    "doc": ""
-  },
-  {
     "path": "observability.metrics.splade_queries_total",
     "kind": "attribute",
     "file": "observability/metrics.py",
-    "lineno": 41,
-    "endlineno": 41,
+    "lineno": 35,
+    "endlineno": 35,
     "doc": ""
   },
   {
@@ -2260,7 +2260,7 @@
     "kind": "class",
     "file": "ontology/catalog.py",
     "lineno": 12,
-    "endlineno": 34,
+    "endlineno": 41,
     "doc": "Ontologycatalog."
   },
   {
@@ -2268,23 +2268,23 @@
     "kind": "function",
     "file": "ontology/catalog.py",
     "lineno": 15,
-    "endlineno": 21,
+    "endlineno": 23,
     "doc": "Init."
   },
   {
     "path": "ontology.catalog.OntologyCatalog.by_id",
     "kind": "attribute",
     "file": "ontology/catalog.py",
-    "lineno": 21,
-    "endlineno": 21,
+    "lineno": 23,
+    "endlineno": 23,
     "doc": ""
   },
   {
     "path": "ontology.catalog.OntologyCatalog.neighbors",
     "kind": "function",
     "file": "ontology/catalog.py",
-    "lineno": 23,
-    "endlineno": 34,
+    "lineno": 25,
+    "endlineno": 41,
     "doc": "Neighbors."
   },
   {
@@ -2372,48 +2372,48 @@
     "kind": "function",
     "file": "orchestration/fixture_flow.py",
     "lineno": 22,
-    "endlineno": 37,
+    "endlineno": 41,
     "doc": "T prepare dirs."
   },
   {
     "path": "orchestration.fixture_flow.t_write_fixture_chunks",
     "kind": "function",
     "file": "orchestration/fixture_flow.py",
-    "lineno": 40,
-    "endlineno": 65,
+    "lineno": 44,
+    "endlineno": 73,
     "doc": "T write fixture chunks."
   },
   {
     "path": "orchestration.fixture_flow.t_write_fixture_dense",
     "kind": "function",
     "file": "orchestration/fixture_flow.py",
-    "lineno": 68,
-    "endlineno": 83,
+    "lineno": 76,
+    "endlineno": 95,
     "doc": "T write fixture dense."
   },
   {
     "path": "orchestration.fixture_flow.t_write_fixture_splade",
     "kind": "function",
     "file": "orchestration/fixture_flow.py",
-    "lineno": 86,
-    "endlineno": 103,
+    "lineno": 98,
+    "endlineno": 119,
     "doc": "T write fixture splade."
   },
   {
     "path": "orchestration.fixture_flow.t_register_in_duckdb",
     "kind": "function",
     "file": "orchestration/fixture_flow.py",
-    "lineno": 106,
-    "endlineno": 154,
+    "lineno": 122,
+    "endlineno": 174,
     "doc": "T register in duckdb."
   },
   {
     "path": "orchestration.fixture_flow.fixture_pipeline",
     "kind": "function",
     "file": "orchestration/fixture_flow.py",
-    "lineno": 157,
-    "endlineno": 172,
-    "doc": "Fixture pipeline."
+    "lineno": 177,
+    "endlineno": 194,
+    "doc": "Run the end-to-end fixture pipeline."
   },
   {
     "path": "orchestration.cli",
@@ -2548,15 +2548,15 @@
     "kind": "function",
     "file": "orchestration/flows.py",
     "lineno": 13,
-    "endlineno": 23,
+    "endlineno": 27,
     "doc": "T echo."
   },
   {
     "path": "orchestration.flows.e2e_flow",
     "kind": "function",
     "file": "orchestration/flows.py",
-    "lineno": 26,
-    "endlineno": 44,
+    "lineno": 30,
+    "endlineno": 48,
     "doc": "E2e flow."
   },
   {
@@ -2636,7 +2636,7 @@
     "kind": "class",
     "file": "registry/duckdb_registry.py",
     "lineno": 17,
-    "endlineno": 211,
+    "endlineno": 262,
     "doc": "Minimal DuckDB-backed registry (skeleton)."
   },
   {
@@ -2644,95 +2644,95 @@
     "kind": "function",
     "file": "registry/duckdb_registry.py",
     "lineno": 20,
-    "endlineno": 28,
+    "endlineno": 30,
     "doc": "Init."
   },
   {
     "path": "registry.duckdb_registry.DuckDBRegistry.db_path",
     "kind": "attribute",
     "file": "registry/duckdb_registry.py",
-    "lineno": 26,
-    "endlineno": 26,
+    "lineno": 28,
+    "endlineno": 28,
     "doc": ""
   },
   {
     "path": "registry.duckdb_registry.DuckDBRegistry.con",
     "kind": "attribute",
     "file": "registry/duckdb_registry.py",
-    "lineno": 27,
-    "endlineno": 27,
+    "lineno": 29,
+    "endlineno": 29,
     "doc": ""
   },
   {
     "path": "registry.duckdb_registry.DuckDBRegistry.begin_dataset",
     "kind": "function",
     "file": "registry/duckdb_registry.py",
-    "lineno": 30,
-    "endlineno": 49,
+    "lineno": 32,
+    "endlineno": 56,
     "doc": "Begin dataset."
   },
   {
     "path": "registry.duckdb_registry.DuckDBRegistry.commit_dataset",
     "kind": "function",
     "file": "registry/duckdb_registry.py",
-    "lineno": 51,
-    "endlineno": 64,
+    "lineno": 58,
+    "endlineno": 77,
     "doc": "Commit dataset."
   },
   {
     "path": "registry.duckdb_registry.DuckDBRegistry.rollback_dataset",
     "kind": "function",
     "file": "registry/duckdb_registry.py",
-    "lineno": 66,
-    "endlineno": 75,
+    "lineno": 79,
+    "endlineno": 92,
     "doc": "Rollback dataset."
   },
   {
     "path": "registry.duckdb_registry.DuckDBRegistry.insert_run",
     "kind": "function",
     "file": "registry/duckdb_registry.py",
-    "lineno": 77,
-    "endlineno": 104,
+    "lineno": 94,
+    "endlineno": 128,
     "doc": "Insert run."
   },
   {
     "path": "registry.duckdb_registry.DuckDBRegistry.close_run",
     "kind": "function",
     "file": "registry/duckdb_registry.py",
-    "lineno": 106,
-    "endlineno": 117,
+    "lineno": 130,
+    "endlineno": 147,
     "doc": "Close run."
   },
   {
     "path": "registry.duckdb_registry.DuckDBRegistry.register_documents",
     "kind": "function",
     "file": "registry/duckdb_registry.py",
-    "lineno": 119,
-    "endlineno": 151,
+    "lineno": 149,
+    "endlineno": 185,
     "doc": "Register documents."
   },
   {
     "path": "registry.duckdb_registry.DuckDBRegistry.register_doctags",
     "kind": "function",
     "file": "registry/duckdb_registry.py",
-    "lineno": 153,
-    "endlineno": 170,
+    "lineno": 187,
+    "endlineno": 208,
     "doc": "Register doctags."
   },
   {
     "path": "registry.duckdb_registry.DuckDBRegistry.emit_event",
     "kind": "function",
     "file": "registry/duckdb_registry.py",
-    "lineno": 172,
-    "endlineno": 190,
+    "lineno": 210,
+    "endlineno": 234,
     "doc": "Emit event."
   },
   {
     "path": "registry.duckdb_registry.DuckDBRegistry.incident",
     "kind": "function",
     "file": "registry/duckdb_registry.py",
-    "lineno": 192,
-    "endlineno": 211,
+    "lineno": 236,
+    "endlineno": 262,
     "doc": "Incident."
   },
   {
@@ -2788,7 +2788,7 @@
     "kind": "class",
     "file": "registry/api.py",
     "lineno": 15,
-    "endlineno": 67,
+    "endlineno": 58,
     "doc": "Registry protocol describing persistence operations."
   },
   {
@@ -2796,71 +2796,71 @@
     "kind": "function",
     "file": "registry/api.py",
     "lineno": 18,
-    "endlineno": 21,
+    "endlineno": 20,
     "doc": "Begin tracking a dataset build for the given run."
   },
   {
     "path": "registry.api.Registry.commit_dataset",
     "kind": "function",
     "file": "registry/api.py",
-    "lineno": 23,
-    "endlineno": 26,
+    "lineno": 22,
+    "endlineno": 24,
     "doc": "Finalize a dataset build."
   },
   {
     "path": "registry.api.Registry.rollback_dataset",
     "kind": "function",
     "file": "registry/api.py",
-    "lineno": 28,
-    "endlineno": 31,
+    "lineno": 26,
+    "endlineno": 28,
     "doc": "Rollback a dataset build after failure."
   },
   {
     "path": "registry.api.Registry.insert_run",
     "kind": "function",
     "file": "registry/api.py",
-    "lineno": 33,
-    "endlineno": 42,
+    "lineno": 30,
+    "endlineno": 38,
     "doc": "Register a new processing run."
   },
   {
     "path": "registry.api.Registry.close_run",
     "kind": "function",
     "file": "registry/api.py",
-    "lineno": 44,
-    "endlineno": 47,
+    "lineno": 40,
+    "endlineno": 42,
     "doc": "Mark a run as complete."
   },
   {
     "path": "registry.api.Registry.register_documents",
     "kind": "function",
     "file": "registry/api.py",
-    "lineno": 49,
-    "endlineno": 52,
+    "lineno": 44,
+    "endlineno": 46,
     "doc": "Register document metadata with the registry."
   },
   {
     "path": "registry.api.Registry.register_doctags",
     "kind": "function",
     "file": "registry/api.py",
-    "lineno": 54,
-    "endlineno": 57,
+    "lineno": 48,
+    "endlineno": 50,
     "doc": "Register DocTags assets with the registry."
   },
   {
     "path": "registry.api.Registry.emit_event",
     "kind": "function",
     "file": "registry/api.py",
-    "lineno": 59,
-    "endlineno": 62,
+    "lineno": 52,
+    "endlineno": 54,
     "doc": "Emit an audit event for monitoring."
   },
   {
     "path": "registry.api.Registry.incident",
     "kind": "function",
     "file": "registry/api.py",
-    "lineno": 64,
-    "endlineno": 67,
+    "lineno": 56,
+    "endlineno": 58,
     "doc": "Record an incident for visibility."
   },
   {
@@ -2932,7 +2932,7 @@
     "kind": "class",
     "file": "registry/helper.py",
     "lineno": 17,
-    "endlineno": 220,
+    "endlineno": 264,
     "doc": "Duckdbregistryhelper."
   },
   {
@@ -2940,87 +2940,87 @@
     "kind": "function",
     "file": "registry/helper.py",
     "lineno": 20,
-    "endlineno": 26,
+    "endlineno": 28,
     "doc": "Init."
   },
   {
     "path": "registry.helper.DuckDBRegistryHelper.db_path",
     "kind": "attribute",
     "file": "registry/helper.py",
-    "lineno": 26,
-    "endlineno": 26,
+    "lineno": 28,
+    "endlineno": 28,
     "doc": ""
   },
   {
     "path": "registry.helper.DuckDBRegistryHelper._con",
     "kind": "function",
     "file": "registry/helper.py",
-    "lineno": 28,
-    "endlineno": 30,
+    "lineno": 30,
+    "endlineno": 32,
     "doc": "Con."
   },
   {
     "path": "registry.helper.DuckDBRegistryHelper.new_run",
     "kind": "function",
     "file": "registry/helper.py",
-    "lineno": 32,
-    "endlineno": 61,
-    "doc": "New run."
+    "lineno": 34,
+    "endlineno": 70,
+    "doc": "Create a new registry run."
   },
   {
     "path": "registry.helper.DuckDBRegistryHelper.close_run",
     "kind": "function",
     "file": "registry/helper.py",
-    "lineno": 63,
-    "endlineno": 85,
+    "lineno": 72,
+    "endlineno": 100,
     "doc": "Close run."
   },
   {
     "path": "registry.helper.DuckDBRegistryHelper.begin_dataset",
     "kind": "function",
     "file": "registry/helper.py",
-    "lineno": 87,
-    "endlineno": 108,
+    "lineno": 102,
+    "endlineno": 128,
     "doc": "Begin dataset."
   },
   {
     "path": "registry.helper.DuckDBRegistryHelper.commit_dataset",
     "kind": "function",
     "file": "registry/helper.py",
-    "lineno": 110,
-    "endlineno": 134,
+    "lineno": 130,
+    "endlineno": 160,
     "doc": "Commit dataset."
   },
   {
     "path": "registry.helper.DuckDBRegistryHelper.rollback_dataset",
     "kind": "function",
     "file": "registry/helper.py",
-    "lineno": 136,
-    "endlineno": 151,
+    "lineno": 162,
+    "endlineno": 181,
     "doc": "Rollback dataset."
   },
   {
     "path": "registry.helper.DuckDBRegistryHelper.register_documents",
     "kind": "function",
     "file": "registry/helper.py",
-    "lineno": 153,
-    "endlineno": 185,
+    "lineno": 183,
+    "endlineno": 219,
     "doc": "Register documents."
   },
   {
     "path": "registry.helper.DuckDBRegistryHelper.register_doctags",
     "kind": "function",
     "file": "registry/helper.py",
-    "lineno": 187,
-    "endlineno": 202,
+    "lineno": 221,
+    "endlineno": 240,
     "doc": "Register doctags."
   },
   {
     "path": "registry.helper.DuckDBRegistryHelper.emit_event",
     "kind": "function",
     "file": "registry/helper.py",
-    "lineno": 204,
-    "endlineno": 220,
+    "lineno": 242,
+    "endlineno": 264,
     "doc": "Emit event."
   },
   {
@@ -3068,16 +3068,16 @@
     "kind": "function",
     "file": "registry/migrate.py",
     "lineno": 16,
-    "endlineno": 29,
+    "endlineno": 34,
     "doc": "Apply."
   },
   {
     "path": "registry.migrate.main",
     "kind": "function",
     "file": "registry/migrate.py",
-    "lineno": 32,
-    "endlineno": 41,
-    "doc": "Main."
+    "lineno": 37,
+    "endlineno": 46,
+    "doc": "Run the CLI entry point for migration commands."
   },
   {
     "path": "search_api",
@@ -3172,51 +3172,19 @@
     "kind": "function",
     "file": "search_api/bm25_index.py",
     "lineno": 23,
-    "endlineno": 32,
+    "endlineno": 36,
     "doc": "Toks."
   },
   {
     "path": "search_api.bm25_index.BM25Doc",
     "kind": "class",
     "file": "search_api/bm25_index.py",
-    "lineno": 35,
-    "endlineno": 44,
+    "lineno": 39,
+    "endlineno": 48,
     "doc": "Bm25doc."
   },
   {
     "path": "search_api.bm25_index.BM25Doc.chunk_id",
-    "kind": "attribute",
-    "file": "search_api/bm25_index.py",
-    "lineno": 39,
-    "endlineno": 39,
-    "doc": ""
-  },
-  {
-    "path": "search_api.bm25_index.BM25Doc.doc_id",
-    "kind": "attribute",
-    "file": "search_api/bm25_index.py",
-    "lineno": 40,
-    "endlineno": 40,
-    "doc": ""
-  },
-  {
-    "path": "search_api.bm25_index.BM25Doc.title",
-    "kind": "attribute",
-    "file": "search_api/bm25_index.py",
-    "lineno": 41,
-    "endlineno": 41,
-    "doc": ""
-  },
-  {
-    "path": "search_api.bm25_index.BM25Doc.section",
-    "kind": "attribute",
-    "file": "search_api/bm25_index.py",
-    "lineno": 42,
-    "endlineno": 42,
-    "doc": ""
-  },
-  {
-    "path": "search_api.bm25_index.BM25Doc.tf",
     "kind": "attribute",
     "file": "search_api/bm25_index.py",
     "lineno": 43,
@@ -3224,11 +3192,43 @@
     "doc": ""
   },
   {
-    "path": "search_api.bm25_index.BM25Doc.dl",
+    "path": "search_api.bm25_index.BM25Doc.doc_id",
     "kind": "attribute",
     "file": "search_api/bm25_index.py",
     "lineno": 44,
     "endlineno": 44,
+    "doc": ""
+  },
+  {
+    "path": "search_api.bm25_index.BM25Doc.title",
+    "kind": "attribute",
+    "file": "search_api/bm25_index.py",
+    "lineno": 45,
+    "endlineno": 45,
+    "doc": ""
+  },
+  {
+    "path": "search_api.bm25_index.BM25Doc.section",
+    "kind": "attribute",
+    "file": "search_api/bm25_index.py",
+    "lineno": 46,
+    "endlineno": 46,
+    "doc": ""
+  },
+  {
+    "path": "search_api.bm25_index.BM25Doc.tf",
+    "kind": "attribute",
+    "file": "search_api/bm25_index.py",
+    "lineno": 47,
+    "endlineno": 47,
+    "doc": ""
+  },
+  {
+    "path": "search_api.bm25_index.BM25Doc.dl",
+    "kind": "attribute",
+    "file": "search_api/bm25_index.py",
+    "lineno": 48,
+    "endlineno": 48,
     "doc": ""
   },
   {
@@ -3243,120 +3243,120 @@
     "path": "search_api.bm25_index.BM25Index",
     "kind": "class",
     "file": "search_api/bm25_index.py",
-    "lineno": 47,
-    "endlineno": 217,
+    "lineno": 51,
+    "endlineno": 248,
     "doc": "Bm25index."
   },
   {
     "path": "search_api.bm25_index.BM25Index.__init__",
     "kind": "function",
     "file": "search_api/bm25_index.py",
-    "lineno": 50,
-    "endlineno": 62,
+    "lineno": 54,
+    "endlineno": 69,
     "doc": "Init."
   },
   {
     "path": "search_api.bm25_index.BM25Index.k1",
     "kind": "attribute",
     "file": "search_api/bm25_index.py",
-    "lineno": 57,
-    "endlineno": 57,
+    "lineno": 64,
+    "endlineno": 64,
     "doc": ""
   },
   {
     "path": "search_api.bm25_index.BM25Index.b",
     "kind": "attribute",
     "file": "search_api/bm25_index.py",
-    "lineno": 58,
-    "endlineno": 58,
+    "lineno": 65,
+    "endlineno": 65,
     "doc": ""
   },
   {
     "path": "search_api.bm25_index.BM25Index.docs",
     "kind": "attribute",
     "file": "search_api/bm25_index.py",
-    "lineno": 59,
-    "endlineno": 59,
+    "lineno": 66,
+    "endlineno": 66,
     "doc": ""
   },
   {
     "path": "search_api.bm25_index.BM25Index.df",
     "kind": "attribute",
     "file": "search_api/bm25_index.py",
-    "lineno": 60,
-    "endlineno": 60,
+    "lineno": 67,
+    "endlineno": 67,
     "doc": ""
   },
   {
     "path": "search_api.bm25_index.BM25Index.N",
     "kind": "attribute",
     "file": "search_api/bm25_index.py",
-    "lineno": 61,
-    "endlineno": 61,
+    "lineno": 68,
+    "endlineno": 68,
     "doc": ""
   },
   {
     "path": "search_api.bm25_index.BM25Index.avgdl",
     "kind": "attribute",
     "file": "search_api/bm25_index.py",
-    "lineno": 62,
-    "endlineno": 62,
+    "lineno": 69,
+    "endlineno": 69,
     "doc": ""
   },
   {
     "path": "search_api.bm25_index.BM25Index.build_from_duckdb",
     "kind": "function",
     "file": "search_api/bm25_index.py",
-    "lineno": 64,
-    "endlineno": 94,
+    "lineno": 71,
+    "endlineno": 105,
     "doc": "Build from duckdb."
   },
   {
     "path": "search_api.bm25_index.BM25Index._build",
     "kind": "function",
     "file": "search_api/bm25_index.py",
-    "lineno": 96,
-    "endlineno": 128,
+    "lineno": 107,
+    "endlineno": 140,
     "doc": "Build."
   },
   {
     "path": "search_api.bm25_index.BM25Index.save",
     "kind": "function",
     "file": "search_api/bm25_index.py",
-    "lineno": 130,
-    "endlineno": 151,
+    "lineno": 142,
+    "endlineno": 167,
     "doc": "Save."
   },
   {
     "path": "search_api.bm25_index.BM25Index.load",
     "kind": "function",
     "file": "search_api/bm25_index.py",
-    "lineno": 153,
-    "endlineno": 170,
+    "lineno": 169,
+    "endlineno": 190,
     "doc": "Load."
   },
   {
     "path": "search_api.bm25_index.BM25Index._idf",
     "kind": "function",
     "file": "search_api/bm25_index.py",
-    "lineno": 172,
-    "endlineno": 182,
+    "lineno": 192,
+    "endlineno": 206,
     "doc": "Idf."
   },
   {
     "path": "search_api.bm25_index.BM25Index.search",
     "kind": "function",
     "file": "search_api/bm25_index.py",
-    "lineno": 184,
-    "endlineno": 206,
+    "lineno": 208,
+    "endlineno": 233,
     "doc": "Search."
   },
   {
     "path": "search_api.bm25_index.BM25Index.doc",
     "kind": "function",
     "file": "search_api/bm25_index.py",
-    "lineno": 208,
-    "endlineno": 217,
+    "lineno": 235,
+    "endlineno": 248,
     "doc": "Doc."
   },
   {
@@ -3692,48 +3692,48 @@
     "kind": "function",
     "file": "search_api/app.py",
     "lineno": 87,
-    "endlineno": 102,
-    "doc": "Auth."
+    "endlineno": 106,
+    "doc": "Validate the bearer-token header for protected endpoints."
   },
   {
     "path": "search_api.app.healthz",
     "kind": "function",
     "file": "search_api/app.py",
-    "lineno": 105,
-    "endlineno": 117,
+    "lineno": 109,
+    "endlineno": 121,
     "doc": "Healthz."
   },
   {
     "path": "search_api.app.rrf_fuse",
     "kind": "function",
     "file": "search_api/app.py",
-    "lineno": 120,
-    "endlineno": 134,
-    "doc": "Rrf fuse."
+    "lineno": 124,
+    "endlineno": 143,
+    "doc": "Fuse ranked lists using reciprocal rank fusion."
   },
   {
     "path": "search_api.app.apply_kg_boosts",
     "kind": "function",
     "file": "search_api/app.py",
-    "lineno": 137,
-    "endlineno": 171,
-    "doc": "Apply kg boosts."
+    "lineno": 146,
+    "endlineno": 187,
+    "doc": "Apply knowledge-graph boosting heuristics."
   },
   {
     "path": "search_api.app.search",
     "kind": "function",
     "file": "search_api/app.py",
-    "lineno": 174,
-    "endlineno": 231,
-    "doc": "Search."
+    "lineno": 190,
+    "endlineno": 249,
+    "doc": "Execute a search request across dense and sparse indices."
   },
   {
     "path": "search_api.app.graph_concepts",
     "kind": "function",
     "file": "search_api/app.py",
-    "lineno": 234,
-    "endlineno": 249,
-    "doc": "Graph concepts."
+    "lineno": 252,
+    "endlineno": 270,
+    "doc": "Return KG concepts that match the provided query fragment."
   },
   {
     "path": "search_api.schemas",
@@ -3940,47 +3940,47 @@
     "kind": "function",
     "file": "search_api/splade_index.py",
     "lineno": 20,
-    "endlineno": 29,
+    "endlineno": 33,
     "doc": "Tok."
   },
   {
     "path": "search_api.splade_index.SpladeDoc",
     "kind": "class",
     "file": "search_api/splade_index.py",
-    "lineno": 32,
-    "endlineno": 39,
+    "lineno": 36,
+    "endlineno": 43,
     "doc": "Spladedoc."
   },
   {
     "path": "search_api.splade_index.SpladeDoc.chunk_id",
     "kind": "attribute",
     "file": "search_api/splade_index.py",
-    "lineno": 36,
-    "endlineno": 36,
+    "lineno": 40,
+    "endlineno": 40,
     "doc": ""
   },
   {
     "path": "search_api.splade_index.SpladeDoc.doc_id",
     "kind": "attribute",
     "file": "search_api/splade_index.py",
-    "lineno": 37,
-    "endlineno": 37,
+    "lineno": 41,
+    "endlineno": 41,
     "doc": ""
   },
   {
     "path": "search_api.splade_index.SpladeDoc.section",
     "kind": "attribute",
     "file": "search_api/splade_index.py",
-    "lineno": 38,
-    "endlineno": 38,
+    "lineno": 42,
+    "endlineno": 42,
     "doc": ""
   },
   {
     "path": "search_api.splade_index.SpladeDoc.text",
     "kind": "attribute",
     "file": "search_api/splade_index.py",
-    "lineno": 39,
-    "endlineno": 39,
+    "lineno": 43,
+    "endlineno": 43,
     "doc": ""
   },
   {
@@ -3995,72 +3995,72 @@
     "path": "search_api.splade_index.SpladeIndex",
     "kind": "class",
     "file": "search_api/splade_index.py",
-    "lineno": 42,
-    "endlineno": 134,
+    "lineno": 46,
+    "endlineno": 153,
     "doc": "Spladeindex."
   },
   {
     "path": "search_api.splade_index.SpladeIndex.__init__",
     "kind": "function",
     "file": "search_api/splade_index.py",
-    "lineno": 45,
-    "endlineno": 62,
+    "lineno": 49,
+    "endlineno": 70,
     "doc": "Init."
   },
   {
     "path": "search_api.splade_index.SpladeIndex.db_path",
     "kind": "attribute",
     "file": "search_api/splade_index.py",
-    "lineno": 58,
-    "endlineno": 58,
+    "lineno": 66,
+    "endlineno": 66,
     "doc": ""
   },
   {
     "path": "search_api.splade_index.SpladeIndex.docs",
     "kind": "attribute",
     "file": "search_api/splade_index.py",
-    "lineno": 59,
-    "endlineno": 59,
+    "lineno": 67,
+    "endlineno": 67,
     "doc": ""
   },
   {
     "path": "search_api.splade_index.SpladeIndex.df",
     "kind": "attribute",
     "file": "search_api/splade_index.py",
-    "lineno": 60,
-    "endlineno": 60,
+    "lineno": 68,
+    "endlineno": 68,
     "doc": ""
   },
   {
     "path": "search_api.splade_index.SpladeIndex.N",
     "kind": "attribute",
     "file": "search_api/splade_index.py",
-    "lineno": 61,
-    "endlineno": 61,
+    "lineno": 69,
+    "endlineno": 69,
     "doc": ""
   },
   {
     "path": "search_api.splade_index.SpladeIndex._load",
     "kind": "function",
     "file": "search_api/splade_index.py",
-    "lineno": 64,
-    "endlineno": 94,
+    "lineno": 72,
+    "endlineno": 104,
     "doc": "Load."
   },
   {
     "path": "search_api.splade_index.SpladeIndex.search",
     "kind": "function",
     "file": "search_api/splade_index.py",
-    "lineno": 96,
-    "endlineno": 123,
+    "lineno": 106,
+    "endlineno": 138,
     "doc": "Search."
   },
   {
     "path": "search_api.splade_index.SpladeIndex.doc",
     "kind": "function",
     "file": "search_api/splade_index.py",
-    "lineno": 125,
-    "endlineno": 134,
+    "lineno": 140,
+    "endlineno": 153,
     "doc": "Doc."
   },
   {
@@ -4092,15 +4092,15 @@
     "kind": "function",
     "file": "search_api/service.py",
     "lineno": 20,
-    "endlineno": 31,
+    "endlineno": 36,
     "doc": "Apply kg boosts."
   },
   {
     "path": "search_api.service.mmr_deduplicate",
     "kind": "function",
     "file": "search_api/service.py",
-    "lineno": 34,
-    "endlineno": 47,
+    "lineno": 39,
+    "endlineno": 57,
     "doc": "Mmr deduplicate."
   },
   {
@@ -4132,23 +4132,23 @@
     "kind": "function",
     "file": "search_api/kg_mock.py",
     "lineno": 23,
-    "endlineno": 37,
+    "endlineno": 41,
     "doc": "Detect query concepts."
   },
   {
     "path": "search_api.kg_mock.linked_concepts_for_text",
     "kind": "function",
     "file": "search_api/kg_mock.py",
-    "lineno": 40,
-    "endlineno": 54,
+    "lineno": 44,
+    "endlineno": 62,
     "doc": "Linked concepts for text."
   },
   {
     "path": "search_api.kg_mock.kg_boost",
     "kind": "function",
     "file": "search_api/kg_mock.py",
-    "lineno": 57,
-    "endlineno": 74,
+    "lineno": 65,
+    "endlineno": 89,
     "doc": "Kg boost."
   },
   {
@@ -4172,7 +4172,7 @@
     "kind": "function",
     "file": "search_api/fusion.py",
     "lineno": 10,
-    "endlineno": 24,
+    "endlineno": 29,
     "doc": "Rrf fuse."
   },
   {
@@ -4292,7 +4292,7 @@
     "kind": "class",
     "file": "search_api/faiss_adapter.py",
     "lineno": 40,
-    "endlineno": 177,
+    "endlineno": 200,
     "doc": "Faissadapter."
   },
   {
@@ -4300,87 +4300,87 @@
     "kind": "function",
     "file": "search_api/faiss_adapter.py",
     "lineno": 43,
-    "endlineno": 56,
+    "endlineno": 62,
     "doc": "Init."
   },
   {
     "path": "search_api.faiss_adapter.FaissAdapter.db_path",
     "kind": "attribute",
     "file": "search_api/faiss_adapter.py",
-    "lineno": 51,
-    "endlineno": 51,
+    "lineno": 57,
+    "endlineno": 57,
     "doc": ""
   },
   {
     "path": "search_api.faiss_adapter.FaissAdapter.factory",
     "kind": "attribute",
     "file": "search_api/faiss_adapter.py",
-    "lineno": 52,
-    "endlineno": 52,
+    "lineno": 58,
+    "endlineno": 58,
     "doc": ""
   },
   {
     "path": "search_api.faiss_adapter.FaissAdapter.metric",
     "kind": "attribute",
     "file": "search_api/faiss_adapter.py",
-    "lineno": 53,
-    "endlineno": 53,
+    "lineno": 59,
+    "endlineno": 59,
     "doc": ""
   },
   {
     "path": "search_api.faiss_adapter.FaissAdapter.index",
     "kind": "attribute",
     "file": "search_api/faiss_adapter.py",
-    "lineno": 54,
-    "endlineno": 54,
+    "lineno": 60,
+    "endlineno": 60,
     "doc": ""
   },
   {
     "path": "search_api.faiss_adapter.FaissAdapter.idmap",
     "kind": "attribute",
     "file": "search_api/faiss_adapter.py",
-    "lineno": 55,
-    "endlineno": 55,
+    "lineno": 61,
+    "endlineno": 61,
     "doc": ""
   },
   {
     "path": "search_api.faiss_adapter.FaissAdapter.vecs",
     "kind": "attribute",
     "file": "search_api/faiss_adapter.py",
-    "lineno": 56,
-    "endlineno": 56,
+    "lineno": 62,
+    "endlineno": 62,
     "doc": ""
   },
   {
     "path": "search_api.faiss_adapter.FaissAdapter._load_dense_parquet",
     "kind": "function",
     "file": "search_api/faiss_adapter.py",
-    "lineno": 58,
-    "endlineno": 86,
+    "lineno": 64,
+    "endlineno": 96,
     "doc": "Load dense parquet."
   },
   {
     "path": "search_api.faiss_adapter.FaissAdapter.build",
     "kind": "function",
     "file": "search_api/faiss_adapter.py",
-    "lineno": 88,
-    "endlineno": 115,
+    "lineno": 98,
+    "endlineno": 127,
     "doc": "Build."
   },
   {
     "path": "search_api.faiss_adapter.FaissAdapter.load_or_build",
     "kind": "function",
     "file": "search_api/faiss_adapter.py",
-    "lineno": 117,
-    "endlineno": 143,
+    "lineno": 129,
+    "endlineno": 159,
     "doc": "Load or build."
   },
   {
     "path": "search_api.faiss_adapter.FaissAdapter.search",
     "kind": "function",
     "file": "search_api/faiss_adapter.py",
-    "lineno": 145,
-    "endlineno": 177,
+    "lineno": 161,
+    "endlineno": 200,
     "doc": "Search."
   },
   {
@@ -4452,55 +4452,55 @@
     "kind": "function",
     "file": "search_api/fixture_index.py",
     "lineno": 21,
-    "endlineno": 30,
+    "endlineno": 34,
     "doc": "Tokenize."
   },
   {
     "path": "search_api.fixture_index.FixtureDoc",
     "kind": "class",
     "file": "search_api/fixture_index.py",
-    "lineno": 33,
-    "endlineno": 41,
+    "lineno": 37,
+    "endlineno": 45,
     "doc": "Fixturedoc."
   },
   {
     "path": "search_api.fixture_index.FixtureDoc.chunk_id",
     "kind": "attribute",
     "file": "search_api/fixture_index.py",
-    "lineno": 37,
-    "endlineno": 37,
+    "lineno": 41,
+    "endlineno": 41,
     "doc": ""
   },
   {
     "path": "search_api.fixture_index.FixtureDoc.doc_id",
     "kind": "attribute",
     "file": "search_api/fixture_index.py",
-    "lineno": 38,
-    "endlineno": 38,
+    "lineno": 42,
+    "endlineno": 42,
     "doc": ""
   },
   {
     "path": "search_api.fixture_index.FixtureDoc.title",
     "kind": "attribute",
     "file": "search_api/fixture_index.py",
-    "lineno": 39,
-    "endlineno": 39,
+    "lineno": 43,
+    "endlineno": 43,
     "doc": ""
   },
   {
     "path": "search_api.fixture_index.FixtureDoc.section",
     "kind": "attribute",
     "file": "search_api/fixture_index.py",
-    "lineno": 40,
-    "endlineno": 40,
+    "lineno": 44,
+    "endlineno": 44,
     "doc": ""
   },
   {
     "path": "search_api.fixture_index.FixtureDoc.text",
     "kind": "attribute",
     "file": "search_api/fixture_index.py",
-    "lineno": 41,
-    "endlineno": 41,
+    "lineno": 45,
+    "endlineno": 45,
     "doc": ""
   },
   {
@@ -4515,88 +4515,88 @@
     "path": "search_api.fixture_index.FixtureIndex",
     "kind": "class",
     "file": "search_api/fixture_index.py",
-    "lineno": 44,
-    "endlineno": 160,
+    "lineno": 48,
+    "endlineno": 180,
     "doc": "Fixtureindex."
   },
   {
     "path": "search_api.fixture_index.FixtureIndex.__init__",
     "kind": "function",
     "file": "search_api/fixture_index.py",
-    "lineno": 47,
-    "endlineno": 59,
+    "lineno": 51,
+    "endlineno": 66,
     "doc": "Init."
   },
   {
     "path": "search_api.fixture_index.FixtureIndex.root",
     "kind": "attribute",
     "file": "search_api/fixture_index.py",
-    "lineno": 54,
-    "endlineno": 54,
+    "lineno": 61,
+    "endlineno": 61,
     "doc": ""
   },
   {
     "path": "search_api.fixture_index.FixtureIndex.db_path",
     "kind": "attribute",
     "file": "search_api/fixture_index.py",
-    "lineno": 55,
-    "endlineno": 55,
+    "lineno": 62,
+    "endlineno": 62,
     "doc": ""
   },
   {
     "path": "search_api.fixture_index.FixtureIndex.docs",
     "kind": "attribute",
     "file": "search_api/fixture_index.py",
-    "lineno": 56,
-    "endlineno": 56,
+    "lineno": 63,
+    "endlineno": 63,
     "doc": ""
   },
   {
     "path": "search_api.fixture_index.FixtureIndex.df",
     "kind": "attribute",
     "file": "search_api/fixture_index.py",
-    "lineno": 57,
-    "endlineno": 57,
+    "lineno": 64,
+    "endlineno": 64,
     "doc": ""
   },
   {
     "path": "search_api.fixture_index.FixtureIndex.tf",
     "kind": "attribute",
     "file": "search_api/fixture_index.py",
-    "lineno": 58,
-    "endlineno": 58,
+    "lineno": 65,
+    "endlineno": 65,
     "doc": ""
   },
   {
     "path": "search_api.fixture_index.FixtureIndex._load_from_duckdb",
     "kind": "function",
     "file": "search_api/fixture_index.py",
-    "lineno": 61,
-    "endlineno": 104,
+    "lineno": 68,
+    "endlineno": 113,
     "doc": "Load from duckdb."
   },
   {
     "path": "search_api.fixture_index.FixtureIndex._build_lex",
     "kind": "function",
     "file": "search_api/fixture_index.py",
-    "lineno": 106,
-    "endlineno": 122,
+    "lineno": 115,
+    "endlineno": 133,
     "doc": "Build lex."
   },
   {
     "path": "search_api.fixture_index.FixtureIndex.search",
     "kind": "function",
     "file": "search_api/fixture_index.py",
-    "lineno": 124,
-    "endlineno": 149,
+    "lineno": 135,
+    "endlineno": 165,
     "doc": "Search."
   },
   {
     "path": "search_api.fixture_index.FixtureIndex.doc",
     "kind": "function",
     "file": "search_api/fixture_index.py",
-    "lineno": 151,
-    "endlineno": 160,
+    "lineno": 167,
+    "endlineno": 180,
     "doc": "Doc."
   },
   {
@@ -4612,7 +4612,7 @@
     "kind": "class",
     "file": "search_client/client.py",
     "lineno": 14,
-    "endlineno": 97,
+    "endlineno": 117,
     "doc": "Kgforgeclient."
   },
   {
@@ -4620,63 +4620,63 @@
     "kind": "function",
     "file": "search_client/client.py",
     "lineno": 17,
-    "endlineno": 32,
+    "endlineno": 36,
     "doc": "Init."
   },
   {
     "path": "search_client.KGForgeClient.base_url",
     "kind": "attribute",
     "file": "search_client/client.py",
-    "lineno": 30,
-    "endlineno": 30,
+    "lineno": 34,
+    "endlineno": 34,
     "doc": ""
   },
   {
     "path": "search_client.KGForgeClient.api_key",
     "kind": "attribute",
     "file": "search_client/client.py",
-    "lineno": 31,
-    "endlineno": 31,
+    "lineno": 35,
+    "endlineno": 35,
     "doc": ""
   },
   {
     "path": "search_client.KGForgeClient.timeout",
     "kind": "attribute",
     "file": "search_client/client.py",
-    "lineno": 32,
-    "endlineno": 32,
+    "lineno": 36,
+    "endlineno": 36,
     "doc": ""
   },
   {
     "path": "search_client.KGForgeClient._headers",
     "kind": "function",
     "file": "search_client/client.py",
-    "lineno": 34,
-    "endlineno": 43,
+    "lineno": 38,
+    "endlineno": 49,
     "doc": "Headers."
   },
   {
     "path": "search_client.KGForgeClient.healthz",
     "kind": "function",
     "file": "search_client/client.py",
-    "lineno": 45,
-    "endlineno": 53,
+    "lineno": 51,
+    "endlineno": 61,
     "doc": "Healthz."
   },
   {
     "path": "search_client.KGForgeClient.search",
     "kind": "function",
     "file": "search_client/client.py",
-    "lineno": 55,
-    "endlineno": 78,
+    "lineno": 63,
+    "endlineno": 93,
     "doc": "Search."
   },
   {
     "path": "search_client.KGForgeClient.concepts",
     "kind": "function",
     "file": "search_client/client.py",
-    "lineno": 80,
-    "endlineno": 97,
+    "lineno": 95,
+    "endlineno": 117,
     "doc": "Concepts."
   },
   {
@@ -4724,7 +4724,7 @@
     "kind": "class",
     "file": "search_client/client.py",
     "lineno": 14,
-    "endlineno": 97,
+    "endlineno": 117,
     "doc": "Kgforgeclient."
   },
   {
@@ -4732,63 +4732,63 @@
     "kind": "function",
     "file": "search_client/client.py",
     "lineno": 17,
-    "endlineno": 32,
+    "endlineno": 36,
     "doc": "Init."
   },
   {
     "path": "search_client.client.KGForgeClient.base_url",
     "kind": "attribute",
     "file": "search_client/client.py",
-    "lineno": 30,
-    "endlineno": 30,
+    "lineno": 34,
+    "endlineno": 34,
     "doc": ""
   },
   {
     "path": "search_client.client.KGForgeClient.api_key",
     "kind": "attribute",
     "file": "search_client/client.py",
-    "lineno": 31,
-    "endlineno": 31,
+    "lineno": 35,
+    "endlineno": 35,
     "doc": ""
   },
   {
     "path": "search_client.client.KGForgeClient.timeout",
     "kind": "attribute",
     "file": "search_client/client.py",
-    "lineno": 32,
-    "endlineno": 32,
+    "lineno": 36,
+    "endlineno": 36,
     "doc": ""
   },
   {
     "path": "search_client.client.KGForgeClient._headers",
     "kind": "function",
     "file": "search_client/client.py",
-    "lineno": 34,
-    "endlineno": 43,
+    "lineno": 38,
+    "endlineno": 49,
     "doc": "Headers."
   },
   {
     "path": "search_client.client.KGForgeClient.healthz",
     "kind": "function",
     "file": "search_client/client.py",
-    "lineno": 45,
-    "endlineno": 53,
+    "lineno": 51,
+    "endlineno": 61,
     "doc": "Healthz."
   },
   {
     "path": "search_client.client.KGForgeClient.search",
     "kind": "function",
     "file": "search_client/client.py",
-    "lineno": 55,
-    "endlineno": 78,
+    "lineno": 63,
+    "endlineno": 93,
     "doc": "Search."
   },
   {
     "path": "search_client.client.KGForgeClient.concepts",
     "kind": "function",
     "file": "search_client/client.py",
-    "lineno": 80,
-    "endlineno": 97,
+    "lineno": 95,
+    "endlineno": 117,
     "doc": "Concepts."
   },
   {
@@ -4844,7 +4844,7 @@
     "kind": "class",
     "file": "vectorstore_faiss/gpu.py",
     "lineno": 15,
-    "endlineno": 211,
+    "endlineno": 245,
     "doc": "FAISS GPU/cuVS wrapper."
   },
   {
@@ -4852,7 +4852,7 @@
     "kind": "function",
     "file": "vectorstore_faiss/gpu.py",
     "lineno": 21,
-    "endlineno": 51,
+    "endlineno": 56,
     "doc": "Init."
   },
   {
@@ -4867,52 +4867,12 @@
     "path": "vectorstore_faiss.gpu.FaissGpuIndex.factory",
     "kind": "attribute",
     "file": "vectorstore_faiss/gpu.py",
-    "lineno": 36,
-    "endlineno": 36,
-    "doc": ""
-  },
-  {
-    "path": "vectorstore_faiss.gpu.FaissGpuIndex.nprobe",
-    "kind": "attribute",
-    "file": "vectorstore_faiss/gpu.py",
-    "lineno": 37,
-    "endlineno": 37,
-    "doc": ""
-  },
-  {
-    "path": "vectorstore_faiss.gpu.FaissGpuIndex.gpu",
-    "kind": "attribute",
-    "file": "vectorstore_faiss/gpu.py",
-    "lineno": 38,
-    "endlineno": 38,
-    "doc": ""
-  },
-  {
-    "path": "vectorstore_faiss.gpu.FaissGpuIndex.cuvs",
-    "kind": "attribute",
-    "file": "vectorstore_faiss/gpu.py",
-    "lineno": 39,
-    "endlineno": 39,
-    "doc": ""
-  },
-  {
-    "path": "vectorstore_faiss.gpu.FaissGpuIndex._faiss",
-    "kind": "attribute",
-    "file": "vectorstore_faiss/gpu.py",
-    "lineno": 49,
-    "endlineno": 49,
-    "doc": ""
-  },
-  {
-    "path": "vectorstore_faiss.gpu.FaissGpuIndex._res",
-    "kind": "attribute",
-    "file": "vectorstore_faiss/gpu.py",
     "lineno": 41,
     "endlineno": 41,
     "doc": ""
   },
   {
-    "path": "vectorstore_faiss.gpu.FaissGpuIndex._index",
+    "path": "vectorstore_faiss.gpu.FaissGpuIndex.nprobe",
     "kind": "attribute",
     "file": "vectorstore_faiss/gpu.py",
     "lineno": 42,
@@ -4920,7 +4880,7 @@
     "doc": ""
   },
   {
-    "path": "vectorstore_faiss.gpu.FaissGpuIndex._idmap",
+    "path": "vectorstore_faiss.gpu.FaissGpuIndex.gpu",
     "kind": "attribute",
     "file": "vectorstore_faiss/gpu.py",
     "lineno": 43,
@@ -4928,7 +4888,7 @@
     "doc": ""
   },
   {
-    "path": "vectorstore_faiss.gpu.FaissGpuIndex._xb",
+    "path": "vectorstore_faiss.gpu.FaissGpuIndex.cuvs",
     "kind": "attribute",
     "file": "vectorstore_faiss/gpu.py",
     "lineno": 44,
@@ -4936,51 +4896,91 @@
     "doc": ""
   },
   {
+    "path": "vectorstore_faiss.gpu.FaissGpuIndex._faiss",
+    "kind": "attribute",
+    "file": "vectorstore_faiss/gpu.py",
+    "lineno": 54,
+    "endlineno": 54,
+    "doc": ""
+  },
+  {
+    "path": "vectorstore_faiss.gpu.FaissGpuIndex._res",
+    "kind": "attribute",
+    "file": "vectorstore_faiss/gpu.py",
+    "lineno": 46,
+    "endlineno": 46,
+    "doc": ""
+  },
+  {
+    "path": "vectorstore_faiss.gpu.FaissGpuIndex._index",
+    "kind": "attribute",
+    "file": "vectorstore_faiss/gpu.py",
+    "lineno": 47,
+    "endlineno": 47,
+    "doc": ""
+  },
+  {
+    "path": "vectorstore_faiss.gpu.FaissGpuIndex._idmap",
+    "kind": "attribute",
+    "file": "vectorstore_faiss/gpu.py",
+    "lineno": 48,
+    "endlineno": 48,
+    "doc": ""
+  },
+  {
+    "path": "vectorstore_faiss.gpu.FaissGpuIndex._xb",
+    "kind": "attribute",
+    "file": "vectorstore_faiss/gpu.py",
+    "lineno": 49,
+    "endlineno": 49,
+    "doc": ""
+  },
+  {
     "path": "vectorstore_faiss.gpu.FaissGpuIndex._ensure_resources",
     "kind": "function",
     "file": "vectorstore_faiss/gpu.py",
-    "lineno": 53,
-    "endlineno": 59,
+    "lineno": 58,
+    "endlineno": 64,
     "doc": "Ensure resources."
   },
   {
     "path": "vectorstore_faiss.gpu.FaissGpuIndex.train",
     "kind": "function",
     "file": "vectorstore_faiss/gpu.py",
-    "lineno": 62,
-    "endlineno": 97,
+    "lineno": 67,
+    "endlineno": 107,
     "doc": "Train."
   },
   {
     "path": "vectorstore_faiss.gpu.FaissGpuIndex.add",
     "kind": "function",
     "file": "vectorstore_faiss/gpu.py",
-    "lineno": 99,
-    "endlineno": 129,
+    "lineno": 109,
+    "endlineno": 145,
     "doc": "Add."
   },
   {
     "path": "vectorstore_faiss.gpu.FaissGpuIndex.search",
     "kind": "function",
     "file": "vectorstore_faiss/gpu.py",
-    "lineno": 131,
-    "endlineno": 157,
+    "lineno": 147,
+    "endlineno": 179,
     "doc": "Search."
   },
   {
     "path": "vectorstore_faiss.gpu.FaissGpuIndex.save",
     "kind": "function",
     "file": "vectorstore_faiss/gpu.py",
-    "lineno": 159,
-    "endlineno": 178,
+    "lineno": 181,
+    "endlineno": 206,
     "doc": "Save."
   },
   {
     "path": "vectorstore_faiss.gpu.FaissGpuIndex.load",
     "kind": "function",
     "file": "vectorstore_faiss/gpu.py",
-    "lineno": 180,
-    "endlineno": 211,
+    "lineno": 208,
+    "endlineno": 245,
     "doc": "Load."
   }
 ]

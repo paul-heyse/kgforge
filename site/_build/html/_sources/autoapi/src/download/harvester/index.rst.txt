@@ -14,8 +14,14 @@ src.download.harvester
 
 
 
+
+
 Module Contents
 ---------------
+
+.. py:data:: HTTP_OK
+   :value: 200
+
 
 .. py:class:: OpenAccessHarvester(user_agent, contact_email, openalex_base = 'https://api.openalex.org', unpaywall_base = 'https://api.unpaywall.org', pdf_host_base = None, out_dir = '/data/pdfs')
 

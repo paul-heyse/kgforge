@@ -169,7 +169,7 @@ Module Contents
 
 
 
-.. py:function:: get_bm25(backend, index_dir, **kwargs)
+.. py:function:: get_bm25(backend, index_dir, *, k1 = 0.9, b = 0.4, field_boosts = None)
 
    Get bm25.
 
@@ -177,6 +177,5 @@ Module Contents
    :type backend: str
    :param index_dir: TODO.
    :type index_dir: str
-   :param kwargs: TODO.
 
 

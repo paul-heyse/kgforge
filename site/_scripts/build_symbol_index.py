@@ -1,17 +1,22 @@
-"""
-Build a machine-friendly symbol index for AI agents:
+"""Build a machine-friendly symbol index for AI agents.
+
+Emits a JSON array containing:
 - fully qualified name
 - kind
 - file path (relative to repo)
 - start/end lines
-- first-line summary doc
-Writes: docs/_build/symbols.json
+- first-line summary docstring
+Writes the result to ``docs/_build/symbols.json``.
 """
+
+from __future__ import annotations
 
 import json
 import os
 import sys
 from pathlib import Path
+
+from griffe import Object
 
 try:
     from griffe.loader import GriffeLoader
@@ -31,24 +36,27 @@ ENV_PKGS = os.environ.get("DOCS_PKG")
 loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
 
 
-def iter_packages():
+def iter_packages() -> list[str]:
+    """Return the packages that should be indexed."""
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     packages = detect_packages()
     return packages or [detect_primary()]
 
 
-rows = []
+rows: list[dict[str, object | None]] = []
 
 
-def safe_attr(node, attr, default=None):
+def safe_attr(node: Object, attr: str, default: object | None = None) -> object | None:
+    """Return ``getattr`` value but swallow attribute lookup failures."""
     try:
         return getattr(node, attr)
     except Exception:
         return default
 
 
-def walk(node):
+def walk(node: Object) -> None:
+    """Traverse the Griffe node tree and append serialized symbol rows."""
     doc = safe_attr(node, "docstring")
     file_rel = safe_attr(node, "relative_package_filepath")
     rows.append(
@@ -76,4 +84,4 @@ for pkg in iter_packages():
 out = ROOT / "docs" / "_build"
 out.mkdir(parents=True, exist_ok=True)
 (out / "symbols.json").write_text(json.dumps(rows, indent=2), encoding="utf-8")
-print(f"Wrote {len(rows)} entries to {out/'symbols.json'}")
+print(f"Wrote {len(rows)} entries to {out / 'symbols.json'}")
