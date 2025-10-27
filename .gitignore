@@ -20,9 +20,6 @@ dist/
 build/
 .wheelhouse/
 KGForge.egg-info/
-docs/_build/
-site/
-sphinx-warn.log
 
 # IDE
 .vscode/
