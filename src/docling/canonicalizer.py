@@ -4,8 +4,7 @@ from __future__ import annotations
 import re, unicodedata
 
 def canonicalize_text(blocks: list[str]) -> str:
-    """Apply NFC, normalize whitespace and bullets, preserve single newlines
-    between blocks."""
+    """Apply NFC, normalize whitespace and bullets, preserve single newlines between blocks."""
     def norm(s: str) -> str:
         """Norm.
 

@@ -1,20 +1,20 @@
 repos:
-  - repo: https://github.com/PyCQA/docformatter
-    rev: v1.7.5
+  - repo: local
     hooks:
       - id: docformatter
+        name: docformatter
+        language: python
+        entry: python tools/hooks/docformatter.py
+        always_run: true
         pass_filenames: false
-        args:
-          - --in-place
-          - --wrap-summaries=120
-          - --wrap-descriptions=120
-          - -r
-          - src
+        additional_dependencies:
+          - docformatter==1.7.5
 
   - repo: https://github.com/PyCQA/pydocstyle
     rev: 6.3.0
     hooks:
       - id: pydocstyle
+        always_run: true
         pass_filenames: false
         args:
           - src
@@ -23,6 +23,7 @@ repos:
     rev: 1.5.0
     hooks:
       - id: interrogate
+        always_run: true
         pass_filenames: false
         additional_dependencies:
           - setuptools
