@@ -23,13 +23,15 @@ if you need to adjust behavior.
 | [`tools/update_docs.sh`](tools/update_docs.sh) | One-touch wrapper that runs docstring generation, nav-map refresh, README generation, and Sphinx builds. |
 | [`Makefile`](Makefile) | Defines developer tasks (`make docstrings`, `make readmes`, `make html/json/symbols`, etc.). |
 | [`.pre-commit-config.yaml`](.pre-commit-config.yaml) | Pre-commit hooks for Ruff, Black, Mypy, docformatter, pydocstyle, and interrogate. |
-| [`Automated Documentation Start.md`](Automated Documentation Start.md) | Original runbook that describes the goals, tooling, and usage patterns. |
+| [`docs/_scripts/build_symbol_index.py`](docs/_scripts/build_symbol_index.py) | Emits `docs/_build/symbols.json` for agent consumption. |
+| [`tools/detect_pkg.py`](tools/detect_pkg.py) | Detects primary/all packages for doc generation (used by Sphinx/Makefile/tools). |
 
 ---
 
 ## What Each File Does
 
 ### Sphinx Configuration (`docs/conf.py`)
+
 - Auto-detects the package (`src/<pkg>` or `<pkg>` layout) via `tools/detect_pkg.py`.
 - Uses **AutoAPI** to statically analyze the source tree (no imports).
 - Adds [linkcode](https://www.sphinx-doc.org/en/master/usage/extensions/linkcode.html) hooks with:
@@ -39,6 +41,7 @@ if you need to adjust behavior.
 - Enables extensions such as `myst_parser`, `sphinx.ext.viewcode`, `sphinx.ext.graphviz`, `sphinx.ext.inheritance_diagram`, and `sphinxcontrib.mermaid`.
 
 ### README Generator (`tools/gen_readmes.py`)
+
 - Uses **Griffe** to walk each package and collect public modules/classes/functions.
 - Writes `README.md` with:
   - A Doctoc-compatible TOC placeholder.
@@ -47,11 +50,13 @@ if you need to adjust behavior.
 - Re-run manually (`python tools/gen_readmes.py`) or automatically via `make readmes`.
 
 ### NavMap Updater (`tools/update_navmaps.py`)
+
 - Called during `make docstrings`.
 - Rewrites module docstrings to append a concise `NavMap:` section summarizing public API entry points.
-- Summaries are truncated to satisfy Ruff’s 100-character limit.
+- Summaries are truncated (~60 chars) so each bullet stays within the 100-char line length enforced by Ruff/Black/docformatter.
 
 ### Docs Update Script (`tools/update_docs.sh`)
+
 - Run from repo root to perform the full pipeline:
   1. `make docstrings` (doq → nav map → docformatter/pydocstyle/interrogate)
   2. `make readmes`
@@ -60,6 +65,7 @@ if you need to adjust behavior.
 - Gracefully skips MkDocs if not present.
 
 ### Makefile Tasks
+
 - `make docstrings`: seeds and formats docstrings, updates NavMaps, runs docformatter/pydocstyle/interrogate.
 - `make readmes`: regenerates package READMEs.
 - `make html/json/symbols`: Sphinx builders for HTML, JSON corpus, and `docs/_build/symbols.json`.
@@ -84,6 +90,7 @@ if you need to adjust behavior.
 | [Doctoc](https://github.com/thlorenz/doctoc) | Optional CLI that updates README TOCs (invoked by `make readmes` if available). |
 
 ### Sphinx Extensions Enabled
+
 - `myst_parser`
 - `sphinx.ext.autosummary`
 - `sphinx.ext.intersphinx`
@@ -95,6 +102,7 @@ if you need to adjust behavior.
 - `sphinxcontrib.mermaid`
 
 ### Optional Extras
+
 - [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) + mkdocstrings + mkdocs-gen-files (see `mkdocs.yml`).
 - Graphviz system binary required for graphviz/inheritance diagrams.
 
@@ -103,9 +111,12 @@ if you need to adjust behavior.
 ## Pre-Commit Hooks
 
 `.pre-commit-config.yaml` wires in:
-- **Ruff** (`ruff --fix`) for linting and code-style checks.
-- **Black** for Python formatting.
-- **Mypy** for static type checking (`args: [src]`).
+
+- **Ruff (imports)** – runs `ruff --select I --fix` to normalize import ordering before other checks.
+- **Ruff (lint+fix)** – runs `ruff --fix` with the full ruleset enabled in `pyproject.toml`.
+- **Ruff (format)** – applies Ruff’s formatter (`ruff format`) so commits always match the project style.
+- **Black** – downstream safety net; should be a no-op if Ruff formatting has already run.
+- **Mypy** – static type checking with strict mode configured via `mypy.ini` (invoked as `mypy src`).
 - **Docformatter** (custom wrapper) for docstring formatting; prints touched files.
 - **pydocstyle** to enforce docstring conventions.
 - **Interrogate** to enforce docstring coverage (90%).
@@ -114,10 +125,26 @@ Run all hooks manually with `pre-commit run --all-files`.
 
 ---
 
+## Formatting & Type Checking Pipeline
+
+- Ruff handles import sorting, linting (including automated fixes), and code formatting. The three Ruff hooks run sequentially so that formatting happens before Black and before mypy executes.
+- Black runs after Ruff to catch any drift (for example if Ruff is upgraded and emits slightly different formatting).
+- Mypy is run in the same pre-commit pass and stops a commit if type checking fails. The configuration in `mypy.ini` enables strict options and whitelists third-party modules that do not ship type stubs.
+
+Because these run on every commit, local commands like `tools/update_docs.sh` maintain code style and type safety as part of their workflow (the script itself calls tooling that reruns Ruff/Black/Mypy when you later commit).
+
+### Style configuration highlights
+
+- Line length is 100 in both Ruff and Black; docformatter also wraps at 100.
+- Ruff’s formatter is authoritative; Black acts as a safety net and should be a no-op.
+- Mypy targets Python 3.13 with strict options; `mypy_path = src` for imports.
+
+---
+
 ## Workflows & CI
 
 - `tools/update_docs.sh` is the recommended local command for a full rebuild.
-- CI (`.github/workflows/ci.yml`) runs Ruff, Black, pytest, the documentation pipeline (`tools/update_docs.sh`), and checks for a clean tree afterward.
+- If CI is configured, it should run Ruff, Black, pytest, the documentation pipeline (`tools/update_docs.sh`), and assert a clean working tree.
 - `make docstrings` is idempotent; it will rewrite docstrings, nav maps, and docformatter output each run.
 
 ---
@@ -159,7 +186,10 @@ make html
 make json
 make symbols
 make watch
+
+# formatting & linting
+make fmt
+make lint
 ```
 
-For questions or modifications, see `Automated Documentation Start.md` or the
-comments inside each tooling script.
+For questions or modifications, see the comments inside each tooling script.

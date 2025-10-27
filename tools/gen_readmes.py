@@ -27,6 +27,38 @@ EDITOR = os.environ.get("DOCS_EDITOR", "vscode")
 ENV_PKGS = os.environ.get("DOCS_PKG")
 
 
+def detect_repo() -> tuple[str, str]:
+    """Infer the GitHub owner/repo from the current git remote."""
+    try:
+        remote = subprocess.check_output(
+            ["git", "config", "--get", "remote.origin.url"], cwd=str(ROOT), text=True
+        ).strip()
+    except Exception:
+        remote = ""
+    owner = os.environ.get("DOCS_GITHUB_ORG")
+    repo = os.environ.get("DOCS_GITHUB_REPO")
+    if owner and repo:
+        return owner, repo
+    if remote.endswith(".git"):
+        remote = remote[:-4]
+    path = ""
+    if remote.startswith("git@"):
+        _, remainder = remote.split("@", 1)
+        path = remainder.split(":", 1)[1]
+    elif remote.startswith("https://"):
+        _, path = remote.split("https://", 1)
+        path = path.split("/", 1)[1]
+    if path:
+        parts = path.split("/")
+        try:
+            owner_guess, repo_guess = parts[:2]
+        except ValueError:
+            pass
+        else:
+            return owner_guess, repo_guess
+    return owner or "your-org", repo or "your-repo"
+
+
 def git_sha() -> str:
     """Return the commit SHA used for GitHub permalinks."""
     try:
@@ -37,8 +69,7 @@ def git_sha() -> str:
         return os.environ.get("DOCS_GITHUB_SHA", "main")
 
 
-OWNER = os.environ.get("DOCS_GITHUB_ORG", "your-org")
-REPO = os.environ.get("DOCS_GITHUB_REPO", "your-repo")
+OWNER, REPO = detect_repo()
 SHA = git_sha()
 
 
@@ -110,36 +141,33 @@ def is_public(node: Object) -> bool:
     return not name.startswith("_")
 
 
-def get_source_url(node: Object) -> str | None:
-    """Return an external permalink for the given node."""
+def get_editor_link(node: Object) -> str | None:
+    """Return an editor deep link when LINK_MODE requests it."""
+    if LINK_MODE != "editor":
+        return None
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
     base = SRC if SRC.exists() else ROOT
     abs_path = (base / rel_path).resolve()
     start = int(getattr(node, "lineno", 1) or 1)
-    end = getattr(node, "endlineno", None)
-    if LINK_MODE == "github":
-        rel = abs_path.relative_to(ROOT)
-        return gh_url(str(rel).replace("\\", "/"), start, end)
     return editor_url(abs_path, start)
 
 
-def get_relative_url(node: Object, readme_dir: Path) -> str | None:
-    """Return a repository-relative link that works inside the README."""
+def get_github_link(node: Object) -> str | None:
+    """Return a GitHub permalink for the given node."""
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
     base = SRC if SRC.exists() else ROOT
     abs_path = (base / rel_path).resolve()
-    try:
-        relative = abs_path.relative_to(readme_dir)
-    except ValueError:
-        return None
     start = int(getattr(node, "lineno", 1) or 1)
     end = getattr(node, "endlineno", None)
-    anchor = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
-    return f"{relative.as_posix()}{anchor}"
+    try:
+        rel = abs_path.relative_to(ROOT)
+    except ValueError:
+        return None
+    return gh_url(str(rel).replace("\\", "/"), start, end)
 
 
 def iter_public_members(node: Object) -> Iterable[Object]:
@@ -162,9 +190,9 @@ def render_member(node: Object, *, indent: int, lines: list[str], readme_dir: Pa
     readme_dir : Path
         Directory that will contain the README (used for relative links).
     """
-    url = get_source_url(node)
-    rel_url = get_relative_url(node, readme_dir)
-    if not url and not rel_url:
+    editor = get_editor_link(node)
+    github = get_github_link(node)
+    if not editor and not github:
         return
     summary = summarize(node)
     bullet = " " * indent + "- "
@@ -173,11 +201,10 @@ def render_member(node: Object, *, indent: int, lines: list[str], readme_dir: Pa
     if summary:
         text += f" — {summary}"
     links: list[str] = []
-    if url:
-        link_label = "source" if LINK_MODE == "github" else "open"
-        links.append(f"[{link_label}]({url})")
-    if rel_url:
-        links.append(f"[view]({rel_url})")
+    if editor:
+        links.append(f"[open]({editor})")
+    if github:
+        links.append(f"[github]({github})")
     if links:
         text += " → " + " | ".join(links)
     text += "\n"
