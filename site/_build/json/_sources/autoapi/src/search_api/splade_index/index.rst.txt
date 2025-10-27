@@ -61,13 +61,13 @@ Module Contents
 
 
    .. py:attribute:: docs
-      :type:  List[SpladeDoc]
+      :type:  list[SpladeDoc]
       :value: []
 
 
 
    .. py:attribute:: df
-      :type:  Dict[str, int]
+      :type:  dict[str, int]
 
 
    .. py:attribute:: N

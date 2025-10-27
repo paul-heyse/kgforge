@@ -475,13 +475,43 @@
 
             <details class="quote">
               <summary>Source code in <code>src/orchestration/flows.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;kgforge_e2e_skeleton&quot;</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">e2e_flow</span><span class="p">():</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;kgforge_e2e_skeleton&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">e2e_flow</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;E2e flow.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">t_echo</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">result</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;harvest&quot;</span><span class="p">,</span><span class="s2">&quot;doctags&quot;</span><span class="p">,</span><span class="s2">&quot;chunk&quot;</span><span class="p">,</span><span class="s2">&quot;embed_dense&quot;</span><span class="p">,</span><span class="s2">&quot;encode_splade&quot;</span><span class="p">,</span><span class="s2">&quot;bm25&quot;</span><span class="p">,</span><span class="s2">&quot;faiss&quot;</span><span class="p">,</span><span class="s2">&quot;ontology&quot;</span><span class="p">,</span><span class="s2">&quot;concept_embed&quot;</span><span class="p">,</span><span class="s2">&quot;linker&quot;</span><span class="p">,</span><span class="s2">&quot;kg&quot;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">t_echo</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="s2">&quot;harvest&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;doctags&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;chunk&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;embed_dense&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;encode_splade&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;bm25&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;faiss&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ontology&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concept_embed&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;linker&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;kg&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -558,8 +588,7 @@
 
             <details class="quote">
               <summary>Source code in <code>src/orchestration/flows.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 7</span>
-<span class="normal"> 8</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
 <span class="normal">11</span>
@@ -568,7 +597,8 @@
 <span class="normal">14</span>
 <span class="normal">15</span>
 <span class="normal">16</span>
-<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@task</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">t_echo</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;T echo.</span>
 

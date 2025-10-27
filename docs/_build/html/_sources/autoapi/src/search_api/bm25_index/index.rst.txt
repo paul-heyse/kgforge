@@ -53,7 +53,7 @@ Module Contents
 
 
    .. py:attribute:: tf
-      :type:  Dict[str, float]
+      :type:  dict[str, float]
 
 
    .. py:attribute:: dl
@@ -72,13 +72,13 @@ Module Contents
 
 
    .. py:attribute:: docs
-      :type:  List[BM25Doc]
+      :type:  list[BM25Doc]
       :value: []
 
 
 
    .. py:attribute:: df
-      :type:  Dict[str, int]
+      :type:  dict[str, int]
 
 
    .. py:attribute:: N

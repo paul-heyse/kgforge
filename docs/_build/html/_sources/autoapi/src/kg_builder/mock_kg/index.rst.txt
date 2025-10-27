@@ -22,11 +22,11 @@ Module Contents
 
 
    .. py:attribute:: chunk2concepts
-      :type:  Dict[str, Set[str]]
+      :type:  dict[str, set[str]]
 
 
    .. py:attribute:: neighbors
-      :type:  Dict[str, Set[str]]
+      :type:  dict[str, set[str]]
 
 
    .. py:method:: add_mention(chunk_id, concept_id)

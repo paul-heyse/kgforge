@@ -26,7 +26,7 @@ Module Contents
 
 
    .. py:attribute:: ids
-      :type:  List[str]
+      :type:  list[str]
 
 
    .. py:attribute:: mat
@@ -48,17 +48,19 @@ Module Contents
 
 
    .. py:attribute:: index
+      :type:  Any | None
       :value: None
 
 
 
    .. py:attribute:: idmap
+      :type:  list[str] | None
       :value: None
 
 
 
    .. py:attribute:: vecs
-      :type:  Optional[DenseVecs]
+      :type:  DenseVecs | None
       :value: None
 
 

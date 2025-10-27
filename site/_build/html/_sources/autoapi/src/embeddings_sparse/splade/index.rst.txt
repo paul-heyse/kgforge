@@ -58,18 +58,17 @@ Module Contents
 
 .. py:class:: PureImpactIndex(index_dir)
 
-   Toy 'impact' index that approximates SPLADE using IDF*log(1+tf) weights
-   over a simple tokenizer.
+   Toy 'impact' index that approximates SPLADE with IDF/log weighting.
 
-   This is *not* a neural encoder; it exists to keep the pipeline
-   runnable without GPUs or Pyserini.
+   - Keeps the pipeline runnable without GPUs or Pyserini.
+   - Substitutes a simple tokenizer plus weighting scheme for the neural encoder.
 
 
    .. py:attribute:: index_dir
 
 
    .. py:attribute:: df
-      :type:  Dict[str, int]
+      :type:  dict[str, int]
 
 
    .. py:attribute:: N
@@ -78,7 +77,7 @@ Module Contents
 
 
    .. py:attribute:: postings
-      :type:  Dict[str, Dict[str, float]]
+      :type:  dict[str, dict[str, float]]
 
 
    .. py:method:: build(docs_iterable)

@@ -31,25 +31,25 @@ Module Contents
 
 
    .. py:attribute:: openalex_id
-      :type:  Optional[str]
+      :type:  str | None
       :value: None
 
 
 
    .. py:attribute:: doi
-      :type:  Optional[str]
+      :type:  str | None
       :value: None
 
 
 
    .. py:attribute:: arxiv_id
-      :type:  Optional[str]
+      :type:  str | None
       :value: None
 
 
 
    .. py:attribute:: pmcid
-      :type:  Optional[str]
+      :type:  str | None
       :value: None
 
 
@@ -61,25 +61,25 @@ Module Contents
 
 
    .. py:attribute:: authors
-      :type:  List[str]
+      :type:  list[str]
       :value: []
 
 
 
    .. py:attribute:: pub_date
-      :type:  Optional[str]
+      :type:  str | None
       :value: None
 
 
 
    .. py:attribute:: license
-      :type:  Optional[str]
+      :type:  str | None
       :value: None
 
 
 
    .. py:attribute:: language
-      :type:  Optional[str]
+      :type:  str | None
       :value: 'en'
 
 
@@ -97,7 +97,7 @@ Module Contents
 
 
    .. py:attribute:: content_hash
-      :type:  Optional[str]
+      :type:  str | None
       :value: None
 
 
@@ -131,7 +131,7 @@ Module Contents
 
 
    .. py:attribute:: avg_logprob
-      :type:  Optional[float]
+      :type:  float | None
       :value: None
 
 
@@ -153,7 +153,7 @@ Module Contents
 
 
    .. py:attribute:: section
-      :type:  Optional[str]
+      :type:  str | None
 
 
    .. py:attribute:: start_char
@@ -169,7 +169,7 @@ Module Contents
 
 
    .. py:attribute:: doctags_span
-      :type:  Dict[str, int]
+      :type:  dict[str, int]
 
 
 .. py:class:: LinkAssertion(/, **data)
@@ -201,13 +201,13 @@ Module Contents
 
 
    .. py:attribute:: evidence_span
-      :type:  Optional[str]
+      :type:  str | None
       :value: None
 
 
 
    .. py:attribute:: features
-      :type:  Dict[str, float]
+      :type:  dict[str, float]
 
 
    .. py:attribute:: run_id
