@@ -16,13 +16,19 @@ This repository is the **skeleton** for the single-machine architecture you spec
 > **Note**: This is a scaffold. Many functions are stubs and marked TODO.
 > It is structured for high cohesion & clean interfaces so multiple teams can implement independently.
 
-## Quickstart (skeleton)
+## Onboarding (uv-first)
 
 ```bash
-make bootstrap   # create venv, install basic dev deps, format hooks, apply DuckDB migrations
-make run         # start API (expects vLLM & Nginx configured), runs on localhost:8080
-make e2e         # runs a light end-to-end test over fixtures (skeleton)
+# one-time setup
+uv python pin 3.13            # writes .python-version
+uv venv                       # creates .venv/
+uv sync                       # installs from uv.lock / pyproject
 ```
+
+- `direnv` automatically activates `.venv` and runs `uv sync --frozen`; see `.envrc`.
+- Pre-commit hooks install automatically the first time direnv loads the project.
+- VS Code terminals default to `.venv`; see `.vscode/settings.json`.
+- Secrets live in `.env`; add overrides in `.envrc.local` (gitignored).
 
 ## Directory layout
 

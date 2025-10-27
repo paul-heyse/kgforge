@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
 [project]
 name = "kgfoundry"
 version = "0.1.0"
@@ -228,6 +232,9 @@ docs = [
 [project.scripts]
 docstokg-hybrid-validation = "DocsToKG.HybridSearch.validation:main"
 
+[tool.hatch.build.targets.wheel]
+packages = [{ include = "kgfoundry", from = "src" }]
+
 [tool.black]
 line-length = 100
 target-version = ["py312"]  # black currently supports up to py312; code runs on py313
@@ -387,6 +394,7 @@ show_error_codes = true
 # Tell uv that vllm should come ONLY from the vllm-nightly index.
 [tool.uv.sources]
 vllm = { index = "vllm-nightly" }
+faiss = { index = "wheelhouse" }
 
 # point torch packages to the *named* PyTorch cu130 index
 torch = [       { index = "pytorch-cu130" } ]
@@ -399,6 +407,13 @@ torchaudio = [  { index = "pytorch-cu130" } ]
 name = "vllm-nightly"
 url = "https://wheels.vllm.ai/nightly"
 explicit = true          # prevents accidental installs of other deps from here
+
+# Tell uv there's a local, flat index of wheels.
+[[tool.uv.index]]
+name = "wheelhouse"
+url = ".wheelhouse"
+format = "flat"
+explicit = true
 
 # NEW — define the cu130 index *by name*, then reference it above
 [[tool.uv.index]]
