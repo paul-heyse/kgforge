@@ -1,9 +1,9 @@
-"""Module for search_api.bm25_index.
+"""In-memory BM25 index used by the fixture search API implementation.
 
 NavMap:
-- toks: Toks.
-- BM25Doc: Bm25doc.
-- BM25Index: Bm25index.
+- toks: Tokenise raw text for BM25 scoring.
+- BM25Doc: Lightweight document representation tracked by the index.
+- BM25Index: Build, persist, and query a BM25 index sourced from DuckDB.
 """
 
 from __future__ import annotations
@@ -14,31 +14,40 @@ import re
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Final
 
 import duckdb
+
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["BM25Doc", "BM25Index", "toks"]
+
+__navmap__: Final[NavMap] = {
+    "title": "search_api.bm25_index",
+    "synopsis": "Toy BM25 index backed by DuckDB parquet exports.",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["toks", "BM25Doc", "BM25Index"],
+        },
+    ],
+}
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
 
-def toks(s: str) -> list[str]:
-    """Toks.
-
-    Parameters
-    ----------
-    s : str
-        TODO.
-
-    Returns
-    -------
-    List[str]
-        TODO.
-    """
-    return [t.lower() for t in TOKEN_RE.findall(s or "")]
+# [nav:anchor toks]
+def toks(text: str) -> list[str]:
+    """Tokenise ``text`` into lowercase alphanumeric terms."""
+    return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
+# [nav:anchor BM25Doc]
 @dataclass
 class BM25Doc:
-    """Bm25doc."""
+    """Container storing fields required for BM25 scoring."""
 
     chunk_id: str
     doc_id: str
@@ -48,19 +57,12 @@ class BM25Doc:
     dl: float
 
 
+# [nav:anchor BM25Index]
 class BM25Index:
-    """Bm25index."""
+    """Construct, persist, and query a BM25 index."""
 
     def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
-        """Init.
-
-        Parameters
-        ----------
-        k1 : float
-            TODO.
-        b : float
-            TODO.
-        """
+        """Initialise the index with standard BM25 hyperparameters."""
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -70,28 +72,17 @@ class BM25Index:
 
     @classmethod
     def build_from_duckdb(cls, db_path: str) -> BM25Index:
-        """Build from duckdb.
-
-        Parameters
-        ----------
-        db_path : str
-            TODO.
-
-        Returns
-        -------
-        "BM25Index"
-            TODO.
-        """
-        idx = cls()
+        """Build an index using the most recent chunk dataset in DuckDB."""
+        index = cls()
         con = duckdb.connect(db_path)
         try:
-            ds = con.execute(
+            dataset = con.execute(
                 "SELECT parquet_root FROM datasets "
                 "WHERE kind='chunks' ORDER BY created_at DESC LIMIT 1"
             ).fetchone()
-            if not ds:
-                return idx
-            root = ds[0]
+            if not dataset:
+                return index
+            root = dataset[0]
             rows = con.execute(
                 f"""
                 SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text, coalesce(d.title,'')
@@ -101,27 +92,22 @@ class BM25Index:
             ).fetchall()
         finally:
             con.close()
-        idx._build(rows)
-        return idx
+        index._build(rows)
+        return index
 
     def _build(self, rows: Iterable[tuple[str, str, str, str, str]]) -> None:
-        """Build.
-
-        Parameters
-        ----------
-            rows: TODO.
-        """
+        """Populate postings, document frequencies, and cached statistics."""
         self.docs.clear()
         self.df.clear()
         dl_sum = 0.0
         for chunk_id, doc_id, section, body, title in rows:
             tf: dict[str, float] = {}
-            for t in toks(body or ""):
-                tf[t] = tf.get(t, 0.0) + 1.0
-            for t in toks(title or ""):
-                tf[t] = tf.get(t, 0.0) + 2.0
-            for t in toks(section or ""):
-                tf[t] = tf.get(t, 0.0) + 1.2
+            for term in toks(body or ""):
+                tf[term] = tf.get(term, 0.0) + 1.0
+            for term in toks(title or ""):
+                tf[term] = tf.get(term, 0.0) + 2.0
+            for term in toks(section or ""):
+                tf[term] = tf.get(term, 0.0) + 1.2
             dl = sum(tf.values())
             self.docs.append(
                 BM25Doc(
@@ -140,20 +126,9 @@ class BM25Index:
         self.avgdl = (dl_sum / self.N) if self.N > 0 else 0.0
 
     def save(self, path: str) -> None:
-        """Save.
-
-        Parameters
-        ----------
-        path : str
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Serialize the index to ``path`` using pickle."""
         Path(path).parent.mkdir(parents=True, exist_ok=True)
-        with open(path, "wb") as f:
+        with open(path, "wb") as handle:
             pickle.dump(
                 {
                     "k1": self.k1,
@@ -163,86 +138,47 @@ class BM25Index:
                     "df": self.df,
                     "docs": self.docs,
                 },
-                f,
+                handle,
             )
 
     @classmethod
     def load(cls, path: str) -> BM25Index:
-        """Load.
-
-        Parameters
-        ----------
-        path : str
-            TODO.
-
-        Returns
-        -------
-        "BM25Index"
-            TODO.
-        """
-        with open(path, "rb") as f:
-            d = pickle.load(f)
-        idx = cls(d.get("k1", 0.9), d.get("b", 0.4))
-        idx.N = d["N"]
-        idx.avgdl = d["avgdl"]
-        idx.df = d["df"]
-        idx.docs = d["docs"]
-        return idx
+        """Load a pickled index from ``path``."""
+        with open(path, "rb") as handle:
+            payload = pickle.load(handle)
+        index = cls(payload.get("k1", 0.9), payload.get("b", 0.4))
+        index.N = payload["N"]
+        index.avgdl = payload["avgdl"]
+        index.df = payload["df"]
+        index.docs = payload["docs"]
+        return index
 
     def _idf(self, term: str) -> float:
-        """Idf.
-
-        Parameters
-        ----------
-        term : str
-            TODO.
-
-        Returns
-        -------
-        float
-            TODO.
-        """
+        """Compute the inverse document frequency for ``term``."""
         df = self.df.get(term, 0)
-        return math.log((self.N - df + 0.5) / (df + 0.5) + 1.0) if self.N > 0 and df > 0 else 0.0
+        if self.N == 0 or df == 0:
+            return 0.0
+        return math.log((self.N - df + 0.5) / (df + 0.5) + 1.0)
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Search.
-
-        Parameters
-        ----------
-        query : str
-            TODO.
-        k : int
-            TODO.
-        """
+        """Score documents for ``query`` and return the top ``k`` hits."""
         if self.N == 0:
             return []
         terms = toks(query)
         scores = [0.0] * self.N
-        for i, d in enumerate(self.docs):
-            s = 0.0
-            for t in terms:
-                tf = d.tf.get(t, 0.0)
+        for i, doc in enumerate(self.docs):
+            score = 0.0
+            for term in terms:
+                tf = doc.tf.get(term, 0.0)
                 if tf <= 0.0:
                     continue
-                idf = self._idf(t)
-                denom = tf + self.k1 * (1.0 - self.b + self.b * (d.dl / (self.avgdl or 1.0)))
-                s += idf * ((tf * (self.k1 + 1.0)) / denom)
-            scores[i] = s
-        ranked = sorted(enumerate(scores), key=lambda x: x[1], reverse=True)
-        return [(i, s) for i, s in ranked[:k] if s > 0.0]
+                idf = self._idf(term)
+                denom = tf + self.k1 * (1.0 - self.b + self.b * (doc.dl / (self.avgdl or 1.0)))
+                score += idf * ((tf * (self.k1 + 1.0)) / denom)
+            scores[i] = score
+        ranked = sorted(enumerate(scores), key=lambda item: item[1], reverse=True)
+        return [(index, score) for index, score in ranked[:k] if score > 0.0]
 
-    def doc(self, idx: int) -> BM25Doc:
-        """Doc.
-
-        Parameters
-        ----------
-        idx : int
-            TODO.
-
-        Returns
-        -------
-        BM25Doc
-            TODO.
-        """
-        return self.docs[idx]
+    def doc(self, index: int) -> BM25Doc:
+        """Return the :class:`BM25Doc` at ``index``."""
+        return self.docs[index]

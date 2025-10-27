@@ -8,6 +8,7 @@ src.search_api.schemas
    Module for search_api.schemas.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - SearchRequest: Searchrequest.
    - SearchResult: Searchresult.
 

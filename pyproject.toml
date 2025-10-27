@@ -280,7 +280,7 @@ select = [
     "C90",
     "PLR",
 ]
-ignore = ["Q", "E203"]
+ignore = ["Q", "E203", "D203", "D213"]
 preview = false
 extend-select = ["RUF100"]
 

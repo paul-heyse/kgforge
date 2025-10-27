@@ -49,6 +49,8 @@ rm -rf docs/_build/html docs/_build/json site
 
 run make docstrings
 run make readmes
+run "$PY" tools/navmap/build_navmap.py
+run "$PY" tools/navmap/check_navmap.py
 run make html
 run make json
 run make symbols

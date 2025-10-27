@@ -1,11 +1,11 @@
-"""Module for search_api.app.
+"""REST endpoints and helper utilities for the kgfoundry search service.
 
 NavMap:
-- SearchRequest: Searchrequest.
-- SearchResult: Searchresult.
+- SearchRequest: Schema describing the search request payload.
+- SearchResult: Schema describing a single ranked search result.
 - auth: Validate the bearer-token header for protected endpoints.
-- healthz: Healthz.
-- rrf_fuse: Fuse ranked lists using reciprocal rank fusion.
+- healthz: Report the health status for core dependencies.
+- rrf_fuse: Fuse ranked results using reciprocal rank fusion.
 - apply_kg_boosts: Apply knowledge-graph boosting heuristics.
 - search: Execute a search request across dense and sparse indices.
 - graph_concepts: Return KG concepts that match the provided query fragment.
@@ -16,7 +16,7 @@ from __future__ import annotations
 import logging
 import os
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, Final
 
 import yaml
 from fastapi import Depends, FastAPI, Header, HTTPException
@@ -25,7 +25,37 @@ from kgfoundry.embeddings_sparse.splade import get_splade
 from kgfoundry.kg_builder.mock_kg import MockKG
 from kgfoundry.vectorstore_faiss.gpu import FaissGpuIndex
 
+from kgfoundry_common.navmap_types import NavMap
 from search_api.schemas import SearchRequest, SearchResult
+
+__all__ = [
+    "apply_kg_boosts",
+    "auth",
+    "graph_concepts",
+    "healthz",
+    "rrf_fuse",
+    "search",
+]
+
+__navmap__: Final[NavMap] = {
+    "title": "search_api.app",
+    "synopsis": "Search service endpoints and helper utilities",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": [
+                "auth",
+                "healthz",
+                "rrf_fuse",
+                "apply_kg_boosts",
+                "search",
+                "graph_concepts",
+            ],
+        },
+    ],
+}
 
 logger = logging.getLogger(__name__)
 
@@ -87,18 +117,19 @@ kg.add_mention("chunk:1", "C:42")
 kg.add_edge("C:42", "C:99")
 
 
+# [nav:anchor auth]
 def auth(authorization: str | None = Header(default=None)) -> None:
-    """Validate the bearer-token header for protected endpoints.
+    """Validate the bearer token supplied in the ``Authorization`` header.
 
     Parameters
     ----------
     authorization : str | None, optional
-        TODO.
+        Authorization header value in the form ``"Bearer <token>"``.
 
-    Returns
-    -------
-    None
-        TODO.
+    Raises
+    ------
+    HTTPException
+        Raised when authentication is enabled and the token is invalid.
     """
     if not API_KEYS:
         return  # disabled in skeleton
@@ -109,9 +140,10 @@ def auth(authorization: str | None = Header(default=None)) -> None:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 
+# [nav:anchor healthz]
 @app.get("/healthz")
 def healthz() -> dict[str, Any]:
-    """Healthz."""
+    """Return a summary of dependency health for readiness checks."""
     return {
         "status": "ok",
         "components": {
@@ -124,20 +156,21 @@ def healthz() -> dict[str, Any]:
     }
 
 
+# [nav:anchor rrf_fuse]
 def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, float]:
-    """Fuse ranked lists using reciprocal rank fusion.
+    """Fuse ranked result lists using reciprocal rank fusion (RRF).
 
     Parameters
     ----------
     lists : list[list[tuple[str, float]]]
-        TODO.
+        Ranked lists where each entry is a ``(document_id, score)`` pair.
     k_rrf : int
-        TODO.
+        Constant controlling how quickly contribution decays with rank.
 
     Returns
     -------
     dict[str, float]
-        TODO.
+        Combined scores keyed by document identifier.
     """
     scores: dict[str, float] = {}
     for hits in lists:
@@ -146,31 +179,31 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
     return scores
 
 
+# [nav:anchor apply_kg_boosts]
 def apply_kg_boosts(
     cands: dict[str, float],
     query: str,
     direct: float = 0.08,
     one_hop: float = 0.04,
 ) -> dict[str, float]:
-    """Apply knowledge-graph boosting heuristics.
+    """Apply knowledge-graph boosting heuristics to ranked candidates.
 
     Parameters
     ----------
     cands : dict[str, float]
-        TODO.
+        Baseline scores keyed by chunk identifier.
     query : str
-        TODO.
-    direct : float, default=0.08
-        TODO.
-    one_hop : float, default=0.04
-        TODO.
+        Original search query used to infer concept mentions.
+    direct : float, optional
+        Boost to apply when a chunk links directly to a concept in the query.
+    one_hop : float, optional
+        Boost to apply when a chunk links to a neighbour of a concept.
 
     Returns
     -------
     dict[str, float]
-        TODO.
+        Adjusted scores that include the knowledge-graph boosts.
     """
-    # toy: map words 'concept42' to concept id
     q_concepts = set()
     for w in query.lower().split():
         if w.startswith("concept"):
@@ -190,6 +223,7 @@ def apply_kg_boosts(
     return out
 
 
+# [nav:anchor search]
 @app.post("/search", response_model=dict)
 def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     """Execute a search request across dense and sparse indices.
@@ -197,9 +231,14 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     Parameters
     ----------
     req : SearchRequest
-        TODO.
+        Request payload describing the query and ranking preferences.
     _ : None
-        TODO.
+        Dependency injection hook used to enforce authentication.
+
+    Returns
+    -------
+    dict[str, Any]
+        Serialized response containing the ranked search results.
     """
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
@@ -258,6 +297,7 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     return {"results": results}
 
 
+# [nav:anchor graph_concepts]
 @app.post("/graph/concepts", response_model=dict)
 def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str, Any]:
     """Return KG concepts that match the provided query fragment.
@@ -265,9 +305,14 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     Parameters
     ----------
     body : Mapping[str, Any]
-        TODO.
+        Request payload optionally containing ``q`` and ``limit`` keys.
     _ : None
-        TODO.
+        Dependency injection hook used to enforce authentication.
+
+    Returns
+    -------
+    dict[str, Any]
+        Concepts whose identifiers match the provided fragment.
     """
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring

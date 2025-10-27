@@ -8,6 +8,7 @@ src.search_api.fusion
    Module for search_api.fusion.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - rrf_fuse: Rrf fuse.
 
 

@@ -1,60 +1,74 @@
-"""Module for orchestration.fixture_flow.
-
-NavMap:
-- t_prepare_dirs: T prepare dirs.
-- t_write_fixture_chunks: T write fixture chunks.
-- t_write_fixture_dense: T write fixture dense.
-- t_write_fixture_splade: T write fixture splade.
-- t_register_in_duckdb: T register in duckdb.
-- fixture_pipeline: Run the end-to-end fixture pipeline.
-"""
+"""Prefect flow scaffolding used to generate fixture data for kgfoundry."""
 
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Final
 
 from kgfoundry.kgfoundry_common.models import Doc
 from kgfoundry.kgfoundry_common.parquet_io import ParquetChunkWriter, ParquetVectorWriter
 from kgfoundry.registry.helper import DuckDBRegistryHelper
 from prefect import flow, task
 
+from kgfoundry_common.navmap_types import NavMap
 
+__all__ = [
+    "fixture_pipeline",
+    "t_prepare_dirs",
+    "t_register_in_duckdb",
+    "t_write_fixture_chunks",
+    "t_write_fixture_dense",
+    "t_write_fixture_splade",
+]
+
+__navmap__: Final[NavMap] = {
+    "title": "orchestration.fixture_flow",
+    "synopsis": "Prefect tasks that generate fixture parquet datasets and register them.",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": [
+                "t_prepare_dirs",
+                "t_write_fixture_chunks",
+                "t_write_fixture_dense",
+                "t_write_fixture_splade",
+                "t_register_in_duckdb",
+                "fixture_pipeline",
+            ],
+        },
+    ],
+}
+
+
+# [nav:anchor t_prepare_dirs]
 @task
 def t_prepare_dirs(root: str) -> dict[str, bool]:
-    """T prepare dirs.
+    """Create the directory layout consumed by subsequent fixture tasks.
 
     Parameters
     ----------
     root : str
-        TODO.
+        Base directory where fixture artefacts should be written.
 
     Returns
     -------
-    dict
-        TODO.
+    dict[str, bool]
+        A trivial acknowledgement used by downstream tasks.
     """
-    p = Path(root)
-    (p / "parquet" / "dense").mkdir(parents=True, exist_ok=True)
-    (p / "parquet" / "sparse").mkdir(parents=True, exist_ok=True)
-    (p / "parquet" / "chunks").mkdir(parents=True, exist_ok=True)
-    (p / "catalog").mkdir(parents=True, exist_ok=True)
+    path = Path(root)
+    (path / "parquet" / "dense").mkdir(parents=True, exist_ok=True)
+    (path / "parquet" / "sparse").mkdir(parents=True, exist_ok=True)
+    (path / "parquet" / "chunks").mkdir(parents=True, exist_ok=True)
+    (path / "catalog").mkdir(parents=True, exist_ok=True)
     return {"ok": True}
 
 
+# [nav:anchor t_write_fixture_chunks]
 @task
 def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
-    """T write fixture chunks.
-
-    Parameters
-    ----------
-    chunks_root : str
-        TODO.
-
-    Returns
-    -------
-    tuple[str, int]
-        TODO.
-    """
+    """Write a minimal chunk parquet dataset for fixture usage."""
     writer = ParquetChunkWriter(chunks_root, model="docling_hybrid", run_id="fixture")
     rows = [
         {
@@ -73,44 +87,24 @@ def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
     return dataset_root, len(rows)
 
 
+# [nav:anchor t_write_fixture_dense]
 @task
 def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
-    """T write fixture dense.
-
-    Parameters
-    ----------
-    dense_root : str
-        TODO.
-
-    Returns
-    -------
-    tuple[str, int]
-        TODO.
-    """
-    w = ParquetVectorWriter(dense_root)
-    vec = [0.0] * 2560
-    out_root = w.write_dense(
-        "Qwen3-Embedding-4B", "fixture", 2560, [("urn:chunk:fixture:0-28", vec, 1.0)], shard=0
+    """Write dense embedding vectors for the fixture chunk."""
+    writer = ParquetVectorWriter(dense_root)
+    vector = [0.0] * 2560
+    out_root = writer.write_dense(
+        "Qwen3-Embedding-4B", "fixture", 2560, [("urn:chunk:fixture:0-28", vector, 1.0)], shard=0
     )
     return out_root, 1
 
 
+# [nav:anchor t_write_fixture_splade]
 @task
 def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
-    """T write fixture splade.
-
-    Parameters
-    ----------
-    sparse_root : str
-        TODO.
-
-    Returns
-    -------
-    tuple[str, int]
-        TODO.
-    """
-    w = ParquetVectorWriter(sparse_root)
-    out_root = w.write_splade(
+    """Write SPLADE-style sparse vectors for the fixture chunk."""
+    writer = ParquetVectorWriter(sparse_root)
+    out_root = writer.write_splade(
         "SPLADE-v3-distilbert",
         "fixture",
         [("urn:chunk:fixture:0-28", [1, 7, 42], [0.3, 0.2, 0.1])],
@@ -119,6 +113,7 @@ def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
     return out_root, 1
 
 
+# [nav:anchor t_register_in_duckdb]
 @task
 def t_register_in_duckdb(
     db_path: str,
@@ -126,31 +121,21 @@ def t_register_in_duckdb(
     dense_info: tuple[str, int],
     sparse_info: tuple[str, int],
 ) -> dict[str, list[str]]:
-    """T register in duckdb.
+    """Insert generated fixture runs and datasets into the DuckDB registry."""
+    registry = DuckDBRegistryHelper(db_path)
+    dense_run = registry.new_run("dense_embed", "Qwen3-Embedding-4B", "main", {"dim": 2560})
+    sparse_run = registry.new_run("splade_encode", "SPLADE-v3-distilbert", "main", {"topk": 256})
 
-    Parameters
-    ----------
-    db_path : str
-        TODO.
-        chunks_info: TODO.
-        dense_info: TODO.
-        sparse_info: TODO.
+    ds_chunks = registry.begin_dataset("chunks", dense_run)
+    registry.commit_dataset(ds_chunks, chunks_info[0], rows=chunks_info[1])
 
-    Returns
-    -------
-    dict
-        TODO.
-    """
-    reg = DuckDBRegistryHelper(db_path)
-    dense_run = reg.new_run("dense_embed", "Qwen3-Embedding-4B", "main", {"dim": 2560})
-    sparse_run = reg.new_run("splade_encode", "SPLADE-v3-distilbert", "main", {"topk": 256})
-    ds_chunks = reg.begin_dataset("chunks", dense_run)
-    reg.commit_dataset(ds_chunks, chunks_info[0], rows=chunks_info[1])
-    ds_dense = reg.begin_dataset("dense", dense_run)
-    reg.commit_dataset(ds_dense, dense_info[0], rows=dense_info[1])
-    ds_sparse = reg.begin_dataset("sparse", sparse_run)
-    reg.commit_dataset(ds_sparse, sparse_info[0], rows=sparse_info[1])
-    reg.register_documents(
+    ds_dense = registry.begin_dataset("dense", dense_run)
+    registry.commit_dataset(ds_dense, dense_info[0], rows=dense_info[1])
+
+    ds_sparse = registry.begin_dataset("sparse", sparse_run)
+    registry.commit_dataset(ds_sparse, sparse_info[0], rows=sparse_info[1])
+
+    registry.register_documents(
         [
             Doc(
                 id="urn:doc:fixture:0001",
@@ -169,24 +154,17 @@ def t_register_in_duckdb(
             )
         ]
     )
-    reg.close_run(dense_run, True)
-    reg.close_run(sparse_run, True)
+    registry.close_run(dense_run, True)
+    registry.close_run(sparse_run, True)
     return {"runs": [dense_run, sparse_run]}
 
 
+# [nav:anchor fixture_pipeline]
 @flow(name="kgfoundry_fixture_pipeline")
 def fixture_pipeline(
     root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb"
 ) -> dict[str, list[str]]:
-    """Run the end-to-end fixture pipeline.
-
-    Parameters
-    ----------
-    root : str, default="/data"
-        TODO.
-    db_path : str, default="/data/catalog/catalog.duckdb"
-        TODO.
-    """
+    """Run the full fixture pipeline and register the generated artefacts."""
     t_prepare_dirs(root)
     chunks_info = t_write_fixture_chunks(f"{root}/parquet/chunks")
     dense_info = t_write_fixture_dense(f"{root}/parquet/dense")

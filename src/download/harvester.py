@@ -1,24 +1,43 @@
-"""Module for download.harvester.
+"""Harvest open-access documents from OpenAlex and Unpaywall.
 
 NavMap:
-- OpenAccessHarvester: Openaccessharvester.
+- OpenAccessHarvester: Coordinate OpenAlex lookups, Unpaywall fallbacks, and
+  local persistence.
 """
 
 from __future__ import annotations
 
 import os
 import time
-from typing import Any
+from typing import Any, Final
 
 import requests
 from kgfoundry.kgfoundry_common.exceptions import DownloadError, UnsupportedMIMEError
 from kgfoundry.kgfoundry_common.models import Doc
 
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["OpenAccessHarvester"]
+
+__navmap__: Final[NavMap] = {
+    "title": "download.harvester",
+    "synopsis": "Utilities for harvesting open-access PDFs from OpenAlex.",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["OpenAccessHarvester"],
+        },
+    ],
+}
+
 HTTP_OK = 200
 
 
+# [nav:anchor OpenAccessHarvester]
 class OpenAccessHarvester:
-    """Openaccessharvester."""
+    """Coordinate OpenAlex and Unpaywall lookups to persist open-access PDFs."""
 
     def __init__(  # noqa: PLR0913 - parameters mirror external API options
         self,
@@ -29,22 +48,22 @@ class OpenAccessHarvester:
         pdf_host_base: str | None = None,
         out_dir: str = "/data/pdfs",
     ) -> None:
-        """Init.
+        """Initialize the harvester with API endpoints and storage options.
 
         Parameters
         ----------
         user_agent : str
-            TODO.
+            User agent string advertised to OpenAlex and downstream APIs.
         contact_email : str
-            TODO.
-        openalex_base : str
-            TODO.
-        unpaywall_base : str
-            TODO.
-        pdf_host_base : Optional[str]
-            TODO.
-        out_dir : str
-            TODO.
+            Contact address required by Unpaywall for polite usage.
+        openalex_base : str, optional
+            Base URL for OpenAlex API requests.
+        unpaywall_base : str, optional
+            Base URL for Unpaywall API lookups.
+        pdf_host_base : str | None, optional
+            Optional fallback host that mirrors PDFs by DOI.
+        out_dir : str, optional
+            Directory where downloaded PDFs will be stored.
         """
         self.ua = user_agent
         self.email = contact_email
@@ -57,21 +76,21 @@ class OpenAccessHarvester:
         self.session.headers.update({"User-Agent": f"{self.ua} ({self.email})"})
 
     def search(self, topic: str, years: str, max_works: int) -> list[dict[str, Any]]:
-        """Search.
+        """Search OpenAlex for works matching the provided topic and year window.
 
         Parameters
         ----------
         topic : str
-            TODO.
+            OpenAlex topic identifier or free-form search term.
         years : str
-            TODO.
+            Publication-year filter expressed in the OpenAlex filter syntax.
         max_works : int
-            TODO.
+            Maximum number of works to retrieve.
 
         Returns
         -------
-        list[dict]
-            TODO.
+        list[dict[str, Any]]
+            Work payloads returned by the OpenAlex API.
         """
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
@@ -79,38 +98,40 @@ class OpenAccessHarvester:
             "per_page": min(200, max_works),
             "cursor": "*",
         }
-        r = self.session.get(url, params=params, timeout=30)
-        r.raise_for_status()
-        data = r.json()
+        if years:
+            params["filter"] = years
+        response = self.session.get(url, params=params, timeout=30)
+        response.raise_for_status()
+        data = response.json()
         return data.get("results", [])[:max_works]
 
     def resolve_pdf(self, work: dict[str, Any]) -> str | None:
-        """Resolve pdf.
+        """Resolve a PDF URL for an OpenAlex work using API metadata and fallbacks.
 
         Parameters
         ----------
-        work : dict
-            TODO.
+        work : dict[str, Any]
+            Work record returned from :meth:`search`.
 
         Returns
         -------
-        Optional[str]
-            TODO.
+        str | None
+            Direct PDF URL if one can be resolved; otherwise ``None``.
         """
         best = work.get("best_oa_location") or {}
         if best and best.get("pdf_url"):
             return best["pdf_url"]
-        for loc in work.get("locations", []):
-            if loc.get("pdf_url"):
-                return loc["pdf_url"]
+        for location in work.get("locations", []):
+            if location.get("pdf_url"):
+                return location["pdf_url"]
         doi = work.get("doi")
         if doi:
-            r = self.session.get(
+            response = self.session.get(
                 f"{self.unpaywall}/v2/{doi}", params={"email": self.email}, timeout=15
             )
-            if r.ok:
-                j = r.json()
-                url = (j.get("best_oa_location") or {}).get("url_for_pdf")
+            if response.ok:
+                payload = response.json()
+                url = (payload.get("best_oa_location") or {}).get("url_for_pdf")
                 if url:
                     return url
         if self.pdf_host and doi:
@@ -118,70 +139,77 @@ class OpenAccessHarvester:
         return None
 
     def download_pdf(self, url: str, target_path: str) -> str:
-        """Download pdf.
+        """Download a PDF to the given path and validate the content type.
 
         Parameters
         ----------
         url : str
-            TODO.
+            Direct URL to the PDF.
         target_path : str
-            TODO.
+            Absolute path on disk where the PDF should be written.
 
         Returns
         -------
         str
-            TODO.
+            Path to the stored PDF.
+
+        Raises
+        ------
+        DownloadError
+            Raised when the response code indicates a failure.
+        UnsupportedMIMEError
+            Raised when the response is not a PDF-like MIME type.
         """
-        r = self.session.get(url, timeout=60)
-        if r.status_code != HTTP_OK:
-            message = f"Bad status {r.status_code} for {url}"
+        response = self.session.get(url, timeout=60)
+        if response.status_code != HTTP_OK:
+            message = f"Bad status {response.status_code} for {url}"
             raise DownloadError(message)
-        ctype = r.headers.get("Content-Type", "application/pdf")
-        if not ctype.startswith("application/"):
-            message = f"Not a PDF-like content-type: {ctype}"
+        content_type = response.headers.get("Content-Type", "application/pdf")
+        if not content_type.startswith("application/"):
+            message = f"Not a PDF-like content type: {content_type}"
             raise UnsupportedMIMEError(message)
-        with open(target_path, "wb") as f:
-            f.write(r.content)
+        with open(target_path, "wb") as file_handle:
+            file_handle.write(response.content)
         return target_path
 
     def run(self, topic: str, years: str, max_works: int) -> list[Doc]:
-        """Run.
+        """Harvest PDFs for matching works and build :class:`Doc` records.
 
         Parameters
         ----------
         topic : str
-            TODO.
+            Topic identifier or search term forwarded to :meth:`search`.
         years : str
-            TODO.
+            Publication-year filter string forwarded to :meth:`search`.
         max_works : int
-            TODO.
+            Maximum number of works to process.
 
         Returns
         -------
-        List[Doc]
-            TODO.
+        list[Doc]
+            Documents referencing the downloaded PDFs.
         """
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)
-        for w in works:
-            pdf_url = self.resolve_pdf(w)
+        for work in works:
+            pdf_url = self.resolve_pdf(work)
             if not pdf_url:
                 continue
-            filename = (w.get("doi") or w.get("id") or str(int(time.time() * 1000))).replace(
+            filename = (work.get("doi") or work.get("id") or str(int(time.time() * 1000))).replace(
                 "/", "_"
             ) + ".pdf"
-            dest = os.path.join(self.out_dir, filename)
-            self.download_pdf(pdf_url, dest)
+            destination = os.path.join(self.out_dir, filename)
+            self.download_pdf(pdf_url, destination)
             doc = Doc(
-                id=f"urn:doc:source:openalex:{w.get('id', 'unknown')}",
-                openalex_id=w.get("id"),
-                doi=w.get("doi"),
-                title=w.get("title", ""),
+                id=f"urn:doc:source:openalex:{work.get('id', 'unknown')}",
+                openalex_id=work.get("id"),
+                doi=work.get("doi"),
+                title=work.get("title", ""),
                 authors=[],
                 pub_date=None,
                 license=None,
                 language="en",
-                pdf_uri=dest,
+                pdf_uri=destination,
                 source="openalex",
                 content_hash=None,
             )

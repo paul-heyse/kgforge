@@ -8,6 +8,7 @@ src.orchestration.cli
    Module for orchestration.cli.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - index_bm25: Build a BM25 index from chunk fixtures (id, title, section,….
    - index_faiss: Train & build FAISS index from fixture dense vectors.
    - api: Run the FastAPI app.
@@ -17,12 +18,8 @@ src.orchestration.cli
 
 
 
-
-
 Module Contents
 ---------------
-
-.. py:data:: app
 
 .. py:function:: index_bm25(chunks_parquet = typer.Argument(..., help='Path to Parquet/JSONL with chunks'), backend = typer.Option('lucene', help='lucene|pure'), index_dir = typer.Option('./_indices/bm25', help='Output index directory'))
 

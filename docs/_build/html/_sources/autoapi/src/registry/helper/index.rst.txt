@@ -8,6 +8,7 @@ src.registry.helper
    Module for registry.helper.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - DuckDBRegistryHelper: Duckdbregistryhelper.
 
 

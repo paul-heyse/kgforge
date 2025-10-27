@@ -1,11 +1,4 @@
-"""Module for embeddings_sparse.bm25.
-
-NavMap:
-- BM25Doc: Bm25doc.
-- PurePythonBM25: Simple offline BM25 builder & searcher (Okapi BM25).
-- LuceneBM25: Pyserini-backed Lucene BM25 adapter.
-- get_bm25: Get bm25.
-"""
+"""BM25 helpers providing pure Python and Lucene-backed sparse retrieval."""
 
 from __future__ import annotations
 
@@ -16,26 +9,70 @@ import re
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Final
+
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["BM25Doc", "LuceneBM25", "PurePythonBM25", "get_bm25"]
+
+__navmap__: Final[NavMap] = {
+    "title": "kgfoundry.embeddings_sparse.bm25",
+    "synopsis": "Pure Python and Lucene-backed BM25 adapters for sparse retrieval",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["BM25Doc", "PurePythonBM25", "LuceneBM25", "get_bm25"],
+        }
+    ],
+    "symbols": {
+        "PurePythonBM25": {
+            "since": "2024.10",
+            "stability": "experimental",
+            "side_effects": ["fs"],
+            "thread_safety": "not-threadsafe",
+            "async_ok": False,
+            "tests": ["tests/unit/test_bm25_adapter.py::test_bm25_build_and_search_from_fixtures"],
+        },
+        "LuceneBM25": {
+            "since": "2024.10",
+            "stability": "experimental",
+            "side_effects": ["fs"],
+            "thread_safety": "not-threadsafe",
+            "async_ok": False,
+        },
+        "get_bm25": {
+            "since": "2024.10",
+            "stability": "stable",
+            "side_effects": ["none"],
+            "thread_safety": "not-threadsafe",
+            "async_ok": False,
+        },
+    },
+    "edit_scopes": {"safe": ["get_bm25"], "risky": ["PurePythonBM25", "LuceneBM25"]},
+    "tags": ["bm25", "retrieval", "sparse"],
+    "see_also": ["kgfoundry.search_api.bm25_index"],
+    "since": "2024.10",
+    "deps": ["pyserini"],
+}
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 
 
+# [nav:anchor BM25Doc]
 @dataclass
 class BM25Doc:
-    """Bm25doc."""
+    """Serialized representation of a BM25 indexed document."""
 
     doc_id: str
     length: int
     fields: dict[str, str]
 
 
+# [nav:anchor PurePythonBM25]
 class PurePythonBM25:
-    """Simple offline BM25 builder & searcher (Okapi BM25).
-
-    Persisted as a pickle.
-    Fields: title, section, body with configurable boosts.
-    """
+    """Pure-Python BM25 builder and searcher for sparse retrieval."""
 
     def __init__(
         self,
@@ -44,19 +81,7 @@ class PurePythonBM25:
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
     ) -> None:
-        """Init.
-
-        Parameters
-        ----------
-        index_dir : str
-            TODO.
-        k1 : float
-            TODO.
-        b : float
-            TODO.
-        field_boosts : Optional[Dict[str, float]]
-            TODO.
-        """
+        """Initialize the on-disk index backing this BM25 instance."""
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -69,33 +94,11 @@ class PurePythonBM25:
 
     @staticmethod
     def _tokenize(text: str) -> list[str]:
-        """Tokenize.
-
-        Parameters
-        ----------
-        text : str
-            TODO.
-
-        Returns
-        -------
-        List[str]
-            TODO.
-        """
+        """Tokenize text into lowercase tokens used for BM25 scoring."""
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """Build.
-
-        Parameters
-        ----------
-        docs_iterable : Iterable[Tuple[str, Dict]]
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Build the BM25 index from an iterable of document field mappings."""
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
@@ -143,13 +146,7 @@ class PurePythonBM25:
             )
 
     def load(self) -> None:
-        """Load.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Load a previously persisted BM25 index from disk."""
         path = os.path.join(self.index_dir, "pure_bm25.pkl")
         with open(path, "rb") as f:
             data = pickle.load(f)
@@ -163,18 +160,7 @@ class PurePythonBM25:
         self.avgdl = data["avgdl"]
 
     def _idf(self, term: str) -> float:
-        """Idf.
-
-        Parameters
-        ----------
-        term : str
-            TODO.
-
-        Returns
-        -------
-        float
-            TODO.
-        """
+        """Compute the BM25 inverse document frequency for ``term``."""
         n_t = self.df.get(term, 0)
         if n_t == 0:
             return 0.0
@@ -184,22 +170,7 @@ class PurePythonBM25:
     def search(
         self, query: str, k: int, fields: Mapping[str, str] | None = None
     ) -> list[tuple[str, float]]:
-        """Search.
-
-        Parameters
-        ----------
-        query : str
-            TODO.
-        k : int
-            TODO.
-        fields : Dict | None
-            TODO.
-
-        Returns
-        -------
-        List[Tuple[str, float]]
-            TODO.
-        """
+        """Score documents using BM25 and return the top ``k`` hits."""
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -217,11 +188,9 @@ class PurePythonBM25:
         return sorted(scores.items(), key=lambda x: x[1], reverse=True)[:k]
 
 
+# [nav:anchor LuceneBM25]
 class LuceneBM25:
-    """Pyserini-backed Lucene BM25 adapter.
-
-    Lazily imported.
-    """
+    """Pyserini-backed Lucene BM25 adapter lazily importing Lucene bindings."""
 
     def __init__(
         self,
@@ -230,19 +199,7 @@ class LuceneBM25:
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
     ) -> None:
-        """Init.
-
-        Parameters
-        ----------
-        index_dir : str
-            TODO.
-        k1 : float
-            TODO.
-        b : float
-            TODO.
-        field_boosts : Optional[Dict[str,float]]
-            TODO.
-        """
+        """Configure the Lucene-backed index interface."""
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -250,18 +207,7 @@ class LuceneBM25:
         self._searcher: Any | None = None
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """Build.
-
-        Parameters
-        ----------
-        docs_iterable : Iterable[Tuple[str, Dict]]
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Materialize a Lucene index from the provided document iterable."""
         try:
             from pyserini.analysis import get_lucene_analyzer
             from pyserini.index import IndexWriter
@@ -287,7 +233,7 @@ class LuceneBM25:
         writer.close()
 
     def _ensure_searcher(self) -> None:
-        """Ensure searcher."""
+        """Instantiate the Lucene searcher if it has not been created yet."""
         if self._searcher is not None:
             return
         from pyserini.search.lucene import LuceneSearcher
@@ -298,22 +244,7 @@ class LuceneBM25:
     def search(
         self, query: str, k: int, fields: dict[str, str] | None = None
     ) -> list[tuple[str, float]]:
-        """Search.
-
-        Parameters
-        ----------
-        query : str
-            TODO.
-        k : int
-            TODO.
-        fields : Dict | None
-            TODO.
-
-        Returns
-        -------
-        List[Tuple[str, float]]
-            TODO.
-        """
+        """Execute a Lucene BM25 query and return the top ``k`` matches."""
         self._ensure_searcher()
         if self._searcher is None:
             message = "Lucene searcher not initialized"
@@ -322,6 +253,7 @@ class LuceneBM25:
         return [(h.docid, float(h.score)) for h in hits]
 
 
+# [nav:anchor get_bm25]
 def get_bm25(
     backend: str,
     index_dir: str,
@@ -330,15 +262,7 @@ def get_bm25(
     b: float = 0.4,
     field_boosts: dict[str, float] | None = None,
 ) -> PurePythonBM25 | LuceneBM25:
-    """Get bm25.
-
-    Parameters
-    ----------
-    backend : str
-        TODO.
-    index_dir : str
-        TODO.
-    """
+    """Construct a BM25 implementation for the requested backend."""
     if backend == "lucene":
         try:
             return LuceneBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)

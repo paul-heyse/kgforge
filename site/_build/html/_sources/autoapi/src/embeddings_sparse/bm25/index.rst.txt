@@ -8,12 +8,11 @@ src.embeddings_sparse.bm25
    Module for embeddings_sparse.bm25.
 
    NavMap:
-   - BM25Doc: Bm25doc.
-   - PurePythonBM25: Simple offline BM25 builder & searcher (Okapi BM25).
-   - LuceneBM25: Pyserini-backed Lucene BM25 adapter.
-   - get_bm25: Get bm25.
-
-
+   - NavMap: Structure describing a module navmap.
+   - BM25Doc: Serialized representation of a BM25 indexed document.
+   - PurePythonBM25: Pure-Python BM25 builder and searcher for sparse retrieval.
+   - LuceneBM25: Pyserini-backed Lucene BM25 adapter lazily importing Lucene….
+   - get_bm25: Return a backend-specific BM25 implementation.
 
 
 
@@ -24,11 +23,9 @@ src.embeddings_sparse.bm25
 Module Contents
 ---------------
 
-.. py:data:: TOKEN_RE
-
 .. py:class:: BM25Doc
 
-   Bm25doc.
+   Serialized representation of a BM25 indexed document.
 
 
    .. py:attribute:: doc_id
@@ -45,10 +42,7 @@ Module Contents
 
 .. py:class:: PurePythonBM25(index_dir, k1 = 0.9, b = 0.4, field_boosts = None)
 
-   Simple offline BM25 builder & searcher (Okapi BM25).
-
-   Persisted as a pickle.
-   Fields: title, section, body with configurable boosts.
+   Pure-Python BM25 builder and searcher for sparse retrieval.
 
 
    .. py:attribute:: index_dir
@@ -91,46 +85,25 @@ Module Contents
 
    .. py:method:: build(docs_iterable)
 
-      Build.
-
-      :param docs_iterable: TODO.
-      :type docs_iterable: Iterable[Tuple[str, Dict]]
-
-      :returns: TODO.
-      :rtype: None
+      Build the BM25 index from an iterable of document field mappings.
 
 
 
    .. py:method:: load()
 
-      Load.
-
-      :returns: TODO.
-      :rtype: None
+      Load a previously persisted BM25 index from disk.
 
 
 
    .. py:method:: search(query, k, fields = None)
 
-      Search.
-
-      :param query: TODO.
-      :type query: str
-      :param k: TODO.
-      :type k: int
-      :param fields: TODO.
-      :type fields: Dict | None
-
-      :returns: TODO.
-      :rtype: List[Tuple[str, float]]
+      Score documents using BM25 and return the top ``k`` hits.
 
 
 
 .. py:class:: LuceneBM25(index_dir, k1 = 0.9, b = 0.4, field_boosts = None)
 
-   Pyserini-backed Lucene BM25 adapter.
-
-   Lazily imported.
+   Pyserini-backed Lucene BM25 adapter lazily importing Lucene bindings.
 
 
    .. py:attribute:: index_dir
@@ -151,39 +124,18 @@ Module Contents
 
    .. py:method:: build(docs_iterable)
 
-      Build.
-
-      :param docs_iterable: TODO.
-      :type docs_iterable: Iterable[Tuple[str, Dict]]
-
-      :returns: TODO.
-      :rtype: None
+      Materialize a Lucene index from the provided document iterable.
 
 
 
    .. py:method:: search(query, k, fields = None)
 
-      Search.
-
-      :param query: TODO.
-      :type query: str
-      :param k: TODO.
-      :type k: int
-      :param fields: TODO.
-      :type fields: Dict | None
-
-      :returns: TODO.
-      :rtype: List[Tuple[str, float]]
+      Execute a Lucene BM25 query and return the top ``k`` matches.
 
 
 
 .. py:function:: get_bm25(backend, index_dir, *, k1 = 0.9, b = 0.4, field_boosts = None)
 
-   Get bm25.
-
-   :param backend: TODO.
-   :type backend: str
-   :param index_dir: TODO.
-   :type index_dir: str
+   Return a backend-specific BM25 implementation.
 
 

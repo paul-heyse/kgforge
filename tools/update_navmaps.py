@@ -79,19 +79,14 @@ def build_nav_lines(module: Object) -> list[str]:
 
 
 def rewrite_docstring(file_path: Path, nav_lines: list[str]) -> None:
-    """Rewrite Docstring.
+    """Rewrite the existing module docstring with the supplied nav lines.
 
     Parameters
     ----------
     file_path : Path
-        TODO.
+        Path to the module whose docstring should be updated.
     nav_lines : list[str]
-        TODO.
-
-    Returns
-    -------
-    None
-        TODO.
+        Rendered lines that form the replacement nav-map docstring body.
     """
     text = file_path.read_text(encoding="utf-8")
     tree = ast.parse(text)

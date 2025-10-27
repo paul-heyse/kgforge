@@ -1,27 +1,30 @@
-"""Module for search_api.fusion.
-
-NavMap:
-- rrf_fuse: Rrf fuse.
-"""
+"""Reciprocal rank fusion helpers used by the search API."""
 
 from __future__ import annotations
 
+from typing import Final
 
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["rrf_fuse"]
+
+__navmap__: Final[NavMap] = {
+    "title": "search_api.fusion",
+    "synopsis": "Reciprocal rank fusion helpers used by the search API",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["rrf_fuse"],
+        },
+    ],
+}
+
+
+# [nav:anchor rrf_fuse]
 def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, float]:
-    """Rrf fuse.
-
-    Parameters
-    ----------
-    rankers : List[List[Tuple[str, float]]]
-        TODO.
-    k : int
-        TODO.
-
-    Returns
-    -------
-    Dict[str, float]
-        TODO.
-    """
+    """Fuse ranked lists using reciprocal rank fusion (RRF)."""
     agg: dict[str, float] = {}
     for ranked in rankers:
         for r, (key, _score) in enumerate(ranked, start=1):

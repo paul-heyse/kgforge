@@ -8,6 +8,7 @@ src.linking.calibration
    Module for linking.calibration.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - isotonic_calibrate: Skeleton: calibrate scores (y=float in [0,1]) vs labels….
 
 

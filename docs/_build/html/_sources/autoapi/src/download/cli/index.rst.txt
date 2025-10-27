@@ -8,9 +8,8 @@ src.download.cli
    Module for download.cli.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - harvest: Harvest OA metadata and download PDFs (skeleton).
-
-
 
 
 
@@ -18,8 +17,6 @@ src.download.cli
 
 Module Contents
 ---------------
-
-.. py:data:: app
 
 .. py:function:: harvest(topic, years = '>=2018', max_works = 20000)
 

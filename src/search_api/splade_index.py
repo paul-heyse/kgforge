@@ -1,9 +1,9 @@
-"""Module for search_api.splade_index.
+"""Sparse SPLADE-inspired index used by the fixture search API.
 
 NavMap:
-- tok: Tok.
-- SpladeDoc: Spladedoc.
-- SpladeIndex: Spladeindex.
+- tok: Tokenise text for sparse SPLADE scoring.
+- SpladeDoc: Minimal payload tracked by the sparse index.
+- SpladeIndex: Load chunk documents and serve sparse similarity queries.
 """
 
 from __future__ import annotations
@@ -11,31 +11,40 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Final
 
 import duckdb
+
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["SpladeDoc", "SpladeIndex", "tok"]
+
+__navmap__: Final[NavMap] = {
+    "title": "search_api.splade_index",
+    "synopsis": "Toy SPLADE-style sparse index for fixture search endpoints.",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["tok", "SpladeDoc", "SpladeIndex"],
+        },
+    ],
+}
 
 TOKEN = re.compile(r"[A-Za-z0-9]+")
 
 
-def tok(s: str) -> list[str]:
-    """Tok.
-
-    Parameters
-    ----------
-    s : str
-        TODO.
-
-    Returns
-    -------
-    List[str]
-        TODO.
-    """
-    return [t.lower() for t in TOKEN.findall(s or "")]
+# [nav:anchor tok]
+def tok(text: str) -> list[str]:
+    """Tokenise ``text`` into lowercase alphanumeric units."""
+    return [token.lower() for token in TOKEN.findall(text or "")]
 
 
+# [nav:anchor SpladeDoc]
 @dataclass
 class SpladeDoc:
-    """Spladedoc."""
+    """Chunk-level document representation for the sparse index."""
 
     chunk_id: str
     doc_id: str
@@ -43,8 +52,9 @@ class SpladeDoc:
     text: str
 
 
+# [nav:anchor SpladeIndex]
 class SpladeIndex:
-    """Spladeindex."""
+    """Load chunk text and expose a sparse similarity search API."""
 
     def __init__(
         self,
@@ -52,17 +62,8 @@ class SpladeIndex:
         chunks_dataset_root: str | None = None,
         sparse_root: str | None = None,
     ) -> None:
-        """Init.
-
-        Parameters
-        ----------
-        db_path : str
-            TODO.
-        chunks_dataset_root : Optional[str]
-            TODO.
-        sparse_root : Optional[str]
-            TODO.
-        """
+        """Initialise the index and eagerly load chunk documents."""
+        _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
         self.df: dict[str, int] = {}
@@ -70,84 +71,58 @@ class SpladeIndex:
         self._load(chunks_dataset_root)
 
     def _load(self, chunks_root: str | None) -> None:
-        """Load.
-
-        Parameters
-        ----------
-        chunks_root : Optional[str]
-            TODO.
-        """
+        """Read the latest chunk dataset and pre-compute document frequencies."""
+        _ = chunks_root  # optional override currently unused
         if not Path(self.db_path).exists():
             return
         con = duckdb.connect(self.db_path)
         try:
-            ds = con.execute(
+            dataset = con.execute(
                 "SELECT parquet_root FROM datasets "
                 "WHERE kind='chunks' ORDER BY created_at DESC LIMIT 1"
             ).fetchone()
-            if ds:
+            if dataset:
                 rows = con.execute(
                     "SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text "
-                    f"FROM read_parquet('{ds[0]}/*/*.parquet', union_by_name=true) AS c"
+                    f"FROM read_parquet('{dataset[0]}/*/*.parquet', union_by_name=true) AS c"
                 ).fetchall()
-                for r in rows:
+                for chunk_id, doc_id, section, text in rows:
                     self.docs.append(
                         SpladeDoc(
-                            chunk_id=r[0], doc_id=r[1] or "urn:doc:fixture", section=r[2], text=r[3]
+                            chunk_id=chunk_id,
+                            doc_id=doc_id or "urn:doc:fixture",
+                            section=section,
+                            text=text or "",
                         )
                     )
         finally:
             con.close()
         self.N = len(self.docs)
-        for d in self.docs:
-            for t in set(tok(d.text)):
-                self.df[t] = self.df.get(t, 0) + 1
+        for doc in self.docs:
+            for term in set(tok(doc.text)):
+                self.df[term] = self.df.get(term, 0) + 1
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Search.
-
-        Parameters
-        ----------
-        query : str
-            TODO.
-        k : int
-            TODO.
-
-        Returns
-        -------
-        List[Tuple[int, float]]
-            TODO.
-        """
+        """Return indices of documents that best match ``query``."""
         if self.N == 0:
             return []
-        q = tok(query)
-        if not q:
+        terms = tok(query)
+        if not terms:
             return []
         scores = [0.0] * self.N
-        for i, d in enumerate(self.docs):
-            tf: dict[str, int] = {}
-            for t in tok(d.text):
-                tf[t] = tf.get(t, 0) + 1
-            s = 0.0
-            for t in q:
-                if t in self.df:
-                    idf = (self.N + 1) / (self.df[t] + 0.5)
-                    s += (tf.get(t, 0)) * idf
-            scores[i] = s
-        ranked = sorted(enumerate(scores), key=lambda x: x[1], reverse=True)
-        return [(i, s) for i, s in ranked[:k] if s > 0.0]
+        for index, doc in enumerate(self.docs):
+            term_freq: dict[str, int] = {}
+            for term in tok(doc.text):
+                term_freq[term] = term_freq.get(term, 0) + 1
+            score = 0.0
+            for term in terms:
+                if term in self.df:
+                    idf = (self.N + 1) / (self.df[term] + 0.5)
+                    score += term_freq.get(term, 0) * idf
+            scores[index] = score
+        ranked = sorted(enumerate(scores), key=lambda item: item[1], reverse=True)
+        return [(idx, value) for idx, value in ranked[:k] if value > 0.0]
 
-    def doc(self, i: int) -> SpladeDoc:
-        """Doc.
-
-        Parameters
-        ----------
-        i : int
-            TODO.
-
-        Returns
-        -------
-        SpladeDoc
-            TODO.
-        """
-        return self.docs[i]
+    def doc(self, index: int) -> SpladeDoc:
+        """Return the :class:`SpladeDoc` at ``index``."""
+        return self.docs[index]

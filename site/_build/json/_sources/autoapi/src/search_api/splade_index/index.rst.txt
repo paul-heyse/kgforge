@@ -8,6 +8,7 @@ src.search_api.splade_index
    Module for search_api.splade_index.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - tok: Tok.
    - SpladeDoc: Spladedoc.
    - SpladeIndex: Spladeindex.
@@ -18,12 +19,8 @@ src.search_api.splade_index
 
 
 
-
-
 Module Contents
 ---------------
-
-.. py:data:: TOKEN
 
 .. py:function:: tok(s)
 

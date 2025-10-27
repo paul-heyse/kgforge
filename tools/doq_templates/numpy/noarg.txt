@@ -1,1 +1,1 @@
-"""{{ name|replace('_', ' ')|title }}."""
+"""Return {{ name|replace('_', ' ') }}."""

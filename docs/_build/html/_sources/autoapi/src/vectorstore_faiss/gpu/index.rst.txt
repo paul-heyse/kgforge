@@ -8,6 +8,7 @@ src.vectorstore_faiss.gpu
    Module for vectorstore_faiss.gpu.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - FaissGpuIndex: FAISS GPU/cuVS wrapper.
 
 

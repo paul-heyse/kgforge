@@ -8,6 +8,7 @@ src.search_api.bm25_index
    Module for search_api.bm25_index.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - toks: Toks.
    - BM25Doc: Bm25doc.
    - BM25Index: Bm25index.
@@ -18,12 +19,8 @@ src.search_api.bm25_index
 
 
 
-
-
 Module Contents
 ---------------
-
-.. py:data:: TOKEN_RE
 
 .. py:function:: toks(s)
 

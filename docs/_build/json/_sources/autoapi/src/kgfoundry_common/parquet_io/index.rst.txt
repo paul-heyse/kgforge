@@ -8,6 +8,7 @@ src.kgfoundry_common.parquet_io
    Module for kgfoundry_common.parquet_io.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - ParquetVectorWriter: Parquetvectorwriter.
    - ParquetChunkWriter: Parquetchunkwriter.
 
@@ -15,18 +16,8 @@ src.kgfoundry_common.parquet_io
 
 
 
-
-
 Module Contents
 ---------------
-
-.. py:data:: ZSTD_LEVEL
-   :value: 6
-
-
-.. py:data:: ROW_GROUP_SIZE
-   :value: 4096
-
 
 .. py:class:: ParquetVectorWriter(root)
 

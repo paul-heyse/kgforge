@@ -8,6 +8,7 @@ src.docling.vlm
    Module for docling.vlm.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - GraniteDoclingVLM: Expose unified utilities for Docling-compatible VLMs.
 
 

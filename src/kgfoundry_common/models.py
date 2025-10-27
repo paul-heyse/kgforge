@@ -1,6 +1,7 @@
 """Module for kgfoundry_common.models.
 
 NavMap:
+- NavMap: Structure describing a module navmap.
 - Doc: Doc.
 - DoctagsAsset: Doctagsasset.
 - Chunk: Chunk.
@@ -9,13 +10,31 @@ NavMap:
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Final, Literal
 
 from pydantic import BaseModel
+
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["Chunk", "Doc", "DoctagsAsset", "LinkAssertion"]
+
+__navmap__: Final[NavMap] = {
+    "title": "kgfoundry_common.models",
+    "synopsis": "Module for kgfoundry_common.models",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["Doc", "DoctagsAsset", "Chunk", "LinkAssertion"],
+        },
+    ],
+}
 
 Id = str
 
 
+# [nav:anchor Doc]
 class Doc(BaseModel):
     """Doc."""
 
@@ -34,6 +53,7 @@ class Doc(BaseModel):
     content_hash: str | None = None
 
 
+# [nav:anchor DoctagsAsset]
 class DoctagsAsset(BaseModel):
     """Doctagsasset."""
 
@@ -45,6 +65,7 @@ class DoctagsAsset(BaseModel):
     avg_logprob: float | None = None
 
 
+# [nav:anchor Chunk]
 class Chunk(BaseModel):
     """Chunk."""
 
@@ -57,6 +78,7 @@ class Chunk(BaseModel):
     doctags_span: dict[str, int]
 
 
+# [nav:anchor LinkAssertion]
 class LinkAssertion(BaseModel):
     """Linkassertion."""
 

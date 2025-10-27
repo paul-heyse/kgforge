@@ -8,6 +8,7 @@ src.embeddings_dense.qwen3
    Module for embeddings_dense.qwen3.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - Qwen3Embedder: Adapter for Qwen3 dense embedding checkpoints.
 
 

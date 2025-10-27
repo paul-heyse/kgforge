@@ -31,7 +31,12 @@ jobs:
       - name: Run ruff
         run: |
           . .venv/bin/activate
-          ruff check src tests tools
+          ruff check src tests tools docs/_scripts
+
+      - name: Check docstring style
+        run: |
+          . .venv/bin/activate
+          python tools/check_docstrings.py --no-todo
 
   tests:
     name: Pytest
@@ -54,6 +59,16 @@ jobs:
           . .venv/bin/activate
           python -m pip install --upgrade pip
           python -m pip install -r requirements/ci-test.txt
+
+      - name: Build navmap
+        run: |
+          . .venv/bin/activate
+          python tools/navmap/build_navmap.py
+
+      - name: Check navmap
+        run: |
+          . .venv/bin/activate
+          python tools/navmap/check_navmap.py
 
       - name: Run pytest
         env:

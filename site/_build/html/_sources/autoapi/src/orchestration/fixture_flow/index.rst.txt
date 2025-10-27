@@ -8,6 +8,7 @@ src.orchestration.fixture_flow
    Module for orchestration.fixture_flow.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - t_prepare_dirs: T prepare dirs.
    - t_write_fixture_chunks: T write fixture chunks.
    - t_write_fixture_dense: T write fixture dense.

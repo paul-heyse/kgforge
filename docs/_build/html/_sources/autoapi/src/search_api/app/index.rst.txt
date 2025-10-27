@@ -8,6 +8,7 @@ src.search_api.app
    Module for search_api.app.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - SearchRequest: Searchrequest.
    - SearchResult: Searchresult.
    - auth: Validate the bearer-token header for protected endpoints.
@@ -21,39 +22,8 @@ src.search_api.app
 
 
 
-
-
 Module Contents
 ---------------
-
-.. py:data:: logger
-
-.. py:data:: API_KEYS
-   :type:  set[str]
-
-.. py:data:: app
-
-.. py:data:: CFG_PATH
-
-.. py:data:: CFG
-
-.. py:data:: SPARSE_BACKEND
-
-.. py:data:: BM25_DIR
-
-.. py:data:: SPLADE_DIR
-
-.. py:data:: FAISS_PATH
-   :value: './_indices/faiss/shard_000.idx'
-
-
-.. py:data:: bm25
-
-.. py:data:: splade
-
-.. py:data:: faiss
-
-.. py:data:: kg
 
 .. py:function:: auth(authorization = Header(default=None))
 

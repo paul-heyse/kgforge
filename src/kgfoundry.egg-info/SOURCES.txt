@@ -20,6 +20,7 @@ src/kg_builder/__init__.py
 src/kg_builder/mock_kg.py
 src/kg_builder/neo4j_store.py
 src/kgfoundry/__init__.py
+src/kgfoundry/py.typed
 src/kgfoundry.egg-info/PKG-INFO
 src/kgfoundry.egg-info/SOURCES.txt
 src/kgfoundry.egg-info/dependency_links.txt
@@ -33,7 +34,9 @@ src/kgfoundry_common/exceptions.py
 src/kgfoundry_common/ids.py
 src/kgfoundry_common/logging.py
 src/kgfoundry_common/models.py
+src/kgfoundry_common/navmap_types.py
 src/kgfoundry_common/parquet_io.py
+src/kgfoundry_common/py.typed
 src/linking/__init__.py
 src/linking/calibration.py
 src/linking/linker.py

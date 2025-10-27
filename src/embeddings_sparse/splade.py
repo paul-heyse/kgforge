@@ -1,11 +1,4 @@
-"""Module for embeddings_sparse.splade.
-
-NavMap:
-- SPLADEv3Encoder: Spladev3encoder.
-- PureImpactIndex: Toy 'impact' index that approximates SPLADE with IDF/log….
-- LuceneImpactIndex: Pyserini SPLADE impact index wrapper.
-- get_splade: Get splade.
-"""
+"""SPLADE-based sparse embedding helpers for kgfoundry."""
 
 from __future__ import annotations
 
@@ -15,13 +8,36 @@ import pickle
 import re
 from collections import Counter, defaultdict
 from collections.abc import Iterable
-from typing import Any
+from typing import Any, Final
+
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["LuceneImpactIndex", "PureImpactIndex", "SPLADEv3Encoder", "get_splade"]
+
+__navmap__: Final[NavMap] = {
+    "title": "embeddings_sparse.splade",
+    "synopsis": "SPLADE sparse embedding helpers",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": [
+                "SPLADEv3Encoder",
+                "PureImpactIndex",
+                "LuceneImpactIndex",
+                "get_splade",
+            ],
+        },
+    ],
+}
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 
 
+# [nav:anchor SPLADEv3Encoder]
 class SPLADEv3Encoder:
-    """Spladev3encoder."""
+    """Describe the SPLADE configuration used for neural encoding."""
 
     name = "SPLADE-v3-distilbert"
 
@@ -32,18 +48,18 @@ class SPLADEv3Encoder:
         topk: int = 256,
         max_seq_len: int = 512,
     ) -> None:
-        """Init.
+        """Record encoder parameters used when exporting SPLADE activations.
 
         Parameters
         ----------
-        model_id : str
-            TODO.
-        device : str
-            TODO.
-        topk : int
-            TODO.
-        max_seq_len : int
-            TODO.
+        model_id : str, optional
+            Hugging Face model identifier backing the encoder.
+        device : str, optional
+            Compute target for inference (``"cuda"`` or ``"cpu"``).
+        topk : int, optional
+            Maximum number of impact weights retained per document.
+        max_seq_len : int, optional
+            Maximum sequence length fed to the encoder.
         """
         self.model_id = model_id
         self.device = device
@@ -51,20 +67,23 @@ class SPLADEv3Encoder:
         self.max_seq_len = max_seq_len
 
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
-        """Encode.
+        """Generate sparse impact vectors for each input text.
 
         Parameters
         ----------
-        texts : List[str]
-            TODO.
+        texts : list[str]
+            Raw text segments to encode.
 
         Returns
         -------
-        List[Tuple[list[int], list[float]]]
-            TODO.
+        list[tuple[list[int], list[float]]]
+            Pairs of token identifiers and weights describing the sparse vector.
+
+        Raises
+        ------
+        NotImplementedError
+            Always raised because the skeleton does not ship a neural encoder.
         """
-        # Placeholder in this skeleton. Real impl would run the HF model and build
-        # top-k (token_id, weight) pairs from the encoder output.
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
@@ -72,21 +91,16 @@ class SPLADEv3Encoder:
         raise NotImplementedError(message)
 
 
+# [nav:anchor PureImpactIndex]
 class PureImpactIndex:
-    """Toy 'impact' index that approximates SPLADE with IDF/log weighting.
+    """Approximate SPLADE indexing with TF/IDF-style impact weighting.
 
-    - Keeps the pipeline runnable without GPUs or Pyserini.
-    - Substitutes a simple tokenizer plus weighting scheme for the neural encoder.
+    Keeps the retrieval path runnable without Pyserini or GPU resources by using a simple tokenizer
+    and log-scaled weights.
     """
 
     def __init__(self, index_dir: str) -> None:
-        """Init.
-
-        Parameters
-        ----------
-        index_dir : str
-            TODO.
-        """
+        """Prepare an empty impact index rooted at ``index_dir``."""
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -94,33 +108,11 @@ class PureImpactIndex:
 
     @staticmethod
     def _tokenize(text: str) -> list[str]:
-        """Tokenize.
-
-        Parameters
-        ----------
-        text : str
-            TODO.
-
-        Returns
-        -------
-        List[str]
-            TODO.
-        """
-        return [t.lower() for t in TOKEN_RE.findall(text)]
+        """Split ``text`` into lowercase alphanumeric tokens."""
+        return [token.lower() for token in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """Build.
-
-        Parameters
-        ----------
-        docs_iterable : Iterable[Tuple[str, Dict]]
-            TODO.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
+        """Construct the impact index from an iterable of documents."""
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -129,133 +121,85 @@ class PureImpactIndex:
             text = " ".join(
                 [fields.get("title", ""), fields.get("section", ""), fields.get("body", "")]
             )
-            toks = self._tokenize(text)
+            tokens = self._tokenize(text)
             doc_count += 1
-            c = Counter(toks)
-            for tok, tf in c.items():
-                df[tok] += 1
-                postings[tok][doc_id] = math.log1p(tf)
-        # compute idf and impact weights
+            counts = Counter(tokens)
+            for token, term_freq in counts.items():
+                df[token] += 1
+                postings[token][doc_id] = math.log1p(term_freq)
         self.N = doc_count
         self.df = dict(df)
         self.postings = {
-            tok: {
-                doc: w * math.log((doc_count - df[tok] + 0.5) / (df[tok] + 0.5) + 1.0)
-                for doc, w in docs.items()
+            token: {
+                doc: weight * math.log((doc_count - df[token] + 0.5) / (df[token] + 0.5) + 1.0)
+                for doc, weight in docs.items()
             }
-            for tok, docs in postings.items()
+            for token, docs in postings.items()
         }
-        with open(os.path.join(self.index_dir, "impact.pkl"), "wb") as f:
+        with open(os.path.join(self.index_dir, "impact.pkl"), "wb") as handle:
             pickle.dump(
                 {"df": self.df, "N": self.N, "postings": self.postings},
-                f,
+                handle,
                 protocol=pickle.HIGHEST_PROTOCOL,
             )
 
     def load(self) -> None:
-        """Load.
-
-        Returns
-        -------
-        None
-            TODO.
-        """
-        with open(os.path.join(self.index_dir, "impact.pkl"), "rb") as f:
-            data = pickle.load(f)
+        """Load an existing impact index from disk."""
+        with open(os.path.join(self.index_dir, "impact.pkl"), "rb") as handle:
+            data = pickle.load(handle)
         self.df = data["df"]
         self.N = data["N"]
         self.postings = data["postings"]
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
-        """Search.
-
-        Parameters
-        ----------
-        query : str
-            TODO.
-        k : int
-            TODO.
-
-        Returns
-        -------
-        List[Tuple[str, float]]
-            TODO.
-        """
-        toks = self._tokenize(query)
+        """Score documents with impact weights and return the top ``k`` hits."""
+        tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
-        for t in toks:
-            posts = self.postings.get(t)
-            if not posts:
+        for token in tokens:
+            postings = self.postings.get(token)
+            if not postings:
                 continue
-            for doc, w in posts.items():
-                scores[doc] += w
-        return sorted(scores.items(), key=lambda x: x[1], reverse=True)[:k]
+            for doc_id, weight in postings.items():
+                scores[doc_id] += weight
+        return sorted(scores.items(), key=lambda item: item[1], reverse=True)[:k]
 
 
+# [nav:anchor LuceneImpactIndex]
 class LuceneImpactIndex:
-    """Pyserini SPLADE impact index wrapper.
-
-    Requires Pyserini build step that writes an impact index on disk.
-    """
+    """Bridge to a Pyserini SPLADE impact index stored on disk."""
 
     def __init__(self, index_dir: str) -> None:
-        """Init.
-
-        Parameters
-        ----------
-        index_dir : str
-            TODO.
-        """
+        """Store the index location and delay Lucene imports until needed."""
         self.index_dir = index_dir
         self._searcher: Any | None = None
 
     def _ensure(self) -> None:
-        """Ensure."""
+        """Initialise the Lucene searcher if it has not been created yet."""
         if self._searcher is not None:
             return
         try:
             from pyserini.search.lucene import LuceneImpactSearcher
-        except Exception as exc:
+        except Exception as exc:  # pragma: no cover - defensive for optional dep
             message = "Pyserini not available for SPLADE impact search"
             raise RuntimeError(message) from exc
         self._searcher = LuceneImpactSearcher(self.index_dir)
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
-        """Search.
-
-        Parameters
-        ----------
-        query : str
-            TODO.
-        k : int
-            TODO.
-
-        Returns
-        -------
-        List[Tuple[str, float]]
-            TODO.
-        """
+        """Execute a SPLADE impact search against the Lucene index."""
         self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
             raise RuntimeError(message)
-        hits = self._searcher.search(query, k=k)  # expects query to be SPLADE-encoded string
-        return [(h.docid, float(h.score)) for h in hits]
+        hits = self._searcher.search(query, k=k)  # expects SPLADE-encoded string
+        return [(hit.docid, float(hit.score)) for hit in hits]
 
 
+# [nav:anchor get_splade]
 def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIndex:
-    """Get splade.
-
-    Parameters
-    ----------
-    backend : str
-        TODO.
-    index_dir : str
-        TODO.
-    """
+    """Construct a SPLADE impact index for the requested backend."""
     if backend == "lucene":
         try:
             return LuceneImpactIndex(index_dir)
-        except Exception:
+        except Exception:  # pragma: no cover - fallback to pure-python path
             pass
     return PureImpactIndex(index_dir)

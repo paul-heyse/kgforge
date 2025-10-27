@@ -1,344 +1,216 @@
-"""Auto-generate lightweight docstrings across the source tree."""
+#!/usr/bin/env python
+"""Fallback docstring generator using the Python AST."""
 
 from __future__ import annotations
 
+import argparse
 import ast
 from collections.abc import Iterable
+from dataclasses import dataclass
 from pathlib import Path
 
-VERB_PREFIXES = {
-    "add",
-    "apply",
-    "build",
-    "cache",
-    "calibrate",
-    "close",
-    "commit",
-    "compute",
-    "configure",
-    "convert",
-    "create",
-    "download",
-    "emit",
-    "encode",
-    "fetch",
-    "generate",
-    "get",
-    "index",
-    "insert",
-    "load",
-    "log",
-    "normalize",
-    "open",
-    "prepare",
-    "process",
-    "register",
-    "run",
-    "save",
-    "search",
-    "train",
-    "update",
-    "write",
-}
 
-SRC_ROOT = Path(__file__).resolve().parents[1] / "src"
+@dataclass
+class DocstringChange:
+    """Record a docstring update for logging purposes."""
 
-Action = tuple[str, int, str | list[str]]
+    path: Path
 
 
-def words_from_name(name: str) -> str:
-    """Return a human-readable phrase from a snake_case identifier.
-
-    Parameters
-    ----------
-    name : str
-        Identifier to normalise.
-
-    Returns
-    -------
-    str
-        Identifier with underscores replaced by spaces.
-    """
-    return name.replace("_", " ")
+def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--target", required=True, type=Path, help="Directory to process.")
+    parser.add_argument("--log", required=False, type=Path, help="Log file for changed paths.")
+    return parser.parse_args()
 
 
-def summary_for(name: str, kind: str) -> str:
-    """Return a summary line tailored to the symbol type.
-
-    Parameters
-    ----------
-    name : str
-        Candidate identifier.
-    kind : str
-        Symbol kind: 'function', 'class', or 'module'.
-
-    Returns
-    -------
-    str
-        One-sentence summary ending with a period.
-    """
-    words = words_from_name(name)
-    first = words.split()[0].lower() if words else ""
-    if kind == "function":
-        if first in VERB_PREFIXES:
-            summary = words.capitalize()
-        else:
-            summary = f"Handle {words}" if words else "Handle value"
-    elif kind == "class":
-        summary = f"Represent {words}" if words else "Represent entity"
+def summarize(name: str, kind: str) -> str:
+    """Return a short imperative summary for the given symbol."""
+    base = " ".join(name.replace("_", " ").split()) or "value"
+    if kind == "class":
+        text = f"Represent {base}."
+    elif kind == "module":
+        text = f"Provide utilities for {base}."
     else:
-        summary = f"Module for {words}" if words else "Module summary"
-    if not summary.endswith("."):
-        summary += "."
-    return summary
+        text = f"Return {base}."
+    return text if text.endswith(".") else text + "."
 
 
-def ensure_module_docstring(path: Path, lines: list[str]) -> list[tuple[int, list[str]]]:
-    """Return insertion actions for a module docstring when one is missing.
-
-    Parameters
-    ----------
-    path : Path
-        File path being processed.
-    lines : list[str]
-        File contents split into individual lines (including newlines).
-
-    Returns
-    -------
-    list[tuple[int, list[str]]]
-        Insertion actions or an empty list when a docstring already exists.
-    """
-    text = "".join(lines)
+def annotation_to_text(node: ast.AST | None) -> str:
+    """Return the textual form of an annotation node."""
+    if node is None:
+        return "Any"
     try:
-        tree = ast.parse(text)
-    except SyntaxError:
-        return []
-    if ast.get_docstring(tree, clean=False) is not None:
-        return []
-    rel = path.relative_to(SRC_ROOT).with_suffix("")
-    module_name = str(rel).replace("/", ".")
-    doc = summary_for(module_name, "module")
-    doc_line = f'"""{doc}"""\n'
-    insert_idx = 0
-    if lines and lines[0].startswith("#!"):
-        insert_idx = 1
-    return [(insert_idx, [doc_line, "\n"])]
+        return ast.unparse(node)
+    except Exception:  # pragma: no cover
+        return "Any"
 
 
-def collect_defs(text: str) -> ast.AST:
-    """Parse source text into an abstract syntax tree.
-
-    Parameters
-    ----------
-    text : str
-        Python source code.
-    """
-    return ast.parse(text)
-
-
-def need_docstring(node: ast.AST) -> bool:
-    """Return True if the AST node lacks a docstring."""
-    return ast.get_docstring(node, clean=False) is None
+def iter_docstring_nodes(tree: ast.Module) -> Iterable[tuple[ast.AST, str]]:
+    """Yield (node, kind) pairs for module, classes, and functions."""
+    yield tree, "module"
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef):
+            yield node, "class"
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            yield node, "function"
 
 
-def action_for_node(node: ast.AST, lines: list[str]) -> list[Action]:
-    """Return docstring insertion actions for the supplied AST node.
+def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[str, str]]:
+    """Return (name, type) tuples for a function's parameters."""
+    params: list[tuple[str, str]] = []
+    args = node.args
 
-    Parameters
-    ----------
-    node : ast.AST
-        Node to inspect.
-    lines : list[str]
-        Source lines for the containing file.
+    def add(arg: ast.arg, default: ast.AST | None) -> None:
+        """Return add.
 
-    Returns
-    -------
-    list[Action]
-        Actions required to insert a docstring (possibly empty).
-    """
-    if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
-        return actions_for_function(node, lines)
-    if isinstance(node, ast.ClassDef):
-        return actions_for_class(node, lines)
-    return []
+        Parameters
+        ----------
+        arg : ast.arg
+            Description.
+        default : ast.AST | None
+            Description.
+
+        Returns
+        -------
+        None
+            Description.
+        """
+        name = arg.arg
+        if name in {"self", "cls"}:
+            return
+        annotation = annotation_to_text(arg.annotation)
+        if default is not None:
+            annotation = f"{annotation}, optional"
+        params.append((name, annotation))
+
+    positional = args.posonlyargs + args.args
+    defaults = [None] * (len(positional) - len(args.defaults)) + list(args.defaults)
+    for arg, default in zip(positional, defaults, strict=True):
+        add(arg, default)
+
+    if args.vararg:
+        params.append((f"*{args.vararg.arg}", "Any, optional"))
+
+    for arg, default in zip(args.kwonlyargs, args.kw_defaults, strict=True):
+        add(arg, default)
+
+    if args.kwarg:
+        params.append((f"**{args.kwarg.arg}", "Any, optional"))
+
+    return params
 
 
-def actions_for_function(
-    node: ast.FunctionDef | ast.AsyncFunctionDef, lines: list[str]
-) -> list[Action]:
-    """Generate docstring insertion actions for a function or coroutine.
+def build_docstring(kind: str, node: ast.AST) -> list[str]:
+    """Construct a NumPy-style docstring for a node."""
+    name = getattr(node, "name", "module")
+    summary = summarize(name, kind)
 
-    Parameters
-    ----------
-    node : ast.FunctionDef | ast.AsyncFunctionDef
-        Function node to inspect.
-    lines : list[str]
-        Source lines for the containing file.
+    parameters: list[tuple[str, str]] = []
+    returns: str | None = None
+    if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        parameters = parameters_for(node)
+        return_annotation = annotation_to_text(node.returns)
+        if return_annotation not in {"None", "NoReturn"}:
+            returns = return_annotation
 
-    Returns
-    -------
-    list[Action]
-        Actions describing how to insert the summary docstring.
-    """
-    if ast.get_docstring(node, clean=False) is not None:
-        return []
-    summary = summary_for(node.name, "function")
-    indent = " " * (node.col_offset + 4)
-    same_line = False
-    trailing = None
-    insert_line = None
-    if node.body:
-        first = node.body[0]
-        same_line = first.lineno == node.lineno
-        if same_line:
-            line_index = node.lineno - 1
-            line = lines[line_index]
-            colon_idx = line.rfind(":")
-            signature = line[: colon_idx + 1]
-            trailing = line[colon_idx + 1 :].strip()
-            actions = [("replace_line", line_index, signature + "\n")]
-            insert_line = line_index + 1
-        else:
-            insert_line = node.body[0].lineno - 1
-            actions = []
+    lines: list[str] = ['"""', summary]
+
+    if parameters:
+        lines.extend(["", "Parameters", "----------"])
+        for name, annotation in parameters:
+            lines.append(f"{name} : {annotation}")
+            lines.append("    Description.")
+
+    if returns:
+        lines.extend(["", "Returns", "-------", returns, "    Description."])
+
+    lines.append('"""')
+    return lines
+
+
+def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
+    """Return the existing docstring text and expression node, if any."""
+    body = getattr(node, "body", [])
+    if not body:
+        return None, None
+    first = body[0]
+    if (
+        isinstance(first, ast.Expr)
+        and isinstance(first.value, ast.Constant)
+        and isinstance(first.value.value, str)
+    ):
+        return first.value.value, first
+    return None, None
+
+
+def replace(
+    doc_expr: ast.Expr | None, lines: list[str], new_lines: list[str], indent: str, insert_at: int
+) -> None:
+    """Replace or insert the docstring at the calculated position."""
+    formatted = [indent + line + "\n" for line in new_lines]
+    if doc_expr is not None:
+        start = doc_expr.lineno - 1
+        end = doc_expr.end_lineno or doc_expr.lineno
+        del lines[start:end]
+        lines[start:start] = formatted
+        after_index = start + len(formatted)
     else:
-        line_index = node.lineno - 1
-        line = lines[line_index]
-        colon_idx = line.rfind(":")
-        signature = line[: colon_idx + 1]
-        trailing = line[colon_idx + 1 :].strip()
-        actions = [("replace_line", line_index, signature + "\n")]
-        insert_line = line_index + 1
-        same_line = True
-    doc_line = indent + f'"""{summary}"""\n'
-    actions.append(("insert_line", insert_line, doc_line))
-    if trailing:
-        actions.append(("insert_line", insert_line + 1, indent + trailing + "\n"))
-    return actions
+        lines[insert_at:insert_at] = formatted
+        after_index = insert_at + len(formatted)
+    lines.insert(after_index, indent + "\n")
 
 
-def actions_for_class(node: ast.ClassDef, lines: list[str]) -> list[Action]:
-    """Generate docstring insertion actions for a class definition.
-
-    Parameters
-    ----------
-    node : ast.ClassDef
-        Class node to inspect.
-    lines : list[str]
-        Source lines for the containing file.
-
-    Returns
-    -------
-    list[Action]
-        Actions describing how to insert the summary docstring.
-    """
-    if ast.get_docstring(node, clean=False) is not None:
-        return []
-    summary = summary_for(node.name, "class")
-    indent = " " * (node.col_offset + 4)
-    actions: list[Action] = []
-    trailing = None
-    if node.body:
-        first = node.body[0]
-        same_line = first.lineno == node.lineno
-        if same_line:
-            line_index = node.lineno - 1
-            line = lines[line_index]
-            colon_idx = line.rfind(":")
-            signature = line[: colon_idx + 1]
-            trailing = line[colon_idx + 1 :].strip()
-            actions.append(("replace_line", line_index, signature + "\n"))
-            insert_line = line_index + 1
-        else:
-            insert_line = node.body[0].lineno - 1
-    else:
-        line_index = node.lineno - 1
-        line = lines[line_index]
-        colon_idx = line.rfind(":")
-        signature = line[: colon_idx + 1]
-        trailing = line[colon_idx + 1 :].strip()
-        actions.append(("replace_line", line_index, signature + "\n"))
-        insert_line = line_index + 1
-    doc_line = indent + f'"""{summary}"""\n'
-    actions.append(("insert_line", insert_line, doc_line))
-    if trailing:
-        actions.append(("insert_line", insert_line + 1, indent + trailing + "\n"))
-    return actions
-
-
-def gather_actions(path: Path, lines: list[str]) -> list[Action]:
-    """Collect all docstring insertion actions for a source file.
-
-    Parameters
-    ----------
-    path : Path
-        File being processed.
-    lines : list[str]
-        Source lines (including newlines).
-
-    Returns
-    -------
-    list[Action]
-        Combined list of module, class, and function actions.
-    """
-    text = "".join(lines)
+def process_file(path: Path) -> bool:
+    """Generate missing or placeholder docstrings for a single file."""
     try:
-        tree = collect_defs(text)
-    except SyntaxError:
-        return []
-    actions: list[Action] = []
-    for idx, block in ensure_module_docstring(path, lines):
-        actions.append(("module_block", idx, block))
-    stack = [tree]
-    while stack:
-        node = stack.pop()
-        if isinstance(node, ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef):
-            actions.extend(action_for_node(node, lines))
-        for child in ast.iter_child_nodes(node):
-            stack.append(child)
-    return actions
+        text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        return False
+    tree = ast.parse(text)
+    lines = text.splitlines()
+    lines = [line + "\n" for line in lines]
+    changed = False
 
-
-def apply_actions(lines: list[str], actions: Iterable[Action]) -> None:
-    """Apply the generated actions to a mutable list of source lines.
-
-    Parameters
-    ----------
-    lines : list[str]
-        Source lines to mutate in-place.
-    actions : Iterable[Action]
-        Actions describing how to update the lines.
-    """
-    sortable: list[tuple[int, Action]] = []
-    for action in actions:
-        if action[0] == "module_block":
-            idx = action[1]
-            content = action[2]
-            sortable.append((idx, ("insert_block", idx, content)))
+    for node, kind in iter_docstring_nodes(tree):
+        doc, expr = docstring_text(node)
+        needs_update = doc is None or (doc and "TODO" in doc)
+        if not needs_update:
+            continue
+        if kind == "module":
+            indent = ""
+            new_lines = build_docstring(kind, node)
+            insert_at = 1 if lines and lines[0].startswith("#!") else 0
+            replace(expr, lines, new_lines, indent, insert_at)
         else:
-            kind, line_idx, payload = action
-            sortable.append((line_idx, (kind, line_idx, payload)))
-    for _, (kind, line_idx, payload) in sorted(sortable, key=lambda x: x[0], reverse=True):
-        if kind == "replace_line" and isinstance(payload, str):
-            lines[line_idx] = payload
-        elif kind == "insert_line" and isinstance(payload, str):
-            lines.insert(line_idx, payload)
-        elif kind == "insert_block" and isinstance(payload, list):
-            for entry in reversed(payload):
-                lines.insert(line_idx, entry)
+            indent = " " * (node.col_offset + 4)
+            new_lines = build_docstring(kind, node)
+            body = getattr(node, "body", [])
+            insert_at = body[0].lineno - 1 if body else node.lineno
+            replace(expr, lines, new_lines, indent, insert_at)
+        changed = True
+
+    if changed:
+        path.write_text("".join(lines), encoding="utf-8")
+    return changed
 
 
 def main() -> None:
-    """Walk the src tree and synthesise missing docstrings."""
-    for path in SRC_ROOT.rglob("*.py"):
-        original = path.read_text()
-        lines = list(original.splitlines(keepends=True))
-        actions = gather_actions(path, lines)
-        if not actions:
-            continue
-        apply_actions(lines, actions)
-        new_text = "".join(lines)
-        path.write_text(new_text)
+    """Entry point for the fallback generator."""
+    args = parse_args()
+    target = args.target.resolve()
+    changed: list[DocstringChange] = []
+
+    for file_path in sorted(target.rglob("*.py")):
+        if process_file(file_path):
+            changed.append(DocstringChange(file_path))
+
+    if args.log:
+        args.log.parent.mkdir(parents=True, exist_ok=True)
+        with args.log.open("a", encoding="utf-8") as handle:
+            for item in changed:
+                handle.write(f"{item.path}\n")
 
 
 if __name__ == "__main__":

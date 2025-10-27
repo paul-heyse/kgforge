@@ -8,6 +8,7 @@ src.registry.migrate
    Module for registry.migrate.
 
    NavMap:
+   - NavMap: Structure describing a module navmap.
    - apply: Apply.
    - main: Run the CLI entry point for migration commands.
 

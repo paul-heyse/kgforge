@@ -1,7 +1,8 @@
 """Module for registry.migrate.
 
 NavMap:
-- apply: Apply.
+- NavMap: Structure describing a module navmap.
+- apply: Return apply.
 - main: Run the CLI entry point for migration commands.
 """
 
@@ -9,24 +10,38 @@ from __future__ import annotations
 
 import argparse
 import pathlib
+from typing import Final
 
 import duckdb
 
+from kgfoundry_common.navmap_types import NavMap
 
+__all__ = ["apply", "main"]
+
+__navmap__: Final[NavMap] = {
+    "title": "registry.migrate",
+    "synopsis": "Module for registry.migrate",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": ["apply", "main"],
+        },
+    ],
+}
+
+
+# [nav:anchor apply]
 def apply(db: str, migrations_dir: str) -> None:
-    """Apply.
+    """Return apply.
 
     Parameters
     ----------
     db : str
-        TODO.
+        Description.
     migrations_dir : str
-        TODO.
-
-    Returns
-    -------
-    None
-        TODO.
+        Description.
     """
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
@@ -34,6 +49,7 @@ def apply(db: str, migrations_dir: str) -> None:
     con.close()
 
 
+# [nav:anchor main]
 def main() -> None:
     """Run the CLI entry point for migration commands."""
     ap = argparse.ArgumentParser()
