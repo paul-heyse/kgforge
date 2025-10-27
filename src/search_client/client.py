@@ -1,62 +1,69 @@
 """Module for search_client.client.
 
 NavMap:
-- KGForgeClient: Kgforgeclient.
+- KGFoundryClient: Minimal synchronous client for the kgfoundry search API.
 """
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Protocol
 
 import requests
 
 
-class KGForgeClient:
-    """Kgforgeclient."""
+class _SupportsResponse(Protocol):
+    """Minimal response protocol shared by httpx and requests objects."""
+
+    def raise_for_status(self) -> None:
+        """Raise For Status."""
+
+    def json(self) -> dict[str, Any]:
+        """Json."""
+
+
+class _SupportsHttp(Protocol):
+    """Subset of the client interface that the wrapper needs."""
+
+    def get(self, url: str, *, timeout: float) -> _SupportsResponse:
+        """Get."""
+
+    def post(
+        self,
+        url: str,
+        *,
+        json: dict[str, Any],
+        headers: dict[str, str],
+        timeout: float,
+    ) -> _SupportsResponse:
+        """Post."""
+
+
+class KGFoundryClient:
+    """Minimal synchronous client for the kgfoundry search API."""
 
     def __init__(
         self,
         base_url: str = "http://localhost:8080",
         api_key: str | None = None,
         timeout: float = 30.0,
+        http: _SupportsHttp | None = None,
     ) -> None:
-        """Init.
-
-        Parameters
-        ----------
-        base_url : str
-            TODO.
-        api_key : Optional[str]
-            TODO.
-        timeout : float
-            TODO.
-        """
+        """Configure the client."""
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
+        self._http: _SupportsHttp = http or requests
 
     def _headers(self) -> dict[str, str]:
-        """Headers.
-
-        Returns
-        -------
-        Dict[str, str]
-            TODO.
-        """
+        """Build request headers with an optional bearer token."""
         h = {"Content-Type": "application/json"}
         if self.api_key:
             h["Authorization"] = f"Bearer {self.api_key}"
         return h
 
     def healthz(self) -> dict[str, Any]:
-        """Healthz.
-
-        Returns
-        -------
-        Dict[str, Any]
-            TODO.
-        """
-        r = requests.get(f"{self.base_url}/healthz", timeout=self.timeout)
+        """Call the `/healthz` endpoint and return its JSON body."""
+        r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
         return r.json()
 
@@ -67,47 +74,17 @@ class KGForgeClient:
         filters: dict[str, Any] | None = None,
         explain: bool = False,
     ) -> dict[str, Any]:
-        """Search.
-
-        Parameters
-        ----------
-        query : str
-            TODO.
-        k : int
-            TODO.
-        filters : Optional[Dict[str, Any]]
-            TODO.
-        explain : bool
-            TODO.
-
-        Returns
-        -------
-        Dict[str, Any]
-            TODO.
-        """
+        """Execute a search query and return the API response body."""
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
-        r = requests.post(
+        r = self._http.post(
             f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout
         )
         r.raise_for_status()
         return r.json()
 
     def concepts(self, q: str, limit: int = 50) -> dict[str, Any]:
-        """Concepts.
-
-        Parameters
-        ----------
-        q : str
-            TODO.
-        limit : int
-            TODO.
-
-        Returns
-        -------
-        Dict[str, Any]
-            TODO.
-        """
-        r = requests.post(
+        """Lookup related concepts via `/graph/concepts`."""
+        r = self._http.post(
             f"{self.base_url}/graph/concepts",
             json={"q": q, "limit": limit},
             headers=self._headers(),

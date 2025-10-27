@@ -1,4 +1,4 @@
--- 0001_init.sql — DuckDB catalog for KGForge
+-- 0001_init.sql — DuckDB catalog for kgfoundry
 
 CREATE TABLE IF NOT EXISTS model_registry (
   model_id TEXT,

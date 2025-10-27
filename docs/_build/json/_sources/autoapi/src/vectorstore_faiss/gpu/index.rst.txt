@@ -25,15 +25,23 @@ Module Contents
 
 
    .. py:attribute:: factory
+      :value: 'OPQ64,IVF8192,PQ64'
+
 
 
    .. py:attribute:: nprobe
+      :value: 64
+
 
 
    .. py:attribute:: gpu
+      :value: True
+
 
 
    .. py:attribute:: cuvs
+      :value: True
+
 
 
    .. py:method:: train(train_vectors, *, seed = 42)

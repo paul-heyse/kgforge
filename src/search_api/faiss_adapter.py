@@ -9,10 +9,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import duckdb
 import numpy as np
+from numpy.typing import NDArray
 
 try:
     try:
@@ -29,12 +30,19 @@ except Exception:
     HAVE_FAISS = False
 
 
+type VecArray = NDArray[np.float32]
+type IndexArray = NDArray[np.int64]
+
+
+__all__ = ["DenseVecs", "FaissAdapter"]
+
+
 @dataclass
 class DenseVecs:
     """Densevecs."""
 
     ids: list[str]
-    mat: np.ndarray
+    mat: VecArray
 
 
 class FaissAdapter:
@@ -89,11 +97,11 @@ class FaissAdapter:
         finally:
             con.close()
         ids = [r[0] for r in rows]
-        mat = np.stack([np.array(r[1], dtype=np.float32) for r in rows])
+        mat = cast(VecArray, np.stack([np.asarray(r[1], dtype=np.float32) for r in rows]))
         # normalize for cosine/IP
         norms = np.linalg.norm(mat, axis=1, keepdims=True) + 1e-9
-        mat = mat / norms
-        return DenseVecs(ids=ids, mat=mat)
+        normalized = cast(VecArray, mat / norms)
+        return DenseVecs(ids=ids, mat=normalized)
 
     def build(self) -> None:
         """Build.
@@ -114,7 +122,7 @@ class FaissAdapter:
         train = vecs.mat[: min(100000, vecs.mat.shape[0])].copy()
         faiss.normalize_L2(train)
         cpu.train(train)
-        ids64 = np.arange(vecs.mat.shape[0], dtype=np.int64)
+        ids64 = cast(IndexArray, np.arange(vecs.mat.shape[0], dtype=np.int64))
         cpu.add_with_ids(vecs.mat, ids64)
         res = faiss.StandardGpuResources()
         co = faiss.GpuClonerOptions()
@@ -158,7 +166,7 @@ class FaissAdapter:
             pass
         self.build()
 
-    def search(self, qvec: np.ndarray, k: int = 10) -> list[tuple[str, float]]:
+    def search(self, qvec: VecArray, k: int = 10) -> list[tuple[str, float]]:
         """Search.
 
         Parameters
@@ -179,7 +187,7 @@ class FaissAdapter:
             if self.idmap is None:
                 message = "ID mapping not loaded for FAISS index"
                 raise RuntimeError(message)
-            q = qvec[None, :].astype(np.float32, copy=False)
+            q = cast(VecArray, np.asarray(qvec[None, :], dtype=np.float32, order="C"))
             distances, indices = self.index.search(q, k)
             out = []
             for idx, score in zip(indices[0], distances[0], strict=False):
@@ -192,7 +200,7 @@ class FaissAdapter:
             message = "Dense vectors not loaded"
             raise RuntimeError(message)
         mat = self.vecs.mat
-        q = qvec.astype(np.float32, copy=False)
+        q = cast(VecArray, np.asarray(qvec, dtype=np.float32, order="C"))
         q /= np.linalg.norm(q) + 1e-9
         sims = mat @ q
         topk = np.argsort(-sims)[:k]

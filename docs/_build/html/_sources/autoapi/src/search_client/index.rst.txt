@@ -8,7 +8,7 @@ src.search_client
    Module for search_client.
 
    NavMap:
-   - KGForgeClient: Kgforgeclient.
+   - KGFoundryClient: Minimal synchronous client for the kgfoundry search API.
 
 
 

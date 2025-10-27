@@ -1,5 +1,5 @@
 
-# KGForge — End-to-End Local RAG + Ontology Grounding (Skeleton)
+# kgfoundry — End-to-End Local RAG + Ontology Grounding (Skeleton)
 
 This repository is the **skeleton** for the single-machine architecture you specified:
 - Ubuntu 24.04 / RTX 5090 / AMD 9950X / 192 GB RAM
@@ -26,7 +26,7 @@ make e2e         # runs a light end-to-end test over fixtures (skeleton)
 
 ## Directory layout
 
-- `src/kgforge_common`: contracts (Pydantic), IDs, config utils, exceptions, logging.
+- `src/kgfoundry_common`: contracts (Pydantic), IDs, config utils, exceptions, logging.
 - `src/download`: PyAlex-based harvester + OA PDF downloader with fallbacks.
 - `src/docling`: VLM client + HybridChunker wrapper.
 - `src/embeddings_dense`: Qwen3-Embedding-4B client (OpenAI-style vLLM).
@@ -53,15 +53,15 @@ make e2e         # runs a light end-to-end test over fixtures (skeleton)
 and minimal shims so teams can implement their parts with confidence.
 
 
-<!-- merged from kgforge_skeleton (1).zip -->
-# KGForge (skeleton)
+<!-- merged from kgfoundry_skeleton (1).zip -->
+# kgfoundry (skeleton)
 Single-machine architecture for ontology-grounded hybrid search (dense + sparse + KG) with local registries and indices.
 **Target host:** Ubuntu 24.04 · RTX 5090 (CUDA 13.0) · AMD 9950X (16 cores) · 192 GB RAM  
 **Runtime:** Python 3.13, PyTorch 2.9 (CUDA 13), vLLM pre-release (CUDA 13), DuckDB ≥ 1.4.1
 This repository is a **skeleton** generated on 2025-10-25. It contains packages, interfaces, configs, and stubs to accelerate
 independent development of each workstream.
 
-<!-- merged from kgforge_skeleton (2).zip -->
+<!-- merged from kgfoundry_skeleton (2).zip -->
 This repository is the **skeleton** for the single-machine architecture:
 - Ubuntu 24.04, RTX 5090, AMD 9950X (16c), 192 GB RAM
 - Python 3.13, PyTorch 2.9 (CUDA 13)
@@ -88,13 +88,13 @@ Generate tiny fixture Parquet datasets (chunks, dense 2560-d, SPLADE) and regist
 kgf fixture --root /data --db-path /data/catalog/catalog.duckdb
 You can then iterate on individual components using these fixed contracts.
 
-<!-- merged from kgforge_skeleton (4).zip -->
-# KGForge (skeleton with fusion & KG mock)
+<!-- merged from kgfoundry_skeleton (4).zip -->
+# kgfoundry (skeleton with fusion & KG mock)
 This minimal skeleton exposes:
 - **FastAPI** search service with **BM25 + SPLADE + FAISS** fusion (RRF) and a tiny **KG mock** boost
 - **CLI** commands to build BM25 (pure) and FAISS indexes for fixture datasets
 ## Run the API
-uvicorn kgforge.search_api.app:app --port 8080 --reload
+uvicorn kgfoundry.search_api.app:app --port 8080 --reload
 Set environment variables for local data if you have them:
 export KGF_FIXTURE_ROOT=/data
 export KGF_FIXTURE_DB=/data/catalog/catalog.duckdb

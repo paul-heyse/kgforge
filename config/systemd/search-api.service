@@ -1,1 +1,1 @@
-[Unit]\nDescription=KGForge API\n[Service]\nExecStart=/usr/bin/uvicorn kgforge.search_api.app:app --app-dir src --port 8080\n
+[Unit]\nDescription=kgfoundry API\n[Service]\nExecStart=/usr/bin/uvicorn kgfoundry.search_api.app:app --app-dir src --port 8080\n

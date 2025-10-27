@@ -13,9 +13,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from kgforge.kgforge_common.models import Doc
-from kgforge.kgforge_common.parquet_io import ParquetChunkWriter, ParquetVectorWriter
-from kgforge.registry.helper import DuckDBRegistryHelper
+from kgfoundry.kgfoundry_common.models import Doc
+from kgfoundry.kgfoundry_common.parquet_io import ParquetChunkWriter, ParquetVectorWriter
+from kgfoundry.registry.helper import DuckDBRegistryHelper
 from prefect import flow, task
 
 
@@ -174,7 +174,7 @@ def t_register_in_duckdb(
     return {"runs": [dense_run, sparse_run]}
 
 
-@flow(name="kgforge_fixture_pipeline")
+@flow(name="kgfoundry_fixture_pipeline")
 def fixture_pipeline(
     root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb"
 ) -> dict[str, list[str]]:

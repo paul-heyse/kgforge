@@ -1,5 +1,5 @@
-from kgforge.registry.helper import DuckDBRegistryHelper
-from kgforge.registry.migrate import apply
+from kgfoundry.registry.helper import DuckDBRegistryHelper
+from kgfoundry.registry.migrate import apply
 
 
 def test_registry_two_phase(tmp_path):

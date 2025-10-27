@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>src.orchestration.cli &#8212; KGForge  documentation</title>
+    <title>src.orchestration.cli &#8212; kgfoundry  documentation</title>
   
   
   
@@ -111,7 +111,7 @@
   
   
   
-    <p class="title logo__title">KGForge  documentation</p>
+    <p class="title logo__title">kgfoundry  documentation</p>
   
 </a></div>
     
@@ -322,14 +322,15 @@
 <li class="toctree-l3"><a class="reference internal" href="../../kg_builder/neo4j_store/index.html">src.kg_builder.neo4j_store</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../kgforge_common/index.html">src.kgforge_common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../kgforge_common/config/index.html">src.kgforge_common.config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kgforge_common/errors/index.html">src.kgforge_common.errors</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kgforge_common/exceptions/index.html">src.kgforge_common.exceptions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kgforge_common/ids/index.html">src.kgforge_common.ids</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kgforge_common/logging/index.html">src.kgforge_common.logging</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kgforge_common/models/index.html">src.kgforge_common.models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kgforge_common/parquet_io/index.html">src.kgforge_common.parquet_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../kgfoundry/index.html">src.kgfoundry</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../kgfoundry_common/index.html">src.kgfoundry_common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/config/index.html">src.kgfoundry_common.config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/errors/index.html">src.kgfoundry_common.errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/exceptions/index.html">src.kgfoundry_common.exceptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/ids/index.html">src.kgfoundry_common.ids</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/logging/index.html">src.kgfoundry_common.logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/models/index.html">src.kgfoundry_common.models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/parquet_io/index.html">src.kgfoundry_common.parquet_io</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../linking/index.html">src.linking</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -453,17 +454,18 @@
 <p>NavMap:
 - index_bm25: Build a BM25 index from chunk fixtures (id, title, section,….
 - index_faiss: Train &amp; build FAISS index from fixture dense vectors.
-- api: Run the FastAPI app.</p>
+- api: Run the FastAPI app.
+- e2e: Execute the skeleton Prefect flow and print completed stages.</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py data">
 <dt class="sig sig-object py" id="src.orchestration.cli.app">
-<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">app</span></span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/orchestration/cli.py:19:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.app" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">app</span></span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/orchestration/cli.py:20:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.app" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.orchestration.cli.index_bm25">
-<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">index_bm25</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunks_parquet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Argument(...,</span> <span class="pre">help='Path</span> <span class="pre">to</span> <span class="pre">Parquet/JSONL</span> <span class="pre">with</span> <span class="pre">chunks')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('lucene',</span> <span class="pre">help='lucene|pure')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('./_indices/bm25',</span> <span class="pre">help='Output</span> <span class="pre">index</span> <span class="pre">directory')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#index_bm25"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/orchestration/cli.py:22:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.index_bm25" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">index_bm25</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunks_parquet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Argument(...,</span> <span class="pre">help='Path</span> <span class="pre">to</span> <span class="pre">Parquet/JSONL</span> <span class="pre">with</span> <span class="pre">chunks')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('lucene',</span> <span class="pre">help='lucene|pure')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('./_indices/bm25',</span> <span class="pre">help='Output</span> <span class="pre">index</span> <span class="pre">directory')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#index_bm25"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/orchestration/cli.py:23:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.index_bm25" title="Link to this definition">#</a></dt>
 <dd><p>Build a BM25 index from chunk fixtures (id, title, section, body).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -481,7 +483,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.orchestration.cli.index_faiss">
-<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">index_faiss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dense_vectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Argument(...,</span> <span class="pre">help='Path</span> <span class="pre">to</span> <span class="pre">dense</span> <span class="pre">vectors</span> <span class="pre">JSON</span> <span class="pre">(skeleton)')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('./_indices/faiss/shard_000.idx',</span> <span class="pre">help='Output</span> <span class="pre">index</span> <span class="pre">(CPU</span> <span class="pre">.idx)')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#index_faiss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/orchestration/cli.py:67:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.index_faiss" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">index_faiss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dense_vectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Argument(...,</span> <span class="pre">help='Path</span> <span class="pre">to</span> <span class="pre">dense</span> <span class="pre">vectors</span> <span class="pre">JSON</span> <span class="pre">(skeleton)')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('./_indices/faiss/shard_000.idx',</span> <span class="pre">help='Output</span> <span class="pre">index</span> <span class="pre">(CPU</span> <span class="pre">.idx)')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#index_faiss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/orchestration/cli.py:68:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.index_faiss" title="Link to this definition">#</a></dt>
 <dd><p>Train &amp; build FAISS index from fixture dense vectors.</p>
 <p>In this skeleton we accept a JSON with entries: {key: str, vector: List[float]}.</p>
 <dl class="field-list simple">
@@ -499,7 +501,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.orchestration.cli.api">
-<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8080</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#api"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/KGForge/src/src/orchestration/cli.py:96:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.api" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8080</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#api"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/orchestration/cli.py:97:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.api" title="Link to this definition">#</a></dt>
 <dd><p>Run the FastAPI app.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -507,6 +509,17 @@
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.orchestration.cli.e2e">
+<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">e2e</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#e2e"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/orchestration/cli.py:105:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.e2e" title="Link to this definition">#</a></dt>
+<dd><p>Execute the skeleton Prefect flow and print completed stages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -566,6 +579,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.orchestration.cli.index_bm25"><code class="docutils literal notranslate"><span class="pre">index_bm25()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.orchestration.cli.index_faiss"><code class="docutils literal notranslate"><span class="pre">index_faiss()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.orchestration.cli.api"><code class="docutils literal notranslate"><span class="pre">api()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.orchestration.cli.e2e"><code class="docutils literal notranslate"><span class="pre">e2e()</span></code></a></li>
 </ul>
 </li>
 </ul>

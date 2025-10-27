@@ -26,7 +26,7 @@ Absolutely—here’s an **updated, repo‑aware guide** that folds in your repo
 
    * Mark first‑party modules (derived from your `src/` layout).
    * Ban relative imports to make navigation and patch targets obvious.
-     Module families include: `docling`, `download`, `embeddings_dense`, `embeddings_sparse`, `kg_builder`, `kgforge_common`, `linking`, `observability`, `ontology`, `orchestration`, `registry`, `search_api`, `search_client`, `vectorstore_faiss`. 
+     Module families include: `docling`, `download`, `embeddings_dense`, `embeddings_sparse`, `kg_builder`, `kgfoundry_common`, `linking`, `observability`, `ontology`, `orchestration`, `registry`, `search_api`, `search_client`, `vectorstore_faiss`. 
 
 4. **Docs pipeline alignment**:
 
@@ -55,8 +55,8 @@ src = ["src"]                       # repo uses a src/ layout
 extend-exclude = [
   "docs/_build/**",
   "site/**",
-  "src/KGForge.egg-info/**",
-  "KGForge.egg-info/**",
+  "src/kgfoundry.egg-info/**",
+  "kgfoundry.egg-info/**",
 ]
 
 # --- Ruff Formatter ---
@@ -107,7 +107,7 @@ convention = "numpy"    # or "google" — must match Sphinx Napoleon config
 [tool.ruff.lint.isort]
 known-first-party = [
   "docling", "download", "embeddings_dense", "embeddings_sparse",
-  "kg_builder", "kgforge_common", "linking", "observability",
+  "kg_builder", "kgfoundry_common", "linking", "observability",
   "ontology", "orchestration", "registry",
   "search_api", "search_client", "vectorstore_faiss",
 ]
@@ -127,7 +127,7 @@ pandas = "pd"
 
 * Your project already uses `line-length = 100`, Python 3.13, and both Black and Ruff; the new blocks preserve those while adding determinism and agent‑friendly lint gates. 
 * The first‑party list mirrors your `src/` layout so import grouping/sorting is stable across contributors and CI. 
-* Exclusions skip generated sites and egg metadata that appear in your tree (e.g., `docs/_build`, `site/`, `KGForge.egg-info`). 
+* Exclusions skip generated sites and egg metadata that appear in your tree (e.g., `docs/_build`, `site/`, `kgfoundry.egg-info`). 
 
 ---
 
@@ -225,7 +225,7 @@ Your automated docs system seeds/rewrites docstrings, formats them, enforces cov
 ## 7) Repo-specific toggles
 
 * **First‑party packages** (used by isort inside Ruff) are derived from `src/`:
-  `docling`, `download`, `embeddings_dense`, `embeddings_sparse`, `kg_builder`, `kgforge_common`, `linking`, `observability`, `ontology`, `orchestration`, `registry`, `search_api`, `search_client`, `vectorstore_faiss`. This makes import grouping/ordering deterministic across machines. 
+  `docling`, `download`, `embeddings_dense`, `embeddings_sparse`, `kg_builder`, `kgfoundry_common`, `linking`, `observability`, `ontology`, `orchestration`, `registry`, `search_api`, `search_client`, `vectorstore_faiss`. This makes import grouping/ordering deterministic across machines. 
 
 * **Exclusions**: Skip `docs/_build`, `site/`, and egg‑info dirs; they exist in your tree and are generated. 
 

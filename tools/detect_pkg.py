@@ -26,11 +26,11 @@ def _candidate_names() -> list[str]:
 
 
 def detect_packages() -> list[str]:
-    """Return package names ordered with a KGForge-first preference."""
+    """Return package names ordered with a kgfoundry-first preference."""
     candidates = _candidate_names()
     lowers = [c for c in candidates if c.islower()]
     base = lowers or candidates
-    preferred = [c for c in base if "kgforge" in c]
+    preferred = [c for c in base if "kgfoundry" in c]
     return preferred + [c for c in base if c not in preferred]
 
 

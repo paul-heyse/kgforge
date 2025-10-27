@@ -37,15 +37,23 @@ Module Contents
 
 
    .. py:attribute:: model_id
+      :value: 'naver/splade-v3-distilbert'
+
 
 
    .. py:attribute:: device
+      :value: 'cuda'
+
 
 
    .. py:attribute:: topk
+      :value: 256
+
 
 
    .. py:attribute:: max_seq_len
+      :value: 512
+
 
 
    .. py:method:: encode(texts)

@@ -27,7 +27,7 @@ def t_echo(msg: str) -> str:
     return msg
 
 
-@flow(name="kgforge_e2e_skeleton")
+@flow(name="kgfoundry_e2e_skeleton")
 def e2e_flow() -> list[str]:
     """E2e flow."""
     return [

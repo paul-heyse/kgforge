@@ -1,6 +1,6 @@
-# KGForge Documentation
+# kgfoundry Documentation
 
-Welcome to the KGForge documentation set. Use the sections below to find onboarding guides, deep dives, API reference material, and architecture decisions.
+Welcome to the kgfoundry documentation set. Use the sections below to find onboarding guides, deep dives, API reference material, and architecture decisions.
 
 ```{toctree}
 :maxdepth: 2

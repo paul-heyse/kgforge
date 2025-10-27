@@ -55,9 +55,13 @@ Module Contents
 
 
    .. py:attribute:: k1
+      :value: 0.9
+
 
 
    .. py:attribute:: b
+      :value: 0.4
+
 
 
    .. py:attribute:: field_boosts
@@ -133,9 +137,13 @@ Module Contents
 
 
    .. py:attribute:: k1
+      :value: 0.9
+
 
 
    .. py:attribute:: b
+      :value: 0.4
+
 
 
    .. py:attribute:: field_boosts

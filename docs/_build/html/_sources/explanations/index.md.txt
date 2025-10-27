@@ -1,6 +1,6 @@
 # Explanations
 
-Deep dives into KGForge architecture and design decisions.
+Deep dives into kgfoundry architecture and design decisions.
 
 ```{toctree}
 :maxdepth: 1

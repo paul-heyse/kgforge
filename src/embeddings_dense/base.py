@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Protocol
 
 import numpy as np
+from numpy.typing import NDArray
 
 
 class DenseEmbedder(Protocol):
@@ -17,6 +18,6 @@ class DenseEmbedder(Protocol):
     name: str
     dim: int
 
-    def embed_texts(self, texts: list[str]) -> np.ndarray:
+    def embed_texts(self, texts: list[str]) -> NDArray[np.float32]:
         """Return embeddings for the supplied texts."""
         ...

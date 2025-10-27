@@ -15,14 +15,8 @@ src.search_api.faiss_adapter
 
 
 
-
-
 Module Contents
 ---------------
-
-.. py:data:: HAVE_FAISS
-   :value: True
-
 
 .. py:class:: DenseVecs
 
@@ -34,7 +28,7 @@ Module Contents
 
 
    .. py:attribute:: mat
-      :type:  numpy.ndarray
+      :type:  VecArray
 
 
 .. py:class:: FaissAdapter(db_path, factory = 'OPQ64,IVF8192,PQ64', metric = 'ip')
@@ -46,9 +40,13 @@ Module Contents
 
 
    .. py:attribute:: factory
+      :value: 'OPQ64,IVF8192,PQ64'
+
 
 
    .. py:attribute:: metric
+      :value: 'ip'
+
 
 
    .. py:attribute:: index

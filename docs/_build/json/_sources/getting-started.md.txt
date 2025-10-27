@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide walks you through the documentation workflow for KGForge.
+This guide walks you through the documentation workflow for kgfoundry.
 
 1. Install the documentation extras once: `pip install -e ".[docs]"`.
 2. Generate docstrings and normalize formatting with `make docstrings`.

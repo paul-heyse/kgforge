@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Protocol
 
-from kgforge.kgforge_common.models import Doc, DoctagsAsset
+from kgfoundry.kgfoundry_common.models import Doc, DoctagsAsset
 
 
 class Registry(Protocol):

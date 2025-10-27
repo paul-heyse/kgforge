@@ -1,6 +1,6 @@
 # Architecture
 
-Architecture decision records and diagrams that govern KGForge.
+Architecture decision records and diagrams that govern kgfoundry.
 
 ```{toctree}
 :maxdepth: 1

@@ -1,7 +1,7 @@
 
 .PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings readmes html json symbols watch
 
-VENV := .kgforge-venv
+VENV := .venv
 PY := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 UVICORN := $(VENV)/bin/uvicorn
@@ -17,11 +17,11 @@ bootstrap:
 	$(PIP) install -U -e ".[dev,docs]"
 	$(PIP) install -U pre-commit
 	$(PRECOMMIT) install
-	$(PY) -m kgforge.registry.migrate apply --db /data/catalog/catalog.duckdb --migrations registry/migrations
+	$(PY) -m kgfoundry.registry.migrate apply --db /data/catalog/catalog.duckdb --migrations registry/migrations
 
 run: api
 api:
-	$(UVICORN) kgforge.search_api.app:app --app-dir src --host 0.0.0.0 --port 8080 --reload
+	$(UVICORN) kgfoundry.search_api.app:app --app-dir src --host 0.0.0.0 --port 8080 --reload
 
 e2e:
 	$(PYTEST) -q -m e2e || $(PYTEST) -q
@@ -42,13 +42,13 @@ lint:
 	$(VENV)/bin/mypy src
 
 clean:
-	rm -rf .kgforge-venv .mypy_cache .ruff_cache .pytest_cache dist build
+	rm -rf .venv .mypy_cache .ruff_cache .pytest_cache dist build
 
 mock:
 	$(PY) -m tests.mock_servers.run_all
 
 fixture:
-	$(PY) -m kgforge.orchestration.fixture_flow
+	$(PY) -m kgfoundry.orchestration.fixture_flow
 
 docstrings:
 	@for pkg in $(PKGS); do \

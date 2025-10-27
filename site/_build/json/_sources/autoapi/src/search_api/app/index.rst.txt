@@ -26,6 +26,8 @@ src.search_api.app
 Module Contents
 ---------------
 
+.. py:data:: logger
+
 .. py:data:: API_KEYS
    :type:  set[str]
 

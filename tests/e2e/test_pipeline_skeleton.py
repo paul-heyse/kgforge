@@ -1,6 +1,10 @@
 import subprocess
 import sys
 
+import pytest
+
+pytest.importorskip("prefect", reason="prefect extra required for pipeline CLI test")
+
 
 def test_cli_e2e():
     # Just ensure CLI entrypoint works

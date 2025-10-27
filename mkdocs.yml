@@ -1,4 +1,4 @@
-site_name: KGForge
+site_name: kgfoundry
 docs_dir: docs
 theme:
   name: material

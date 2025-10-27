@@ -25,8 +25,8 @@ from griffe import Module as GriffeModule
 from sphinxcontrib.serializinghtml import jsonimpl  # type: ignore[attr-defined]
 
 # --- Project metadata (override via env if you like)
-project = os.environ.get("PROJECT_NAME", "KGForge")
-author = os.environ.get("PROJECT_AUTHOR", "KGForge Maintainers")
+project = os.environ.get("PROJECT_NAME", "kgfoundry")
+author = os.environ.get("PROJECT_AUTHOR", "kgfoundry Maintainers")
 
 # --- Paths
 DOCS_DIR = Path(__file__).resolve().parent

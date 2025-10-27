@@ -70,6 +70,8 @@ Module Contents
 
 
    .. py:attribute:: db_path
+      :value: '/data/catalog/catalog.duckdb'
+
 
 
    .. py:attribute:: docs
