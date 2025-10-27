@@ -1,4 +1,8 @@
-"""Module for kgforge_common.config."""
+"""Module for kgforge_common.config.
+
+NavMap:
+- load_config: Load config.
+"""
 
 from __future__ import annotations
 

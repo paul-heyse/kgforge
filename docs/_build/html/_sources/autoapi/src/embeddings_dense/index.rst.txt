@@ -5,7 +5,7 @@ src.embeddings_dense
 
 .. autoapi-nested-parse::
 
-   Module for embeddings_dense.__init__.
+   Module for embeddings_dense.
 
 
 

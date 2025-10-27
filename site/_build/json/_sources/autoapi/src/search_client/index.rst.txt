@@ -5,7 +5,10 @@ src.search_client
 
 .. autoapi-nested-parse::
 
-   Module for search_client.__init__.
+   Module for search_client.
+
+   NavMap:
+   - KGForgeClient: Kgforgeclient.
 
 
 

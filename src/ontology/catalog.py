@@ -1,4 +1,8 @@
-"""Module for ontology.catalog."""
+"""Module for ontology.catalog.
+
+NavMap:
+- OntologyCatalog: Ontologycatalog.
+"""
 
 from __future__ import annotations
 

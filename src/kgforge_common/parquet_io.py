@@ -1,4 +1,9 @@
-"""Module for kgforge_common.parquet_io."""
+"""Module for kgforge_common.parquet_io.
+
+NavMap:
+- ParquetVectorWriter: Parquetvectorwriter.
+- ParquetChunkWriter: Parquetchunkwriter.
+"""
 
 from __future__ import annotations
 

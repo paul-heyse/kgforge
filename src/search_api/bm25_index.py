@@ -1,4 +1,10 @@
-"""Module for search_api.bm25_index."""
+"""Module for search_api.bm25_index.
+
+NavMap:
+- toks: Toks.
+- BM25Doc: Bm25doc.
+- BM25Index: Bm25index.
+"""
 
 from __future__ import annotations
 

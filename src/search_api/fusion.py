@@ -1,4 +1,8 @@
-"""Module for search_api.fusion."""
+"""Module for search_api.fusion.
+
+NavMap:
+- rrf_fuse: Rrf fuse.
+"""
 
 from __future__ import annotations
 

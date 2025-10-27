@@ -1,4 +1,9 @@
-"""Module for kgforge_common.logging."""
+"""Module for kgforge_common.logging.
+
+NavMap:
+- JsonFormatter: Jsonformatter.
+- setup_logging: Setup logging.
+"""
 
 import json
 import logging

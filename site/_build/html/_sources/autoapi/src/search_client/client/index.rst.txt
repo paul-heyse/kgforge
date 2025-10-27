@@ -7,6 +7,9 @@ src.search_client.client
 
    Module for search_client.client.
 
+   NavMap:
+   - KGForgeClient: Kgforgeclient.
+
 
 
 

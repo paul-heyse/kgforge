@@ -5,7 +5,7 @@ src.observability
 
 .. autoapi-nested-parse::
 
-   Module for observability.__init__.
+   Module for observability.
 
 
 

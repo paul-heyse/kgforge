@@ -5,7 +5,7 @@ src.docling
 
 .. autoapi-nested-parse::
 
-   Module for docling.__init__.
+   Module for docling.
 
 
 

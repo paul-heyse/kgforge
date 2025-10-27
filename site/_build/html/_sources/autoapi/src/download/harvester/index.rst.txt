@@ -7,6 +7,9 @@ src.download.harvester
 
    Module for download.harvester.
 
+   NavMap:
+   - OpenAccessHarvester: Openaccessharvester.
+
 
 
 

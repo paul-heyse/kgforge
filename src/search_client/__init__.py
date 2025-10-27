@@ -1,4 +1,8 @@
-"""Module for search_client.__init__."""
+"""Module for search_client.
+
+NavMap:
+- KGForgeClient: Kgforgeclient.
+"""
 
 from .client import KGForgeClient
 

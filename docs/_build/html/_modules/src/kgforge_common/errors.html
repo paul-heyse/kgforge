@@ -347,105 +347,119 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for src.kgforge_common.errors</h1><div class="highlight"><pre>
-<span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Module for kgforge_common.errors.&quot;&quot;&quot;</span>
+<span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Module for kgforge_common.errors.</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span>
+<span class="linenos"> 3</span><span class="sd">NavMap:</span>
+<span class="linenos"> 4</span><span class="sd">- DownloadError: Raised when an external download fails.</span>
+<span class="linenos"> 5</span><span class="sd">- UnsupportedMIMEError: Raised when an unsupported MIME type is encountered.</span>
+<span class="linenos"> 6</span><span class="sd">- DoclingError: Base Docling processing error.</span>
+<span class="linenos"> 7</span><span class="sd">- OCRTimeout: Raised when OCR operations exceed time limits.</span>
+<span class="linenos"> 8</span><span class="sd">- ChunkingError: Raised when chunk generation fails.</span>
+<span class="linenos"> 9</span><span class="sd">- EmbeddingError: Raised when embedding generation fails.</span>
+<span class="linenos">10</span><span class="sd">- SpladeOOM: Raised when SPLADE runs out of memory.</span>
+<span class="linenos">11</span><span class="sd">- IndexBuildError: Raised when index construction fails.</span>
+<span class="linenos">12</span><span class="sd">- OntologyParseError: Raised when ontology parsing fails.</span>
+<span class="linenos">13</span><span class="sd">- LinkerCalibrationError: Raised when linker calibration cannot be performed.</span>
+<span class="linenos">14</span><span class="sd">- Neo4jError: Raised when Neo4j operations fail.</span>
+<span class="linenos">15</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span>
 <div class="viewcode-block" id="DownloadError">
 <a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.DownloadError">[docs]</a>
-<span class="linenos"> 4</span><span class="k">class</span><span class="w"> </span><span class="nc">DownloadError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="linenos"> 5</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an external download fails.&quot;&quot;&quot;</span>
-<span class="linenos"> 6</span>
-<span class="linenos"> 7</span>    <span class="o">...</span></div>
+<span class="linenos">18</span><span class="k">class</span><span class="w"> </span><span class="nc">DownloadError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="linenos">19</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an external download fails.&quot;&quot;&quot;</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span>    <span class="o">...</span></div>
 
-<span class="linenos"> 8</span>
-<span class="linenos"> 9</span>
+<span class="linenos">22</span>
+<span class="linenos">23</span>
 <div class="viewcode-block" id="UnsupportedMIMEError">
 <a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.UnsupportedMIMEError">[docs]</a>
-<span class="linenos">10</span><span class="k">class</span><span class="w"> </span><span class="nc">UnsupportedMIMEError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="linenos">11</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an unsupported MIME type is encountered.&quot;&quot;&quot;</span>
-<span class="linenos">12</span>
-<span class="linenos">13</span>    <span class="o">...</span></div>
+<span class="linenos">24</span><span class="k">class</span><span class="w"> </span><span class="nc">UnsupportedMIMEError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="linenos">25</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an unsupported MIME type is encountered.&quot;&quot;&quot;</span>
+<span class="linenos">26</span>
+<span class="linenos">27</span>    <span class="o">...</span></div>
 
-<span class="linenos">14</span>
-<span class="linenos">15</span>
+<span class="linenos">28</span>
+<span class="linenos">29</span>
 <div class="viewcode-block" id="DoclingError">
 <a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.DoclingError">[docs]</a>
-<span class="linenos">16</span><span class="k">class</span><span class="w"> </span><span class="nc">DoclingError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="linenos">17</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Base Docling processing error.&quot;&quot;&quot;</span>
-<span class="linenos">18</span>
-<span class="linenos">19</span>    <span class="o">...</span></div>
+<span class="linenos">30</span><span class="k">class</span><span class="w"> </span><span class="nc">DoclingError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="linenos">31</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Base Docling processing error.&quot;&quot;&quot;</span>
+<span class="linenos">32</span>
+<span class="linenos">33</span>    <span class="o">...</span></div>
 
-<span class="linenos">20</span>
-<span class="linenos">21</span>
+<span class="linenos">34</span>
+<span class="linenos">35</span>
 <div class="viewcode-block" id="OCRTimeout">
 <a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.OCRTimeout">[docs]</a>
-<span class="linenos">22</span><span class="k">class</span><span class="w"> </span><span class="nc">OCRTimeout</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="linenos">23</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when OCR operations exceed time limits.&quot;&quot;&quot;</span>
-<span class="linenos">24</span>
-<span class="linenos">25</span>    <span class="o">...</span></div>
+<span class="linenos">36</span><span class="k">class</span><span class="w"> </span><span class="nc">OCRTimeout</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="linenos">37</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when OCR operations exceed time limits.&quot;&quot;&quot;</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span>    <span class="o">...</span></div>
 
-<span class="linenos">26</span>
-<span class="linenos">27</span>
+<span class="linenos">40</span>
+<span class="linenos">41</span>
 <div class="viewcode-block" id="ChunkingError">
 <a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.ChunkingError">[docs]</a>
-<span class="linenos">28</span><span class="k">class</span><span class="w"> </span><span class="nc">ChunkingError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="linenos">29</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when chunk generation fails.&quot;&quot;&quot;</span>
-<span class="linenos">30</span>
-<span class="linenos">31</span>    <span class="o">...</span></div>
+<span class="linenos">42</span><span class="k">class</span><span class="w"> </span><span class="nc">ChunkingError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="linenos">43</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when chunk generation fails.&quot;&quot;&quot;</span>
+<span class="linenos">44</span>
+<span class="linenos">45</span>    <span class="o">...</span></div>
 
-<span class="linenos">32</span>
-<span class="linenos">33</span>
+<span class="linenos">46</span>
+<span class="linenos">47</span>
 <div class="viewcode-block" id="EmbeddingError">
 <a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.EmbeddingError">[docs]</a>
-<span class="linenos">34</span><span class="k">class</span><span class="w"> </span><span class="nc">EmbeddingError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="linenos">35</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when embedding generation fails.&quot;&quot;&quot;</span>
-<span class="linenos">36</span>
-<span class="linenos">37</span>    <span class="o">...</span></div>
+<span class="linenos">48</span><span class="k">class</span><span class="w"> </span><span class="nc">EmbeddingError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="linenos">49</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when embedding generation fails.&quot;&quot;&quot;</span>
+<span class="linenos">50</span>
+<span class="linenos">51</span>    <span class="o">...</span></div>
 
-<span class="linenos">38</span>
-<span class="linenos">39</span>
+<span class="linenos">52</span>
+<span class="linenos">53</span>
 <div class="viewcode-block" id="SpladeOOM">
 <a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.SpladeOOM">[docs]</a>
-<span class="linenos">40</span><span class="k">class</span><span class="w"> </span><span class="nc">SpladeOOM</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="linenos">41</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when SPLADE runs out of memory.&quot;&quot;&quot;</span>
-<span class="linenos">42</span>
-<span class="linenos">43</span>    <span class="o">...</span></div>
+<span class="linenos">54</span><span class="k">class</span><span class="w"> </span><span class="nc">SpladeOOM</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="linenos">55</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when SPLADE runs out of memory.&quot;&quot;&quot;</span>
+<span class="linenos">56</span>
+<span class="linenos">57</span>    <span class="o">...</span></div>
 
-<span class="linenos">44</span>
-<span class="linenos">45</span>
+<span class="linenos">58</span>
+<span class="linenos">59</span>
 <div class="viewcode-block" id="IndexBuildError">
 <a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.IndexBuildError">[docs]</a>
-<span class="linenos">46</span><span class="k">class</span><span class="w"> </span><span class="nc">IndexBuildError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="linenos">47</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when index construction fails.&quot;&quot;&quot;</span>
-<span class="linenos">48</span>
-<span class="linenos">49</span>    <span class="o">...</span></div>
+<span class="linenos">60</span><span class="k">class</span><span class="w"> </span><span class="nc">IndexBuildError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="linenos">61</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when index construction fails.&quot;&quot;&quot;</span>
+<span class="linenos">62</span>
+<span class="linenos">63</span>    <span class="o">...</span></div>
 
-<span class="linenos">50</span>
-<span class="linenos">51</span>
+<span class="linenos">64</span>
+<span class="linenos">65</span>
 <div class="viewcode-block" id="OntologyParseError">
 <a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.OntologyParseError">[docs]</a>
-<span class="linenos">52</span><span class="k">class</span><span class="w"> </span><span class="nc">OntologyParseError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="linenos">53</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when ontology parsing fails.&quot;&quot;&quot;</span>
-<span class="linenos">54</span>
-<span class="linenos">55</span>    <span class="o">...</span></div>
+<span class="linenos">66</span><span class="k">class</span><span class="w"> </span><span class="nc">OntologyParseError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="linenos">67</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when ontology parsing fails.&quot;&quot;&quot;</span>
+<span class="linenos">68</span>
+<span class="linenos">69</span>    <span class="o">...</span></div>
 
-<span class="linenos">56</span>
-<span class="linenos">57</span>
+<span class="linenos">70</span>
+<span class="linenos">71</span>
 <div class="viewcode-block" id="LinkerCalibrationError">
 <a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.LinkerCalibrationError">[docs]</a>
-<span class="linenos">58</span><span class="k">class</span><span class="w"> </span><span class="nc">LinkerCalibrationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="linenos">59</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when linker calibration cannot be performed.&quot;&quot;&quot;</span>
-<span class="linenos">60</span>
-<span class="linenos">61</span>    <span class="o">...</span></div>
+<span class="linenos">72</span><span class="k">class</span><span class="w"> </span><span class="nc">LinkerCalibrationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="linenos">73</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when linker calibration cannot be performed.&quot;&quot;&quot;</span>
+<span class="linenos">74</span>
+<span class="linenos">75</span>    <span class="o">...</span></div>
 
-<span class="linenos">62</span>
-<span class="linenos">63</span>
+<span class="linenos">76</span>
+<span class="linenos">77</span>
 <div class="viewcode-block" id="Neo4jError">
 <a class="viewcode-back" href="../../../autoapi/src/kgforge_common/errors/index.html#src.kgforge_common.errors.Neo4jError">[docs]</a>
-<span class="linenos">64</span><span class="k">class</span><span class="w"> </span><span class="nc">Neo4jError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="linenos">65</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when Neo4j operations fail.&quot;&quot;&quot;</span>
-<span class="linenos">66</span>
-<span class="linenos">67</span>    <span class="o">...</span></div>
+<span class="linenos">78</span><span class="k">class</span><span class="w"> </span><span class="nc">Neo4jError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="linenos">79</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when Neo4j operations fail.&quot;&quot;&quot;</span>
+<span class="linenos">80</span>
+<span class="linenos">81</span>    <span class="o">...</span></div>
 
 </pre></div>
 

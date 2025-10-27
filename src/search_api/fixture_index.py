@@ -1,4 +1,10 @@
-"""Module for search_api.fixture_index."""
+"""Module for search_api.fixture_index.
+
+NavMap:
+- tokenize: Tokenize.
+- FixtureDoc: Fixturedoc.
+- FixtureIndex: Fixtureindex.
+"""
 
 from __future__ import annotations
 

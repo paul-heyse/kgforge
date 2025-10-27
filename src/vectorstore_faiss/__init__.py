@@ -1,1 +1,1 @@
-"""Module for vectorstore_faiss.__init__."""
+"""Module for vectorstore_faiss."""

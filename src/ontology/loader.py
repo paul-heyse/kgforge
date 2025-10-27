@@ -1,4 +1,8 @@
-"""Module for ontology.loader."""
+"""Module for ontology.loader.
+
+NavMap:
+- OntologyLoader: Placeholder loader for ontology metadata.
+"""
 
 
 class OntologyLoader:

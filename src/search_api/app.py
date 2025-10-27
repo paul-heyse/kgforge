@@ -1,4 +1,15 @@
-"""Module for search_api.app."""
+"""Module for search_api.app.
+
+NavMap:
+- SearchRequest: Searchrequest.
+- SearchResult: Searchresult.
+- auth: Auth.
+- healthz: Healthz.
+- rrf_fuse: Rrf fuse.
+- apply_kg_boosts: Apply kg boosts.
+- search: Search.
+- graph_concepts: Graph concepts.
+"""
 
 from __future__ import annotations
 

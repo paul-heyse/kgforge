@@ -1,4 +1,11 @@
-"""Module for kgforge_common.models."""
+"""Module for kgforge_common.models.
+
+NavMap:
+- Doc: Doc.
+- DoctagsAsset: Doctagsasset.
+- Chunk: Chunk.
+- LinkAssertion: Linkassertion.
+"""
 
 from __future__ import annotations
 

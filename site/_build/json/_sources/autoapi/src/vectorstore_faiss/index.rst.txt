@@ -5,7 +5,7 @@ src.vectorstore_faiss
 
 .. autoapi-nested-parse::
 
-   Module for vectorstore_faiss.__init__.
+   Module for vectorstore_faiss.
 
 
 

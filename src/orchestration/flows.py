@@ -1,4 +1,9 @@
-"""Module for orchestration.flows."""
+"""Module for orchestration.flows.
+
+NavMap:
+- t_echo: T echo.
+- e2e_flow: E2e flow.
+"""
 
 from __future__ import annotations
 

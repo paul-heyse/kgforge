@@ -1,4 +1,8 @@
-"""Module for download.cli."""
+"""Module for download.cli.
+
+NavMap:
+- harvest: Harvest OA metadata and download PDFs (skeleton).
+"""
 
 from __future__ import annotations
 

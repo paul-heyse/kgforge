@@ -7,6 +7,9 @@ src.registry.api
 
    Module for registry.api.
 
+   NavMap:
+   - Registry: Registry protocol describing persistence operations.
+
 
 
 

@@ -1,1 +1,1 @@
-"""Module for embeddings_sparse.__init__."""
+"""Module for embeddings_sparse."""

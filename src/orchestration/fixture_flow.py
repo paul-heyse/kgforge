@@ -1,4 +1,13 @@
-"""Module for orchestration.fixture_flow."""
+"""Module for orchestration.fixture_flow.
+
+NavMap:
+- t_prepare_dirs: T prepare dirs.
+- t_write_fixture_chunks: T write fixture chunks.
+- t_write_fixture_dense: T write fixture dense.
+- t_write_fixture_splade: T write fixture splade.
+- t_register_in_duckdb: T register in duckdb.
+- fixture_pipeline: Fixture pipeline.
+"""
 
 from __future__ import annotations
 

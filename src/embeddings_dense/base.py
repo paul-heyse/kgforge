@@ -1,4 +1,8 @@
-"""Module for embeddings_dense.base."""
+"""Module for embeddings_dense.base.
+
+NavMap:
+- DenseEmbedder: Protocol describing a dense embedding provider.
+"""
 
 from __future__ import annotations
 

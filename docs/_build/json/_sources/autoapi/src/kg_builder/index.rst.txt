@@ -5,7 +5,7 @@ src.kg_builder
 
 .. autoapi-nested-parse::
 
-   Module for kg_builder.__init__.
+   Module for kg_builder.
 
 
 

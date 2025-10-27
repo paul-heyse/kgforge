@@ -1,4 +1,8 @@
-"""Module for registry.helper."""
+"""Module for registry.helper.
+
+NavMap:
+- DuckDBRegistryHelper: Duckdbregistryhelper.
+"""
 
 from __future__ import annotations
 

@@ -5,7 +5,7 @@ src.linking
 
 .. autoapi-nested-parse::
 
-   Module for linking.__init__.
+   Module for linking.
 
 
 

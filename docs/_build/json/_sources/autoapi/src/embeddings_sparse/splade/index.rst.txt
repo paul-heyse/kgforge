@@ -7,6 +7,12 @@ src.embeddings_sparse.splade
 
    Module for embeddings_sparse.splade.
 
+   NavMap:
+   - SPLADEv3Encoder: Spladev3encoder.
+   - PureImpactIndex: Toy 'impact' index that approximates SPLADE with IDF/log….
+   - LuceneImpactIndex: Pyserini SPLADE impact index wrapper.
+   - get_splade: Get splade.
+
 
 
 

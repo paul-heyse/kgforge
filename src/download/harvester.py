@@ -1,4 +1,8 @@
-"""Module for download.harvester."""
+"""Module for download.harvester.
+
+NavMap:
+- OpenAccessHarvester: Openaccessharvester.
+"""
 
 from __future__ import annotations
 

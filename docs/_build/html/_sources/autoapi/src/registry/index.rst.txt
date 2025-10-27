@@ -5,7 +5,7 @@ src.registry
 
 .. autoapi-nested-parse::
 
-   Module for registry.__init__.
+   Module for registry.
 
 
 

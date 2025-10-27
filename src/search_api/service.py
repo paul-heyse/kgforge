@@ -1,4 +1,10 @@
-"""Module for search_api.service."""
+"""Module for search_api.service.
+
+NavMap:
+- rrf_fuse: Reciprocal Rank Fusion skeleton.
+- apply_kg_boosts: Apply kg boosts.
+- mmr_deduplicate: Mmr deduplicate.
+"""
 
 from __future__ import annotations
 
