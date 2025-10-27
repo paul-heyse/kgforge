@@ -1,3 +1,7 @@
+"""Utilities to inject default module docstrings into the source tree."""
+
+from __future__ import annotations
+
 import ast
 from pathlib import Path
 
@@ -6,11 +10,13 @@ SRC = ROOT / "src"
 
 
 def module_name(path: Path) -> str:
+    """Return the dotted module path for a given source file."""
     rel = path.relative_to(SRC).with_suffix("")
     return str(rel).replace("/", ".")
 
 
 def needs_docstring(text: str) -> bool:
+    """Return True when the module lacks a top-level docstring."""
     try:
         tree = ast.parse(text)
     except SyntaxError:
@@ -19,6 +25,7 @@ def needs_docstring(text: str) -> bool:
 
 
 def insert_docstring(path: Path) -> bool:
+    """Insert a module docstring if the file does not already have one."""
     text = path.read_text()
     if not needs_docstring(text):
         return False
@@ -35,7 +42,8 @@ def insert_docstring(path: Path) -> bool:
     return True
 
 
-def main():
+def main() -> None:
+    """Entry point when invoked as a script."""
     for path in SRC.rglob("*.py"):
         insert_docstring(path)
 

@@ -17,11 +17,13 @@ from kgforge.kgforge_common.models import Doc, DoctagsAsset
 class DuckDBRegistry:
     """Minimal DuckDB-backed registry (skeleton)."""
 
-    def __init__(self, db_path: str):
+    def __init__(self, db_path: str) -> None:
         """Init.
 
-        Args:
-            db_path (str): TODO.
+        Parameters
+        ----------
+        db_path : str
+            TODO.
         """
         self.db_path = db_path
         self.con = duckdb.connect(db_path, read_only=False)
@@ -30,12 +32,17 @@ class DuckDBRegistry:
     def begin_dataset(self, kind: str, run_id: str) -> str:
         """Begin dataset.
 
-        Args:
-            kind (str): TODO.
-            run_id (str): TODO.
+        Parameters
+        ----------
+        kind : str
+            TODO.
+        run_id : str
+            TODO.
 
-        Returns:
-            str: TODO.
+        Returns
+        -------
+        str
+            TODO.
         """
         dsid = str(uuid.uuid4())
         self.con.execute(
@@ -51,13 +58,19 @@ class DuckDBRegistry:
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
         """Commit dataset.
 
-        Args:
-            dataset_id (str): TODO.
-            parquet_root (str): TODO.
-            rows (int): TODO.
+        Parameters
+        ----------
+        dataset_id : str
+            TODO.
+        parquet_root : str
+            TODO.
+        rows : int
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         self.con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
@@ -66,11 +79,15 @@ class DuckDBRegistry:
     def rollback_dataset(self, dataset_id: str) -> None:
         """Rollback dataset.
 
-        Args:
-            dataset_id (str): TODO.
+        Parameters
+        ----------
+        dataset_id : str
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         self.con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
 
@@ -83,14 +100,21 @@ class DuckDBRegistry:
     ) -> str:
         """Insert run.
 
-        Args:
-            purpose (str): TODO.
-            model_id (str | None): TODO.
-            revision (str | None): TODO.
-            config (dict): TODO.
+        Parameters
+        ----------
+        purpose : str
+            TODO.
+        model_id : str | None
+            TODO.
+        revision : str | None
+            TODO.
+        config : dict
+            TODO.
 
-        Returns:
-            str: TODO.
+        Returns
+        -------
+        str
+            TODO.
         """
         run_id = str(uuid.uuid4())
         self.con.execute(
@@ -106,24 +130,34 @@ class DuckDBRegistry:
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
         """Close run.
 
-        Args:
-            run_id (str): TODO.
-            success (bool): TODO.
-            notes (str | None): TODO.
+        Parameters
+        ----------
+        run_id : str
+            TODO.
+        success : bool
+            TODO.
+        notes : str | None
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         self.con.execute("UPDATE runs SET finished_at=now() WHERE run_id=?", [run_id])
 
     def register_documents(self, docs: list[Doc]) -> None:
         """Register documents.
 
-        Args:
-            docs (List[Doc]): TODO.
+        Parameters
+        ----------
+        docs : List[Doc]
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         for d in docs:
             self.con.execute(
@@ -153,11 +187,15 @@ class DuckDBRegistry:
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
         """Register doctags.
 
-        Args:
-            assets (List[DoctagsAsset]): TODO.
+        Parameters
+        ----------
+        assets : List[DoctagsAsset]
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         for a in assets:
             self.con.execute(
@@ -172,13 +210,19 @@ class DuckDBRegistry:
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
         """Emit event.
 
-        Args:
-            event_name (str): TODO.
-            subject_id (str): TODO.
-            payload (Dict): TODO.
+        Parameters
+        ----------
+        event_name : str
+            TODO.
+        subject_id : str
+            TODO.
+        payload : Dict
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         self.con.execute(
             (
@@ -192,14 +236,21 @@ class DuckDBRegistry:
     def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
         """Incident.
 
-        Args:
-            event (str): TODO.
-            subject_id (str): TODO.
-            error_class (str): TODO.
-            message (str): TODO.
+        Parameters
+        ----------
+        event : str
+            TODO.
+        subject_id : str
+            TODO.
+        error_class : str
+            TODO.
+        message : str
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         self.con.execute(
             (

@@ -19,13 +19,17 @@ class KGForgeClient:
         base_url: str = "http://localhost:8080",
         api_key: str | None = None,
         timeout: float = 30.0,
-    ):
+    ) -> None:
         """Init.
 
-        Args:
-            base_url (str): TODO.
-            api_key (Optional[str]): TODO.
-            timeout (float): TODO.
+        Parameters
+        ----------
+        base_url : str
+            TODO.
+        api_key : Optional[str]
+            TODO.
+        timeout : float
+            TODO.
         """
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
@@ -34,8 +38,10 @@ class KGForgeClient:
     def _headers(self) -> dict[str, str]:
         """Headers.
 
-        Returns:
-            Dict[str, str]: TODO.
+        Returns
+        -------
+        Dict[str, str]
+            TODO.
         """
         h = {"Content-Type": "application/json"}
         if self.api_key:
@@ -45,8 +51,10 @@ class KGForgeClient:
     def healthz(self) -> dict[str, Any]:
         """Healthz.
 
-        Returns:
-            Dict[str, Any]: TODO.
+        Returns
+        -------
+        Dict[str, Any]
+            TODO.
         """
         r = requests.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
@@ -61,14 +69,21 @@ class KGForgeClient:
     ) -> dict[str, Any]:
         """Search.
 
-        Args:
-            query (str): TODO.
-            k (int): TODO.
-            filters (Optional[Dict[str, Any]]): TODO.
-            explain (bool): TODO.
+        Parameters
+        ----------
+        query : str
+            TODO.
+        k : int
+            TODO.
+        filters : Optional[Dict[str, Any]]
+            TODO.
+        explain : bool
+            TODO.
 
-        Returns:
-            Dict[str, Any]: TODO.
+        Returns
+        -------
+        Dict[str, Any]
+            TODO.
         """
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = requests.post(
@@ -80,12 +95,17 @@ class KGForgeClient:
     def concepts(self, q: str, limit: int = 50) -> dict[str, Any]:
         """Concepts.
 
-        Args:
-            q (str): TODO.
-            limit (int): TODO.
+        Parameters
+        ----------
+        q : str
+            TODO.
+        limit : int
+            TODO.
 
-        Returns:
-            Dict[str, Any]: TODO.
+        Returns
+        -------
+        Dict[str, Any]
+            TODO.
         """
         r = requests.post(
             f"{self.base_url}/graph/concepts",

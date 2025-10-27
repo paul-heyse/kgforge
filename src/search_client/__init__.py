@@ -4,6 +4,6 @@ NavMap:
 - KGForgeClient: Kgforgeclient.
 """
 
-from .client import KGForgeClient
+from search_client.client import KGForgeClient
 
 __all__ = ["KGForgeClient"]

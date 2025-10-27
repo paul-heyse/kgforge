@@ -23,11 +23,15 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 def toks(s: str) -> list[str]:
     """Toks.
 
-    Args:
-        s (str): TODO.
+    Parameters
+    ----------
+    s : str
+        TODO.
 
-    Returns:
-        List[str]: TODO.
+    Returns
+    -------
+    List[str]
+        TODO.
     """
     return [t.lower() for t in TOKEN_RE.findall(s or "")]
 
@@ -47,12 +51,15 @@ class BM25Doc:
 class BM25Index:
     """Bm25index."""
 
-    def __init__(self, k1: float = 0.9, b: float = 0.4):
+    def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
         """Init.
 
-        Args:
-            k1 (float): TODO.
-            b (float): TODO.
+        Parameters
+        ----------
+        k1 : float
+            TODO.
+        b : float
+            TODO.
         """
         self.k1 = k1
         self.b = b
@@ -65,11 +72,15 @@ class BM25Index:
     def build_from_duckdb(cls, db_path: str) -> BM25Index:
         """Build from duckdb.
 
-        Args:
-            db_path (str): TODO.
+        Parameters
+        ----------
+        db_path : str
+            TODO.
 
-        Returns:
-            "BM25Index": TODO.
+        Returns
+        -------
+        "BM25Index"
+            TODO.
         """
         idx = cls()
         con = duckdb.connect(db_path)
@@ -96,7 +107,8 @@ class BM25Index:
     def _build(self, rows: Iterable[tuple[str, str, str, str, str]]) -> None:
         """Build.
 
-        Args:
+        Parameters
+        ----------
             rows: TODO.
         """
         self.docs.clear()
@@ -130,11 +142,15 @@ class BM25Index:
     def save(self, path: str) -> None:
         """Save.
 
-        Args:
-            path (str): TODO.
+        Parameters
+        ----------
+        path : str
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as f:
@@ -154,11 +170,15 @@ class BM25Index:
     def load(cls, path: str) -> BM25Index:
         """Load.
 
-        Args:
-            path (str): TODO.
+        Parameters
+        ----------
+        path : str
+            TODO.
 
-        Returns:
-            "BM25Index": TODO.
+        Returns
+        -------
+        "BM25Index"
+            TODO.
         """
         with open(path, "rb") as f:
             d = pickle.load(f)
@@ -172,11 +192,15 @@ class BM25Index:
     def _idf(self, term: str) -> float:
         """Idf.
 
-        Args:
-            term (str): TODO.
+        Parameters
+        ----------
+        term : str
+            TODO.
 
-        Returns:
-            float: TODO.
+        Returns
+        -------
+        float
+            TODO.
         """
         df = self.df.get(term, 0)
         return math.log((self.N - df + 0.5) / (df + 0.5) + 1.0) if self.N > 0 and df > 0 else 0.0
@@ -184,9 +208,12 @@ class BM25Index:
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
         """Search.
 
-        Args:
-            query (str): TODO.
-            k (int): TODO.
+        Parameters
+        ----------
+        query : str
+            TODO.
+        k : int
+            TODO.
         """
         if self.N == 0:
             return []
@@ -208,10 +235,14 @@ class BM25Index:
     def doc(self, idx: int) -> BM25Doc:
         """Doc.
 
-        Args:
-            idx (int): TODO.
+        Parameters
+        ----------
+        idx : int
+            TODO.
 
-        Returns:
-            BM25Doc: TODO.
+        Returns
+        -------
+        BM25Doc
+            TODO.
         """
         return self.docs[idx]

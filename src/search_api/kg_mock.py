@@ -23,11 +23,15 @@ _CONCEPTS = {
 def detect_query_concepts(query: str) -> list[str]:
     """Detect query concepts.
 
-    Args:
-        query (str): TODO.
+    Parameters
+    ----------
+    query : str
+        TODO.
 
-    Returns:
-        List[str]: TODO.
+    Returns
+    -------
+    List[str]
+        TODO.
     """
     q = query.lower()
     hits = []
@@ -40,11 +44,15 @@ def detect_query_concepts(query: str) -> list[str]:
 def linked_concepts_for_text(text: str) -> list[str]:
     """Linked concepts for text.
 
-    Args:
-        text (str): TODO.
+    Parameters
+    ----------
+    text : str
+        TODO.
 
-    Returns:
-        List[str]: TODO.
+    Returns
+    -------
+    List[str]
+        TODO.
     """
     t = text.lower()
     hits = []
@@ -62,13 +70,20 @@ def kg_boost(
 ) -> float:
     """Kg boost.
 
-    Args:
-        query_concepts (List[str]): TODO.
-        chunk_concepts (List[str]): TODO.
-        direct (float): TODO.
-        one_hop (float): TODO.
+    Parameters
+    ----------
+    query_concepts : List[str]
+        TODO.
+    chunk_concepts : List[str]
+        TODO.
+    direct : float
+        TODO.
+    one_hop : float
+        TODO.
 
-    Returns:
-        float: TODO.
+    Returns
+    -------
+    float
+        TODO.
     """
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

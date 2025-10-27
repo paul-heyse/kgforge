@@ -14,11 +14,15 @@ from prefect import flow, task
 def t_echo(msg: str) -> str:
     """T echo.
 
-    Args:
-        msg (str): TODO.
+    Parameters
+    ----------
+    msg : str
+        TODO.
 
-    Returns:
-        str: TODO.
+    Returns
+    -------
+    str
+        TODO.
     """
     return msg
 

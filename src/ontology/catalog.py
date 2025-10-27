@@ -12,23 +12,30 @@ from kgforge.kgforge_common.models import Concept
 class OntologyCatalog:
     """Ontologycatalog."""
 
-    def __init__(self, concepts: list[Concept]):
+    def __init__(self, concepts: list[Concept]) -> None:
         """Init.
 
-        Args:
-            concepts (List[Concept]): TODO.
+        Parameters
+        ----------
+        concepts : List[Concept]
+            TODO.
         """
         self.by_id = {c.id: c for c in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> list[str]:
         """Neighbors.
 
-        Args:
-            concept_id (str): TODO.
-            depth (int): TODO.
+        Parameters
+        ----------
+        concept_id : str
+            TODO.
+        depth : int
+            TODO.
 
-        Returns:
-            List[str]: TODO.
+        Returns
+        -------
+        List[str]
+            TODO.
         """
-        # TODO: return neighbor concept IDs up to depth.
+        # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return []

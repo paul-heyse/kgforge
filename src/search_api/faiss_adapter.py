@@ -40,13 +40,19 @@ class DenseVecs:
 class FaissAdapter:
     """Faissadapter."""
 
-    def __init__(self, db_path: str, factory: str = "OPQ64,IVF8192,PQ64", metric: str = "ip"):
+    def __init__(
+        self, db_path: str, factory: str = "OPQ64,IVF8192,PQ64", metric: str = "ip"
+    ) -> None:
         """Init.
 
-        Args:
-            db_path (str): TODO.
-            factory (str): TODO.
-            metric (str): TODO.
+        Parameters
+        ----------
+        db_path : str
+            TODO.
+        factory : str
+            TODO.
+        metric : str
+            TODO.
         """
         self.db_path = db_path
         self.factory = factory
@@ -58,18 +64,22 @@ class FaissAdapter:
     def _load_dense_parquet(self) -> DenseVecs:
         """Load dense parquet.
 
-        Returns:
-            DenseVecs: TODO.
+        Returns
+        -------
+        DenseVecs
+            TODO.
         """
         if not Path(self.db_path).exists():
-            raise RuntimeError("DuckDB registry not found")
+            message = "DuckDB registry not found"
+            raise RuntimeError(message)
         con = duckdb.connect(self.db_path)
         try:
             dr = con.execute(
                 "SELECT parquet_root, dim FROM dense_runs ORDER BY created_at DESC LIMIT 1"
             ).fetchone()
             if not dr:
-                raise RuntimeError("No dense_runs found")
+                message = "No dense_runs found"
+                raise RuntimeError(message)
             root = dr[0]
             rows = con.execute(
                 f"""
@@ -88,8 +98,10 @@ class FaissAdapter:
     def build(self) -> None:
         """Build.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         vecs = self._load_dense_parquet()
         self.vecs = vecs
@@ -117,11 +129,15 @@ class FaissAdapter:
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
         """Load or build.
 
-        Args:
-            cpu_index_path (Optional[str]): TODO.
+        Parameters
+        ----------
+        cpu_index_path : Optional[str]
+            TODO.
 
-        Returns:
-            None: TODO.
+        Returns
+        -------
+        None
+            TODO.
         """
         try:
             if HAVE_FAISS and cpu_index_path and Path(cpu_index_path).exists():
@@ -145,18 +161,24 @@ class FaissAdapter:
     def search(self, qvec: np.ndarray, k: int = 10) -> list[tuple[str, float]]:
         """Search.
 
-        Args:
-            qvec (np.ndarray): TODO.
-            k (int): TODO.
+        Parameters
+        ----------
+        qvec : np.ndarray
+            TODO.
+        k : int
+            TODO.
 
-        Returns:
-            List[Tuple[str, float]]: TODO.
+        Returns
+        -------
+        List[Tuple[str, float]]
+            TODO.
         """
         if self.vecs is None and self.index is None:
             return []
         if HAVE_FAISS and self.index is not None:
             if self.idmap is None:
-                raise RuntimeError("ID mapping not loaded for FAISS index")
+                message = "ID mapping not loaded for FAISS index"
+                raise RuntimeError(message)
             q = qvec[None, :].astype(np.float32, copy=False)
             distances, indices = self.index.search(q, k)
             out = []
@@ -167,7 +189,8 @@ class FaissAdapter:
             return out
         # numpy brute force
         if self.vecs is None:
-            raise RuntimeError("Dense vectors not loaded")
+            message = "Dense vectors not loaded"
+            raise RuntimeError(message)
         mat = self.vecs.mat
         q = qvec.astype(np.float32, copy=False)
         q /= np.linalg.norm(q) + 1e-9

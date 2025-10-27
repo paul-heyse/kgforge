@@ -1,7 +1,7 @@
 
 .PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings readmes html json symbols watch
 
-VENV := .venv
+VENV := .kgforge-venv
 PY := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 UVICORN := $(VENV)/bin/uvicorn
@@ -30,15 +30,19 @@ test:
 	$(PYTEST) -q
 
 fmt:
+	$(VENV)/bin/ruff check --select I --fix src tests
 	$(VENV)/bin/ruff check --fix src tests
+	$(VENV)/bin/ruff format src tests
 	$(VENV)/bin/black src tests
 
 lint:
+	$(VENV)/bin/ruff check --select I src tests
 	$(VENV)/bin/ruff check src tests
+	$(VENV)/bin/ruff format --check src tests
 	$(VENV)/bin/mypy src
 
 clean:
-	rm -rf .venv .mypy_cache .ruff_cache .pytest_cache dist build
+	rm -rf .kgforge-venv .mypy_cache .ruff_cache .pytest_cache dist build
 
 mock:
 	$(PY) -m tests.mock_servers.run_all
@@ -49,7 +53,7 @@ fixture:
 docstrings:
 	@for pkg in $(PKGS); do \
 		echo "Updating docstrings for $$pkg"; \
-	$(VENV)/bin/doq --formatter google -t tools/doq_templates/google -w -r -d src/$$pkg; \
+	$(VENV)/bin/doq --formatter numpy -t tools/doq_templates/numpy -w -r -d src/$$pkg; \
 	done
 	$(PY) tools/update_navmaps.py
 	$(VENV)/bin/docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i src || true

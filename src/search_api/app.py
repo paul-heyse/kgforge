@@ -3,12 +3,12 @@
 NavMap:
 - SearchRequest: Searchrequest.
 - SearchResult: Searchresult.
-- auth: Auth.
+- auth: Validate the bearer-token header for protected endpoints.
 - healthz: Healthz.
-- rrf_fuse: Rrf fuse.
-- apply_kg_boosts: Apply kg boosts.
-- search: Search.
-- graph_concepts: Graph concepts.
+- rrf_fuse: Fuse ranked lists using reciprocal rank fusion.
+- apply_kg_boosts: Apply knowledge-graph boosting heuristics.
+- search: Execute a search request across dense and sparse indices.
+- graph_concepts: Return KG concepts that match the provided query fragment.
 """
 
 from __future__ import annotations
@@ -24,9 +24,9 @@ from kgforge.embeddings_sparse.splade import get_splade
 from kgforge.kg_builder.mock_kg import MockKG
 from kgforge.vectorstore_faiss.gpu import FaissGpuIndex
 
-from .schemas import SearchRequest, SearchResult
+from search_api.schemas import SearchRequest, SearchResult
 
-API_KEYS: set[str] = set()  # TODO: load from env SEARCH_API_KEYS
+API_KEYS: set[str] = set()  # NOTE: load from env SEARCH_API_KEYS when secrets wiring is ready
 
 app = FastAPI(title="KGForge Search API", version="0.2.0")
 
@@ -85,13 +85,17 @@ kg.add_edge("C:42", "C:99")
 
 
 def auth(authorization: str | None = Header(default=None)) -> None:
-    """Auth.
+    """Validate the bearer-token header for protected endpoints.
 
-    Args:
-        authorization (Optional[str]): TODO.
+    Parameters
+    ----------
+    authorization : str | None, optional
+        TODO.
 
-    Returns:
-        None: TODO.
+    Returns
+    -------
+    None
+        TODO.
     """
     if not API_KEYS:
         return  # disabled in skeleton
@@ -118,14 +122,19 @@ def healthz() -> dict[str, Any]:
 
 
 def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, float]:
-    """Rrf fuse.
+    """Fuse ranked lists using reciprocal rank fusion.
 
-    Args:
-        lists (List[List[Tuple[str, float]]]): TODO.
-        k_rrf (int): TODO.
+    Parameters
+    ----------
+    lists : list[list[tuple[str, float]]]
+        TODO.
+    k_rrf : int
+        TODO.
 
-    Returns:
-        Dict[str, float]: TODO.
+    Returns
+    -------
+    dict[str, float]
+        TODO.
     """
     scores: dict[str, float] = {}
     for hits in lists:
@@ -140,22 +149,29 @@ def apply_kg_boosts(
     direct: float = 0.08,
     one_hop: float = 0.04,
 ) -> dict[str, float]:
-    """Apply kg boosts.
+    """Apply knowledge-graph boosting heuristics.
 
-    Args:
-        cands (Dict[str, float]): TODO.
-        query (str): TODO.
-        direct: TODO.
-        one_hop: TODO.
+    Parameters
+    ----------
+    cands : dict[str, float]
+        TODO.
+    query : str
+        TODO.
+    direct : float, default=0.08
+        TODO.
+    one_hop : float, default=0.04
+        TODO.
 
-    Returns:
-        Dict[str, float]: TODO.
+    Returns
+    -------
+    dict[str, float]
+        TODO.
     """
     # toy: map words 'concept42' to concept id
     q_concepts = set()
     for w in query.lower().split():
         if w.startswith("concept"):
-            q_concepts.add(f"C:{w.replace('concept','')}")
+            q_concepts.add(f"C:{w.replace('concept', '')}")
     out = dict(cands)
     for chunk_id, base in cands.items():
         linked = set(kg.linked_concepts(chunk_id))
@@ -173,16 +189,18 @@ def apply_kg_boosts(
 
 @app.post("/search", response_model=dict)
 def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
-    """Search.
+    """Execute a search request across dense and sparse indices.
 
-    Args:
-        req (SearchRequest): TODO.
-        _: TODO.
+    Parameters
+    ----------
+    req : SearchRequest
+        TODO.
+    _ : None
+        TODO.
     """
     # Retrieve from each channel
-    dense_hits: list[tuple[str, float]] = (
-        []
-    )  # we don't have a query embedder here; fallback to empty or demo vector
+    # We don't have a query embedder here; fallback to empty or demo vector
+    dense_hits: list[tuple[str, float]] = []
     # sparse via BM25 (preferred) and SPLADE
     bm25_hits = bm25.search(req.query, k=CFG["search"]["sparse_candidates"]) if bm25 else []
     try:
@@ -233,11 +251,14 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
 
 @app.post("/graph/concepts", response_model=dict)
 def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str, Any]:
-    """Graph concepts.
+    """Return KG concepts that match the provided query fragment.
 
-    Args:
-        body (dict): TODO.
-        _: TODO.
+    Parameters
+    ----------
+    body : Mapping[str, Any]
+        TODO.
+    _ : None
+        TODO.
     """
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring

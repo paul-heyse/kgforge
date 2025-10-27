@@ -64,7 +64,7 @@ if you need to adjust behavior.
 - `make readmes`: regenerates package READMEs.
 - `make html/json/symbols`: Sphinx builders for HTML, JSON corpus, and `docs/_build/symbols.json`.
 - `make watch`: runs `sphinx-autobuild` (auto rebuild+serve).
-- `make bootstrap`: creates `.venv`, installs `pip install -e "[dev,docs]"`, sets up pre-commit.
+- `make bootstrap`: creates `.kgforge-venv`, installs `pip install -e "[dev,docs]"`, sets up pre-commit.
 
 ---
 
@@ -138,7 +138,7 @@ Run all hooks manually with `pre-commit run --all-files`.
 5. **Type Checking**
    - `mypy.ini` is configured with `mypy_path = src` and ignores for third-party packages lacking stubs (duckdb, faiss, etc.).
 6. **Docstring Templates**
-   - Located under `tools/doq_templates/google/` and used by `doq` during `make docstrings`.
+   - Located under `tools/doq_templates/numpy/` and used by `doq` during `make docstrings` to emit NumPy-style docstrings.
 7. **Environment Variables**
    - `DOCS_EDITOR` for editor scheme (`vscode`, `pycharm`).
    - `SPHINX_AUTOBUILD_PORT` to change the live server port.

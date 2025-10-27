@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+"""Pre-commit helper to run docformatter and report touched files."""
+
 from __future__ import annotations
 
 import subprocess
@@ -6,6 +8,13 @@ import sys
 
 
 def git_diff_names() -> set[str]:
+    """Return the set of files currently reported by ``git diff --name-only``.
+
+    Returns
+    -------
+    set[str]
+        Relative paths of files with unstaged or staged modifications.
+    """
     result = subprocess.run(
         ["git", "diff", "--name-only"],
         check=True,
@@ -16,6 +25,13 @@ def git_diff_names() -> set[str]:
 
 
 def main() -> int:
+    """Execute docformatter and print any files it modifies.
+
+    Returns
+    -------
+    int
+        Process exit code (0 on success, docformatter exit code otherwise).
+    """
     repo = subprocess.run(
         ["git", "rev-parse", "--show-toplevel"],
         check=True,

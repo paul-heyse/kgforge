@@ -79,11 +79,11 @@ def index_faiss(
     with open(dense_vectors, encoding="utf-8") as fh:
         vecs = json.load(fh)
     keys = [r["key"] for r in vecs]
-    X = np.array([r["vector"] for r in vecs], dtype="float32")
+    vectors = np.array([r["vector"] for r in vecs], dtype="float32")
     # Train and add
     vs = FaissGpuIndex()
-    vs.train(X[: min(len(X), 10000)])  # small train set
-    vs.add(keys, X)
+    vs.train(vectors[: min(len(vectors), 10000)])  # small train set
+    vs.add(keys, vectors)
     # Save CPU form when possible
     try:
         vs.save(index_path, None)

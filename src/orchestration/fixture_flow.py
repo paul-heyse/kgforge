@@ -6,7 +6,7 @@ NavMap:
 - t_write_fixture_dense: T write fixture dense.
 - t_write_fixture_splade: T write fixture splade.
 - t_register_in_duckdb: T register in duckdb.
-- fixture_pipeline: Fixture pipeline.
+- fixture_pipeline: Run the end-to-end fixture pipeline.
 """
 
 from __future__ import annotations
@@ -23,11 +23,15 @@ from prefect import flow, task
 def t_prepare_dirs(root: str) -> dict[str, bool]:
     """T prepare dirs.
 
-    Args:
-        root (str): TODO.
+    Parameters
+    ----------
+    root : str
+        TODO.
 
-    Returns:
-        dict: TODO.
+    Returns
+    -------
+    dict
+        TODO.
     """
     p = Path(root)
     (p / "parquet" / "dense").mkdir(parents=True, exist_ok=True)
@@ -41,11 +45,15 @@ def t_prepare_dirs(root: str) -> dict[str, bool]:
 def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
     """T write fixture chunks.
 
-    Args:
-        chunks_root (str): TODO.
+    Parameters
+    ----------
+    chunks_root : str
+        TODO.
 
-    Returns:
-        tuple[str, int]: TODO.
+    Returns
+    -------
+    tuple[str, int]
+        TODO.
     """
     writer = ParquetChunkWriter(chunks_root, model="docling_hybrid", run_id="fixture")
     rows = [
@@ -69,11 +77,15 @@ def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
 def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
     """T write fixture dense.
 
-    Args:
-        dense_root (str): TODO.
+    Parameters
+    ----------
+    dense_root : str
+        TODO.
 
-    Returns:
-        tuple[str, int]: TODO.
+    Returns
+    -------
+    tuple[str, int]
+        TODO.
     """
     w = ParquetVectorWriter(dense_root)
     vec = [0.0] * 2560
@@ -87,11 +99,15 @@ def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
 def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
     """T write fixture splade.
 
-    Args:
-        sparse_root (str): TODO.
+    Parameters
+    ----------
+    sparse_root : str
+        TODO.
 
-    Returns:
-        tuple[str, int]: TODO.
+    Returns
+    -------
+    tuple[str, int]
+        TODO.
     """
     w = ParquetVectorWriter(sparse_root)
     out_root = w.write_splade(
@@ -112,14 +128,18 @@ def t_register_in_duckdb(
 ) -> dict[str, list[str]]:
     """T register in duckdb.
 
-    Args:
-        db_path (str): TODO.
+    Parameters
+    ----------
+    db_path : str
+        TODO.
         chunks_info: TODO.
         dense_info: TODO.
         sparse_info: TODO.
 
-    Returns:
-        dict: TODO.
+    Returns
+    -------
+    dict
+        TODO.
     """
     reg = DuckDBRegistryHelper(db_path)
     dense_run = reg.new_run("dense_embed", "Qwen3-Embedding-4B", "main", {"dim": 2560})
@@ -158,18 +178,20 @@ def t_register_in_duckdb(
 def fixture_pipeline(
     root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb"
 ) -> dict[str, list[str]]:
-    """Fixture pipeline.
+    """Run the end-to-end fixture pipeline.
 
-    Args:
-        root (str): TODO.
-        db_path (str): TODO.
+    Parameters
+    ----------
+    root : str, default="/data"
+        TODO.
+    db_path : str, default="/data/catalog/catalog.duckdb"
+        TODO.
     """
     t_prepare_dirs(root)
     chunks_info = t_write_fixture_chunks(f"{root}/parquet/chunks")
     dense_info = t_write_fixture_dense(f"{root}/parquet/dense")
     sparse_info = t_write_fixture_splade(f"{root}/parquet/sparse")
-    summary = t_register_in_duckdb(db_path, chunks_info, dense_info, sparse_info)
-    return summary
+    return t_register_in_duckdb(db_path, chunks_info, dense_info, sparse_info)
 
 
 if __name__ == "__main__":

@@ -5,7 +5,6 @@ from multiprocessing import Process
 import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-
 from tests.mock_servers.openalex_mock import app as openalex_app
 from tests.mock_servers.unpaywall_mock import app as unpaywall_app
 

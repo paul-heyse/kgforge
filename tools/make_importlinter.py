@@ -1,5 +1,5 @@
-"""
-Create a .importlinter file with a default layered-architecture contract.
+"""Create a .importlinter file with a default layered-architecture contract.
+
 Detects the root package automatically (prefers src/<pkg>).
 """
 

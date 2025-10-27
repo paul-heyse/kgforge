@@ -20,11 +20,15 @@ TOKEN = re.compile(r"[A-Za-z0-9]+")
 def tok(s: str) -> list[str]:
     """Tok.
 
-    Args:
-        s (str): TODO.
+    Parameters
+    ----------
+    s : str
+        TODO.
 
-    Returns:
-        List[str]: TODO.
+    Returns
+    -------
+    List[str]
+        TODO.
     """
     return [t.lower() for t in TOKEN.findall(s or "")]
 
@@ -47,13 +51,17 @@ class SpladeIndex:
         db_path: str,
         chunks_dataset_root: str | None = None,
         sparse_root: str | None = None,
-    ):
+    ) -> None:
         """Init.
 
-        Args:
-            db_path (str): TODO.
-            chunks_dataset_root (Optional[str]): TODO.
-            sparse_root (Optional[str]): TODO.
+        Parameters
+        ----------
+        db_path : str
+            TODO.
+        chunks_dataset_root : Optional[str]
+            TODO.
+        sparse_root : Optional[str]
+            TODO.
         """
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -64,8 +72,10 @@ class SpladeIndex:
     def _load(self, chunks_root: str | None) -> None:
         """Load.
 
-        Args:
-            chunks_root (Optional[str]): TODO.
+        Parameters
+        ----------
+        chunks_root : Optional[str]
+            TODO.
         """
         if not Path(self.db_path).exists():
             return
@@ -96,12 +106,17 @@ class SpladeIndex:
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
         """Search.
 
-        Args:
-            query (str): TODO.
-            k (int): TODO.
+        Parameters
+        ----------
+        query : str
+            TODO.
+        k : int
+            TODO.
 
-        Returns:
-            List[Tuple[int, float]]: TODO.
+        Returns
+        -------
+        List[Tuple[int, float]]
+            TODO.
         """
         if self.N == 0:
             return []
@@ -125,10 +140,14 @@ class SpladeIndex:
     def doc(self, i: int) -> SpladeDoc:
         """Doc.
 
-        Args:
-            i (int): TODO.
+        Parameters
+        ----------
+        i : int
+            TODO.
 
-        Returns:
-            SpladeDoc: TODO.
+        Returns
+        -------
+        SpladeDoc
+            TODO.
         """
         return self.docs[i]

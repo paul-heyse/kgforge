@@ -47,7 +47,7 @@ Absolutely—here’s an **updated, repo‑aware guide** that folds in your repo
 # Keep your line-length/target-version; add determinism and repo awareness.
 line-length = 100
 target-version = "py313"
-required-version = ">=0.5.0"        # pin to the version you run in CI
+required-version = ">=0.14.2"        # pin to the version you run in CI
 output-format = "grouped"           # easier to parse in CI logs
 src = ["src"]                       # repo uses a src/ layout
 
@@ -271,4 +271,3 @@ ruff check --select I --fix && ruff check --fix && ruff format \
 This respects your docs automation and existing test layout.  
 
 ---
-

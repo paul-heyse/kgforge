@@ -1,0 +1,274 @@
+Metadata-Version: 2.4
+Name: kgforge
+Version: 0.1.0
+Summary: kgforge
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: httpx>=0.28.1
+Requires-Dist: hishel>=0.1.0
+Requires-Dist: certifi>=2025.10.5
+Requires-Dist: pyrate-limiter>=3.9
+Requires-Dist: url-normalize>=2.2.0
+Requires-Dist: uvicorn>=0.38.0
+Requires-Dist: fastapi>=0.115.0
+Requires-Dist: pyarrow>=21.0.0
+Requires-Dist: numpy>=2.2.6
+Requires-Dist: jsonlines>=4.0.0
+Requires-Dist: libarchive-c>=5.3
+Requires-Dist: pydantic>=2.0
+Requires-Dist: pydantic-core>=2.41.4
+Requires-Dist: pydantic-settings>=2.11.0
+Requires-Dist: docling-core>=2.48.4
+Requires-Dist: pyalex>=0.18
+Requires-Dist: waybackpy>=3.0.6
+Requires-Dist: bioregistry>=0.12.43
+Requires-Dist: arelle>=2.2
+Requires-Dist: rdflib>=7.2.1
+Requires-Dist: trafilatura>=2.0.0
+Requires-Dist: beautifulsoup4>=4.14.2
+Requires-Dist: transformers>=4.57.1
+Requires-Dist: prometheus-client>=0.23.1
+Requires-Dist: tenacity>=9.1.2
+Requires-Dist: pybreaker
+Requires-Dist: typer>=0.19.2
+Requires-Dist: rich>=14.2.0
+Requires-Dist: tqdm>=4.67.1
+Requires-Dist: mypy>=1.11.0
+Requires-Dist: mypy-extensions>=1.0.0
+Requires-Dist: types-requests>=2.32.0.20241016
+Requires-Dist: types-PyYAML>=6.0.12.20240917
+Requires-Dist: black
+Requires-Dist: ruff
+Requires-Dist: filelock>=3.20.0
+Requires-Dist: platformdirs>=4.5.0
+Requires-Dist: typing-extensions>=4.15.0
+Requires-Dist: pyyaml>=6
+Requires-Dist: jsonschema>=4.25.1
+Requires-Dist: pytest>=8.4.2
+Requires-Dist: pytest-cov>=7.0.0
+Requires-Dist: pytest-logging>=2015.11.4
+Requires-Dist: hypothesis>=6.141.0
+Requires-Dist: requests>=2.32.5
+Requires-Dist: psutil>=7.1.0
+Requires-Dist: boto3
+Requires-Dist: psycopg>=3
+Requires-Dist: psycopg-pool
+Requires-Dist: sqlalchemy>=2.0.44
+Requires-Dist: redis>=6.4.0
+Requires-Dist: polars
+Requires-Dist: duckdb>=1.4.1
+Provides-Extra: gpu
+Requires-Dist: cython>=3.2.0b1; extra == "gpu"
+Requires-Dist: nvidia-cublas>=12.9.1.4; extra == "gpu"
+Requires-Dist: nvidia-cuda-cupti>=12.9.79; extra == "gpu"
+Requires-Dist: nvidia-cuda-nvrtc>=12.9.86; extra == "gpu"
+Requires-Dist: nvidia-cuda-runtime>=12.9.79; extra == "gpu"
+Requires-Dist: nvidia-cudnn-cu13>=9.10.2.21; extra == "gpu"
+Requires-Dist: nvidia-cudnn-frontend>=1.15.0; extra == "gpu"
+Requires-Dist: nvidia-cufft>=11.4.1.4; extra == "gpu"
+Requires-Dist: nvidia-cufile>=1.14.1.1; extra == "gpu"
+Requires-Dist: nvidia-curand>=10.3.10.19; extra == "gpu"
+Requires-Dist: nvidia-cusolver>=11.7.5.82; extra == "gpu"
+Requires-Dist: nvidia-cusparse>=12.5.10.65; extra == "gpu"
+Requires-Dist: nvidia-cusparselt-cu13>=0.7.1; extra == "gpu"
+Requires-Dist: nvidia-cutlass-dsl>=4.2.1; extra == "gpu"
+Requires-Dist: nvidia-ml-py>=13.580.82; extra == "gpu"
+Requires-Dist: nvidia-nccl-cu13>=2.27.3; extra == "gpu"
+Requires-Dist: nvidia-nvjitlink>=12.9.86; extra == "gpu"
+Requires-Dist: nvidia-nvshmem-cu13>=3; extra == "gpu"
+Requires-Dist: nvidia-nvtx>=12.9.79; extra == "gpu"
+Requires-Dist: cuda-bindings>=12.9.3; extra == "gpu"
+Requires-Dist: cuda-pathfinder>=1.3.1; extra == "gpu"
+Requires-Dist: cuda-python>=13.0.0; extra == "gpu"
+Requires-Dist: cuda-toolkit>=13.0.0; extra == "gpu"
+Requires-Dist: pylibraft-cu13>=25.10.0; extra == "gpu"
+Requires-Dist: rmm-cu13>=25.10.0; extra == "gpu"
+Requires-Dist: torch; extra == "gpu"
+Requires-Dist: torchvision; extra == "gpu"
+Requires-Dist: torchaudio; extra == "gpu"
+Requires-Dist: flashinfer-cubin>=0.4.0; extra == "gpu"
+Requires-Dist: apache-tvm-ffi==0.1.0b15; extra == "gpu"
+Requires-Dist: flashinfer-python>=0.4.0; extra == "gpu"
+Requires-Dist: compressed-tensors>=0.11.0; extra == "gpu"
+Requires-Dist: accelerate>=1.10.1; extra == "gpu"
+Requires-Dist: easyocr>=1.7.2; extra == "gpu"
+Requires-Dist: libcuvs-cu13>=25.10.0; extra == "gpu"
+Requires-Dist: libraft-cu13>=25.10.0; extra == "gpu"
+Requires-Dist: librmm-cu13>=25.10.0; extra == "gpu"
+Requires-Dist: cuvs-cu13>=25.10.0; extra == "gpu"
+Requires-Dist: docling>=2.56.1; extra == "gpu"
+Requires-Dist: docling-ibm-models>=3.9.1; extra == "gpu"
+Requires-Dist: openai>=2.3.0; extra == "gpu"
+Requires-Dist: openai-harmony>=0.0.4; extra == "gpu"
+Requires-Dist: openai-whisper>=20250625; extra == "gpu"
+Requires-Dist: pyserini>=1.2.0; extra == "gpu"
+Requires-Dist: transformers>=4.57.1; extra == "gpu"
+Requires-Dist: triton>=3.4.0; extra == "gpu"
+Requires-Dist: sentence-transformers>=5.1.1; extra == "gpu"
+Requires-Dist: keybert>=0.9.0; extra == "gpu"
+Requires-Dist: stanza>=1.11.0; extra == "gpu"
+Requires-Dist: xgrammar>=0.1.25; extra == "gpu"
+Requires-Dist: safetensors>=0.6.2; extra == "gpu"
+Requires-Dist: triton; extra == "gpu"
+Requires-Dist: triton-kernels@ git+https://github.com/triton-lang/triton.git@v3.5.0#subdirectory=python/triton_kernels ; extra == "gpu"
+Requires-Dist: vllm; extra == "gpu"
+Requires-Dist: faiss==1.12.0; (python_version >= "3.13" and python_version < "3.14" and platform_system == "Linux" and platform_machine == "x86_64") and extra == "gpu"
+Requires-Dist: ray>=2.50.0; extra == "gpu"
+Provides-Extra: docs
+Requires-Dist: sphinx>=8.2.3; extra == "docs"
+Requires-Dist: myst-parser>=3.0.1; extra == "docs"
+Requires-Dist: myst-parser[linkify]>=3.0.1; extra == "docs"
+Requires-Dist: pydata-sphinx-theme>=0.15.4; extra == "docs"
+Requires-Dist: sphinx-sitemap>=2.6.0; extra == "docs"
+Requires-Dist: sphinx-copybutton>=0.5.2; extra == "docs"
+Requires-Dist: sphinx-design>=0.5.0; extra == "docs"
+Requires-Dist: sphinx-autoapi>=3.3.0; extra == "docs"
+Requires-Dist: astroid>=4.0.0; extra == "docs"
+Requires-Dist: sphinx-autobuild>=2024.4.3; extra == "docs"
+Requires-Dist: sphinx-autodoc-typehints>=1.27.0; extra == "docs"
+Requires-Dist: sphinxext-opengraph[social-cards]>=0.13.0; extra == "docs"
+Requires-Dist: sphinx-notfound-page>=1.1.0; extra == "docs"
+Requires-Dist: sphinxext-rediraffe>=0.3.0; extra == "docs"
+Requires-Dist: sphinx-codeautolink>=0.17.5; extra == "docs"
+Requires-Dist: autodoc-pydantic>=2.0.0; extra == "docs"
+Requires-Dist: myst-nb>=1.3.0; extra == "docs"
+Requires-Dist: sphinxcontrib-mermaid>=0.7.1; extra == "docs"
+Requires-Dist: sphinx-issues>=5.0.1; extra == "docs"
+Requires-Dist: sphinxcontrib-spelling>=7.7.0; extra == "docs"
+Requires-Dist: pyenchant>=3.3.0; extra == "docs"
+Requires-Dist: linkify-it-py>=2.0.3; extra == "docs"
+Requires-Dist: sphinxcontrib-typer>=0.6.2; extra == "docs"
+Requires-Dist: nbsphinx>=0.9.1; extra == "docs"
+Requires-Dist: nbformat>=5.10.2; extra == "docs"
+Requires-Dist: ipykernel>=6.29.5; extra == "docs"
+Requires-Dist: ipywidgets>=8.1.1; extra == "docs"
+Requires-Dist: sphinx-favicon>=0.2.0; extra == "docs"
+Requires-Dist: sphinx-inline-tabs>=0.3.0; extra == "docs"
+Requires-Dist: sphobjinv>=2.3.1.3; extra == "docs"
+Requires-Dist: graphviz>=0.21; extra == "docs"
+Requires-Dist: griffe; extra == "docs"
+Requires-Dist: doq; extra == "docs"
+Requires-Dist: pyment; extra == "docs"
+Requires-Dist: interrogate; extra == "docs"
+Requires-Dist: pydocstyle; extra == "docs"
+Requires-Dist: docformatter; extra == "docs"
+Requires-Dist: import-linter; extra == "docs"
+Requires-Dist: mkdocs; extra == "docs"
+Requires-Dist: mkdocs-material; extra == "docs"
+Requires-Dist: mkdocstrings[python]; extra == "docs"
+Requires-Dist: mkdocs-gen-files; extra == "docs"
+Requires-Dist: mkdocs-literate-nav; extra == "docs"
+Requires-Dist: mkdocs-section-index; extra == "docs"
+Dynamic: license-file
+
+
+# KGForge — End-to-End Local RAG + Ontology Grounding (Skeleton)
+
+This repository is the **skeleton** for the single-machine architecture you specified:
+- Ubuntu 24.04 / RTX 5090 / AMD 9950X / 192 GB RAM
+- Python 3.13, PyTorch 2.9 (CUDA 13.0)
+- vLLM (pre-release supporting CUDA 13)
+- DuckDB ≥ 1.4.1
+- Docling VLM (Granite-Docling) → DocTags + Docling HybridChunker
+- Dense embeddings: Qwen3-Embedding-4B (2560-d)
+- Sparse: BM25 + SPLADE-v3 (GPU)
+- FAISS (GPU) with cuVS backend
+- Neo4j local graph
+- Everything registered in DuckDB; all embeddings in Parquet
+
+> **Note**: This is a scaffold. Many functions are stubs and marked TODO.
+> It is structured for high cohesion & clean interfaces so multiple teams can implement independently.
+
+## Quickstart (skeleton)
+
+```bash
+make bootstrap   # create venv, install basic dev deps, format hooks, apply DuckDB migrations
+make run         # start API (expects vLLM & Nginx configured), runs on localhost:8080
+make e2e         # runs a light end-to-end test over fixtures (skeleton)
+```
+
+## Directory layout
+
+- `src/kgforge_common`: contracts (Pydantic), IDs, config utils, exceptions, logging.
+- `src/download`: PyAlex-based harvester + OA PDF downloader with fallbacks.
+- `src/docling`: VLM client + HybridChunker wrapper.
+- `src/embeddings_dense`: Qwen3-Embedding-4B client (OpenAI-style vLLM).
+- `src/embeddings_sparse`: SPLADE-v3 GPU encoder + BM25 (Pyserini) skeletons.
+- `src/vectorstore_faiss`: FAISS GPU/cuVS adapter.
+- `src/ontology`: loaders for OWL/OBO/SKOS + normalizer.
+- `src/linking`: linker pipelines + calibration placeholders.
+- `src/kg_builder`: Neo4j adapter.
+- `src/search_api`: FastAPI app with /search, /graph/concepts, /healthz.
+- `src/orchestration`: Prefect 2.x flows (idempotent, local-only).
+- `src/observability`: Prometheus metrics + OpenTelemetry tracing priming.
+- `registry/migrations`: DuckDB DDL; incremental migrations.
+- `config`: example YAML + Nginx and Systemd templates.
+- `tests`: unit and e2e skeletons.
+
+## Python & Tooling
+
+- `pyproject.toml`: Python 3.13; dependencies pinned minimally; heavy libs listed but commented or optional extras.
+- Pre-commit with ruff/black/mypy; strict typing by default.
+
+---
+
+**This skeleton intentionally does not execute heavy GPU code** — the goal is to provide interfaces, contracts,
+and minimal shims so teams can implement their parts with confidence.
+
+
+<!-- merged from kgforge_skeleton (1).zip -->
+# KGForge (skeleton)
+Single-machine architecture for ontology-grounded hybrid search (dense + sparse + KG) with local registries and indices.
+**Target host:** Ubuntu 24.04 · RTX 5090 (CUDA 13.0) · AMD 9950X (16 cores) · 192 GB RAM  
+**Runtime:** Python 3.13, PyTorch 2.9 (CUDA 13), vLLM pre-release (CUDA 13), DuckDB ≥ 1.4.1
+This repository is a **skeleton** generated on 2025-10-25. It contains packages, interfaces, configs, and stubs to accelerate
+independent development of each workstream.
+
+<!-- merged from kgforge_skeleton (2).zip -->
+This repository is the **skeleton** for the single-machine architecture:
+- Ubuntu 24.04, RTX 5090, AMD 9950X (16c), 192 GB RAM
+- Python 3.13, PyTorch 2.9 (CUDA 13)
+- vLLM prerelease (CUDA 13): Granite-Docling VLM + Qwen3-Embedding-4B (2560-d)
+- Docling HybridChunker for chunking
+- Dense: Qwen3-Embedding-4B (2560)
+- FAISS GPU (cuVS) for vector indexing
+- Neo4j local KG
+- DuckDB ≥ 1.4.1 registry
+- **All embeddings stored as Parquet** (no JSONL)
+## Quickstart
+make bootstrap   # venv, dev deps, DuckDB migrations
+make run         # starts FastAPI app (skeleton) on :8080
+make e2e         # runs skeleton end-to-end tests
+## Mock OA discovery (OpenAlex / Unpaywall) & fixture pipeline
+Run local mock servers (one shell):
+python -m tests.mock_servers.run_all
+# OpenAlex mock:  http://localhost:8998/works
+# Unpaywall mock: http://localhost:8997/v2/{doi}
+# PDF host:       http://localhost:8999/pdf/...
+In another shell, use the mock-aware harvester:
+kgf harvest-mock --topic "test" --max-works 2 --out-dir /data/pdfs --db-path /data/catalog/catalog.duckdb
+Generate tiny fixture Parquet datasets (chunks, dense 2560-d, SPLADE) and register them:
+kgf fixture --root /data --db-path /data/catalog/catalog.duckdb
+You can then iterate on individual components using these fixed contracts.
+
+<!-- merged from kgforge_skeleton (4).zip -->
+# KGForge (skeleton with fusion & KG mock)
+This minimal skeleton exposes:
+- **FastAPI** search service with **BM25 + SPLADE + FAISS** fusion (RRF) and a tiny **KG mock** boost
+- **CLI** commands to build BM25 (pure) and FAISS indexes for fixture datasets
+## Run the API
+uvicorn kgforge.search_api.app:app --port 8080 --reload
+Set environment variables for local data if you have them:
+export KGF_FIXTURE_ROOT=/data
+export KGF_FIXTURE_DB=/data/catalog/catalog.duckdb
+export KGF_FAISS_CPU_INDEX=/data/faiss/fixture.index
+export SEARCH_API_KEYS=testkey
+## Build indexes
+# BM25 (pure Python pickle)
+kgf index-bm25 --db-path /data/catalog/catalog.duckdb --out-dir /data/lucene/bm25
+# FAISS CPU index
+kgf index-faiss --db-path /data/catalog/catalog.duckdb --factory "OPQ64,IVF8192,PQ64" --cpu-index-path /data/faiss/fixture.index
+## Health & search
+curl http://localhost:8080/healthz
+curl -X POST http://localhost:8080/search -H "Authorization: Bearer testkey" -H "Content-Type: application/json" -d '{"query":"LLM alignment","k":5}'
