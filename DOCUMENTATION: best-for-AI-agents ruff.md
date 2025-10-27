@@ -1,156 +1,274 @@
 # DOCUMENTATION: best-for-AI-agents ruff formatting 
 
-Here’s a pragmatic “best-for-AI-agents” set of Ruff **prefix groups** to enable. It maximizes structural regularity, rich docstrings, explicit typing, stable imports, and modern syntax—exactly the stuff that helps agents read, refactor, and extend code safely.
-
-### Core (turn these on)
-
-* **F, E4, E7, E9** – Pyflakes + the non-stylistic pycodestyle subsets that Ruff enables by default; good signal, low noise. ([Astral Docs][1])
-* **I** – isort (import ordering). Note: Ruff’s *formatter* does **not** sort imports; you must enable `I` and run `ruff check --select I --fix` (then format). ([Astral Docs][2])
-* **ANN** – flake8-annotations (enforces complete type hints; complements a real type checker). ([Astral Docs][3])
-* **D** (+ **DOC** if you want stricter structure) – pydocstyle (+ pydoclint) for consistent, parseable docstrings; set an explicit convention (Google or NumPy). ([Astral Docs][3])
-* **N** – pep8-naming; stable, predictable symbol names help tools. ([Astral Docs][3])
-* **UP** – pyupgrade; auto-modernizes syntax (e.g., PEP 604 unions). ([Astral Docs][3])
-* **SIM, C4** – simplify and comprehension rules; reduces cyclomatic “texture” agents must parse. ([Astral Docs][3])
-* **B** – flake8-bugbear; common foot-guns & design smells. ([Astral Docs][3])
-* **RUF** – Ruff-specific improvements and fixes. ([Astral Docs][3])
-
-### Quality & hygiene (strong add-ons)
-
-* **RET, RSE, TRY** – return/raise/exception best practices; clearer control-flow for agents. ([Astral Docs][3])
-* **EM, G, LOG** – better error messages and logging patterns. ([Astral Docs][3])
-* **ISC** – ban implicit string concat (easy to misread). ([Astral Docs][3])
-* **TID, ICN** – tidy imports & import conventions. ([Astral Docs][3])
-* **ERA, TD, PGH** – remove commented-out code; surface TODOs. ([Astral Docs][3])
-
-### Optional, depending on stack
-
-* **PERF** (perflint), **S** (bandit), **NPY** (NumPy), **PD** (pandas), **PTH** (pathlib), **TC** (type-checking import placement), **PYI** (stubs). ([Astral Docs][3])
+Absolutely—here’s an **updated, repo‑aware guide** that folds in your repo map, current `pyproject.toml`, and automated docs system. It’s written **to** an AI programming agent operating inside your environment, so it’s explicit about *what to change* and *how to verify it*.
 
 ---
 
-### Drop-in config you can use
+# Best‑for‑AI Ruff Implementation (Repo‑Aware Guide)
+
+**Goal:** give AI agents a deterministic, low‑noise, modern Python surface: stable imports, consistent formatting, parseable docstrings, and predictable complexity—*so edits are safer and more accurate*. This update merges your original guide with repo‑specific details (layout, tooling, current config). 
+
+---
+
+## TL;DR — What to implement
+
+1. **Ruff config upgrade** in `pyproject.toml`:
+
+   * Pin Ruff version, set grouped CI output, declare `src = ["src"]`, exclude generated trees (`docs/_build`, `site/`, egg‑info), define **first‑party packages** from this repo, and ban relative imports.
+   * Expand `select` to include naming, annotations, docstrings, returns/raises/try, tidy‑imports, logging, etc.; add `RUF100` to auto‑clean unused `noqa`.
+   * Cap complexity/branches with McCabe + Pylint (gentle defaults).
+   * Keep quotes/wrapping in the **formatter**, not linters.
+     These changes extend the curated profile from your original “best‑for‑AI” doc. 
+
+2. **Preserve the two‑stage flow**: `ruff check --select I --fix && ruff check --fix && ruff format`. Ruff’s formatter does **not** sort imports, so run `I` before formatting. 
+
+3. **Repo‑aware import semantics**:
+
+   * Mark first‑party modules (derived from your `src/` layout).
+   * Ban relative imports to make navigation and patch targets obvious.
+     Module families include: `docling`, `download`, `embeddings_dense`, `embeddings_sparse`, `kg_builder`, `kgforge_common`, `linking`, `observability`, `ontology`, `orchestration`, `registry`, `search_api`, `search_client`, `vectorstore_faiss`. 
+
+4. **Docs pipeline alignment**:
+
+   * Keep docstring *text* reflow in your doc tools, but let Ruff handle **code blocks inside docstrings** (`format.docstring-code-format = true`).
+   * Ensure Sphinx/Napoleon style (Google/NumPy) matches Ruff’s pydocstyle convention; leave your existing automated updates (`tools/update_docs.sh`) intact. 
+
+5. **If you keep Black:** retain `ignore = ["E203"]` for Black compatibility. If you migrate to **Ruff as sole formatter**, you can drop that ignore and remove Black’s hook later. Your current `pyproject.toml` has both Ruff and Black configured. 
+
+---
+
+## 1) Replace the Ruff blocks in `pyproject.toml`
+
+> **Action:** Replace **only** the `[tool.ruff]`, `[tool.ruff.format]`, and `[tool.ruff.lint*]` sections with the blocks below. Keep your existing project metadata and tools. Current values (e.g., `line-length = 100`, `target-version = "py313"`) are preserved. 
 
 ```toml
+# --- Ruff: top-level settings ---
 [tool.ruff]
-target-version = "py313"
+# Keep your line-length/target-version; add determinism and repo awareness.
 line-length = 100
+target-version = "py313"
+required-version = ">=0.5.0"        # pin to the version you run in CI
+output-format = "grouped"           # easier to parse in CI logs
+src = ["src"]                       # repo uses a src/ layout
 
+# Ignore generated or non-source trees to cut noise and speed up runs.
+extend-exclude = [
+  "docs/_build/**",
+  "site/**",
+  "src/KGForge.egg-info/**",
+  "KGForge.egg-info/**",
+]
+
+# --- Ruff Formatter ---
 [tool.ruff.format]
-# Let Ruff handle style; don't duplicate with quote/commas linters.
 quote-style = "double"
 indent-style = "space"
 docstring-code-format = true
+# optional (keeps code in docstrings readable):
+# docstring-code-line-length = "dynamic"
 
+# --- Ruff Linter: rule selection & ergonomics ---
 [tool.ruff.lint]
+# Curated, explicit set for "best-for-agents".
 select = [
-  "F","E4","E7","E9",
-  "I","N","UP","SIM","C4","RUF","B",
-  "ANN","D","DOC",
-  "RET","RSE","TRY","EM","G","LOG","ISC","TID","ICN",
-  "TD","ERA","PGH"
+  "F","E4","E7","E9",         # core correctness
+  "I",                        # import sorting (linter side)
+  "N",                        # pep8-naming
+  "UP","SIM","C4","B",        # modernization + simplifications + bugbear
+  "RUF",                      # ruff-specific improvements
+  "ANN","D",                  # annotations + docstrings
+  # "DOC",                    # (enable later if you want stricter doc structure)
+  "RET","RSE","TRY",          # clear returns/raises/exception handling
+  "EM","G","LOG","ISC",       # error messages, logging, ban implicit str concat
+  "TID","ICN",                # tidy imports + import conventions
+  "TD","ERA","PGH",           # TODOs, eradicate commented-out code, grep hooks
+  "C90","PLR"                 # mild complexity/branches caps (McCabe/Pylint)
 ]
-# Avoid stylistic overlap with the formatter (e.g., flake8-quotes).
-ignore = ["Q"]
+# Keep Black-compatible ignore; remove "E203" if you later switch to Ruff-only formatting.
+ignore = ["Q", "E203"]
 
+# Be conservative with bleeding-edge rule surfaces.
+preview = false
+# Auto-remove unused "noqa" comments: invaluable for keeping suppressions honest.
+extend-select = ["RUF100"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-branches = 12
+max-returns  = 6
+
+# Align docstring convention with your docs stack (Napoleon); choose ONE.
 [tool.ruff.lint.pydocstyle]
-# Pick ONE and stick to it project-wide for machine-readability:
-convention = "numpy"  # or "google"
+convention = "numpy"    # or "google" — must match Sphinx Napoleon config
+
+# Make import order deterministic across the monorepo
+[tool.ruff.lint.isort]
+known-first-party = [
+  "docling", "download", "embeddings_dense", "embeddings_sparse",
+  "kg_builder", "kgforge_common", "linking", "observability",
+  "ontology", "orchestration", "registry",
+  "search_api", "search_client", "vectorstore_faiss",
+]
+
+# Disallow relative imports; agents navigate absolute imports better.
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+# Optional: standardize common scientific aliases if these libs are used.
+[tool.ruff.lint.flake8-import-conventions.aliases]
+numpy = "np"
+pandas = "pd"
+"matplotlib.pyplot" = "plt"
 ```
 
-**How to run (imports → format):**
+**Why this matches your repo:**
 
-```bash
-ruff check --select I --fix && ruff check --fix && ruff format
-```
-
-(Ruff’s formatter aims for Black-compatible output, but it doesn’t sort imports—hence the two-step “check then format”.) ([Astral Docs][2])
+* Your project already uses `line-length = 100`, Python 3.13, and both Black and Ruff; the new blocks preserve those while adding determinism and agent‑friendly lint gates. 
+* The first‑party list mirrors your `src/` layout so import grouping/sorting is stable across contributors and CI. 
+* Exclusions skip generated sites and egg metadata that appear in your tree (e.g., `docs/_build`, `site/`, `KGForge.egg-info`). 
 
 ---
 
-### Notes & caveats
+## 2) Keep (and enforce) the **run order**
 
-* Prefer **explicit `select`** (like above) over `ALL`; `ALL` auto-enables new rules on upgrade and can create churn. ([Astral Docs][4])
-* Ruff is **not** a type checker—run Mypy/Pyright (or Astral’s emerging *ty* / Red-Knot) alongside it; `ANN` just enforces presence/consistency of hints. ([Astral Docs][5])
-* If you adopt Ruff’s formatter, skip linters that duplicate formatting (quotes/commas/line-wrap). Ruff’s formatter supports configurable quotes/indent/line-endings and formats code blocks in docstrings, which is great for AI agents reading examples. ([Astral Docs][2])
+> **Action:** Use this exact sequence in pre‑commit, CI, and local scripts:
 
-This profile gives you consistent structure (imports, names, types, docstrings), modern syntax, and reduced noise—conditions under which AI programming agents make the fewest mistakes and deliver the most reliable edits.
+```bash
+ruff check --select I --fix \
+&& ruff check --fix \
+&& ruff format
+```
 
-[1]: https://docs.astral.sh/ruff/settings/?utm_source=chatgpt.com "Settings | Ruff - Astral Docs"
-[2]: https://docs.astral.sh/ruff/formatter/ "The Ruff Formatter | Ruff"
-[3]: https://docs.astral.sh/ruff/rules/ "Rules | Ruff"
-[4]: https://docs.astral.sh/ruff/linter/?utm_source=chatgpt.com "The Ruff Linter - Astral Docs"
-[5]: https://docs.astral.sh/ruff/faq/?utm_source=chatgpt.com "FAQ | Ruff - Astral Docs"
+Ruff’s formatter is Black‑compatible but **doesn’t sort imports**; imports must be handled by the linter (`I`) before formatting. Your original guide already called this out—keep it. 
 
+---
 
-Here’s the full set of **prefix letters (and letter groups) you can put in `select`** and what each enables:
+## 3) Pre‑commit wiring (update, don’t replace)
 
-* **AIR** – Airflow rules
-* **ANN** – flake8-annotations
-* **ARG** – flake8-unused-arguments
-* **A** – flake8-builtins
-* **ASYNC** – flake8-async
-* **B** – flake8-bugbear
-* **BLE** – flake8-blind-except
-* **C4** – flake8-comprehensions
-* **C90** – mccabe complexity
-* **COM** – flake8-commas
-* **CPY** – flake8-copyright
-* **D** – **pydocstyle** (docstrings)
-* **DJ** – flake8-django
-* **DOC** – pydoclint
-* **DTZ** – flake8-datetimez
-* **E**, **W** – pycodestyle (errors/warnings)
-* **EM** – flake8-errmsg
-* **ERA** – eradicate (commented-out code)
-* **EXE** – flake8-executable
-* **F** – Pyflakes
-* **FA** – flake8-future-annotations
-* **FAST** – FastAPI rules
-* **FIX** – flake8-fixme (TODO/FIXME etc.)
-* **FLY** – flynt (f-string conversions)
-* **FURB** – refurb
-* **G** – flake8-logging-format
-* **I** – isort (import order)
-* **ICN** – flake8-import-conventions
-* **INP** – flake8-no-pep420
-* **INT** – flake8-gettext
-* **ISC** – flake8-implicit-str-concat
-* **LOG** – flake8-logging
-* **N** – pep8-naming
-* **NPY** – NumPy-specific rules
-* **PD** – pandas-vet
-* **PERF** – perflint
-* **PGH** – pygrep-hooks
-* **PL** – Pylint (with sub-groups **PLC**, **PLE**, **PLR**, **PLW**)
-* **PT** – flake8-pytest-style
-* **PTH** – flake8-use-pathlib
-* **PYI** – flake8-pyi (stub files)
-* **Q** – flake8-quotes
-* **RET** – flake8-return
-* **RSE** – flake8-raise
-* **RUF** – Ruff-specific rules
-* **S** – flake8-bandit (security)
-* **SIM** – flake8-simplify
-* **SLOT** – flake8-slots
-* **SLF** – flake8-self (private member access)
-* **TC** – flake8-type-checking
-* **TD** – flake8-todos
-* **T10** – flake8-debugger
-* **T20** – flake8-print
-* **TID** – flake8-tidy-imports
-* **TRY** – tryceratops (exception handling)
-* **UP** – pyupgrade
-* **YTT** – flake8-2020 (version checks) ([Astral Docs][1])
+Your docs system explicitly mentions a pre‑commit stack that runs Ruff, Black, Mypy, docformatter, pydocstyle, and interrogate. Keep that model; just ensure **Ruff import sorting → Ruff fixes → Ruff format** happen in that order. 
 
-A few useful notes:
+> **Action:** In `.pre-commit-config.yaml`, add/adjust hooks roughly like:
 
-* You can also use **`ALL`** to select every rule, then `ignore` specific ones; by default Ruff selects `["E4","E7","E9","F"]`. ([Astral Docs][2])
-* Prefixes are hierarchical: `select = ["D"]` enables all docstring rules; `["D2"]` would enable just the `D2xx` subset, etc. ([Astral Docs][3])
-* If you’re enforcing a specific docstring style (Google/NumPy/PEP 257), you can set it under `[tool.ruff.lint.pydocstyle]` with `convention = "google" | "numpy" | "pep257"`. ([Astral Docs][4])
+```yaml
+# Ruff: imports first, then fixes, then formatter
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: <pin-to-your-ruff-version>     # match [tool.ruff].required-version
+  hooks:
+    - id: ruff
+      name: ruff (imports)
+      args: ["--select", "I", "--fix"]
+    - id: ruff
+      name: ruff (lint+fix)
+      args: ["--fix"]
+    - id: ruff-format
+      name: ruff (format)
+```
 
-All of the above mappings come from Ruff’s official **Rules** index. If you want to double-check or browse individual rules, that page lists every code under each prefix. ([Astral Docs][1])
+If you **keep Black**, leave the Black hook as-is and retain `ignore = ["E203"]`. If you later migrate to **Ruff-only formatting**, remove Black’s hook and drop `E203` from Ruff’s ignores. Your current `pyproject.toml` carries both Black and Ruff sections, so either path is supported. 
 
-[1]: https://docs.astral.sh/ruff/rules/ "Rules | Ruff"
-[2]: https://docs.astral.sh/ruff/settings/?utm_source=chatgpt.com "Settings | Ruff - Astral Docs"
-[3]: https://docs.astral.sh/uv/reference/cli/?utm_source=chatgpt.com "Commands | uv - Astral Docs"
-[4]: https://docs.astral.sh/ruff/faq/?utm_source=chatgpt.com "FAQ | Ruff - Astral Docs"
+---
+
+## 4) CI: run order and gating
+
+Your CI already runs Ruff, Black, pytest, and the docs pipeline (`tools/update_docs.sh`). Keep that, just enforce the same Ruff order and pin the same version used locally for reproducibility. After formatting/linting, run tests and the docs pipeline; fail if the tree is dirty. 
+
+**Suggested job steps (shell-level):**
+
+```bash
+uv run ruff --version    # ensure pinned version
+uv run ruff check --select I --fix
+uv run ruff check --fix
+uv run ruff format
+uv run pytest -q
+uv run tools/update_docs.sh
+git diff --quiet || { echo "Working tree changed"; git --no-pager diff; exit 1; }
+```
+
+---
+
+## 5) Codebase adjustments the agent should perform
+
+> These are one-time or low-frequency codemods that get you to the new policy.
+
+1. **Convert relative imports → absolute imports**
+
+   * Search for `from .` or `from ..` patterns across `src/**`. Replace with absolute package names from the **first‑party list** above. Re-run Ruff to verify `TID` rules are satisfied. 
+
+2. **Standardize scientific aliases (optional)**
+
+   * If the code uses NumPy/Pandas/Matplotlib, normalize to `np`, `pd`, `plt` so agents can reuse idioms consistently; the linter will enforce it once aliases are declared. (Block is included but harmless if unused.)
+
+3. **Complexity and branching caps**
+
+   * If any functions exceed `max-complexity=10`, `max-branches=12`, or `max-returns=6`, nudge them down with small refactors (early returns, helper functions). These thresholds keep agent patches local and readable.
+
+4. **Suppressions hygiene**
+
+   * Run Ruff with `--fix` to auto‑remove unused `noqa` (`RUF100`), then audit remaining suppressions. The goal is fewer, intentional ignores over time.
+
+---
+
+## 6) Documentation pipeline: align with Ruff
+
+Your automated docs system seeds/rewrites docstrings, formats them, enforces coverage, and builds Sphinx (AutoAPI + Napoleon), all via `tools/update_docs.sh`. Keep that flow, but ensure conventions match Ruff. 
+
+> **Action checklist:**
+
+* **Pick one docstring style**—`numpy` or `google`—and set it in Ruff (`[tool.ruff.lint.pydocstyle]`) **and** ensure Sphinx Napoleon is configured for the same style (Napoleon is already enabled in your stack). 
+* Keep your docstring tools (doq, docformatter, pydocstyle, interrogate). Ruff will only format **code blocks in docstrings**; your doc tools continue to reflow docstring text and enforce coverage. 
+* Continue to generate/regenerate docs with `tools/update_docs.sh` and Makefile tasks (`make docstrings`, `make readmes`, `make html/json/symbols`). 
+
+---
+
+## 7) Repo-specific toggles
+
+* **First‑party packages** (used by isort inside Ruff) are derived from `src/`:
+  `docling`, `download`, `embeddings_dense`, `embeddings_sparse`, `kg_builder`, `kgforge_common`, `linking`, `observability`, `ontology`, `orchestration`, `registry`, `search_api`, `search_client`, `vectorstore_faiss`. This makes import grouping/ordering deterministic across machines. 
+
+* **Exclusions**: Skip `docs/_build`, `site/`, and egg‑info dirs; they exist in your tree and are generated. 
+
+* **Python / toolchain alignment**:
+  Your `pyproject.toml` targets Python 3.13, with Black pinned to py312 syntax support. The Ruff formatter is Black‑compatible; if/when you migrate to Ruff‑only formatting, you can remove Black to simplify tooling, otherwise keep `E203` ignored for Black compatibility. 
+
+---
+
+## 8) Acceptance criteria (what “done” looks like)
+
+* `ruff check --select I --fix && ruff check --fix && ruff format` produces **no diffs** on a clean checkout. 
+* No relative imports remain in `src/**`. Imports are grouped with first‑party blocks stable across contributors. 
+* CI shows **grouped** Ruff output and uses the same Ruff version as local (`required-version` satisfied). 
+* Sphinx builds cleanly via `tools/update_docs.sh`, and docstring style in code matches Napoleon’s mode (Google/NumPy). 
+
+---
+
+## 9) (Optional) If you want a slimmer toolchain
+
+* Move `black` and `ruff` from `[project.dependencies]` into a developer extra or your pinned `requirements/` set, since they are dev‑time tools. Your current `pyproject.toml` lists them as runtime deps; not harmful, but unnecessary. 
+* If you drop Black in favor of Ruff’s formatter, remove Black’s config/hook and delete `E203` from Ruff ignores. 
+
+---
+
+## Appendix A — Rationale (from your prior guide)
+
+* Favor **explicit `select`** over `ALL` to avoid churn when Ruff adds rules.
+* Keep stylistic checks that duplicate the formatter (e.g., quotes/wrapping) **disabled**; let the formatter own them.
+* Run **import sorting** via `I` before `ruff format`, because the formatter doesn’t sort imports.
+  These principles all come from your original “best‑for‑AI” profile and are retained here.  
+
+---
+
+### One-line command for the agent to validate the whole stack locally
+
+```bash
+# Lint + format (import sort → fix → format), then docs and tests
+ruff check --select I --fix && ruff check --fix && ruff format \
+&& tools/update_docs.sh \
+&& pytest -q
+```
+
+This respects your docs automation and existing test layout.  
+
+---
+
