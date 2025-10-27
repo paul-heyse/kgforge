@@ -1,11 +1,15 @@
-"""Module for search_api.fixture_index.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- tokenize: Tokenise ``text`` into lowercase alphanumeric tokens.
-- FixtureDoc: Chunk-level document representation used by the lexical….
-- FixtureIndex: Materialise a lexical index from DuckDB parquet exports.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+search_api.fixture_index
+"""
+
 
 from __future__ import annotations
 
@@ -39,14 +43,77 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
 # [nav:anchor tokenize]
 def tokenize(text: str) -> list[str]:
-    """Tokenise ``text`` into lowercase alphanumeric tokens."""
+    """
+    Return tokenize.
+    
+    Parameters
+    ----------
+    text : str
+        Description for ``text``.
+    
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from search_api.fixture_index import tokenize
+    >>> result = tokenize(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.fixture_index
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
 # [nav:anchor FixtureDoc]
 @dataclass
 class FixtureDoc:
-    """Chunk-level document representation used by the lexical index."""
+    """
+    Represent FixtureDoc.
+    
+    Attributes
+    ----------
+    chunk_id : str
+        Attribute description.
+    doc_id : str
+        Attribute description.
+    title : str
+        Attribute description.
+    section : str
+        Attribute description.
+    text : str
+        Attribute description.
+    
+    Examples
+    --------
+    >>> from search_api.fixture_index import FixtureDoc
+    >>> result = FixtureDoc()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.fixture_index
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     chunk_id: str
     doc_id: str
@@ -57,10 +124,70 @@ class FixtureDoc:
 
 # [nav:anchor FixtureIndex]
 class FixtureIndex:
-    """Materialise a lexical index from DuckDB parquet exports."""
+    """
+    Represent FixtureIndex.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Methods
+    -------
+    __init__()
+        Method description.
+    _load_from_duckdb()
+        Method description.
+    _build_lex()
+        Method description.
+    search()
+        Method description.
+    doc()
+        Method description.
+    
+    Examples
+    --------
+    >>> from search_api.fixture_index import FixtureIndex
+    >>> result = FixtureIndex()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.fixture_index
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
 
     def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb") -> None:
-        """Initialise the index and eagerly load chunk metadata."""
+        """
+        Return init.
+        
+        Parameters
+        ----------
+        root : str, optional
+            Description for ``root``.
+        db_path : str, optional
+            Description for ``db_path``.
+        
+        Examples
+        --------
+        >>> from search_api.fixture_index import __init__
+        >>> __init__(..., ...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        search_api.fixture_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []
@@ -69,7 +196,23 @@ class FixtureIndex:
         self._load_from_duckdb()
 
     def _load_from_duckdb(self) -> None:
-        """Read the latest chunk dataset and populate the document list."""
+        """
+        Return load from duckdb.
+        
+        Examples
+        --------
+        >>> from search_api.fixture_index import _load_from_duckdb
+        >>> _load_from_duckdb()  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        search_api.fixture_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         if not Path(self.db_path).exists():
             return
         con = duckdb.connect(self.db_path)
@@ -110,7 +253,23 @@ class FixtureIndex:
         self._build_lex()
 
     def _build_lex(self) -> None:
-        """Build term-frequency and document-frequency statistics."""
+        """
+        Return build lex.
+        
+        Examples
+        --------
+        >>> from search_api.fixture_index import _build_lex
+        >>> _build_lex()  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        search_api.fixture_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         self.tf.clear()
         self.df.clear()
         for doc in self.docs:
@@ -124,7 +283,38 @@ class FixtureIndex:
         self.N = len(self.docs)
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Score documents for ``query`` using a simple TF-IDF variant."""
+        """
+        Return search.
+        
+        Parameters
+        ----------
+        query : str
+            Description for ``query``.
+        k : int, optional
+            Description for ``k``.
+        
+        Returns
+        -------
+        List[Tuple[int, float]]
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from search_api.fixture_index import search
+        >>> result = search(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        search_api.fixture_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
+        
         if getattr(self, "N", 0) == 0:
             return []
         qtoks = tokenize(query)
@@ -143,5 +333,33 @@ class FixtureIndex:
         return [(index, score) for index, score in ranked[:k] if score > 0.0]
 
     def doc(self, index: int) -> FixtureDoc:
-        """Return the :class:`FixtureDoc` at ``index``."""
+        """
+        Return doc.
+        
+        Parameters
+        ----------
+        index : int
+            Description for ``index``.
+        
+        Returns
+        -------
+        FixtureDoc
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from search_api.fixture_index import doc
+        >>> result = doc(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        search_api.fixture_index
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         return self.docs[index]

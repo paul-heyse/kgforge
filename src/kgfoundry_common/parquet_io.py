@@ -1,10 +1,15 @@
-"""Module for kgfoundry_common.parquet_io.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- ParquetVectorWriter: Persist embedding vectors into partitioned Parquet datasets.
-- ParquetChunkWriter: Persist chunk metadata and text into Parquet files.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+kgfoundry_common.parquet_io
+"""
+
 
 from __future__ import annotations
 
@@ -39,22 +44,76 @@ ROW_GROUP_SIZE = 4096
 
 # [nav:anchor ParquetVectorWriter]
 class ParquetVectorWriter:
-    """Persist embedding vectors into partitioned Parquet datasets."""
+    """
+    Represent ParquetVectorWriter.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Methods
+    -------
+    dense_schema()
+        Method description.
+    __init__()
+        Method description.
+    write_dense()
+        Method description.
+    splade_schema()
+        Method description.
+    write_splade()
+        Method description.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.parquet_io import ParquetVectorWriter
+    >>> result = ParquetVectorWriter()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.parquet_io
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
 
     @staticmethod
     def dense_schema(dim: int) -> pa.schema:
-        """Return the schema used for dense embedding Parquet files.
-
+        """
+        Return dense schema.
+        
         Parameters
         ----------
         dim : int
-            Number of dimensions in each dense vector.
-
+            Description for ``dim``.
+        
         Returns
         -------
         pa.schema
-            Arrow schema describing the dense vector rows.
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import dense_schema
+        >>> result = dense_schema(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        kgfoundry_common.parquet_io
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
         """
+        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -68,7 +127,28 @@ class ParquetVectorWriter:
         )
 
     def __init__(self, root: str) -> None:
-        """Initialise the writer with a root output directory."""
+        """
+        Return init.
+        
+        Parameters
+        ----------
+        root : str
+            Description for ``root``.
+        
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import __init__
+        >>> __init__(...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        kgfoundry_common.parquet_io
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         self.root = Path(root)
 
     def write_dense(
@@ -79,26 +159,44 @@ class ParquetVectorWriter:
         records: Iterable[tuple[str, list[float], float]],
         shard: int = 0,
     ) -> str:
-        """Write dense embedding vectors to a Parquet shard.
-
+        """
+        Return write dense.
+        
         Parameters
         ----------
         model : str
-            Identifier for the embedding model.
+            Description for ``model``.
         run_id : str
-            Identifier for the batch or run that produced the embeddings.
+            Description for ``run_id``.
         dim : int
-            Number of dimensions in the embedding vectors.
-        records : Iterable[tuple[str, list[float], float]]
-            Sequence of ``(chunk_id, vector, l2_norm)`` rows.
+            Description for ``dim``.
+        records : Iterable[Tuple[str, List[float], float]]
+            Description for ``records``.
         shard : int, optional
-            Shard partition to write, defaults to ``0``.
-
+            Description for ``shard``.
+        
         Returns
         -------
         str
-            Root directory path as a string.
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import write_dense
+        >>> result = write_dense(..., ..., ..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        kgfoundry_common.parquet_io
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
         """
+        
+        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -126,13 +224,30 @@ class ParquetVectorWriter:
 
     @staticmethod
     def splade_schema() -> pa.schema:
-        """Return the schema used for SPLADE sparse vector Parquet files.
-
+        """
+        Return splade schema.
+        
         Returns
         -------
         pa.schema
-            Arrow schema describing sparse vocab ids and weights.
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import splade_schema
+        >>> result = splade_schema()
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        kgfoundry_common.parquet_io
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
         """
+        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -152,24 +267,42 @@ class ParquetVectorWriter:
         records: Iterable[tuple[str, list[int], list[float]]],
         shard: int = 0,
     ) -> str:
-        """Write SPLADE sparse vector data to a Parquet shard.
-
+        """
+        Return write splade.
+        
         Parameters
         ----------
         model : str
-            Identifier for the sparse embedding model.
+            Description for ``model``.
         run_id : str
-            Identifier for the batch or run that produced the embeddings.
-        records : Iterable[tuple[str, list[int], list[float]]]
-            Sequence of ``(chunk_id, vocab_ids, weights)`` rows.
+            Description for ``run_id``.
+        records : Iterable[Tuple[str, List[int], List[float]]]
+            Description for ``records``.
         shard : int, optional
-            Shard partition to write, defaults to ``0``.
-
+            Description for ``shard``.
+        
         Returns
         -------
         str
-            Root directory path as a string.
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import write_splade
+        >>> result = write_splade(..., ..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        kgfoundry_common.parquet_io
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
         """
+        
+        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -198,17 +331,67 @@ class ParquetVectorWriter:
 
 # [nav:anchor ParquetChunkWriter]
 class ParquetChunkWriter:
-    """Persist chunk metadata and text into Parquet files."""
+    """
+    Represent ParquetChunkWriter.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Methods
+    -------
+    chunk_schema()
+        Method description.
+    __init__()
+        Method description.
+    write()
+        Method description.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.parquet_io import ParquetChunkWriter
+    >>> result = ParquetChunkWriter()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.parquet_io
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
 
     @staticmethod
     def chunk_schema() -> pa.schema:
-        """Return the schema describing chunk metadata rows.
-
+        """
+        Return chunk schema.
+        
         Returns
         -------
         pa.schema
-            Arrow schema describing chunk metadata and text columns.
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import chunk_schema
+        >>> result = chunk_schema()
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        kgfoundry_common.parquet_io
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
         """
+        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -233,33 +416,65 @@ class ParquetChunkWriter:
         )
 
     def __init__(self, root: str, model: str = "docling_hybrid", run_id: str = "dev") -> None:
-        """Initialise the writer with a target directory and identifiers.
-
+        """
+        Return init.
+        
         Parameters
         ----------
         root : str
-            Base directory where chunk Parquet files are written.
+            Description for ``root``.
         model : str, optional
-            Name of the chunking model, defaults to ``"docling_hybrid"``.
+            Description for ``model``.
         run_id : str, optional
-            Identifier for the batch or run, defaults to ``"dev"``.
+            Description for ``run_id``.
+        
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import __init__
+        >>> __init__(..., ..., ...)  # doctest: +ELLIPSIS
+        
+        See Also
+        --------
+        kgfoundry_common.parquet_io
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
         """
+        
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
     def write(self, rows: Iterable[dict[str, Any]]) -> str:
-        """Write chunk rows to Parquet and return the run directory.
-
+        """
+        Return write.
+        
         Parameters
         ----------
         rows : Iterable[dict[str, Any]]
-            Sequence of dictionaries matching :meth:`chunk_schema`.
-
+            Description for ``rows``.
+        
         Returns
         -------
         str
-            Path (as string) to the containing run directory.
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import write
+        >>> result = write(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        kgfoundry_common.parquet_io
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
         """
+        
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(
             table,

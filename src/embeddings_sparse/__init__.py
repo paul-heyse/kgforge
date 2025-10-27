@@ -1,1 +1,12 @@
-"""Module for embeddings_sparse."""
+"""
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+embeddings_sparse
+"""
+

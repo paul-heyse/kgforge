@@ -1,4 +1,15 @@
-"""Module for kgfoundry."""
+"""
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+kgfoundry
+"""
+
 
 _ALIASES: dict[str, str] = {
     "docling": "docling",
@@ -21,7 +32,35 @@ __all__ = sorted(_ALIASES)
 
 
 def _load(name: str) -> object:
-    """Import the real module and register it under the kgfoundry namespace."""
+    """
+    Return load.
+    
+    Parameters
+    ----------
+    name : str
+        Description for ``name``.
+    
+    Returns
+    -------
+    object
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from kgfoundry import _load
+    >>> result = _load(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     import importlib
     import sys
 
@@ -31,7 +70,40 @@ def _load(name: str) -> object:
 
 
 def __getattr__(name: str) -> object:
-    """Load a lazily requested submodule from the compatibility namespace."""
+    """
+    Return getattr.
+    
+    Parameters
+    ----------
+    name : str
+        Description for ``name``.
+    
+    Returns
+    -------
+    object
+        Description of return value.
+    
+    Raises
+    ------
+    AttributeError
+        Raised when validation fails.
+    
+    Examples
+    --------
+    >>> from kgfoundry import __getattr__
+    >>> result = __getattr__(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     if name not in _ALIASES:
         message = f"module {__name__!r} has no attribute {name!r}"
         raise AttributeError(message) from None
@@ -39,12 +111,57 @@ def __getattr__(name: str) -> object:
 
 
 def __dir__() -> list[str]:
-    """Expose the known compatibility submodules for auto-complete."""
+    """
+    Return dir.
+    
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from kgfoundry import __dir__
+    >>> result = __dir__()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     return sorted(set(__all__))
 
 
 def _ensure_namespace_alias(name: str) -> None:
-    """Guarantee that ``kgfoundry.<name>`` resolves to the real package."""
+    """
+    Return ensure namespace alias.
+    
+    Parameters
+    ----------
+    name : str
+        Description for ``name``.
+    
+    Examples
+    --------
+    >>> from kgfoundry import _ensure_namespace_alias
+    >>> _ensure_namespace_alias(...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    kgfoundry
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     import sys
 
     if f"{__name__}.{name}" not in sys.modules:

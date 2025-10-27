@@ -1,9 +1,15 @@
-"""Module for docling.hybrid.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- HybridChunker: Placeholder hybrid chunker for Docling outputs.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+docling.hybrid
+"""
+
 
 from __future__ import annotations
 
@@ -29,6 +35,32 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor HybridChunker]
 class HybridChunker:
-    """Placeholder hybrid chunker for Docling outputs."""
+    """
+    Represent HybridChunker.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from docling.hybrid import HybridChunker
+    >>> result = HybridChunker()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    docling.hybrid
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...

@@ -1,0 +1,10 @@
+"""Summary of the module.
+
+Notes
+-----
+Provide high-level context for the module responsibilities.
+
+See Also
+--------
+Related module references.
+"""

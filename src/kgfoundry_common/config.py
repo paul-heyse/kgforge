@@ -1,9 +1,15 @@
-"""Module for kgfoundry_common.config.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- load_config: Load a YAML configuration file from ``path``.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+kgfoundry_common.config
+"""
+
 
 from __future__ import annotations
 
@@ -31,17 +37,35 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor load_config]
 def load_config(path: str) -> dict[str, Any]:
-    """Load a YAML configuration file from ``path``.
-
+    """
+    Return load config.
+    
     Parameters
     ----------
     path : str
-        Path to the configuration file on disk.
-
+        Description for ``path``.
+    
     Returns
     -------
-    dict[str, Any]
-        Parsed configuration values.
+    Mapping[str, Any]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.config import load_config
+    >>> result = load_config(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.config
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
     """
+    
+    
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f)

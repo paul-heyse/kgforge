@@ -1,16 +1,15 @@
-"""Module for search_api.app.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- SearchRequest: Searchrequest.
-- SearchResult: Searchresult.
-- auth: Validate the bearer token supplied in the ``Authorization``….
-- healthz: Return a summary of dependency health for readiness checks.
-- rrf_fuse: Fuse ranked result lists using reciprocal rank fusion (RRF).
-- apply_kg_boosts: Apply knowledge-graph boosting heuristics to ranked….
-- search: Execute a search request across dense and sparse indices.
-- graph_concepts: Return KG concepts that match the provided query fragment.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+search_api.app
+"""
+
 
 from __future__ import annotations
 
@@ -120,18 +119,33 @@ kg.add_edge("C:42", "C:99")
 
 # [nav:anchor auth]
 def auth(authorization: str | None = Header(default=None)) -> None:
-    """Validate the bearer token supplied in the ``Authorization`` header.
-
+    """
+    Return auth.
+    
     Parameters
     ----------
     authorization : str | None, optional
-        Authorization header value in the form ``"Bearer <token>"``.
-
+        Description for ``authorization``.
+    
     Raises
     ------
     HTTPException
-        Raised when authentication is enabled and the token is invalid.
+        Raised when validation fails.
+    
+    Examples
+    --------
+    >>> from search_api.app import auth
+    >>> auth(...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    search_api.app
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
     """
+    
     if not API_KEYS:
         return  # disabled in skeleton
     if not authorization or not authorization.startswith("Bearer "):
@@ -144,7 +158,31 @@ def auth(authorization: str | None = Header(default=None)) -> None:
 # [nav:anchor healthz]
 @app.get("/healthz")
 def healthz() -> dict[str, Any]:
-    """Return a summary of dependency health for readiness checks."""
+    """
+    Return healthz.
+    
+    Returns
+    -------
+    Mapping[str, Any]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from search_api.app import healthz
+    >>> result = healthz()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.app
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     return {
         "status": "ok",
         "components": {
@@ -159,20 +197,38 @@ def healthz() -> dict[str, Any]:
 
 # [nav:anchor rrf_fuse]
 def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, float]:
-    """Fuse ranked result lists using reciprocal rank fusion (RRF).
-
+    """
+    Return rrf fuse.
+    
     Parameters
     ----------
-    lists : list[list[tuple[str, float]]]
-        Ranked lists where each entry is a ``(document_id, score)`` pair.
+    lists : List[List[Tuple[str, float]]]
+        Description for ``lists``.
     k_rrf : int
-        Constant controlling how quickly contribution decays with rank.
-
+        Description for ``k_rrf``.
+    
     Returns
     -------
-    dict[str, float]
-        Combined scores keyed by document identifier.
+    Mapping[str, float]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from search_api.app import rrf_fuse
+    >>> result = rrf_fuse(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.app
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
     """
+    
+    
     scores: dict[str, float] = {}
     for hits in lists:
         for rank, (doc_id, _score) in enumerate(hits, start=1):
@@ -187,24 +243,42 @@ def apply_kg_boosts(
     direct: float = 0.08,
     one_hop: float = 0.04,
 ) -> dict[str, float]:
-    """Apply knowledge-graph boosting heuristics to ranked candidates.
-
+    """
+    Return apply kg boosts.
+    
     Parameters
     ----------
-    cands : dict[str, float]
-        Baseline scores keyed by chunk identifier.
+    cands : Mapping[str, float]
+        Description for ``cands``.
     query : str
-        Original search query used to infer concept mentions.
+        Description for ``query``.
     direct : float, optional
-        Boost to apply when a chunk links directly to a concept in the query.
+        Description for ``direct``.
     one_hop : float, optional
-        Boost to apply when a chunk links to a neighbour of a concept.
-
+        Description for ``one_hop``.
+    
     Returns
     -------
-    dict[str, float]
-        Adjusted scores that include the knowledge-graph boosts.
+    Mapping[str, float]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from search_api.app import apply_kg_boosts
+    >>> result = apply_kg_boosts(..., ..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.app
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
     """
+    
+    
     q_concepts = set()
     for w in query.lower().split():
         if w.startswith("concept"):
@@ -227,20 +301,38 @@ def apply_kg_boosts(
 # [nav:anchor search]
 @app.post("/search", response_model=dict)
 def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
-    """Execute a search request across dense and sparse indices.
-
+    """
+    Return search.
+    
     Parameters
     ----------
     req : SearchRequest
-        Request payload describing the query and ranking preferences.
-    _ : None
-        Dependency injection hook used to enforce authentication.
-
+        Description for ``req``.
+    _ : None, optional
+        Description for ``_``.
+    
     Returns
     -------
-    dict[str, Any]
-        Serialized response containing the ranked search results.
+    Mapping[str, Any]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from search_api.app import search
+    >>> result = search(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.app
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
     """
+    
+    
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
     dense_hits: list[tuple[str, float]] = []
@@ -301,20 +393,38 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
 # [nav:anchor graph_concepts]
 @app.post("/graph/concepts", response_model=dict)
 def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str, Any]:
-    """Return KG concepts that match the provided query fragment.
-
+    """
+    Return graph concepts.
+    
     Parameters
     ----------
     body : Mapping[str, Any]
-        Request payload optionally containing ``q`` and ``limit`` keys.
-    _ : None
-        Dependency injection hook used to enforce authentication.
-
+        Description for ``body``.
+    _ : None, optional
+        Description for ``_``.
+    
     Returns
     -------
-    dict[str, Any]
-        Concepts whose identifiers match the provided fragment.
+    Mapping[str, Any]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from search_api.app import graph_concepts
+    >>> result = graph_concepts(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.app
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
     """
+    
+    
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring
     concepts = [

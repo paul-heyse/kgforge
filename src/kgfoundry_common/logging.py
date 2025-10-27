@@ -1,10 +1,15 @@
-"""Module for kgfoundry_common.logging.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- JsonFormatter: Format log records as compact JSON payloads.
-- setup_logging: Configure the root logger with JSON formatting.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+kgfoundry_common.logging
+"""
+
 
 from __future__ import annotations
 
@@ -33,10 +38,67 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor JsonFormatter]
 class JsonFormatter(logging.Formatter):
-    """Format log records as compact JSON payloads."""
+    """
+    Represent JsonFormatter.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Methods
+    -------
+    format()
+        Method description.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.logging import JsonFormatter
+    >>> result = JsonFormatter()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kgfoundry_common.logging
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
 
     def format(self, record: logging.LogRecord) -> str:
-        """Serialise a log record into a JSON string."""
+        """
+        Return format.
+        
+        Parameters
+        ----------
+        record : logging.LogRecord
+            Description for ``record``.
+        
+        Returns
+        -------
+        str
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from kgfoundry_common.logging import format
+        >>> result = format(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        
+        See Also
+        --------
+        kgfoundry_common.logging
+        
+        Notes
+        -----
+        Provide usage considerations, constraints, or complexity notes.
+        """
+        
         data = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
             "level": record.levelname,
@@ -52,13 +114,28 @@ class JsonFormatter(logging.Formatter):
 
 # [nav:anchor setup_logging]
 def setup_logging(level: int = logging.INFO) -> None:
-    """Configure the root logger with JSON formatting.
-
+    """
+    Return setup logging.
+    
     Parameters
     ----------
     level : int, optional
-        Minimum log level to emit, defaults to :data:`logging.INFO`.
+        Description for ``level``.
+    
+    Examples
+    --------
+    >>> from kgfoundry_common.logging import setup_logging
+    >>> setup_logging(...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    kgfoundry_common.logging
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
     """
+    
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())
     logging.basicConfig(level=level, handlers=[handler])

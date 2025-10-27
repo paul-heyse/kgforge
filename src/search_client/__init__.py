@@ -1,8 +1,15 @@
-"""Module for search_client.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+search_client
+"""
+
 
 from kgfoundry_common.navmap_types import NavMap
 from search_client.client import KGFoundryClient as _KGFoundryClient

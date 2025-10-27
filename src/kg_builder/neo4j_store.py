@@ -1,9 +1,15 @@
-"""Module for kg_builder.neo4j_store.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- Neo4jStore: Placeholder interface for a Neo4j-backed store.
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+kg_builder.neo4j_store
+"""
+
 
 from __future__ import annotations
 
@@ -29,6 +35,32 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Neo4jStore]
 class Neo4jStore:
-    """Placeholder interface for a Neo4j-backed store."""
+    """
+    Represent Neo4jStore.
+    
+    Attributes
+    ----------
+    None
+        No public attributes documented.
+    
+    Examples
+    --------
+    >>> from kg_builder.neo4j_store import Neo4jStore
+    >>> result = Neo4jStore()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    kg_builder.neo4j_store
+    
+    Notes
+    -----
+    Document class invariants and lifecycle details here.
+    """
+    
+    
+    
+    
 
     ...

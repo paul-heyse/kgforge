@@ -37,6 +37,11 @@ repos:
         pass_filenames: false
         additional_dependencies:
           - docformatter==1.7.5
+      - id: pydoclint
+        name: pydoclint
+        entry: pydoclint --style numpy src
+        language: system
+        pass_filenames: false
       - id: navmap-check
         name: navmap-check
         entry: python tools/navmap/check_navmap.py

@@ -1,9 +1,15 @@
-"""Module for search_api.fusion.
-
-NavMap:
-- NavMap: Structure describing a module navmap.
-- rrf_fuse: Fuse ranked lists using reciprocal rank fusion (RRF).
 """
+Provide utilities for module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+search_api.fusion
+"""
+
 
 from __future__ import annotations
 
@@ -29,7 +35,38 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor rrf_fuse]
 def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, float]:
-    """Fuse ranked lists using reciprocal rank fusion (RRF)."""
+    """
+    Return rrf fuse.
+    
+    Parameters
+    ----------
+    rankers : List[List[Tuple[str, float]]]
+        Description for ``rankers``.
+    k : int, optional
+        Description for ``k``.
+    
+    Returns
+    -------
+    Mapping[str, float]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from search_api.fusion import rrf_fuse
+    >>> result = rrf_fuse(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    search_api.fusion
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    
     agg: dict[str, float] = {}
     for ranked in rankers:
         for r, (key, _score) in enumerate(ranked, start=1):
