@@ -308,6 +308,10 @@ nitpick_ignore.update(
     {
         ("py:class", "optional"),
         ("py:class", "Optional"),
+        ("py:class", "duckdb.DuckDBPyConnection"),
+        ("py:class", "pyarrow.schema"),
+        ("py:class", "pyarrow.Schema"),
+        ("py:class", "pyarrow.Table"),
     }
 )
 
