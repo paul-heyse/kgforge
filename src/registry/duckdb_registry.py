@@ -47,6 +47,8 @@ class DuckDBRegistry:
         
         
         
+        
+        
 
 
 
@@ -84,6 +86,8 @@ class DuckDBRegistry:
         str
             Description of return value.
         """
+        
+        
         
         
         
@@ -135,6 +139,8 @@ class DuckDBRegistry:
         
         
         
+        
+        
 
 
 
@@ -165,6 +171,8 @@ class DuckDBRegistry:
         dataset_id : str
             Description for ``dataset_id``.
         """
+        
+        
         
         
         
@@ -220,6 +228,8 @@ class DuckDBRegistry:
         
         
         
+        
+        
 
 
 
@@ -266,6 +276,8 @@ class DuckDBRegistry:
         
         
         
+        
+        
 
 
 
@@ -296,6 +308,8 @@ class DuckDBRegistry:
         docs : List[Doc]
             Description for ``docs``.
         """
+        
+        
         
         
         
@@ -357,6 +371,8 @@ class DuckDBRegistry:
         
         
         
+        
+        
 
 
 
@@ -409,6 +425,8 @@ class DuckDBRegistry:
         
         
         
+        
+        
 
 
 
@@ -450,6 +468,8 @@ class DuckDBRegistry:
         message : str
             Description for ``message``.
         """
+        
+        
         
         
         

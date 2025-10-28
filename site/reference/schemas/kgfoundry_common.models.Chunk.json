@@ -1,0 +1,54 @@
+{
+  "description": "Describe Chunk.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "doc_id": {
+      "title": "Doc Id",
+      "type": "string"
+    },
+    "section": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Section"
+    },
+    "start_char": {
+      "title": "Start Char",
+      "type": "integer"
+    },
+    "end_char": {
+      "title": "End Char",
+      "type": "integer"
+    },
+    "tokens": {
+      "title": "Tokens",
+      "type": "integer"
+    },
+    "doctags_span": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Doctags Span",
+      "type": "object"
+    }
+  },
+  "required": [
+    "id",
+    "doc_id",
+    "section",
+    "start_char",
+    "end_char",
+    "tokens",
+    "doctags_span"
+  ],
+  "title": "Chunk",
+  "type": "object"
+}

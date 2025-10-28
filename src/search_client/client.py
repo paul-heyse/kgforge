@@ -37,6 +37,8 @@ class _SupportsResponse(Protocol):
         
         
         
+        
+        
 
 
 
@@ -69,6 +71,8 @@ class _SupportsResponse(Protocol):
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
         
         
         
@@ -117,6 +121,8 @@ class _SupportsHttp(Protocol):
         src.search_client.client._SupportsResponse
             Description of return value.
         """
+        
+        
         
         
         
@@ -177,6 +183,8 @@ class _SupportsHttp(Protocol):
         
         
         
+        
+        
 
 
 
@@ -226,6 +234,8 @@ class KGFoundryClient:
         http : _SupportsHttp | None
             Description for ``http``.
         """
+        
+        
         
         
         
@@ -281,6 +291,8 @@ class KGFoundryClient:
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
         
         
         
@@ -342,6 +354,8 @@ class KGFoundryClient:
         
         
         
+        
+        
 
 
 
@@ -386,6 +400,8 @@ class KGFoundryClient:
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
         
         
         

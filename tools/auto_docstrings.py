@@ -174,6 +174,8 @@ def parse_args() -> argparse.Namespace:
     
     
     
+    
+    
 
 
 
@@ -203,6 +205,8 @@ def module_name_for(path: Path) -> str:
     str
         Description of return value.
     """
+    
+    
     
     
     
@@ -253,6 +257,8 @@ def summarize(name: str, kind: str) -> str:
     
     
     
+    
+    
 
 
 
@@ -292,6 +298,8 @@ def extended_summary(kind: str, name: str, module_name: str) -> str:
     str
         Description of return value.
     """
+    
+    
     
     
     
@@ -356,6 +364,8 @@ def annotation_to_text(node: ast.AST | None) -> str:
     
     
     
+    
+    
 
 
 
@@ -408,6 +418,8 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     
     
     
+    
+    
 
 
 
@@ -446,6 +458,8 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
     
     
     
+    
+    
 
 
 
@@ -469,6 +483,8 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
         default : ast.AST | None
             Description for ``default``.
         """
+        
+        
         
         
         
@@ -526,6 +542,8 @@ def detect_raises(node: ast.AST) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
     
     
     
@@ -593,6 +611,8 @@ def build_examples(
     
     
     
+    
+    
 
 
 
@@ -635,6 +655,8 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
     
     
     
@@ -756,6 +778,8 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     
     
     
+    
+    
 
 
 
@@ -802,6 +826,8 @@ def replace(
     
     
     
+    
+    
 
 
 
@@ -838,6 +864,8 @@ def process_file(path: Path) -> bool:
     bool
         Description of return value.
     """
+    
+    
     
     
     
@@ -933,6 +961,8 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
     
     
     

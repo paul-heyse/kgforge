@@ -7,10 +7,10 @@ Linking utilities
 
 ## Modules
 
-- **`linking.calibration`** — Calibration utilities → [open](vscode://file//home/paul/kgfoundry/src/linking/calibration.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5dfbe3d9af9aa202dac875e3eeb49578ed9a092b/src/linking/calibration.py#L1)
-- **`linking.linker`** — Linker utilities → [open](vscode://file//home/paul/kgfoundry/src/linking/linker.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5dfbe3d9af9aa202dac875e3eeb49578ed9a092b/src/linking/linker.py#L1)
+- **`linking.calibration`** — Calibration utilities → [open](vscode://file//home/paul/kgfoundry/src/linking/calibration.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/d00efba427cbed104ea7b610148a4d1332a7d360/src/linking/calibration.py#L1)
+- **`linking.linker`** — Linker utilities → [open](vscode://file//home/paul/kgfoundry/src/linking/linker.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/d00efba427cbed104ea7b610148a4d1332a7d360/src/linking/linker.py#L1)
 
 ## Classes
 
-- **`linking.NavMap`** — Describe NavMap → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:32:1) | [view](https://github.com/github.com/paul-heyse/blob/5dfbe3d9af9aa202dac875e3eeb49578ed9a092b/src/kgfoundry_common/navmap_types.py#L32-L45)
-<!-- agent:readme v1 sha:5dfbe3d9af9aa202dac875e3eeb49578ed9a092b content:be800732e056 -->
+- **`linking.NavMap`** — Describe NavMap → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:32:1) | [view](https://github.com/github.com/paul-heyse/blob/d00efba427cbed104ea7b610148a4d1332a7d360/src/kgfoundry_common/navmap_types.py#L32-L45)
+<!-- agent:readme v1 sha:d00efba427cbed104ea7b610148a4d1332a7d360 content:af31b7f832dd -->

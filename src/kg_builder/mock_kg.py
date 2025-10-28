@@ -36,6 +36,8 @@ class MockKG:
         
         
         
+        
+        
 
 
 
@@ -76,6 +78,8 @@ class MockKG:
         
         
         
+        
+        
 
 
 
@@ -110,6 +114,8 @@ class MockKG:
         b : str
             Description for ``b``.
         """
+        
+        
         
         
         
@@ -158,6 +164,8 @@ class MockKG:
         
         
         
+        
+        
 
 
 
@@ -195,6 +203,8 @@ class MockKG:
         List[str]
             Description of return value.
         """
+        
+        
         
         
         
