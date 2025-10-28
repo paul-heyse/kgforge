@@ -39,20 +39,6 @@ class NavMapLoadError(RuntimeError):
     """
     
 
-# Restrict symbol discovery to known project namespaces to keep noise low.
-KNOWN_PREFIXES = (
-    "kgfoundry",
-    "kgfoundry_common",
-    "kg_builder",
-    "search_api",
-    "embeddings_dense",
-    "embeddings_sparse",
-    "ontology",
-    "orchestration",
-    "observability",
-    "registry",
-)
-
 WINDOW = int(os.getenv("TESTMAP_WINDOW", "3"))
 COV_JSON = Path(os.getenv("TESTMAP_COVERAGE_JSON", str(OUTDIR / "coverage.json")))
 FAIL_BUDGET = int(os.getenv("TESTMAP_FAIL_BUDGET", "5"))
@@ -106,27 +92,61 @@ def load_symbol_candidates() -> set[str]:
     """
     
     candidates: set[str] = set()
+
+    def _record(module_name: str, exports: list[object] | None = None) -> None:
+        module = module_name[:-len(".__init__")] if module_name.endswith(".__init__") else module_name
+        if not module:
+            return
+        candidates.add(module)
+        if exports:
+            for symbol in exports:
+                if isinstance(symbol, str) and symbol:
+                    if symbol.startswith(f"{module}."):
+                        candidates.add(symbol)
+                    else:
+                        candidates.add(f"{module}.{symbol}")
+
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if symbols_json.exists():
         try:
-            data = json.loads(symbols_json.read_text())
+            data = json.loads(symbols_json.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             data = []
         for row in data:
             path = row.get("path")
             if isinstance(path, str):
-                candidates.add(path)
+                _record(path)
+    if candidates:
+        return candidates
+
+    navmap = ROOT / "site" / "_build" / "navmap" / "navmap.json"
+    if navmap.exists():
+        try:
+            nav_data = json.loads(navmap.read_text(encoding="utf-8"))
+        except Exception:
+            nav_data = {}
+        modules = nav_data.get("modules") if isinstance(nav_data, dict) else None
+        if isinstance(modules, dict):
+            for module_name, entry in modules.items():
+                exports: list[object] | None = None
+                if isinstance(entry, dict):
+                    ex = entry.get("exports")
+                    if isinstance(ex, list):
+                        exports = ex
+                if isinstance(module_name, str):
+                    _record(module_name, exports)
     if candidates:
         return candidates
 
     for pyfile in SRC.rglob("*.py"):
-        rel = pyfile.relative_to(SRC)
+        try:
+            rel = pyfile.relative_to(SRC)
+        except ValueError:
+            continue
         module = ".".join(rel.with_suffix("").parts)
         if module.endswith(".__init__"):
             module = module[: -len(".__init__")]
-        if not module:
-            continue
-        if module.startswith(KNOWN_PREFIXES):
+        if module:
             candidates.add(module)
     return candidates
 
