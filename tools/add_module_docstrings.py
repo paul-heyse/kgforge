@@ -31,7 +31,10 @@ def module_name(path: Path) -> str:
     
     
     rel = path.relative_to(SRC).with_suffix("")
-    return str(rel).replace("/", ".")
+    parts = list(rel.parts)
+    if parts and parts[-1] == "__init__":
+        parts = parts[:-1]
+    return ".".join(parts)
 
 
 def needs_docstring(text: str) -> bool:
