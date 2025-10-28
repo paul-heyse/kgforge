@@ -56,6 +56,7 @@ class DuckDBRegistryHelper:
         """
         
         
+        
         self.db_path = db_path
 
     def _con(self) -> duckdb.DuckDBPyConnection:

@@ -68,15 +68,16 @@ class OpenAccessHarvester:
             Description for ``user_agent``.
         contact_email : str
             Description for ``contact_email``.
-        openalex_base : str | None
+        openalex_base : str, optional, default='https://api.openalex.org'
             Description for ``openalex_base``.
-        unpaywall_base : str | None
+        unpaywall_base : str, optional, default='https://api.unpaywall.org'
             Description for ``unpaywall_base``.
-        pdf_host_base : str | None
+        pdf_host_base : str | None, optional, default=None
             Description for ``pdf_host_base``.
-        out_dir : str | None
+        out_dir : str, optional, default='/data/pdfs'
             Description for ``out_dir``.
         """
+        
         
         
         self.ua = user_agent

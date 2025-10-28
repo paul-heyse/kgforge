@@ -60,6 +60,7 @@ class OntologyCatalog:
         """
         
         
+        
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
