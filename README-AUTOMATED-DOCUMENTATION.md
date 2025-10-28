@@ -37,6 +37,7 @@ generation pipeline, explaining every component, tool, and step in the process.
 2. **[The Complete Documentation Pipeline](#the-complete-documentation-pipeline)**
    - [Stage 0: Clean Slate](#stage-0-clean-slate)
    - [Stage 1: Docstring Generation](#stage-1-docstring-generation-make-docstrings)
+   - [Gallery Validation](#gallery-validation-python-toolsvalidate_gallerypy)
    - [Stage 2: README Generation](#stage-2-readme-generation-make-readmes)
    - [Stage 3: NavMap Update](#stage-3-navmap-update-python-toolsupdate_navmapspy)
    - [Stage 4: NavMap Index Build](#stage-4-navmap-index-build-python-toolsnavmapbuild_navmappy)
@@ -251,19 +252,20 @@ The script executes stages sequentially in a strict order. Each stage must compl
 **Complete execution order:**
 
 1. `make docstrings` - Generate and validate docstrings
-2. `make readmes` - Generate package READMEs  
-3. `python tools/update_navmaps.py` - Validate no legacy NavMap sections
-4. `python tools/navmap/build_navmap.py` - Build navmap index
-5. `python tools/navmap/check_navmap.py` - Validate navmap metadata
-6. `pytest --xdoctest examples` - Run doctest examples
-7. `make symbols` - Build symbol index (flat JSON array)
-8. `python tools/docs/build_test_map.py` - Build test coverage map
-9. `python tools/docs/scan_observability.py` - Scan observability instrumentation
-10. `python tools/docs/export_schemas.py` - Export data contract schemas
-11. `python tools/docs/build_graphs.py` - Build dependency graphs
-12. `make html` - Build Sphinx HTML docs
-13. `make json` - Build Sphinx JSON corpus
-14. `mkdocs build` (optional) - Build MkDocs site if available
+2. `python tools/validate_gallery.py` - Enforce Sphinx-Gallery example format
+3. `make readmes` - Generate package READMEs
+4. `python tools/update_navmaps.py` - Validate no legacy NavMap sections
+5. `python tools/navmap/build_navmap.py` - Build navmap index
+6. `python tools/navmap/check_navmap.py` - Validate navmap metadata
+7. `pytest --xdoctest examples` - Run doctest examples
+8. `make symbols` - Build symbol index (flat JSON array)
+9. `python tools/docs/build_test_map.py` - Build test coverage map
+10. `python tools/docs/scan_observability.py` - Scan observability instrumentation
+11. `python tools/docs/export_schemas.py` - Export data contract schemas
+12. `python tools/docs/build_graphs.py` - Build dependency graphs
+13. `make html` - Build Sphinx HTML docs
+14. `make json` - Build Sphinx JSON corpus
+15. `mkdocs build` (optional) - Build MkDocs site if available
 
 #### Stage 1: Docstring Generation (`make docstrings`)
 
@@ -292,6 +294,33 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - Docstring coverage below 90%
 - PEP 257 style violations detected
 - Generation tool errors (malformed Python)
+
+#### Gallery Validation (`python tools/validate_gallery.py`)
+
+**Purpose:** Verify that every gallery example follows the title, tag, and
+constraint conventions required by Sphinx-Gallery.
+
+**Executes:**
+
+1. `python tools/validate_gallery.py --examples-dir examples/` - Parse module
+   docstrings and enforce formatting rules.
+
+**Targets:** `examples/*.py`
+
+**What it checks:**
+- First docstring line is a ≤79 character title with a matching `=` underline.
+- `.. tags::` directive exists directly under the description.
+- `Constraints` section uses a dashed underline and bullet list.
+- Prohibits legacy `:orphan:` directives and custom `.. _gallery_*:` labels.
+
+**Exit condition:**
+- Returns `0` when all examples pass validation.
+- Returns `1` when at least one example fails (prevents later Sphinx stages).
+
+**Failure reasons:**
+- Missing module docstrings or incorrect title formatting.
+- Missing tags or constraints sections.
+- Residual legacy directives conflicting with auto-generated anchors.
 
 #### Stage 2: README Generation (`make readmes`)
 
@@ -525,6 +554,7 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - Generates visual dependency graphs
 - Creates architecture diagrams
 - Maps module relationships and import hierarchies
+- Supports `--format` values `svg` (default) and `png`, with caching keyed per format
 
 **Generates:** Graph visualizations and diagrams (location TBD based on tool implementation)
 
@@ -990,7 +1020,8 @@ def func1():
 | [`docs/_scripts/build_symbol_index.py`](docs/_scripts/build_symbol_index.py) | Emits `docs/_build/symbols.json` flat array for agent consumption. Each entry contains fully qualified name, kind, file path, line range, and docstring summary. |
 | [`Makefile`](Makefile) | Defines developer tasks: `docstrings`, `readmes`, `html`, `json`, `symbols`, `navmap-build`, `navmap-check`, `watch`, `fmt`, `lint`, `bootstrap`. |
 | [`mkdocs.yml`](mkdocs.yml) | MkDocs configuration for Material theme with plugins: search, gen-files (dynamic API pages), mkdocstrings (Python docs), literate-nav, section-index. |
-| [`.pre-commit-config.yaml`](.pre-commit-config.yaml) | Pre-commit hooks: Ruff (imports/lint/format), Black, Mypy, docformatter, **pydoclint**, pydocstyle, interrogate, navmap-build, navmap-check. |
+| [`.pre-commit-config.yaml`](.pre-commit-config.yaml) | Pre-commit hooks: Ruff (imports/lint/format), Black, Mypy, docformatter, **pydoclint**, navmap-build, navmap-check, validate-gallery, pydocstyle, interrogate. |
+| [`tools/validate_gallery.py`](tools/validate_gallery.py) | Parses `examples/*.py` to ensure docstrings follow the Sphinx-Gallery title, tag, and constraints conventions. Fails early when examples drift. |
 | [`.numpydoc`](.numpydoc) | Global numpydoc validation settings (`GL01`, `SS01`, `ES01`, `RT01`, `PR01`) used by Sphinx during HTML/JSON builds. |
 | [`pyproject.toml`](pyproject.toml) | Configures Ruff (lint/format), Black, pytest, mypy, pydocstyle, and docs extras (`[project.optional-dependencies.docs]`). |
 | [`mypy.ini`](mypy.ini) | Strict type-check configuration (Python 3.13, `mypy_path=src`, third-party ignores for packages lacking stubs). |
@@ -1017,25 +1048,47 @@ The single entry point for complete documentation regeneration.
 **Execution flow:**
 1. Clean slate: `rm -rf docs/_build site`
 2. `make docstrings` - Generate and validate docstrings
-3. `make readmes` - Generate package READMEs
-4. `python tools/update_navmaps.py` - Validate no legacy NavMap sections
-5. `python tools/navmap/build_navmap.py` - Build navmap index
-6. `python tools/navmap/check_navmap.py` - Validate navmap
-7. `pytest --xdoctest examples` - Run doctest examples
-8. `make symbols` - Build symbol index (flat JSON array)
-9. `python tools/docs/build_test_map.py` - Build test coverage map
-10. `python tools/docs/scan_observability.py` - Scan observability instrumentation
-11. `python tools/docs/export_schemas.py` - Export data contract schemas
-12. `python tools/docs/build_graphs.py` - Build dependency graphs
-13. `make html` - Build Sphinx HTML docs
-14. `make json` - Build Sphinx JSON corpus
-15. `mkdocs build` (optional) - Build MkDocs site if available
+3. `python tools/validate_gallery.py` - Enforce gallery example format
+4. `make readmes` - Generate package READMEs
+5. `python tools/update_navmaps.py` - Validate no legacy NavMap sections
+6. `python tools/navmap/build_navmap.py` - Build navmap index
+7. `python tools/navmap/check_navmap.py` - Validate navmap
+8. `pytest --xdoctest examples` - Run doctest examples
+9. `make symbols` - Build symbol index (flat JSON array)
+10. `python tools/docs/build_test_map.py` - Build test coverage map
+11. `python tools/docs/scan_observability.py` - Scan observability instrumentation
+12. `python tools/docs/export_schemas.py` - Export data contract schemas
+13. `python tools/docs/build_graphs.py` - Build dependency graphs
+14. `make html` - Build Sphinx HTML docs
+15. `make json` - Build Sphinx JSON corpus
+16. `mkdocs build` (optional) - Build MkDocs site if available
 
 **Exit behavior:**
 - Exits with error if virtual environment is missing
 - Exits with error if required doc tools are missing
 - Continues with warning if mkdocs is unavailable
 - Each stage must complete successfully or the script fails
+
+### Gallery Validator: `tools/validate_gallery.py`
+
+Ensures every gallery example exposes a title, tags, and constraints section
+that Sphinx-Gallery can parse reliably.
+
+**Responsibilities:**
+- Parse `examples/*.py` using `ast` to obtain raw docstrings.
+- Enforce title + underline structure with a ≤79 character limit.
+- Require `.. tags::` and `Constraints` sections; forbid `:orphan:` and custom
+  gallery anchors.
+- Provide actionable error messages when validation fails.
+
+**CLI options:**
+- `--examples-dir PATH` (default `examples/`)
+- `--strict` for additional checks (e.g., trailing punctuation on titles)
+- `--verbose` to print passing files
+- `--fix` reserved for future auto-formatting helpers
+
+**Integration points:** invoked by pre-commit, `tools/update_docs.sh`, and the
+CI docs workflow to block Sphinx builds when examples drift.
 
 ### Sphinx Configuration: `docs/conf.py`
 
@@ -2636,8 +2689,9 @@ pre-commit run --all-files
 4. docformatter (custom wrapper)
 5. **navmap-build** (regenerates index)
 6. **navmap-check** (validates metadata)
-7. pydocstyle
-8. interrogate
+7. **validate-gallery** (enforces gallery example format)
+8. pydocstyle
+9. interrogate
 
 **Critical:** Stages 5-7 enforce documentation consistency on every commit.
 
@@ -2654,6 +2708,25 @@ Skip installing pre-commit (or skip the hook manually) when README regeneration
 is undesirable—for example during large refactors where READMEs will be updated
 later or when CI validation is sufficient.
 
+### Gallery Examples: `examples/`
+
+Sphinx-Gallery reads each module in `examples/` and derives HTML titles and
+`:ref:` anchors from the first line of the module docstring. The new
+`tools/validate_gallery.py` hook guarantees the required structure before the
+documentation build starts.
+
+- **Title extraction:** the first docstring line becomes the page heading and is
+  paired with an `=` underline. The generated anchor follows the
+  `sphx_glr_gallery_<filename>.py` convention used throughout the docs.
+- **Metadata:** the validator enforces the presence of `.. tags::` directives
+  and a `Constraints` section so examples describe runtime expectations.
+- **Automation:** the hook runs automatically during pre-commit, in
+  `tools/update_docs.sh`, and inside CI. Any failure blocks the documentation
+  build until the example format is corrected.
+- **Contributor guide:** see
+  [`docs/how-to/contributing-gallery-examples.md`](docs/how-to/contributing-gallery-examples.md)
+  for a fully annotated template and troubleshooting tips.
+
 ### CI/CD Integration
 
 For continuous integration we now enforce README freshness in addition to the
@@ -2669,7 +2742,7 @@ git diff --quiet --exit-code -- src/**/README.md
 ```
 
 **CI workflow highlights:**
-1. Run `tools/update_docs.sh` (Sphinx, NavMap, TestMap, etc.).
+1. Run `tools/update_docs.sh` (includes gallery validation, Sphinx, NavMap, TestMap, etc.).
 2. Execute the README generator in GitHub-only mode to avoid editor-specific
    links.
 3. Inspect `git diff -- src/**/README.md`; when differences exist the workflow

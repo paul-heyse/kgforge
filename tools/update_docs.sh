@@ -74,6 +74,10 @@ export GRAPH_FAIL_ON_CYCLES=0
 export GRAPH_FAIL_ON_LAYER=0
 
 run make docstrings
+if ! run "$PY" tools/validate_gallery.py; then
+  echo "Gallery validation failed. Fix errors before building docs." >&2
+  exit 1
+fi
 run make readmes
 run "$PY" tools/update_navmaps.py
 run "$PY" tools/navmap/build_navmap.py
