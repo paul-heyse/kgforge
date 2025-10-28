@@ -20,7 +20,7 @@ import sys
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 # Third-party (global graph & rendering)
 try:
@@ -475,6 +475,9 @@ def analyze_graph(g: nx.DiGraph, layers: dict[str, Any]) -> dict[str, Any]:
         # older NetworkX without length_bound
         cyc_iter = nx.simple_cycles(gp)
 
+    cycle_enumeration_skipped = False
+    scc_summary: list[dict[str, Any]] = []
+
     if cycle_limit > 0:
         for i, c in enumerate(cyc_iter, 1):
             cycles.append(c)
@@ -484,28 +487,39 @@ def analyze_graph(g: nx.DiGraph, layers: dict[str, Any]) -> dict[str, Any]:
         # Guard against pathological blow-ups: if graph is too large, skip enumeration and use SCCs
         EDGE_BUDGET = int(os.getenv("GRAPH_EDGE_BUDGET", "50000"))
         if gp.number_of_edges() > EDGE_BUDGET:
+            cycle_enumeration_skipped = True
             sccs = [list(s) for s in nx.strongly_connected_components(gp) if len(s) > 1]
-            return {
-                "cycles": [],
-                "centrality": nx.degree_centrality(gp),
-                "layer_violations": [],
-                "scc_summary": [{"members": s, "size": len(s)} for s in sccs],
-            }
-        cycles = [c for c in cyc_iter]
-    centrality = nx.degree_centrality(g) if g.number_of_nodes() else {}
-    # layer policy violations (dependencies should point inward in the layer order)
-    order = layers.get("order", [])
-    pkg2layer: dict[str, str] = layers.get("packages", {}) or {}
-    rank = {name: i for i, name in enumerate(order)}
-    violations: list[list[str]] = []
-    rules = layers.get("rules", {})
-    allow_outward = bool(rules.get("allow_outward", False))
-    for u, v in g.edges():
-        lu, lv = pkg2layer.get(u), pkg2layer.get(v)
-        if lu and lv and lu in rank and lv in rank:
-            if rank[lv] > rank[lu] and not allow_outward:
-                violations.append([lu, lv, f"edge:{u}->{v}"])
-    return {"cycles": cycles, "centrality": centrality, "layer_violations": violations}
+            scc_summary = [{"members": s, "size": len(s)} for s in sccs]
+        else:
+            cycles = [c for c in cyc_iter]
+
+    if cycle_enumeration_skipped:
+        centrality = nx.degree_centrality(gp) if gp.number_of_nodes() else {}
+        violations: list[list[str]] = []
+    else:
+        centrality = nx.degree_centrality(g) if g.number_of_nodes() else {}
+        # layer policy violations (dependencies should point inward in the layer order)
+        order = layers.get("order", [])
+        pkg2layer = cast(dict[str, str], layers.get("packages", {}) or {})
+        rank = {name: i for i, name in enumerate(order)}
+        violations = []
+        rules = layers.get("rules", {})
+        allow_outward = bool(rules.get("allow_outward", False))
+        for u, v in g.edges():
+            lu, lv = pkg2layer.get(u), pkg2layer.get(v)
+            if lu and lv and lu in rank and lv in rank:
+                if rank[lv] > rank[lu] and not allow_outward:
+                    violations.append([lu, lv, f"edge:{u}->{v}"])
+
+    result: dict[str, Any] = {
+        "cycles": cycles,
+        "centrality": centrality,
+        "layer_violations": violations,
+        "cycle_enumeration_skipped": cycle_enumeration_skipped,
+    }
+    if scc_summary:
+        result["scc_summary"] = scc_summary
+    return result
 
 
 def style_and_render(
@@ -951,14 +965,39 @@ def main() -> None:
     # 4) Analyze, render, write meta
     analysis = analyze_graph(g, layers)
     style_and_render(g, layers, analysis, OUT / f"subsystems.{fmt}", fmt=fmt)
-    meta = {
+    meta: dict[str, Any] = {
         "packages": sorted([str(n) for n in g.nodes()]),
         "cycles": analysis["cycles"],
         "centrality": analysis["centrality"],
         "layer_violations": analysis["layer_violations"],
+        "cycle_enumeration_skipped": analysis.get("cycle_enumeration_skipped", False),
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
+    if analysis.get("scc_summary"):
+        meta["scc_summary"] = analysis["scc_summary"]
     (OUT / "graph_meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+
+    summary_lines = [
+        "# Subsystem Graph Metadata",
+        "",
+        (
+            "*Cycle enumeration skipped:* Yes"
+            if meta["cycle_enumeration_skipped"]
+            else "*Cycle enumeration skipped:* No"
+        ),
+    ]
+    if meta.get("scc_summary"):
+        summary_lines += [
+            "",
+            "The fallback strongly connected components are:",
+        ]
+        for entry in meta["scc_summary"]:
+            members = ", ".join(sorted(entry["members"]))
+            summary_lines.append(f"- size {entry['size']}: {members}")
+    else:
+        summary_lines.append("")
+        summary_lines.append("Cycle enumeration completed normally.")
+    (OUT / "subsystems_meta.md").write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
 
     # 5) Enforce policy
     enforce_policy(analysis, allow, args.fail_on_cycles, args.fail_on_layer_violations)
