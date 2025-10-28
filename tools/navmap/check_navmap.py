@@ -35,6 +35,16 @@ SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 IDENT_RE = re.compile(r"^[A-Za-z_]\w*$")
 STABILITY = {"stable", "beta", "experimental", "deprecated"}
 
+
+class _AllDictTemplate:
+    """Sentinel for {name: TEMPLATE for name in __all__} structures."""
+
+    __slots__ = ("template",)
+
+    def __init__(self, template: Any) -> None:
+        self.template = template
+
+
 # Optional PEP 440 validation
 try:
     from packaging.version import InvalidVersion, Version  # type: ignore
@@ -78,6 +88,42 @@ def _parse_navmap_dict(py: Path) -> dict[str, Any]:
         return {}
     result: dict[str, Any] = {}
 
+    def _expand_placeholders(value: Any, exports: list[str]) -> Any:
+        """Replace __all__ placeholders within navmap literals."""
+        if isinstance(value, str) and value == "__all__":
+            return list(dict.fromkeys(exports))
+        if isinstance(value, list):
+            items: list[Any] = []
+            for entry in value:
+                replaced = _expand_placeholders(entry, exports)
+                if isinstance(replaced, list):
+                    items.extend(replaced)
+                else:
+                    items.append(replaced)
+            return items
+        if isinstance(value, set):
+            items: set[Any] = set()
+            for entry in value:
+                replaced = _expand_placeholders(entry, exports)
+                if isinstance(replaced, list):
+                    items.update(replaced)
+                else:
+                    items.add(replaced)
+            return items
+        if isinstance(value, dict):
+            return {k: _expand_placeholders(v, exports) for k, v in value.items()}
+        if isinstance(value, _AllDictTemplate):
+            template = value.template
+            result: dict[str, Any] = {}
+            for name in exports:
+                mapped = _expand_placeholders(template, exports)
+                if isinstance(mapped, dict):
+                    result[name] = mapped
+                else:
+                    result[name] = mapped
+            return result
+        return value
+
     def _safe_eval(value: ast.AST) -> Any:
         """Safe eval.
 
@@ -112,6 +158,16 @@ def _parse_navmap_dict(py: Path) -> dict[str, Any]:
             return {
                 _safe_eval(k): _safe_eval(v) for k, v in zip(value.keys, value.values, strict=False)
             }
+        if isinstance(value, ast.DictComp):
+            if len(value.generators) != 1:
+                raise ValueError("unsupported dict comprehension")
+            comp = value.generators[0]
+            if not isinstance(comp.target, ast.Name) or not isinstance(comp.iter, ast.Name):
+                raise ValueError("unsupported dict comprehension")
+            if comp.iter.id != "__all__":
+                raise ValueError("unsupported dict comprehension iterator")
+            template = _safe_eval(value.value)
+            return _AllDictTemplate(template)
         raise ValueError(ast.dump(value))
 
     for node in tree.body:
@@ -131,6 +187,17 @@ def _parse_navmap_dict(py: Path) -> dict[str, Any]:
                         result = value
                 except Exception:
                     pass
+    exports = _parse_all(py)
+    if not exports and isinstance(result, dict):
+        raw_exports = result.get("exports")
+        if isinstance(raw_exports, list):
+            exports = [x for x in raw_exports if isinstance(x, str)]
+    if exports and result:
+        result = _expand_placeholders(result, exports)
+        if isinstance(result.get("exports"), list):
+            result["exports"] = list(
+                dict.fromkeys(x for x in result["exports"] if isinstance(x, str))
+            )
     return result
 
 
@@ -144,7 +211,7 @@ def _parse_all(py: Path) -> list[str]:
         return []
 
     def _literal(node: ast.AST) -> list[str] | None:
-        """literal.
+        """Literal.
 
         Parameters
         ----------
@@ -306,12 +373,6 @@ def main(argv: list[str] | None = None) -> int:
     int
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     errors: list[str] = []
     for py in sorted(SRC.rglob("*.py")):
         errors.extend(_inspect(py))
