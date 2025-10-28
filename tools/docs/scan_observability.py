@@ -226,9 +226,8 @@ def _deep_merge_dicts(base: dict[str, Any], override: dict[str, Any]) -> dict[st
 
 
 def load_policy() -> dict[str, Any]:
-    """
-    Compute load policy.
-    
+    """Compute load policy.
+
     Carry out the load policy operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
     
     Returns
@@ -243,7 +242,6 @@ def load_policy() -> dict[str, Any]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
     try:

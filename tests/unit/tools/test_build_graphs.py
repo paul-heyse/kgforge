@@ -106,7 +106,6 @@ def test_main_exits_on_failure_and_cleans_outputs(
 
 def test_build_one_package_supports_png_and_cache(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
     """Non-default formats should render and populate the cache without rebuilding."""
-
     out_dir = tmp_path / "graphs"
     out_dir.mkdir()
     cache_dir = tmp_path / "cache"

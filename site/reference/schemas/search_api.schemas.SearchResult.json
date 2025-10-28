@@ -1,0 +1,76 @@
+{
+  "$id": "https://kgfoundry/schemas/search_api.schemas.SearchResult.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Describe SearchResult.",
+  "examples": [
+    {
+      "chunk_id": null,
+      "concepts": [],
+      "doc_id": null,
+      "score": null,
+      "section": null,
+      "signals": {},
+      "spans": {},
+      "title": null
+    }
+  ],
+  "properties": {
+    "chunk_id": {
+      "title": "Chunk Id",
+      "type": "string"
+    },
+    "concepts": {
+      "default": [],
+      "items": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "type": "object"
+      },
+      "title": "Concepts",
+      "type": "array"
+    },
+    "doc_id": {
+      "title": "Doc Id",
+      "type": "string"
+    },
+    "score": {
+      "title": "Score",
+      "type": "number"
+    },
+    "section": {
+      "title": "Section",
+      "type": "string"
+    },
+    "signals": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "default": {},
+      "title": "Signals",
+      "type": "object"
+    },
+    "spans": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "default": {},
+      "title": "Spans",
+      "type": "object"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "doc_id",
+    "chunk_id",
+    "title",
+    "section",
+    "score"
+  ],
+  "title": "SearchResult",
+  "type": "object",
+  "x-version-introduced": "0.2.0"
+}

@@ -14,9 +14,9 @@ import ast
 import inspect
 import re
 import sys
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
 
 TITLE_MAX_LENGTH = 79
 UNDERLINE_TOLERANCE = 1
@@ -53,14 +53,42 @@ class ValidationResult:
     errors: list[str]
 
     def extend(self, messages: Iterable[str]) -> None:
-        """Append messages to the error list."""
+        """Compute extend.
 
+        Carry out the extend operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
+        Parameters
+        ----------
+        messages : collections.abc.Iterable
+            Description for ``messages``.
+        
+        Examples
+        --------
+        >>> from tools.validate_gallery import extend
+        >>> extend(...)  # doctest: +ELLIPSIS
+        """
+        
         self.errors.extend(messages)
 
     @property
     def ok(self) -> bool:
-        """Return ``True`` when the file has no validation errors."""
+        """Compute ok.
 
+        Carry out the ok operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
+        Returns
+        -------
+        bool
+            Description of return value.
+        
+        Examples
+        --------
+        >>> from tools.validate_gallery import ok
+        >>> result = ok()
+        >>> result  # doctest: +ELLIPSIS
+        ...
+        """
+        
         return not self.errors
 
 
@@ -69,8 +97,28 @@ class GalleryValidationError(RuntimeError):
 
 
 def validate_title_format(docstring: str) -> tuple[bool, str]:
-    """Validate the title + underline structure in a docstring."""
+    """Compute validate title format.
 
+    Carry out the validate title format operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
+    Parameters
+    ----------
+    docstring : str
+        Description for ``docstring``.
+    
+    Returns
+    -------
+    Tuple[bool, str]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.validate_gallery import validate_title_format
+    >>> result = validate_title_format(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    """
+    
     lines = [line.rstrip() for line in inspect.cleandoc(docstring).splitlines()]
     while lines and not lines[0].strip():
         lines.pop(0)
@@ -98,33 +146,73 @@ def validate_title_format(docstring: str) -> tuple[bool, str]:
 
 
 def check_orphan_directive(docstring: str) -> bool:
-    """Return ``True`` when the docstring still contains the ``:orphan:`` directive."""
+    """Compute check orphan directive.
 
+    Carry out the check orphan directive operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
+    Parameters
+    ----------
+    docstring : str
+        Description for ``docstring``.
+    
+    Returns
+    -------
+    bool
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.validate_gallery import check_orphan_directive
+    >>> result = check_orphan_directive(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    """
+    
     return ":orphan:" in docstring
 
 
 def check_custom_labels(docstring: str) -> list[str]:
-    """Return custom ``.. _gallery_*:`` labels present in the docstring."""
+    """Compute check custom labels.
 
+    Carry out the check custom labels operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
+    Parameters
+    ----------
+    docstring : str
+        Description for ``docstring``.
+    
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.validate_gallery import check_custom_labels
+    >>> result = check_custom_labels(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    """
+    
     return CUSTOM_LABEL_PATTERN.findall(docstring)
 
 
 def _has_tags_directive(docstring: str) -> bool:
-    """Return ``True`` if the docstring declares a ``.. tags::`` directive."""
+    """Return ``True`` if the docstring declares a ``..
 
+    tags::`` directive.
+    """
     return TAGS_PATTERN.search(docstring) is not None
 
 
 def _has_constraints_section(docstring: str) -> bool:
     """Return ``True`` if a ``Constraints`` section header is present."""
-
     match = CONSTRAINTS_HEADER_PATTERN.search(docstring)
     return bool(match and set(match.group("rule")) == {"-"})
 
 
 def _load_docstring(path: Path) -> str | None:
     """Extract the module docstring from ``path`` using ``ast`` parsing."""
-
     try:
         module = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     except SyntaxError as exc:  # pragma: no cover - should never happen for examples
@@ -133,8 +221,30 @@ def _load_docstring(path: Path) -> str | None:
 
 
 def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]:
-    """Validate ``file_path`` and return a list of human-readable errors."""
+    """Compute validate example file.
 
+    Carry out the validate example file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
+    Parameters
+    ----------
+    file_path : Path
+        Description for ``file_path``.
+    strict : bool | None
+        Description for ``strict``.
+    
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.validate_gallery import validate_example_file
+    >>> result = validate_example_file(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    """
+    
     errors: list[str] = []
     docstring = _load_docstring(file_path)
     if docstring is None:
@@ -169,7 +279,6 @@ def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]
 
 def _iter_example_files(examples_dir: Path) -> Iterable[Path]:
     """Yield Python files inside ``examples_dir`` (non-recursive)."""
-
     for path in sorted(examples_dir.glob("*.py")):
         if path.name.startswith("."):
             continue
@@ -177,8 +286,32 @@ def _iter_example_files(examples_dir: Path) -> Iterable[Path]:
 
 
 def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> int:
-    """Validate gallery examples located in ``examples_dir``."""
+    """Compute main.
 
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
+    Parameters
+    ----------
+    examples_dir : Path
+        Description for ``examples_dir``.
+    strict : bool | None
+        Description for ``strict``.
+    verbose : bool | None
+        Description for ``verbose``.
+    
+    Returns
+    -------
+    int
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.validate_gallery import main
+    >>> result = main(..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    """
+    
     results: list[ValidationResult] = []
     exit_code = 0
     for path in _iter_example_files(examples_dir):
@@ -207,7 +340,6 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
     """Parse CLI arguments."""
-
     parser = argparse.ArgumentParser(
         description="Validate Sphinx-Gallery example docstrings for kgfoundry.",
     )
@@ -237,7 +369,6 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 
 def _run_from_cli(argv: list[str]) -> int:
     """Entry point used by ``if __name__ == '__main__'`` guard."""
-
     args = _parse_args(argv)
     if args.fix:
         print("Automatic fixing is not implemented yet.", file=sys.stderr)
