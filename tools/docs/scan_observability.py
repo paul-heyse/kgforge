@@ -969,7 +969,6 @@ def main() -> None:
         json.dumps(lints, indent=2) + "\n", encoding="utf-8"
     )
     _write_config_summary(all_metrics, all_logs, all_traces)
-    _write_config_summary(all_metrics, all_logs, all_traces)
 
     # Strict mode for CI
     fail = os.getenv("OBS_FAIL_ON_LINT", "0") == "1"
