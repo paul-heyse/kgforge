@@ -15,15 +15,28 @@ __all__ = ["SpladeDoc", "SpladeIndex", "tok"]
 
 __navmap__: Final[NavMap] = {
     "title": "search_api.splade_index",
-    "synopsis": "Toy SPLADE-style sparse index for fixture search endpoints.",
+    "synopsis": "Example SPLADE index used in the search API fixtures",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["tok", "SpladeDoc", "SpladeIndex"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@search-api",
+        "stability": "experimental",
+        "since": "0.2.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@search-api",
+            "stability": "experimental",
+            "since": "0.2.0",
+        }
+        for name in __all__
+    },
 }
 
 TOKEN = re.compile(r"[A-Za-z0-9]+")
@@ -45,7 +58,6 @@ def tok(text: str) -> list[str]:
     List[str]
         Description of return value.
     """
-    
     return [token.lower() for token in TOKEN.findall(text or "")]
 
 
@@ -83,7 +95,6 @@ class SpladeIndex:
         sparse_root : str | None
             Description for ``sparse_root``.
         """
-        
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -148,7 +159,6 @@ class SpladeIndex:
         List[Tuple[int, float]]
             Description of return value.
         """
-        
         if self.N == 0:
             return []
         terms = tok(query)
@@ -183,5 +193,4 @@ class SpladeIndex:
         src.search_api.splade_index.SpladeDoc
             Description of return value.
         """
-        
         return self.docs[index]

@@ -12,15 +12,27 @@ __all__ = ["KGFoundryClient"]
 
 __navmap__: Final[NavMap] = {
     "title": "search_client.client",
-    "synopsis": "Client SDK for interacting with the kgfoundry search API",
+    "synopsis": "Lightweight HTTP client for the kgfoundry Search API",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["KGFoundryClient"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@search-api",
+        "stability": "experimental",
+        "since": "0.2.0",
+    },
+    "symbols": {
+        "KGFoundryClient": {
+            "owner": "@search-api",
+            "stability": "experimental",
+            "since": "0.2.0",
+        },
+    },
 }
 
 
@@ -32,10 +44,6 @@ class _SupportsResponse(Protocol):
 
         Carry out the raise for status operation.
         """
-        
-        
-        
-        
 
     def json(self) -> dict[str, Any]:
         """Compute json.
@@ -47,10 +55,6 @@ class _SupportsResponse(Protocol):
         Mapping[str, Any]
             Description of return value.
         """
-        
-        
-        
-        
 
 
 class _SupportsHttp(Protocol):
@@ -73,10 +77,6 @@ class _SupportsHttp(Protocol):
         src.search_client.client._SupportsResponse
             Description of return value.
         """
-        
-        
-        
-        
 
     def post(
         self,
@@ -106,10 +106,6 @@ class _SupportsHttp(Protocol):
         src.search_client.client._SupportsResponse
             Description of return value.
         """
-        
-        
-        
-        
 
 
 # [nav:anchor KGFoundryClient]
@@ -138,7 +134,6 @@ class KGFoundryClient:
         http : _SupportsHttp | None
             Description for ``http``.
         """
-        
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
@@ -169,7 +164,6 @@ class KGFoundryClient:
         Mapping[str, Any]
             Description of return value.
         """
-        
         r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
         return r.json()
@@ -201,7 +195,6 @@ class KGFoundryClient:
         Mapping[str, Any]
             Description of return value.
         """
-        
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
             f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout
@@ -226,7 +219,6 @@ class KGFoundryClient:
         Mapping[str, Any]
             Description of return value.
         """
-        
         r = self._http.post(
             f"{self.base_url}/graph/concepts",
             json={"q": q, "limit": limit},

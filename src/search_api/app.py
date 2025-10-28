@@ -44,6 +44,19 @@ __navmap__: Final[NavMap] = {
             ],
         },
     ],
+    "module_meta": {
+        "owner": "@search-api",
+        "stability": "experimental",
+        "since": "0.2.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@search-api",
+            "stability": "experimental",
+            "since": "0.2.0",
+        }
+        for name in __all__
+    },
 }
 
 logger = logging.getLogger(__name__)
