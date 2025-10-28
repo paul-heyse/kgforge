@@ -325,11 +325,9 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
     sh(cmd, cwd=ROOT)
 
 
-def collapse_to_packages(dot_path: Path):
+def collapse_to_packages(dot_path: Path) -> nx.DiGraph:
     """
-    Compute collapse to packages.
-    
-    Carry out the collapse to packages operation.
+    Collapse a pydeps DOT graph into package-level edges.
     
     Parameters
     ----------
@@ -338,7 +336,7 @@ def collapse_to_packages(dot_path: Path):
     
     Returns
     -------
-    Any
+    nx.DiGraph
         Description of return value.
     """
     graphs = pydot.graph_from_dot_file(str(dot_path))
@@ -353,15 +351,15 @@ def collapse_to_packages(dot_path: Path):
     return collapsed
 
 
-def analyze_graph(g, layers: dict[str, Any]) -> dict[str, Any]:
+def analyze_graph(g: nx.DiGraph, layers: dict[str, Any]) -> dict[str, Any]:
     """
-    Compute analyze graph.
+    Analyze the collapsed dependency graph for policy violations.
     
     Carry out the analyze graph operation.
     
     Parameters
     ----------
-    g : Any
+    g : nx.DiGraph
         Description for ``g``.
     layers : Mapping[str, Any]
         Description for ``layers``.
@@ -371,7 +369,7 @@ def analyze_graph(g, layers: dict[str, Any]) -> dict[str, Any]:
     Mapping[str, Any]
         Description of return value.
     """
-    # cycles (Johnson’s algorithm) & degree centrality
+    # cycles (Johnson's algorithm) & degree centrality
     # 1) prune forbidden outward edges before cycle enumeration
     order = layers.get("order", [])
     pkg2layer: dict[str, str] = layers.get("packages", {}) or {}
@@ -434,10 +432,10 @@ def analyze_graph(g, layers: dict[str, Any]) -> dict[str, Any]:
 
 
 def style_and_render(
-    g, layers: dict[str, Any], analysis: dict[str, Any], out_svg: Path, fmt: str = "svg"
+    g: nx.DiGraph, layers: dict[str, Any], analysis: dict[str, Any], out_svg: Path, fmt: str = "svg"
 ) -> None:
     """
-    Compute style and render.
+    Style the graph and render it to disk.
     
     Carry out the style and render operation.
     
@@ -699,7 +697,7 @@ def build_one_package(
 
 
 def main() -> None:
-    """Main.
+    """Run the build-graphs command-line entry point.
 
     Returns
     -------

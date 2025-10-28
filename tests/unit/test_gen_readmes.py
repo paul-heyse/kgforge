@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import importlib
 import sys
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -33,8 +36,7 @@ fake_detect_pkg.detect_packages = lambda: []
 fake_detect_pkg.detect_primary = lambda: "pkg"
 sys.modules.setdefault("detect_pkg", fake_detect_pkg)
 
-import pytest
-from tools import gen_readmes as gr
+gr = importlib.import_module("tools.gen_readmes")
 
 
 def _docstring(text: str | None) -> SimpleNamespace | None:

@@ -262,8 +262,9 @@ def _gh_link(path: Path, start: int | None, end: int | None) -> str | None:
 
 
 def _module_name(py: Path) -> str | None:
-    """Module name.
-
+    """
+    Return the dotted module name for ``py``.
+    
     Parameters
     ----------
     py : Path
@@ -507,8 +508,9 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
 
 
 def main() -> int:
-    """Main.
-
+    """
+    Run the navmap build CLI.
+    
     Returns
     -------
     int

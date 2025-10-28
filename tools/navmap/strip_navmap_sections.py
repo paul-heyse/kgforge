@@ -67,9 +67,7 @@ def clean_docstring(text: str) -> str:
 
 def rewrite_module(path: Path) -> bool:
     """
-    Compute rewrite module.
-    
-    Carry out the rewrite module operation.
+    Rewrite the module docstring when it contains legacy NavMap sections.
     
     Parameters
     ----------
@@ -89,10 +87,7 @@ def rewrite_module(path: Path) -> bool:
         return False
 
     cleaned = clean_docstring(doc_text)
-    if "\n" in cleaned:
-        new_lines = ['"""' + cleaned, '"""']
-    else:
-        new_lines = ['"""' + cleaned + '"""']
+    new_lines = ['"""' + cleaned, '"""'] if "\n" in cleaned else ['"""' + cleaned + '"""']
 
     original_lines = path.read_text(encoding="utf-8").splitlines()
     start = doc_expr.lineno - 1
@@ -103,11 +98,7 @@ def rewrite_module(path: Path) -> bool:
 
 
 def main() -> None:
-    """
-    Compute main.
-    
-    Carry out the main operation.
-    """
+    """Run the CLI that strips NavMap sections from module docstrings."""
     changed = 0
     for file_path in sorted(SRC.rglob("*.py")):
         if rewrite_module(file_path):

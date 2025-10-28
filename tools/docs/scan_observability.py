@@ -846,19 +846,20 @@ def _links_for(path: Path, lineno: int) -> dict[str, str]:
 
 
 def main() -> None:
-    """Main.
-
+    """
+    Run the observability scan CLI.
+    
     Returns
     -------
     None
         Description.
-
-
+    
+    
     Raises
     ------
     Exception
         Description.
-
+    
     Examples
     --------
     >>> main(...)

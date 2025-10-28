@@ -24,7 +24,7 @@ import json
 import os
 import pkgutil
 import sys
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -209,7 +209,7 @@ def _placeholder(py_type: Any) -> Any:
     return {}
 
 
-def _example_for_pydantic(model_cls) -> dict[str, Any]:
+def _example_for_pydantic(model_cls: type[object]) -> dict[str, Any]:
     """Synthesize a minimal example dict from model_fields (Pydantic v2)."""
     try:
         fields = getattr(model_cls, "model_fields", {})
@@ -226,7 +226,7 @@ def _example_for_pydantic(model_cls) -> dict[str, Any]:
     return example
 
 
-def _example_for_pandera(model_cls) -> dict[str, Any]:
+def _example_for_pandera(model_cls: type[object]) -> dict[str, Any]:
     """Produce a minimal 'row' example based on class attributes / schema JSON."""
     try:
         schema_json = model_cls.to_schema().to_json()
@@ -411,7 +411,7 @@ class Cfg:
 
 
 def _export_one_pydantic(
-    module_name: str, name: str, model_cls, cfg: Cfg, nav: dict
+    module_name: str, name: str, model_cls: type[object], cfg: Cfg, nav: dict
 ) -> tuple[Path, dict]:
     """Export one pydantic.
 
@@ -459,7 +459,7 @@ def _export_one_pydantic(
 
 
 def _export_one_pandera(
-    module_name: str, name: str, model_cls, cfg: Cfg, nav: dict
+    module_name: str, name: str, model_cls: type[object], cfg: Cfg, nav: dict
 ) -> tuple[Path, dict]:
     """Export one pandera.
 
@@ -502,12 +502,12 @@ def _export_one_pandera(
     return (OUT / f"{module_name}.{name}.json", _sorted(schema))
 
 
-def _iter_models():
-    """Return  iter models.
+def _iter_models() -> Iterator[tuple[str, str, object]]:
+    """Yield Pydantic and Pandera models discovered under ``TOP_PACKAGES``.
 
     Returns
     -------
-    Any
+    Iterator[tuple[str, str, object]]
         Description.
 
     Examples
@@ -526,7 +526,7 @@ def _iter_models():
 
 def main(argv: list[str] | None = None) -> int:
     """
-    Compute main.
+    Run the export-schemas CLI.
     
     Carry out the main operation.
     

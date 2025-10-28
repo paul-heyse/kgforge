@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Final
 
+from kgfoundry_common.navmap_types import NavMap
+
 
 @dataclass
 class Concept:
@@ -12,9 +14,6 @@ class Concept:
 
     id: str
     label: str | None = None
-
-
-from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["OntologyCatalog"]
 
