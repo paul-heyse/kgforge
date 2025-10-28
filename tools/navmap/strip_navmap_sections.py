@@ -38,6 +38,8 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
     
     
     
+    
+    
 
 
 
@@ -87,6 +89,8 @@ def clean_docstring(text: str) -> str:
     str
         Description of return value.
     """
+    
+    
     
     
     
@@ -157,6 +161,8 @@ def rewrite_module(path: Path) -> bool:
     
     
     
+    
+    
 
 
 
@@ -203,6 +209,8 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
     
     
     

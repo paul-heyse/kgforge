@@ -163,6 +163,12 @@ autodoc_typehints = "description"
 # Cross-link to Python stdlib docs
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
+    "pydantic": ("https://docs.pydantic.dev/latest/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "pyarrow": ("https://arrow.apache.org/docs/", None),
+    "fastapi": ("https://fastapi.tiangolo.com/", None),
+    "typer": ("https://typer.tiangolo.com/", None),
+    "duckdb": ("https://duckdb.org/docs/", None),
 }
 
 # Show line numbers in rendered source pages (Sphinx >= 7.2)

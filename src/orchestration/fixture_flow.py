@@ -68,6 +68,8 @@ def t_prepare_dirs(root: str) -> dict[str, bool]:
     
     
     
+    
+    
     path = Path(root)
     (path / "parquet" / "dense").mkdir(parents=True, exist_ok=True)
     (path / "parquet" / "sparse").mkdir(parents=True, exist_ok=True)
@@ -93,6 +95,8 @@ def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
     Tuple[str, int]
         Description of return value.
     """
+    
+    
     
     
     
@@ -146,6 +150,8 @@ def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
     
     
     
+    
+    
     writer = ParquetVectorWriter(dense_root)
     vector = [0.0] * 2560
     out_root = writer.write_dense(
@@ -171,6 +177,8 @@ def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
     Tuple[str, int]
         Description of return value.
     """
+    
+    
     
     
     
@@ -218,6 +226,8 @@ def t_register_in_duckdb(
     Mapping[str, List[str]]
         Description of return value.
     """
+    
+    
     
     
     
@@ -285,6 +295,8 @@ def fixture_pipeline(
     Mapping[str, List[str]]
         Description of return value.
     """
+    
+    
     
     
     

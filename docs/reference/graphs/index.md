@@ -12,3 +12,8 @@ Below are generated import and UML diagrams for the project packages.
 :width: 100%
 ```
 
+## Subsystems (policy-aware)
+
+```{image} ../../_build/graphs/subsystems.svg
+:alt: Cross-subsystem import graph (cycles red; thickness ~ centrality)
+:width: 100%

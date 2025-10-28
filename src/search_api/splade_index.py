@@ -58,6 +58,8 @@ def tok(text: str) -> list[str]:
     
     
     
+    
+    
 
 
 
@@ -115,6 +117,8 @@ class SpladeIndex:
         sparse_root : str | None
             Description for ``sparse_root``.
         """
+        
+        
         
         
         
@@ -225,6 +229,8 @@ class SpladeIndex:
         
         
         
+        
+        
 
 
 
@@ -279,6 +285,8 @@ class SpladeIndex:
         src.search_api.splade_index.SpladeDoc
             Description of return value.
         """
+        
+        
         
         
         

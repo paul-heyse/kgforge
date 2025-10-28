@@ -236,6 +236,9 @@ docs = [
     "mkdocs-literate-nav",
     "mkdocs-section-index",
     "numpydoc-validation",
+    "pydeps",
+    "pydot",
+    "networkx",
 ]
 
 [project.scripts]
