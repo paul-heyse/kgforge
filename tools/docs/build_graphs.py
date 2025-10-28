@@ -5,7 +5,9 @@ Adds:
   1) Parallel per-package builds (pydeps + pyreverse) via ProcessPoolExecutor.
   2) Per-package caching keyed by last git commit touching src/<package>.
 
-Everything else (global collapsed graph, layer policy, cycle checks) is unchanged.
+Outputs may be rendered as ``svg`` (default) or ``png``; cache entries are specific to the
+requested format. Everything else (global collapsed graph, layer policy, cycle checks) is
+unchanged.
 """
 
 from __future__ import annotations
@@ -40,6 +42,9 @@ ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 OUT = ROOT / "docs" / "_build" / "graphs"
 OUT.mkdir(parents=True, exist_ok=True)
+
+# Render targets supported by both Graphviz and our docs pipeline.
+SUPPORTED_FORMATS: tuple[str, ...] = ("svg", "png")
 
 # Defaults / policy files
 LAYER_FILE = ROOT / "docs" / "policies" / "layers.yml"
@@ -78,8 +83,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--format",
         default=os.getenv("GRAPH_FORMAT", "svg"),
-        choices=["svg", "png"],
-        help="Image format for rendered graphs",
+        choices=list(SUPPORTED_FORMATS),
+        help="Image format for rendered graphs (svg or png)",
     )
     p.add_argument(
         "--max-bacon",
@@ -773,7 +778,7 @@ def build_one_package(
     pyrev_ok = True
 
     imports_out = OUT / f"{pkg}-imports.{fmt}"
-    uml_out = OUT / f"{pkg}-uml.svg"  # UML is always rendered to SVG downstream
+    uml_out = OUT / f"{pkg}-uml.{fmt}"
 
     if use_cache:
         tree_h = last_tree_commit(pkg)
