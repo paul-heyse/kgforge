@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Final, cast
+from typing import Any, Final, TypeAlias, cast
 
 import numpy as np
 from numpy.typing import NDArray
 
 from kgfoundry_common.navmap_types import NavMap
 
-__all__ = ["FaissGpuIndex"]
+__all__ = ["FloatArray", "IntArray", "StrArray", "FaissGpuIndex"]
 
 __navmap__: Final[NavMap] = {
     "title": "vectorstore_faiss.gpu",
@@ -29,17 +29,23 @@ __navmap__: Final[NavMap] = {
         "since": "0.2.0",
     },
     "symbols": {
-        "FaissGpuIndex": {
+        name: {
             "owner": "@search-api",
             "stability": "experimental",
             "since": "0.2.0",
-        },
+        }
+        for name in __all__
     },
 }
 
-type FloatArray = NDArray[np.float32]
-type IntArray = NDArray[np.int64]
-type StrArray = NDArray[np.str_]
+# [nav:anchor FloatArray]
+FloatArray: TypeAlias = NDArray[np.float32]
+
+# [nav:anchor IntArray]
+IntArray: TypeAlias = NDArray[np.int64]
+
+# [nav:anchor StrArray]
+StrArray: TypeAlias = NDArray[np.str_]
 
 
 # [nav:anchor FaissGpuIndex]

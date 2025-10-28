@@ -42,13 +42,15 @@ __navmap__: Final[NavMap] = {
         },
     },
 }
-
-
 # [nav:anchor DownloadError]
-class DownloadError(_DownloadError):
-    """Compatibility alias for :class:`kgfoundry_common.errors.DownloadError`."""
+DownloadError = _DownloadError
+DownloadError.__doc__ = (
+    "Compatibility alias for :class:`kgfoundry_common.errors.DownloadError`."
+)
 
 
 # [nav:anchor UnsupportedMIMEError]
-class UnsupportedMIMEError(_UnsupportedMIMEError):
-    """Compatibility alias for :class:`kgfoundry_common.errors.UnsupportedMIMEError`."""
+UnsupportedMIMEError = _UnsupportedMIMEError
+UnsupportedMIMEError.__doc__ = (
+    "Compatibility alias for :class:`kgfoundry_common.errors.UnsupportedMIMEError`."
+)
