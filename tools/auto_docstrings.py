@@ -937,13 +937,51 @@ def _format_annotation_string(value: str) -> str:
     if text.startswith("Optional[") and text.endswith("]"):
         inner = text[len("Optional[") : -1]
         inner_text = _normalize_qualified_name(_format_annotation_string(inner))
-        return f"Optional {inner_text}"
+        return f"Optional[{inner_text}]"
     text = _normalize_qualified_name(text)
     if text.startswith("Optional[") and text.endswith("]"):
         inner = text[len("Optional[") : -1]
         inner_text = _normalize_qualified_name(_format_annotation_string(inner))
-        return f"Optional {inner_text}"
+        return f"Optional[{inner_text}]"
     return text
+
+
+def _annotation_accepts_none(text: str) -> bool:
+    """Return ``True`` when ``text`` indicates that ``None`` is an allowed value."""
+    cleaned = text.replace(" ", "")
+    if not cleaned:
+        return False
+    if cleaned == "None":
+        return True
+    if cleaned.startswith("Optional[") and cleaned.endswith("]"):
+        return True
+    return "|None" in cleaned or "None|" in cleaned
+
+
+def _unparse_or_none(node: ast.AST | None) -> str | None:
+    """Safely call :func:`ast.unparse` and return ``None`` if it fails."""
+    if node is None:
+        return None
+    try:
+        return ast.unparse(node)
+    except Exception:  # pragma: no cover - defensive
+        return None
+
+
+_DEFAULT_SENTINEL = object()
+
+
+@dataclass
+class ParameterDetails:
+    """Describe the metadata captured for a function parameter."""
+
+    name: str
+    annotation: str
+    original_annotation: str | None = None
+    has_default: bool = False
+    default_value: Any = _DEFAULT_SENTINEL
+    default_text: str | None = None
+    accepts_none: bool = False
 
 
 @dataclass
@@ -1199,7 +1237,7 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     return items
 
 
-def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[str, str]]:
+def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[ParameterDetails]:
     """Compute parameters for.
 
     Carry out the parameters for operation.
@@ -1211,7 +1249,7 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
 
     Returns
     -------
-    List[Tuple[str, str]]
+    List[ParameterDetails]
         Description of return value.
 
     Examples
@@ -1220,7 +1258,7 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
     >>> result = parameters_for(...)
     >>> result  # doctest: +ELLIPSIS
     """
-    params: list[tuple[str, str]] = []
+    params: list[ParameterDetails] = []
     args = node.args
 
     def add(arg: ast.arg, default: ast.AST | None) -> None:
@@ -1243,14 +1281,37 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
         name = arg.arg
         if name in {"self", "cls"}:
             return
-        annotation = annotation_to_text(arg.annotation)
-        is_optional = default is not None
-        if is_optional and annotation.endswith(" | None"):
-            annotation = annotation[: -len(" | None")]
-        if is_optional:
-            cleaned = annotation or "Any"
-            annotation = f"{cleaned} | None"
-        params.append((name, annotation or "Any"))
+        annotation_text = annotation_to_text(arg.annotation)
+        original_annotation = _unparse_or_none(arg.annotation)
+        cleaned_annotation = annotation_text or "Any"
+        has_default = default is not None
+        evaluated_default: Any = _DEFAULT_SENTINEL
+        default_text: str | None = None
+        accepts_none = _annotation_accepts_none(cleaned_annotation)
+        if has_default:
+            try:
+                evaluated_default = ast.literal_eval(default)
+            except (TypeError, ValueError):
+                evaluated_default = _DEFAULT_SENTINEL
+            except Exception:  # pragma: no cover - defensive
+                evaluated_default = _DEFAULT_SENTINEL
+            if evaluated_default is not _DEFAULT_SENTINEL:
+                default_text = repr(evaluated_default)
+            else:
+                default_text = _unparse_or_none(default)
+            if evaluated_default is None or default_text == "None":
+                accepts_none = True
+        params.append(
+            ParameterDetails(
+                name=name,
+                annotation=cleaned_annotation,
+                original_annotation=original_annotation,
+                has_default=has_default,
+                default_value=evaluated_default,
+                default_text=default_text,
+                accepts_none=accepts_none,
+            )
+        )
 
     positional = args.posonlyargs + args.args
     defaults = [None] * (len(positional) - len(args.defaults)) + list(args.defaults)
@@ -1258,13 +1319,27 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
         add(arg, default)
 
     if args.vararg:
-        params.append((f"*{args.vararg.arg}", "Any"))
+        annotation_text = annotation_to_text(args.vararg.annotation)
+        params.append(
+            ParameterDetails(
+                name=f"*{args.vararg.arg}",
+                annotation=annotation_text or "Any",
+                original_annotation=_unparse_or_none(args.vararg.annotation),
+            )
+        )
 
     for arg, default in zip(args.kwonlyargs, args.kw_defaults, strict=True):
         add(arg, default)
 
     if args.kwarg:
-        params.append((f"**{args.kwarg.arg}", "Any"))
+        annotation_text = annotation_to_text(args.kwarg.annotation)
+        params.append(
+            ParameterDetails(
+                name=f"**{args.kwarg.arg}",
+                annotation=annotation_text or "Any",
+                original_annotation=_unparse_or_none(args.kwarg.annotation),
+            )
+        )
 
     return params
 
@@ -1338,7 +1413,7 @@ def detect_raises(node: ast.AST) -> list[str]:
 
 
 def build_examples(
-    module_name: str, name: str, parameters: list[tuple[str, str]], has_return: bool
+    module_name: str, name: str, parameters: list[ParameterDetails], has_return: bool
 ) -> list[str]:
     """Compute build examples.
 
@@ -1350,7 +1425,7 @@ def build_examples(
         Description for ``module_name``.
     name : str
         Description for ``name``.
-    parameters : List[Tuple[str, str]]
+    parameters : List[ParameterDetails]
         Description for ``parameters``.
     has_return : bool
         Description for ``has_return``.
@@ -1369,7 +1444,7 @@ def build_examples(
     lines: list[str] = ["Examples", "--------"]
     if module_name and not name.startswith("__"):
         lines.append(f">>> from {module_name} import {name}")
-    call_args = ["..."] * sum(1 for param, _ in parameters if not param.startswith("*"))
+    call_args = ["..."] * sum(1 for param in parameters if not param.name.startswith("*"))
     invocation = f"{name}({', '.join(call_args)})" if call_args else f"{name}()"
     if not name.startswith("__"):
         if has_return:
@@ -1415,7 +1490,7 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
         summary = summarize(object_name, kind)
         extended = extended_summary(kind, object_name, module_name, node)
 
-    parameters: list[tuple[str, str]] = []
+    parameters: list[ParameterDetails] = []
     returns: str | None = None
     raises: list[str] = []
     if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -1439,9 +1514,15 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
 
     if parameters:
         lines.extend(["", "Parameters", "----------"])
-        for param_name, annotation in parameters:
-            lines.append(f"{param_name} : {annotation}")
-            lines.append(f"    Description for ``{param_name}``.")
+        for parameter in parameters:
+            extras: list[str] = []
+            if parameter.has_default:
+                extras.append("optional")
+                if parameter.default_text is not None:
+                    extras.append(f"default={parameter.default_text}")
+            suffix = f", {', '.join(extras)}" if extras else ""
+            lines.append(f"{parameter.name} : {parameter.annotation}{suffix}")
+            lines.append(f"    Description for ``{parameter.name}``.")
 
     if returns:
         lines.extend(["", "Returns", "-------", returns, "    Description of return value."])
@@ -1466,7 +1547,7 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
 
 def _required_sections(
     kind: str,
-    parameters: list[tuple[str, str]],
+    parameters: list[ParameterDetails],
     returns: str | None,
     raises: list[str],
     node_name: str | None,
@@ -1474,11 +1555,21 @@ def _required_sections(
 ) -> set[str]:
     """Return placeholder markers emitted by the fallback generator.
 
-    The auto docstring fallback produces deterministic placeholder phrases for
-    sections such as parameter descriptions, return summaries, and the extended
-    "Carry out the … operation." sentence. This helper enumerates those markers
-    so ``process_file`` can distinguish between bespoke docstrings and
-    previously generated placeholders.
+    Parameters
+    ----------
+    kind : str
+        Description for ``kind``.
+    parameters : List[ParameterDetails]
+        Description for ``parameters``.
+    returns : str | None
+        Description for ``returns``.
+    raises : List[str]
+        Description for ``raises``.
+
+    Returns
+    -------
+    Set[str]
+        Description of return value.
     """
     if kind in {"module", "class"}:
         return set()
@@ -1630,7 +1721,7 @@ def process_file(path: Path) -> bool:
                 continue
 
         doc, expr = docstring_text(node)
-        parameters: list[tuple[str, str]] = []
+        parameters: list[ParameterDetails] = []
         returns: str | None = None
         raises: list[str] = []
         include_examples = False
