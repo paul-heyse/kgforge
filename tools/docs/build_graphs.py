@@ -192,6 +192,10 @@ def ensure_bin(name: str) -> None:
     
     if not shutil.which(name):
         print(f"[graphs] Missing required executable on PATH: {name}", file=sys.stderr)
+        print(
+            "[graphs] Run 'uv sync --frozen --extra docs' (or './scripts/bootstrap.sh') to install it.",
+            file=sys.stderr,
+        )
         sys.exit(2)
 
 
@@ -876,6 +880,9 @@ def main() -> None:
     if not shutil.which("dot"):
         print("[graphs] graphviz 'dot' not found on PATH. Install graphviz.", file=sys.stderr)
         sys.exit(2)
+
+    ensure_bin("pydeps")
+    ensure_bin("pyreverse")
 
     packages: list[str] = (
         [s.strip() for s in args.packages.split(",") if s.strip()]
