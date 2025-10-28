@@ -11,19 +11,26 @@ SRC = ROOT / "src"
 
 
 def iter_python_files() -> list[Path]:
-    """Return iter python files.
+    """Compute iter python files.
+
+    Carry out the iter python files operation.
 
     Returns
     -------
     List[Path]
         Description of return value.
     """
+    
+    
+    
     search_root = SRC if SRC.exists() else ROOT
     return sorted(path for path in search_root.rglob("*.py") if path.is_file())
 
 
 def module_docstring(path: Path) -> str | None:
-    """Return module docstring.
+    """Compute module docstring.
+
+    Carry out the module docstring operation.
 
     Parameters
     ----------
@@ -35,6 +42,9 @@ def module_docstring(path: Path) -> str | None:
     str | None
         Description of return value.
     """
+    
+    
+    
     try:
         tree = ast.parse(path.read_text(encoding="utf-8"))
     except UnicodeDecodeError:
@@ -43,13 +53,18 @@ def module_docstring(path: Path) -> str | None:
 
 
 def main() -> None:
-    """Return main.
+    """Compute main.
+
+    Carry out the main operation.
 
     Raises
     ------
     SystemExit
         Raised when validation fails.
     """
+    
+    
+    
     offenders: list[Path] = []
     for file_path in iter_python_files():
         doc = module_docstring(file_path)

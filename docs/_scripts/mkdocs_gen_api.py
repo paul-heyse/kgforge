@@ -27,13 +27,18 @@ with mkdocs_gen_files.open(out / "index.md", "w") as f:
 
 
 def iter_packages() -> list[str]:
-    """Return iter packages.
+    """Compute iter packages.
+
+    Carry out the iter packages operation.
 
     Returns
     -------
     List[str]
         Description of return value.
     """
+    
+    
+    
     packages = detect_packages()
     return packages or [detect_primary()]
 
@@ -42,13 +47,18 @@ loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
 
 
 def write_node(node: Object) -> None:
-    """Return write node.
+    """Compute write node.
+
+    Carry out the write node operation.
 
     Parameters
     ----------
     node : Object
         Description for ``node``.
     """
+    
+    
+    
     rel = node.path.replace(".", "/")
     page = out / rel / "index.md"
     with mkdocs_gen_files.open(page, "w") as f:

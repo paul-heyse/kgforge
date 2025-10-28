@@ -1,4 +1,5 @@
-"""
+"""Search smoke example metadata.
+
 Title: Search — tiny corpus smoke (no GPU)
 Tags: search, smoke
 Time: <2s

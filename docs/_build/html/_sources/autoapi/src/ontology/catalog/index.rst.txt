@@ -45,7 +45,9 @@ Module Contents
    .. py:method:: neighbors(concept_id, depth = 1)
 
       
-      Return neighbors.
+      Compute neighbors.
+
+      Carry out the neighbors operation.
 
       :param concept_id: Description for ``concept_id``.
       :type concept_id: str
@@ -75,7 +77,9 @@ Module Contents
    .. py:method:: hydrate(concept_id)
 
       
-      Return hydrate.
+      Compute hydrate.
+
+      Carry out the hydrate operation.
 
       :param concept_id: Description for ``concept_id``.
       :type concept_id: str

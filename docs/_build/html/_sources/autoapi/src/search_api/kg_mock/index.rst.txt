@@ -19,7 +19,9 @@ Module Contents
 .. py:function:: detect_query_concepts(query)
 
    
-   Return detect query concepts.
+   Compute detect query concepts.
+
+   Carry out the detect query concepts operation.
 
    :param query: Description for ``query``.
    :type query: str
@@ -46,7 +48,9 @@ Module Contents
 .. py:function:: linked_concepts_for_text(text)
 
    
-   Return linked concepts for text.
+   Compute linked concepts for text.
+
+   Carry out the linked concepts for text operation.
 
    :param text: Description for ``text``.
    :type text: str
@@ -73,7 +77,9 @@ Module Contents
 .. py:function:: kg_boost(query_concepts, chunk_concepts, direct = 0.08, one_hop = 0.04)
 
    
-   Return kg boost.
+   Compute kg boost.
+
+   Carry out the kg boost operation.
 
    :param query_concepts: Description for ``query_concepts``.
    :type query_concepts: List[str]

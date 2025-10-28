@@ -19,7 +19,9 @@ Module Contents
 .. py:function:: urn_doc_from_text(text)
 
    
-   Return urn doc from text.
+   Compute urn doc from text.
+
+   Carry out the urn doc from text operation.
 
    :param text: Description for ``text``.
    :type text: str
@@ -46,7 +48,9 @@ Module Contents
 .. py:function:: urn_chunk(doc_hash, start, end)
 
    
-   Return urn chunk.
+   Compute urn chunk.
+
+   Carry out the urn chunk operation.
 
    :param doc_hash: Description for ``doc_hash``.
    :type doc_hash: str

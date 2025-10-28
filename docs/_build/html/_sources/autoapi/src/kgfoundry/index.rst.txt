@@ -42,7 +42,9 @@ Package Contents
 .. py:function:: _load(name)
 
    
-   Return load.
+   Compute load.
+
+   Carry out the load operation.
 
    :param name: Description for ``name``.
    :type name: str
@@ -69,7 +71,9 @@ Package Contents
 .. py:function:: __getattr__(name)
 
    
-   Return getattr.
+   Compute getattr.
+
+   Carry out the getattr operation.
 
    :param name: Description for ``name``.
    :type name: str
@@ -98,7 +102,9 @@ Package Contents
 .. py:function:: __dir__()
 
    
-   Return dir.
+   Compute dir.
+
+   Carry out the dir operation.
 
    :returns: *List[str]* -- Description of return value.
 
@@ -122,7 +128,9 @@ Package Contents
 .. py:function:: _ensure_namespace_alias(name)
 
    
-   Return ensure namespace alias.
+   Compute ensure namespace alias.
+
+   Carry out the ensure namespace alias operation.
 
    :param name: Description for ``name``.
    :type name: str

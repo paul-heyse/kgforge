@@ -13,7 +13,9 @@ SRC = REPO / "src"
 
 
 def repair_module(path: Path) -> list[str]:
-    """Return repair module.
+    """Compute repair module.
+
+    Carry out the repair module operation.
 
     Parameters
     ----------
@@ -25,11 +27,16 @@ def repair_module(path: Path) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
     return _inspect(path)
 
 
 def repair_all(root: Path) -> list[str]:
-    """Return repair all.
+    """Compute repair all.
+
+    Carry out the repair all operation.
 
     Parameters
     ----------
@@ -41,6 +48,9 @@ def repair_all(root: Path) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
     errors: list[str] = []
     for py in root.rglob("*.py"):
         errors.extend(repair_module(py))
@@ -48,7 +58,9 @@ def repair_all(root: Path) -> list[str]:
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    """Return parse args.
+    """Compute parse args.
+
+    Carry out the parse args operation.
 
     Parameters
     ----------
@@ -71,7 +83,9 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Return main.
+    """Compute main.
+
+    Carry out the main operation.
 
     Parameters
     ----------
@@ -83,6 +97,9 @@ def main(argv: list[str] | None = None) -> int:
     int
         Description of return value.
     """
+    
+    
+    
     args = _parse_args(argv)
     root = args.root.resolve()
     errors = repair_all(root)

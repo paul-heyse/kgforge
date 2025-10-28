@@ -19,7 +19,9 @@ Module Contents
 .. py:function:: isotonic_calibrate(pairs)
 
    
-   Return isotonic calibrate.
+   Compute isotonic calibrate.
+
+   Carry out the isotonic calibrate operation.
 
    :param pairs: Description for ``pairs``.
    :type pairs: List[Tuple[float, int]]

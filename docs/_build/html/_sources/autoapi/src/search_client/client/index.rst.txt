@@ -61,7 +61,9 @@ Module Contents
    .. py:method:: _headers()
 
       
-      Return headers.
+      Compute headers.
+
+      Carry out the headers operation.
 
       :returns: *Mapping[str, str]* -- Description of return value.
 
@@ -86,7 +88,9 @@ Module Contents
    .. py:method:: healthz()
 
       
-      Return healthz.
+      Compute healthz.
+
+      Carry out the healthz operation.
 
       :returns: *Mapping[str, Any]* -- Description of return value.
 
@@ -111,7 +115,9 @@ Module Contents
    .. py:method:: search(query, k = 10, filters = None, explain = False)
 
       
-      Return search.
+      Compute search.
+
+      Carry out the search operation.
 
       :param query: Description for ``query``.
       :type query: str
@@ -145,7 +151,9 @@ Module Contents
    .. py:method:: concepts(q, limit = 50)
 
       
-      Return concepts.
+      Compute concepts.
+
+      Carry out the concepts operation.
 
       :param q: Description for ``q``.
       :type q: str

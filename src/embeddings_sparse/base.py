@@ -30,7 +30,9 @@ class SparseEncoder(Protocol):
     name: str
 
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
-        """Return encode.
+        """Compute encode.
+
+        Carry out the encode operation.
 
         Parameters
         ----------
@@ -42,6 +44,9 @@ class SparseEncoder(Protocol):
         List[Tuple[List[int], List[float]]]
             Description of return value.
         """
+        
+        
+        
         ...
 
 
@@ -50,19 +55,26 @@ class SparseIndex(Protocol):
     """Describe SparseIndex."""
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """Return build.
+        """Compute build.
+
+        Carry out the build operation.
 
         Parameters
         ----------
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
+        
+        
+        
         ...
 
     def search(
         self, query: str, k: int, fields: Mapping[str, str] | None = None
     ) -> list[tuple[str, float]]:
-        """Return search.
+        """Compute search.
+
+        Carry out the search operation.
 
         Parameters
         ----------
@@ -78,4 +90,7 @@ class SparseIndex(Protocol):
         List[Tuple[str, float]]
             Description of return value.
         """
+        
+        
+        
         ...

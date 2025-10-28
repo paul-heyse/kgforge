@@ -475,38 +475,38 @@ window.addEventListener("load", () => mermaid.run());
   <h1>Source code for src.orchestration.flows</h1><div class="highlight"><pre>
 <span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Flows utilities.&quot;&quot;&quot;</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span>
+<span class="linenos"> 3</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 <span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="linenos"> 5</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span>
 <span class="linenos"> 6</span>
-<span class="linenos"> 7</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span>
+<span class="linenos"> 7</span><span class="kn">from</span><span class="w"> </span><span class="nn">prefect</span><span class="w"> </span><span class="kn">import</span> <span class="n">flow</span><span class="p">,</span> <span class="n">task</span>
 <span class="linenos"> 8</span>
-<span class="linenos"> 9</span><span class="kn">from</span><span class="w"> </span><span class="nn">prefect</span><span class="w"> </span><span class="kn">import</span> <span class="n">flow</span><span class="p">,</span> <span class="n">task</span>
+<span class="linenos"> 9</span><span class="kn">from</span><span class="w"> </span><span class="nn">kgfoundry_common.navmap_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NavMap</span>
 <span class="linenos">10</span>
-<span class="linenos">11</span><span class="kn">from</span><span class="w"> </span><span class="nn">kgfoundry_common.navmap_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NavMap</span>
+<span class="linenos">11</span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;e2e_flow&quot;</span><span class="p">,</span> <span class="s2">&quot;t_echo&quot;</span><span class="p">]</span>
 <span class="linenos">12</span>
-<span class="linenos">13</span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;e2e_flow&quot;</span><span class="p">,</span> <span class="s2">&quot;t_echo&quot;</span><span class="p">]</span>
-<span class="linenos">14</span>
-<span class="linenos">15</span><span class="n">__navmap__</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">NavMap</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-<span class="linenos">16</span>    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;orchestration.flows&quot;</span><span class="p">,</span>
-<span class="linenos">17</span>    <span class="s2">&quot;synopsis&quot;</span><span class="p">:</span> <span class="s2">&quot;Prefect orchestration flows used in kgfoundry demos&quot;</span><span class="p">,</span>
-<span class="linenos">18</span>    <span class="s2">&quot;exports&quot;</span><span class="p">:</span> <span class="n">__all__</span><span class="p">,</span>
-<span class="linenos">19</span>    <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[</span>
-<span class="linenos">20</span>        <span class="p">{</span>
-<span class="linenos">21</span>            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;public-api&quot;</span><span class="p">,</span>
-<span class="linenos">22</span>            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Public API&quot;</span><span class="p">,</span>
-<span class="linenos">23</span>            <span class="s2">&quot;symbols&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;t_echo&quot;</span><span class="p">,</span> <span class="s2">&quot;e2e_flow&quot;</span><span class="p">],</span>
-<span class="linenos">24</span>        <span class="p">},</span>
-<span class="linenos">25</span>    <span class="p">],</span>
-<span class="linenos">26</span><span class="p">}</span>
-<span class="linenos">27</span>
-<span class="linenos">28</span>
-<span class="linenos">29</span><span class="c1"># [nav:anchor t_echo]</span>
-<span class="linenos">30</span><span class="nd">@task</span>
+<span class="linenos">13</span><span class="n">__navmap__</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">NavMap</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+<span class="linenos">14</span>    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;orchestration.flows&quot;</span><span class="p">,</span>
+<span class="linenos">15</span>    <span class="s2">&quot;synopsis&quot;</span><span class="p">:</span> <span class="s2">&quot;Prefect orchestration flows used in kgfoundry demos&quot;</span><span class="p">,</span>
+<span class="linenos">16</span>    <span class="s2">&quot;exports&quot;</span><span class="p">:</span> <span class="n">__all__</span><span class="p">,</span>
+<span class="linenos">17</span>    <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[</span>
+<span class="linenos">18</span>        <span class="p">{</span>
+<span class="linenos">19</span>            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;public-api&quot;</span><span class="p">,</span>
+<span class="linenos">20</span>            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Public API&quot;</span><span class="p">,</span>
+<span class="linenos">21</span>            <span class="s2">&quot;symbols&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;t_echo&quot;</span><span class="p">,</span> <span class="s2">&quot;e2e_flow&quot;</span><span class="p">],</span>
+<span class="linenos">22</span>        <span class="p">},</span>
+<span class="linenos">23</span>    <span class="p">],</span>
+<span class="linenos">24</span><span class="p">}</span>
+<span class="linenos">25</span>
+<span class="linenos">26</span>
+<span class="linenos">27</span><span class="c1"># [nav:anchor t_echo]</span>
+<span class="linenos">28</span><span class="nd">@task</span>
 <div class="viewcode-block" id="t_echo">
 <a class="viewcode-back" href="../../../autoapi/src/orchestration/flows/index.html#src.orchestration.flows.t_echo">[docs]</a>
-<span class="linenos">31</span><span class="k">def</span><span class="w"> </span><span class="nf">t_echo</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="linenos">32</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return t echo.</span>
+<span class="linenos">29</span><span class="k">def</span><span class="w"> </span><span class="nf">t_echo</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos">30</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute t echo.</span>
+<span class="linenos">31</span>
+<span class="linenos">32</span><span class="sd">    Carry out the t echo operation.</span>
 <span class="linenos">33</span>
 <span class="linenos">34</span><span class="sd">    Parameters</span>
 <span class="linenos">35</span><span class="sd">    ----------</span>
@@ -521,44 +521,43 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">44</span>    
 <span class="linenos">45</span>    
 <span class="linenos">46</span>    
-<span class="linenos">47</span>    
-<span class="linenos">48</span>    <span class="k">return</span> <span class="n">msg</span></div>
+<span class="linenos">47</span>    <span class="k">return</span> <span class="n">msg</span></div>
 
+<span class="linenos">48</span>
 <span class="linenos">49</span>
-<span class="linenos">50</span>
-<span class="linenos">51</span><span class="c1"># [nav:anchor e2e_flow]</span>
-<span class="linenos">52</span><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;kgfoundry_e2e_skeleton&quot;</span><span class="p">)</span>
+<span class="linenos">50</span><span class="c1"># [nav:anchor e2e_flow]</span>
+<span class="linenos">51</span><span class="nd">@flow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;kgfoundry_e2e_skeleton&quot;</span><span class="p">)</span>
 <div class="viewcode-block" id="e2e_flow">
 <a class="viewcode-back" href="../../../autoapi/src/orchestration/flows/index.html#src.orchestration.flows.e2e_flow">[docs]</a>
-<span class="linenos">53</span><span class="k">def</span><span class="w"> </span><span class="nf">e2e_flow</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="linenos">54</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return e2e flow.</span>
-<span class="linenos">55</span>
-<span class="linenos">56</span><span class="sd">    Returns</span>
-<span class="linenos">57</span><span class="sd">    -------</span>
-<span class="linenos">58</span><span class="sd">    List[str]</span>
-<span class="linenos">59</span><span class="sd">        Description of return value.</span>
-<span class="linenos">60</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">61</span>    
+<span class="linenos">52</span><span class="k">def</span><span class="w"> </span><span class="nf">e2e_flow</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="linenos">53</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute e2e flow.</span>
+<span class="linenos">54</span>
+<span class="linenos">55</span><span class="sd">    Carry out the e2e flow operation.</span>
+<span class="linenos">56</span>
+<span class="linenos">57</span><span class="sd">    Returns</span>
+<span class="linenos">58</span><span class="sd">    -------</span>
+<span class="linenos">59</span><span class="sd">    List[str]</span>
+<span class="linenos">60</span><span class="sd">        Description of return value.</span>
+<span class="linenos">61</span><span class="sd">    &quot;&quot;&quot;</span>
 <span class="linenos">62</span>    
 <span class="linenos">63</span>    
 <span class="linenos">64</span>    
-<span class="linenos">65</span>    
-<span class="linenos">66</span>    <span class="k">return</span> <span class="p">[</span>
-<span class="linenos">67</span>        <span class="n">t_echo</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-<span class="linenos">68</span>        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span>
-<span class="linenos">69</span>            <span class="s2">&quot;harvest&quot;</span><span class="p">,</span>
-<span class="linenos">70</span>            <span class="s2">&quot;doctags&quot;</span><span class="p">,</span>
-<span class="linenos">71</span>            <span class="s2">&quot;chunk&quot;</span><span class="p">,</span>
-<span class="linenos">72</span>            <span class="s2">&quot;embed_dense&quot;</span><span class="p">,</span>
-<span class="linenos">73</span>            <span class="s2">&quot;encode_splade&quot;</span><span class="p">,</span>
-<span class="linenos">74</span>            <span class="s2">&quot;bm25&quot;</span><span class="p">,</span>
-<span class="linenos">75</span>            <span class="s2">&quot;faiss&quot;</span><span class="p">,</span>
-<span class="linenos">76</span>            <span class="s2">&quot;ontology&quot;</span><span class="p">,</span>
-<span class="linenos">77</span>            <span class="s2">&quot;concept_embed&quot;</span><span class="p">,</span>
-<span class="linenos">78</span>            <span class="s2">&quot;linker&quot;</span><span class="p">,</span>
-<span class="linenos">79</span>            <span class="s2">&quot;kg&quot;</span><span class="p">,</span>
-<span class="linenos">80</span>        <span class="p">]</span>
-<span class="linenos">81</span>    <span class="p">]</span></div>
+<span class="linenos">65</span>    <span class="k">return</span> <span class="p">[</span>
+<span class="linenos">66</span>        <span class="n">t_echo</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+<span class="linenos">67</span>        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span>
+<span class="linenos">68</span>            <span class="s2">&quot;harvest&quot;</span><span class="p">,</span>
+<span class="linenos">69</span>            <span class="s2">&quot;doctags&quot;</span><span class="p">,</span>
+<span class="linenos">70</span>            <span class="s2">&quot;chunk&quot;</span><span class="p">,</span>
+<span class="linenos">71</span>            <span class="s2">&quot;embed_dense&quot;</span><span class="p">,</span>
+<span class="linenos">72</span>            <span class="s2">&quot;encode_splade&quot;</span><span class="p">,</span>
+<span class="linenos">73</span>            <span class="s2">&quot;bm25&quot;</span><span class="p">,</span>
+<span class="linenos">74</span>            <span class="s2">&quot;faiss&quot;</span><span class="p">,</span>
+<span class="linenos">75</span>            <span class="s2">&quot;ontology&quot;</span><span class="p">,</span>
+<span class="linenos">76</span>            <span class="s2">&quot;concept_embed&quot;</span><span class="p">,</span>
+<span class="linenos">77</span>            <span class="s2">&quot;linker&quot;</span><span class="p">,</span>
+<span class="linenos">78</span>            <span class="s2">&quot;kg&quot;</span><span class="p">,</span>
+<span class="linenos">79</span>        <span class="p">]</span>
+<span class="linenos">80</span>    <span class="p">]</span></div>
 
 </pre></div>
 

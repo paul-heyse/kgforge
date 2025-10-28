@@ -21,7 +21,9 @@ Module Contents
 .. py:function:: tok(text)
 
    
-   Return tok.
+   Compute tok.
+
+   Carry out the tok operation.
 
    :param text: Description for ``text``.
    :type text: str
@@ -128,7 +130,9 @@ Module Contents
    .. py:method:: _load(chunks_root)
 
       
-      Return load.
+      Compute load.
+
+      Carry out the load operation.
 
       :param chunks_root: Description for ``chunks_root``.
       :type chunks_root: str | None
@@ -154,7 +158,9 @@ Module Contents
    .. py:method:: search(query, k = 10)
 
       
-      Return search.
+      Compute search.
+
+      Carry out the search operation.
 
       :param query: Description for ``query``.
       :type query: str
@@ -184,7 +190,9 @@ Module Contents
    .. py:method:: doc(index)
 
       
-      Return doc.
+      Compute doc.
+
+      Carry out the doc operation.
 
       :param index: Description for ``index``.
       :type index: int

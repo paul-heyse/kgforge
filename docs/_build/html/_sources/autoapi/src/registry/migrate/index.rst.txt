@@ -19,7 +19,9 @@ Module Contents
 .. py:function:: apply(db, migrations_dir)
 
    
-   Return apply.
+   Compute apply.
+
+   Carry out the apply operation.
 
    :param db: Description for ``db``.
    :type db: str
@@ -46,8 +48,9 @@ Module Contents
 .. py:function:: main()
 
    
-   Return main.
+   Compute main.
 
+   Carry out the main operation.
 
 
 

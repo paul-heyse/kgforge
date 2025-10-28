@@ -44,7 +44,9 @@ Module Contents
 
 
       
-      Return dense schema.
+      Compute dense schema.
+
+      Carry out the dense schema operation.
 
       :param dim: Description for ``dim``.
       :type dim: int
@@ -75,7 +77,9 @@ Module Contents
    .. py:method:: write_dense(model, run_id, dim, records, shard = 0)
 
       
-      Return write dense.
+      Compute write dense.
+
+      Carry out the write dense operation.
 
       :param model: Description for ``model``.
       :type model: str
@@ -113,7 +117,9 @@ Module Contents
 
 
       
-      Return splade schema.
+      Compute splade schema.
+
+      Carry out the splade schema operation.
 
       :returns: *pa.schema* -- Description of return value.
 
@@ -138,7 +144,9 @@ Module Contents
    .. py:method:: write_splade(model, run_id, records, shard = 0)
 
       
-      Return write splade.
+      Compute write splade.
+
+      Carry out the write splade operation.
 
       :param model: Description for ``model``.
       :type model: str
@@ -197,7 +205,9 @@ Module Contents
 
 
       
-      Return chunk schema.
+      Compute chunk schema.
+
+      Carry out the chunk schema operation.
 
       :returns: *pa.schema* -- Description of return value.
 
@@ -225,7 +235,9 @@ Module Contents
    .. py:method:: write(rows)
 
       
-      Return write.
+      Compute write.
+
+      Carry out the write operation.
 
       :param rows: Description for ``rows``.
       :type rows: Iterable[dict[str, Any]]

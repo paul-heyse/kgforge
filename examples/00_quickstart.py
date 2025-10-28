@@ -1,4 +1,5 @@
-"""
+"""Quickstart example metadata.
+
 Title: Quickstart — minimal import smoke test
 Tags: getting-started, smoke
 Time: <2s

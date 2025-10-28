@@ -22,13 +22,18 @@ ENV_PKGS = os.environ.get("DOCS_PKG")
 
 
 def detect_repo() -> tuple[str, str]:
-    """Return detect repo.
+    """Compute detect repo.
+
+    Carry out the detect repo operation.
 
     Returns
     -------
     Tuple[str, str]
         Description of return value.
     """
+    
+    
+    
     try:
         remote = subprocess.check_output(
             ["git", "config", "--get", "remote.origin.url"], cwd=str(ROOT), text=True
@@ -60,13 +65,18 @@ def detect_repo() -> tuple[str, str]:
 
 
 def git_sha() -> str:
-    """Return git sha.
+    """Compute git sha.
+
+    Carry out the git sha operation.
 
     Returns
     -------
     str
         Description of return value.
     """
+    
+    
+    
     try:
         return subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=str(ROOT), text=True
@@ -80,7 +90,9 @@ SHA = git_sha()
 
 
 def gh_url(rel: str, start: int, end: int | None) -> str:
-    """Return gh url.
+    """Compute gh url.
+
+    Carry out the gh url operation.
 
     Parameters
     ----------
@@ -96,18 +108,26 @@ def gh_url(rel: str, start: int, end: int | None) -> str:
     str
         Description of return value.
     """
+    
+    
+    
     rng = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel}{rng}"
 
 
 def iter_packages() -> list[str]:
-    """Return iter packages.
+    """Compute iter packages.
+
+    Carry out the iter packages operation.
 
     Returns
     -------
     List[str]
         Description of return value.
     """
+    
+    
+    
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     return detect_packages() or [detect_primary()]
@@ -117,7 +137,9 @@ loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
 
 
 def summarize(node: Object) -> str:
-    """Return summarize.
+    """Compute summarize.
+
+    Carry out the summarize operation.
 
     Parameters
     ----------
@@ -129,6 +151,9 @@ def summarize(node: Object) -> str:
     str
         Description of return value.
     """
+    
+    
+    
     doc = getattr(node, "docstring", None)
     if doc and getattr(doc, "value", None):
         summary = doc.value.strip().splitlines()[0].strip()
@@ -137,7 +162,9 @@ def summarize(node: Object) -> str:
 
 
 def is_public(node: Object) -> bool:
-    """Return is public.
+    """Compute is public.
+
+    Carry out the is public operation.
 
     Parameters
     ----------
@@ -149,12 +176,17 @@ def is_public(node: Object) -> bool:
     bool
         Description of return value.
     """
+    
+    
+    
     name = getattr(node, "name", "")
     return not name.startswith("_")
 
 
 def get_open_link(node: Object, readme_dir: Path) -> str | None:
-    """Return get open link.
+    """Compute get open link.
+
+    Carry out the get open link operation.
 
     Parameters
     ----------
@@ -168,6 +200,9 @@ def get_open_link(node: Object, readme_dir: Path) -> str | None:
     str | None
         Description of return value.
     """
+    
+    
+    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -183,7 +218,9 @@ def get_open_link(node: Object, readme_dir: Path) -> str | None:
 
 
 def get_view_link(node: Object, readme_dir: Path) -> str | None:
-    """Return get view link.
+    """Compute get view link.
+
+    Carry out the get view link operation.
 
     Parameters
     ----------
@@ -197,6 +234,9 @@ def get_view_link(node: Object, readme_dir: Path) -> str | None:
     str | None
         Description of return value.
     """
+    
+    
+    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -212,7 +252,9 @@ def get_view_link(node: Object, readme_dir: Path) -> str | None:
 
 
 def iter_public_members(node: Object) -> Iterable[Object]:
-    """Return iter public members.
+    """Compute iter public members.
+
+    Carry out the iter public members operation.
 
     Parameters
     ----------
@@ -224,12 +266,17 @@ def iter_public_members(node: Object) -> Iterable[Object]:
     Iterable[Object]
         Description of return value.
     """
+    
+    
+    
     members = getattr(node, "members", {})
     return sorted([m for m in members.values() if is_public(m)], key=lambda child: child.name)
 
 
 def render_member(node: Object, *, indent: int, lines: list[str], readme_dir: Path) -> None:
-    """Return render member.
+    """Compute render member.
+
+    Carry out the render member operation.
 
     Parameters
     ----------
@@ -242,6 +289,9 @@ def render_member(node: Object, *, indent: int, lines: list[str], readme_dir: Pa
     readme_dir : Path
         Description for ``readme_dir``.
     """
+    
+    
+    
     open_link = get_open_link(node, readme_dir)
     view_link = get_view_link(node, readme_dir)
     if not open_link and not view_link:
@@ -271,13 +321,18 @@ def render_member(node: Object, *, indent: int, lines: list[str], readme_dir: Pa
 
 
 def write_readme(node: Object) -> None:
-    """Return write readme.
+    """Compute write readme.
+
+    Carry out the write readme operation.
 
     Parameters
     ----------
     node : Object
         Description for ``node``.
     """
+    
+    
+    
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"
     lines = [

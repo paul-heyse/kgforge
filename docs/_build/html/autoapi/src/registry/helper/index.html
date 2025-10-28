@@ -489,13 +489,14 @@
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.registry.helper.DuckDBRegistryHelper.db_path">
-<span class="sig-name descname"><span class="pre">db_path</span></span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.db_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:43:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.db_path" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">db_path</span></span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.db_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:48:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.db_path" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.registry.helper.DuckDBRegistryHelper._con">
-<span class="sig-name descname"><span class="pre">_con</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper._con"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:45:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper._con" title="Link to this definition">#</a></dt>
-<dd><p>Return con.</p>
+<span class="sig-name descname"><span class="pre">_con</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper._con"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:50:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper._con" title="Link to this definition">#</a></dt>
+<dd><p>Compute con.</p>
+<p>Carry out the con operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>duckdb.DuckDBPyConnection</em> – Description of return value.</p>
@@ -508,8 +509,9 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.registry.helper.DuckDBRegistryHelper.new_run">
-<span class="sig-name descname"><span class="pre">new_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">purpose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revision</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.new_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:55:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.new_run" title="Link to this definition">#</a></dt>
-<dd><p>Return new run.</p>
+<span class="sig-name descname"><span class="pre">new_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">purpose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revision</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.new_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:62:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.new_run" title="Link to this definition">#</a></dt>
+<dd><p>Compute new run.</p>
+<p>Carry out the new run operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -530,8 +532,9 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.registry.helper.DuckDBRegistryHelper.close_run">
-<span class="sig-name descname"><span class="pre">close_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">success</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.close_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:93:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.close_run" title="Link to this definition">#</a></dt>
-<dd><p>Return close run.</p>
+<span class="sig-name descname"><span class="pre">close_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">success</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.close_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:105:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.close_run" title="Link to this definition">#</a></dt>
+<dd><p>Compute close run.</p>
+<p>Carry out the close run operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -548,8 +551,9 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.registry.helper.DuckDBRegistryHelper.begin_dataset">
-<span class="sig-name descname"><span class="pre">begin_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.begin_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:118:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.begin_dataset" title="Link to this definition">#</a></dt>
-<dd><p>Return begin dataset.</p>
+<span class="sig-name descname"><span class="pre">begin_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.begin_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:135:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.begin_dataset" title="Link to this definition">#</a></dt>
+<dd><p>Compute begin dataset.</p>
+<p>Carry out the begin dataset operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -568,8 +572,9 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.registry.helper.DuckDBRegistryHelper.commit_dataset">
-<span class="sig-name descname"><span class="pre">commit_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parquet_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.commit_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:146:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.commit_dataset" title="Link to this definition">#</a></dt>
-<dd><p>Return commit dataset.</p>
+<span class="sig-name descname"><span class="pre">commit_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parquet_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.commit_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:168:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.commit_dataset" title="Link to this definition">#</a></dt>
+<dd><p>Compute commit dataset.</p>
+<p>Carry out the commit dataset operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -586,8 +591,9 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.registry.helper.DuckDBRegistryHelper.rollback_dataset">
-<span class="sig-name descname"><span class="pre">rollback_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.rollback_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:173:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.rollback_dataset" title="Link to this definition">#</a></dt>
-<dd><p>Return rollback dataset.</p>
+<span class="sig-name descname"><span class="pre">rollback_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.rollback_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:200:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.rollback_dataset" title="Link to this definition">#</a></dt>
+<dd><p>Compute rollback dataset.</p>
+<p>Carry out the rollback dataset operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>dataset_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Description for <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>.</p>
@@ -600,8 +606,9 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.registry.helper.DuckDBRegistryHelper.register_documents">
-<span class="sig-name descname"><span class="pre">register_documents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">docs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.register_documents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:189:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.register_documents" title="Link to this definition">#</a></dt>
-<dd><p>Return register documents.</p>
+<span class="sig-name descname"><span class="pre">register_documents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">docs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.register_documents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:221:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.register_documents" title="Link to this definition">#</a></dt>
+<dd><p>Compute register documents.</p>
+<p>Carry out the register documents operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>docs</strong> (<em>List</em><em>[</em><a class="reference internal" href="../../kgfoundry_common/models/index.html#src.kgfoundry_common.models.Doc" title="src.kgfoundry_common.models.Doc"><em>Doc</em></a><em>]</em>) – Description for <code class="docutils literal notranslate"><span class="pre">docs</span></code>.</p>
@@ -614,8 +621,9 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.registry.helper.DuckDBRegistryHelper.register_doctags">
-<span class="sig-name descname"><span class="pre">register_doctags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">assets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.register_doctags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:222:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.register_doctags" title="Link to this definition">#</a></dt>
-<dd><p>Return register doctags.</p>
+<span class="sig-name descname"><span class="pre">register_doctags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">assets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.register_doctags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:259:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.register_doctags" title="Link to this definition">#</a></dt>
+<dd><p>Compute register doctags.</p>
+<p>Carry out the register doctags operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>assets</strong> (<em>List</em><em>[</em><a class="reference internal" href="../../kgfoundry_common/models/index.html#src.kgfoundry_common.models.DoctagsAsset" title="src.kgfoundry_common.models.DoctagsAsset"><em>DoctagsAsset</em></a><em>]</em>) – Description for <code class="docutils literal notranslate"><span class="pre">assets</span></code>.</p>
@@ -628,8 +636,9 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.registry.helper.DuckDBRegistryHelper.emit_event">
-<span class="sig-name descname"><span class="pre">emit_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.emit_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:245:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.emit_event" title="Link to this definition">#</a></dt>
-<dd><p>Return emit event.</p>
+<span class="sig-name descname"><span class="pre">emit_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/registry/helper.html#DuckDBRegistryHelper.emit_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/registry/helper.py:287:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.registry.helper.DuckDBRegistryHelper.emit_event" title="Link to this definition">#</a></dt>
+<dd><p>Compute emit event.</p>
+<p>Carry out the emit event operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

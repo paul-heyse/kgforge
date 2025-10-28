@@ -23,24 +23,34 @@ GRAPH_PACKAGES = {
 
 
 def run(cmd: list[str]) -> None:
-    """Return run.
+    """Compute run.
+
+    Carry out the run operation.
 
     Parameters
     ----------
     cmd : List[str]
         Description for ``cmd``.
     """
+    
+    
+    
     subprocess.run(cmd, check=True, cwd=ROOT)
 
 
 def top_level_packages() -> set[str]:
-    """Return top level packages.
+    """Compute top level packages.
+
+    Carry out the top level packages operation.
 
     Returns
     -------
     Set[str]
         Description of return value.
     """
+    
+    
+    
     packages: set[str] = set()
     if not SRC.exists():
         return packages
@@ -58,13 +68,18 @@ def top_level_packages() -> set[str]:
 
 
 def build_pydeps(pkg: str) -> None:
-    """Return build pydeps.
+    """Compute build pydeps.
+
+    Carry out the build pydeps operation.
 
     Parameters
     ----------
     pkg : str
         Description for ``pkg``.
     """
+    
+    
+    
     dot_path = OUT / f"{pkg}.dot"
     svg_path = OUT / f"{pkg}-imports.svg"
     cmd = [
@@ -87,13 +102,18 @@ def build_pydeps(pkg: str) -> None:
 
 
 def build_pyreverse(pkg: str) -> None:
-    """Return build pyreverse.
+    """Compute build pyreverse.
+
+    Carry out the build pyreverse operation.
 
     Parameters
     ----------
     pkg : str
         Description for ``pkg``.
     """
+    
+    
+    
     cmd = [
         sys.executable,
         "-m",
@@ -115,7 +135,13 @@ def build_pyreverse(pkg: str) -> None:
 
 
 def main() -> None:
-    """Return main."""
+    """Compute main.
+
+    Carry out the main operation.
+    """
+    
+    
+    
     for pkg in sorted(top_level_packages()):
         try:
             build_pydeps(pkg)

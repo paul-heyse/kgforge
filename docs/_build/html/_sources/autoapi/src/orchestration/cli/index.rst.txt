@@ -19,7 +19,9 @@ Module Contents
 .. py:function:: index_bm25(chunks_parquet = typer.Argument(..., help='Path to Parquet/JSONL with chunks'), backend = typer.Option('lucene', help='lucene|pure'), index_dir = typer.Option('./_indices/bm25', help='Output index directory'))
 
    
-   Return index bm25.
+   Compute index bm25.
+
+   Carry out the index bm25 operation.
 
    :param chunks_parquet: Description for ``chunks_parquet``.
    :type chunks_parquet: str | None
@@ -48,7 +50,9 @@ Module Contents
 .. py:function:: index_faiss(dense_vectors = typer.Argument(..., help='Path to dense vectors JSON (skeleton)'), index_path = typer.Option('./_indices/faiss/shard_000.idx', help='Output index (CPU .idx)'))
 
    
-   Return index faiss.
+   Compute index faiss.
+
+   Carry out the index faiss operation.
 
    :param dense_vectors: Description for ``dense_vectors``.
    :type dense_vectors: str | None
@@ -75,7 +79,9 @@ Module Contents
 .. py:function:: api(port = 8080)
 
    
-   Return api.
+   Compute api.
+
+   Carry out the api operation.
 
    :param port: Description for ``port``.
    :type port: int | None
@@ -100,7 +106,9 @@ Module Contents
 .. py:function:: e2e()
 
    
-   Return e2e.
+   Compute e2e.
+
+   Carry out the e2e operation.
 
    :raises typer.Exit: Raised when validation fails.
 

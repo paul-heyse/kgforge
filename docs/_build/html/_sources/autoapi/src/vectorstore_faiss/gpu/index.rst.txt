@@ -92,8 +92,9 @@ Module Contents
    .. py:method:: _ensure_resources()
 
       
-      Return ensure resources.
+      Compute ensure resources.
 
+      Carry out the ensure resources operation.
 
 
 
@@ -116,7 +117,9 @@ Module Contents
    .. py:method:: train(train_vectors, *, seed = 42)
 
       
-      Return train.
+      Compute train.
+
+      Carry out the train operation.
 
       :param train_vectors: Description for ``train_vectors``.
       :type train_vectors: src.vectorstore_faiss.gpu.FloatArray
@@ -144,7 +147,9 @@ Module Contents
    .. py:method:: add(keys, vectors)
 
       
-      Return add.
+      Compute add.
+
+      Carry out the add operation.
 
       :param keys: Description for ``keys``.
       :type keys: List[str]
@@ -174,7 +179,9 @@ Module Contents
    .. py:method:: search(query, k)
 
       
-      Return search.
+      Compute search.
+
+      Carry out the search operation.
 
       :param query: Description for ``query``.
       :type query: src.vectorstore_faiss.gpu.FloatArray
@@ -206,7 +213,9 @@ Module Contents
    .. py:method:: save(index_uri, idmap_uri = None)
 
       
-      Return save.
+      Compute save.
+
+      Carry out the save operation.
 
       :param index_uri: Description for ``index_uri``.
       :type index_uri: str
@@ -236,7 +245,9 @@ Module Contents
    .. py:method:: load(index_uri, idmap_uri = None)
 
       
-      Return load.
+      Compute load.
+
+      Carry out the load operation.
 
       :param index_uri: Description for ``index_uri``.
       :type index_uri: str

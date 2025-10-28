@@ -12,6 +12,46 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SRC_ROOT = REPO_ROOT / "src"
 
+
+def _humanize_identifier(value: str) -> str:
+    """Compute humanize identifier.
+
+    Carry out the humanize identifier operation.
+
+    Parameters
+    ----------
+    value : str
+        Description for ``value``.
+
+    Returns
+    -------
+    str
+        Description of return value.
+    """
+    cleaned = value.replace("_", " ").strip()
+    return " ".join(cleaned.split())
+
+
+def _is_magic(name: str | None) -> bool:
+    """Return whether ``name`` is a Python magic method."""
+    return bool(name and name.startswith("__") and name.endswith("__"))
+
+
+def _is_pydantic_model(node: ast.ClassDef) -> bool:
+    """Return whether ``node`` inherits from pydantic BaseModel."""
+    for base in node.bases:
+        if isinstance(base, ast.Name) and base.id == "BaseModel":
+            return True
+        if isinstance(base, ast.Attribute) and base.attr == "BaseModel":
+            return True
+    return False
+
+
+def _is_pydantic_field(name: str | None) -> bool:
+    """Return whether ``name`` matches pydantic auto attributes."""
+    return bool(name and name.startswith("model_"))
+
+
 QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
     "FloatArray": "src.vectorstore_faiss.gpu.FloatArray",
     "IntArray": "src.vectorstore_faiss.gpu.IntArray",
@@ -19,6 +59,11 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
     "VecArray": "src.search_api.faiss_adapter.VecArray",
     "_SupportsHttp": "src.search_client.client._SupportsHttp",
     "_SupportsResponse": "src.search_client.client._SupportsResponse",
+    "kgfoundry.kgfoundry_common.models.Doc": "src.kgfoundry_common.models.Doc",
+    "kgfoundry.kgfoundry_common.models.DoctagsAsset": "src.kgfoundry_common.models.DoctagsAsset",
+    "kgfoundry.kgfoundry_common.models.Chunk": "src.kgfoundry_common.models.Chunk",
+    "kgfoundry.kgfoundry_common.models.LinkAssertion": "src.kgfoundry_common.models.LinkAssertion",
+    "kgfoundry.kgfoundry_common.models.Concept": "src.ontology.catalog.ConceptMeta",
     "NavMap": "src.kgfoundry_common.navmap_types.NavMap",
     "Doc": "src.kgfoundry_common.models.Doc",
     "DoctagsAsset": "src.kgfoundry_common.models.DoctagsAsset",
@@ -34,9 +79,14 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
     "FixtureDoc": "src.search_api.fixture_index.FixtureDoc",
     "SpladeDoc": "src.search_api.splade_index.SpladeDoc",
     "Concept": "src.ontology.catalog.ConceptMeta",
+    "ConceptMeta": "src.ontology.catalog.ConceptMeta",
     "Neo4jStore": "src.kg_builder.neo4j_store.Neo4jStore",
+    "ParsedSchema": "src.kgfoundry_common.parquet_io.ParsedSchema",
+    "DatasetVersion": "src.kgfoundry_common.parquet_io.DatasetVersion",
+    "Id": "src.kgfoundry_common.models.Id",
     "BaseModel": "pydantic.BaseModel",
     "NDArray": "numpy.typing.NDArray",
+    "numpy.float32": "numpy.float32",
     "ArrayLike": "numpy.typing.ArrayLike",
     "Iterable": "typing.Iterable",
     "Iterator": "typing.Iterator",
@@ -47,10 +97,13 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
     "Optional": "typing.Optional",
     "Callable": "typing.Callable",
     "Any": "typing.Any",
-    "duckdb.DuckDBPyConnection": "duckdb.DuckDBPyConnection",
-    "DuckDBPyConnection": "duckdb.DuckDBPyConnection",
-    "pyarrow.Schema": "pyarrow.Schema",
+    "Type": "typing.Type",
+    "Literal": "typing.Literal",
+    "Final": "typing.Final",
     "pyarrow.schema": "pyarrow.schema",
+    "pyarrow.Schema": "pyarrow.Schema",
+    "DuckDBPyConnection": "duckdb.DuckDBPyConnection",
+    "duckdb.DuckDBPyConnection": "duckdb.DuckDBPyConnection",
     "HTTPException": "fastapi.HTTPException",
     "Exit": "typer.Exit",
 }
@@ -64,13 +117,16 @@ class DocstringChange:
 
 
 def parse_args() -> argparse.Namespace:
-    """Return parse args.
+    """Compute parse args.
+
+    Carry out the parse args operation.
 
     Returns
     -------
     argparse.Namespace
         Description of return value.
     """
+    
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", required=True, type=Path, help="Directory to process.")
     parser.add_argument("--log", required=False, type=Path, help="Log file for changed paths.")
@@ -78,7 +134,9 @@ def parse_args() -> argparse.Namespace:
 
 
 def module_name_for(path: Path) -> str:
-    """Return module name for.
+    """Compute module name for.
+
+    Carry out the module name for operation.
 
     Parameters
     ----------
@@ -90,6 +148,7 @@ def module_name_for(path: Path) -> str:
     str
         Description of return value.
     """
+    
     try:
         relative = path.relative_to(REPO_ROOT)
     except ValueError:
@@ -106,7 +165,9 @@ def module_name_for(path: Path) -> str:
 
 
 def summarize(name: str, kind: str) -> str:
-    """Return summarize.
+    """Compute summarize.
+
+    Carry out the summarize operation.
 
     Parameters
     ----------
@@ -120,18 +181,23 @@ def summarize(name: str, kind: str) -> str:
     str
         Description of return value.
     """
-    base = " ".join(name.replace("_", " ").split()).strip()
-    if kind == "class":
-        text = f"Describe {base or 'object'}."
-    elif kind == "module":
-        text = f"{base.title() or 'Module'} utilities."
+    
+    base = _humanize_identifier(name) or "value"
+    if kind == "module":
+        text = f"Overview of {base}."
+    elif kind == "class":
+        text = f"Model the {base}."
+    elif kind == "function":
+        text = f"Compute {base}."
     else:
-        text = f"Return {base or 'value'}."
+        text = f"Describe {base}."
     return text if text.endswith(".") else text + "."
 
 
 def extended_summary(kind: str, name: str, module_name: str) -> str:
-    """Return extended summary.
+    """Compute extended summary.
+
+    Carry out the extended summary operation.
 
     Parameters
     ----------
@@ -147,11 +213,42 @@ def extended_summary(kind: str, name: str, module_name: str) -> str:
     str
         Description of return value.
     """
-    return ""
+    
+    pretty = _humanize_identifier(name)
+    if kind == "module":
+        module_pretty = _humanize_identifier(module_name.split(".")[-1] if module_name else name)
+        return (
+            f"This module bundles {module_pretty.lower()} logic for the kgfoundry stack."
+            if module_pretty
+            else "Utility module providing KGFoundry helpers."
+        )
+    if kind == "class" and isinstance(node, ast.ClassDef):
+        if _is_pydantic_model(node):
+            return "Pydantic model defining the structured payload used across the system."
+        return (
+            f"Represents the {pretty.lower()} data structure used throughout the project."
+            if pretty
+            else "Core data structure used within kgfoundry."
+        )
+    if kind == "function" and name == "__init__":
+        return "Initialise a new instance with validated parameters."
+    if kind == "function" and _is_magic(name):
+        return "Special method customising Python's object protocol for this class."
+    if kind == "function" and _is_pydantic_field(name):
+        return "Internal helper generated by Pydantic for model configuration and validation."
+    if kind == "function":
+        return (
+            f"Carry out the {pretty.lower()} operation."
+            if pretty
+            else "Perform the requested operation."
+        )
+    return "Auto-generated reference for project internals."
 
 
 def annotation_to_text(node: ast.AST | None) -> str:
-    """Return annotation to text.
+    """Compute annotation to text.
+
+    Carry out the annotation to text operation.
 
     Parameters
     ----------
@@ -163,6 +260,7 @@ def annotation_to_text(node: ast.AST | None) -> str:
     str
         Description of return value.
     """
+    
     if node is None:
         return "Any"
     try:
@@ -179,15 +277,18 @@ def annotation_to_text(node: ast.AST | None) -> str:
     text = text.replace("list[", "List[").replace("tuple[", "Tuple[").replace("set[", "Set[")
     if text.startswith("dict["):
         text = text.replace("dict[", "Mapping[")
-    resolved = QUALIFIED_NAME_OVERRIDES.get(text, text)
-    if resolved.startswith("Optional[") and resolved.endswith("]"):
-        inner = resolved[len("Optional[") : -1]
+    if text in QUALIFIED_NAME_OVERRIDES:
+        text = QUALIFIED_NAME_OVERRIDES[text]
+    if text.startswith("Optional[") and text.endswith("]"):
+        inner = text[len("Optional[") : -1]
         return f"Optional {inner}"
-    return resolved
+    return text
 
 
 def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
-    """Return iter docstring nodes.
+    """Compute iter docstring nodes.
+
+    Carry out the iter docstring nodes operation.
 
     Parameters
     ----------
@@ -199,6 +300,7 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     List[Tuple[int, ast.AST, str]]
         Description of return value.
     """
+    
     items: list[tuple[int, ast.AST, str]] = [(0, tree, "module")]
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
@@ -210,7 +312,9 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
 
 
 def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[str, str]]:
-    """Return parameters for.
+    """Compute parameters for.
+
+    Carry out the parameters for operation.
 
     Parameters
     ----------
@@ -222,11 +326,14 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
     List[Tuple[str, str]]
         Description of return value.
     """
+    
     params: list[tuple[str, str]] = []
     args = node.args
 
     def add(arg: ast.arg, default: ast.AST | None) -> None:
-        """Return add.
+        """Compute add.
+
+        Carry out the add operation.
 
         Parameters
         ----------
@@ -235,6 +342,7 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
         default : ast.AST | None
             Description for ``default``.
         """
+        
         name = arg.arg
         if name in {"self", "cls"}:
             return
@@ -265,7 +373,9 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
 
 
 def detect_raises(node: ast.AST) -> list[str]:
-    """Return detect raises.
+    """Compute detect raises.
+
+    Carry out the detect raises operation.
 
     Parameters
     ----------
@@ -277,6 +387,7 @@ def detect_raises(node: ast.AST) -> list[str]:
     List[str]
         Description of return value.
     """
+    
     seen: OrderedDict[str, None] = OrderedDict()
     for child in ast.walk(node):
         if not isinstance(child, ast.Raise):
@@ -306,7 +417,9 @@ def detect_raises(node: ast.AST) -> list[str]:
 def build_examples(
     module_name: str, name: str, parameters: list[tuple[str, str]], has_return: bool
 ) -> list[str]:
-    """Return build examples.
+    """Compute build examples.
+
+    Carry out the build examples operation.
 
     Parameters
     ----------
@@ -324,6 +437,7 @@ def build_examples(
     List[str]
         Description of return value.
     """
+    
     lines: list[str] = ["Examples", "--------"]
     if module_name and not name.startswith("__"):
         lines.append(f">>> from {module_name} import {name}")
@@ -340,7 +454,9 @@ def build_examples(
 
 
 def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
-    """Return build docstring.
+    """Compute build docstring.
+
+    Carry out the build docstring operation.
 
     Parameters
     ----------
@@ -356,6 +472,7 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     List[str]
         Description of return value.
     """
+    
     if kind == "module":
         module_display = module_name.split(".")[-1] if module_name else "module"
         summary = summarize(module_display, kind)
@@ -412,7 +529,9 @@ def _required_sections(
     returns: str | None,
     raises: list[str],
 ) -> set[str]:
-    """Return required sections.
+    """Compute required sections.
+
+    Carry out the required sections operation.
 
     Parameters
     ----------
@@ -443,7 +562,9 @@ def _required_sections(
 
 
 def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
-    """Return docstring text.
+    """Compute docstring text.
+
+    Carry out the docstring text operation.
 
     Parameters
     ----------
@@ -455,6 +576,7 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     Tuple[str | None, ast.Expr | None]
         Description of return value.
     """
+    
     body = getattr(node, "body", [])
     if not body:
         return None, None
@@ -471,7 +593,9 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
 def replace(
     doc_expr: ast.Expr | None, lines: list[str], new_lines: list[str], indent: str, insert_at: int
 ) -> None:
-    """Return replace.
+    """Compute replace.
+
+    Carry out the replace operation.
 
     Parameters
     ----------
@@ -486,6 +610,7 @@ def replace(
     insert_at : int
         Description for ``insert_at``.
     """
+    
     formatted = [indent + line + "\n" for line in new_lines]
     if doc_expr is not None:
         start = doc_expr.lineno - 1
@@ -500,7 +625,9 @@ def replace(
 
 
 def process_file(path: Path) -> bool:
-    """Return process file.
+    """Compute process file.
+
+    Carry out the process file operation.
 
     Parameters
     ----------
@@ -512,6 +639,7 @@ def process_file(path: Path) -> bool:
     bool
         Description of return value.
     """
+    
     try:
         text = path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
@@ -524,6 +652,20 @@ def process_file(path: Path) -> bool:
     module_name = module_name_for(path)
 
     for _, node, kind in iter_docstring_nodes(tree):
+        node_name = getattr(node, "name", None)
+        if kind != "module" and isinstance(
+            node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+        ):
+            if (
+                node_name
+                and node_name.startswith("__")
+                and node_name.endswith("__")
+                and node_name != "__init__"
+            ):
+                continue
+            if node_name and node_name.startswith("_") and not node_name.startswith("__"):
+                continue
+
         doc, expr = docstring_text(node)
         parameters: list[tuple[str, str]] = []
         returns: str | None = None
@@ -576,7 +718,11 @@ def process_file(path: Path) -> bool:
 
 
 def main() -> None:
-    """Return main."""
+    """Compute main.
+
+    Carry out the main operation.
+    """
+    
     args = parse_args()
     target = args.target.resolve()
     changed: list[DocstringChange] = []

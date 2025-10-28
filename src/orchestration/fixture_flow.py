@@ -45,7 +45,9 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor t_prepare_dirs]
 @task
 def t_prepare_dirs(root: str) -> dict[str, bool]:
-    """Return t prepare dirs.
+    """Compute t prepare dirs.
+
+    Carry out the t prepare dirs operation.
 
     Parameters
     ----------
@@ -57,6 +59,9 @@ def t_prepare_dirs(root: str) -> dict[str, bool]:
     Mapping[str, bool]
         Description of return value.
     """
+    
+    
+    
     path = Path(root)
     (path / "parquet" / "dense").mkdir(parents=True, exist_ok=True)
     (path / "parquet" / "sparse").mkdir(parents=True, exist_ok=True)
@@ -68,7 +73,9 @@ def t_prepare_dirs(root: str) -> dict[str, bool]:
 # [nav:anchor t_write_fixture_chunks]
 @task
 def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
-    """Return t write fixture chunks.
+    """Compute t write fixture chunks.
+
+    Carry out the t write fixture chunks operation.
 
     Parameters
     ----------
@@ -80,6 +87,9 @@ def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
     Tuple[str, int]
         Description of return value.
     """
+    
+    
+    
     writer = ParquetChunkWriter(chunks_root, model="docling_hybrid", run_id="fixture")
     rows = [
         {
@@ -101,7 +111,9 @@ def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
 # [nav:anchor t_write_fixture_dense]
 @task
 def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
-    """Return t write fixture dense.
+    """Compute t write fixture dense.
+
+    Carry out the t write fixture dense operation.
 
     Parameters
     ----------
@@ -113,6 +125,9 @@ def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
     Tuple[str, int]
         Description of return value.
     """
+    
+    
+    
     writer = ParquetVectorWriter(dense_root)
     vector = [0.0] * 2560
     out_root = writer.write_dense(
@@ -124,7 +139,9 @@ def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
 # [nav:anchor t_write_fixture_splade]
 @task
 def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
-    """Return t write fixture splade.
+    """Compute t write fixture splade.
+
+    Carry out the t write fixture splade operation.
 
     Parameters
     ----------
@@ -136,6 +153,9 @@ def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
     Tuple[str, int]
         Description of return value.
     """
+    
+    
+    
     writer = ParquetVectorWriter(sparse_root)
     out_root = writer.write_splade(
         "SPLADE-v3-distilbert",
@@ -154,7 +174,9 @@ def t_register_in_duckdb(
     dense_info: tuple[str, int],
     sparse_info: tuple[str, int],
 ) -> dict[str, list[str]]:
-    """Return t register in duckdb.
+    """Compute t register in duckdb.
+
+    Carry out the t register in duckdb operation.
 
     Parameters
     ----------
@@ -172,6 +194,9 @@ def t_register_in_duckdb(
     Mapping[str, List[str]]
         Description of return value.
     """
+    
+    
+    
     registry = DuckDBRegistryHelper(db_path)
     dense_run = registry.new_run("dense_embed", "Qwen3-Embedding-4B", "main", {"dim": 2560})
     sparse_run = registry.new_run("splade_encode", "SPLADE-v3-distilbert", "main", {"topk": 256})
@@ -214,7 +239,9 @@ def t_register_in_duckdb(
 def fixture_pipeline(
     root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb"
 ) -> dict[str, list[str]]:
-    """Return fixture pipeline.
+    """Compute fixture pipeline.
+
+    Carry out the fixture pipeline operation.
 
     Parameters
     ----------
@@ -228,6 +255,9 @@ def fixture_pipeline(
     Mapping[str, List[str]]
         Description of return value.
     """
+    
+    
+    
     t_prepare_dirs(root)
     chunks_info = t_write_fixture_chunks(f"{root}/parquet/chunks")
     dense_info = t_write_fixture_dense(f"{root}/parquet/dense")

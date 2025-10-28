@@ -19,7 +19,9 @@ Module Contents
 .. py:function:: rrf_fuse(dense, sparse, k = 60)
 
    
-   Return rrf fuse.
+   Compute rrf fuse.
+
+   Carry out the rrf fuse operation.
 
    :param dense: Description for ``dense``.
    :type dense: List[Tuple[str, float]]
@@ -50,7 +52,9 @@ Module Contents
 .. py:function:: apply_kg_boosts(fused, query)
 
    
-   Return apply kg boosts.
+   Compute apply kg boosts.
+
+   Carry out the apply kg boosts operation.
 
    :param fused: Description for ``fused``.
    :type fused: List[Tuple[str, float]]
@@ -79,7 +83,9 @@ Module Contents
 .. py:function:: mmr_deduplicate(results, lambda_ = 0.7)
 
    
-   Return mmr deduplicate.
+   Compute mmr deduplicate.
+
+   Carry out the mmr deduplicate operation.
 
    :param results: Description for ``results``.
    :type results: List[Tuple[str, float]]

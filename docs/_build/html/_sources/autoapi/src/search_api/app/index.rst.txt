@@ -19,7 +19,9 @@ Module Contents
 .. py:function:: auth(authorization = Header(default=None))
 
    
-   Return auth.
+   Compute auth.
+
+   Carry out the auth operation.
 
    :param authorization: Description for ``authorization``.
    :type authorization: str | None
@@ -46,7 +48,9 @@ Module Contents
 .. py:function:: healthz()
 
    
-   Return healthz.
+   Compute healthz.
+
+   Carry out the healthz operation.
 
    :returns: *Mapping[str, Any]* -- Description of return value.
 
@@ -70,7 +74,9 @@ Module Contents
 .. py:function:: rrf_fuse(lists, k_rrf)
 
    
-   Return rrf fuse.
+   Compute rrf fuse.
+
+   Carry out the rrf fuse operation.
 
    :param lists: Description for ``lists``.
    :type lists: List[List[Tuple[str, float]]]
@@ -99,7 +105,9 @@ Module Contents
 .. py:function:: apply_kg_boosts(cands, query, direct = 0.08, one_hop = 0.04)
 
    
-   Return apply kg boosts.
+   Compute apply kg boosts.
+
+   Carry out the apply kg boosts operation.
 
    :param cands: Description for ``cands``.
    :type cands: Mapping[str, float]
@@ -132,7 +140,9 @@ Module Contents
 .. py:function:: search(req, _ = Depends(auth))
 
    
-   Return search.
+   Compute search.
+
+   Carry out the search operation.
 
    :param req: Description for ``req``.
    :type req: src.search_api.schemas.SearchRequest
@@ -161,7 +171,9 @@ Module Contents
 .. py:function:: graph_concepts(body, _ = Depends(auth))
 
    
-   Return graph concepts.
+   Compute graph concepts.
+
+   Carry out the graph concepts operation.
 
    :param body: Description for ``body``.
    :type body: Mapping[str, Any]

@@ -43,7 +43,9 @@ class OpenAccessHarvester:
         pdf_host_base: str | None = None,
         out_dir: str = "/data/pdfs",
     ) -> None:
-        """Return init.
+        """Compute init.
+
+        Initialise a new instance with validated parameters.
 
         Parameters
         ----------
@@ -60,6 +62,9 @@ class OpenAccessHarvester:
         out_dir : str | None
             Description for ``out_dir``.
         """
+        
+        
+        
         self.ua = user_agent
         self.email = contact_email
         self.openalex = openalex_base.rstrip("/")
@@ -71,7 +76,9 @@ class OpenAccessHarvester:
         self.session.headers.update({"User-Agent": f"{self.ua} ({self.email})"})
 
     def search(self, topic: str, years: str, max_works: int) -> list[dict[str, Any]]:
-        """Return search.
+        """Compute search.
+
+        Carry out the search operation.
 
         Parameters
         ----------
@@ -87,6 +94,9 @@ class OpenAccessHarvester:
         List[dict[str, Any]]
             Description of return value.
         """
+        
+        
+        
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
             "topic": topic,
@@ -101,7 +111,9 @@ class OpenAccessHarvester:
         return data.get("results", [])[:max_works]
 
     def resolve_pdf(self, work: dict[str, Any]) -> str | None:
-        """Return resolve pdf.
+        """Compute resolve pdf.
+
+        Carry out the resolve pdf operation.
 
         Parameters
         ----------
@@ -113,6 +125,9 @@ class OpenAccessHarvester:
         str | None
             Description of return value.
         """
+        
+        
+        
         best = work.get("best_oa_location") or {}
         if best and best.get("pdf_url"):
             return best["pdf_url"]
@@ -134,7 +149,9 @@ class OpenAccessHarvester:
         return None
 
     def download_pdf(self, url: str, target_path: str) -> str:
-        """Return download pdf.
+        """Compute download pdf.
+
+        Carry out the download pdf operation.
 
         Parameters
         ----------
@@ -155,6 +172,9 @@ class OpenAccessHarvester:
         UnsupportedMIMEError
             Raised when validation fails.
         """
+        
+        
+        
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
             message = f"Bad status {response.status_code} for {url}"
@@ -168,7 +188,9 @@ class OpenAccessHarvester:
         return target_path
 
     def run(self, topic: str, years: str, max_works: int) -> list[Doc]:
-        """Return run.
+        """Compute run.
+
+        Carry out the run operation.
 
         Parameters
         ----------
@@ -184,6 +206,9 @@ class OpenAccessHarvester:
         List[Doc]
             Description of return value.
         """
+        
+        
+        
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)
         for work in works:

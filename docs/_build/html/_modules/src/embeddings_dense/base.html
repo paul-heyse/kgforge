@@ -502,30 +502,35 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">27</span>
 <span class="linenos">28</span>
 <span class="linenos">29</span><span class="c1"># [nav:anchor DenseEmbeddingModel]</span>
-<span class="linenos">30</span><span class="k">class</span><span class="w"> </span><span class="nc">DenseEmbeddingModel</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="linenos">31</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Describe DenseEmbeddingModel.&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="DenseEmbeddingModel">
 <a class="viewcode-back" href="../../../autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbeddingModel">[docs]</a>
+<span class="linenos">30</span><span class="k">class</span><span class="w"> </span><span class="nc">DenseEmbeddingModel</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="linenos">31</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Describe DenseEmbeddingModel.&quot;&quot;&quot;</span>
 <span class="linenos">32</span>
-<span class="linenos">33</span>    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">texts</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">]:</span>
-<span class="linenos">34</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return encode.</span>
-<span class="linenos">35</span>
 <div class="viewcode-block" id="DenseEmbeddingModel.encode">
 <a class="viewcode-back" href="../../../autoapi/src/embeddings_dense/base/index.html#src.embeddings_dense.base.DenseEmbeddingModel.encode">[docs]</a>
-<span class="linenos">36</span><span class="sd">        Parameters</span>
-<span class="linenos">37</span><span class="sd">        ----------</span>
-<span class="linenos">38</span><span class="sd">        texts : Sequence[str]</span>
-<span class="linenos">39</span><span class="sd">            Description for ``texts``.</span>
-<span class="linenos">40</span>
-<span class="linenos">41</span><span class="sd">        Returns</span>
-<span class="linenos">42</span><span class="sd">        -------</span>
-<span class="linenos">43</span><span class="sd">        NDArray[np.float32]</span>
-<span class="linenos">44</span><span class="sd">            Description of return value.</span>
-<span class="linenos">45</span><span class="sd">        &quot;&quot;&quot;</span>
-<span class="linenos">46</span>        <span class="o">...</span>
-</pre></div></div>
+<span class="linenos">33</span>    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">texts</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">]:</span>
+<span class="linenos">34</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute encode.</span>
+<span class="linenos">35</span>
+<span class="linenos">36</span><span class="sd">        Carry out the encode operation.</span>
+<span class="linenos">37</span>
+<span class="linenos">38</span><span class="sd">        Parameters</span>
+<span class="linenos">39</span><span class="sd">        ----------</span>
+<span class="linenos">40</span><span class="sd">        texts : Sequence[str]</span>
+<span class="linenos">41</span><span class="sd">            Description for ``texts``.</span>
+<span class="linenos">42</span>
+<span class="linenos">43</span><span class="sd">        Returns</span>
+<span class="linenos">44</span><span class="sd">        -------</span>
+<span class="linenos">45</span><span class="sd">        NDArray[np.float32]</span>
+<span class="linenos">46</span><span class="sd">            Description of return value.</span>
+<span class="linenos">47</span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos">48</span>        
+<span class="linenos">49</span>        
+<span class="linenos">50</span>        
+<span class="linenos">51</span>        <span class="o">...</span></div>
 </div>
 
+</pre></div>
 
                 </article>
               

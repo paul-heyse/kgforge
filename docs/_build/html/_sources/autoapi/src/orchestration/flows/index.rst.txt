@@ -19,7 +19,9 @@ Module Contents
 .. py:function:: t_echo(msg)
 
    
-   Return t echo.
+   Compute t echo.
+
+   Carry out the t echo operation.
 
    :param msg: Description for ``msg``.
    :type msg: str
@@ -46,7 +48,9 @@ Module Contents
 .. py:function:: e2e_flow()
 
    
-   Return e2e flow.
+   Compute e2e flow.
+
+   Carry out the e2e flow operation.
 
    :returns: *List[str]* -- Description of return value.
 

@@ -24,7 +24,9 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor isotonic_calibrate]
 def isotonic_calibrate(pairs: list[tuple[float, int]]) -> dict[str, object]:
-    """Return isotonic calibrate.
+    """Compute isotonic calibrate.
+
+    Carry out the isotonic calibrate operation.
 
     Parameters
     ----------
@@ -36,5 +38,8 @@ def isotonic_calibrate(pairs: list[tuple[float, int]]) -> dict[str, object]:
     Mapping[str, object]
         Description of return value.
     """
+    
+    
+    
     # NOTE: fit isotonic regression parameters when calibrator is implemented
     return {"kind": "isotonic", "params": []}

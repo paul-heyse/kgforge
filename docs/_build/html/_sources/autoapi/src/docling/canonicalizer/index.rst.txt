@@ -19,7 +19,9 @@ Module Contents
 .. py:function:: canonicalize_text(blocks)
 
    
-   Return canonicalize text.
+   Compute canonicalize text.
+
+   Carry out the canonicalize text operation.
 
    :param blocks: Description for ``blocks``.
    :type blocks: List[str]

@@ -481,7 +481,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="src.search_api.kg_mock.detect_query_concepts">
 <span class="sig-prename descclassname"><span class="pre">src.search_api.kg_mock.</span></span><span class="sig-name descname"><span class="pre">detect_query_concepts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/kg_mock.html#detect_query_concepts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/kg_mock.py:45:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.kg_mock.detect_query_concepts" title="Link to this definition">#</a></dt>
-<dd><p>Return detect query concepts.</p>
+<dd><p>Compute detect query concepts.</p>
+<p>Carry out the detect query concepts operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Description for <code class="docutils literal notranslate"><span class="pre">query</span></code>.</p>
@@ -497,8 +498,9 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.search_api.kg_mock.linked_concepts_for_text">
-<span class="sig-prename descclassname"><span class="pre">src.search_api.kg_mock.</span></span><span class="sig-name descname"><span class="pre">linked_concepts_for_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/kg_mock.html#linked_concepts_for_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/kg_mock.py:67:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.kg_mock.linked_concepts_for_text" title="Link to this definition">#</a></dt>
-<dd><p>Return linked concepts for text.</p>
+<span class="sig-prename descclassname"><span class="pre">src.search_api.kg_mock.</span></span><span class="sig-name descname"><span class="pre">linked_concepts_for_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/kg_mock.html#linked_concepts_for_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/kg_mock.py:72:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.kg_mock.linked_concepts_for_text" title="Link to this definition">#</a></dt>
+<dd><p>Compute linked concepts for text.</p>
+<p>Carry out the linked concepts for text operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Description for <code class="docutils literal notranslate"><span class="pre">text</span></code>.</p>
@@ -514,8 +516,9 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.search_api.kg_mock.kg_boost">
-<span class="sig-prename descclassname"><span class="pre">src.search_api.kg_mock.</span></span><span class="sig-name descname"><span class="pre">kg_boost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_concepts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_concepts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">one_hop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/kg_mock.html#kg_boost"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/kg_mock.py:89:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.kg_mock.kg_boost" title="Link to this definition">#</a></dt>
-<dd><p>Return kg boost.</p>
+<span class="sig-prename descclassname"><span class="pre">src.search_api.kg_mock.</span></span><span class="sig-name descname"><span class="pre">kg_boost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_concepts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_concepts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">one_hop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/kg_mock.html#kg_boost"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/kg_mock.py:99:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.kg_mock.kg_boost" title="Link to this definition">#</a></dt>
+<dd><p>Compute kg boost.</p>
+<p>Carry out the kg boost operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
