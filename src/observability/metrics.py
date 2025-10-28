@@ -44,7 +44,6 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             _NoopMetric
                 Description of return value.
             """
-            
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
@@ -59,7 +58,6 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
-            
             return
 
         def inc(self, *args: object, **kwargs: object) -> None:
@@ -74,7 +72,6 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
-            
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
@@ -89,7 +86,6 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
-            
             return
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:

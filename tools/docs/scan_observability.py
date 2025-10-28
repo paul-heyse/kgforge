@@ -111,12 +111,8 @@ DEFAULT_POLICY = {
             r"path",
         ],
     },
-    "logs": {
-        "require_structured": True  # prefer structured keys over %-format/f-strings
-    },
-    "traces": {
-        "name_regex": r"^[a-z0-9_.]+$"  # OTel-style dotted lowercase names
-    },
+    "logs": {"require_structured": True},  # prefer structured keys over %-format/f-strings
+    "traces": {"name_regex": r"^[a-z0-9_.]+$"},  # OTel-style dotted lowercase names
     "error_taxonomy_json": "docs/_build/error_taxonomy.json",  # optional; map messages/codes to runbooks
 }
 
