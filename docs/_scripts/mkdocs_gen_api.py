@@ -40,6 +40,11 @@ def iter_packages() -> list[str]:
     
     
     
+    
+    
+    
+    
+    
     packages = detect_packages()
     return packages or [detect_primary()]
 
@@ -57,6 +62,11 @@ def write_node(node: Object) -> None:
     node : Object
         Description for ``node``.
     """
+    
+    
+    
+    
+    
     
     
     

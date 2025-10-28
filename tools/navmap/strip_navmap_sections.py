@@ -29,6 +29,11 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
     
     
     
+    
+    
+    
+    
+    
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if not tree.body:
@@ -62,6 +67,11 @@ def clean_docstring(text: str) -> str:
     
     
     
+    
+    
+    
+    
+    
     lines: list[str] = []
     for raw in text.splitlines():
         if raw.strip().startswith("NavMap:"):
@@ -86,6 +96,11 @@ def rewrite_module(path: Path) -> bool:
     bool
         Description of return value.
     """
+    
+    
+    
+    
+    
     
     
     
@@ -116,6 +131,11 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
     
     
     

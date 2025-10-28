@@ -37,6 +37,11 @@ def has_python_files(path: Path) -> bool:
     
     
     
+    
+    
+    
+    
+    
     return any(path.rglob("*.py"))
 
 
@@ -50,6 +55,11 @@ def run_doq(target: Path) -> None:
     target : Path
         Description for ``target``.
     """
+    
+    
+    
+    
+    
     
     
     
@@ -84,6 +94,11 @@ def run_fallback(target: Path) -> None:
     
     
     
+    
+    
+    
+    
+    
     cmd = [
         sys.executable,
         "tools/auto_docstrings.py",
@@ -100,6 +115,11 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
     
     
     

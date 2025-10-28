@@ -24,6 +24,11 @@ def iter_python_files() -> list[Path]:
     
     
     
+    
+    
+    
+    
+    
     search_root = SRC if SRC.exists() else ROOT
     return sorted(path for path in search_root.rglob("*.py") if path.is_file())
 
@@ -47,6 +52,11 @@ def module_docstring(path: Path) -> str | None:
     
     
     
+    
+    
+    
+    
+    
     try:
         tree = ast.parse(path.read_text(encoding="utf-8"))
     except UnicodeDecodeError:
@@ -64,6 +74,11 @@ def main() -> None:
     SystemExit
         Raised when validation fails.
     """
+    
+    
+    
+    
+    
     
     
     

@@ -43,6 +43,11 @@ def apply(db: str, migrations_dir: str) -> None:
     
     
     
+    
+    
+    
+    
+    
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
         con.execute(p.read_text())
@@ -55,6 +60,11 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
     
     
     

@@ -48,6 +48,11 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             
             
             
+            
+            
+            
+            
+            
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
@@ -62,6 +67,11 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
+            
+            
+            
+            
+            
             
             
             
@@ -84,6 +94,11 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             
             
             
+            
+            
+            
+            
+            
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
@@ -98,6 +113,11 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
+            
+            
+            
+            
+            
             
             
             

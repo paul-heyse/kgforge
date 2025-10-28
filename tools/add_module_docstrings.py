@@ -28,6 +28,11 @@ def module_name(path: Path) -> str:
     
     
     
+    
+    
+    
+    
+    
     rel = path.relative_to(SRC).with_suffix("")
     return str(rel).replace("/", ".")
 
@@ -47,6 +52,11 @@ def needs_docstring(text: str) -> bool:
     bool
         Description of return value.
     """
+    
+    
+    
+    
+    
     
     
     
@@ -77,6 +87,11 @@ def insert_docstring(path: Path) -> bool:
     
     
     
+    
+    
+    
+    
+    
     text = path.read_text()
     if not needs_docstring(text):
         return False
@@ -98,6 +113,11 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
     
     
     
