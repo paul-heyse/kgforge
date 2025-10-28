@@ -222,6 +222,7 @@ def load_policy() -> dict[str, Any]:
     
     
     
+    
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
     try:
@@ -718,6 +719,7 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     
     
     
+    
     try:
         text = path.read_text(encoding="utf-8")
     except OSError:
@@ -746,6 +748,7 @@ def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], 
     Tuple[List[LogRow], List[MetricRow], List[TraceRow]]
         Description of return value.
     """
+    
     
     
     

@@ -100,6 +100,7 @@ def load_symbol_candidates() -> set[str]:
     
     
     
+    
     candidates: set[str] = set()
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if symbols_json.exists():
@@ -138,6 +139,7 @@ def load_symbol_spans() -> dict[str, dict[str, Any]]:
     
     
     
+    
     out: dict[str, dict[str, Any]] = {}
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if not symbols_json.exists():
@@ -167,6 +169,7 @@ def load_public_symbols() -> set[str]:
     Set[str]
         Description of return value.
     """
+    
     
     
     
@@ -251,6 +254,7 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     Mapping[str, List[Mapping[str, object]]]
         Description of return value.
     """
+    
     
     
     
@@ -358,6 +362,7 @@ def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]
     
     
     
+    
     if not COV_JSON.exists():
         return ({}, {})
     data = _load_json(COV_JSON)
@@ -404,6 +409,7 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     
     
     
+    
     table: dict[str, list[dict[str, object]]] = defaultdict(list)
     if not TESTS.exists():
         return {}
@@ -439,6 +445,7 @@ def attach_coverage(
     Mapping[str, Mapping[str, Any]]
         Description of return value.
     """
+    
     
     
     
@@ -500,6 +507,7 @@ def summarize(
     Tuple[dict[str, Any], List[dict[str, Any]]]
         Description of return value.
     """
+    
     
     
     

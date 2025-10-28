@@ -400,6 +400,7 @@ def main(argv: list[str] | None = None) -> int:
     
     
     
+    
     errors: list[str] = []
     for py in sorted(SRC.rglob("*.py")):
         errors.extend(_inspect(py))
