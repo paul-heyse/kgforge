@@ -58,10 +58,11 @@ class OpenAccessHarvester:
         pdf_host_base: str | None = None,
         out_dir: str = "/data/pdfs",
     ) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters.
-
+        """
+        Compute init.
+        
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
+        
         Parameters
         ----------
         user_agent : str
@@ -77,6 +78,7 @@ class OpenAccessHarvester:
         out_dir : str | None
             Description for ``out_dir``.
         """
+        
         self.ua = user_agent
         self.email = contact_email
         self.openalex = openalex_base.rstrip("/")

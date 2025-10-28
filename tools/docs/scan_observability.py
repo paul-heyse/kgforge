@@ -226,17 +226,24 @@ def _deep_merge_dicts(base: dict[str, Any], override: dict[str, Any]) -> dict[st
 
 
 def load_policy() -> dict[str, Any]:
-    """Load the observability policy, deep-merging overrides into the defaults.
-
-    The YAML file at :data:`POLICY_PATH` is optional. When present, only the fields provided in
-    the file need to be specified because nested mappings are merged recursively with
-    :data:`DEFAULT_POLICY`.
-
+    """
+    Compute load policy.
+    
+    Carry out the load policy operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Returns
     -------
-    dict[str, Any]
-        The policy mapping with overrides applied.
+    collections.abc.Mapping
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.docs.scan_observability import load_policy
+    >>> result = load_policy()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
     try:
