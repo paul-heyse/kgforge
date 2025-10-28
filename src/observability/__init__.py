@@ -1,8 +1,8 @@
 """Observability utilities."""
 
-import observability.metrics as metrics
-
+# [nav:anchor metrics]
 from kgfoundry_common.navmap_types import NavMap
+from observability import metrics
 
 __all__ = ["metrics"]
 
@@ -21,6 +21,10 @@ __navmap__: NavMap = {
         },
     ],
     "symbols": {
-        "metrics": {},
+        "metrics": {
+            "stability": "beta",
+            "owner": "@observability",
+            "since": "0.1.0",
+        },
     },
 }

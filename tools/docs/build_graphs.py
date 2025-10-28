@@ -32,22 +32,26 @@ def run(cmd: list[str]) -> None:
     cmd : List[str]
         Description for ``cmd``.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     subprocess.run(cmd, check=True, cwd=ROOT)
 
 
@@ -61,22 +65,26 @@ def top_level_packages() -> set[str]:
     Set[str]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     packages: set[str] = set()
     if not SRC.exists():
         return packages
@@ -103,22 +111,26 @@ def build_pydeps(pkg: str) -> None:
     pkg : str
         Description for ``pkg``.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     dot_path = OUT / f"{pkg}.dot"
     svg_path = OUT / f"{pkg}-imports.svg"
     cmd = [
@@ -150,22 +162,26 @@ def build_pyreverse(pkg: str) -> None:
     pkg : str
         Description for ``pkg``.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     cmd = [
         sys.executable,
         "-m",
@@ -191,22 +207,26 @@ def main() -> None:
 
     Carry out the main operation.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     for pkg in sorted(top_level_packages()):
         try:
             build_pydeps(pkg)

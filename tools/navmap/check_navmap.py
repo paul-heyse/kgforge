@@ -199,22 +199,26 @@ def main() -> int:
     int
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     errors: list[str] = []
     for py in SRC.rglob("*.py"):
         errors.extend(_inspect(py))

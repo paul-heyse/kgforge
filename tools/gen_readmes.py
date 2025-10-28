@@ -38,7 +38,11 @@ def detect_repo() -> tuple[str, str]:
     Tuple[str, str]
         Description of return value.
     """
-    
+
+
+
+
+
     try:
         remote = subprocess.check_output(
             ["git", "config", "--get", "remote.origin.url"], cwd=ROOT, text=True
@@ -78,7 +82,11 @@ def git_sha() -> str:
     str
         Description of return value.
     """
-    
+
+
+
+
+
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     except Exception:
@@ -108,7 +116,11 @@ def gh_url(rel: str, start: int, end: int | None) -> str:
     str
         Description of return value.
     """
-    
+
+
+
+
+
     fragment = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel}{fragment}"
 
@@ -123,7 +135,11 @@ def iter_packages() -> list[str]:
     List[str]
         Description of return value.
     """
-    
+
+
+
+
+
     env_pkgs = os.environ.get("DOCS_PKG")
     if env_pkgs:
         return [pkg.strip() for pkg in env_pkgs.split(",") if pkg.strip()]
@@ -145,7 +161,11 @@ def summarize(node: Object) -> str:
     str
         Description of return value.
     """
-    
+
+
+
+
+
     doc = getattr(node, "docstring", None)
     if doc and getattr(doc, "value", None):
         return doc.value.strip().splitlines()[0].strip().rstrip(".")
@@ -167,7 +187,11 @@ def is_public(node: Object) -> bool:
     bool
         Description of return value.
     """
-    
+
+
+
+
+
     name = getattr(node, "name", "")
     return not name.startswith("_")
 
@@ -189,7 +213,11 @@ def get_open_link(node: Object, readme_dir: Path) -> str | None:
     str | None
         Description of return value.
     """
-    
+
+
+
+
+
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -220,7 +248,11 @@ def get_view_link(node: Object, readme_dir: Path) -> str | None:
     str | None
         Description of return value.
     """
-    
+
+
+
+
+
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -250,7 +282,11 @@ def iter_public_members(node: Object) -> Iterable[Object]:
     Iterable[Object]
         Description of return value.
     """
-    
+
+
+
+
+
     members = getattr(node, "members", {})
     return sorted([m for m in members.values() if is_public(m)], key=lambda child: child.name)
 
@@ -459,7 +495,11 @@ def badges_for(qname: str) -> Badges:
     Badges
         Description of return value.
     """
-    
+
+
+
+
+
     meta, defaults = _lookup_nav(qname)
     merged = {**defaults, **meta}
     tests: list[dict[str, Any]] = []
@@ -533,7 +573,11 @@ def format_badges(qname: str) -> str:
     str
         Description of return value.
     """
-    
+
+
+
+
+
     badges = badges_for(qname)
     tags: list[str] = []
     if badges.stability:
@@ -571,7 +615,11 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
     str | None
         Description of return value.
     """
-    
+
+
+
+
+
     if editor_mode == "vscode":
         return f"vscode://file/{abs_path}:{lineno}:1"
     # For 'relative', fall back to caller logic.
@@ -667,7 +715,11 @@ def render_line(node: Object, readme_dir: Path, cfg: Config) -> str | None:
     str | None
         Description of return value.
     """
-    
+
+
+
+
+
     qname = getattr(node, "path", "")
     summary = summarize(node)
 
@@ -719,7 +771,11 @@ def write_if_changed(path: Path, content: str) -> bool:
     bool
         Description of return value.
     """
-    
+
+
+
+
+
     digest = hashlib.sha256(content.encode("utf-8")).hexdigest()[:12]
     rendered = content.rstrip() + f"\n<!-- agent:readme v1 sha:{SHA} content:{digest} -->\n"
     previous = path.read_text(encoding="utf-8") if path.exists() else ""
@@ -747,7 +803,11 @@ def write_readme(node: Object, cfg: Config) -> bool:
     bool
         Description of return value.
     """
-    
+
+
+
+
+
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"
 

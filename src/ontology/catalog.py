@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Final
 
-from kgfoundry_common.models import Concept
+from kgfoundry_common.parquet_io import ConceptMeta as Concept
 from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["OntologyCatalog"]
@@ -37,18 +37,22 @@ class OntologyCatalog:
         concepts : List[Concept]
             Description for ``concepts``.
         """
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
@@ -68,18 +72,22 @@ class OntologyCatalog:
         Set[str]
             Description of return value.
         """
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return set()
 
@@ -98,16 +106,20 @@ class OntologyCatalog:
         Mapping[str, Any]
             Description of return value.
         """
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         return {}

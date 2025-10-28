@@ -70,22 +70,26 @@ def rrf_fuse(
     List[Tuple[str, float]]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # NOTE: implement stable RRF across rankers when ranker outputs are wired
     return []
 
@@ -108,22 +112,26 @@ def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[st
     List[Tuple[str, float]]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # NOTE: apply boosts for direct & one-hop concept matches once KG signals exist
     return fused
 
@@ -148,21 +156,25 @@ def mmr_deduplicate(
     List[Tuple[str, float]]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # NOTE: add doc-level diversity via MMR when result scoring is available
     return results

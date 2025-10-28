@@ -169,10 +169,14 @@ def parse_args() -> argparse.Namespace:
     argparse.Namespace
         Description of return value.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", required=True, type=Path, help="Directory to process.")
     parser.add_argument("--log", required=False, type=Path, help="Log file for changed paths.")
@@ -194,10 +198,14 @@ def module_name_for(path: Path) -> str:
     str
         Description of return value.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     try:
         relative = path.relative_to(REPO_ROOT)
     except ValueError:
@@ -230,10 +238,14 @@ def summarize(name: str, kind: str) -> str:
     str
         Description of return value.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     base = _humanize_identifier(name) or "value"
     if kind == "module":
         text = f"Overview of {base}."
@@ -265,10 +277,14 @@ def extended_summary(kind: str, name: str, module_name: str) -> str:
     str
         Description of return value.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     pretty = _humanize_identifier(name)
     if kind == "module":
         module_pretty = _humanize_identifier(module_name.split(".")[-1] if module_name else name)
@@ -315,10 +331,14 @@ def annotation_to_text(node: ast.AST | None) -> str:
     str
         Description of return value.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     if node is None:
         return "Any"
     try:
@@ -358,10 +378,14 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     List[Tuple[int, ast.AST, str]]
         Description of return value.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     items: list[tuple[int, ast.AST, str]] = [(0, tree, "module")]
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
@@ -387,10 +411,14 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
     List[Tuple[str, str]]
         Description of return value.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     params: list[tuple[str, str]] = []
     args = node.args
 
@@ -406,10 +434,14 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
         default : ast.AST | None
             Description for ``default``.
         """
-        
-        
-        
-        
+
+
+
+
+
+
+
+
         name = arg.arg
         if name in {"self", "cls"}:
             return
@@ -454,10 +486,14 @@ def detect_raises(node: ast.AST) -> list[str]:
     List[str]
         Description of return value.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     seen: OrderedDict[str, None] = OrderedDict()
     for child in ast.walk(node):
         if not isinstance(child, ast.Raise):
@@ -507,10 +543,14 @@ def build_examples(
     List[str]
         Description of return value.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     lines: list[str] = ["Examples", "--------"]
     if module_name and not name.startswith("__"):
         lines.append(f">>> from {module_name} import {name}")
@@ -545,10 +585,14 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     List[str]
         Description of return value.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     if kind == "module":
         module_display = module_name.split(".")[-1] if module_name else "module"
         summary = summarize(module_display, kind)
@@ -652,10 +696,14 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     Tuple[str | None, ast.Expr | None]
         Description of return value.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     body = getattr(node, "body", [])
     if not body:
         return None, None
@@ -689,10 +737,14 @@ def replace(
     insert_at : int
         Description for ``insert_at``.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     formatted = [indent + line + "\n" for line in new_lines]
     if doc_expr is not None:
         start = doc_expr.lineno - 1
@@ -721,10 +773,14 @@ def process_file(path: Path) -> bool:
     bool
         Description of return value.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     try:
         text = path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
@@ -807,10 +863,14 @@ def main() -> None:
 
     Carry out the main operation.
     """
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     args = parse_args()
     target = args.target.resolve()
     changed: list[DocstringChange] = []

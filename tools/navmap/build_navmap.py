@@ -211,12 +211,16 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
     Mapping[str, Any]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
 
     sha = _git_sha()
     data: dict[str, Any] = {
@@ -309,12 +313,16 @@ def main(argv: list[str] | None = None) -> int:
     int
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
 
     args = _parse_args(argv)
     root = args.root.resolve()
