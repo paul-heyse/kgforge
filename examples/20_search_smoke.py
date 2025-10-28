@@ -1,10 +1,17 @@
-"""Search smoke example metadata.
+""".. _gallery_search_smoke:
 
-Title: Search — tiny corpus smoke (no GPU)
-Tags: search, smoke
-Time: <2s
-GPU: no
-Network: no
+Search — tiny corpus smoke (no GPU)
+===================================
+
+Exercise the bundled tiny corpus utilities without requiring accelerators.
+
+.. tags:: search, smoke
+
+**Constraints**
+
+- **Time:** <2s
+- **GPU:** no
+- **Network:** no
 
 >>> from examples._utils import tiny_corpus
 >>> len(tiny_corpus())

@@ -1,10 +1,17 @@
-"""Quickstart example metadata.
+""".. _gallery_quickstart:
 
-Title: Quickstart — minimal import smoke test
-Tags: getting-started, smoke
-Time: <2s
-GPU: no
-Network: no
+Quickstart — minimal import smoke test
+======================================
+
+Ensure the :mod:`kgfoundry` package can be imported without side effects.
+
+.. tags:: getting-started, smoke
+
+**Constraints**
+
+- **Time:** <2s
+- **GPU:** no
+- **Network:** no
 
 >>> import importlib
 >>> module = importlib.import_module("kgfoundry")
