@@ -34,7 +34,9 @@ class ModuleInfo:
 
 
 def _extract_string(node: ast.AST) -> str | None:
-    """Return extract string.
+    """Compute extract string.
+
+    Carry out the extract string operation.
 
     Parameters
     ----------
@@ -52,7 +54,9 @@ def _extract_string(node: ast.AST) -> str | None:
 
 
 def _extract_strings(node: ast.AST) -> list[str]:
-    """Return extract strings.
+    """Compute extract strings.
+
+    Carry out the extract strings operation.
 
     Parameters
     ----------
@@ -72,7 +76,9 @@ def _extract_strings(node: ast.AST) -> list[str]:
 
 
 def _literal_eval(node: ast.AST, names: Mapping[str, object]) -> object:
-    """Return literal eval.
+    """Compute literal eval.
+
+    Carry out the literal eval operation.
 
     Parameters
     ----------
@@ -113,7 +119,9 @@ def _literal_eval(node: ast.AST, names: Mapping[str, object]) -> object:
 
 
 def _module_name(py: Path) -> str | None:
-    """Return module name.
+    """Compute module name.
+
+    Carry out the module name operation.
 
     Parameters
     ----------
@@ -136,7 +144,9 @@ def _module_name(py: Path) -> str | None:
 
 
 def _rel(path: Path) -> str:
-    """Return rel.
+    """Compute rel.
+
+    Carry out the rel operation.
 
     Parameters
     ----------
@@ -152,7 +162,9 @@ def _rel(path: Path) -> str:
 
 
 def _git_sha() -> str:
-    """Return git sha.
+    """Compute git sha.
+
+    Carry out the git sha operation.
 
     Returns
     -------
@@ -163,7 +175,9 @@ def _git_sha() -> str:
 
 
 def _parse_module(py: Path) -> ModuleInfo | None:  # noqa: C901, PLR0912
-    """Return parse module.
+    """Compute parse module.
+
+    Carry out the parse module operation.
 
     Parameters
     ----------
@@ -229,7 +243,9 @@ def _parse_module(py: Path) -> ModuleInfo | None:  # noqa: C901, PLR0912
 
 
 def _collect_modules() -> list[ModuleInfo]:
-    """Return collect modules.
+    """Compute collect modules.
+
+    Carry out the collect modules operation.
 
     Returns
     -------
@@ -245,13 +261,18 @@ def _collect_modules() -> list[ModuleInfo]:
 
 
 def build_index() -> dict[str, Any]:
-    """Return build index.
+    """Compute build index.
+
+    Carry out the build index operation.
 
     Returns
     -------
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
+    
     sha = _git_sha()
     data: dict[str, Any] = {"commit": sha, "modules": {}}
 
@@ -277,7 +298,13 @@ def build_index() -> dict[str, Any]:
 
 
 def main() -> None:
-    """Return main."""
+    """Compute main.
+
+    Carry out the main operation.
+    """
+    
+    
+    
     index = build_index()
     OUT.mkdir(parents=True, exist_ok=True)
     out_path = OUT / "navmap.json"

@@ -1,5 +1,5 @@
 {
-  "description": "Represent Chunk.\n\nAttributes\n----------\nid : Id\n    Attribute description.\ndoc_id : Id\n    Attribute description.\nsection : str | None\n    Attribute description.\nstart_char : int\n    Attribute description.\nend_char : int\n    Attribute description.\ntokens : int\n    Attribute description.\ndoctags_span : Mapping[str, int]\n    Attribute description.\n\nExamples\n--------\n>>> from kgfoundry_common.models import Chunk\n>>> result = Chunk()\n>>> result  # doctest: +ELLIPSIS\n...\n\nSee Also\n--------\nkgfoundry_common.models\n\nNotes\n-----\nDocument class invariants and lifecycle details here.",
+  "description": "Describe Chunk.",
   "properties": {
     "id": {
       "title": "Id",

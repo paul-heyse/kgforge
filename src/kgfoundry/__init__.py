@@ -21,7 +21,9 @@ __all__ = sorted(_ALIASES)
 
 
 def _load(name: str) -> object:
-    """Return load.
+    """Compute load.
+
+    Carry out the load operation.
 
     Parameters
     ----------
@@ -42,7 +44,9 @@ def _load(name: str) -> object:
 
 
 def __getattr__(name: str) -> object:
-    """Return getattr.
+    """Compute getattr.
+
+    Carry out the getattr operation.
 
     Parameters
     ----------
@@ -66,7 +70,9 @@ def __getattr__(name: str) -> object:
 
 
 def __dir__() -> list[str]:
-    """Return dir.
+    """Compute dir.
+
+    Carry out the dir operation.
 
     Returns
     -------
@@ -77,7 +83,9 @@ def __dir__() -> list[str]:
 
 
 def _ensure_namespace_alias(name: str) -> None:
-    """Return ensure namespace alias.
+    """Compute ensure namespace alias.
+
+    Carry out the ensure namespace alias operation.
 
     Parameters
     ----------

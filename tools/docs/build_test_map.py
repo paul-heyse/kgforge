@@ -29,13 +29,18 @@ KNOWN_PREFIXES = (
 
 
 def load_symbol_candidates() -> set[str]:
-    """Return load symbol candidates.
+    """Compute load symbol candidates.
+
+    Carry out the load symbol candidates operation.
 
     Returns
     -------
     Set[str]
         Description of return value.
     """
+    
+    
+    
     candidates: set[str] = set()
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if symbols_json.exists():
@@ -59,7 +64,9 @@ def load_symbol_candidates() -> set[str]:
 
 
 def _names_from_ast(tree: ast.AST) -> set[str]:
-    """Return names from ast.
+    """Compute names from ast.
+
+    Carry out the names from ast operation.
 
     Parameters
     ----------
@@ -92,7 +99,9 @@ def _names_from_ast(tree: ast.AST) -> set[str]:
 
 
 def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, object]]]:
-    """Return scan test file.
+    """Compute scan test file.
+
+    Carry out the scan test file operation.
 
     Parameters
     ----------
@@ -106,6 +115,9 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     Mapping[str, List[Mapping[str, object]]]
         Description of return value.
     """
+    
+    
+    
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -145,7 +157,9 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
 
 
 def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
-    """Return build test map.
+    """Compute build test map.
+
+    Carry out the build test map operation.
 
     Parameters
     ----------
@@ -157,6 +171,9 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     Mapping[str, List[Mapping[str, object]]]
         Description of return value.
     """
+    
+    
+    
     table: dict[str, list[dict[str, object]]] = defaultdict(list)
     if not TESTS.exists():
         return {}
@@ -169,7 +186,13 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
 
 
 def main() -> None:
-    """Return main."""
+    """Compute main.
+
+    Carry out the main operation.
+    """
+    
+    
+    
     symbols = load_symbol_candidates()
     OUTFILE.parent.mkdir(parents=True, exist_ok=True)
     OUTFILE.write_text(json.dumps(build_test_map(symbols), indent=2) + "\n", encoding="utf-8")

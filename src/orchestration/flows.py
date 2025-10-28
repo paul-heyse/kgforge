@@ -27,7 +27,9 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor t_echo]
 @task
 def t_echo(msg: str) -> str:
-    """Return t echo.
+    """Compute t echo.
+
+    Carry out the t echo operation.
 
     Parameters
     ----------
@@ -39,19 +41,27 @@ def t_echo(msg: str) -> str:
     str
         Description of return value.
     """
+    
+    
+    
     return msg
 
 
 # [nav:anchor e2e_flow]
 @flow(name="kgfoundry_e2e_skeleton")
 def e2e_flow() -> list[str]:
-    """Return e2e flow.
+    """Compute e2e flow.
+
+    Carry out the e2e flow operation.
 
     Returns
     -------
     List[str]
         Description of return value.
     """
+    
+    
+    
     return [
         t_echo.submit(x).result()
         for x in [

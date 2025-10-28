@@ -30,7 +30,9 @@ class Registry(Protocol):
     """Describe Registry."""
 
     def begin_dataset(self, kind: str, run_id: str) -> str:
-        """Return begin dataset.
+        """Compute begin dataset.
+
+        Carry out the begin dataset operation.
 
         Parameters
         ----------
@@ -44,10 +46,15 @@ class Registry(Protocol):
         str
             Description of return value.
         """
+        
+        
+        
         ...
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
-        """Return commit dataset.
+        """Compute commit dataset.
+
+        Carry out the commit dataset operation.
 
         Parameters
         ----------
@@ -58,16 +65,24 @@ class Registry(Protocol):
         rows : int
             Description for ``rows``.
         """
+        
+        
+        
         ...
 
     def rollback_dataset(self, dataset_id: str) -> None:
-        """Return rollback dataset.
+        """Compute rollback dataset.
+
+        Carry out the rollback dataset operation.
 
         Parameters
         ----------
         dataset_id : str
             Description for ``dataset_id``.
         """
+        
+        
+        
         ...
 
     def insert_run(
@@ -77,7 +92,9 @@ class Registry(Protocol):
         revision: str | None,
         config: Mapping[str, object],
     ) -> str:
-        """Return insert run.
+        """Compute insert run.
+
+        Carry out the insert run operation.
 
         Parameters
         ----------
@@ -95,10 +112,15 @@ class Registry(Protocol):
         str
             Description of return value.
         """
+        
+        
+        
         ...
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
-        """Return close run.
+        """Compute close run.
+
+        Carry out the close run operation.
 
         Parameters
         ----------
@@ -109,30 +131,45 @@ class Registry(Protocol):
         notes : str | None
             Description for ``notes``.
         """
+        
+        
+        
         ...
 
     def register_documents(self, docs: list[Doc]) -> None:
-        """Return register documents.
+        """Compute register documents.
+
+        Carry out the register documents operation.
 
         Parameters
         ----------
         docs : List[Doc]
             Description for ``docs``.
         """
+        
+        
+        
         ...
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
-        """Return register doctags.
+        """Compute register doctags.
+
+        Carry out the register doctags operation.
 
         Parameters
         ----------
         assets : List[DoctagsAsset]
             Description for ``assets``.
         """
+        
+        
+        
         ...
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
-        """Return emit event.
+        """Compute emit event.
+
+        Carry out the emit event operation.
 
         Parameters
         ----------
@@ -143,10 +180,15 @@ class Registry(Protocol):
         payload : Mapping[str, object]
             Description for ``payload``.
         """
+        
+        
+        
         ...
 
     def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
-        """Return incident.
+        """Compute incident.
+
+        Carry out the incident operation.
 
         Parameters
         ----------
@@ -159,4 +201,7 @@ class Registry(Protocol):
         message : str
             Description for ``message``.
         """
+        
+        
+        
         ...

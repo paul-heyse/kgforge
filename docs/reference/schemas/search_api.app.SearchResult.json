@@ -1,5 +1,5 @@
 {
-  "description": "Represent SearchResult.\n\nAttributes\n----------\ndoc_id : str\n    Attribute description.\nchunk_id : str\n    Attribute description.\ntitle : str\n    Attribute description.\nsection : str\n    Attribute description.\nscore : float\n    Attribute description.\nsignals : Mapping[str, float]\n    Attribute description.\nspans : Mapping[str, int]\n    Attribute description.\nconcepts : List[dict[str, str]]\n    Attribute description.\n\nExamples\n--------\n>>> from search_api.schemas import SearchResult\n>>> result = SearchResult()\n>>> result  # doctest: +ELLIPSIS\n...\n\nSee Also\n--------\nsearch_api.schemas\n\nNotes\n-----\nDocument class invariants and lifecycle details here.",
+  "description": "Describe SearchResult.",
   "properties": {
     "doc_id": {
       "title": "Doc Id",

@@ -69,7 +69,9 @@ Module Contents
    .. py:method:: encode(texts)
 
       
-      Return encode.
+      Compute encode.
+
+      Carry out the encode operation.
 
       :param texts: Description for ``texts``.
       :type texts: List[str]
@@ -140,7 +142,9 @@ Module Contents
 
 
       
-      Return tokenize.
+      Compute tokenize.
+
+      Carry out the tokenize operation.
 
       :param text: Description for ``text``.
       :type text: str
@@ -168,7 +172,9 @@ Module Contents
    .. py:method:: build(docs_iterable)
 
       
-      Return build.
+      Compute build.
+
+      Carry out the build operation.
 
       :param docs_iterable: Description for ``docs_iterable``.
       :type docs_iterable: Iterable[Tuple[str, dict[str, str]]]
@@ -194,8 +200,9 @@ Module Contents
    .. py:method:: load()
 
       
-      Return load.
+      Compute load.
 
+      Carry out the load operation.
 
 
 
@@ -218,7 +225,9 @@ Module Contents
    .. py:method:: search(query, k)
 
       
-      Return search.
+      Compute search.
+
+      Carry out the search operation.
 
       :param query: Description for ``query``.
       :type query: str
@@ -280,7 +289,9 @@ Module Contents
    .. py:method:: _ensure()
 
       
-      Return ensure.
+      Compute ensure.
+
+      Carry out the ensure operation.
 
       :raises RuntimeError: Raised when validation fails.
 
@@ -305,7 +316,9 @@ Module Contents
    .. py:method:: search(query, k)
 
       
-      Return search.
+      Compute search.
+
+      Carry out the search operation.
 
       :param query: Description for ``query``.
       :type query: str
@@ -337,7 +350,9 @@ Module Contents
 .. py:function:: get_splade(backend, index_dir)
 
    
-   Return get splade.
+   Compute get splade.
+
+   Carry out the get splade operation.
 
    :param backend: Description for ``backend``.
    :type backend: str

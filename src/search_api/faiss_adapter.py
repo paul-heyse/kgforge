@@ -65,7 +65,9 @@ class FaissAdapter:
         factory: str = "OPQ64,IVF8192,PQ64",
         metric: str = "ip",
     ) -> None:
-        """Return init.
+        """Compute init.
+
+        Initialise a new instance with validated parameters.
 
         Parameters
         ----------
@@ -76,6 +78,9 @@ class FaissAdapter:
         metric : str | None
             Description for ``metric``.
         """
+        
+        
+        
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
@@ -84,7 +89,9 @@ class FaissAdapter:
         self.vecs: DenseVecs | None = None
 
     def _load_dense_parquet(self) -> DenseVecs:
-        """Return load dense parquet.
+        """Compute load dense parquet.
+
+        Carry out the load dense parquet operation.
 
         Returns
         -------
@@ -123,7 +130,13 @@ class FaissAdapter:
         return DenseVecs(ids=ids, mat=normalized)
 
     def build(self) -> None:
-        """Return build."""
+        """Compute build.
+
+        Carry out the build operation.
+        """
+        
+        
+        
         vectors = self._load_dense_parquet()
         self.vecs = vectors
         if not HAVE_FAISS:
@@ -148,13 +161,18 @@ class FaissAdapter:
         self.idmap = vectors.ids
 
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
-        """Return load or build.
+        """Compute load or build.
+
+        Carry out the load or build operation.
 
         Parameters
         ----------
         cpu_index_path : str | None
             Description for ``cpu_index_path``.
         """
+        
+        
+        
         try:
             if HAVE_FAISS and cpu_index_path and Path(cpu_index_path).exists():
                 cpu = faiss.read_index(cpu_index_path)
@@ -175,7 +193,9 @@ class FaissAdapter:
         self.build()
 
     def search(self, qvec: VecArray, k: int = 10) -> list[tuple[str, float]]:
-        """Return search.
+        """Compute search.
+
+        Carry out the search operation.
 
         Parameters
         ----------
@@ -194,6 +214,9 @@ class FaissAdapter:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
         if self.vecs is None and self.index is None:
             return []
         if HAVE_FAISS and self.index is not None:

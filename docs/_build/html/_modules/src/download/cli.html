@@ -503,27 +503,32 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">28</span>
 <span class="linenos">29</span><span class="c1"># [nav:anchor harvest]</span>
 <span class="linenos">30</span><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
-<span class="linenos">31</span><span class="k">def</span><span class="w"> </span><span class="nf">harvest</span><span class="p">(</span><span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">years</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&gt;=2018&quot;</span><span class="p">,</span> <span class="n">max_works</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="linenos">32</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return harvest.</span>
 <div class="viewcode-block" id="harvest">
 <a class="viewcode-back" href="../../../autoapi/src/download/cli/index.html#src.download.cli.harvest">[docs]</a>
+<span class="linenos">31</span><span class="k">def</span><span class="w"> </span><span class="nf">harvest</span><span class="p">(</span><span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">years</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&gt;=2018&quot;</span><span class="p">,</span> <span class="n">max_works</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">32</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute harvest.</span>
 <span class="linenos">33</span>
-<span class="linenos">34</span><span class="sd">    Parameters</span>
-<span class="linenos">35</span><span class="sd">    ----------</span>
-<span class="linenos">36</span><span class="sd">    topic : str</span>
-<span class="linenos">37</span><span class="sd">        Description for ``topic``.</span>
-<span class="linenos">38</span><span class="sd">    years : str | None</span>
-<span class="linenos">39</span><span class="sd">        Description for ``years``.</span>
-<span class="linenos">40</span><span class="sd">    max_works : int | None</span>
-<span class="linenos">41</span><span class="sd">        Description for ``max_works``.</span>
-<span class="linenos">42</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">43</span>    <span class="n">typer</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[dry-run] would harvest topic=</span><span class="si">{</span><span class="n">topic</span><span class="si">!r}</span><span class="s2">, years=</span><span class="si">{</span><span class="n">years</span><span class="si">}</span><span class="s2">, max_works=</span><span class="si">{</span><span class="n">max_works</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="linenos">44</span>
-<span class="linenos">45</span>
-<span class="linenos">46</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-<span class="linenos">47</span>    <span class="n">app</span><span class="p">()</span>
-</pre></div></div>
+<span class="linenos">34</span><span class="sd">    Carry out the harvest operation.</span>
+<span class="linenos">35</span>
+<span class="linenos">36</span><span class="sd">    Parameters</span>
+<span class="linenos">37</span><span class="sd">    ----------</span>
+<span class="linenos">38</span><span class="sd">    topic : str</span>
+<span class="linenos">39</span><span class="sd">        Description for ``topic``.</span>
+<span class="linenos">40</span><span class="sd">    years : str | None</span>
+<span class="linenos">41</span><span class="sd">        Description for ``years``.</span>
+<span class="linenos">42</span><span class="sd">    max_works : int | None</span>
+<span class="linenos">43</span><span class="sd">        Description for ``max_works``.</span>
+<span class="linenos">44</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">45</span>    
+<span class="linenos">46</span>    
+<span class="linenos">47</span>    
+<span class="linenos">48</span>    <span class="n">typer</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[dry-run] would harvest topic=</span><span class="si">{</span><span class="n">topic</span><span class="si">!r}</span><span class="s2">, years=</span><span class="si">{</span><span class="n">years</span><span class="si">}</span><span class="s2">, max_works=</span><span class="si">{</span><span class="n">max_works</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
+<span class="linenos">49</span>
+<span class="linenos">50</span>
+<span class="linenos">51</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="linenos">52</span>    <span class="n">app</span><span class="p">()</span>
+</pre></div>
 
                 </article>
               

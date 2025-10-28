@@ -19,7 +19,9 @@ Module Contents
 .. py:function:: harvest(topic, years = '>=2018', max_works = 20000)
 
    
-   Return harvest.
+   Compute harvest.
+
+   Carry out the harvest operation.
 
    :param topic: Description for ``topic``.
    :type topic: str

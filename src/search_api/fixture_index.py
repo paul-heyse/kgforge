@@ -32,7 +32,9 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
 # [nav:anchor tokenize]
 def tokenize(text: str) -> list[str]:
-    """Return tokenize.
+    """Compute tokenize.
+
+    Carry out the tokenize operation.
 
     Parameters
     ----------
@@ -44,6 +46,9 @@ def tokenize(text: str) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -64,7 +69,9 @@ class FixtureIndex:
     """Describe FixtureIndex."""
 
     def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb") -> None:
-        """Return init.
+        """Compute init.
+
+        Initialise a new instance with validated parameters.
 
         Parameters
         ----------
@@ -73,6 +80,9 @@ class FixtureIndex:
         db_path : str | None
             Description for ``db_path``.
         """
+        
+        
+        
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []
@@ -81,7 +91,10 @@ class FixtureIndex:
         self._load_from_duckdb()
 
     def _load_from_duckdb(self) -> None:
-        """Return load from duckdb."""
+        """Compute load from duckdb.
+
+        Carry out the load from duckdb operation.
+        """
         if not Path(self.db_path).exists():
             return
         con = duckdb.connect(self.db_path)
@@ -122,7 +135,10 @@ class FixtureIndex:
         self._build_lex()
 
     def _build_lex(self) -> None:
-        """Return build lex."""
+        """Compute build lex.
+
+        Carry out the build lex operation.
+        """
         self.tf.clear()
         self.df.clear()
         for doc in self.docs:
@@ -136,7 +152,9 @@ class FixtureIndex:
         self.N = len(self.docs)
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Return search.
+        """Compute search.
+
+        Carry out the search operation.
 
         Parameters
         ----------
@@ -150,6 +168,9 @@ class FixtureIndex:
         List[Tuple[int, float]]
             Description of return value.
         """
+        
+        
+        
         if getattr(self, "N", 0) == 0:
             return []
         qtoks = tokenize(query)
@@ -168,7 +189,9 @@ class FixtureIndex:
         return [(index, score) for index, score in ranked[:k] if score > 0.0]
 
     def doc(self, index: int) -> FixtureDoc:
-        """Return doc.
+        """Compute doc.
+
+        Carry out the doc operation.
 
         Parameters
         ----------
@@ -180,4 +203,7 @@ class FixtureIndex:
         src.search_api.fixture_index.FixtureDoc
             Description of return value.
         """
+        
+        
+        
         return self.docs[index]

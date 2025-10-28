@@ -119,7 +119,9 @@ Module Contents
 
 
       
-      Return tokenize.
+      Compute tokenize.
+
+      Carry out the tokenize operation.
 
       :param text: Description for ``text``.
       :type text: str
@@ -147,7 +149,9 @@ Module Contents
    .. py:method:: build(docs_iterable)
 
       
-      Return build.
+      Compute build.
+
+      Carry out the build operation.
 
       :param docs_iterable: Description for ``docs_iterable``.
       :type docs_iterable: Iterable[Tuple[str, dict[str, str]]]
@@ -173,8 +177,9 @@ Module Contents
    .. py:method:: load()
 
       
-      Return load.
+      Compute load.
 
+      Carry out the load operation.
 
 
 
@@ -197,7 +202,9 @@ Module Contents
    .. py:method:: _idf(term)
 
       
-      Return idf.
+      Compute idf.
+
+      Carry out the idf operation.
 
       :param term: Description for ``term``.
       :type term: str
@@ -225,7 +232,9 @@ Module Contents
    .. py:method:: search(query, k, fields = None)
 
       
-      Return search.
+      Compute search.
+
+      Carry out the search operation.
 
       :param query: Description for ``query``.
       :type query: str
@@ -302,7 +311,9 @@ Module Contents
    .. py:method:: build(docs_iterable)
 
       
-      Return build.
+      Compute build.
+
+      Carry out the build operation.
 
       :param docs_iterable: Description for ``docs_iterable``.
       :type docs_iterable: Iterable[Tuple[str, dict[str, str]]]
@@ -330,8 +341,9 @@ Module Contents
    .. py:method:: _ensure_searcher()
 
       
-      Return ensure searcher.
+      Compute ensure searcher.
 
+      Carry out the ensure searcher operation.
 
 
 
@@ -354,7 +366,9 @@ Module Contents
    .. py:method:: search(query, k, fields = None)
 
       
-      Return search.
+      Compute search.
+
+      Carry out the search operation.
 
       :param query: Description for ``query``.
       :type query: str
@@ -388,7 +402,9 @@ Module Contents
 .. py:function:: get_bm25(backend, index_dir, *, k1 = 0.9, b = 0.4, field_boosts = None)
 
    
-   Return get bm25.
+   Compute get bm25.
+
+   Carry out the get bm25 operation.
 
    :param backend: Description for ``backend``.
    :type backend: str

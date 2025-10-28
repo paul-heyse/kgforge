@@ -30,7 +30,9 @@ class JsonFormatter(logging.Formatter):
     """Describe JsonFormatter."""
 
     def format(self, record: logging.LogRecord) -> str:
-        """Return format.
+        """Compute format.
+
+        Carry out the format operation.
 
         Parameters
         ----------
@@ -42,6 +44,9 @@ class JsonFormatter(logging.Formatter):
         str
             Description of return value.
         """
+        
+        
+        
         data = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
             "level": record.levelname,
@@ -57,13 +62,18 @@ class JsonFormatter(logging.Formatter):
 
 # [nav:anchor setup_logging]
 def setup_logging(level: int = logging.INFO) -> None:
-    """Return setup logging.
+    """Compute setup logging.
+
+    Carry out the setup logging operation.
 
     Parameters
     ----------
     level : int | None
         Description for ``level``.
     """
+    
+    
+    
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())
     logging.basicConfig(level=level, handlers=[handler])

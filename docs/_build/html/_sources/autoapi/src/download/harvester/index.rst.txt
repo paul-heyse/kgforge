@@ -71,7 +71,9 @@ Module Contents
    .. py:method:: search(topic, years, max_works)
 
       
-      Return search.
+      Compute search.
+
+      Carry out the search operation.
 
       :param topic: Description for ``topic``.
       :type topic: str
@@ -103,7 +105,9 @@ Module Contents
    .. py:method:: resolve_pdf(work)
 
       
-      Return resolve pdf.
+      Compute resolve pdf.
+
+      Carry out the resolve pdf operation.
 
       :param work: Description for ``work``.
       :type work: Mapping[str, Any]
@@ -131,7 +135,9 @@ Module Contents
    .. py:method:: download_pdf(url, target_path)
 
       
-      Return download pdf.
+      Compute download pdf.
+
+      Carry out the download pdf operation.
 
       :param url: Description for ``url``.
       :type url: str
@@ -164,7 +170,9 @@ Module Contents
    .. py:method:: run(topic, years, max_works)
 
       
-      Return run.
+      Compute run.
+
+      Carry out the run operation.
 
       :param topic: Description for ``topic``.
       :type topic: str

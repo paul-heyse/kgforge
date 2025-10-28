@@ -45,7 +45,9 @@ Module Contents
    .. py:method:: encode(texts)
 
       
-      Return encode.
+      Compute encode.
+
+      Carry out the encode operation.
 
       :param texts: Description for ``texts``.
       :type texts: Sequence[str]

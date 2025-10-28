@@ -28,13 +28,18 @@ loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
 
 
 def iter_packages() -> list[str]:
-    """Return iter packages.
+    """Compute iter packages.
+
+    Carry out the iter packages operation.
 
     Returns
     -------
     List[str]
         Description of return value.
     """
+    
+    
+    
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     packages = detect_packages()
@@ -45,7 +50,9 @@ rows: list[dict[str, object | None]] = []
 
 
 def safe_attr(node: Object, attr: str, default: object | None = None) -> object | None:
-    """Return safe attr.
+    """Compute safe attr.
+
+    Carry out the safe attr operation.
 
     Parameters
     ----------
@@ -61,6 +68,9 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
     object | None
         Description of return value.
     """
+    
+    
+    
     try:
         return getattr(node, attr)
     except Exception:
@@ -68,13 +78,18 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
 
 
 def walk(node: Object) -> None:
-    """Return walk.
+    """Compute walk.
+
+    Carry out the walk operation.
 
     Parameters
     ----------
     node : Object
         Description for ``node``.
     """
+    
+    
+    
     doc = safe_attr(node, "docstring")
     file_rel = safe_attr(node, "relative_package_filepath")
     rows.append(

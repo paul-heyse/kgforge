@@ -47,7 +47,9 @@ Module Contents
    .. py:method:: format(record)
 
       
-      Return format.
+      Compute format.
+
+      Carry out the format operation.
 
       :param record: Description for ``record``.
       :type record: logging.LogRecord
@@ -75,7 +77,9 @@ Module Contents
 .. py:function:: setup_logging(level = logging.INFO)
 
    
-   Return setup logging.
+   Compute setup logging.
+
+   Carry out the setup logging operation.
 
    :param level: Description for ``level``.
    :type level: int | None

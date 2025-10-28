@@ -12,7 +12,9 @@ OUT = ROOT / "docs" / "_build"
 
 
 def read_ast(path: Path) -> tuple[str, ast.AST | None]:
-    """Return read ast.
+    """Compute read ast.
+
+    Carry out the read ast operation.
 
     Parameters
     ----------
@@ -24,6 +26,9 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     Tuple[str, ast.AST | None]
         Description of return value.
     """
+    
+    
+    
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -38,7 +43,9 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
 def scan_file(
     path: Path,
 ) -> tuple[list[dict[str, object]], list[dict[str, object]], list[dict[str, object]], bool]:
-    """Return scan file.
+    """Compute scan file.
+
+    Carry out the scan file operation.
 
     Parameters
     ----------
@@ -50,6 +57,9 @@ def scan_file(
     Tuple[List[dict[str, object]], List[dict[str, object]], List[dict[str, object]], bool]
         Description of return value.
     """
+    
+    
+    
     text, tree = read_ast(path)
     if not text:
         return ([], [], [], False)
@@ -125,7 +135,13 @@ def scan_file(
 
 
 def main() -> None:
-    """Return main."""
+    """Compute main.
+
+    Carry out the main operation.
+    """
+    
+    
+    
     OUT.mkdir(parents=True, exist_ok=True)
     metrics: list[dict[str, object]] = []
     logs: list[dict[str, object]] = []

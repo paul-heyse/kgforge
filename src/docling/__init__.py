@@ -1,5 +1,7 @@
 """Docling utilities."""
 
-from . import canonicalizer, hybrid, vlm
+import docling.canonicalizer as canonicalizer
+import docling.hybrid as hybrid
+import docling.vlm as vlm
 
 __all__ = ["canonicalizer", "hybrid", "vlm"]

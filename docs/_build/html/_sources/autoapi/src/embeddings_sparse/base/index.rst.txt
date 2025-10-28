@@ -49,7 +49,9 @@ Module Contents
    .. py:method:: encode(texts)
 
       
-      Return encode.
+      Compute encode.
+
+      Carry out the encode operation.
 
       :param texts: Description for ``texts``.
       :type texts: List[str]
@@ -103,7 +105,9 @@ Module Contents
    .. py:method:: build(docs_iterable)
 
       
-      Return build.
+      Compute build.
+
+      Carry out the build operation.
 
       :param docs_iterable: Description for ``docs_iterable``.
       :type docs_iterable: Iterable[Tuple[str, dict[str, str]]]
@@ -129,7 +133,9 @@ Module Contents
    .. py:method:: search(query, k, fields = None)
 
       
-      Return search.
+      Compute search.
+
+      Carry out the search operation.
 
       :param query: Description for ``query``.
       :type query: str

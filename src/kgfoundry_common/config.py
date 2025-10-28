@@ -26,7 +26,9 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor load_config]
 def load_config(path: str) -> dict[str, Any]:
-    """Return load config.
+    """Compute load config.
+
+    Carry out the load config operation.
 
     Parameters
     ----------
@@ -38,5 +40,8 @@ def load_config(path: str) -> dict[str, Any]:
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
+    
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f)

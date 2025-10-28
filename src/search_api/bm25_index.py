@@ -34,7 +34,9 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
 # [nav:anchor toks]
 def toks(text: str) -> list[str]:
-    """Return toks.
+    """Compute toks.
+
+    Carry out the toks operation.
 
     Parameters
     ----------
@@ -46,6 +48,9 @@ def toks(text: str) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -67,7 +72,9 @@ class BM25Index:
     """Describe BM25Index."""
 
     def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
-        """Return init.
+        """Compute init.
+
+        Initialise a new instance with validated parameters.
 
         Parameters
         ----------
@@ -76,6 +83,9 @@ class BM25Index:
         b : float | None
             Description for ``b``.
         """
+        
+        
+        
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -85,7 +95,9 @@ class BM25Index:
 
     @classmethod
     def build_from_duckdb(cls, db_path: str) -> BM25Index:
-        """Return build from duckdb.
+        """Compute build from duckdb.
+
+        Carry out the build from duckdb operation.
 
         Parameters
         ----------
@@ -97,6 +109,9 @@ class BM25Index:
         BM25Index
             Description of return value.
         """
+        
+        
+        
         index = cls()
         con = duckdb.connect(db_path)
         try:
@@ -120,7 +135,9 @@ class BM25Index:
         return index
 
     def _build(self, rows: Iterable[tuple[str, str, str, str, str]]) -> None:
-        """Return build.
+        """Compute build.
+
+        Carry out the build operation.
 
         Parameters
         ----------
@@ -156,13 +173,18 @@ class BM25Index:
         self.avgdl = (dl_sum / self.N) if self.N > 0 else 0.0
 
     def save(self, path: str) -> None:
-        """Return save.
+        """Compute save.
+
+        Carry out the save operation.
 
         Parameters
         ----------
         path : str
             Description for ``path``.
         """
+        
+        
+        
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as handle:
             pickle.dump(
@@ -179,7 +201,9 @@ class BM25Index:
 
     @classmethod
     def load(cls, path: str) -> BM25Index:
-        """Return load.
+        """Compute load.
+
+        Carry out the load operation.
 
         Parameters
         ----------
@@ -191,6 +215,9 @@ class BM25Index:
         BM25Index
             Description of return value.
         """
+        
+        
+        
         with open(path, "rb") as handle:
             payload = pickle.load(handle)
         index = cls(payload.get("k1", 0.9), payload.get("b", 0.4))
@@ -201,7 +228,9 @@ class BM25Index:
         return index
 
     def _idf(self, term: str) -> float:
-        """Return idf.
+        """Compute idf.
+
+        Carry out the idf operation.
 
         Parameters
         ----------
@@ -219,7 +248,9 @@ class BM25Index:
         return math.log((self.N - df + 0.5) / (df + 0.5) + 1.0)
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Return search.
+        """Compute search.
+
+        Carry out the search operation.
 
         Parameters
         ----------
@@ -233,6 +264,9 @@ class BM25Index:
         List[Tuple[int, float]]
             Description of return value.
         """
+        
+        
+        
         if self.N == 0:
             return []
         terms = toks(query)
@@ -251,7 +285,9 @@ class BM25Index:
         return [(index, score) for index, score in ranked[:k] if score > 0.0]
 
     def doc(self, index: int) -> BM25Doc:
-        """Return doc.
+        """Compute doc.
+
+        Carry out the doc operation.
 
         Parameters
         ----------
@@ -263,4 +299,7 @@ class BM25Index:
         BM25Doc
             Description of return value.
         """
+        
+        
+        
         return self.docs[index]

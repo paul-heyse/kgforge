@@ -48,7 +48,9 @@ Module Contents
    .. py:method:: begin_dataset(kind, run_id)
 
       
-      Return begin dataset.
+      Compute begin dataset.
+
+      Carry out the begin dataset operation.
 
       :param kind: Description for ``kind``.
       :type kind: str
@@ -78,7 +80,9 @@ Module Contents
    .. py:method:: commit_dataset(dataset_id, parquet_root, rows)
 
       
-      Return commit dataset.
+      Compute commit dataset.
+
+      Carry out the commit dataset operation.
 
       :param dataset_id: Description for ``dataset_id``.
       :type dataset_id: str
@@ -108,7 +112,9 @@ Module Contents
    .. py:method:: rollback_dataset(dataset_id)
 
       
-      Return rollback dataset.
+      Compute rollback dataset.
+
+      Carry out the rollback dataset operation.
 
       :param dataset_id: Description for ``dataset_id``.
       :type dataset_id: str
@@ -134,7 +140,9 @@ Module Contents
    .. py:method:: insert_run(purpose, model_id, revision, config)
 
       
-      Return insert run.
+      Compute insert run.
+
+      Carry out the insert run operation.
 
       :param purpose: Description for ``purpose``.
       :type purpose: str
@@ -168,7 +176,9 @@ Module Contents
    .. py:method:: close_run(run_id, success, notes = None)
 
       
-      Return close run.
+      Compute close run.
+
+      Carry out the close run operation.
 
       :param run_id: Description for ``run_id``.
       :type run_id: str
@@ -198,7 +208,9 @@ Module Contents
    .. py:method:: register_documents(docs)
 
       
-      Return register documents.
+      Compute register documents.
+
+      Carry out the register documents operation.
 
       :param docs: Description for ``docs``.
       :type docs: List[Doc]
@@ -224,7 +236,9 @@ Module Contents
    .. py:method:: register_doctags(assets)
 
       
-      Return register doctags.
+      Compute register doctags.
+
+      Carry out the register doctags operation.
 
       :param assets: Description for ``assets``.
       :type assets: List[DoctagsAsset]
@@ -250,7 +264,9 @@ Module Contents
    .. py:method:: emit_event(event_name, subject_id, payload)
 
       
-      Return emit event.
+      Compute emit event.
+
+      Carry out the emit event operation.
 
       :param event_name: Description for ``event_name``.
       :type event_name: str
@@ -280,7 +296,9 @@ Module Contents
    .. py:method:: incident(event, subject_id, error_class, message)
 
       
-      Return incident.
+      Compute incident.
+
+      Carry out the incident operation.
 
       :param event: Description for ``event``.
       :type event: str

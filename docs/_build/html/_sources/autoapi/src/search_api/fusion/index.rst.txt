@@ -19,7 +19,9 @@ Module Contents
 .. py:function:: rrf_fuse(rankers, k = 60)
 
    
-   Return rrf fuse.
+   Compute rrf fuse.
+
+   Carry out the rrf fuse operation.
 
    :param rankers: Description for ``rankers``.
    :type rankers: List[List[Tuple[str, float]]]

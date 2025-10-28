@@ -293,3 +293,20 @@ def linkcode_resolve(domain: str, info: Mapping[str, str | None]) -> str | None:
     if EDITOR == "pycharm":
         return f"pycharm://open?file={abs_path}&line={start}"
     return None
+
+
+nitpick_ignore = set()
+
+nitpick_ignore.update(
+    {
+        ("py:class", "optional"),
+        ("py:class", "Optional"),
+    }
+)
+
+nitpick_ignore_regex = [
+    ("py:obj", r"pydantic\\.BaseModel"),
+    ("py:class", r"pydantic\\.BaseModel"),
+    ("py:class", r"kgfoundry\\.kgfoundry_common\\..*"),
+    ("py:class", r"kgfoundry\\.kgfoundry_common\\.models\\.Id"),
+]

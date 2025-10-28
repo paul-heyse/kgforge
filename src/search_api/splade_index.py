@@ -31,7 +31,9 @@ TOKEN = re.compile(r"[A-Za-z0-9]+")
 
 # [nav:anchor tok]
 def tok(text: str) -> list[str]:
-    """Return tok.
+    """Compute tok.
+
+    Carry out the tok operation.
 
     Parameters
     ----------
@@ -43,6 +45,9 @@ def tok(text: str) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
     return [token.lower() for token in TOKEN.findall(text or "")]
 
 
@@ -67,7 +72,9 @@ class SpladeIndex:
         chunks_dataset_root: str | None = None,
         sparse_root: str | None = None,
     ) -> None:
-        """Return init.
+        """Compute init.
+
+        Initialise a new instance with validated parameters.
 
         Parameters
         ----------
@@ -78,6 +85,9 @@ class SpladeIndex:
         sparse_root : str | None
             Description for ``sparse_root``.
         """
+        
+        
+        
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -86,7 +96,9 @@ class SpladeIndex:
         self._load(chunks_dataset_root)
 
     def _load(self, chunks_root: str | None) -> None:
-        """Return load.
+        """Compute load.
+
+        Carry out the load operation.
 
         Parameters
         ----------
@@ -124,7 +136,9 @@ class SpladeIndex:
                 self.df[term] = self.df.get(term, 0) + 1
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Return search.
+        """Compute search.
+
+        Carry out the search operation.
 
         Parameters
         ----------
@@ -138,6 +152,9 @@ class SpladeIndex:
         List[Tuple[int, float]]
             Description of return value.
         """
+        
+        
+        
         if self.N == 0:
             return []
         terms = tok(query)
@@ -158,7 +175,9 @@ class SpladeIndex:
         return [(idx, value) for idx, value in ranked[:k] if value > 0.0]
 
     def doc(self, index: int) -> SpladeDoc:
-        """Return doc.
+        """Compute doc.
+
+        Carry out the doc operation.
 
         Parameters
         ----------
@@ -170,4 +189,7 @@ class SpladeIndex:
         src.search_api.splade_index.SpladeDoc
             Description of return value.
         """
+        
+        
+        
         return self.docs[index]

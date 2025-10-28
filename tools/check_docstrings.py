@@ -19,13 +19,18 @@ TARGETS = [
 
 
 def parse_args() -> argparse.Namespace:
-    """Return parse args.
+    """Compute parse args.
+
+    Carry out the parse args operation.
 
     Returns
     -------
     argparse.Namespace
         Description of return value.
     """
+    
+    
+    
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--no-todo",
@@ -36,7 +41,9 @@ def parse_args() -> argparse.Namespace:
 
 
 def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
-    """Return iter docstrings.
+    """Compute iter docstrings.
+
+    Carry out the iter docstrings operation.
 
     Parameters
     ----------
@@ -48,6 +55,9 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
     Iterable[Tuple[Path, int, str]]
         Description of return value.
     """
+    
+    
+    
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if (doc := ast.get_docstring(tree, clean=False)) is not None:
@@ -61,13 +71,18 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
 
 
 def check_placeholders() -> int:
-    """Return check placeholders.
+    """Compute check placeholders.
+
+    Carry out the check placeholders operation.
 
     Returns
     -------
     int
         Description of return value.
     """
+    
+    
+    
     errors: list[str] = []
     keywords = {"TODO", "TBD", "FIXME"}
 
@@ -88,13 +103,18 @@ def check_placeholders() -> int:
 
 
 def main() -> None:
-    """Return main.
+    """Compute main.
+
+    Carry out the main operation.
 
     Raises
     ------
     SystemExit
         Raised when validation fails.
     """
+    
+    
+    
     options = parse_args()
 
     cmd = [

@@ -28,7 +28,9 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
         """Describe NoopMetric."""
 
         def labels(self, *args: object, **kwargs: object) -> _NoopMetric:
-            """Return labels.
+            """Compute labels.
+
+            Carry out the labels operation.
 
             Parameters
             ----------
@@ -42,10 +44,15 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             _NoopMetric
                 Description of return value.
             """
+            
+            
+            
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
-            """Return observe.
+            """Compute observe.
+
+            Carry out the observe operation.
 
             Parameters
             ----------
@@ -54,10 +61,15 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
+            
+            
+            
             return
 
         def inc(self, *args: object, **kwargs: object) -> None:
-            """Return inc.
+            """Compute inc.
+
+            Carry out the inc operation.
 
             Parameters
             ----------
@@ -66,10 +78,15 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
+            
+            
+            
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
-            """Return set.
+            """Compute set.
+
+            Carry out the set operation.
 
             Parameters
             ----------
@@ -78,10 +95,15 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
+            
+            
+            
             return
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:
-        """Return make noop metric.
+        """Compute make noop metric.
+
+        Carry out the make noop metric operation.
 
         Parameters
         ----------

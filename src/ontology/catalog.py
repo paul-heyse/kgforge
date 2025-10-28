@@ -29,17 +29,24 @@ class OntologyCatalog:
     """Describe OntologyCatalog."""
 
     def __init__(self, concepts: list[Concept]) -> None:
-        """Return init.
+        """Compute init.
+
+        Initialise a new instance with validated parameters.
 
         Parameters
         ----------
         concepts : List[Concept]
             Description for ``concepts``.
         """
+        
+        
+        
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
-        """Return neighbors.
+        """Compute neighbors.
+
+        Carry out the neighbors operation.
 
         Parameters
         ----------
@@ -53,11 +60,16 @@ class OntologyCatalog:
         Set[str]
             Description of return value.
         """
+        
+        
+        
         # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return set()
 
     def hydrate(self, concept_id: str) -> dict[str, Any]:
-        """Return hydrate.
+        """Compute hydrate.
+
+        Carry out the hydrate operation.
 
         Parameters
         ----------
@@ -69,4 +81,7 @@ class OntologyCatalog:
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
+        
         return {}

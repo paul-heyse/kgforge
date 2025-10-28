@@ -21,7 +21,9 @@ Module Contents
 .. py:function:: tokenize(text)
 
    
-   Return tokenize.
+   Compute tokenize.
+
+   Carry out the tokenize operation.
 
    :param text: Description for ``text``.
    :type text: str
@@ -138,8 +140,9 @@ Module Contents
    .. py:method:: _load_from_duckdb()
 
       
-      Return load from duckdb.
+      Compute load from duckdb.
 
+      Carry out the load from duckdb operation.
 
 
 
@@ -162,8 +165,9 @@ Module Contents
    .. py:method:: _build_lex()
 
       
-      Return build lex.
+      Compute build lex.
 
+      Carry out the build lex operation.
 
 
 
@@ -186,7 +190,9 @@ Module Contents
    .. py:method:: search(query, k = 10)
 
       
-      Return search.
+      Compute search.
+
+      Carry out the search operation.
 
       :param query: Description for ``query``.
       :type query: str
@@ -216,7 +222,9 @@ Module Contents
    .. py:method:: doc(index)
 
       
-      Return doc.
+      Compute doc.
+
+      Carry out the doc operation.
 
       :param index: Description for ``index``.
       :type index: int

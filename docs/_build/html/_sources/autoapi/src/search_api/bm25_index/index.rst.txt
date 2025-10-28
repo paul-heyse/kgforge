@@ -21,7 +21,9 @@ Module Contents
 .. py:function:: toks(text)
 
    
-   Return toks.
+   Compute toks.
+
+   Carry out the toks operation.
 
    :param text: Description for ``text``.
    :type text: str
@@ -150,7 +152,9 @@ Module Contents
 
 
       
-      Return build from duckdb.
+      Compute build from duckdb.
+
+      Carry out the build from duckdb operation.
 
       :param db_path: Description for ``db_path``.
       :type db_path: str
@@ -178,7 +182,9 @@ Module Contents
    .. py:method:: _build(rows)
 
       
-      Return build.
+      Compute build.
+
+      Carry out the build operation.
 
       :param rows: Description for ``rows``.
       :type rows: Iterable[Tuple[str, str, str, str, str]]
@@ -204,7 +210,9 @@ Module Contents
    .. py:method:: save(path)
 
       
-      Return save.
+      Compute save.
+
+      Carry out the save operation.
 
       :param path: Description for ``path``.
       :type path: str
@@ -232,7 +240,9 @@ Module Contents
 
 
       
-      Return load.
+      Compute load.
+
+      Carry out the load operation.
 
       :param path: Description for ``path``.
       :type path: str
@@ -260,7 +270,9 @@ Module Contents
    .. py:method:: _idf(term)
 
       
-      Return idf.
+      Compute idf.
+
+      Carry out the idf operation.
 
       :param term: Description for ``term``.
       :type term: str
@@ -288,7 +300,9 @@ Module Contents
    .. py:method:: search(query, k = 10)
 
       
-      Return search.
+      Compute search.
+
+      Carry out the search operation.
 
       :param query: Description for ``query``.
       :type query: str
@@ -318,7 +332,9 @@ Module Contents
    .. py:method:: doc(index)
 
       
-      Return doc.
+      Compute doc.
+
+      Carry out the doc operation.
 
       :param index: Description for ``index``.
       :type index: int

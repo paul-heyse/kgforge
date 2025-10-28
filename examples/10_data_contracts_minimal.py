@@ -1,4 +1,5 @@
-"""
+"""Data contracts smoke metadata.
+
 Title: Data contracts — schema export smoke
 Tags: schema, pydantic
 Time: <2s

@@ -104,7 +104,9 @@ Module Contents
    .. py:method:: _load_dense_parquet()
 
       
-      Return load dense parquet.
+      Compute load dense parquet.
+
+      Carry out the load dense parquet operation.
 
       :returns: *DenseVecs* -- Description of return value.
 
@@ -131,8 +133,9 @@ Module Contents
    .. py:method:: build()
 
       
-      Return build.
+      Compute build.
 
+      Carry out the build operation.
 
 
 
@@ -155,7 +158,9 @@ Module Contents
    .. py:method:: load_or_build(cpu_index_path = None)
 
       
-      Return load or build.
+      Compute load or build.
+
+      Carry out the load or build operation.
 
       :param cpu_index_path: Description for ``cpu_index_path``.
       :type cpu_index_path: str | None
@@ -181,7 +186,9 @@ Module Contents
    .. py:method:: search(qvec, k = 10)
 
       
-      Return search.
+      Compute search.
+
+      Carry out the search operation.
 
       :param qvec: Description for ``qvec``.
       :type qvec: src.search_api.faiss_adapter.VecArray

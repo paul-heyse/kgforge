@@ -28,7 +28,9 @@ TOP_PACKAGES = (
 
 
 def is_pydantic_model(obj: object) -> bool:
-    """Return is pydantic model.
+    """Compute is pydantic model.
+
+    Carry out the is pydantic model operation.
 
     Parameters
     ----------
@@ -40,6 +42,9 @@ def is_pydantic_model(obj: object) -> bool:
     bool
         Description of return value.
     """
+    
+    
+    
     try:
         from pydantic import BaseModel
     except Exception:
@@ -48,7 +53,9 @@ def is_pydantic_model(obj: object) -> bool:
 
 
 def is_pandera_model(obj: object) -> bool:
-    """Return is pandera model.
+    """Compute is pandera model.
+
+    Carry out the is pandera model operation.
 
     Parameters
     ----------
@@ -60,6 +67,9 @@ def is_pandera_model(obj: object) -> bool:
     bool
         Description of return value.
     """
+    
+    
+    
     try:
         import pandera as pa
     except Exception:
@@ -71,13 +81,18 @@ def is_pandera_model(obj: object) -> bool:
 
 
 def iter_packages() -> list[str]:
-    """Return iter packages.
+    """Compute iter packages.
+
+    Carry out the iter packages operation.
 
     Returns
     -------
     List[str]
         Description of return value.
     """
+    
+    
+    
     discovered: list[str] = []
     for pkg in TOP_PACKAGES:
         try:
@@ -92,7 +107,9 @@ def iter_packages() -> list[str]:
 
 
 def export_schema(module_name: str, name: str, obj: object) -> None:
-    """Return export schema.
+    """Compute export schema.
+
+    Carry out the export schema operation.
 
     Parameters
     ----------
@@ -103,6 +120,9 @@ def export_schema(module_name: str, name: str, obj: object) -> None:
     obj : object
         Description for ``obj``.
     """
+    
+    
+    
     filename = f"{module_name}.{name}.json"
     path = OUT / filename
     if is_pydantic_model(obj):
@@ -120,7 +140,13 @@ def export_schema(module_name: str, name: str, obj: object) -> None:
 
 
 def main() -> None:
-    """Return main."""
+    """Compute main.
+
+    Carry out the main operation.
+    """
+    
+    
+    
     exported = 0
     for module_name in iter_packages():
         try:

@@ -19,7 +19,9 @@ Module Contents
 .. py:function:: load_config(path)
 
    
-   Return load config.
+   Compute load config.
+
+   Carry out the load config operation.
 
    :param path: Description for ``path``.
    :type path: str

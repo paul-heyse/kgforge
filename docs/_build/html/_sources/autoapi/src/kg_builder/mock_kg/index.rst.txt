@@ -50,7 +50,9 @@ Module Contents
    .. py:method:: add_mention(chunk_id, concept_id)
 
       
-      Return add mention.
+      Compute add mention.
+
+      Carry out the add mention operation.
 
       :param chunk_id: Description for ``chunk_id``.
       :type chunk_id: str
@@ -78,7 +80,9 @@ Module Contents
    .. py:method:: add_edge(a, b)
 
       
-      Return add edge.
+      Compute add edge.
+
+      Carry out the add edge operation.
 
       :param a: Description for ``a``.
       :type a: str
@@ -106,7 +110,9 @@ Module Contents
    .. py:method:: linked_concepts(chunk_id)
 
       
-      Return linked concepts.
+      Compute linked concepts.
+
+      Carry out the linked concepts operation.
 
       :param chunk_id: Description for ``chunk_id``.
       :type chunk_id: str
@@ -134,7 +140,9 @@ Module Contents
    .. py:method:: one_hop(concept_id)
 
       
-      Return one hop.
+      Compute one hop.
+
+      Carry out the one hop operation.
 
       :param concept_id: Description for ``concept_id``.
       :type concept_id: str

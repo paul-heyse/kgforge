@@ -27,7 +27,9 @@ SYMBOL_RE = re.compile(r"^[A-Za-z_]\w*$")
 
 
 def _extract_string(node: ast.AST) -> str | None:
-    """Return extract string.
+    """Compute extract string.
+
+    Carry out the extract string operation.
 
     Parameters
     ----------
@@ -45,7 +47,9 @@ def _extract_string(node: ast.AST) -> str | None:
 
 
 def _extract_strings(node: ast.AST) -> list[str]:
-    """Return extract strings.
+    """Compute extract strings.
+
+    Carry out the extract strings operation.
 
     Parameters
     ----------
@@ -65,7 +69,9 @@ def _extract_strings(node: ast.AST) -> list[str]:
 
 
 def _literal_eval(node: ast.AST, names: Mapping[str, object]) -> object:
-    """Return literal eval.
+    """Compute literal eval.
+
+    Carry out the literal eval operation.
 
     Parameters
     ----------
@@ -106,7 +112,9 @@ def _literal_eval(node: ast.AST, names: Mapping[str, object]) -> object:
 
 
 def _inspect(py: Path) -> ModuleInfo | None:  # noqa: C901, PLR0912
-    """Return inspect.
+    """Compute inspect.
+
+    Carry out the inspect operation.
 
     Parameters
     ----------
@@ -182,13 +190,18 @@ def _inspect(py: Path) -> ModuleInfo | None:  # noqa: C901, PLR0912
 
 
 def main() -> int:
-    """Return main.
+    """Compute main.
+
+    Carry out the main operation.
 
     Returns
     -------
     int
         Description of return value.
     """
+    
+    
+    
     errors: list[str] = []
     for py in SRC.rglob("*.py"):
         errors.extend(_inspect(py))

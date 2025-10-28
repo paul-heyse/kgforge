@@ -46,7 +46,9 @@ Module Contents
    .. py:method:: labels(*args, **kwargs)
 
       
-      Return labels.
+      Compute labels.
+
+      Carry out the labels operation.
 
       :param \*args: Description for ``*args``.
       :type \*args: Any
@@ -76,7 +78,9 @@ Module Contents
    .. py:method:: observe(*args, **kwargs)
 
       
-      Return observe.
+      Compute observe.
+
+      Carry out the observe operation.
 
       :param \*args: Description for ``*args``.
       :type \*args: Any
@@ -104,7 +108,9 @@ Module Contents
    .. py:method:: inc(*args, **kwargs)
 
       
-      Return inc.
+      Compute inc.
+
+      Carry out the inc operation.
 
       :param \*args: Description for ``*args``.
       :type \*args: Any
@@ -132,7 +138,9 @@ Module Contents
    .. py:method:: set(*args, **kwargs)
 
       
-      Return set.
+      Compute set.
+
+      Carry out the set operation.
 
       :param \*args: Description for ``*args``.
       :type \*args: Any

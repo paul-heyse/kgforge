@@ -1,5 +1,5 @@
 {
-  "description": "Represent SearchRequest.\n\nAttributes\n----------\nquery : str\n    Attribute description.\nk : int\n    Attribute description.\nfilters : Mapping[str, object] | None\n    Attribute description.\nexplain : bool\n    Attribute description.\n\nExamples\n--------\n>>> from search_api.schemas import SearchRequest\n>>> result = SearchRequest()\n>>> result  # doctest: +ELLIPSIS\n...\n\nSee Also\n--------\nsearch_api.schemas\n\nNotes\n-----\nDocument class invariants and lifecycle details here.",
+  "description": "Describe SearchRequest.",
   "properties": {
     "query": {
       "minLength": 1,
