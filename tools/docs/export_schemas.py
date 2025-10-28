@@ -184,7 +184,8 @@ def _nav_versions(module_name: str, class_name: str, nav: dict[str, Any]) -> dic
     entry = mods.get(module_name)
     if not entry:
         return None
-    meta = (entry.get("meta") or {}).get(class_name) or {}
+    meta_map = entry.get("meta") or {}
+    meta = meta_map.get(class_name) or meta_map.get(f"{module_name}.{class_name}") or {}
     out = {}
     if "since" in meta:
         out["x-version-introduced"] = meta["since"]
