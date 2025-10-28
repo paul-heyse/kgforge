@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import sys
 from concurrent.futures import Future
 from pathlib import Path
 from types import SimpleNamespace
-import sys
 
 import pytest
 
@@ -22,7 +22,7 @@ class _DummyExecutor:
     def __init__(self, *args, **kwargs) -> None:
         pass
 
-    def __enter__(self) -> "_DummyExecutor":
+    def __enter__(self) -> _DummyExecutor:
         return self
 
     def __exit__(self, exc_type, exc, tb) -> bool:
@@ -48,7 +48,6 @@ def test_main_exits_on_failure_and_cleans_outputs(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """The CLI should abort and delete partial files when a per-package build fails."""
-
     out_dir = tmp_path / "graphs"
     out_dir.mkdir()
     monkeypatch.setattr(build_graphs, "OUT", out_dir)

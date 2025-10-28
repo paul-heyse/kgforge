@@ -5,8 +5,8 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
-from types import ModuleType
 from pathlib import Path
+from types import ModuleType
 
 
 def _load_exporter() -> ModuleType:
@@ -23,7 +23,6 @@ def _load_exporter() -> ModuleType:
 
 def _prepare_environment(monkeypatch, tmp_path: Path) -> tuple[ModuleType, Path, Path]:
     """Configure the exporter module to operate within ``tmp_path``."""
-
     export_schemas = _load_exporter()
     out_dir = tmp_path / "schemas"
     out_dir.mkdir()
@@ -40,7 +39,6 @@ def _prepare_environment(monkeypatch, tmp_path: Path) -> tuple[ModuleType, Path,
 
 def test_prunes_stale_schema_files(monkeypatch, tmp_path: Path) -> None:
     """Stale schemas are removed and recorded in drift summaries."""
-
     export_schemas, out_dir, drift_out = _prepare_environment(monkeypatch, tmp_path)
     stale_path = out_dir / "stale.Model.json"
     stale_path.write_text(json.dumps({"title": "Old"}) + "\n", encoding="utf-8")
@@ -57,7 +55,6 @@ def test_prunes_stale_schema_files(monkeypatch, tmp_path: Path) -> None:
 
 def test_check_drift_flags_stale_files(monkeypatch, tmp_path: Path) -> None:
     """The --check-drift flag surfaces stale files without deleting them."""
-
     export_schemas, out_dir, drift_out = _prepare_environment(monkeypatch, tmp_path)
     stale_path = out_dir / "stale.Model.json"
     stale_path.write_text(json.dumps({"title": "Old"}) + "\n", encoding="utf-8")

@@ -34,7 +34,7 @@ class FakeExecutor:
     def __exit__(self, exc_type, exc, tb) -> bool:
         return False
 
-    def submit(self, fn, pkg: str, *args, **kwargs) -> FakeFuture:  # noqa: ANN001
+    def submit(self, fn, pkg: str, *args, **kwargs) -> FakeFuture:
         return FakeFuture(self._results[pkg])
 
 

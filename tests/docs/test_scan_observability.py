@@ -9,7 +9,6 @@ from tools.docs import scan_observability
 
 def test_config_summary_invoked_once(monkeypatch, tmp_path) -> None:
     """Ensure the summary writer executes exactly once per run."""
-
     root = tmp_path
     src = root / "src"
     src.mkdir()

@@ -209,7 +209,6 @@ POLICY_PATH = ROOT / "docs" / "policies" / "observability.yml"
 
 def _deep_merge_dicts(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
     """Return a deep merge of ``override`` into ``base`` without mutating either mapping."""
-
     merged: dict[str, Any] = {}
     for key, base_value in base.items():
         if key in override:
