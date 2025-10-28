@@ -76,3 +76,55 @@ def test_graph_build_outputs_are_clean() -> None:
 
     assert (graphs / "kf_common-uml.svg").exists()
     assert (graphs / "kf_common-uml.png").exists()
+    meta_path = graphs / "graph_meta.json"
+    assert meta_path.exists(), "graph metadata missing"
+    meta = json.loads(meta_path.read_text())
+    assert "cycle_enumeration_skipped" in meta
+    if meta["cycle_enumeration_skipped"]:
+        assert meta.get("scc_summary"), "scc_summary should be recorded when enumeration is skipped"
+    summary_md = graphs / "subsystems_meta.md"
+    assert summary_md.exists(), "subsystems metadata markdown should be generated"
+
+
+def test_graph_metadata_includes_scc_summary_when_cycles_skipped() -> None:
+    pytest.importorskip("pydot")
+    pytest.importorskip("networkx")
+    pytest.importorskip("yaml")
+
+    repo_root = Path(__file__).resolve().parents[2]
+    graphs = repo_root / "docs" / "_build" / "graphs"
+
+    if graphs.exists():
+        shutil.rmtree(graphs)
+
+    env = os.environ.copy()
+    python_path = str(repo_root / "src")
+    env["PYTHONPATH"] = (
+        f"{python_path}{os.pathsep}{env['PYTHONPATH']}" if env.get("PYTHONPATH") else python_path
+    )
+    env["GRAPH_EDGE_BUDGET"] = "0"
+
+    if shutil.which("dot") is None:
+        pytest.skip("graphviz 'dot' binary not available")
+
+    cmd = [
+        sys.executable,
+        "tools/docs/build_graphs.py",
+        "--packages",
+        "kf_common",
+        "--format",
+        "svg",
+        "--max-workers",
+        "1",
+        "--no-cache",
+    ]
+    subprocess.run(cmd, check=True, cwd=repo_root, env=env)
+
+    meta_path = graphs / "graph_meta.json"
+    assert meta_path.exists(), "graph metadata missing"
+    meta = json.loads(meta_path.read_text())
+    assert meta.get("cycle_enumeration_skipped") is True
+    assert meta.get("scc_summary"), "scc_summary should be populated when enumeration is skipped"
+    summary_md = graphs / "subsystems_meta.md"
+    assert summary_md.exists(), "subsystems metadata markdown should be generated"
+    assert "Cycle enumeration skipped" in summary_md.read_text()
