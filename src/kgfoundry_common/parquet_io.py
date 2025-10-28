@@ -60,6 +60,10 @@ class ParquetVectorWriter:
         
         
         
+        
+        
+        
+        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -82,6 +86,10 @@ class ParquetVectorWriter:
         root : str
             Description for ``root``.
         """
+        
+        
+        
+        
         
         
         
@@ -123,6 +131,10 @@ class ParquetVectorWriter:
         str
             Description of return value.
         """
+        
+        
+        
+        
         
         
         
@@ -177,6 +189,10 @@ class ParquetVectorWriter:
         
         
         
+        
+        
+        
+        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -216,6 +232,10 @@ class ParquetVectorWriter:
         str
             Description of return value.
         """
+        
+        
+        
+        
         
         
         
@@ -275,6 +295,10 @@ class ParquetChunkWriter:
         
         
         
+        
+        
+        
+        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -321,6 +345,10 @@ class ParquetChunkWriter:
         
         
         
+        
+        
+        
+        
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
@@ -339,6 +367,10 @@ class ParquetChunkWriter:
         str
             Description of return value.
         """
+        
+        
+        
+        
         
         
         

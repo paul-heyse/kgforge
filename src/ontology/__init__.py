@@ -1,7 +1,5 @@
 """Ontology utilities."""
 
-from typing import Final
-
 import ontology.catalog as catalog
 import ontology.loader as loader
 
@@ -9,7 +7,7 @@ from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["catalog", "loader"]
 
-__navmap__: Final[NavMap] = {
+__navmap__: NavMap = {
     "title": "ontology",
     "synopsis": "Ontology loading and lookup helpers",
     "exports": __all__,

@@ -3,8 +3,10 @@
 
 from __future__ import annotations
 
+import argparse
 import ast
 import json
+import os
 import re
 import subprocess
 from collections.abc import Mapping
@@ -20,6 +22,12 @@ OUT = REPO / "site" / "_build" / "navmap"
 ANCHOR_RE = re.compile(r"^\s*#\s*\[nav:anchor\s+([A-Za-z_]\w*)\]")
 SECTION_RE = re.compile(r"^\s*#\s*\[nav:section\s+([a-z0-9]+(?:-[a-z0-9]+)*)\]")
 
+G_ORG = os.getenv("DOCS_GITHUB_ORG")
+G_REPO = os.getenv("DOCS_GITHUB_REPO")
+G_SHA = os.getenv("DOCS_GITHUB_SHA")
+LINK_MODE = os.getenv("DOCS_LINK_MODE", "editor")
+POLICY_VERSION = "1"
+
 
 @dataclass(slots=True)
 class ModuleInfo:
@@ -34,40 +42,16 @@ class ModuleInfo:
 
 
 def _extract_string(node: ast.AST) -> str | None:
-    """Compute extract string.
+    """Compute extract string."""
 
-    Carry out the extract string operation.
-
-    Parameters
-    ----------
-    node : ast.AST
-        Description for ``node``.
-
-    Returns
-    -------
-    str | None
-        Description of return value.
-    """
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
         return node.value
     return None
 
 
 def _extract_strings(node: ast.AST) -> list[str]:
-    """Compute extract strings.
+    """Compute extract strings."""
 
-    Carry out the extract strings operation.
-
-    Parameters
-    ----------
-    node : ast.AST
-        Description for ``node``.
-
-    Returns
-    -------
-    List[str]
-        Description of return value.
-    """
     match node:
         case ast.List(elts=elts) | ast.Tuple(elts=elts):
             return [s for elt in elts if (s := _extract_string(elt)) is not None]
@@ -76,27 +60,8 @@ def _extract_strings(node: ast.AST) -> list[str]:
 
 
 def _literal_eval(node: ast.AST, names: Mapping[str, object]) -> object:
-    """Compute literal eval.
+    """Compute literal eval."""
 
-    Carry out the literal eval operation.
-
-    Parameters
-    ----------
-    node : ast.AST
-        Description for ``node``.
-    names : Mapping[str, object]
-        Description for ``names``.
-
-    Returns
-    -------
-    object
-        Description of return value.
-
-    Raises
-    ------
-    ValueError
-        Raised when validation fails.
-    """
     match node:
         case ast.Constant(value=value):
             return value
@@ -119,20 +84,8 @@ def _literal_eval(node: ast.AST, names: Mapping[str, object]) -> object:
 
 
 def _module_name(py: Path) -> str | None:
-    """Compute module name.
+    """Compute module name."""
 
-    Carry out the module name operation.
-
-    Parameters
-    ----------
-    py : Path
-        Description for ``py``.
-
-    Returns
-    -------
-    str | None
-        Description of return value.
-    """
     try:
         rel = py.relative_to(SRC)
     except ValueError:
@@ -144,51 +97,39 @@ def _module_name(py: Path) -> str | None:
 
 
 def _rel(path: Path) -> str:
-    """Compute rel.
+    """Compute rel."""
 
-    Carry out the rel operation.
-
-    Parameters
-    ----------
-    path : Path
-        Description for ``path``.
-
-    Returns
-    -------
-    str
-        Description of return value.
-    """
     return path.relative_to(REPO).as_posix()
 
 
 def _git_sha() -> str:
-    """Compute git sha.
+    """Compute git sha."""
 
-    Carry out the git sha operation.
+    return (
+        subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO)
+        .decode("utf-8")
+        .strip()
+    )
 
-    Returns
-    -------
-    str
-        Description of return value.
-    """
-    return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO).decode("utf-8").strip()
+
+def _gh_link(path: Path, start: int | None = None, end: int | None = None) -> str | None:
+    """Build a GitHub permalink for the provided file and optional span."""
+
+    if not (G_ORG and G_REPO):
+        return None
+    sha = G_SHA or _git_sha()
+    fragment = ""
+    if start and end and end != start:
+        fragment = f"#L{start}-L{end}"
+    elif start:
+        fragment = f"#L{start}"
+    rel_path = _rel(path)
+    return f"https://github.com/{G_ORG}/{G_REPO}/blob/{sha}/{rel_path}{fragment}"
 
 
 def _parse_module(py: Path) -> ModuleInfo | None:  # noqa: C901, PLR0912
-    """Compute parse module.
+    """Compute parse module."""
 
-    Carry out the parse module operation.
-
-    Parameters
-    ----------
-    py : Path
-        Description for ``py``.
-
-    Returns
-    -------
-    ModuleInfo | None
-        Description of return value.
-    """
     module = _module_name(py)
     if not module:
         return None
@@ -242,28 +183,28 @@ def _parse_module(py: Path) -> ModuleInfo | None:  # noqa: C901, PLR0912
     )
 
 
-def _collect_modules() -> list[ModuleInfo]:
-    """Compute collect modules.
+def _collect_modules(root: Path) -> list[ModuleInfo]:
+    """Compute collect modules."""
 
-    Carry out the collect modules operation.
-
-    Returns
-    -------
-    List[ModuleInfo]
-        Description of return value.
-    """
     modules: list[ModuleInfo] = []
-    for py in SRC.rglob("*.py"):
+    for py in root.rglob("*.py"):
         info = _parse_module(py)
         if info:
             modules.append(info)
     return modules
 
 
-def build_index() -> dict[str, Any]:
+def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, Any]:
     """Compute build index.
 
     Carry out the build index operation.
+
+    Parameters
+    ----------
+    root : Path | None
+        Description for ``root``.
+    json_path : Path | None
+        Description for ``json_path``.
 
     Returns
     -------
@@ -273,48 +214,109 @@ def build_index() -> dict[str, Any]:
     
     
     
-    
-    
-    sha = _git_sha()
-    data: dict[str, Any] = {"commit": sha, "modules": {}}
 
-    for info in _collect_modules():
+    sha = _git_sha()
+    data: dict[str, Any] = {
+        "commit": sha,
+        "policy_version": POLICY_VERSION,
+        "link_mode": LINK_MODE,
+        "modules": {},
+    }
+
+    for info in _collect_modules(root):
         navmap = info.navmap or {}
-        exports = navmap.get("exports", info.exports)
+        exports = list(dict.fromkeys(navmap.get("exports", info.exports)))
+        sections = navmap.get("sections", [])
+        module_meta = {
+            key: navmap[key]
+            for key in ("owner", "stability", "since", "deprecated_in")
+            if navmap.get(key) is not None
+        }
+        symbols_meta = {
+            name: dict(meta)
+            for name, meta in navmap.get("symbols", {}).items()
+        }
+
+        if module_meta:
+            for name, meta in symbols_meta.items():
+                for key, value in module_meta.items():
+                    meta.setdefault(key, value)
+
+        links: dict[str, Any] = {
+            "source": f"vscode://file/{_rel(info.path)}",
+        }
+        if LINK_MODE in {"github", "both"}:
+            gh_url = _gh_link(info.path)
+            if gh_url:
+                links["github"] = gh_url
+
         data["modules"][info.module] = {
             "path": _rel(info.path),
             "exports": exports,
-            "sections": navmap.get("sections", []),
+            "sections": sections,
             "section_lines": info.sections,
             "anchors": info.anchors,
-            "links": {
-                "source": f"vscode://file/{_rel(info.path)}",
-            },
-            "meta": navmap.get("symbols", {}),
+            "links": links,
+            "meta": symbols_meta,
+            "module_meta": module_meta,
             "tags": navmap.get("tags", []),
             "synopsis": navmap.get("synopsis", ""),
             "see_also": navmap.get("see_also", []),
             "deps": navmap.get("deps", []),
         }
+
+    if json_path:
+        json_path.parent.mkdir(parents=True, exist_ok=True)
+        json_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
     return data
 
 
-def main() -> None:
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse CLI arguments."""
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=SRC,
+        help="Directory tree to scan for navmap metadata (default: %(default)s).",
+    )
+    parser.add_argument(
+        "--json",
+        type=Path,
+        default=OUT / "navmap.json",
+        help="Path to write the navmap JSON output (default: %(default)s).",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
     Carry out the main operation.
+
+    Parameters
+    ----------
+    argv : List[str] | None
+        Description for ``argv``.
+
+    Returns
+    -------
+    int
+        Description of return value.
     """
     
     
     
-    
-    
-    index = build_index()
-    OUT.mkdir(parents=True, exist_ok=True)
-    out_path = OUT / "navmap.json"
-    out_path.write_text(json.dumps(index, indent=2), encoding="utf-8")
-    print(f"Wrote {_rel(out_path)} @ {index['commit']}")
+
+    args = _parse_args(argv)
+    root = args.root.resolve()
+    json_path = args.json.resolve()
+    index = build_index(root=root, json_path=json_path)
+    print(f"Wrote {_rel(json_path)} @ {index['commit']}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

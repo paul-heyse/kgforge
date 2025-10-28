@@ -53,69 +53,36 @@ def _is_pydantic_field(name: str | None) -> bool:
 
 
 def _is_pydantic_artifact(name: str | None) -> bool:
-    """Is pydantic artifact.
-
-    Parameters
-    ----------
-    name : str | None
-        Description.
-
-    Returns
-    -------
-    bool
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _is_pydantic_artifact(...)
-    """
+    """Return ``True`` when ``name`` refers to a Pydantic helper attribute."""
     if not name:
         return False
-    return name.startswith("model_") or name.startswith("__pydantic_") or name in {
-        "model_dump",
-        "model_dump_json",
-        "model_validate",
-        "model_validate_json",
-        "model_copy",
-        "model_construct",
-        "model_serializer",
-        "schema",
-        "schema_json",
-        "model_json_schema",
-        "dict",
-        "json",
-        "copy",
-        "__class_vars__",
-        "__private_attributes__",
-        "__signature__",
-    }
+    return (
+        name.startswith("model_")
+        or name.startswith("__pydantic_")
+        or name
+        in {
+            "model_dump",
+            "model_dump_json",
+            "model_validate",
+            "model_validate_json",
+            "model_copy",
+            "model_construct",
+            "model_serializer",
+            "schema",
+            "schema_json",
+            "model_json_schema",
+            "dict",
+            "json",
+            "copy",
+            "__class_vars__",
+            "__private_attributes__",
+            "__signature__",
+        }
+    )
 
 
 def _is_dataclass_artifact(name: str | None) -> bool:
-    """Is dataclass artifact.
-
-    Parameters
-    ----------
-    name : str | None
-        Description.
-
-    Returns
-    -------
-    bool
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _is_dataclass_artifact(...)
-    """
+    """Return ``True`` when ``name`` matches a dataclass support attribute."""
     if not name:
         return False
     return name in {
@@ -203,12 +170,6 @@ def parse_args() -> argparse.Namespace:
         Description of return value.
     """
     
-    
-    
-    
-    
-    
-    
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", required=True, type=Path, help="Directory to process.")
     parser.add_argument("--log", required=False, type=Path, help="Log file for changed paths.")
@@ -230,12 +191,6 @@ def module_name_for(path: Path) -> str:
     str
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     
     try:
         relative = path.relative_to(REPO_ROOT)
@@ -270,12 +225,6 @@ def summarize(name: str, kind: str) -> str:
         Description of return value.
     """
     
-    
-    
-    
-    
-    
-    
     base = _humanize_identifier(name) or "value"
     if kind == "module":
         text = f"Overview of {base}."
@@ -307,12 +256,6 @@ def extended_summary(kind: str, name: str, module_name: str) -> str:
     str
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     
     pretty = _humanize_identifier(name)
     if kind == "module":
@@ -361,12 +304,6 @@ def annotation_to_text(node: ast.AST | None) -> str:
         Description of return value.
     """
     
-    
-    
-    
-    
-    
-    
     if node is None:
         return "Any"
     try:
@@ -407,12 +344,6 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
         Description of return value.
     """
     
-    
-    
-    
-    
-    
-    
     items: list[tuple[int, ast.AST, str]] = [(0, tree, "module")]
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
@@ -439,12 +370,6 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
         Description of return value.
     """
     
-    
-    
-    
-    
-    
-    
     params: list[tuple[str, str]] = []
     args = node.args
 
@@ -460,12 +385,6 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
         default : ast.AST | None
             Description for ``default``.
         """
-        
-        
-        
-        
-        
-        
         
         name = arg.arg
         if name in {"self", "cls"}:
@@ -511,12 +430,6 @@ def detect_raises(node: ast.AST) -> list[str]:
     List[str]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     
     seen: OrderedDict[str, None] = OrderedDict()
     for child in ast.walk(node):
@@ -568,12 +481,6 @@ def build_examples(
         Description of return value.
     """
     
-    
-    
-    
-    
-    
-    
     lines: list[str] = ["Examples", "--------"]
     if module_name and not name.startswith("__"):
         lines.append(f">>> from {module_name} import {name}")
@@ -608,12 +515,6 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     List[str]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     
     if kind == "module":
         module_display = module_name.split(".")[-1] if module_name else "module"
@@ -719,12 +620,6 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
         Description of return value.
     """
     
-    
-    
-    
-    
-    
-    
     body = getattr(node, "body", [])
     if not body:
         return None, None
@@ -759,12 +654,6 @@ def replace(
         Description for ``insert_at``.
     """
     
-    
-    
-    
-    
-    
-    
     formatted = [indent + line + "\n" for line in new_lines]
     if doc_expr is not None:
         start = doc_expr.lineno - 1
@@ -793,12 +682,6 @@ def process_file(path: Path) -> bool:
     bool
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     
     try:
         text = path.read_text(encoding="utf-8")
@@ -882,12 +765,6 @@ def main() -> None:
 
     Carry out the main operation.
     """
-    
-    
-    
-    
-    
-    
     
     args = parse_args()
     target = args.target.resolve()

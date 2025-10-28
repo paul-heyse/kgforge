@@ -1,7 +1,5 @@
 """Embeddings Sparse utilities."""
 
-from typing import Final
-
 import embeddings_sparse.base as base
 import embeddings_sparse.bm25 as bm25
 import embeddings_sparse.splade as splade
@@ -10,7 +8,7 @@ from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["base", "bm25", "splade"]
 
-__navmap__: Final[NavMap] = {
+__navmap__: NavMap = {
     "title": "embeddings_sparse",
     "synopsis": "Sparse embedding adapters and indices",
     "exports": __all__,

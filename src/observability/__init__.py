@@ -1,14 +1,12 @@
 """Observability utilities."""
 
-from typing import Final
-
 import observability.metrics as metrics
 
 from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["metrics"]
 
-__navmap__: Final[NavMap] = {
+__navmap__: NavMap = {
     "title": "observability",
     "synopsis": "Metrics and tracing utilities for kgfoundry services",
     "exports": __all__,

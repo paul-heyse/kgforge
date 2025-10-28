@@ -1,7 +1,5 @@
 """Kgfoundry Common utilities."""
 
-from typing import Final
-
 import kgfoundry_common.config as config
 import kgfoundry_common.errors as errors
 import kgfoundry_common.exceptions as exceptions
@@ -24,7 +22,7 @@ __all__ = [
     "parquet_io",
 ]
 
-__navmap__: Final[NavMap] = {
+__navmap__: NavMap = {
     "title": "kgfoundry_common",
     "synopsis": "Shared utilities and data structures used across kgfoundry",
     "exports": __all__,

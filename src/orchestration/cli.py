@@ -60,6 +60,10 @@ def index_bm25(
     
     
     
+    
+    
+    
+    
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
@@ -126,6 +130,10 @@ def index_faiss(
     
     
     
+    
+    
+    
+    
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
         vecs = json.load(fh)
@@ -165,6 +173,10 @@ def api(port: int = 8080) -> None:
     
     
     
+    
+    
+    
+    
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
@@ -182,6 +194,10 @@ def e2e() -> None:
     typer.Exit
         Raised when validation fails.
     """
+    
+    
+    
+    
     
     
     

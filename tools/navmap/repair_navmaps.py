@@ -32,6 +32,10 @@ def repair_module(path: Path) -> list[str]:
     
     
     
+    
+    
+    
+    
     return _inspect(path)
 
 
@@ -50,6 +54,10 @@ def repair_all(root: Path) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
     
     
     
@@ -101,6 +109,10 @@ def main(argv: list[str] | None = None) -> int:
     int
         Description of return value.
     """
+    
+    
+    
+    
     
     
     

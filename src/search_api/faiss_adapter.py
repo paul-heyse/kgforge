@@ -83,6 +83,10 @@ class FaissAdapter:
         
         
         
+        
+        
+        
+        
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
@@ -141,6 +145,10 @@ class FaissAdapter:
         
         
         
+        
+        
+        
+        
         vectors = self._load_dense_parquet()
         self.vecs = vectors
         if not HAVE_FAISS:
@@ -174,6 +182,10 @@ class FaissAdapter:
         cpu_index_path : str | None
             Description for ``cpu_index_path``.
         """
+        
+        
+        
+        
         
         
         
@@ -220,6 +232,10 @@ class FaissAdapter:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
         
         
         

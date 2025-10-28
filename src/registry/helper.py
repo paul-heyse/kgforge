@@ -47,6 +47,10 @@ class DuckDBRegistryHelper:
         
         
         
+        
+        
+        
+        
         self.db_path = db_path
 
     def _con(self) -> duckdb.DuckDBPyConnection:
@@ -93,6 +97,10 @@ class DuckDBRegistryHelper:
         
         
         
+        
+        
+        
+        
         run_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -120,6 +128,10 @@ class DuckDBRegistryHelper:
         notes : str | None
             Description for ``notes``.
         """
+        
+        
+        
+        
         
         
         
@@ -160,6 +172,10 @@ class DuckDBRegistryHelper:
         
         
         
+        
+        
+        
+        
         dataset_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -187,6 +203,10 @@ class DuckDBRegistryHelper:
         rows : int
             Description for ``rows``.
         """
+        
+        
+        
+        
         
         
         
@@ -222,6 +242,10 @@ class DuckDBRegistryHelper:
         
         
         
+        
+        
+        
+        
         con = self._con()
         con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
         con.execute(
@@ -240,6 +264,10 @@ class DuckDBRegistryHelper:
         docs : List[Doc]
             Description for ``docs``.
         """
+        
+        
+        
+        
         
         
         
@@ -285,6 +313,10 @@ class DuckDBRegistryHelper:
         
         
         
+        
+        
+        
+        
         con = self._con()
         for asset in assets:
             con.execute(
@@ -314,6 +346,10 @@ class DuckDBRegistryHelper:
         payload : Mapping[str, object]
             Description for ``payload``.
         """
+        
+        
+        
+        
         
         
         
