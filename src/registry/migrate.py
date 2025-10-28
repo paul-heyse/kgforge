@@ -14,15 +14,28 @@ __all__ = ["apply", "main"]
 
 __navmap__: Final[NavMap] = {
     "title": "registry.migrate",
-    "synopsis": "Module for registry.migrate",
+    "synopsis": "Migration helpers for DuckDB registry schemas",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["apply", "main"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@registry",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@registry",
+            "stability": "experimental",
+            "since": "0.1.0",
+        }
+        for name in __all__
+    },
 }
 
 

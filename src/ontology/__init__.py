@@ -11,9 +11,6 @@ __navmap__: NavMap = {
     "title": "ontology",
     "synopsis": "Ontology loading and lookup helpers",
     "exports": __all__,
-    "owner": "@ontology",
-    "stability": "experimental",
-    "since": "0.1.0",
     "sections": [
         {
             "id": "public-api",
@@ -21,6 +18,11 @@ __navmap__: NavMap = {
             "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@ontology",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
     "symbols": {
         "catalog": {
             "stability": "beta",

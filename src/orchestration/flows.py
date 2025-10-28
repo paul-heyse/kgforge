@@ -12,15 +12,28 @@ __all__ = ["e2e_flow", "t_echo"]
 
 __navmap__: Final[NavMap] = {
     "title": "orchestration.flows",
-    "synopsis": "Prefect orchestration flows used in kgfoundry demos",
+    "synopsis": "Prefect flow definitions for kgfoundry pipelines",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["t_echo", "e2e_flow"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@orchestration",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@orchestration",
+            "stability": "experimental",
+            "since": "0.1.0",
+        }
+        for name in __all__
+    },
 }
 
 
@@ -41,7 +54,6 @@ def t_echo(msg: str) -> str:
     str
         Description of return value.
     """
-    
     return msg
 
 
@@ -57,7 +69,6 @@ def e2e_flow() -> list[str]:
     List[str]
         Description of return value.
     """
-    
     return [
         t_echo.submit(x).result()
         for x in [

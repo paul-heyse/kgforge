@@ -16,15 +16,28 @@ __all__ = ["FixtureDoc", "FixtureIndex", "tokenize"]
 
 __navmap__: Final[NavMap] = {
     "title": "search_api.fixture_index",
-    "synopsis": "Tiny lexical index backed by DuckDB parquet fixtures.",
+    "synopsis": "In-memory fixture index used for tests and tutorials",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["tokenize", "FixtureDoc", "FixtureIndex"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@search-api",
+        "stability": "experimental",
+        "since": "0.2.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@search-api",
+            "stability": "experimental",
+            "since": "0.2.0",
+        }
+        for name in __all__
+    },
 }
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
@@ -46,7 +59,6 @@ def tokenize(text: str) -> list[str]:
     List[str]
         Description of return value.
     """
-    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -78,7 +90,6 @@ class FixtureIndex:
         db_path : str | None
             Description for ``db_path``.
         """
-        
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []
@@ -164,7 +175,6 @@ class FixtureIndex:
         List[Tuple[int, float]]
             Description of return value.
         """
-        
         if getattr(self, "N", 0) == 0:
             return []
         qtoks = tokenize(query)
@@ -197,5 +207,4 @@ class FixtureIndex:
         src.search_api.fixture_index.FixtureDoc
             Description of return value.
         """
-        
         return self.docs[index]

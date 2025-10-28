@@ -9,8 +9,8 @@ from kgfoundry_common.navmap_types import NavMap
 __all__ = ["apply_kg_boosts", "mmr_deduplicate", "rrf_fuse"]
 
 __navmap__: Final[NavMap] = {
-    "title": "kgfoundry.search_api.service",
-    "synopsis": "Ranking utilities composing the kgfoundry search pipeline",
+    "title": "search_api.service",
+    "synopsis": "Search orchestration helpers that combine retrieval backends",
     "exports": __all__,
     "sections": [
         {
@@ -19,28 +19,18 @@ __navmap__: Final[NavMap] = {
             "symbols": ["rrf_fuse", "apply_kg_boosts", "mmr_deduplicate"],
         }
     ],
+    "module_meta": {
+        "owner": "@search-api",
+        "stability": "experimental",
+        "since": "0.2.0",
+    },
     "symbols": {
-        "rrf_fuse": {
-            "since": "2024.10",
+        name: {
+            "owner": "@search-api",
             "stability": "experimental",
-            "side_effects": ["none"],
-            "thread_safety": "reentrant",
-            "async_ok": True,
-        },
-        "apply_kg_boosts": {
-            "since": "2024.10",
-            "stability": "experimental",
-            "side_effects": ["none"],
-            "thread_safety": "reentrant",
-            "async_ok": True,
-        },
-        "mmr_deduplicate": {
-            "since": "2024.10",
-            "stability": "experimental",
-            "side_effects": ["none"],
-            "thread_safety": "reentrant",
-            "async_ok": True,
-        },
+            "since": "0.2.0",
+        }
+        for name in __all__
     },
     "edit_scopes": {"safe": ["apply_kg_boosts", "mmr_deduplicate"], "risky": ["rrf_fuse"]},
     "tags": ["search", "ranking"],
@@ -70,7 +60,6 @@ def rrf_fuse(
     List[Tuple[str, float]]
         Description of return value.
     """
-    
     # NOTE: implement stable RRF across rankers when ranker outputs are wired
     return []
 
@@ -93,7 +82,6 @@ def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[st
     List[Tuple[str, float]]
         Description of return value.
     """
-    
     # NOTE: apply boosts for direct & one-hop concept matches once KG signals exist
     return fused
 
@@ -118,6 +106,5 @@ def mmr_deduplicate(
     List[Tuple[str, float]]
         Description of return value.
     """
-    
     # NOTE: add doc-level diversity via MMR when result scoring is available
     return results
