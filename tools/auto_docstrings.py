@@ -14,6 +14,7 @@ import ast
 from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 
 def _paragraph(*sentences: str) -> str:
@@ -942,13 +943,51 @@ def _format_annotation_string(value: str) -> str:
     if text.startswith("Optional[") and text.endswith("]"):
         inner = text[len("Optional[") : -1]
         inner_text = _normalize_qualified_name(_format_annotation_string(inner))
-        return f"Optional {inner_text}"
+        return f"Optional[{inner_text}]"
     text = _normalize_qualified_name(text)
     if text.startswith("Optional[") and text.endswith("]"):
         inner = text[len("Optional[") : -1]
         inner_text = _normalize_qualified_name(_format_annotation_string(inner))
-        return f"Optional {inner_text}"
+        return f"Optional[{inner_text}]"
     return text
+
+
+def _annotation_accepts_none(text: str) -> bool:
+    """Return ``True`` when ``text`` indicates that ``None`` is an allowed value."""
+    cleaned = text.replace(" ", "")
+    if not cleaned:
+        return False
+    if cleaned == "None":
+        return True
+    if cleaned.startswith("Optional[") and cleaned.endswith("]"):
+        return True
+    return "|None" in cleaned or "None|" in cleaned
+
+
+def _unparse_or_none(node: ast.AST | None) -> str | None:
+    """Safely call :func:`ast.unparse` and return ``None`` if it fails."""
+    if node is None:
+        return None
+    try:
+        return ast.unparse(node)
+    except Exception:  # pragma: no cover - defensive
+        return None
+
+
+_DEFAULT_SENTINEL = object()
+
+
+@dataclass
+class ParameterDetails:
+    """Describe the metadata captured for a function parameter."""
+
+    name: str
+    annotation: str
+    original_annotation: str | None = None
+    has_default: bool = False
+    default_value: Any = _DEFAULT_SENTINEL
+    default_text: str | None = None
+    accepts_none: bool = False
 
 
 @dataclass
@@ -1292,6 +1331,37 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[Paramet
             cleaned = annotation or "Any"
             annotation = f"{cleaned} | None"
         params.append(ParameterInfo(name, annotation or "Any", not is_optional))
+        annotation_text = annotation_to_text(arg.annotation)
+        original_annotation = _unparse_or_none(arg.annotation)
+        cleaned_annotation = annotation_text or "Any"
+        has_default = default is not None
+        evaluated_default: Any = _DEFAULT_SENTINEL
+        default_text: str | None = None
+        accepts_none = _annotation_accepts_none(cleaned_annotation)
+        if has_default:
+            try:
+                evaluated_default = ast.literal_eval(default)
+            except (TypeError, ValueError):
+                evaluated_default = _DEFAULT_SENTINEL
+            except Exception:  # pragma: no cover - defensive
+                evaluated_default = _DEFAULT_SENTINEL
+            if evaluated_default is not _DEFAULT_SENTINEL:
+                default_text = repr(evaluated_default)
+            else:
+                default_text = _unparse_or_none(default)
+            if evaluated_default is None or default_text == "None":
+                accepts_none = True
+        params.append(
+            ParameterDetails(
+                name=name,
+                annotation=cleaned_annotation,
+                original_annotation=original_annotation,
+                has_default=has_default,
+                default_value=evaluated_default,
+                default_text=default_text,
+                accepts_none=accepts_none,
+            )
+        )
 
     positional = args.posonlyargs + args.args
     defaults = [None] * (len(positional) - len(args.defaults)) + list(args.defaults)
@@ -1300,12 +1370,28 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[Paramet
 
     if args.vararg:
         params.append(ParameterInfo(f"*{args.vararg.arg}", "Any", False))
+        annotation_text = annotation_to_text(args.vararg.annotation)
+        params.append(
+            ParameterDetails(
+                name=f"*{args.vararg.arg}",
+                annotation=annotation_text or "Any",
+                original_annotation=_unparse_or_none(args.vararg.annotation),
+            )
+        )
 
     for arg, default in zip(args.kwonlyargs, args.kw_defaults, strict=True):
         add(arg, default)
 
     if args.kwarg:
         params.append(ParameterInfo(f"**{args.kwarg.arg}", "Any", False))
+        annotation_text = annotation_to_text(args.kwarg.annotation)
+        params.append(
+            ParameterDetails(
+                name=f"**{args.kwarg.arg}",
+                annotation=annotation_text or "Any",
+                original_annotation=_unparse_or_none(args.kwarg.annotation),
+            )
+        )
 
     return params
 
@@ -1338,24 +1424,50 @@ def detect_raises(node: ast.AST) -> list[str]:
         if not isinstance(child, ast.Raise):
             continue
         exc = child.exc
+
+    def _exception_name(exc: ast.AST | None) -> str:
         if exc is None:
-            name = "Exception"
-        elif isinstance(exc, ast.Call):
+            return "Exception"
+        if isinstance(exc, ast.Call):
             func = exc.func
             if isinstance(func, ast.Name):
-                name = func.id
-            elif isinstance(func, ast.Attribute):
-                name = ast.unparse(func)
-            else:  # pragma: no cover - defensive
-                name = "Exception"
-        elif isinstance(exc, ast.Name):
-            name = exc.id
-        elif isinstance(exc, ast.Attribute):
-            name = ast.unparse(exc)
-        else:
-            name = "Exception"
-        if name not in seen:
-            seen[name] = None
+                return func.id
+            if isinstance(func, ast.Attribute):
+                return ast.unparse(func)
+            return "Exception"  # pragma: no cover - defensive
+        if isinstance(exc, ast.Name):
+            return exc.id
+        if isinstance(exc, ast.Attribute):
+            return ast.unparse(exc)
+        return "Exception"
+
+    seen: OrderedDict[str, None] = OrderedDict()
+
+    class RaiseCollector(ast.NodeVisitor):
+        """Collect ``raise`` statements while respecting scope boundaries."""
+
+        _NESTED_SCOPES = (
+            ast.FunctionDef,
+            ast.AsyncFunctionDef,
+            ast.ClassDef,
+            ast.Lambda,
+        )
+
+        def __init__(self, root: ast.AST) -> None:
+            self._root = root
+
+        def visit(self, current: ast.AST) -> Any:
+            if current is not self._root and isinstance(current, self._NESTED_SCOPES):
+                return None
+            return super().visit(current)
+
+        def visit_Raise(self, raise_node: ast.Raise) -> None:  # noqa: D401 - short override
+            name = _exception_name(raise_node.exc)
+            if name not in seen:
+                seen[name] = None
+            self.generic_visit(raise_node)
+
+    RaiseCollector(node).visit(node)
     return list(seen.keys())
 
 
@@ -1470,6 +1582,13 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
         lines.extend(["", "Parameters", "----------"])
         for parameter in parameters:
             lines.append(f"{parameter.name} : {parameter.annotation}")
+            extras: list[str] = []
+            if parameter.has_default:
+                extras.append("optional")
+                if parameter.default_text is not None:
+                    extras.append(f"default={parameter.default_text}")
+            suffix = f", {', '.join(extras)}" if extras else ""
+            lines.append(f"{parameter.name} : {parameter.annotation}{suffix}")
             lines.append(f"    Description for ``{parameter.name}``.")
 
     if returns:
@@ -1498,10 +1617,10 @@ def _required_sections(
     parameters: list[ParameterInfo],
     returns: str | None,
     raises: list[str],
+    node_name: str | None,
+    include_examples: bool,
 ) -> set[str]:
-    """Compute required sections.
-
-    Carry out the required sections operation.
+    """Return placeholder markers emitted by the fallback generator.
 
     Parameters
     ----------
@@ -1521,14 +1640,27 @@ def _required_sections(
     """
     if kind in {"module", "class"}:
         return set()
-    required: set[str] = {"Examples"}
+
+    markers: set[str] = set()
+    if node_name:
+        operation = _humanize_identifier(node_name).lower()
+        markers.add(f"Carry out the {operation} operation for the surrounding component.")
+        markers.add(
+            "Generated documentation highlights how this helper collaborates with neighbouring utilities.",
+        )
+        markers.add("Callers rely on the routine to remain stable across releases.")
+    for param_name, _ in parameters:
+        markers.add(f"Description for ``{param_name}``.")
+    required: set[str] = set()
+    if include_examples:
+        required.add("Examples")
     if parameters:
         required.add("Parameters")
     if returns:
-        required.add("Returns")
+        markers.add("Description of return value.")
     if raises:
-        required.add("Raises")
-    return required
+        markers.add("Raised when validation fails.")
+    return markers
 
 
 def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
@@ -1594,7 +1726,11 @@ def replace(
     """
     
     formatted = [indent + line + "\n" for line in new_lines]
+    existing_blank_line = False
     if doc_expr is not None:
+        next_line_index = (doc_expr.end_lineno or doc_expr.lineno)
+        if next_line_index < len(lines):
+            existing_blank_line = lines[next_line_index].strip() == ""
         start = doc_expr.lineno - 1
         end = doc_expr.end_lineno or doc_expr.lineno
         del lines[start:end]
@@ -1603,7 +1739,8 @@ def replace(
     else:
         lines[insert_at:insert_at] = formatted
         after_index = insert_at + len(formatted)
-    lines.insert(after_index, indent + "\n")
+    if not existing_blank_line:
+        lines.insert(after_index, indent + "\n")
 
 
 def process_file(path: Path) -> bool:
@@ -1659,6 +1796,7 @@ def process_file(path: Path) -> bool:
         parameters: list[ParameterInfo] = []
         returns: str | None = None
         raises: list[str] = []
+        include_examples = False
         if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             parameters = parameters_for(node)
             return_annotation: str = annotation_to_text(node.returns)
@@ -1666,17 +1804,26 @@ def process_file(path: Path) -> bool:
                 returns = return_annotation
             raises = detect_raises(node)
 
-        required_sections = _required_sections(kind, parameters, returns, raises)
+        placeholder_markers = _required_sections(
+            include_examples = bool(node_name) and not node_name.startswith("_")
+
+        required_sections = _required_sections(
+            kind,
+            parameters,
+            returns,
+            raises,
+            node_name,
+            include_examples,
+        )
         needs_update = doc is None or "TODO" in (doc or "") or "NavMap:" in (doc or "")
-        if not needs_update and required_sections:
-            if doc is None:
+        if not needs_update and doc and placeholder_markers:
+            if any(marker in doc for marker in placeholder_markers):
                 needs_update = True
             else:
-                needs_update = not all(section in doc for section in required_sections)
-        if not needs_update and doc:
-            lower_markers = (" list[", " tuple[", " set[", " dict[", " list ", " dict ")
-            if any(marker in doc for marker in lower_markers):
-                needs_update = True
+                lower_doc = doc.lower()
+                lower_markers = tuple(marker.lower() for marker in placeholder_markers)
+                if any(marker in lower_doc for marker in lower_markers):
+                    needs_update = True
         if not needs_update and doc is not None:
             boilerplate_tokens = (
                 "Provide utilities for module.",

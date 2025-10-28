@@ -111,9 +111,9 @@ class FixtureIndex:
 
         Parameters
         ----------
-        root : str | None
+        root : str, optional, default='/data'
             Description for ``root``.
-        db_path : str | None
+        db_path : str, optional, default='/data/catalog/catalog.duckdb'
             Description for ``db_path``.
         """
         

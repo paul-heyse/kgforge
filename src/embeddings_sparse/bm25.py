@@ -121,11 +121,11 @@ class PurePythonBM25:
         ----------
         index_dir : str
             Description for ``index_dir``.
-        k1 : float | None
+        k1 : float, optional, default=0.9
             Description for ``k1``.
-        b : float | None
+        b : float, optional, default=0.4
             Description for ``b``.
-        field_boosts : Mapping[str, float] | None
+        field_boosts : Mapping[str, float] | None, optional, default=None
             Description for ``field_boosts``.
         """
         
@@ -337,11 +337,11 @@ class LuceneBM25:
         ----------
         index_dir : str
             Description for ``index_dir``.
-        k1 : float | None
+        k1 : float, optional, default=0.9
             Description for ``k1``.
-        b : float | None
+        b : float, optional, default=0.4
             Description for ``b``.
-        field_boosts : Mapping[str, float] | None
+        field_boosts : Mapping[str, float] | None, optional, default=None
             Description for ``field_boosts``.
         """
         

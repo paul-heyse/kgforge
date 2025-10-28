@@ -77,13 +77,13 @@ class FaissGpuIndex:
 
         Parameters
         ----------
-        factory : str | None
+        factory : str, optional, default='OPQ64,IVF8192,PQ64'
             Description for ``factory``.
-        nprobe : int | None
+        nprobe : int, optional, default=64
             Description for ``nprobe``.
-        gpu : bool | None
+        gpu : bool, optional, default=True
             Description for ``gpu``.
-        cuvs : bool | None
+        cuvs : bool, optional, default=True
             Description for ``cuvs``.
         """
         

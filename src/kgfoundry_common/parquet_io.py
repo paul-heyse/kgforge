@@ -332,9 +332,9 @@ class ParquetChunkWriter:
         ----------
         root : str
             Description for ``root``.
-        model : str | None
+        model : str, optional, default='docling_hybrid'
             Description for ``model``.
-        run_id : str | None
+        run_id : str, optional, default='dev'
             Description for ``run_id``.
         """
         
