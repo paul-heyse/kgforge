@@ -33,6 +33,11 @@ def has_python_files(path: Path) -> bool:
     bool
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -66,6 +71,11 @@ def run_doq(target: Path) -> None:
     target : Path
         Description for ``target``.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -112,6 +122,11 @@ def run_fallback(target: Path) -> None:
     target : Path
         Description for ``target``.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -148,6 +163,11 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
 
 
 

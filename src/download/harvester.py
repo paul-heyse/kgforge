@@ -62,6 +62,11 @@ class OpenAccessHarvester:
         out_dir : str | None
             Description for ``out_dir``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -111,6 +116,11 @@ class OpenAccessHarvester:
         List[dict[str, Any]]
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -159,6 +169,11 @@ class OpenAccessHarvester:
         str | None
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -223,6 +238,11 @@ class OpenAccessHarvester:
         UnsupportedMIMEError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -274,6 +294,11 @@ class OpenAccessHarvester:
         List[Doc]
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 

@@ -12,7 +12,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 from kgfoundry.embeddings_sparse.bm25 import PurePythonBM25, get_bm25
 from kgfoundry.embeddings_sparse.splade import get_splade
 from kgfoundry.kg_builder.mock_kg import MockKG
-from kgfoundry.vectorstore_faiss.gpu import FaissGpuIndex
+from vectorstore_faiss import gpu as faiss_gpu
 
 from kgfoundry_common.navmap_types import NavMap
 from search_api.schemas import SearchRequest, SearchResult
@@ -88,7 +88,7 @@ try:
 except Exception:
     pass
 
-faiss = FaissGpuIndex(
+faiss = faiss_gpu.FaissGpuIndex(
     factory=CFG.get("faiss", {}).get("index_factory", "OPQ64,IVF8192,PQ64"),
     nprobe=int(CFG.get("faiss", {}).get("nprobe", 64)),
     gpu=bool(CFG.get("faiss", {}).get("gpu", True)),
@@ -122,6 +122,11 @@ def auth(authorization: str | None = Header(default=None)) -> None:
     HTTPException
         Raised when validation fails.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -163,6 +168,11 @@ def healthz() -> dict[str, Any]:
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -213,6 +223,11 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
     Mapping[str, float]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -267,6 +282,11 @@ def apply_kg_boosts(
     Mapping[str, float]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -325,6 +345,11 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -421,6 +446,11 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 

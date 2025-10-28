@@ -288,6 +288,11 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -379,6 +384,11 @@ def repair_all(root: Path, apply: bool) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -441,6 +451,11 @@ def main(argv: list[str] | None = None) -> int:
     int
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 

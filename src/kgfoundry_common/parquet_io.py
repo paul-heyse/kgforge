@@ -51,6 +51,11 @@ class ParquetVectorWriter:
         pa.schema
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -93,6 +98,11 @@ class ParquetVectorWriter:
         root : str
             Description for ``root``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -145,6 +155,11 @@ class ParquetVectorWriter:
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -201,6 +216,11 @@ class ParquetVectorWriter:
         pa.schema
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -260,6 +280,11 @@ class ParquetVectorWriter:
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -321,6 +346,11 @@ class ParquetChunkWriter:
         pa.schema
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -378,6 +408,11 @@ class ParquetChunkWriter:
         run_id : str | None
             Description for ``run_id``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -416,6 +451,11 @@ class ParquetChunkWriter:
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 

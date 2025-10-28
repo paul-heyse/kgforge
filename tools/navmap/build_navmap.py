@@ -211,6 +211,11 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -313,6 +318,11 @@ def main(argv: list[str] | None = None) -> int:
     int
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 

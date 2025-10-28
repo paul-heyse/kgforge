@@ -96,6 +96,11 @@ class PurePythonBM25:
         field_boosts : Mapping[str, float] | None
             Description for ``field_boosts``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -154,6 +159,11 @@ class PurePythonBM25:
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -225,6 +235,11 @@ class PurePythonBM25:
 
         Carry out the load operation.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -299,6 +314,11 @@ class PurePythonBM25:
         List[Tuple[str, float]]
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -362,6 +382,11 @@ class LuceneBM25:
         field_boosts : Mapping[str, float] | None
             Description for ``field_boosts``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -403,6 +428,11 @@ class LuceneBM25:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -485,6 +515,11 @@ class LuceneBM25:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -544,6 +579,11 @@ def get_bm25(
     PurePythonBM25 | LuceneBM25
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 

@@ -45,6 +45,11 @@ class DenseEmbeddingModel(Protocol):
         NDArray[np.float32]
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 

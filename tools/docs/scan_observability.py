@@ -26,6 +26,11 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     Tuple[str, ast.AST | None]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -74,6 +79,11 @@ def scan_file(
     Tuple[List[dict[str, object]], List[dict[str, object]], List[dict[str, object]], bool]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -173,6 +183,11 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
 
 
 
