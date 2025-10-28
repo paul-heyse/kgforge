@@ -208,3 +208,30 @@ def outer(flag: bool) -> None:
     )
 
     assert detect_raises(node) == ["ValueError"]
+def test_process_file_preserves_single_blank_line_after_existing_docstring(
+    repo_layout: Path,
+) -> None:
+    """Ensure processing preserves single spacer after an existing docstring."""
+    target = repo_layout / "src" / "package" / "module.py"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        """
+def sample(value: int) -> int:
+    return value
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    assert auto_docstrings.process_file(target)
+    auto_docstrings.process_file(target)
+
+    contents = target.read_text(encoding="utf-8").splitlines()
+    def_index = next(i for i, line in enumerate(contents) if line.startswith("def sample"))
+    delimiter_indices = [
+        i for i in range(def_index + 1, len(contents)) if contents[i].strip() == '"""'
+    ]
+    assert len(delimiter_indices) >= 2
+    closing_index = delimiter_indices[-1]
+
+    assert contents[closing_index + 1].strip() == ""
+    assert contents[closing_index + 2].strip() == "return value"
