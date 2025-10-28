@@ -1,4 +1,10 @@
-"""Navmap Types utilities."""
+"""Overview of navmap types.
+
+This module bundles navmap types logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -6,7 +12,13 @@ from typing import Literal, NotRequired, TypedDict
 
 
 class NavSection(TypedDict):
-    """Describe NavSection."""
+    """Model the NavSection.
+
+    Represent the navsection data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     id: str
     title: str
@@ -14,7 +26,13 @@ class NavSection(TypedDict):
 
 
 class SymbolMeta(TypedDict, total=False):
-    """Describe SymbolMeta."""
+    """Model the SymbolMeta.
+
+    Represent the symbolmeta data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     since: str
     stability: Literal["frozen", "stable", "experimental", "internal"]
@@ -30,7 +48,13 @@ class SymbolMeta(TypedDict, total=False):
 
 
 class NavMap(TypedDict, total=False):
-    """Describe NavMap."""
+    """Model the NavMap.
+
+    Represent the navmap data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     title: str
     synopsis: str

@@ -1,4 +1,10 @@
-"""Linker utilities."""
+"""Overview of linker.
+
+This module bundles linker logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -36,6 +42,12 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Linker]
 class Linker:
-    """Describe Linker."""
+    """Model the Linker.
+
+    Represent the linker data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     ...

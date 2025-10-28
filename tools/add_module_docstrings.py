@@ -1,4 +1,10 @@
-"""Add Module Docstrings utilities."""
+"""Overview of add module docstrings.
+
+This module bundles add module docstrings logic for the kgfoundry stack. It groups related helpers
+so downstream packages can import a single cohesive namespace. Refer to the functions and classes
+below for implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -12,18 +18,18 @@ SRC = ROOT / "src"
 def module_name(path: Path) -> str:
     """Compute module name.
 
-    Carry out the module name operation.
-
+    Carry out the module name operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     str
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.add_module_docstrings import module_name
@@ -31,6 +37,7 @@ def module_name(path: Path) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     rel = path.relative_to(SRC).with_suffix("")
     parts = list(rel.parts)
     if parts and parts[-1] == "__init__":
@@ -41,18 +48,18 @@ def module_name(path: Path) -> str:
 def needs_docstring(text: str) -> bool:
     """Compute needs docstring.
 
-    Carry out the needs docstring operation.
-
+    Carry out the needs docstring operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     text : str
         Description for ``text``.
-
+    
     Returns
     -------
     bool
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.add_module_docstrings import needs_docstring
@@ -60,6 +67,7 @@ def needs_docstring(text: str) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     try:
         tree = ast.parse(text)
     except SyntaxError:
@@ -70,18 +78,18 @@ def needs_docstring(text: str) -> bool:
 def insert_docstring(path: Path) -> bool:
     """Compute insert docstring.
 
-    Carry out the insert docstring operation.
-
+    Carry out the insert docstring operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     bool
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.add_module_docstrings import insert_docstring
@@ -89,6 +97,7 @@ def insert_docstring(path: Path) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     text = path.read_text()
     if not needs_docstring(text):
         return False
@@ -108,13 +117,14 @@ def insert_docstring(path: Path) -> bool:
 def main() -> None:
     """Compute main.
 
-    Carry out the main operation.
-
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Examples
     --------
     >>> from tools.add_module_docstrings import main
     >>> main()  # doctest: +ELLIPSIS
     """
+    
     for path in SRC.rglob("*.py"):
         insert_docstring(path)
 

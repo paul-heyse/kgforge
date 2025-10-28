@@ -1,4 +1,10 @@
-"""Gpu utilities."""
+"""Overview of gpu.
+
+This module bundles gpu logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -50,7 +56,13 @@ type StrArray = NDArray[np.str_]
 
 # [nav:anchor FaissGpuIndex]
 class FaissGpuIndex:
-    """Describe FaissGpuIndex."""
+    """Model the FaissGpuIndex.
+
+    Represent the faissgpuindex data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     def __init__(
         self,
@@ -74,6 +86,8 @@ class FaissGpuIndex:
         cuvs : bool | None
             Description for ``cuvs``.
         """
+        
+        
         
         
         self.factory = factory
@@ -106,20 +120,21 @@ class FaissGpuIndex:
     def train(self, train_vectors: FloatArray, *, seed: int = 42) -> None:
         """Compute train.
 
-        Carry out the train operation.
-
+        Carry out the train operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         train_vectors : src.vectorstore_faiss.gpu.FloatArray
             Description for ``train_vectors``.
         seed : int | None
             Description for ``seed``.
-
+        
         Examples
         --------
         >>> from vectorstore_faiss.gpu import train
-        >>> train(..., ...)  # doctest: +ELLIPSIS
+        >>> train(...)  # doctest: +ELLIPSIS
         """
+        
         if self._faiss is None:
             return
         train_mat = cast(FloatArray, np.asarray(train_vectors, dtype=np.float32, order="C"))
@@ -148,25 +163,26 @@ class FaissGpuIndex:
     def add(self, keys: list[str], vectors: FloatArray) -> None:
         """Compute add.
 
-        Carry out the add operation.
-
+        Carry out the add operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         keys : List[str]
             Description for ``keys``.
         vectors : src.vectorstore_faiss.gpu.FloatArray
             Description for ``vectors``.
-
+        
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from vectorstore_faiss.gpu import add
         >>> add(..., ...)  # doctest: +ELLIPSIS
         """
+        
         vec_array = cast(FloatArray, np.asarray(vectors, dtype=np.float32, order="C"))
         if self._faiss is None:
             self._xb = cast(FloatArray, np.array(vec_array, copy=True))
@@ -193,25 +209,25 @@ class FaissGpuIndex:
     def search(self, query: FloatArray, k: int) -> list[tuple[str, float]]:
         """Compute search.
 
-        Carry out the search operation.
-
+        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         query : src.vectorstore_faiss.gpu.FloatArray
             Description for ``query``.
         k : int
             Description for ``k``.
-
+        
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
+        
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from vectorstore_faiss.gpu import search
@@ -219,6 +235,7 @@ class FaissGpuIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         q = cast(FloatArray, np.asarray(query, dtype=np.float32, order="C"))
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12
         if self._faiss is None or self._index is None:
@@ -239,25 +256,26 @@ class FaissGpuIndex:
     def save(self, index_uri: str, idmap_uri: str | None = None) -> None:
         """Compute save.
 
-        Carry out the save operation.
-
+        Carry out the save operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         index_uri : str
             Description for ``index_uri``.
         idmap_uri : str | None
             Description for ``idmap_uri``.
-
+        
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from vectorstore_faiss.gpu import save
-        >>> save(..., ...)  # doctest: +ELLIPSIS
+        >>> save(...)  # doctest: +ELLIPSIS
         """
+        
         if self._faiss is None or self._index is None:
             if self._xb is not None and self._idmap is not None:
                 np.savez(index_uri, xb=self._xb, ids=self._idmap)
@@ -272,25 +290,26 @@ class FaissGpuIndex:
     def load(self, index_uri: str, idmap_uri: str | None = None) -> None:
         """Compute load.
 
-        Carry out the load operation.
-
+        Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         index_uri : str
             Description for ``index_uri``.
         idmap_uri : str | None
             Description for ``idmap_uri``.
-
+        
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from vectorstore_faiss.gpu import load
-        >>> load(..., ...)  # doctest: +ELLIPSIS
+        >>> load(...)  # doctest: +ELLIPSIS
         """
+        
         if self._faiss is None:
             if os.path.exists(index_uri + ".npz"):
                 data = np.load(index_uri + ".npz", allow_pickle=True)

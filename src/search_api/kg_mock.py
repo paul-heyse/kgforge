@@ -1,4 +1,10 @@
-"""Kg Mock utilities."""
+"""Overview of kg mock.
+
+This module bundles kg mock logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -36,7 +42,13 @@ __navmap__: Final[NavMap] = {
 
 
 class ConceptMeta(TypedDict):
-    """Describe ConceptMeta."""
+    """Model the ConceptMeta.
+
+    Represent the conceptmeta data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     label: str
     keywords: list[str]
@@ -58,18 +70,18 @@ CONCEPTS: Final[dict[str, ConceptMeta]] = {
 def detect_query_concepts(query: str) -> set[str]:
     """Compute detect query concepts.
 
-    Carry out the detect query concepts operation.
-
+    Carry out the detect query concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     query : str
         Description for ``query``.
-
+    
     Returns
     -------
     collections.abc.Set
         Description of return value.
-
+    
     Examples
     --------
     >>> from search_api.kg_mock import detect_query_concepts
@@ -77,6 +89,7 @@ def detect_query_concepts(query: str) -> set[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     lowered = query.lower()
     hits: set[str] = set()
     for concept_id, meta in CONCEPTS.items():
@@ -89,18 +102,18 @@ def detect_query_concepts(query: str) -> set[str]:
 def linked_concepts_for_text(text: str) -> list[str]:
     """Compute linked concepts for text.
 
-    Carry out the linked concepts for text operation.
-
+    Carry out the linked concepts for text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     text : str
         Description for ``text``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from search_api.kg_mock import linked_concepts_for_text
@@ -108,6 +121,7 @@ def linked_concepts_for_text(text: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     lowered = text.lower()
     hits = []
     for concept_id, meta in CONCEPTS.items():
@@ -125,8 +139,8 @@ def kg_boost(
 ) -> float:
     """Compute kg boost.
 
-    Carry out the kg boost operation.
-
+    Carry out the kg boost operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     query_concepts : List[str]
@@ -137,18 +151,19 @@ def kg_boost(
         Description for ``direct``.
     one_hop : float | None
         Description for ``one_hop``.
-
+    
     Returns
     -------
     float
         Description of return value.
-
+    
     Examples
     --------
     >>> from search_api.kg_mock import kg_boost
-    >>> result = kg_boost(..., ..., ..., ...)
+    >>> result = kg_boost(..., ...)
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

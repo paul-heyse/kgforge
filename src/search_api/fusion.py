@@ -1,4 +1,10 @@
-"""Fusion utilities."""
+"""Overview of fusion.
+
+This module bundles fusion logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -38,27 +44,28 @@ __navmap__: Final[NavMap] = {
 def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, float]:
     """Compute rrf fuse.
 
-    Carry out the rrf fuse operation.
-
+    Carry out the rrf fuse operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     rankers : List[List[Tuple[str, float]]]
         Description for ``rankers``.
     k : int | None
         Description for ``k``.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from search_api.fusion import rrf_fuse
-    >>> result = rrf_fuse(..., ...)
+    >>> result = rrf_fuse(...)
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     agg: dict[str, float] = {}
     for ranked in rankers:
         for r, (key, _score) in enumerate(ranked, start=1):

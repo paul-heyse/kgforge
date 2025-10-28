@@ -1,4 +1,10 @@
-"""Base utilities."""
+"""Overview of base.
+
+This module bundles base logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -40,23 +46,29 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DenseEmbeddingModel]
 class DenseEmbeddingModel(Protocol):
-    """Describe DenseEmbeddingModel."""
+    """Model the DenseEmbeddingModel.
+
+    Represent the denseembeddingmodel data structure used throughout the project. The class
+    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+    are typically created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]:
         """Compute encode.
 
-        Carry out the encode operation.
-
+        Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         texts : collections.abc.Sequence
             Description for ``texts``.
-
+        
         Returns
         -------
         numpy.typing.NDArray
             Description of return value.
-
+        
         Examples
         --------
         >>> from embeddings_dense.base import encode
@@ -64,4 +76,5 @@ class DenseEmbeddingModel(Protocol):
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         ...

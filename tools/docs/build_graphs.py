@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-"""Build dependency (pydeps) and UML (pyreverse) graphs for the repo.
+"""Overview of build graphs.
 
-Adds:
-  1) Parallel per-package builds (pydeps + pyreverse) via ProcessPoolExecutor.
-  2) Per-package caching keyed by last git commit touching src/<package>.
-
-Outputs may be rendered as ``svg`` (default) or ``png``; cache entries are specific to the
-requested format. Everything else (global collapsed graph, layer policy, cycle checks) is
-unchanged.
+This module bundles build graphs logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
+
 
 from __future__ import annotations
 
@@ -58,13 +55,13 @@ ALLOW_FILE = ROOT / "docs" / "policies" / "graph_allowlist.json"
 def parse_args() -> argparse.Namespace:
     """Compute parse args.
 
-    Carry out the parse args operation.
-
+    Carry out the parse args operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Returns
     -------
     argparse.Namespace
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import parse_args
@@ -72,6 +69,7 @@ def parse_args() -> argparse.Namespace:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     p = argparse.ArgumentParser(
         description="Build per-package and cross-subsystem graphs with policy checks."
     )
@@ -147,8 +145,8 @@ def parse_args() -> argparse.Namespace:
 def sh(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subprocess.CompletedProcess:
     """Compute sh.
 
-    Carry out the sh operation.
-
+    Carry out the sh operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     cmd : List[str]
@@ -157,19 +155,20 @@ def sh(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subproces
         Description for ``cwd``.
     check : bool | None
         Description for ``check``.
-
+    
     Returns
     -------
     subprocess.CompletedProcess
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import sh
-    >>> result = sh(..., ..., ...)
+    >>> result = sh(...)
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return subprocess.run(
         cmd, check=check, cwd=str(cwd) if cwd else None, text=True, capture_output=False
     )
@@ -178,18 +177,19 @@ def sh(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subproces
 def ensure_bin(name: str) -> None:
     """Compute ensure bin.
 
-    Carry out the ensure bin operation.
-
+    Carry out the ensure bin operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     name : str
         Description for ``name``.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import ensure_bin
     >>> ensure_bin(...)  # doctest: +ELLIPSIS
     """
+    
     if not shutil.which(name):
         print(f"[graphs] Missing required executable on PATH: {name}", file=sys.stderr)
         sys.exit(2)
@@ -198,13 +198,13 @@ def ensure_bin(name: str) -> None:
 def find_top_packages() -> list[str]:
     """Compute find top packages.
 
-    Carry out the find top packages operation.
-
+    Carry out the find top packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import find_top_packages
@@ -212,6 +212,7 @@ def find_top_packages() -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     # Top-level packages are directories under src/ that contain __init__.py
     pkgs: list[str] = []
     if not SRC.exists():
@@ -240,8 +241,8 @@ def build_pydeps_for_package(
 ) -> None:
     """Compute build pydeps for package.
 
-    Carry out the build pydeps for package operation.
-
+    Carry out the build pydeps for package operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     pkg : str
@@ -254,12 +255,13 @@ def build_pydeps_for_package(
         Description for ``max_bacon``.
     fmt : str
         Description for ``fmt``.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import build_pydeps_for_package
     >>> build_pydeps_for_package(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
+    
     dot_tmp = out_svg.with_suffix(".dot")
     cmd = [
         sys.executable,
@@ -287,8 +289,8 @@ def build_pydeps_for_package(
 def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
     """Compute build pyreverse for package.
 
-    Carry out the build pyreverse for package operation.
-
+    Carry out the build pyreverse for package operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     pkg : str
@@ -297,12 +299,13 @@ def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
         Description for ``out_dir``.
     fmt : str
         Description for ``fmt``.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import build_pyreverse_for_package
     >>> build_pyreverse_for_package(..., ..., ...)  # doctest: +ELLIPSIS
     """
+    
     # classes_<project>.dot is named by -p <project>; use the package name to get unique names.
     out_dir.mkdir(parents=True, exist_ok=True)
     sh(
@@ -351,8 +354,8 @@ def _pkg_of(dotted: str) -> str:
 def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> None:
     """Compute build global pydeps.
 
-    Carry out the build global pydeps operation.
-
+    Carry out the build global pydeps operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     dot_out : Path
@@ -361,12 +364,13 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
         Description for ``excludes``.
     max_bacon : int
         Description for ``max_bacon``.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import build_global_pydeps
     >>> build_global_pydeps(..., ..., ...)  # doctest: +ELLIPSIS
     """
+    
     cmd = [
         sys.executable,
         "-m",
@@ -396,18 +400,18 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
 def collapse_to_packages(dot_path: Path) -> nx.DiGraph:
     """Compute collapse to packages.
 
-    Carry out the collapse to packages operation.
-
+    Carry out the collapse to packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     dot_path : Path
         Description for ``dot_path``.
-
+    
     Returns
     -------
     nx.DiGraph
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import collapse_to_packages
@@ -415,6 +419,7 @@ def collapse_to_packages(dot_path: Path) -> nx.DiGraph:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     graphs = pydot.graph_from_dot_file(str(dot_path))
     pd = graphs[0] if isinstance(graphs, list) else graphs
     g = nx.drawing.nx_pydot.from_pydot(pd).to_directed()
@@ -430,20 +435,20 @@ def collapse_to_packages(dot_path: Path) -> nx.DiGraph:
 def analyze_graph(g: nx.DiGraph, layers: dict[str, Any]) -> dict[str, Any]:
     """Compute analyze graph.
 
-    Carry out the analyze graph operation.
-
+    Carry out the analyze graph operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     g : nx.DiGraph
         Description for ``g``.
     layers : collections.abc.Mapping
         Description for ``layers``.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import analyze_graph
@@ -451,6 +456,7 @@ def analyze_graph(g: nx.DiGraph, layers: dict[str, Any]) -> dict[str, Any]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     # cycles (Johnson's algorithm) & degree centrality
     # 1) prune forbidden outward edges before cycle enumeration
     order = layers.get("order", [])
@@ -532,8 +538,8 @@ def style_and_render(
 ) -> None:
     """Compute style and render.
 
-    Carry out the style and render operation.
-
+    Carry out the style and render operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     g : nx.DiGraph
@@ -546,12 +552,13 @@ def style_and_render(
         Description for ``out_svg``.
     fmt : str | None
         Description for ``fmt``.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import style_and_render
-    >>> style_and_render(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
+    >>> style_and_render(..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
+    
     pkg2layer = layers.get("packages", {}) or {}
     palette = {
         "domain": "#2f855a",
@@ -597,20 +604,21 @@ def style_and_render(
 def write_meta(meta: dict[str, Any], out_json: Path) -> None:
     """Compute write meta.
 
-    Carry out the write meta operation.
-
+    Carry out the write meta operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     meta : collections.abc.Mapping
         Description for ``meta``.
     out_json : Path
         Description for ``out_json``.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import write_meta
     >>> write_meta(..., ...)  # doctest: +ELLIPSIS
     """
+    
     out_json.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
 
@@ -619,8 +627,8 @@ def enforce_policy(
 ) -> None:
     """Compute enforce policy.
 
-    Carry out the enforce policy operation.
-
+    Carry out the enforce policy operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     analysis : collections.abc.Mapping
@@ -631,12 +639,13 @@ def enforce_policy(
         Description for ``fail_cycles``.
     fail_layers : bool
         Description for ``fail_layers``.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import enforce_policy
     >>> enforce_policy(..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
+    
     allowed_cycles = set(tuple(c) for c in (allow.get("cycles") or []))
     allowed_edges = set(tuple(e) for e in (allow.get("edges") or []))
     new_cycles = [c for c in analysis["cycles"] if tuple(c) not in allowed_cycles]
@@ -664,18 +673,18 @@ def enforce_policy(
 def last_tree_commit(pkg: str) -> str:
     """Compute last tree commit.
 
-    Carry out the last tree commit operation.
-
+    Carry out the last tree commit operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     pkg : str
         Description for ``pkg``.
-
+    
     Returns
     -------
     str
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import last_tree_commit
@@ -683,6 +692,7 @@ def last_tree_commit(pkg: str) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     try:
         sha = subprocess.check_output(
             ["git", "log", "-1", "--format=%H", "--", f"src/{pkg}"], cwd=str(ROOT), text=True
@@ -705,8 +715,8 @@ def last_tree_commit(pkg: str) -> str:
 def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
     """Compute cache bucket.
 
-    Carry out the cache bucket operation.
-
+    Carry out the cache bucket operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     cache_dir : Path
@@ -715,12 +725,12 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
         Description for ``pkg``.
     tree_hash : str
         Description for ``tree_hash``.
-
+    
     Returns
     -------
     Path
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import cache_bucket
@@ -728,6 +738,7 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return cache_dir / pkg / tree_hash
 
 
@@ -742,8 +753,8 @@ def build_one_package(
 ) -> tuple[str, bool, bool, bool]:
     """Compute build one package.
 
-    Carry out the build one package operation.
-
+    Carry out the build one package operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     pkg : str
@@ -760,12 +771,12 @@ def build_one_package(
         Description for ``use_cache``.
     verbose : bool
         Description for ``verbose``.
-
+    
     Returns
     -------
     Tuple[str, bool, bool, bool]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import build_one_package
@@ -773,6 +784,7 @@ def build_one_package(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     used_cache = False
     pydeps_ok = True
     pyrev_ok = True
@@ -833,22 +845,16 @@ def build_one_package(
 
 
 def main() -> None:
-    """Run the build-graphs command-line entry point.
+    """Compute main.
 
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Examples
     --------
-    >>> main(...)
+    >>> from tools.docs.build_graphs import main
+    >>> main()  # doctest: +ELLIPSIS
     """
+    
     args = parse_args()
 
     # Lazy imports check for global graph path

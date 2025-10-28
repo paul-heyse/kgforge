@@ -1,4 +1,10 @@
-"""Observability utilities."""
+"""Overview of observability.
+
+This module bundles observability logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
+"""
+
 
 # [nav:anchor metrics]
 from kgfoundry_common.navmap_types import NavMap

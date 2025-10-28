@@ -1,4 +1,10 @@
-"""Mkdocs Gen Api utilities."""
+"""Overview of mkdocs gen api.
+
+This module bundles mkdocs gen api logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -29,13 +35,13 @@ with mkdocs_gen_files.open(out / "index.md", "w") as f:
 def iter_packages() -> list[str]:
     """Compute iter packages.
 
-    Carry out the iter packages operation.
-
+    Carry out the iter packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from docs._scripts.mkdocs_gen_api import iter_packages
@@ -43,6 +49,7 @@ def iter_packages() -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     packages = detect_packages()
     return packages or [detect_primary()]
 
@@ -53,18 +60,19 @@ loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
 def write_node(node: Object) -> None:
     """Compute write node.
 
-    Carry out the write node operation.
-
+    Carry out the write node operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     node : Object
         Description for ``node``.
-
+    
     Examples
     --------
     >>> from docs._scripts.mkdocs_gen_api import write_node
     >>> write_node(...)  # doctest: +ELLIPSIS
     """
+    
     rel = node.path.replace(".", "/")
     page = out / rel / "index.md"
     with mkdocs_gen_files.open(page, "w") as f:

@@ -1,4 +1,10 @@
-"""Splade Index utilities."""
+"""Overview of splade index.
+
+This module bundles splade index logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -46,18 +52,18 @@ TOKEN = re.compile(r"[A-Za-z0-9]+")
 def tok(text: str) -> list[str]:
     """Compute tok.
 
-    Carry out the tok operation.
-
+    Carry out the tok operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     text : str
         Description for ``text``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from search_api.splade_index import tok
@@ -65,13 +71,20 @@ def tok(text: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return [token.lower() for token in TOKEN.findall(text or "")]
 
 
 # [nav:anchor SpladeDoc]
 @dataclass
 class SpladeDoc:
-    """Describe SpladeDoc."""
+    """Model the SpladeDoc.
+
+    Represent the spladedoc data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     chunk_id: str
     doc_id: str
@@ -81,7 +94,13 @@ class SpladeDoc:
 
 # [nav:anchor SpladeIndex]
 class SpladeIndex:
-    """Describe SpladeIndex."""
+    """Model the SpladeIndex.
+
+    Represent the spladeindex data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     def __init__(
         self,
@@ -102,6 +121,8 @@ class SpladeIndex:
         sparse_root : str | None
             Description for ``sparse_root``.
         """
+        
+        
         
         
         _ = sparse_root  # retained for interface compatibility
@@ -154,27 +175,28 @@ class SpladeIndex:
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
         """Compute search.
 
-        Carry out the search operation.
-
+        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         query : str
             Description for ``query``.
         k : int | None
             Description for ``k``.
-
+        
         Returns
         -------
         List[Tuple[int, float]]
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_api.splade_index import search
-        >>> result = search(..., ...)
+        >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         if self.N == 0:
             return []
         terms = tok(query)
@@ -197,18 +219,18 @@ class SpladeIndex:
     def doc(self, index: int) -> SpladeDoc:
         """Compute doc.
 
-        Carry out the doc operation.
-
+        Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         index : int
             Description for ``index``.
-
+        
         Returns
         -------
         src.search_api.splade_index.SpladeDoc
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_api.splade_index import doc
@@ -216,4 +238,5 @@ class SpladeIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         return self.docs[index]

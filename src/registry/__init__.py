@@ -1,4 +1,10 @@
-"""Registry utilities."""
+"""Overview of registry.
+
+This module bundles registry logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from kgfoundry_common.navmap_types import NavMap
 from registry import api, duckdb_registry, helper, migrate

@@ -1,4 +1,10 @@
-"""Cli utilities."""
+"""Overview of cli.
+
+This module bundles cli logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -43,8 +49,8 @@ app = typer.Typer(help="Downloader & harvester CLI (skeleton).")
 def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
     """Compute harvest.
 
-    Carry out the harvest operation.
-
+    Carry out the harvest operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     topic : str
@@ -53,12 +59,13 @@ def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
         Description for ``years``.
     max_works : int | None
         Description for ``max_works``.
-
+    
     Examples
     --------
     >>> from download.cli import harvest
-    >>> harvest(..., ..., ...)  # doctest: +ELLIPSIS
+    >>> harvest(...)  # doctest: +ELLIPSIS
     """
+    
     typer.echo(f"[dry-run] would harvest topic={topic!r}, years={years}, max_works={max_works}")
 
 

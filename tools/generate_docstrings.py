@@ -1,5 +1,11 @@
 #!/usr/bin/env python
-"""Generate Docstrings utilities."""
+"""Overview of generate docstrings.
+
+This module bundles generate docstrings logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -21,18 +27,18 @@ LOG_FILE = LOG_DIR / "fallback.log"
 def has_python_files(path: Path) -> bool:
     """Compute has python files.
 
-    Carry out the has python files operation.
-
+    Carry out the has python files operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     bool
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.generate_docstrings import has_python_files
@@ -40,24 +46,26 @@ def has_python_files(path: Path) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return any(path.rglob("*.py"))
 
 
 def run_doq(target: Path) -> None:
     """Compute run doq.
 
-    Carry out the run doq operation.
-
+    Carry out the run doq operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     target : Path
         Description for ``target``.
-
+    
     Examples
     --------
     >>> from tools.generate_docstrings import run_doq
     >>> run_doq(...)  # doctest: +ELLIPSIS
     """
+    
     cmd = [
         sys.executable,
         "-m",
@@ -77,18 +85,19 @@ def run_doq(target: Path) -> None:
 def run_fallback(target: Path) -> None:
     """Compute run fallback.
 
-    Carry out the run fallback operation.
-
+    Carry out the run fallback operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     target : Path
         Description for ``target``.
-
+    
     Examples
     --------
     >>> from tools.generate_docstrings import run_fallback
     >>> run_fallback(...)  # doctest: +ELLIPSIS
     """
+    
     cmd = [
         sys.executable,
         "tools/auto_docstrings.py",
@@ -103,13 +112,14 @@ def run_fallback(target: Path) -> None:
 def main() -> None:
     """Compute main.
 
-    Carry out the main operation.
-
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Examples
     --------
     >>> from tools.generate_docstrings import main
     >>> main()  # doctest: +ELLIPSIS
     """
+    
     if LOG_FILE.exists():
         LOG_FILE.unlink()
     LOG_DIR.mkdir(parents=True, exist_ok=True)
