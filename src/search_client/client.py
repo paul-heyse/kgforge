@@ -40,25 +40,35 @@ class _SupportsResponse(Protocol):
     """Describe SupportsResponse."""
 
     def raise_for_status(self) -> None:
-        """
-        Compute raise for status.
-        
+        """Compute raise for status.
+
         Carry out the raise for status operation.
         """
         
         
+        
+        
+        
+        
+        
+        
 
     def json(self) -> dict[str, Any]:
-        """
-        Compute json.
-        
+        """Compute json.
+
         Carry out the json operation.
-        
+
         Returns
         -------
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         
         
 
@@ -67,23 +77,28 @@ class _SupportsHttp(Protocol):
     """Describe SupportsHttp."""
 
     def get(self, url: str, *, timeout: float) -> _SupportsResponse:
-        """
-        Compute get.
-        
+        """Compute get.
+
         Carry out the get operation.
-        
+
         Parameters
         ----------
         url : str
             Description for ``url``.
         timeout : float
             Description for ``timeout``.
-        
+
         Returns
         -------
         src.search_client.client._SupportsResponse
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         
         
 
@@ -95,11 +110,10 @@ class _SupportsHttp(Protocol):
         headers: dict[str, str],
         timeout: float,
     ) -> _SupportsResponse:
-        """
-        Compute post.
-        
+        """Compute post.
+
         Carry out the post operation.
-        
+
         Parameters
         ----------
         url : str
@@ -110,12 +124,18 @@ class _SupportsHttp(Protocol):
             Description for ``headers``.
         timeout : float
             Description for ``timeout``.
-        
+
         Returns
         -------
         src.search_client.client._SupportsResponse
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         
         
 
@@ -131,11 +151,10 @@ class KGFoundryClient:
         timeout: float = 30.0,
         http: _SupportsHttp | None = None,
     ) -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters.
-        
+
         Parameters
         ----------
         base_url : str | None
@@ -147,6 +166,12 @@ class KGFoundryClient:
         http : _SupportsHttp | None
             Description for ``http``.
         """
+        
+        
+        
+        
+        
+        
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
@@ -168,16 +193,21 @@ class KGFoundryClient:
         return h
 
     def healthz(self) -> dict[str, Any]:
-        """
-        Compute healthz.
-        
+        """Compute healthz.
+
         Carry out the healthz operation.
-        
+
         Returns
         -------
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
         return r.json()
@@ -189,11 +219,10 @@ class KGFoundryClient:
         filters: dict[str, Any] | None = None,
         explain: bool = False,
     ) -> dict[str, Any]:
-        """
-        Compute search.
-        
+        """Compute search.
+
         Carry out the search operation.
-        
+
         Parameters
         ----------
         query : str
@@ -204,12 +233,18 @@ class KGFoundryClient:
             Description for ``filters``.
         explain : bool | None
             Description for ``explain``.
-        
+
         Returns
         -------
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
             f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout
@@ -218,23 +253,28 @@ class KGFoundryClient:
         return r.json()
 
     def concepts(self, q: str, limit: int = 50) -> dict[str, Any]:
-        """
-        Compute concepts.
-        
+        """Compute concepts.
+
         Carry out the concepts operation.
-        
+
         Parameters
         ----------
         q : str
             Description for ``q``.
         limit : int | None
             Description for ``limit``.
-        
+
         Returns
         -------
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         r = self._http.post(
             f"{self.base_url}/graph/concepts",
             json={"q": q, "limit": limit},

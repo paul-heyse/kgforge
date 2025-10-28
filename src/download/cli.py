@@ -41,11 +41,10 @@ app = typer.Typer(help="Downloader & harvester CLI (skeleton).")
 # [nav:anchor harvest]
 @app.command()
 def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
-    """
-    Compute harvest.
-    
+    """Compute harvest.
+
     Carry out the harvest operation.
-    
+
     Parameters
     ----------
     topic : str
@@ -55,6 +54,12 @@ def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
     max_works : int | None
         Description for ``max_works``.
     """
+    
+    
+    
+    
+    
+    
     typer.echo(f"[dry-run] would harvest topic={topic!r}, years={years}, max_works={max_works}")
 
 

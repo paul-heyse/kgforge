@@ -36,23 +36,28 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor rrf_fuse]
 def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, float]:
-    """
-    Compute rrf fuse.
-    
+    """Compute rrf fuse.
+
     Carry out the rrf fuse operation.
-    
+
     Parameters
     ----------
     rankers : List[List[Tuple[str, float]]]
         Description for ``rankers``.
     k : int | None
         Description for ``k``.
-    
+
     Returns
     -------
     Mapping[str, float]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     agg: dict[str, float] = {}
     for ranked in rankers:
         for r, (key, _score) in enumerate(ranked, start=1):

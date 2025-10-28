@@ -52,16 +52,21 @@ DEFAULT_SYNOPSIS = "Package synopsis not yet documented."
 
 
 def detect_repo() -> tuple[str, str]:
-    """
-    Compute detect repo.
-    
+    """Compute detect repo.
+
     Carry out the detect repo operation.
-    
+
     Returns
     -------
     Tuple[str, str]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     try:
         remote = subprocess.check_output(
             ["git", "config", "--get", "remote.origin.url"], cwd=ROOT, text=True
@@ -92,16 +97,21 @@ def detect_repo() -> tuple[str, str]:
 
 
 def git_sha() -> str:
-    """
-    Compute git sha.
-    
+    """Compute git sha.
+
     Carry out the git sha operation.
-    
+
     Returns
     -------
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     except Exception:
@@ -113,11 +123,10 @@ SHA = git_sha()
 
 
 def gh_url(rel_path: str, start: int, end: int | None) -> str:
-    """
-    Compute gh url.
-    
+    """Compute gh url.
+
     Carry out the gh url operation.
-    
+
     Parameters
     ----------
     rel_path : str
@@ -126,27 +135,38 @@ def gh_url(rel_path: str, start: int, end: int | None) -> str:
         Description for ``start``.
     end : int | None
         Description for ``end``.
-    
+
     Returns
     -------
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     fragment = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel_path}{fragment}"
 
 
 def iter_packages() -> list[str]:
-    """
-    Compute iter packages.
-    
+    """Compute iter packages.
+
     Carry out the iter packages operation.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     env_pkgs = os.environ.get("DOCS_PKG")
     if env_pkgs:
         return [pkg.strip() for pkg in env_pkgs.split(",") if pkg.strip()]
@@ -154,21 +174,26 @@ def iter_packages() -> list[str]:
 
 
 def summarize(node: Object) -> str:
-    """
-    Compute summarize.
-    
+    """Compute summarize.
+
     Carry out the summarize operation.
-    
+
     Parameters
     ----------
     node : Object
         Description for ``node``.
-    
+
     Returns
     -------
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     doc = getattr(node, "docstring", None)
     if not doc or not getattr(doc, "value", None):
         return ""
@@ -186,42 +211,52 @@ def summarize(node: Object) -> str:
 
 
 def is_public(node: Object) -> bool:
-    """
-    Compute is public.
-    
+    """Compute is public.
+
     Carry out the is public operation.
-    
+
     Parameters
     ----------
     node : Object
         Description for ``node``.
-    
+
     Returns
     -------
     bool
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     return not getattr(node, "name", "").startswith("_")
 
 
 def get_open_link(node: Object, readme_dir: Path) -> str | None:
-    """
-    Compute get open link.
-    
+    """Compute get open link.
+
     Carry out the get open link operation.
-    
+
     Parameters
     ----------
     node : Object
         Description for ``node``.
     readme_dir : Path
         Description for ``readme_dir``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -236,21 +271,26 @@ def get_open_link(node: Object, readme_dir: Path) -> str | None:
 
 
 def get_view_link(node: Object) -> str | None:
-    """
-    Compute get view link.
-    
+    """Compute get view link.
+
     Carry out the get view link operation.
-    
+
     Parameters
     ----------
     node : Object
         Description for ``node``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -266,21 +306,26 @@ def get_view_link(node: Object) -> str | None:
 
 
 def iter_public_members(node: Object) -> Iterable[Object]:
-    """
-    Compute iter public members.
-    
+    """Compute iter public members.
+
     Carry out the iter public members operation.
-    
+
     Parameters
     ----------
     node : Object
         Description for ``node``.
-    
+
     Returns
     -------
     Iterable[Object]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     members = getattr(node, "members", {})
     public = [m for m in members.values() if is_public(m)]
     return sorted(public, key=lambda child: getattr(child, "path", child.name))
@@ -346,16 +391,21 @@ class Badges:
 
 
 def parse_config() -> Config:
-    """
-    Compute parse config.
-    
+    """Compute parse config.
+
     Carry out the parse config operation.
-    
+
     Returns
     -------
     Config
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     parser = argparse.ArgumentParser(description="Generate per-package README files.")
     parser.add_argument("--packages", default=os.getenv("DOCS_PKG", ""))
     parser.add_argument(
@@ -469,21 +519,26 @@ def _lookup_nav(qname: str) -> tuple[dict[str, Any], dict[str, Any]]:
 
 
 def badges_for(qname: str) -> Badges:
-    """
-    Compute badges for.
-    
+    """Compute badges for.
+
     Carry out the badges for operation.
-    
+
     Parameters
     ----------
     qname : str
         Description for ``qname``.
-    
+
     Returns
     -------
     Badges
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     symbol_meta, defaults = _lookup_nav(qname)
     merged = {**defaults, **symbol_meta}
     tests: list[dict[str, Any]] = []
@@ -541,23 +596,28 @@ def _format_test_badge(entries: list[dict[str, Any]] | None) -> str | None:
 
 
 def format_badges(qname: str, base_length: int = 0) -> str:
-    """
-    Compute format badges.
-    
+    """Compute format badges.
+
     Carry out the format badges operation.
-    
+
     Parameters
     ----------
     qname : str
         Description for ``qname``.
     base_length : int | None
         Description for ``base_length``.
-    
+
     Returns
     -------
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     badge = badges_for(qname)
     parts: list[str] = []
     if badge.stability:
@@ -597,11 +657,10 @@ def format_badges(qname: str, base_length: int = 0) -> str:
 
 
 def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
-    """
-    Compute editor link.
-    
+    """Compute editor link.
+
     Carry out the editor link operation.
-    
+
     Parameters
     ----------
     abs_path : Path
@@ -610,12 +669,18 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
         Description for ``lineno``.
     editor_mode : str
         Description for ``editor_mode``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     if editor_mode == "vscode":
         return f"vscode://file/{abs_path}:{lineno}:1"
     if editor_mode == "relative":
@@ -698,11 +763,10 @@ def bucket_for(node: Object) -> str:
 
 
 def render_line(node: Object, readme_dir: Path, cfg: Config) -> str | None:
-    """
-    Compute render line.
-    
+    """Compute render line.
+
     Carry out the render line operation.
-    
+
     Parameters
     ----------
     node : Object
@@ -711,12 +775,18 @@ def render_line(node: Object, readme_dir: Path, cfg: Config) -> str | None:
         Description for ``readme_dir``.
     cfg : Config
         Description for ``cfg``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     qname = getattr(node, "path", "")
     summary = summarize(node)
 
@@ -786,23 +856,28 @@ def write_if_changed(path: Path, content: str) -> bool:
 
 
 def write_readme(node: Object, cfg: Config) -> bool:
-    """
-    Compute write readme.
-    
+    """Compute write readme.
+
     Carry out the write readme operation.
-    
+
     Parameters
     ----------
     node : Object
         Description for ``node``.
     cfg : Config
         Description for ``cfg``.
-    
+
     Returns
     -------
     bool
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"
 
@@ -908,16 +983,21 @@ def _collect_missing_metadata(node: Object, missing: set[str]) -> None:
 
 
 def main() -> None:
-    """
-    Compute main.
-    
+    """Compute main.
+
     Carry out the main operation.
-    
+
     Raises
     ------
     SystemExit
         Raised when validation fails.
     """
+    
+    
+    
+    
+    
+    
     cfg = parse_config()
     if not cfg.packages:
         raise SystemExit("No packages detected; set DOCS_PKG or add packages under src/.")

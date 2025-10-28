@@ -54,21 +54,26 @@ class ParquetVectorWriter:
 
     @staticmethod
     def dense_schema(dim: int) -> pa.schema:
-        """
-        Compute dense schema.
-        
+        """Compute dense schema.
+
         Carry out the dense schema operation.
-        
+
         Parameters
         ----------
         dim : int
             Description for ``dim``.
-        
+
         Returns
         -------
         pa.schema
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -82,16 +87,21 @@ class ParquetVectorWriter:
         )
 
     def __init__(self, root: str) -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters.
-        
+
         Parameters
         ----------
         root : str
             Description for ``root``.
         """
+        
+        
+        
+        
+        
+        
         self.root = Path(root)
 
     def write_dense(
@@ -102,11 +112,10 @@ class ParquetVectorWriter:
         records: Iterable[tuple[str, list[float], float]],
         shard: int = 0,
     ) -> str:
-        """
-        Compute write dense.
-        
+        """Compute write dense.
+
         Carry out the write dense operation.
-        
+
         Parameters
         ----------
         model : str
@@ -119,12 +128,18 @@ class ParquetVectorWriter:
             Description for ``records``.
         shard : int | None
             Description for ``shard``.
-        
+
         Returns
         -------
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -152,16 +167,21 @@ class ParquetVectorWriter:
 
     @staticmethod
     def splade_schema() -> pa.schema:
-        """
-        Compute splade schema.
-        
+        """Compute splade schema.
+
         Carry out the splade schema operation.
-        
+
         Returns
         -------
         pa.schema
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -181,11 +201,10 @@ class ParquetVectorWriter:
         records: Iterable[tuple[str, list[int], list[float]]],
         shard: int = 0,
     ) -> str:
-        """
-        Compute write splade.
-        
+        """Compute write splade.
+
         Carry out the write splade operation.
-        
+
         Parameters
         ----------
         model : str
@@ -196,12 +215,18 @@ class ParquetVectorWriter:
             Description for ``records``.
         shard : int | None
             Description for ``shard``.
-        
+
         Returns
         -------
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -234,16 +259,21 @@ class ParquetChunkWriter:
 
     @staticmethod
     def chunk_schema() -> pa.schema:
-        """
-        Compute chunk schema.
-        
+        """Compute chunk schema.
+
         Carry out the chunk schema operation.
-        
+
         Returns
         -------
         pa.schema
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -268,11 +298,10 @@ class ParquetChunkWriter:
         )
 
     def __init__(self, root: str, model: str = "docling_hybrid", run_id: str = "dev") -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters.
-        
+
         Parameters
         ----------
         root : str
@@ -282,25 +311,36 @@ class ParquetChunkWriter:
         run_id : str | None
             Description for ``run_id``.
         """
+        
+        
+        
+        
+        
+        
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
     def write(self, rows: Iterable[dict[str, Any]]) -> str:
-        """
-        Compute write.
-        
+        """Compute write.
+
         Carry out the write operation.
-        
+
         Parameters
         ----------
         rows : Iterable[dict[str, Any]]
             Description for ``rows``.
-        
+
         Returns
         -------
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(
             table,

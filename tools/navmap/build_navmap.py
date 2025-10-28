@@ -50,9 +50,8 @@ PLACEHOLDER_ALL = object()
 
 
 class AllDictTemplate:
-    """
-    Model the AllDictTemplate.
-    
+    """Model the AllDictTemplate.
+
     Represents the alldicttemplate data structure used throughout the project.
     """
 
@@ -262,9 +261,8 @@ def _gh_link(path: Path, start: int | None, end: int | None) -> str | None:
 
 
 def _module_name(py: Path) -> str | None:
-    """
-    Return the dotted module name for ``py``.
-    
+    """Return the dotted module name for ``py``.
+
     Parameters
     ----------
     py : Path
@@ -428,23 +426,28 @@ def _discover_py_files() -> list[Path]:
 
 
 def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, Any]:
-    """
-    Compute build index.
-    
+    """Compute build index.
+
     Carry out the build index operation.
-    
+
     Parameters
     ----------
     root : Path | None
         Description for ``root``.
     json_path : Path | None
         Description for ``json_path``.
-    
+
     Returns
     -------
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     files = _discover_py_files()
     data: dict[str, Any] = {
         "commit": _git_sha(),
@@ -508,9 +511,8 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
 
 
 def main() -> int:
-    """
-    Run the navmap build CLI.
-    
+    """Run the navmap build CLI.
+
     Returns
     -------
     int

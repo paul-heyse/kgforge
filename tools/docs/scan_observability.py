@@ -207,16 +207,21 @@ POLICY_PATH = ROOT / "docs" / "policies" / "observability.yml"
 
 
 def load_policy() -> dict[str, Any]:
-    """
-    Compute load policy.
-    
+    """Compute load policy.
+
     Carry out the load policy operation.
-    
+
     Returns
     -------
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
     try:
@@ -693,21 +698,26 @@ def _lint_trace(policy: dict, row: TraceRow) -> list[dict]:
 
 
 def read_ast(path: Path) -> tuple[str, ast.AST | None]:
-    """
-    Compute read ast.
-    
+    """Compute read ast.
+
     Carry out the read ast operation.
-    
+
     Parameters
     ----------
     path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     Tuple[str, ast.AST | None]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     try:
         text = path.read_text(encoding="utf-8")
     except OSError:
@@ -720,23 +730,28 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
 
 
 def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], list[TraceRow]]:
-    """
-    Compute scan file.
-    
+    """Compute scan file.
+
     Carry out the scan file operation.
-    
+
     Parameters
     ----------
     path : Path
         Description for ``path``.
     policy : Mapping[str, Any]
         Description for ``policy``.
-    
+
     Returns
     -------
     Tuple[List[LogRow], List[MetricRow], List[TraceRow]]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     text, tree = read_ast(path)
     if not text or tree is None:
         return ([], [], [])
@@ -846,9 +861,8 @@ def _links_for(path: Path, lineno: int) -> dict[str, str]:
 
 
 def main() -> None:
-    """
-    Run the observability scan CLI.
-    
+    """Run the observability scan CLI.
+
     Returns
     -------
     None

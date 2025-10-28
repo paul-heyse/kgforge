@@ -51,16 +51,21 @@ ALLOW_FILE = ROOT / "docs" / "policies" / "graph_allowlist.json"
 
 
 def parse_args() -> argparse.Namespace:
-    """
-    Compute parse args.
-    
+    """Compute parse args.
+
     Carry out the parse args operation.
-    
+
     Returns
     -------
     argparse.Namespace
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     p = argparse.ArgumentParser(
         description="Build per-package and cross-subsystem graphs with policy checks."
     )
@@ -134,11 +139,10 @@ def parse_args() -> argparse.Namespace:
 
 
 def sh(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subprocess.CompletedProcess:
-    """
-    Compute sh.
-    
+    """Compute sh.
+
     Carry out the sh operation.
-    
+
     Parameters
     ----------
     cmd : List[str]
@@ -147,44 +151,60 @@ def sh(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subproces
         Description for ``cwd``.
     check : bool | None
         Description for ``check``.
-    
+
     Returns
     -------
     subprocess.CompletedProcess
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     return subprocess.run(
         cmd, check=check, cwd=str(cwd) if cwd else None, text=True, capture_output=False
     )
 
 
 def ensure_bin(name: str) -> None:
-    """
-    Compute ensure bin.
-    
+    """Compute ensure bin.
+
     Carry out the ensure bin operation.
-    
+
     Parameters
     ----------
     name : str
         Description for ``name``.
     """
+    
+    
+    
+    
+    
+    
     if not shutil.which(name):
         print(f"[graphs] Missing required executable on PATH: {name}", file=sys.stderr)
         sys.exit(2)
 
 
 def find_top_packages() -> list[str]:
-    """
-    Compute find top packages.
-    
+    """Compute find top packages.
+
     Carry out the find top packages operation.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     # Top-level packages are directories under src/ that contain __init__.py
     pkgs: list[str] = []
     if not SRC.exists():
@@ -211,11 +231,10 @@ def _rel(p: Path) -> str:
 def build_pydeps_for_package(
     pkg: str, out_svg: Path, excludes: list[str], max_bacon: int, fmt: str
 ) -> None:
-    """
-    Compute build pydeps for package.
-    
+    """Compute build pydeps for package.
+
     Carry out the build pydeps for package operation.
-    
+
     Parameters
     ----------
     pkg : str
@@ -229,6 +248,12 @@ def build_pydeps_for_package(
     fmt : str
         Description for ``fmt``.
     """
+    
+    
+    
+    
+    
+    
     dot_tmp = out_svg.with_suffix(".dot")
     cmd = [
         sys.executable,
@@ -252,11 +277,10 @@ def build_pydeps_for_package(
 
 
 def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
-    """
-    Compute build pyreverse for package.
-    
+    """Compute build pyreverse for package.
+
     Carry out the build pyreverse for package operation.
-    
+
     Parameters
     ----------
     pkg : str
@@ -266,6 +290,12 @@ def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
     fmt : str
         Description for ``fmt``.
     """
+    
+    
+    
+    
+    
+    
     # classes_<project>.dot is named by -p <project>; use the package name to get unique names.
     sh(["pyreverse", f"src/{pkg}", "-o", "dot", "-p", pkg], cwd=ROOT)
     dot_file = ROOT / f"classes_{pkg}.dot"
@@ -285,11 +315,10 @@ def _pkg_of(dotted: str) -> str:
 
 
 def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> None:
-    """
-    Compute build global pydeps.
-    
+    """Compute build global pydeps.
+
     Carry out the build global pydeps operation.
-    
+
     Parameters
     ----------
     dot_out : Path
@@ -299,6 +328,12 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
     max_bacon : int
         Description for ``max_bacon``.
     """
+    
+    
+    
+    
+    
+    
     cmd = [
         sys.executable,
         "-m",
@@ -326,19 +361,26 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
 
 
 def collapse_to_packages(dot_path: Path) -> nx.DiGraph:
-    """
-    Collapse a pydeps DOT graph into package-level edges.
-    
+    """Compute collapse to packages.
+
+    Carry out the collapse to packages operation.
+
     Parameters
     ----------
     dot_path : Path
         Description for ``dot_path``.
-    
+
     Returns
     -------
     nx.DiGraph
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     graphs = pydot.graph_from_dot_file(str(dot_path))
     pd = graphs[0] if isinstance(graphs, list) else graphs
     g = nx.drawing.nx_pydot.from_pydot(pd).to_directed()
@@ -352,23 +394,28 @@ def collapse_to_packages(dot_path: Path) -> nx.DiGraph:
 
 
 def analyze_graph(g: nx.DiGraph, layers: dict[str, Any]) -> dict[str, Any]:
-    """
-    Analyze the collapsed dependency graph for policy violations.
-    
+    """Compute analyze graph.
+
     Carry out the analyze graph operation.
-    
+
     Parameters
     ----------
     g : nx.DiGraph
         Description for ``g``.
     layers : Mapping[str, Any]
         Description for ``layers``.
-    
+
     Returns
     -------
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     # cycles (Johnson's algorithm) & degree centrality
     # 1) prune forbidden outward edges before cycle enumeration
     order = layers.get("order", [])
@@ -434,14 +481,13 @@ def analyze_graph(g: nx.DiGraph, layers: dict[str, Any]) -> dict[str, Any]:
 def style_and_render(
     g: nx.DiGraph, layers: dict[str, Any], analysis: dict[str, Any], out_svg: Path, fmt: str = "svg"
 ) -> None:
-    """
-    Style the graph and render it to disk.
-    
+    """Compute style and render.
+
     Carry out the style and render operation.
-    
+
     Parameters
     ----------
-    g : Any
+    g : nx.DiGraph
         Description for ``g``.
     layers : Mapping[str, Any]
         Description for ``layers``.
@@ -452,6 +498,12 @@ def style_and_render(
     fmt : str | None
         Description for ``fmt``.
     """
+    
+    
+    
+    
+    
+    
     pkg2layer = layers.get("packages", {}) or {}
     palette = {
         "domain": "#2f855a",
@@ -495,11 +547,10 @@ def style_and_render(
 
 
 def write_meta(meta: dict[str, Any], out_json: Path) -> None:
-    """
-    Compute write meta.
-    
+    """Compute write meta.
+
     Carry out the write meta operation.
-    
+
     Parameters
     ----------
     meta : Mapping[str, Any]
@@ -507,17 +558,22 @@ def write_meta(meta: dict[str, Any], out_json: Path) -> None:
     out_json : Path
         Description for ``out_json``.
     """
+    
+    
+    
+    
+    
+    
     out_json.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
 
 def enforce_policy(
     analysis: dict[str, Any], allow: dict[str, Any], fail_cycles: bool, fail_layers: bool
 ) -> None:
-    """
-    Compute enforce policy.
-    
+    """Compute enforce policy.
+
     Carry out the enforce policy operation.
-    
+
     Parameters
     ----------
     analysis : Mapping[str, Any]
@@ -529,6 +585,12 @@ def enforce_policy(
     fail_layers : bool
         Description for ``fail_layers``.
     """
+    
+    
+    
+    
+    
+    
     allowed_cycles = set(tuple(c) for c in (allow.get("cycles") or []))
     allowed_edges = set(tuple(e) for e in (allow.get("edges") or []))
     new_cycles = [c for c in analysis["cycles"] if tuple(c) not in allowed_cycles]
@@ -554,21 +616,26 @@ def enforce_policy(
 
 
 def last_tree_commit(pkg: str) -> str:
-    """
-    Compute last tree commit.
-    
+    """Compute last tree commit.
+
     Carry out the last tree commit operation.
-    
+
     Parameters
     ----------
     pkg : str
         Description for ``pkg``.
-    
+
     Returns
     -------
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     try:
         sha = subprocess.check_output(
             ["git", "log", "-1", "--format=%H", "--", f"src/{pkg}"], cwd=str(ROOT), text=True
@@ -589,11 +656,10 @@ def last_tree_commit(pkg: str) -> str:
 
 
 def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
-    """
-    Compute cache bucket.
-    
+    """Compute cache bucket.
+
     Carry out the cache bucket operation.
-    
+
     Parameters
     ----------
     cache_dir : Path
@@ -602,12 +668,18 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
         Description for ``pkg``.
     tree_hash : str
         Description for ``tree_hash``.
-    
+
     Returns
     -------
     Path
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     return cache_dir / pkg / tree_hash
 
 
@@ -620,11 +692,10 @@ def build_one_package(
     use_cache: bool,
     verbose: bool,
 ) -> tuple[str, bool, bool, bool]:
-    """
-    Compute build one package.
-    
+    """Compute build one package.
+
     Carry out the build one package operation.
-    
+
     Parameters
     ----------
     pkg : str
@@ -641,12 +712,18 @@ def build_one_package(
         Description for ``use_cache``.
     verbose : bool
         Description for ``verbose``.
-    
+
     Returns
     -------
     Tuple[str, bool, bool, bool]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     used_cache = False
     pydeps_ok = True
     pyrev_ok = True

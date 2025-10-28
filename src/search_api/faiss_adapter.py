@@ -90,11 +90,10 @@ class FaissAdapter:
         factory: str = "OPQ64,IVF8192,PQ64",
         metric: str = "ip",
     ) -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters.
-        
+
         Parameters
         ----------
         db_path : str
@@ -104,6 +103,12 @@ class FaissAdapter:
         metric : str | None
             Description for ``metric``.
         """
+        
+        
+        
+        
+        
+        
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
@@ -153,11 +158,16 @@ class FaissAdapter:
         return DenseVecs(ids=ids, mat=normalized)
 
     def build(self) -> None:
-        """
-        Compute build.
-        
+        """Compute build.
+
         Carry out the build operation.
         """
+        
+        
+        
+        
+        
+        
         vectors = self._load_dense_parquet()
         self.vecs = vectors
         if not HAVE_FAISS:
@@ -182,16 +192,21 @@ class FaissAdapter:
         self.idmap = vectors.ids
 
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
-        """
-        Compute load or build.
-        
+        """Compute load or build.
+
         Carry out the load or build operation.
-        
+
         Parameters
         ----------
         cpu_index_path : str | None
             Description for ``cpu_index_path``.
         """
+        
+        
+        
+        
+        
+        
         try:
             if HAVE_FAISS and cpu_index_path and Path(cpu_index_path).exists():
                 cpu = faiss.read_index(cpu_index_path)
@@ -212,28 +227,33 @@ class FaissAdapter:
         self.build()
 
     def search(self, qvec: VecArray, k: int = 10) -> list[tuple[str, float]]:
-        """
-        Compute search.
-        
+        """Compute search.
+
         Carry out the search operation.
-        
+
         Parameters
         ----------
         qvec : src.search_api.faiss_adapter.VecArray
             Description for ``qvec``.
         k : int | None
             Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
+        
         if self.vecs is None and self.index is None:
             return []
         if HAVE_FAISS and self.index is not None:

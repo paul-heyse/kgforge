@@ -380,21 +380,26 @@ def _inspect(py: Path) -> list[str]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """
-    Compute main.
-    
+    """Compute main.
+
     Carry out the main operation.
-    
+
     Parameters
     ----------
     argv : List[str] | None
         Description for ``argv``.
-    
+
     Returns
     -------
     int
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     errors: list[str] = []
     for py in sorted(SRC.rglob("*.py")):
         errors.extend(_inspect(py))
