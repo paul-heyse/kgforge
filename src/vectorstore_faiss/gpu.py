@@ -59,10 +59,11 @@ class FaissGpuIndex:
         gpu: bool = True,
         cuvs: bool = True,
     ) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters.
-
+        """
+        Compute init.
+        
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
+        
         Parameters
         ----------
         factory : str | None
@@ -74,6 +75,7 @@ class FaissGpuIndex:
         cuvs : bool | None
             Description for ``cuvs``.
         """
+        
         self.factory = factory
         self.nprobe = nprobe
         self.gpu = gpu

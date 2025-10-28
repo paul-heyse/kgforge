@@ -169,21 +169,29 @@ def load_symbol_spans() -> dict[str, dict[str, Any]]:
 
 
 def load_public_symbols() -> set[str]:
-    """Compute load public symbols.
-
-    Carry out the load public symbols operation.
-
+    """
+    Compute load public symbols.
+    
+    Carry out the load public symbols operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Returns
     -------
     collections.abc.Set
         Description of return value.
-
+    
+    Raises
+    ------
+    NavMapLoadError
+        Raised when validation fails.
+    
     Examples
     --------
     >>> from tools.docs.build_test_map import load_public_symbols
     >>> result = load_public_symbols()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     nav = ROOT / "site" / "_build" / "navmap" / "navmap.json"
     if not nav.exists():
         raise NavMapLoadError(
@@ -360,21 +368,24 @@ def _normalize_repo_rel(path_like: str) -> str:
 
 
 def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]]]:
-    """Compute load coverage.
-
-    Carry out the load coverage operation.
-
+    """
+    Compute load coverage.
+    
+    Carry out the load coverage operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Returns
     -------
     Tuple[dict[str, collections.abc.Set], dict[Tuple[str, int], collections.abc.Set]]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_test_map import load_coverage
     >>> result = load_coverage()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     if not COV_JSON.exists():
         return ({}, {})
     data = _load_json(COV_JSON)

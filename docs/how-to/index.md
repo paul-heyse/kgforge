@@ -7,4 +7,5 @@ Practical recipes for common workflows will live here. Add a page per topic and 
 :hidden:
 
 contributing
+contributing-gallery-examples
 ```

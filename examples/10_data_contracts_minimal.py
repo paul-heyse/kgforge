@@ -1,19 +1,16 @@
-"""Data contracts — schema export smoke.
-
-.. _gallery_data_contracts_minimal:
-
-Data contracts — schema export smoke
+"""Data contracts — schema export smoke
 ====================================
 
 Demonstrate exporting a minimal :class:`pydantic.BaseModel` schema.
 
 .. tags:: schema, pydantic
 
-**Constraints**
+Constraints
+-----------
 
-- **Time:** <2s
-- **GPU:** no
-- **Network:** no
+- Time: <2s
+- GPU: no
+- Network: no
 
 >>> from pydantic import BaseModel
 >>> class DemoPayload(BaseModel):

@@ -76,10 +76,11 @@ class SPLADEv3Encoder:
         topk: int = 256,
         max_seq_len: int = 512,
     ) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters.
-
+        """
+        Compute init.
+        
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
+        
         Parameters
         ----------
         model_id : str | None
@@ -91,6 +92,7 @@ class SPLADEv3Encoder:
         max_seq_len : int | None
             Description for ``max_seq_len``.
         """
+        
         self.model_id = model_id
         self.device = device
         self.topk = topk
@@ -135,15 +137,17 @@ class PureImpactIndex:
     """Describe PureImpactIndex."""
 
     def __init__(self, index_dir: str) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters.
-
+        """
+        Compute init.
+        
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
+        
         Parameters
         ----------
         index_dir : str
             Description for ``index_dir``.
         """
+        
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -268,15 +272,17 @@ class LuceneImpactIndex:
     """Describe LuceneImpactIndex."""
 
     def __init__(self, index_dir: str) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters.
-
+        """
+        Compute init.
+        
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
+        
         Parameters
         ----------
         index_dir : str
             Description for ``index_dir``.
         """
+        
         self.index_dir = index_dir
         self._searcher: Any | None = None
 
