@@ -2,14 +2,36 @@
 
 from __future__ import annotations
 
+"""Generate deterministic, metadata-rich package README files.
+
+The README generator walks the object tree discovered by Griffe, enriches
+each public symbol with metadata from the NavMap/TestMap JSON artifacts,
+and writes per-package ``README.md`` files.  The generated documents follow a
+strict structure so downstream automation (agents, tooling, DocToc) can reason
+about the content reliably.
+
+High level workflow:
+
+* discover packages to document (CLI flags, environment variables, detection)
+* load NavMap/TestMap metadata for badges and "tested-by" annotations
+* render each package into a deterministic markdown structure
+* optionally invoke DocToc to populate the table of contents markers
+
+The module also exposes helpers that the unit tests exercise directly so we can
+guarantee determinism, badge ordering, and link formatting behaviour.
+"""
+
 import argparse
 import hashlib
 import json
 import os
+import re
+import shutil
 import subprocess
+import sys
 import time
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -26,6 +48,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 NAVMAP_PATH = ROOT / "site" / "_build" / "navmap" / "navmap.json"
 TESTMAP_PATH = ROOT / "docs" / "_build" / "test_map.json"
+
+DEFAULT_SYNOPSIS = "Package synopsis not yet documented."
 
 
 def detect_repo() -> tuple[str, str]:
@@ -131,25 +155,29 @@ def iter_packages() -> list[str]:
 
 
 def summarize(node: Object) -> str:
-    """Compute summarize.
+    """Return the first sentence of ``node``'s docstring.
 
-    Carry out the summarize operation.
-
-    Parameters
-    ----------
-    node : Object
-        Description for ``node``.
-
-    Returns
-    -------
-    str
-        Description of return value.
+    Griffe surfaces docstrings via ``Object.docstring.value``.  The README
+    synopsis needs the first complete sentence – not merely the first line – so
+    we trim surrounding whitespace, drop leading blank lines, and capture the
+    first sentence boundary.  Punctuation is preserved to keep the natural
+    language flow intact.
     """
-    
+
     doc = getattr(node, "docstring", None)
-    if doc and getattr(doc, "value", None):
-        return doc.value.strip().splitlines()[0].strip().rstrip(".")
-    return ""
+    if not doc or not getattr(doc, "value", None):
+        return ""
+    raw = doc.value.strip()
+    if not raw:
+        return ""
+    # Find the first non-empty line before attempting to split into sentences.
+    first_line = next((line.strip() for line in raw.splitlines() if line.strip()), "")
+    if not first_line:
+        return ""
+    match = re.search(r"(?<=[.!?])\s", first_line)
+    if match:
+        return first_line[: match.start()].strip()
+    return first_line
 
 
 def is_public(node: Object) -> bool:
@@ -289,22 +317,7 @@ TEST_MAP = _load_json(TESTMAP_PATH)
 
 @dataclass(frozen=True)
 class Config:
-    """Represent Config.
-
-    Attributes
-    ----------
-    attribute : type
-        Description.
-
-    Methods
-    -------
-    method()
-        Description.
-
-    Examples
-    --------
-    >>> Config(...)
-    """
+    """Configuration for README generation."""
 
     packages: list[str]
     link_mode: str  # github | editor | both
@@ -312,52 +325,23 @@ class Config:
     fail_on_metadata_miss: bool
     dry_run: bool
     verbose: bool
+    run_doctoc: bool
 
 
 @dataclass(frozen=True)
 class Badges:
-    """Represent Badges.
-
-    Attributes
-    ----------
-    attribute : type
-        Description.
-
-    Methods
-    -------
-    method()
-        Description.
-
-    Examples
-    --------
-    >>> Badges(...)
-    """
+    """Container for metadata badges rendered next to each symbol."""
 
     stability: str | None = None
     owner: str | None = None
     section: str | None = None
     since: str | None = None
     deprecated_in: str | None = None
-    tested_by: list[dict[str, Any]] = None
+    tested_by: list[dict[str, Any]] = field(default_factory=list)
 
 
 def parse_config() -> Config:
-    """Parse config.
-
-    Returns
-    -------
-    Config
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> parse_config(...)
-    """
+    """Parse CLI arguments and environment variables into :class:`Config`."""
     parser = argparse.ArgumentParser(description="Generate per-package README files.")
     parser.add_argument("--packages", default=os.getenv("DOCS_PKG", ""))
     parser.add_argument(
@@ -373,6 +357,7 @@ def parse_config() -> Config:
     parser.add_argument("--fail-on-metadata-miss", action="store_true", default=False)
     parser.add_argument("--dry-run", action="store_true", default=False)
     parser.add_argument("--verbose", action="store_true", default=False)
+    parser.add_argument("--run-doctoc", action="store_true", default=False)
     args = parser.parse_args()
 
     packages = (
@@ -387,34 +372,43 @@ def parse_config() -> Config:
         fail_on_metadata_miss=args.fail_on_metadata_miss,
         dry_run=args.dry_run,
         verbose=args.verbose,
+        run_doctoc=args.run_doctoc,
     )
 
 
 def _lookup_nav(qname: str) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Lookup nav.
+    """Return symbol metadata and module defaults from the NavMap.
 
-    Parameters
-    ----------
-    qname : str
-        Description.
+    The NavMap JSON generated by ``tools/navmap/build_navmap.py`` has the
+    structure::
 
-    Returns
-    -------
-    tuple[dict[str, Any], dict[str, Any]]
-        Description.
+        {
+            "modules": {
+                "package.module": {
+                    "meta": {
+                        "package.module.symbol": {...}
+                    },
+                    "module_meta": {...},
+                    "sections": [
+                        {"id": "storage", "symbols": ["symbol"]},
+                    ],
+                }
+            }
+        }
 
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _lookup_nav(...)
+    ``meta`` entries are per-symbol overrides; ``module_meta`` supplies default
+    values that cascade to every symbol in the module.  We normalise the lookup
+    so ``badges_for`` can merge overrides with defaults seamlessly.
     """
     modules = NAVMAP.get("modules", {}) if isinstance(NAVMAP, dict) else {}
+    if not isinstance(modules, dict):
+        return {}, {}
+
     symbol = qname.split(".")[-1]
-    for module in modules.values():
+    best_defaults: dict[str, Any] = {}
+    for module_id, module in modules.items():
+        if not isinstance(module_id, str):
+            continue
         if not isinstance(module, dict):
             continue
         meta = module.get("meta")
@@ -445,31 +439,33 @@ def _lookup_nav(qname: str) -> tuple[dict[str, Any], dict[str, Any]]:
                     if key in module:
                         defaults[key] = module[key]
 
-            return symbol_meta, defaults
+            if symbol_meta:
+                return symbol_meta, defaults
+
+            if defaults and (qname.startswith(module_id) or symbol in (module.get("symbols") or [])):
+                return {}, defaults
+
+            if defaults and qname.startswith(module_id):
+                best_defaults = defaults
+    if best_defaults:
+        return {}, best_defaults
     return {}, {}
 
 
 def badges_for(qname: str) -> Badges:
-    """Badges for.
+    """Return :class:`Badges` describing README metadata for ``qname``.
 
-    Parameters
-    ----------
-    qname : str
-        Description.
+    The ``docs/_build/test_map.json`` structure maps fully-qualified symbol
+    names to a list of test descriptors::
 
-    Returns
-    -------
-    Badges
-        Description.
+        {
+            "package.module.symbol": [
+                {"file": "tests/unit/test_symbol.py", "lines": [10, 12]},
+                ...
+            ]
+        }
 
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> badges_for(...)
+    Only the first three entries are rendered to keep the output compact.
     """
     symbol_meta, defaults = _lookup_nav(qname)
     merged = {**defaults, **symbol_meta}
@@ -524,31 +520,18 @@ def _format_test_badge(entries: list[dict[str, Any]] | None) -> str | None:
             formatted.append(file)
     if not formatted:
         return None
-    return "`tested-by:" + ", ".join(formatted) + "`"
+    return "`tested-by: " + ", ".join(formatted) + "`"
 
 
-def format_badges(qname: str) -> str:
-    """Format badges.
+def format_badges(qname: str, base_length: int = 0) -> str:
+    """Format metadata badges for ``qname`` with optional wrapping.
 
-    Parameters
-    ----------
-    qname : str
-        Description.
-
-    Returns
-    -------
-    str
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> format_badges(...)
+    ``base_length`` represents the length of the rendered line prefix (symbol
+    name + summary).  When the combined prefix and badge text would exceed 80
+    characters we emit a newline and indent continuation lines with four spaces
+    to keep badges readable.
     """
+
     badge = badges_for(qname)
     parts: list[str] = []
     if badge.stability:
@@ -564,37 +547,40 @@ def format_badges(qname: str) -> str:
     test_badge = _format_test_badge(badge.tested_by)
     if test_badge:
         parts.append(test_badge)
-    return (" " + " ".join(parts)) if parts else ""
+    if not parts:
+        return ""
+    badge_line = " ".join(parts)
+    if base_length and base_length + 1 + len(badge_line) > 80:
+        wrapped: list[str] = []
+        current: list[str] = []
+        current_len = 0
+        available = 80 - 4
+        for part in parts:
+            part_len = len(part) + (1 if current else 0)
+            if current and current_len + part_len > available:
+                wrapped.append(" ".join(current))
+                current = [part]
+                current_len = len(part)
+            else:
+                current.append(part)
+                current_len += part_len
+        if current:
+            wrapped.append(" ".join(current))
+        return "\n    " + "\n    ".join(wrapped)
+    return " " + badge_line
 
 
 def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
-    """Editor link.
+    """Generate an ``[open]`` link for the configured editor mode."""
 
-    Parameters
-    ----------
-    abs_path : Path
-        Description.
-    lineno : int
-        Description.
-    editor_mode : str
-        Description.
-
-    Returns
-    -------
-    str | None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> editor_link(...)
-    """
     if editor_mode == "vscode":
         return f"vscode://file/{abs_path}:{lineno}:1"
+    if editor_mode == "relative":
+        try:
+            rel = abs_path.relative_to(ROOT)
+        except ValueError:
+            rel = abs_path
+        return f"./{rel.as_posix()}:{lineno}:1"
     return None
 
 
@@ -669,30 +655,13 @@ def bucket_for(node: Object) -> str:
 
 
 def render_line(node: Object, readme_dir: Path, cfg: Config) -> str | None:
-    """Render line.
+    """Render a markdown bullet for ``node``.
 
-    Parameters
-    ----------
-    node : Object
-        Description.
-    readme_dir : Path
-        Description.
-    cfg : Config
-        Description.
-
-    Returns
+    Example
     -------
-    str | None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> render_line(...)
+    >>> line = render_line(node, Path("src/pkg"), cfg)
+    >>> line.startswith("- **`pkg.symbol`**")
+    True
     """
     qname = getattr(node, "path", "")
     summary = summarize(node)
@@ -712,12 +681,12 @@ def render_line(node: Object, readme_dir: Path, cfg: Config) -> str | None:
     if not (open_link or view_link):
         return None
 
-    parts = [f"- **`{qname}`**"]
+    line = f"- **`{qname}`**"
     if summary:
-        parts.append(f"— {summary}")
-    badge_text = format_badges(qname)
+        line += f" — {summary}"
+    badge_text = format_badges(qname, len(line))
     if badge_text:
-        parts.append(badge_text)
+        line += badge_text
 
     links: list[str] = []
     if open_link:
@@ -725,7 +694,7 @@ def render_line(node: Object, readme_dir: Path, cfg: Config) -> str | None:
     if view_link:
         links.append(f"[view]({view_link})")
     tail = f" → {' | '.join(links)}" if links else ""
-    return " ".join(parts).strip() + tail + "\n"
+    return line + tail + "\n"
 
 
 def write_if_changed(path: Path, content: str) -> bool:
@@ -763,28 +732,10 @@ def write_if_changed(path: Path, content: str) -> bool:
 
 
 def write_readme(node: Object, cfg: Config) -> bool:
-    """Write readme.
+    """Write (or update) the README for ``node``.
 
-    Parameters
-    ----------
-    node : Object
-        Description.
-    cfg : Config
-        Description.
-
-    Returns
-    -------
-    bool
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> write_readme(...)
+    The function returns ``True`` when the markdown on disk changed which allows
+    callers to decide whether to run expensive follow-up tooling such as DocToc.
     """
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"
@@ -802,9 +753,8 @@ def write_readme(node: Object, cfg: Config) -> bool:
             buckets[bucket_for(child)].append(line)
 
     lines: list[str] = [f"# `{node.path}`\n\n"]
-    synopsis = summarize(node)
-    if synopsis:
-        lines.append(f"{synopsis}\n\n")
+    synopsis = summarize(node) or DEFAULT_SYNOPSIS
+    lines.append(f"{synopsis}\n\n")
     lines.extend(
         [
             "<!-- START doctoc generated TOC please keep comment here to allow auto update -->\n",
@@ -826,7 +776,35 @@ def write_readme(node: Object, cfg: Config) -> bool:
     changed = write_if_changed(readme, content)
     if changed:
         print(f"Wrote {readme}")
+        _maybe_run_doctoc(readme, cfg)
     return changed
+
+
+def _maybe_run_doctoc(readme: Path, cfg: Config) -> None:
+    """Run DocToc when enabled via ``--run-doctoc``."""
+
+    if not cfg.run_doctoc:
+        return
+    doctoc = shutil.which("doctoc")
+    if not doctoc:
+        print(f"Info: doctoc not installed; skipping TOC update for {readme}")
+        return
+    result = subprocess.run(
+        [doctoc, str(readme)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if cfg.verbose:
+        if result.stdout.strip():
+            print(result.stdout.strip())
+        if result.stderr.strip():
+            print(result.stderr.strip(), file=sys.stderr)
+    if result.returncode != 0:
+        print(
+            f"Warning: doctoc exited with code {result.returncode} for {readme}",
+            file=sys.stderr,
+        )
 
 
 def _collect_missing_metadata(node: Object, missing: set[str]) -> None:
@@ -865,25 +843,17 @@ def _collect_missing_metadata(node: Object, missing: set[str]) -> None:
 
 
 def main() -> None:
-    """Main.
-
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> main(...)
-    """
+    """CLI entry point for README generation."""
     cfg = parse_config()
     if not cfg.packages:
         raise SystemExit("No packages detected; set DOCS_PKG or add packages under src/.")
+
+    if not NAVMAP_PATH.exists():
+        print(f"Warning: NavMap not found at {NAVMAP_PATH}; badges will be empty")
+    if not TESTMAP_PATH.exists():
+        print(
+            f"Warning: Test map not found at {TESTMAP_PATH}; tested-by badges will be empty"
+        )
 
     loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
     missing_meta: set[str] = set()

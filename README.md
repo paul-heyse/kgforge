@@ -52,6 +52,9 @@ uv sync                       # installs from uv.lock / pyproject
 
 - `pyproject.toml`: Python 3.13; dependencies pinned minimally; heavy libs listed but commented or optional extras.
 - Pre-commit with ruff/black/mypy; strict typing by default.
+- Package README generation: `python tools/gen_readmes.py` (see
+  [Automated Documentation](README-AUTOMATED-DOCUMENTATION.md#readme-generation-toolsgen_readmespy)
+  for full workflow details).
 
 ---
 

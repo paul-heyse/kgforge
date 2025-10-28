@@ -109,6 +109,19 @@ jobs:
           . .venv/bin/activate
           tools/update_docs.sh
 
+      - name: Check README freshness
+        run: |
+          . .venv/bin/activate
+          python tools/gen_readmes.py --link-mode github --editor relative
+          if git diff --quiet --exit-code -- src/**/README.md; then
+            echo "Package READMEs are up to date."
+          else
+            echo "::error::Detected stale package README files."
+            echo "Run: python tools/gen_readmes.py --link-mode github --editor relative"
+            git diff -- src/**/README.md
+            exit 1
+          fi
+
       - name: Verify clean tree
         run: |
           git status --short
