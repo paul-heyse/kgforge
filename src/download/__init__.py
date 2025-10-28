@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 from download import cli, harvester
 
 # [nav:anchor cli]

@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 from __future__ import annotations
 
 from typing import Final
@@ -51,7 +50,6 @@ class SearchRequest(BaseModel):
     conform to the declared schema while producing clear error messages. Use this class when
     serialising or parsing data for the surrounding feature.
     """
-    
 
     query: str = Field(min_length=1)
     k: int = 10
@@ -67,7 +65,6 @@ class SearchResult(BaseModel):
     conform to the declared schema while producing clear error messages. Use this class when
     serialising or parsing data for the surrounding feature.
     """
-    
 
     doc_id: str
     chunk_id: str

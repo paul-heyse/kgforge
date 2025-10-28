@@ -5,10 +5,11 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 from typing import Literal, NotRequired, TypedDict
+
+Stability = Literal["frozen", "stable", "experimental", "internal", "beta", "deprecated"]
 
 
 class NavSection(TypedDict):
@@ -18,7 +19,6 @@ class NavSection(TypedDict):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     id: str
     title: str
@@ -32,19 +32,29 @@ class SymbolMeta(TypedDict, total=False):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     since: str
-    stability: Literal["frozen", "stable", "experimental", "internal"]
+    stability: Stability
     side_effects: list[Literal["none", "fs", "net", "gpu", "db"]]
     thread_safety: Literal["reentrant", "threadsafe", "not-threadsafe"]
     async_ok: bool
     perf_budget_ms: float
     tests: list[str]
+    owner: NotRequired[str]
+    deprecated_in: NotRequired[str]
     replaced_by: NotRequired[str]
     deprecated_msg: NotRequired[str]
     contracts: NotRequired[list[str]]
     coverage_target: NotRequired[float]
+
+
+class ModuleMeta(TypedDict, total=False):
+    """Describe module-level metadata surfaced in navigation structures."""
+
+    owner: str
+    stability: Stability
+    since: str
+    deprecated_in: str
 
 
 class NavMap(TypedDict, total=False):
@@ -54,7 +64,6 @@ class NavMap(TypedDict, total=False):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     title: str
     synopsis: str
@@ -67,3 +76,4 @@ class NavMap(TypedDict, total=False):
     symbols: dict[str, SymbolMeta]
     edit_scopes: dict[str, list[str]]
     deps: list[str]
+    module_meta: ModuleMeta

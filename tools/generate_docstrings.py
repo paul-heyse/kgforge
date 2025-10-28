@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
-from typing import Sequence
+from collections.abc import Sequence
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
@@ -29,17 +29,18 @@ def has_python_files(path: Path) -> bool:
     """Compute has python files.
 
     Carry out the has python files operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
+    path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.generate_docstrings import has_python_files
@@ -47,13 +48,13 @@ def has_python_files(path: Path) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return any(path.rglob("*.py"))
 
 
-def _record_doq_failure(target: Path, cmd: Sequence[str], result: subprocess.CompletedProcess[str]) -> None:
+def _record_doq_failure(
+    target: Path, cmd: Sequence[str], result: subprocess.CompletedProcess[str]
+) -> None:
     """Persist information about a failed DoQ invocation for post-run triage."""
-
     rel_target = target.relative_to(REPO) if target.is_relative_to(REPO) else target
     header = (
         "[docstrings] doq failed for "
@@ -77,18 +78,25 @@ def run_doq(target: Path) -> bool:
     """Compute run doq.
 
     Carry out the run doq operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     target : Path
+    target : Path
         Description for ``target``.
-    
+
+    Returns
+    -------
+    bool
+        Description of return value.
+
     Examples
     --------
     >>> from tools.generate_docstrings import run_doq
-    >>> run_doq(...)  # doctest: +ELLIPSIS
+    >>> result = run_doq(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
     cmd = [
         sys.executable,
         "-m",
@@ -113,18 +121,18 @@ def run_fallback(target: Path) -> None:
     """Compute run fallback.
 
     Carry out the run fallback operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     target : Path
+    target : Path
         Description for ``target``.
-    
+
     Examples
     --------
     >>> from tools.generate_docstrings import run_fallback
     >>> run_fallback(...)  # doctest: +ELLIPSIS
     """
-    
     cmd = [
         sys.executable,
         "tools/auto_docstrings.py",
@@ -140,13 +148,12 @@ def main() -> None:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Examples
     --------
     >>> from tools.generate_docstrings import main
     >>> main()  # doctest: +ELLIPSIS
     """
-    
     if LOG_FILE.exists():
         LOG_FILE.unlink()
     LOG_DIR.mkdir(parents=True, exist_ok=True)

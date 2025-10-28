@@ -1,15 +1,16 @@
+"""Skeleton tests covering public modules and API health checks."""
+
+from __future__ import annotations
+
 import importlib
+from collections.abc import Sequence
 
 import pytest
 
-try:
-    from fastapi.testclient import TestClient
-except ModuleNotFoundError:  # pragma: no cover
-    TestClient = None  # type: ignore[assignment]
 
-
-def test_imports():
-    for mod in [
+def test_imports() -> None:
+    """Ensure commonly referenced modules remain importable."""
+    modules: Sequence[str] = [
         "kgfoundry_common.models",
         "download.harvester",
         "docling.vlm",
@@ -23,16 +24,18 @@ def test_imports():
         "kg_builder.neo4j_store",
         "search_api.app",
         "orchestration.flows",
-    ]:
-        importlib.import_module(mod)
+    ]
+    for module in modules:
+        importlib.import_module(module)
 
 
-def test_api_skeleton():
-    if TestClient is None:  # pragma: no cover - optional dependency missing
-        pytest.skip("fastapi is required for API skeleton test")
-
+def test_api_skeleton() -> None:
+    """Verify the API skeleton serves the health endpoint when available."""
+    pytest.importorskip("fastapi.testclient")
+    testclient_module = importlib.import_module("fastapi.testclient")
+    TestClient = testclient_module.TestClient
     from search_api.app import app
 
     client = TestClient(app)
-    r = client.get("/healthz")
-    assert r.status_code == 200
+    response = client.get("/healthz")
+    assert response.status_code == 200

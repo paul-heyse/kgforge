@@ -4,15 +4,13 @@ import importlib
 import sys
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
+from typing import Callable, TypeVar
 
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-
-fake_griffe = ModuleType("griffe")
-
 
 class _LoaderStub:
     def __init__(self, *args: object, **kwargs: object) -> None:
@@ -22,18 +20,52 @@ class _LoaderStub:
         raise NotImplementedError
 
 
-fake_griffe.Object = SimpleNamespace
-fake_griffe.GriffeLoader = _LoaderStub
+class _FakeGriffeModule(ModuleType):
+    Object: type[SimpleNamespace]
+    GriffeLoader: type[_LoaderStub]
 
-fake_loader_module = ModuleType("griffe.loader")
-fake_loader_module.GriffeLoader = _LoaderStub
+    def __init__(self) -> None:
+        super().__init__("griffe")
+        self.Object = SimpleNamespace
+        self.GriffeLoader = _LoaderStub
+
+
+class _FakeLoaderModule(ModuleType):
+    GriffeLoader: type[_LoaderStub]
+
+    def __init__(self) -> None:
+        super().__init__("griffe.loader")
+        self.GriffeLoader = _LoaderStub
+
+
+def _detect_packages() -> list[str]:
+    return []
+
+
+def _detect_primary() -> str:
+    return "pkg"
+
+
+class _FakeDetectModule(ModuleType):
+    detect_packages: Callable[[], list[str]]
+    detect_primary: Callable[[], str]
+
+    def __init__(self) -> None:
+        super().__init__("detect_pkg")
+        self.detect_packages = _detect_packages
+        self.detect_primary = _detect_primary
+
+
+fake_griffe = _FakeGriffeModule()
+
+
+fake_griffe.Object = SimpleNamespace
+fake_loader_module = _FakeLoaderModule()
 
 sys.modules.setdefault("griffe", fake_griffe)
 sys.modules.setdefault("griffe.loader", fake_loader_module)
 
-fake_detect_pkg = ModuleType("detect_pkg")
-fake_detect_pkg.detect_packages = lambda: []
-fake_detect_pkg.detect_primary = lambda: "pkg"
+fake_detect_pkg = _FakeDetectModule()
 sys.modules.setdefault("detect_pkg", fake_detect_pkg)
 
 gr = importlib.import_module("tools.gen_readmes")

@@ -27,6 +27,7 @@ module_name_for = auto_docstrings.module_name_for
 parameters_for = auto_docstrings.parameters_for
 extended_summary = auto_docstrings.extended_summary
 process_file = auto_docstrings.process_file
+detect_raises = auto_docstrings.detect_raises
 
 
 @pytest.fixture()
@@ -138,8 +139,7 @@ def process(item: str, limit: int | None = None) -> str:
 
     params = parameters_for(node)
     returns = annotation_to_text(node.returns)
-    markers = _required_sections("function", params, returns, [], node.name)
-    required = _required_sections("function", params, returns, [], True)
+    markers = _required_sections("function", params, returns, [], node.name, True)
 
     assert markers
     for marker in markers:
@@ -211,8 +211,10 @@ def sample(
 
     invocation_line = next(line for line in examples if line.startswith(">>> result = sample"))
 
-    assert ">>> result = sample(..., ..., *values, **extras)" == invocation_line
+    assert invocation_line == ">>> result = sample(..., ..., *values, **extras)"
     assert any(not param.required for param in params if not param.name.startswith("*"))
+
+
 def test_process_file_preserves_curated_docstring_without_examples(
     repo_layout: Path,
 ) -> None:
@@ -247,6 +249,7 @@ def test_process_file_preserves_curated_docstring_without_examples(
     assert "Return curated values." in updated
     assert "Provide rich guidance for the caller." in updated
     assert "Description for ``value``." not in updated
+    assert not changed
 
 
 def test_process_file_preserves_docstring_with_list_and_dict_mentions(
@@ -276,6 +279,9 @@ def test_process_file_preserves_docstring_with_list_and_dict_mentions(
     assert "Explain how list and dict collections interact." in updated
     assert "should not be replaced by the fallback generator." in updated
     assert "Description for ``records``." not in updated
+    assert not changed
+
+
 def test_process_file_is_idempotent_for_init_method(repo_layout: Path) -> None:
     module_path = repo_layout / "src" / "pkg" / "example.py"
     module_path.parent.mkdir(parents=True, exist_ok=True)
@@ -294,6 +300,8 @@ class Example:
 
     assert not process_file(module_path)
     assert module_path.read_text(encoding="utf-8") == original_contents
+
+
 def test_detect_raises_ignores_nested_scopes() -> None:
     node = _get_function(
         """
@@ -314,6 +322,8 @@ def outer(flag: bool) -> None:
     )
 
     assert detect_raises(node) == ["ValueError"]
+
+
 def test_process_file_preserves_single_blank_line_after_existing_docstring(
     repo_layout: Path,
 ) -> None:

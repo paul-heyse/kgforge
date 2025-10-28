@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 from __future__ import annotations
 
 from typing import Final, Literal
@@ -67,7 +66,6 @@ class Doc(BaseModel):
     conform to the declared schema while producing clear error messages. Use this class when
     serialising or parsing data for the surrounding feature.
     """
-    
 
     id: Id
     openalex_id: str | None = None
@@ -92,7 +90,6 @@ class DoctagsAsset(BaseModel):
     conform to the declared schema while producing clear error messages. Use this class when
     serialising or parsing data for the surrounding feature.
     """
-    
 
     doc_id: Id
     doctags_uri: str
@@ -110,7 +107,6 @@ class Chunk(BaseModel):
     conform to the declared schema while producing clear error messages. Use this class when
     serialising or parsing data for the surrounding feature.
     """
-    
 
     id: Id
     doc_id: Id
@@ -129,7 +125,6 @@ class LinkAssertion(BaseModel):
     conform to the declared schema while producing clear error messages. Use this class when
     serialising or parsing data for the surrounding feature.
     """
-    
 
     id: Id
     chunk_id: Id

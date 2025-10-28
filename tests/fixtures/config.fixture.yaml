@@ -1,0 +1,25 @@
+faiss:
+  cuvs: false
+  gpu: false
+  index_factory: Flat
+  nprobe: 1
+search:
+  dense_candidates: 50
+  k: 5
+  kg_boosts:
+    direct: 0.1
+    one_hop: 0.05
+  rrf_k: 20
+  sparse_backend: pure
+  sparse_candidates: 50
+sparse_embedding:
+  bm25:
+    b: 0.4
+    index_dir: /home/paul/kgfoundry/tests/fixtures/_indices/bm25
+    k1: 0.9
+  splade:
+    index_dir: /home/paul/kgfoundry/tests/fixtures/_indices/splade_impact
+    topk: 256
+system:
+  duckdb_path: /home/paul/kgfoundry/tests/fixtures/catalog.duckdb
+  parquet_root: /home/paul/kgfoundry/tests/fixtures

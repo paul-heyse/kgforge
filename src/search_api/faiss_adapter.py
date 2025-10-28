@@ -5,7 +5,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -86,7 +85,6 @@ class DenseVecs:
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     ids: list[str]
     mat: VecArray
@@ -100,7 +98,6 @@ class FaissAdapter:
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     def __init__(
         self,
@@ -115,22 +112,42 @@ class FaissAdapter:
         Parameters
         ----------
         db_path : str
+        db_path : str
             Description for ``db_path``.
-        factory : str, optional, default='OPQ64,IVF8192,PQ64'
+        factory : str | None
+        factory : str | None, optional, default='OPQ64,IVF8192,PQ64'
             Description for ``factory``.
-        metric : str, optional, default='ip'
+        metric : str | None
+        metric : str | None, optional, default='ip'
             Description for ``metric``.
         """
-        
-        
-        
-        
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
         self.index: Any | None = None
         self.idmap: list[str] | None = None
         self.vecs: DenseVecs | None = None
+
+    def _load_dense_from_parquet(self, source: Path) -> DenseVecs:
+        """Load dense vectors directly from a parquet dataset."""
+        con = duckdb.connect(database=":memory:")
+        try:
+            rows = con.execute(
+                f"""
+                SELECT chunk_id, vector
+                FROM read_parquet('{source}', union_by_name=true)
+            """
+            ).fetchall()
+        finally:
+            con.close()
+        if not rows:
+            message = f"No dense vectors discovered in {source}"
+            raise RuntimeError(message)
+        ids = [row[0] for row in rows]
+        mat = cast(VecArray, np.stack([np.asarray(row[1], dtype=np.float32) for row in rows]))
+        norms = np.linalg.norm(mat, axis=1, keepdims=True) + 1e-9
+        normalized = cast(VecArray, mat / norms)
+        return DenseVecs(ids=ids, mat=normalized)
 
     def _load_dense_parquet(self) -> DenseVecs:
         """Compute load dense parquet.
@@ -147,10 +164,16 @@ class FaissAdapter:
         RuntimeError
             Raised when validation fails.
         """
-        if not Path(self.db_path).exists():
+        candidate = Path(self.db_path)
+        if candidate.is_dir() or candidate.suffix == ".parquet":
+            return self._load_dense_from_parquet(candidate)
+        if not candidate.exists():
             message = "DuckDB registry not found"
             raise RuntimeError(message)
-        con = duckdb.connect(self.db_path)
+        try:
+            con = duckdb.connect(self.db_path)
+        except duckdb.Error:
+            return self._load_dense_from_parquet(candidate)
         try:
             dense_run = con.execute(
                 "SELECT parquet_root, dim FROM dense_runs ORDER BY created_at DESC LIMIT 1"
@@ -177,20 +200,20 @@ class FaissAdapter:
         """Compute build.
 
         Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Examples
         --------
         >>> from search_api.faiss_adapter import build
         >>> build()  # doctest: +ELLIPSIS
         """
-        
         vectors = self._load_dense_parquet()
         self.vecs = vectors
         if not HAVE_FAISS:
             return
         dimension = vectors.mat.shape[1]
         metric_type = faiss.METRIC_INNER_PRODUCT if self.metric == "ip" else faiss.METRIC_L2
-        cpu = faiss.index_factory(dimension, self.factory, metric_type)
+        factory = self.factory if dimension >= 64 else "Flat"
+        cpu = faiss.index_factory(dimension, factory, metric_type)
         cpu = faiss.IndexIDMap2(cpu)
         train = vectors.mat[: min(100000, vectors.mat.shape[0])].copy()
         faiss.normalize_L2(train)
@@ -211,18 +234,18 @@ class FaissAdapter:
         """Compute load or build.
 
         Carry out the load or build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         cpu_index_path : str | None
+        cpu_index_path : str | None, optional, default=None
             Description for ``cpu_index_path``.
-        
+
         Examples
         --------
         >>> from search_api.faiss_adapter import load_or_build
         >>> load_or_build()  # doctest: +ELLIPSIS
         """
-        
         try:
             if HAVE_FAISS and cpu_index_path and Path(cpu_index_path).exists():
                 cpu = faiss.read_index(cpu_index_path)
@@ -242,28 +265,30 @@ class FaissAdapter:
             pass
         self.build()
 
-    def search(self, qvec: VecArray, k: int = 10) -> list[tuple[str, float]]:
+    def search(self, qvec: VecArray, k: int = 10) -> list[list[tuple[str, float]]]:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         qvec : src.search_api.faiss_adapter.VecArray
+        qvec : src.search_api.faiss_adapter.VecArray
             Description for ``qvec``.
         k : int | None
+        k : int | None, optional, default=10
             Description for ``k``.
-        
+
         Returns
         -------
-        List[Tuple[str, float]]
+        List[List[Tuple[str, float]]]
             Description of return value.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-        
+
         Examples
         --------
         >>> from search_api.faiss_adapter import search
@@ -271,28 +296,38 @@ class FaissAdapter:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         if self.vecs is None and self.index is None:
             return []
         if HAVE_FAISS and self.index is not None:
             if self.idmap is None:
                 message = "ID mapping not loaded for FAISS index"
                 raise RuntimeError(message)
-            query = cast(VecArray, np.asarray(qvec[None, :], dtype=np.float32, order="C"))
+            query_arr = np.asarray(qvec, dtype=np.float32, order="C")
+            if query_arr.ndim == 1:
+                query_arr = query_arr[None, :]
+            query = cast(VecArray, query_arr)
             distances, indices = self.index.search(query, k)
-            results: list[tuple[str, float]] = []
-            for idx, score in zip(indices[0], distances[0], strict=False):
-                if idx < 0:
-                    continue
-                results.append((self.idmap[int(idx)], float(score)))
-            return results
+            batches: list[list[tuple[str, float]]] = []
+            for idx_row, dist_row in zip(indices, distances, strict=False):
+                results: list[tuple[str, float]] = []
+                for idx, score in zip(idx_row, dist_row, strict=False):
+                    if idx < 0:
+                        continue
+                    results.append((self.idmap[int(idx)], float(score)))
+                batches.append(results)
+            return batches
         if self.vecs is None:
             message = "Dense vectors not loaded"
             raise RuntimeError(message)
         matrix = self.vecs.mat
-        query = cast(VecArray, np.asarray(qvec, dtype=np.float32, order="C"))
-        query /= np.linalg.norm(query) + 1e-9
-        sims = matrix @ query
-        topk = np.argsort(-sims)[:k]
-        ids = self.vecs.ids
-        return [(ids[i], float(sims[i])) for i in topk]
+        query = np.asarray(qvec, dtype=np.float32, order="C")
+        if query.ndim == 1:
+            query = query[None, :]
+        batches = []
+        for row in query:
+            row = row.copy()
+            row /= np.linalg.norm(row) + 1e-9
+            sims = matrix @ row
+            topk = np.argsort(-sims)[:k]
+            batches.append([(self.vecs.ids[i], float(sims[i])) for i in topk])
+        return batches

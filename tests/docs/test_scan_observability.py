@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from types import SimpleNamespace
 
+from pytest import MonkeyPatch
 from tools.docs import scan_observability
 
 
-def test_config_summary_invoked_once(monkeypatch, tmp_path) -> None:
+def test_config_summary_invoked_once(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
     """Ensure the summary writer executes exactly once per run."""
     root = tmp_path
     src = root / "src"

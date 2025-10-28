@@ -5,7 +5,7 @@ import pyarrow.parquet as pq
 from kgfoundry.kgfoundry_common.parquet_io import ParquetChunkWriter, ParquetVectorWriter
 
 
-def test_parquet_dense_write(tmp_path):
+def test_parquet_dense_write(tmp_path: Path) -> None:
     root = tmp_path / "dense"
     w = ParquetVectorWriter(str(root))
     vec = [0.0] * 2560
@@ -17,7 +17,7 @@ def test_parquet_dense_write(tmp_path):
     assert t.schema.field("vector").type.value_type == pa.float32()
 
 
-def test_parquet_splade_write(tmp_path):
+def test_parquet_splade_write(tmp_path: Path) -> None:
     root = tmp_path / "splade"
     w = ParquetVectorWriter(str(root))
     w.write_splade("SPLADE-v3-distilbert", "run123", [("chunk:1", [1, 2, 3], [0.1, 0.2, 0.3])])
@@ -25,7 +25,7 @@ def test_parquet_splade_write(tmp_path):
     assert files, "SPLADE parquet not written"
 
 
-def test_parquet_chunks_write(tmp_path):
+def test_parquet_chunks_write(tmp_path: Path) -> None:
     root = tmp_path / "chunks"
     w = ParquetChunkWriter(str(root), model="docling_hybrid", run_id="runX")
     dataset_root = w.write(

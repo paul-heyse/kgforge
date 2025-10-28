@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 from docling import canonicalizer, hybrid, vlm
 from kgfoundry_common.navmap_types import NavMap
 

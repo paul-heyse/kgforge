@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 # [nav:anchor catalog]
 # [nav:anchor loader]
 from kgfoundry_common.navmap_types import NavMap

@@ -5,7 +5,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 # [nav:anchor metrics]
 from kgfoundry_common.navmap_types import NavMap
 from observability import metrics

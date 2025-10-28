@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+from typing import Any
+
 from fastapi import FastAPI
 
 app = FastAPI(title="OpenAlex Mock")
 
 
 @app.get("/works")
-def works(topic: str = "test", per_page: int = 2, cursor: str = "*"):
+def works(topic: str = "test", per_page: int = 2, cursor: str = "*") -> dict[str, Any]:
     return {
         "meta": {"count": 2, "per_page": per_page, "next_cursor": None},
         "results": [

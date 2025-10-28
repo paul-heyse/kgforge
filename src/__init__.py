@@ -5,5 +5,4 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 __all__: list[str] = []

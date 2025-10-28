@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import shutil
+import subprocess
+from pathlib import Path
 
 import networkx as nx
 import pytest
-
+from tools.docs import build_graphs
 from tools.docs.build_graphs import collapse_to_packages, style_and_render
 
 
@@ -28,7 +29,6 @@ def _write_dot(path: Path) -> None:
 
 def test_collapse_to_packages_preserves_isolated_nodes(tmp_path: Path) -> None:
     """Ensure collapsing retains packages even when they have no edges."""
-
     dot_path = tmp_path / "graph.dot"
     _write_dot(dot_path)
 
@@ -40,16 +40,15 @@ def test_collapse_to_packages_preserves_isolated_nodes(tmp_path: Path) -> None:
 
 def test_style_and_render_writes_isolated_nodes(tmp_path: Path) -> None:
     """Rendering includes edge-free packages in the SVG output."""
-
     if shutil.which("dot") is None:
         pytest.skip("graphviz 'dot' binary is required for rendering tests")
 
-    g = nx.DiGraph()
+    g: nx.DiGraph[str] = nx.DiGraph()
     g.add_nodes_from(["pkg_alpha", "pkg_beta", "pkg_isolated"])
     g.add_edge("pkg_alpha", "pkg_beta", weight=1)
 
     analysis = {
-        "centrality": {node: 0.0 for node in g.nodes},
+        "centrality": dict.fromkeys(g.nodes, 0.0),
         "cycles": [],
         "layer_violations": [],
         "cycle_enumeration_skipped": False,
@@ -61,21 +60,13 @@ def test_style_and_render_writes_isolated_nodes(tmp_path: Path) -> None:
     svg = out_svg.read_text(encoding="utf-8")
     for name in g.nodes:
         assert name in svg
-"""Tests for tools.docs.build_graphs caching helpers."""
-
-from __future__ import annotations
-
-import subprocess
-from pathlib import Path
-
-import tools.docs.build_graphs as build_graphs
 
 
 def _git(repo: Path, *args: str) -> None:
     subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True)
 
 
-def test_dirty_worktree_invalidates_cache(tmp_path, monkeypatch) -> None:
+def test_dirty_worktree_invalidates_cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()
     src_pkg = repo / "src" / "sample_pkg"
@@ -100,7 +91,9 @@ def test_dirty_worktree_invalidates_cache(tmp_path, monkeypatch) -> None:
 
     counters = {"pydeps": 0, "pyrev": 0}
 
-    def fake_pydeps(pkg: str, imports_out: Path, excludes: list[str], max_bacon: int, fmt: str) -> None:
+    def fake_pydeps(
+        pkg: str, imports_out: Path, excludes: list[str], max_bacon: int, fmt: str
+    ) -> None:
         counters["pydeps"] += 1
         imports_out.write_text(f"deps {counters['pydeps']}\n", encoding="utf-8")
 

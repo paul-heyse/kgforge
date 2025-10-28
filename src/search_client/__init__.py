@@ -5,7 +5,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from kgfoundry_common.navmap_types import NavMap
 from search_client.client import KGFoundryClient as _KGFoundryClient
 

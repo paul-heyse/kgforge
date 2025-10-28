@@ -5,15 +5,8 @@
 build/**
 dist/**
 src/**/*.egg-info/**
-/.wheelhouse/**
-*.whl
 
 # --- Caches & transient ---
-**/__pycache__/**
-**/.ruff_cache/**
-**/.mypy_cache/**
-**/.pytest_cache/**
-**/.cache/**
 **/.ipynb_checkpoints/**
 
 
@@ -26,7 +19,6 @@ datasets/**
 artifacts/**
 models/**
 vectors/**
-cache/**
 downloads/**
 
 

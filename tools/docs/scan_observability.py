@@ -10,6 +10,7 @@ for implementation specifics.
 from __future__ import annotations
 
 import ast
+import importlib
 import json
 import os
 import re
@@ -18,10 +19,36 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-try:
-    import yaml  # policy
-except Exception:
-    yaml = None  # handled below
+
+def _optional_import(name: str) -> Any:
+    """Import module if available.
+
+    Parameters
+    ----------
+    name : str
+        Description.
+
+    Returns
+    -------
+    Any
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _optional_import(...)
+    """
+    try:
+        return importlib.import_module(name)
+    except Exception:
+        return None
+
+
+yaml = _optional_import("yaml")
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
@@ -157,7 +184,7 @@ def _editor_link(path: Path, line: int | None) -> str:
 
 # ---------- Policy ------------------------------------------------------------
 
-DEFAULT_POLICY = {
+DEFAULT_POLICY: dict[str, Any] = {
     "metric": {
         # snake_case, must end with base unit or _total (counters) when using Prometheus exposition format
         "name_regex": r"^[a-z][a-z0-9_]*$",
@@ -216,12 +243,12 @@ def load_policy() -> dict[str, Any]:
     """Compute load policy.
 
     Carry out the load policy operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.scan_observability import load_policy
@@ -229,7 +256,6 @@ def load_policy() -> dict[str, Any]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
     try:
@@ -252,7 +278,6 @@ class MetricRow:
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     name: str
     type: str | None
@@ -273,7 +298,6 @@ class LogRow:
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     logger: str | None
     level: str
@@ -293,7 +317,6 @@ class TraceRow:
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     span_name: str | None
     attributes: list[str]
@@ -355,7 +378,7 @@ def _keywords_map(node: ast.Call, text: str) -> dict[str, Any]:
     --------
     >>> _keywords_map(...)
     """
-    out = {}
+    out: dict[str, str] = {}
     for kw in node.keywords or []:
         k = kw.arg
         if k is None:
@@ -492,7 +515,7 @@ def _is_structured_logging(call: ast.Call, text: str) -> tuple[list[str], bool]:
 # ---------- Lint engine -------------------------------------------------------
 
 
-def _lint_metric(policy: dict, row: MetricRow) -> list[dict]:
+def _lint_metric(policy: dict[str, Any], row: MetricRow) -> list[dict[str, Any]]:
     """Lint metric.
 
     Parameters
@@ -517,7 +540,7 @@ def _lint_metric(policy: dict, row: MetricRow) -> list[dict]:
     --------
     >>> _lint_metric(...)
     """
-    errs = []
+    errs: list[dict[str, Any]] = []
     name_rx = re.compile(policy["metric"]["name_regex"])
     if not name_rx.match(row.name or ""):
         errs.append(
@@ -595,7 +618,7 @@ def _lint_metric(policy: dict, row: MetricRow) -> list[dict]:
     return errs
 
 
-def _lint_log(policy: dict, row: LogRow) -> list[dict]:
+def _lint_log(policy: dict[str, Any], row: LogRow) -> list[dict[str, Any]]:
     """Lint log.
 
     Parameters
@@ -620,7 +643,7 @@ def _lint_log(policy: dict, row: LogRow) -> list[dict]:
     --------
     >>> _lint_log(...)
     """
-    errs = []
+    errs: list[dict[str, Any]] = []
     if policy["logs"].get("require_structured", True) and not row.structured_keys:
         errs.append(
             {
@@ -636,7 +659,7 @@ def _lint_log(policy: dict, row: LogRow) -> list[dict]:
     return errs
 
 
-def _lint_trace(policy: dict, row: TraceRow) -> list[dict]:
+def _lint_trace(policy: dict[str, Any], row: TraceRow) -> list[dict[str, Any]]:
     """Lint trace.
 
     Parameters
@@ -661,7 +684,7 @@ def _lint_trace(policy: dict, row: TraceRow) -> list[dict]:
     --------
     >>> _lint_trace(...)
     """
-    errs = []
+    errs: list[dict[str, Any]] = []
     rx = re.compile(policy["traces"]["name_regex"])
     if row.span_name and not rx.match(row.span_name):
         errs.append(
@@ -685,17 +708,18 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     """Compute read ast.
 
     Carry out the read ast operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
+    path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     Tuple[str, ast.AST | None]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.scan_observability import read_ast
@@ -703,7 +727,6 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     try:
         text = path.read_text(encoding="utf-8")
     except OSError:
@@ -715,23 +738,27 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     return (text, tree)
 
 
-def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], list[TraceRow]]:
+def scan_file(
+    path: Path, policy: dict[str, Any]
+) -> tuple[list[LogRow], list[MetricRow], list[TraceRow]]:
     """Compute scan file.
 
     Carry out the scan file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
+    path : Path
         Description for ``path``.
     policy : collections.abc.Mapping
+    policy : collections.abc.Mapping
         Description for ``policy``.
-    
+
     Returns
     -------
     Tuple[List[LogRow], List[MetricRow], List[TraceRow]]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.scan_observability import scan_file
@@ -739,7 +766,6 @@ def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], 
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     text, tree = read_ast(path)
     if not text or tree is None:
         return ([], [], [])
@@ -761,7 +787,7 @@ def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], 
                     seg = ast.get_source_segment(text, node.args[0])
                     msg = (seg or "").strip()[:240]
                 keys, ok_struct = _is_structured_logging(node, text)
-                row = LogRow(
+                log_row = LogRow(
                     logger=base_name,
                     level=attr,
                     message_template=msg,
@@ -770,7 +796,7 @@ def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], 
                     lineno=node.lineno,
                     source_link=_links_for(path, node.lineno),
                 )
-                logs.append(row)
+                logs.append(log_row)
 
             # --- METRICS (prometheus_client.* or helper factories)
             if base_name in {"prometheus_client", "metrics", "stats"} or attr in _METRIC_CALL_TYPES:
@@ -778,7 +804,7 @@ def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], 
                 name = _first_str(node, text)
                 labels = _extract_labels_from_kw(kwmap)
                 unit = _infer_unit_from_name(name or "") if name else None
-                row = MetricRow(
+                metric_row = MetricRow(
                     name=name or "<dynamic>",
                     type=mtype,
                     unit=unit,
@@ -789,12 +815,12 @@ def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], 
                     recommended_aggregation=_recommended_aggregation(mtype),
                     source_link=_links_for(path, node.lineno),
                 )
-                metrics.append(row)
+                metrics.append(metric_row)
 
             # --- TRACES (OpenTelemetry)
             if attr in {"start_span", "start_as_current_span"}:
                 span_name = _first_str(node, text)
-                row = TraceRow(
+                trace_row = TraceRow(
                     span_name=span_name,
                     attributes=[],
                     file=_rel(path),
@@ -802,7 +828,7 @@ def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], 
                     call=(ast.get_source_segment(text, node) or "").strip()[:240],
                     source_link=_links_for(path, node.lineno),
                 )
-                traces.append(row)
+                traces.append(trace_row)
             if attr in {"set_attribute", "add_event"}:
                 # attach attributes to the last span in this file list if any
                 if traces:
@@ -838,7 +864,7 @@ def _links_for(path: Path, lineno: int) -> dict[str, str]:
     --------
     >>> _links_for(...)
     """
-    out = {}
+    out: dict[str, str] = {}
     if LINK_MODE in {"editor", "both"}:
         out["editor"] = _editor_link(path, lineno)
     if LINK_MODE in {"github", "both"}:
@@ -884,13 +910,12 @@ def main() -> None:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Examples
     --------
     >>> from tools.docs.scan_observability import main
     >>> main()  # doctest: +ELLIPSIS
     """
-    
     policy = load_policy()
     if not SRC.exists():
         return
@@ -898,7 +923,7 @@ def main() -> None:
     all_logs: list[LogRow] = []
     all_metrics: list[MetricRow] = []
     all_traces: list[TraceRow] = []
-    lints: list[dict] = []
+    lints: list[dict[str, Any]] = []
 
     for py in SRC.rglob("*.py"):
         file_logs, file_metrics, file_traces = scan_file(py, policy)
@@ -906,22 +931,24 @@ def main() -> None:
         all_metrics.extend(file_metrics)
         all_traces.extend(file_traces)
 
-        for r in file_metrics:
-            lints.extend(_lint_metric(policy, r))
-        for r in file_logs:
-            lints.extend(_lint_log(policy, r))
-        for r in file_traces:
-            lints.extend(_lint_trace(policy, r))
+        for metric in file_metrics:
+            lints.extend(_lint_metric(policy, metric))
+        for log_event in file_logs:
+            lints.extend(_lint_log(policy, log_event))
+        for trace in file_traces:
+            lints.extend(_lint_trace(policy, trace))
 
     # Optional runbook linking (error taxonomy)
     tax_path = ROOT / (policy.get("error_taxonomy_json") or "")
     if tax_path.exists():
+        tax_data: Any
         try:
-            tax = json.loads(tax_path.read_text(encoding="utf-8"))
+            tax_data = json.loads(tax_path.read_text(encoding="utf-8"))
         except Exception:
-            tax = {}
+            tax_data = {}
+        tax = tax_data if isinstance(tax_data, dict) else {}
         # naïve example: map by message substring to extensions.runbook
-        rb = {}
+        rb: dict[str, str] = {}
         for item in tax.get("errors", []):
             if "message" in item and "extensions" in item and "runbook" in item["extensions"]:
                 rb[item["message"]] = item["extensions"]["runbook"]

@@ -25,19 +25,21 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str
     """Compute migrate navmaps.
 
     Carry out the migrate navmaps operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     output : Path | None
+    output : Path | None, optional, default=None
         Description for ``output``.
     pretty : bool | None
+    pretty : bool | None, optional, default=True
         Description for ``pretty``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.migrate_navmaps import migrate_navmaps
@@ -45,7 +47,6 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     index = build_index()
     if output:
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -88,17 +89,18 @@ def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     argv : List[str] | None
+    argv : List[str] | None, optional, default=None
         Description for ``argv``.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.migrate_navmaps import main
@@ -106,7 +108,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     args = _parse_args(argv)
     migrate_navmaps(args.output, pretty=not args.compact)
     print(f"Wrote navmap index to {args.output}")

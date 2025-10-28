@@ -7,6 +7,8 @@ import json
 import os
 from pathlib import Path
 
+from pytest import MonkeyPatch
+
 MODULE_PATH = Path(__file__).resolve().parents[2] / "tools" / "docs" / "build_test_map.py"
 
 spec = importlib.util.spec_from_file_location("tools.docs.build_test_map", MODULE_PATH)
@@ -15,7 +17,7 @@ build_test_map = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(build_test_map)
 
 
-def test_load_symbol_candidates_strips_init(tmp_path, monkeypatch):
+def test_load_symbol_candidates_strips_init(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     root = tmp_path
     src = root / "src"
     pkg = src / "kgfoundry"
@@ -31,7 +33,7 @@ def test_load_symbol_candidates_strips_init(tmp_path, monkeypatch):
     assert "kgfoundry.__init__" not in candidates
 
 
-def test_load_symbol_candidates_reads_navmap(tmp_path, monkeypatch):
+def test_load_symbol_candidates_reads_navmap(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     root = tmp_path
     navmap_dir = root / "site" / "_build" / "navmap"
     navmap_dir.mkdir(parents=True, exist_ok=True)

@@ -47,7 +47,6 @@ class AllDictTemplate:
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     __slots__ = ("template",)
 
@@ -59,13 +58,13 @@ class AllDictTemplate:
         Parameters
         ----------
         template : typing.Any
+        template : typing.Any
             Description for ``template``.
         """
-        
         self.template = template
 
 
-def _literal_eval_navmap(node: ast.AST) -> Any:
+def _literal_eval_navmap(node: ast.AST | None) -> Any:
     """Literal eval navmap.
 
     Parameters
@@ -88,6 +87,8 @@ def _literal_eval_navmap(node: ast.AST) -> Any:
     --------
     >>> _literal_eval_navmap(...)
     """
+    if node is None:
+        raise ValueError("unsupported empty literal")
     if isinstance(node, ast.Constant):
         return node.value
     if isinstance(node, ast.Name):
@@ -161,25 +162,25 @@ def _replace_placeholders(value: Any, exports: list[str]) -> Any:
                 result[name] = resolved
         return result
     if isinstance(value, list):
-        items: list[Any] = []
+        expanded_items: list[Any] = []
         for entry in value:
             replaced = _replace_placeholders(entry, exports)
             if isinstance(replaced, list):
-                items.extend(replaced)
+                expanded_items.extend(replaced)
             else:
-                items.append(replaced)
-        return items
+                expanded_items.append(replaced)
+        return expanded_items
     if isinstance(value, dict):
         return {k: _replace_placeholders(v, exports) for k, v in value.items()}
     if isinstance(value, set):
-        items: set[Any] = set()
+        unique_items: set[Any] = set()
         for entry in value:
             replaced = _replace_placeholders(entry, exports)
             if isinstance(replaced, list):
-                items.update(replaced)
+                unique_items.update(replaced)
             else:
-                items.add(replaced)
-        return items
+                unique_items.add(replaced)
+        return unique_items
     return value
 
 
@@ -191,7 +192,6 @@ class ModuleInfo:
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     module: str
     path: Path
@@ -236,7 +236,6 @@ def _gh_link(path: Path, start: int | None, end: int | None) -> str | None:
 
 def _editor_link(path: Path, line: int | None = None) -> str | None:
     """Build an editor deep link respecting ``DOCS_EDITOR`` mode."""
-
     if EDITOR_MODE == "relative":
         try:
             rel_path = path.relative_to(REPO).as_posix()
@@ -286,8 +285,10 @@ def _module_name(py: Path) -> str | None:
     return ".".join(parts)
 
 
-def _literal_list_of_strs(node: ast.AST) -> list[str] | None:
+def _literal_list_of_strs(node: ast.AST | None) -> list[str] | None:
     """Best-effort get list/tuple of strings from AST node."""
+    if node is None:
+        return None
     if isinstance(node, (ast.List, ast.Tuple)):
         vals = []
         for elt in node.elts:
@@ -327,16 +328,18 @@ def _parse_py(py: Path) -> tuple[dict[str, Any], list[str]]:
                     nav_raw = {}
         elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
             if node.target.id == "__all__":
-                vals = _literal_list_of_strs(node.value)
-                if vals is not None:
-                    exports = vals
+                if node.value is not None:
+                    vals = _literal_list_of_strs(node.value)
+                    if vals is not None:
+                        exports = vals
             if node.target.id == "__navmap__":
-                try:
-                    nav_raw = _literal_eval_navmap(node.value)
-                    if not isinstance(nav_raw, dict):
+                if node.value is not None:
+                    try:
+                        nav_raw = _literal_eval_navmap(node.value)
+                        if not isinstance(nav_raw, dict):
+                            nav_raw = {}
+                    except Exception:
                         nav_raw = {}
-                except Exception:
-                    nav_raw = {}
 
     nav: dict[str, Any] = {}
     exports = list(dict.fromkeys(exports))
@@ -420,19 +423,21 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
     """Compute build index.
 
     Carry out the build index operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     root : Path | None
+    root : Path | None, optional, default=SRC
         Description for ``root``.
     json_path : Path | None
+    json_path : Path | None, optional, default=None
         Description for ``json_path``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.build_navmap import build_index
@@ -440,7 +445,6 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     files = _discover_py_files()
     data: dict[str, Any] = {
         "commit": _git_sha(),
@@ -513,12 +517,12 @@ def main() -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.build_navmap import main
@@ -526,7 +530,6 @@ def main() -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     build_index()
     print(f"navmap built → {INDEX_PATH}")
     return 0

@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 from kgfoundry_common.navmap_types import NavMap
 from registry import api, duckdb_registry, helper, migrate
 

@@ -37,7 +37,7 @@ class NavMapLoadError(RuntimeError):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
+
 
 WINDOW = int(os.getenv("TESTMAP_WINDOW", "3"))
 COV_JSON = Path(os.getenv("TESTMAP_COVERAGE_JSON", str(OUTDIR / "coverage.json")))
@@ -77,12 +77,12 @@ def load_symbol_candidates() -> set[str]:
     """Compute load symbol candidates.
 
     Carry out the load symbol candidates operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     collections.abc.Set
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import load_symbol_candidates
@@ -90,11 +90,35 @@ def load_symbol_candidates() -> set[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     candidates: set[str] = set()
 
     def _record(module_name: str, exports: list[object] | None = None) -> None:
-        module = module_name[:-len(".__init__")] if module_name.endswith(".__init__") else module_name
+        """Record.
+
+        Parameters
+        ----------
+        module_name : str
+            Description.
+        exports : list[object] | None
+            Description.
+
+        Returns
+        -------
+        None
+            Description.
+
+        Raises
+        ------
+        Exception
+            Description.
+
+        Examples
+        --------
+        >>> _record(...)
+        """
+        module = (
+            module_name[: -len(".__init__")] if module_name.endswith(".__init__") else module_name
+        )
         if not module:
             return
         candidates.add(module)
@@ -155,12 +179,12 @@ def load_symbol_spans() -> dict[str, dict[str, Any]]:
     """Compute load symbol spans.
 
     Carry out the load symbol spans operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import load_symbol_spans
@@ -168,7 +192,6 @@ def load_symbol_spans() -> dict[str, dict[str, Any]]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     out: dict[str, dict[str, Any]] = {}
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if not symbols_json.exists():
@@ -192,17 +215,17 @@ def load_public_symbols() -> set[str]:
     """Compute load public symbols.
 
     Carry out the load public symbols operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     collections.abc.Set
         Description of return value.
-    
+
     Raises
     ------
     NavMapLoadError
         Raised when validation fails.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import load_public_symbols
@@ -210,7 +233,6 @@ def load_public_symbols() -> set[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     nav = ROOT / "site" / "_build" / "navmap" / "navmap.json"
     if not nav.exists():
         raise NavMapLoadError(
@@ -219,9 +241,11 @@ def load_public_symbols() -> set[str]:
     try:
         j = json.loads(nav.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
-        raise NavMapLoadError(f"Failed to parse {nav}: {exc}") from exc
+        message = f"Failed to parse {nav}: {exc}"
+        raise NavMapLoadError(message) from exc
     except OSError as exc:
-        raise NavMapLoadError(f"Failed to read {nav}: {exc}") from exc
+        message = f"Failed to read {nav}: {exc}"
+        raise NavMapLoadError(message) from exc
     exports: set[str] = set()
     mods = (j.get("modules") or {}).items()
     for mod, entry in mods:
@@ -280,19 +304,21 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     """Compute scan test file.
 
     Carry out the scan test file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
+    path : Path
         Description for ``path``.
     symbols : collections.abc.Set
+    symbols : collections.abc.Set
         Description for ``symbols``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import scan_test_file
@@ -300,7 +326,6 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -392,12 +417,12 @@ def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]
     """Compute load coverage.
 
     Carry out the load coverage operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     Tuple[dict[str, collections.abc.Set], dict[Tuple[str, int], collections.abc.Set]]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import load_coverage
@@ -405,10 +430,6 @@ def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
-    
-    
-    
     if not COV_JSON.exists():
         return ({}, {})
     data = _load_json(COV_JSON)
@@ -438,17 +459,18 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     """Compute build test map.
 
     Carry out the build test map operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     symbols : collections.abc.Set
+    symbols : collections.abc.Set
         Description for ``symbols``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import build_test_map
@@ -456,7 +478,6 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     table: dict[str, list[dict[str, object]]] = defaultdict(list)
     if not TESTS.exists():
         return {}
@@ -477,21 +498,24 @@ def attach_coverage(
     """Compute attach coverage.
 
     Carry out the attach coverage operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     symbol_spans : collections.abc.Mapping
+    symbol_spans : collections.abc.Mapping
         Description for ``symbol_spans``.
+    executed : collections.abc.Mapping
     executed : collections.abc.Mapping
         Description for ``executed``.
     ctx_by_line : collections.abc.Mapping
+    ctx_by_line : collections.abc.Mapping
         Description for ``ctx_by_line``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import attach_coverage
@@ -499,7 +523,6 @@ def attach_coverage(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     result: dict[str, dict[str, Any]] = {}
     for sym, meta in symbol_spans.items():
         f = meta.get("file")
@@ -512,7 +535,7 @@ def attach_coverage(
             hits = sorted(list(executed[rel].intersection(span)))
         # contexts (optional)
         contexts: set[str] = set()
-        if hits:
+        if hits and rel:
             for h in hits[:50]:  # limit
                 contexts |= ctx_by_line.get((rel, h), set())
         ratio = 0.0
@@ -538,23 +561,27 @@ def summarize(
     """Compute summarize.
 
     Carry out the summarize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     public_syms : collections.abc.Set
+    public_syms : collections.abc.Set
         Description for ``public_syms``.
+    symbol_spans : collections.abc.Mapping
     symbol_spans : collections.abc.Mapping
         Description for ``symbol_spans``.
     coverage : collections.abc.Mapping
+    coverage : collections.abc.Mapping
         Description for ``coverage``.
     budget : int
+    budget : int
         Description for ``budget``.
-    
+
     Returns
     -------
     Tuple[dict[str, typing.Any], List[dict[str, typing.Any]]]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import summarize
@@ -562,7 +589,6 @@ def summarize(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     # group by module
     by_mod: dict[str, list[str]] = defaultdict(list)
     for s in public_syms:
@@ -606,13 +632,12 @@ def main() -> None:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import main
     >>> main()  # doctest: +ELLIPSIS
     """
-    
     symbols = load_symbol_candidates()
     spans = load_symbol_spans()
     try:

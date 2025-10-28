@@ -5,7 +5,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 import re
@@ -47,17 +46,18 @@ def canonicalize_text(blocks: list[str]) -> str:
     """Compute canonicalize text.
 
     Carry out the canonicalize text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     blocks : List[str]
+    blocks : List[str]
         Description for ``blocks``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
     Examples
     --------
     >>> from docling.canonicalizer import canonicalize_text
@@ -65,23 +65,23 @@ def canonicalize_text(blocks: list[str]) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
 
     def norm(s: str) -> str:
         """Compute norm.
 
         Carry out the norm operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         s : str
+        s : str
             Description for ``s``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
+
         Examples
         --------
         >>> from docling.canonicalizer import norm
@@ -89,7 +89,6 @@ def canonicalize_text(blocks: list[str]) -> str:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         s = unicodedata.normalize("NFC", s)
         s = s.replace("\r\n", "\n").replace("\r", "\n")
         s = re.sub(r"[\u2022\u25E6\u2013]", "-", s)  # bullets/dashes

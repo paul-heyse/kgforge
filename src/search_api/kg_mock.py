@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 from __future__ import annotations
 
 from typing import Final, TypedDict
@@ -48,7 +47,6 @@ class ConceptMeta(TypedDict):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     label: str
     keywords: list[str]
@@ -71,17 +69,18 @@ def detect_query_concepts(query: str) -> set[str]:
     """Compute detect query concepts.
 
     Carry out the detect query concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     query : str
+    query : str
         Description for ``query``.
-    
+
     Returns
     -------
     collections.abc.Set
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.kg_mock import detect_query_concepts
@@ -89,7 +88,6 @@ def detect_query_concepts(query: str) -> set[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     lowered = query.lower()
     hits: set[str] = set()
     for concept_id, meta in CONCEPTS.items():
@@ -103,17 +101,18 @@ def linked_concepts_for_text(text: str) -> list[str]:
     """Compute linked concepts for text.
 
     Carry out the linked concepts for text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     text : str
+    text : str
         Description for ``text``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.kg_mock import linked_concepts_for_text
@@ -121,7 +120,6 @@ def linked_concepts_for_text(text: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     lowered = text.lower()
     hits = []
     for concept_id, meta in CONCEPTS.items():
@@ -140,23 +138,27 @@ def kg_boost(
     """Compute kg boost.
 
     Carry out the kg boost operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     query_concepts : List[str]
+    query_concepts : List[str]
         Description for ``query_concepts``.
+    chunk_concepts : List[str]
     chunk_concepts : List[str]
         Description for ``chunk_concepts``.
     direct : float | None
+    direct : float | None, optional, default=0.08
         Description for ``direct``.
     one_hop : float | None
+    one_hop : float | None, optional, default=0.04
         Description for ``one_hop``.
-    
+
     Returns
     -------
     float
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.kg_mock import kg_boost
@@ -164,6 +166,5 @@ def kg_boost(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

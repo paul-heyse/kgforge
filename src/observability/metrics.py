@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -37,19 +36,21 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             """Compute labels.
 
             Carry out the labels operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-            
+
             Parameters
             ----------
-            *args : Any
+            *args : object
+            *args : object
                 Description for ``*args``.
-            **kwargs : Any
+            **kwargs : object
+            **kwargs : object
                 Description for ``**kwargs``.
-            
+
             Returns
             -------
             _NoopMetric
                 Description of return value.
-            
+
             Examples
             --------
             >>> from observability.metrics import labels
@@ -57,67 +58,69 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             >>> result  # doctest: +ELLIPSIS
             ...
             """
-            
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
             """Compute observe.
 
             Carry out the observe operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-            
+
             Parameters
             ----------
-            *args : Any
+            *args : object
+            *args : object
                 Description for ``*args``.
-            **kwargs : Any
+            **kwargs : object
+            **kwargs : object
                 Description for ``**kwargs``.
-            
+
             Examples
             --------
             >>> from observability.metrics import observe
             >>> observe(*args, **kwargs)  # doctest: +ELLIPSIS
             """
-            
             return
 
         def inc(self, *args: object, **kwargs: object) -> None:
             """Compute inc.
 
             Carry out the inc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-            
+
             Parameters
             ----------
-            *args : Any
+            *args : object
+            *args : object
                 Description for ``*args``.
-            **kwargs : Any
+            **kwargs : object
+            **kwargs : object
                 Description for ``**kwargs``.
-            
+
             Examples
             --------
             >>> from observability.metrics import inc
             >>> inc(*args, **kwargs)  # doctest: +ELLIPSIS
             """
-            
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
             """Compute set.
 
             Carry out the set operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-            
+
             Parameters
             ----------
-            *args : Any
+            *args : object
+            *args : object
                 Description for ``*args``.
-            **kwargs : Any
+            **kwargs : object
+            **kwargs : object
                 Description for ``**kwargs``.
-            
+
             Examples
             --------
             >>> from observability.metrics import set
             >>> set(*args, **kwargs)  # doctest: +ELLIPSIS
             """
-            
             return
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:

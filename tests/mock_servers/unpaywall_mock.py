@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+from typing import Any
+
 from fastapi import FastAPI
 
 app = FastAPI(title="Unpaywall Mock")
 
 
 @app.get("/v2/{doi}")
-def by_doi(doi: str, email: str = "test@example.com"):
+def by_doi(doi: str, email: str = "test@example.com") -> dict[str, Any]:
     return {
         "doi": doi,
         "best_oa_location": {

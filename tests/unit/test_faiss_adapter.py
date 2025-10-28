@@ -27,7 +27,7 @@ except Exception:
 
 
 @pytest.mark.skipif(not (HAVE_ADAPTER or HAVE_VS), reason="FAISS adapters not importable")
-def test_dense_search_top1_is_self(tmp_path):
+def test_dense_search_top1_is_self(tmp_path: pathlib.Path) -> None:
     # Load first vector and id from parquet
     con = duckdb.connect(database=":memory:")
     try:

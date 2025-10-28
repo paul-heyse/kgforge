@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import importlib
 import sys
+from collections.abc import Callable
 from concurrent.futures import Future
 from pathlib import Path
-from types import SimpleNamespace
+from types import SimpleNamespace, TracebackType
+from typing import Any, Literal
 
 import pytest
 
@@ -13,23 +16,33 @@ ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from tools.docs import build_graphs
+build_graphs = importlib.import_module("tools.docs.build_graphs")
 
 
 class _DummyExecutor:
     """Synchronous stand-in for :class:`ProcessPoolExecutor` used in tests."""
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         pass
 
     def __enter__(self) -> _DummyExecutor:
         return self
 
-    def __exit__(self, exc_type, exc, tb) -> bool:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> Literal[False]:
         return False
 
-    def submit(self, fn, *args, **kwargs) -> Future:  # type: ignore[override]
-        fut: Future = Future()
+    def submit(
+        self,
+        fn: Callable[..., tuple[str, bool, bool, bool]],
+        *args: Any,
+        **kwargs: Any,
+    ) -> Future[tuple[str, bool, bool, bool]]:
+        fut: Future[tuple[str, bool, bool, bool]] = Future()
         try:
             result = fn(*args, **kwargs)
         except Exception as exc:
@@ -44,7 +57,7 @@ class _DummyExecutor:
 
 def test_main_exits_on_failure_and_cleans_outputs(
     monkeypatch: pytest.MonkeyPatch,
-    tmp_path,
+    tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """The CLI should abort and delete partial files when a per-package build fails."""
@@ -74,11 +87,13 @@ def test_main_exits_on_failure_and_cleans_outputs(
     )
     monkeypatch.setattr(build_graphs, "parse_args", lambda: args)
 
-    def failing_pydeps(pkg: str, out_svg, excludes, max_bacon, fmt) -> None:
+    def failing_pydeps(
+        pkg: str, out_svg: Path, excludes: list[str] | None, max_bacon: int, fmt: str
+    ) -> None:
         out_svg.write_text("partial", encoding="utf-8")
         raise RuntimeError("boom")
 
-    def fake_pyreverse(pkg: str, out_dir_arg, fmt: str) -> None:
+    def fake_pyreverse(pkg: str, out_dir_arg: Path, fmt: str) -> None:
         out_dir_arg.mkdir(parents=True, exist_ok=True)
         (out_dir_arg / f"{pkg}-uml.{fmt}").write_text("uml", encoding="utf-8")
 
@@ -104,7 +119,9 @@ def test_main_exits_on_failure_and_cleans_outputs(
     assert "demo_pkg" in captured.err
 
 
-def test_build_one_package_supports_png_and_cache(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
+def test_build_one_package_supports_png_and_cache(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     """Non-default formats should render and populate the cache without rebuilding."""
     out_dir = tmp_path / "graphs"
     out_dir.mkdir()
@@ -116,7 +133,9 @@ def test_build_one_package_supports_png_and_cache(monkeypatch: pytest.MonkeyPatc
     pydeps_calls = 0
     pyrev_calls = 0
 
-    def fake_pydeps(pkg: str, out_path: Path, excludes, max_bacon: int, requested_fmt: str) -> None:
+    def fake_pydeps(
+        pkg: str, out_path: Path, excludes: list[str] | None, max_bacon: int, requested_fmt: str
+    ) -> None:
         nonlocal pydeps_calls
         pydeps_calls += 1
         assert requested_fmt == fmt
@@ -153,10 +172,10 @@ def test_build_one_package_supports_png_and_cache(monkeypatch: pytest.MonkeyPatc
     imports_path.unlink()
     uml_path.unlink()
 
-    def fail_pydeps(*_args, **_kwargs) -> None:  # pragma: no cover - defensive guard
+    def fail_pydeps(*_args: Any, **_kwargs: Any) -> None:  # pragma: no cover - defensive guard
         raise AssertionError("pydeps should not run on cache hit")
 
-    def fail_pyreverse(*_args, **_kwargs) -> None:  # pragma: no cover - defensive guard
+    def fail_pyreverse(*_args: Any, **_kwargs: Any) -> None:  # pragma: no cover - defensive guard
         raise AssertionError("pyreverse should not run on cache hit")
 
     monkeypatch.setattr(build_graphs, "build_pydeps_for_package", fail_pydeps)

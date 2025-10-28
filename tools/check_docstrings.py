@@ -28,12 +28,12 @@ def parse_args() -> argparse.Namespace:
     """Compute parse args.
 
     Carry out the parse args operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     argparse.Namespace
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.check_docstrings import parse_args
@@ -41,7 +41,6 @@ def parse_args() -> argparse.Namespace:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--no-todo",
@@ -55,17 +54,18 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
     """Compute iter docstrings.
 
     Carry out the iter docstrings operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
+    path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     collections.abc.Iterable
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.check_docstrings import iter_docstrings
@@ -73,7 +73,6 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if (doc := ast.get_docstring(tree, clean=False)) is not None:
@@ -90,12 +89,12 @@ def check_placeholders() -> int:
     """Compute check placeholders.
 
     Carry out the check placeholders operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.check_docstrings import check_placeholders
@@ -103,7 +102,6 @@ def check_placeholders() -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     errors: list[str] = []
     keywords = {"TODO", "TBD", "FIXME"}
 
@@ -127,18 +125,17 @@ def main() -> None:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Raises
     ------
     SystemExit
         Raised when validation fails.
-    
+
     Examples
     --------
     >>> from tools.check_docstrings import main
     >>> main()  # doctest: +ELLIPSIS
     """
-    
     options = parse_args()
 
     cmd = [

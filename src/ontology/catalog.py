@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -22,7 +21,6 @@ class Concept:
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     id: str
     label: str | None = None
@@ -64,7 +62,6 @@ class OntologyCatalog:
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     def __init__(self, concepts: list[Concept]) -> None:
         """Compute init.
@@ -74,31 +71,30 @@ class OntologyCatalog:
         Parameters
         ----------
         concepts : List[src.ontology.catalog.Concept]
+        concepts : List[src.ontology.catalog.Concept]
             Description for ``concepts``.
         """
-        
-        
-        
-        
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
         """Compute neighbors.
 
         Carry out the neighbors operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         concept_id : str
+        concept_id : str
             Description for ``concept_id``.
         depth : int | None
+        depth : int | None, optional, default=1
             Description for ``depth``.
-        
+
         Returns
         -------
         collections.abc.Set
             Description of return value.
-        
+
         Examples
         --------
         >>> from ontology.catalog import neighbors
@@ -106,7 +102,6 @@ class OntologyCatalog:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return set()
 
@@ -114,17 +109,18 @@ class OntologyCatalog:
         """Compute hydrate.
 
         Carry out the hydrate operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         concept_id : str
+        concept_id : str
             Description for ``concept_id``.
-        
+
         Returns
         -------
         collections.abc.Mapping
             Description of return value.
-        
+
         Examples
         --------
         >>> from ontology.catalog import hydrate
@@ -132,5 +128,4 @@ class OntologyCatalog:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         return {}

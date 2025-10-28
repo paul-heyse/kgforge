@@ -1,5 +1,7 @@
-"""Quickstart — minimal import smoke test
+"""Quickstart - minimal import smoke test
 ======================================
+
+Run the quickstart import smoke test.
 
 Ensure the :mod:`kgfoundry` package can be imported without side effects.
 

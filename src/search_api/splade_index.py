@@ -5,7 +5,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 import re
@@ -53,17 +52,18 @@ def tok(text: str) -> list[str]:
     """Compute tok.
 
     Carry out the tok operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     text : str
+    text : str
         Description for ``text``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.splade_index import tok
@@ -71,7 +71,6 @@ def tok(text: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return [token.lower() for token in TOKEN.findall(text or "")]
 
 
@@ -84,7 +83,6 @@ class SpladeDoc:
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     chunk_id: str
     doc_id: str
@@ -100,7 +98,6 @@ class SpladeIndex:
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     def __init__(
         self,
@@ -115,16 +112,15 @@ class SpladeIndex:
         Parameters
         ----------
         db_path : str
+        db_path : str
             Description for ``db_path``.
+        chunks_dataset_root : str | None
         chunks_dataset_root : str | None, optional, default=None
             Description for ``chunks_dataset_root``.
+        sparse_root : str | None
         sparse_root : str | None, optional, default=None
             Description for ``sparse_root``.
         """
-        
-        
-        
-        
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -176,19 +172,21 @@ class SpladeIndex:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         query : str
+        query : str
             Description for ``query``.
         k : int | None
+        k : int | None, optional, default=10
             Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[int, float]]
             Description of return value.
-        
+
         Examples
         --------
         >>> from search_api.splade_index import search
@@ -196,7 +194,6 @@ class SpladeIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         if self.N == 0:
             return []
         terms = tok(query)
@@ -220,17 +217,18 @@ class SpladeIndex:
         """Compute doc.
 
         Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         index : int
+        index : int
             Description for ``index``.
-        
+
         Returns
         -------
         src.search_api.splade_index.SpladeDoc
             Description of return value.
-        
+
         Examples
         --------
         >>> from search_api.splade_index import doc
@@ -238,5 +236,4 @@ class SpladeIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         return self.docs[index]

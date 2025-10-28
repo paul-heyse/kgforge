@@ -5,7 +5,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from kgfoundry_common.navmap_types import NavMap
 from orchestration import cli, fixture_flow, flows
 

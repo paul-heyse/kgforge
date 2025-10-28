@@ -1,5 +1,7 @@
 """Utility helpers used by Sphinx gallery examples
-===============================================
+================================================
+
+Explain the utility helpers used by Sphinx gallery examples.
 
 The helpers in this module must stay import-safe, deterministic, and CPU-only so
 that doctest and gallery generation remain fast. Keep the data tiny and avoid

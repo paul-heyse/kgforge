@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 from __future__ import annotations
 
 from typing import Final
@@ -50,22 +49,24 @@ def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
     """Compute harvest.
 
     Carry out the harvest operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     topic : str
+    topic : str
         Description for ``topic``.
     years : str | None
+    years : str | None, optional, default='>=2018'
         Description for ``years``.
     max_works : int | None
+    max_works : int | None, optional, default=20000
         Description for ``max_works``.
-    
+
     Examples
     --------
     >>> from download.cli import harvest
     >>> harvest(...)  # doctest: +ELLIPSIS
     """
-    
     typer.echo(f"[dry-run] would harvest topic={topic!r}, years={years}, max_works={max_works}")
 
 

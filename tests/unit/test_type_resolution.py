@@ -6,6 +6,7 @@ import ast
 import fnmatch
 import ssl
 from pathlib import Path
+from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
@@ -15,7 +16,7 @@ from tools.auto_docstrings import QUALIFIED_NAME_OVERRIDES, _normalize_qualified
 CONF_PATH = Path(__file__).resolve().parents[2] / "docs" / "conf.py"
 
 
-def _load_conf_symbol(name: str) -> object:
+def _load_conf_symbol(name: str) -> Any:
     """Return the literal value assigned to ``name`` inside ``docs/conf.py``."""
     module = ast.parse(CONF_PATH.read_text())
     for node in module.body:

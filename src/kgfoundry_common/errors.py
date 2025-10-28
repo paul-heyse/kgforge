@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 from __future__ import annotations
 
 from typing import Final
@@ -61,7 +60,6 @@ class DownloadError(Exception):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     ...
 
@@ -74,7 +72,6 @@ class UnsupportedMIMEError(Exception):
     encapsulates behaviour behind a well-defined interface for collaborating components. Instances
     are typically created by factories or runtime orchestrators documented nearby.
     """
-    
 
     ...
 
@@ -87,7 +84,6 @@ class DoclingError(Exception):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     ...
 
@@ -100,7 +96,6 @@ class OCRTimeoutError(Exception):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     ...
 
@@ -113,7 +108,6 @@ class ChunkingError(Exception):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     ...
 
@@ -126,7 +120,6 @@ class EmbeddingError(Exception):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     ...
 
@@ -139,7 +132,6 @@ class SpladeOOMError(Exception):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     ...
 
@@ -152,7 +144,6 @@ class IndexBuildError(Exception):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     ...
 
@@ -165,7 +156,6 @@ class OntologyParseError(Exception):
     encapsulates behaviour behind a well-defined interface for collaborating components. Instances
     are typically created by factories or runtime orchestrators documented nearby.
     """
-    
 
     ...
 
@@ -178,7 +168,6 @@ class LinkerCalibrationError(Exception):
     encapsulates behaviour behind a well-defined interface for collaborating components. Instances
     are typically created by factories or runtime orchestrators documented nearby.
     """
-    
 
     ...
 
@@ -191,6 +180,5 @@ class Neo4jError(Exception):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     ...

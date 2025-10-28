@@ -1,7 +1,7 @@
 {
   "$id": "https://kgfoundry/schemas/search_api.schemas.SearchRequest.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Describe SearchRequest.",
+  "description": "Model the SearchRequest.\n\nPydantic model defining the structured payload used across the system. Validation ensures inputs\nconform to the declared schema while producing clear error messages. Use this class when\nserialising or parsing data for the surrounding feature.",
   "examples": [
     {
       "explain": false,

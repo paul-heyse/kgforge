@@ -5,9 +5,9 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
+import importlib
 import json
 import os
 import subprocess
@@ -15,22 +15,29 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from types import ModuleType
+from typing import Any, cast
 
-from griffe import Object
-
+griffe_module = importlib.import_module("griffe")
+loader_module: ModuleType | None
 try:
-    from griffe.loader import GriffeLoader
-except ImportError:  # pragma: no cover - compatibility shim
-    from griffe import GriffeLoader  # type: ignore[attr-defined]
+    loader_module = importlib.import_module("griffe.loader")
+except ModuleNotFoundError:
+    loader_module = None
+Object = cast(Any, griffe_module.Object)
+default_loader = griffe_module.GriffeLoader
+GriffeLoader = cast(
+    Any,
+    loader_module.GriffeLoader if loader_module is not None else default_loader,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
-DOCS_BUILD = ROOT / "docs" / "_build"
-TOOLS_DIR = ROOT / "tools"
-if str(TOOLS_DIR) not in sys.path:
-    sys.path.insert(0, str(TOOLS_DIR))
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
-from detect_pkg import detect_packages, detect_primary  # noqa: E402
+DOCS_BUILD = ROOT / "docs" / "_build"
+
+from tools.detect_pkg import detect_packages, detect_primary  # noqa: E402
 
 SRC = ROOT / "src"
 ENV_PKGS = os.environ.get("DOCS_PKG")
@@ -56,7 +63,6 @@ class NavLookup:
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     symbol_meta: dict[str, dict[str, Any]]
     module_meta: dict[str, dict[str, Any]]
@@ -67,12 +73,12 @@ def iter_packages() -> list[str]:
     """Compute iter packages.
 
     Carry out the iter packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from docs._scripts.build_symbol_index import iter_packages
@@ -80,32 +86,34 @@ def iter_packages() -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     packages = detect_packages()
     return packages or [detect_primary()]
 
 
-def safe_attr(node: Object, attr: str, default: object | None = None) -> object | None:
+def safe_attr(node: Any, attr: str, default: object | None = None) -> object | None:
     """Compute safe attr.
 
     Carry out the safe attr operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
-    node : Object
+    node : typing.Any
+    node : typing.Any
         Description for ``node``.
+    attr : str
     attr : str
         Description for ``attr``.
     default : object | None
+    default : object | None, optional, default=None
         Description for ``default``.
-    
+
     Returns
     -------
     object | None
         Description of return value.
-    
+
     Examples
     --------
     >>> from docs._scripts.build_symbol_index import safe_attr
@@ -113,7 +121,6 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     try:
         return getattr(node, attr)
     except Exception:
@@ -139,7 +146,7 @@ def _package_for(module: str | None, path: str | None) -> str | None:
     return target.split(".", 1)[0]
 
 
-def _canonical_path(node: Object) -> str | None:
+def _canonical_path(node: Any) -> str | None:
     """Return the canonical path for ``node`` if available."""
     canonical = safe_attr(node, "canonical_path")
     if isinstance(canonical, Object):
@@ -149,7 +156,7 @@ def _canonical_path(node: Object) -> str | None:
     return str(canonical)
 
 
-def _string_signature(node: Object) -> str | None:
+def _string_signature(node: Any) -> str | None:
     """Return a printable signature for callable ``node`` objects."""
     signature = safe_attr(node, "signature")
     if signature is None:
@@ -305,15 +312,17 @@ def _meta_value(
     return None
 
 
-def _doc_first_paragraph(node: Object) -> str:
+def _doc_first_paragraph(node: Any) -> str:
     """Return the first paragraph of a node's docstring."""
     doc = safe_attr(node, "docstring")
-    if doc and getattr(doc, "value", None):
-        text = doc.value.strip()
-        if not text:
-            return ""
-        first = text.split("\n\n", 1)[0]
-        return first.strip()
+    if doc is None:
+        return ""
+    value = getattr(doc, "value", None)
+    if isinstance(value, str):
+        text = value.strip()
+        if text:
+            first = text.split("\n\n", 1)[0]
+            return first.strip()
     return ""
 
 
@@ -321,7 +330,7 @@ def _collect_rows(nav: NavLookup, test_map: dict[str, Any]) -> list[dict[str, An
     """Traverse packages and return enriched symbol rows."""
     rows: dict[str, dict[str, Any]] = {}
 
-    def _walk(node: Object) -> None:
+    def _walk(node: Any) -> None:
         """Walk.
 
         Parameters
@@ -347,7 +356,11 @@ def _collect_rows(nav: NavLookup, test_map: dict[str, Any]) -> list[dict[str, An
         if not isinstance(path, str):
             return
 
-        kind = node.kind.value
+        kind_obj = getattr(node, "kind", None)
+        kind_val = getattr(kind_obj, "value", None)
+        if not isinstance(kind_val, str):
+            return
+        kind = kind_val
         module = _module_for(path, kind)
         package = _package_for(module, path)
 
@@ -456,12 +469,12 @@ def main() -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Examples
     --------
     >>> from docs._scripts.build_symbol_index import main
@@ -469,7 +482,6 @@ def main() -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     nav_lookup = _load_navmap()
     test_map = _load_test_map()
 

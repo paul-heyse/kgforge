@@ -11,37 +11,79 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib
 import json
 import os
 import shutil
 import subprocess
 import sys
 import time
+import warnings
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, cast
 
-# Third-party (global graph & rendering)
-try:
-    import pydot  # DOT <-> pydot
-except Exception:
-    pydot = None  # handled in main()
-try:
-    import networkx as nx  # cycles, centrality
-except Exception:
-    nx = None  # handled in main()
-try:
-    import yaml  # layers policy
-except Exception:
-    yaml = None
+
+def _optional_import(name: str) -> Any:
+    """Import module if available.
+
+    Parameters
+    ----------
+    name : str
+        Description.
+
+    Returns
+    -------
+    Any
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _optional_import(...)
+    """
+    try:
+        return importlib.import_module(name)
+    except Exception:
+        return None
+
+
+pydot = _optional_import("pydot")
+nx = _optional_import("networkx")
+yaml = _optional_import("yaml")
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 OUT = ROOT / "docs" / "_build" / "graphs"
 OUT.mkdir(parents=True, exist_ok=True)
 
+# Temporary workspace for graph builds to avoid clobbering finished outputs.
+STAGING_ROOT = OUT / "_staging"
+STAGING_ROOT.mkdir(parents=True, exist_ok=True)
+
 # Render targets supported by both Graphviz and our docs pipeline.
 SUPPORTED_FORMATS: tuple[str, ...] = ("svg", "png")
+
+warnings.filterwarnings(
+    "ignore",
+    category=SyntaxWarning,
+    module=r"pyserini\.trectools\._base",
+)
+
+_PYTHONWARNINGS = "PYTHONWARNINGS"
+_PYSERINI_WARNING = "ignore::SyntaxWarning:pyserini.trectools._base"
+
+# Ensure child interpreters (pydeps/pyreverse) inherit the targeted suppression.
+if _PYTHONWARNINGS in os.environ and os.environ[_PYTHONWARNINGS]:
+    os.environ[_PYTHONWARNINGS] = ",".join(
+        [os.environ[_PYTHONWARNINGS], _PYSERINI_WARNING],
+    )
+else:
+    os.environ[_PYTHONWARNINGS] = _PYSERINI_WARNING
 
 # Defaults / policy files
 LAYER_FILE = ROOT / "docs" / "policies" / "layers.yml"
@@ -56,12 +98,12 @@ def parse_args() -> argparse.Namespace:
     """Compute parse args.
 
     Carry out the parse args operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     argparse.Namespace
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import parse_args
@@ -69,7 +111,6 @@ def parse_args() -> argparse.Namespace:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     p = argparse.ArgumentParser(
         description="Build per-package and cross-subsystem graphs with policy checks."
     )
@@ -142,25 +183,30 @@ def parse_args() -> argparse.Namespace:
 # --------------------------------------------------------------------------------------
 
 
-def sh(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subprocess.CompletedProcess:
+def sh(
+    cmd: list[str], cwd: Path | None = None, check: bool = True
+) -> subprocess.CompletedProcess[str]:
     """Compute sh.
 
     Carry out the sh operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     cmd : List[str]
+    cmd : List[str]
         Description for ``cmd``.
     cwd : Path | None
+    cwd : Path | None, optional, default=None
         Description for ``cwd``.
     check : bool | None
+    check : bool | None, optional, default=True
         Description for ``check``.
-    
+
     Returns
     -------
-    subprocess.CompletedProcess
+    subprocess.CompletedProcess[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import sh
@@ -168,7 +214,6 @@ def sh(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subproces
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return subprocess.run(
         cmd, check=check, cwd=str(cwd) if cwd else None, text=True, capture_output=False
     )
@@ -178,18 +223,18 @@ def ensure_bin(name: str) -> None:
     """Compute ensure bin.
 
     Carry out the ensure bin operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     name : str
+    name : str
         Description for ``name``.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import ensure_bin
     >>> ensure_bin(...)  # doctest: +ELLIPSIS
     """
-    
     if not shutil.which(name):
         print(f"[graphs] Missing required executable on PATH: {name}", file=sys.stderr)
         print(
@@ -203,12 +248,12 @@ def find_top_packages() -> list[str]:
     """Compute find top packages.
 
     Carry out the find top packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import find_top_packages
@@ -216,7 +261,6 @@ def find_top_packages() -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     # Top-level packages are directories under src/ that contain __init__.py
     pkgs: list[str] = []
     if not SRC.exists():
@@ -246,27 +290,33 @@ def build_pydeps_for_package(
     """Compute build pydeps for package.
 
     Carry out the build pydeps for package operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     pkg : str
+    pkg : str
         Description for ``pkg``.
+    out_svg : Path
     out_svg : Path
         Description for ``out_svg``.
     excludes : List[str]
+    excludes : List[str]
         Description for ``excludes``.
+    max_bacon : int
     max_bacon : int
         Description for ``max_bacon``.
     fmt : str
+    fmt : str
         Description for ``fmt``.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import build_pydeps_for_package
     >>> build_pydeps_for_package(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
     dot_tmp = out_svg.with_suffix(".dot")
+    dot_tmp.parent.mkdir(parents=True, exist_ok=True)
+    dot_target = dot_tmp if dot_tmp.is_absolute() else dot_tmp.resolve()
     cmd = [
         sys.executable,
         "-m",
@@ -275,7 +325,7 @@ def build_pydeps_for_package(
         "--noshow",
         "--show-dot",
         "--dot-output",
-        str(dot_tmp),
+        str(dot_target),
         "--max-bacon",
         str(max_bacon),
         "-T",
@@ -284,32 +334,40 @@ def build_pydeps_for_package(
     for pat in excludes:
         cmd += ["-x", pat]
     sh(cmd, cwd=ROOT)
+    fallback_dot = ROOT / f"src_{pkg}.dot"
+    if not dot_target.exists() and fallback_dot.exists():
+        fallback_dot.replace(dot_target)
+    for leftover in ROOT.glob(f"src_{pkg}*.dot"):
+        if leftover.exists():
+            leftover.unlink()
     # Render to final image via graphviz (dot)
-    sh(["dot", f"-T{fmt}", str(dot_tmp), "-o", str(out_svg)], cwd=ROOT)
-    if dot_tmp.exists():
-        dot_tmp.unlink()
+    sh(["dot", f"-T{fmt}", str(dot_target), "-o", str(out_svg)], cwd=ROOT)
+    if dot_target.exists():
+        dot_target.unlink()
 
 
 def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
     """Compute build pyreverse for package.
 
     Carry out the build pyreverse for package operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     pkg : str
+    pkg : str
         Description for ``pkg``.
+    out_dir : Path
     out_dir : Path
         Description for ``out_dir``.
     fmt : str
+    fmt : str
         Description for ``fmt``.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import build_pyreverse_for_package
     >>> build_pyreverse_for_package(..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
     # classes_<project>.dot is named by -p <project>; use the package name to get unique names.
     out_dir.mkdir(parents=True, exist_ok=True)
     sh(
@@ -362,22 +420,27 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
     """Compute build global pydeps.
 
     Carry out the build global pydeps operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     dot_out : Path
+    dot_out : Path
         Description for ``dot_out``.
+    excludes : List[str]
     excludes : List[str]
         Description for ``excludes``.
     max_bacon : int
+    max_bacon : int
         Description for ``max_bacon``.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import build_global_pydeps
     >>> build_global_pydeps(..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
+    dot_out.parent.mkdir(parents=True, exist_ok=True)
+    dot_target = dot_out if dot_out.is_absolute() else dot_out.resolve()
+
     cmd = [
         sys.executable,
         "-m",
@@ -386,7 +449,7 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
         "--noshow",
         "--show-dot",
         "--dot-output",
-        str(dot_out),
+        str(dot_target),
         "--max-bacon",
         str(max_bacon),
         "-T",
@@ -403,22 +466,37 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
         cmd += ["-x", pat]
     sh(cmd, cwd=ROOT)
 
+    # Newer pydeps releases still emit src*.dot files in the repository root; prefer the
+    # explicitly requested location and clean up any temporary artifacts.
+    fallback_dot = ROOT / "src.dot"
+    if not dot_target.exists() and fallback_dot.exists():
+        fallback_dot.replace(dot_target)
+    for leftover in ROOT.glob("src*.dot"):
+        if leftover.exists():
+            leftover.unlink()
 
-def collapse_to_packages(dot_path: Path) -> nx.DiGraph:
+
+def collapse_to_packages(dot_path: Path) -> Any:
     """Compute collapse to packages.
 
     Carry out the collapse to packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     dot_path : Path
+    dot_path : Path
         Description for ``dot_path``.
-    
+
     Returns
     -------
-    nx.DiGraph
+    typing.Any
         Description of return value.
-    
+
+    Raises
+    ------
+    RuntimeError
+        Raised when validation fails.
+
     Examples
     --------
     >>> from tools.docs.build_graphs import collapse_to_packages
@@ -426,16 +504,41 @@ def collapse_to_packages(dot_path: Path) -> nx.DiGraph:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
+    if nx is None or pydot is None:
+        raise RuntimeError("networkx and pydot are required to collapse graphs")
+
     graphs = pydot.graph_from_dot_file(str(dot_path))
     pd = graphs[0] if isinstance(graphs, list) else graphs
     g = nx.drawing.nx_pydot.from_pydot(pd).to_directed()
     collapsed = nx.DiGraph()
 
     def _module_name(node: Any, data: dict[str, Any]) -> str:
+        """Return module name.
+
+        Parameters
+        ----------
+        node : Any
+            Description.
+        data : dict[str, Any]
+            Description.
+
+        Returns
+        -------
+        str
+            Description.
+
+        Raises
+        ------
+        Exception
+            Description.
+
+        Examples
+        --------
+        >>> _module_name(...)
+        """
         label = data.get("label")
         if label:
-            raw = str(label).strip("\"")
+            raw = str(label).strip('"')
             normalized = raw.replace(r"\n", "\n").replace(r"\.", ".").replace(r"\\", "\\")
             return normalized.replace("\n", "")
         return str(node)
@@ -453,23 +556,30 @@ def collapse_to_packages(dot_path: Path) -> nx.DiGraph:
     return collapsed
 
 
-def analyze_graph(g: nx.DiGraph, layers: dict[str, Any]) -> dict[str, Any]:
+def analyze_graph(g: Any, layers: dict[str, Any]) -> dict[str, Any]:
     """Compute analyze graph.
 
     Carry out the analyze graph operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
-    g : nx.DiGraph
+    g : typing.Any
+    g : typing.Any
         Description for ``g``.
     layers : collections.abc.Mapping
+    layers : collections.abc.Mapping
         Description for ``layers``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
+    Raises
+    ------
+    RuntimeError
+        Raised when validation fails.
+
     Examples
     --------
     >>> from tools.docs.build_graphs import analyze_graph
@@ -477,7 +587,9 @@ def analyze_graph(g: nx.DiGraph, layers: dict[str, Any]) -> dict[str, Any]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
+    if nx is None:
+        raise RuntimeError("networkx is required for graph analysis")
+
     # cycles (Johnson's algorithm) & degree centrality
     # 1) prune forbidden outward edges before cycle enumeration
     order = layers.get("order", [])
@@ -555,31 +667,43 @@ def analyze_graph(g: nx.DiGraph, layers: dict[str, Any]) -> dict[str, Any]:
 
 
 def style_and_render(
-    g: nx.DiGraph, layers: dict[str, Any], analysis: dict[str, Any], out_svg: Path, fmt: str = "svg"
+    g: Any, layers: dict[str, Any], analysis: dict[str, Any], out_svg: Path, fmt: str = "svg"
 ) -> None:
     """Compute style and render.
 
     Carry out the style and render operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
-    g : nx.DiGraph
+    g : typing.Any
+    g : typing.Any
         Description for ``g``.
+    layers : collections.abc.Mapping
     layers : collections.abc.Mapping
         Description for ``layers``.
     analysis : collections.abc.Mapping
+    analysis : collections.abc.Mapping
         Description for ``analysis``.
+    out_svg : Path
     out_svg : Path
         Description for ``out_svg``.
     fmt : str | None
+    fmt : str | None, optional, default='svg'
         Description for ``fmt``.
-    
+
+    Raises
+    ------
+    RuntimeError
+        Raised when validation fails.
+
     Examples
     --------
     >>> from tools.docs.build_graphs import style_and_render
     >>> style_and_render(..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
+    if pydot is None:
+        raise RuntimeError("pydot is required for rendering graphs")
+
     pkg2layer = layers.get("packages", {}) or {}
     palette = {
         "domain": "#2f855a",
@@ -598,7 +722,7 @@ def style_and_render(
             u, v = cyc[i], cyc[(i + 1) % len(cyc)]
             cycle_edges.add((u, v))
 
-    pd = pydot.Dot(graph_type="digraph", rankdir="LR")
+    pd: Any = pydot.Dot(graph_type="digraph", rankdir="LR")
 
     # nodes
     for n in sorted(g.nodes()):
@@ -626,20 +750,21 @@ def write_meta(meta: dict[str, Any], out_json: Path) -> None:
     """Compute write meta.
 
     Carry out the write meta operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     meta : collections.abc.Mapping
+    meta : collections.abc.Mapping
         Description for ``meta``.
     out_json : Path
+    out_json : Path
         Description for ``out_json``.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import write_meta
     >>> write_meta(..., ...)  # doctest: +ELLIPSIS
     """
-    
     out_json.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
 
@@ -649,24 +774,27 @@ def enforce_policy(
     """Compute enforce policy.
 
     Carry out the enforce policy operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     analysis : collections.abc.Mapping
+    analysis : collections.abc.Mapping
         Description for ``analysis``.
+    allow : collections.abc.Mapping
     allow : collections.abc.Mapping
         Description for ``allow``.
     fail_cycles : bool
+    fail_cycles : bool
         Description for ``fail_cycles``.
     fail_layers : bool
+    fail_layers : bool
         Description for ``fail_layers``.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import enforce_policy
     >>> enforce_policy(..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
     allowed_cycles = set(tuple(c) for c in (allow.get("cycles") or []))
     allowed_edges = set(tuple(e) for e in (allow.get("edges") or []))
     new_cycles = [c for c in analysis["cycles"] if tuple(c) not in allowed_cycles]
@@ -692,119 +820,78 @@ def enforce_policy(
 
 
 def package_snapshot_digest(pkg: str) -> str:
-    """Compute package snapshot digest.
-
-    Carry out the package snapshot digest operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Return a deterministic digest representing the package contents.
 
     Parameters
     ----------
     pkg : str
-        Description for ``pkg``.
+        Package name relative to ``src/``.
 
     Returns
     -------
     str
-        Description of return value.
+        Hex digest that changes only when tracked sources change.
 
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import package_snapshot_digest
-    >>> result = package_snapshot_digest(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
+    Notes
+    -----
+    The digest intentionally ignores Git metadata, file mtimes, and transient artifacts such as
+    ``__pycache__`` or ``*.pyc`` to remain stable across environment rebuilds and history rewrites.
     """
-
     h = hashlib.sha256()
     path = SRC / pkg
     if not path.exists():
         return "EMPTY"
+
+    skip_names = {"__pycache__", ".DS_Store"}
+    skip_suffixes = {".pyc", ".pyo", ".pyd"}
+
     for entry in sorted(path.rglob("*")):
+        name = entry.name
+        if name in skip_names or entry.suffix in skip_suffixes:
+            continue
         if not entry.is_file():
             continue
-        st = entry.stat()
-        h.update(str(entry.relative_to(ROOT)).encode())
-        h.update(str(st.st_size).encode())
-        h.update(str(st.st_mtime_ns).encode())
+
+        rel = entry.relative_to(ROOT)
+        h.update(str(rel).encode("utf-8"))
+
+        try:
+            with entry.open("rb") as fh:
+                for chunk in iter(lambda: fh.read(8192), b""):
+                    h.update(chunk)
+        except OSError:
+            # Skip files we cannot read; treat as unchanged.
+            continue
     return h.hexdigest() or "EMPTY"
 
 
 def last_tree_commit(pkg: str) -> str:
-    """Compute last tree commit.
-
-    Carry out the last tree commit operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    pkg : str
-        Description for ``pkg``.
-
-    Returns
-    -------
-    str
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import last_tree_commit
-    >>> result = last_tree_commit(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    """
-
-    sha = ""
-    try:
-        sha = subprocess.check_output(
-            ["git", "log", "-1", "--format=%H", "--", f"src/{pkg}"], cwd=str(ROOT), text=True
-        ).strip()
-    except Exception:
-        sha = ""
-
-    dirty = False
-    if sha:
-        try:
-            dirty = bool(
-                subprocess.check_output(
-                    ["git", "status", "--porcelain", "--", f"src/{pkg}"],
-                    cwd=str(ROOT),
-                    text=True,
-                ).strip()
-            )
-        except Exception:
-            dirty = True
-    else:
-        dirty = True
-
-    snapshot_digest = package_snapshot_digest(pkg)
-    if not sha:
-        return snapshot_digest
-    if not dirty:
-        return sha
-
-    blended = hashlib.sha256()
-    blended.update(sha.encode())
-    blended.update(snapshot_digest.encode())
-    return blended.hexdigest()
+    """Return the content-based cache key for ``pkg``."""
+    return package_snapshot_digest(pkg)
 
 
 def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
     """Compute cache bucket.
 
     Carry out the cache bucket operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     cache_dir : Path
+    cache_dir : Path
         Description for ``cache_dir``.
+    pkg : str
     pkg : str
         Description for ``pkg``.
     tree_hash : str
+    tree_hash : str
         Description for ``tree_hash``.
-    
+
     Returns
     -------
     Path
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import cache_bucket
@@ -812,7 +899,6 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return cache_dir / pkg / tree_hash
 
 
@@ -828,29 +914,36 @@ def build_one_package(
     """Compute build one package.
 
     Carry out the build one package operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     pkg : str
+    pkg : str
         Description for ``pkg``.
+    fmt : str
     fmt : str
         Description for ``fmt``.
     excludes : List[str]
+    excludes : List[str]
         Description for ``excludes``.
+    max_bacon : int
     max_bacon : int
         Description for ``max_bacon``.
     cache_dir : Path
+    cache_dir : Path
         Description for ``cache_dir``.
+    use_cache : bool
     use_cache : bool
         Description for ``use_cache``.
     verbose : bool
+    verbose : bool
         Description for ``verbose``.
-    
+
     Returns
     -------
     Tuple[str, bool, bool, bool]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import build_one_package
@@ -858,7 +951,6 @@ def build_one_package(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     used_cache = False
     pydeps_ok = True
     pyrev_ok = True
@@ -881,33 +973,50 @@ def build_one_package(
                 print(f"[graphs] cache hit: {pkg}@{tree_h[:7]}")
             return (pkg, True, pydeps_ok, pyrev_ok)
 
-    # Build fresh
-    imports_out.unlink(missing_ok=True)
-    uml_out.unlink(missing_ok=True)
+    # Build fresh using a staging directory so existing docs remain intact.
+    staging_dir = STAGING_ROOT / pkg
+    shutil.rmtree(staging_dir, ignore_errors=True)
+    staging_dir.mkdir(parents=True, exist_ok=True)
+    stage_imports = staging_dir / imports_out.name
+    stage_uml = staging_dir / uml_out.name
+
     try:
-        build_pydeps_for_package(pkg, imports_out, excludes, max_bacon, fmt)
+        build_pydeps_for_package(pkg, stage_imports, excludes, max_bacon, fmt)
     except Exception:
         pydeps_ok = False
     try:
-        build_pyreverse_for_package(pkg, OUT, fmt)
+        build_pyreverse_for_package(pkg, staging_dir, fmt)
     except Exception:
         pyrev_ok = False
 
-    if not (pydeps_ok and pyrev_ok):
-        for partial in (imports_out, uml_out):
-            if partial.exists():
-                partial.unlink()
+    if pydeps_ok and pyrev_ok:
+        imports_out.parent.mkdir(parents=True, exist_ok=True)
+        uml_out.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            stage_imports.replace(imports_out)
+            stage_uml.replace(uml_out)
+        except Exception:
+            pydeps_ok = False
+            pyrev_ok = False
+    else:
+        # Preserve previously generated docs; only clean staging artifacts.
+        stage_imports.unlink(missing_ok=True)
+        stage_uml.unlink(missing_ok=True)
+
+    shutil.rmtree(staging_dir, ignore_errors=True)
 
     # Save to cache if requested and successful
     if use_cache and pydeps_ok and pyrev_ok and tree_h and bucket is not None:
         bucket.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(imports_out, bucket / imports_out.name)
-        shutil.copy2(uml_out, bucket / uml_out.name)
-        if verbose:
-            print(f"[graphs] cached: {pkg}@{tree_h[:7]}")
-    elif not (pydeps_ok and pyrev_ok):
-        imports_out.unlink(missing_ok=True)
-        uml_out.unlink(missing_ok=True)
+        try:
+            shutil.copy2(imports_out, bucket / imports_out.name)
+            shutil.copy2(uml_out, bucket / uml_out.name)
+        except Exception:
+            if verbose:
+                print(f"[graphs] warning: failed to update cache for {pkg}@{tree_h[:7]}")
+        else:
+            if verbose:
+                print(f"[graphs] cached: {pkg}@{tree_h[:7]}")
 
     return (pkg, used_cache, pydeps_ok, pyrev_ok)
 
@@ -921,13 +1030,12 @@ def main() -> None:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import main
     >>> main()  # doctest: +ELLIPSIS
     """
-    
     args = parse_args()
 
     # Lazy imports check for global graph path
@@ -995,7 +1103,7 @@ def main() -> None:
                     f"[graphs] {pkg}: {src}; pydeps={'ok' if ok1 else 'FAIL'}; pyreverse={'ok' if ok2 else 'FAIL'}"
                 )
 
-    failures: list[str] = []
+    failure_messages: list[str] = []
     for pkg, _, ok1, ok2 in results:
         reasons: list[str] = []
         if not ok1:
@@ -1003,21 +1111,19 @@ def main() -> None:
         if not ok2:
             reasons.append("pyreverse")
         if reasons:
-            failures.append(f"{pkg} ({', '.join(reasons)})")
+            failure_messages.append(f"{pkg} ({', '.join(reasons)})")
 
-    if failures:
+    if failure_messages:
         print(
-            f"[graphs] per-package build failures: {', '.join(sorted(failures))}",
+            f"[graphs] per-package build failures: {', '.join(sorted(failure_messages))}",
             file=sys.stderr,
         )
-    failures: list[tuple[str, bool, bool]] = [
-        (pkg, ok1, ok2)
-        for pkg, _, ok1, ok2 in results
-        if not (ok1 and ok2)
+    failed_packages: list[tuple[str, bool, bool]] = [
+        (pkg, ok1, ok2) for pkg, _, ok1, ok2 in results if not (ok1 and ok2)
     ]
-    if failures:
+    if failed_packages:
         lines = ["[graphs] build failures detected during per-package graph generation:"]
-        for pkg, ok1, ok2 in failures:
+        for pkg, ok1, ok2 in failed_packages:
             failed_parts: list[str] = []
             if not ok1:
                 failed_parts.append("pydeps")

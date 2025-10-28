@@ -19,7 +19,6 @@ data/**/*
 __pycache__/
 dist/
 build/
-/.wheelhouse/
 .env
 .envrc.local
 site/_build/

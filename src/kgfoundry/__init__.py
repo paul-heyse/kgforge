@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 _ALIASES: dict[str, str] = {
     "docling": "docling",
     "download": "download",

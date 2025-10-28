@@ -5,7 +5,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from embeddings_sparse import base, bm25, splade
 from kgfoundry_common.navmap_types import NavMap
 

@@ -2574,6 +2574,8 @@ dependencies = [
     { name = "trafilatura" },
     { name = "transformers" },
     { name = "typer" },
+    { name = "types-docutils" },
+    { name = "types-networkx" },
     { name = "types-pyyaml" },
     { name = "types-requests" },
     { name = "typing-extensions" },
@@ -2617,6 +2619,7 @@ docs = [
     { name = "pyenchant" },
     { name = "pylint" },
     { name = "pyment" },
+    { name = "pytest-doctestplus" },
     { name = "sphinx" },
     { name = "sphinx-autoapi" },
     { name = "sphinx-autobuild" },
@@ -2814,6 +2817,7 @@ requires-dist = [
     { name = "pyserini", marker = "extra == 'gpu'", specifier = ">=1.2.0" },
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest-cov", specifier = ">=7.0.0" },
+    { name = "pytest-doctestplus", marker = "extra == 'docs'" },
     { name = "pytest-logging", specifier = ">=2015.11.4" },
     { name = "pyyaml", specifier = ">=6" },
     { name = "ray", marker = "extra == 'gpu'", specifier = ">=2.50.0" },
@@ -2858,6 +2862,8 @@ requires-dist = [
     { name = "triton", marker = "extra == 'gpu'", specifier = ">=3.4.0" },
     { name = "triton-kernels", marker = "extra == 'gpu'", git = "https://github.com/triton-lang/triton.git?subdirectory=python%2Ftriton_kernels&rev=v3.5.0" },
     { name = "typer", specifier = ">=0.19.2" },
+    { name = "types-docutils" },
+    { name = "types-networkx" },
     { name = "types-pyyaml", specifier = ">=6.0.12.20240917" },
     { name = "types-requests", specifier = ">=2.32.0.20241016" },
     { name = "typing-extensions", specifier = ">=4.15.0" },
@@ -5636,6 +5642,19 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-doctestplus"
+version = "1.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/00/e6/43339f24435cc836336a4a1fecf73c5ce1e4572389116df8d06de7718376/pytest_doctestplus-1.5.0.tar.gz", hash = "sha256:1bfb9ecf0a5a61452abd4c2a5218450d0ddd125a2c241da9e4f7f8ccf6b779fe", size = 49184, upload-time = "2025-10-18T02:01:19.035Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d7/d3/d029c859fcab2696bce8f14a5dd554f121a6506879d00468b46dafb9adde/pytest_doctestplus-1.5.0-py3-none-any.whl", hash = "sha256:e13e014bab450285b3735de27a1429d4f95bca2efc7a2becd9a863247e91ae4e", size = 25393, upload-time = "2025-10-18T02:01:17.758Z" },
+]
+
+[[package]]
 name = "pytest-logging"
 version = "2015.11.4"
 source = { registry = "https://pypi.org/simple" }
@@ -7600,6 +7619,27 @@ standard = [
 ]
 
 [[package]]
+name = "types-docutils"
+version = "0.22.2.20251006"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/30/79/3b5419ad9af32d99c1a953f2c96faa396280fddba22201d3788ff5b41b8a/types_docutils-0.22.2.20251006.tar.gz", hash = "sha256:c36c0459106eda39e908e9147bcff9dbd88535975cde399433c428a517b9e3b2", size = 56658, upload-time = "2025-10-06T02:55:19.477Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d1/47/c1eed8aef21d010e8d726855c1a6346f526c40ce1f76ceabf5cd6775f6a1/types_docutils-0.22.2.20251006-py3-none-any.whl", hash = "sha256:1e61afdeb4fab4ae802034deea3e853ced5c9b5e1d156179000cb68c85daf384", size = 91880, upload-time = "2025-10-06T02:55:18.119Z" },
+]
+
+[[package]]
+name = "types-networkx"
+version = "3.5.0.20251001"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ac/5b/d903d119f6159e0c9291c53db0e92ea33cb725331f75069d1b45b83b4405/types_networkx-3.5.0.20251001.tar.gz", hash = "sha256:8e3c5c491ba5870d75e175751d70ddeac81df43caf2a64bae161e181f5e8ea7a", size = 71748, upload-time = "2025-10-01T03:04:26.155Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9a/41/cdd9498383b30290cce9de6dbed75fa75d6dc06fe4b47d6da6de4b156aa0/types_networkx-3.5.0.20251001-py3-none-any.whl", hash = "sha256:4bb9dd0378a52ca57d68f8215f8662e736d800a8ff892b457646eccd828a0230", size = 160095, upload-time = "2025-10-01T03:04:24.821Z" },
+]
+
+[[package]]
 name = "types-pyyaml"
 version = "6.0.12.20250915"
 source = { registry = "https://pypi.org/simple" }
@@ -7789,7 +7829,7 @@ wheels = [
 
 [[package]]
 name = "vllm"
-version = "0.11.1rc4.dev47+g0291fbf65.cu129"
+version = "0.11.1rc4.dev67+g141e6a050.cu129"
 source = { registry = "https://wheels.vllm.ai/nightly" }
 dependencies = [
     { name = "aiohttp" },
@@ -7853,8 +7893,8 @@ dependencies = [
     { name = "xgrammar", marker = "platform_machine == 'aarch64' or platform_machine == 'arm64' or platform_machine == 'x86_64'" },
 ]
 wheels = [
-    { url = "https://wheels.vllm.ai/nightly/vllm-0.11.1rc4.dev47%2Bg0291fbf65.cu129-cp38-abi3-manylinux1_x86_64.whl" },
-    { url = "https://wheels.vllm.ai/nightly/vllm-0.11.1rc4.dev47%2Bg0291fbf65.cu129-cp38-abi3-manylinux2014_aarch64.whl" },
+    { url = "https://wheels.vllm.ai/nightly/vllm-0.11.1rc4.dev67%2Bg141e6a050.cu129-cp38-abi3-manylinux1_x86_64.whl" },
+    { url = "https://wheels.vllm.ai/nightly/vllm-0.11.1rc4.dev67%2Bg141e6a050.cu129-cp38-abi3-manylinux2014_aarch64.whl" },
 ]
 
 [[package]]

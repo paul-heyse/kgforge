@@ -5,7 +5,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 # [nav:anchor config]
 # [nav:anchor errors]
 # [nav:anchor exceptions]

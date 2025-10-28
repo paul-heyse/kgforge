@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 from __future__ import annotations
 
 from typing import Final
@@ -49,17 +48,18 @@ def t_echo(msg: str) -> str:
     """Compute t echo.
 
     Carry out the t echo operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     msg : str
+    msg : str
         Description for ``msg``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
     Examples
     --------
     >>> from orchestration.flows import t_echo
@@ -67,7 +67,6 @@ def t_echo(msg: str) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return msg
 
 
@@ -77,12 +76,12 @@ def e2e_flow() -> list[str]:
     """Compute e2e flow.
 
     Carry out the e2e flow operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from orchestration.flows import e2e_flow
@@ -90,7 +89,6 @@ def e2e_flow() -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return [
         t_echo.submit(x).result()
         for x in [

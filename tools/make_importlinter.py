@@ -5,7 +5,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -37,23 +36,27 @@ def main(
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     root_package : str | None
+    root_package : str | None, optional, default=None
         Description for ``root_package``.
     output_path : Path | None
+    output_path : Path | None, optional, default=None
         Description for ``output_path``.
     root_dir : Path | None
+    root_dir : Path | None, optional, default=None
         Description for ``root_dir``.
     detect : Callable[[], str] | None
+    detect : Callable[[], str] | None, optional, default=None
         Description for ``detect``.
-    
+
     Returns
     -------
     Path
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.make_importlinter import main
@@ -61,7 +64,6 @@ def main(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     detected_root = root_dir or Path(__file__).resolve().parents[1]
     if root_package is None:
         detect_primary = detect or _import_detect_primary
@@ -90,7 +92,7 @@ def _import_detect_primary() -> str:
     --------
     >>> _import_detect_primary(...)
     """
-    from detect_pkg import detect_primary
+    from tools.detect_pkg import detect_primary
 
     return detect_primary()
 

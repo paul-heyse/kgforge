@@ -16,9 +16,10 @@ import os
 import pkgutil
 import sys
 from collections.abc import Iterable, Iterator
+from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
@@ -93,17 +94,18 @@ def is_pydantic_model(obj: object) -> bool:
     """Compute is pydantic model.
 
     Carry out the is pydantic model operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     obj : object
+    obj : object
         Description for ``obj``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.export_schemas import is_pydantic_model
@@ -111,7 +113,6 @@ def is_pydantic_model(obj: object) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     try:
         from pydantic import BaseModel
     except Exception:
@@ -123,17 +124,18 @@ def is_pandera_model(obj: object) -> bool:
     """Compute is pandera model.
 
     Carry out the is pandera model operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     obj : object
+    obj : object
         Description for ``obj``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.export_schemas import is_pandera_model
@@ -141,7 +143,6 @@ def is_pandera_model(obj: object) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     try:
         import pandera as pa
     except Exception:
@@ -237,8 +238,9 @@ def _example_for_pydantic(model_cls: type[object]) -> dict[str, Any]:
 
 def _example_for_pandera(model_cls: type[object]) -> dict[str, Any]:
     """Produce a minimal 'row' example based on class attributes / schema JSON."""
+    model_any = cast(Any, model_cls)
     try:
-        schema_json = model_cls.to_schema().to_json()
+        schema_json = model_any.to_schema().to_json()
         data = json.loads(schema_json)
     except Exception:
         return {}
@@ -256,7 +258,9 @@ def _example_for_pandera(model_cls: type[object]) -> dict[str, Any]:
 # --------------------------- schema transforms ---------------------------
 
 
-def _apply_headers(schema: dict, module_name: str, class_name: str, base_url: str) -> None:
+def _apply_headers(
+    schema: dict[str, Any], module_name: str, class_name: str, base_url: str
+) -> None:
     """Apply headers.
 
     Parameters
@@ -288,7 +292,7 @@ def _apply_headers(schema: dict, module_name: str, class_name: str, base_url: st
     schema["$id"] = f"{base_url.rstrip('/')}/{module_name}.{class_name}.json#"
 
 
-def _inject_examples(schema: dict, example: dict | None) -> None:
+def _inject_examples(schema: dict[str, Any], example: dict[str, Any] | None) -> None:
     """Inject examples.
 
     Parameters
@@ -322,7 +326,7 @@ def _inject_examples(schema: dict, example: dict | None) -> None:
         schema["examples"] = ex
 
 
-def _inject_versions(schema: dict, versions: dict | None) -> None:
+def _inject_versions(schema: dict[str, Any], versions: dict[str, Any] | None) -> None:
     """Inject versions.
 
     Parameters
@@ -364,21 +368,22 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
     out["top_level_added"] = add_keys
     out["top_level_removed"] = del_keys
 
-    def prop_keys(d: dict) -> set[str]:
+    def prop_keys(d: dict[str, Any]) -> set[str]:
         """Compute prop keys.
 
         Carry out the prop keys operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         d : collections.abc.Mapping
+        d : collections.abc.Mapping
             Description for ``d``.
-        
+
         Returns
         -------
         collections.abc.Set
             Description of return value.
-        
+
         Examples
         --------
         >>> from tools.docs.export_schemas import prop_keys
@@ -386,7 +391,6 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         props = d.get("properties")
         return set(props.keys()) if isinstance(props, dict) else set()
 
@@ -409,7 +413,6 @@ class Cfg:
     behind a well-defined interface for collaborating components. Instances are typically created by
     factories or runtime orchestrators documented nearby.
     """
-    
 
     ref_template: str
     base_url: str
@@ -418,8 +421,8 @@ class Cfg:
 
 
 def _export_one_pydantic(
-    module_name: str, name: str, model_cls: type[object], cfg: Cfg, nav: dict
-) -> tuple[Path, dict]:
+    module_name: str, name: str, model_cls: type[object], cfg: Cfg, nav: dict[str, Any]
+) -> tuple[Path, dict[str, Any]]:
     """Export one pydantic.
 
     Parameters
@@ -452,22 +455,23 @@ def _export_one_pydantic(
     # Generate schema dict (JSON schema 2020-12). Pydantic v2 exposes ref_template.
     # Docs: model_json_schema and ref_template customization.
     # https://docs.pydantic.dev/usage/schema/
-    kwargs = {}
+    kwargs: dict[str, Any] = {}
     if cfg.by_alias:
         kwargs["by_alias"] = True
     if cfg.ref_template:
         kwargs["ref_template"] = cfg.ref_template
 
-    schema = model_cls.model_json_schema(**kwargs)  # dict
+    model_any = cast(Any, model_cls)
+    schema = cast(dict[str, Any], model_any.model_json_schema(**kwargs))
     _apply_headers(schema, module_name, name, cfg.base_url)
     _inject_versions(schema, _nav_versions(module_name, name, nav))
     _inject_examples(schema, _example_for_pydantic(model_cls))
-    return (OUT / f"{module_name}.{name}.json", _sorted(schema))
+    return (OUT / f"{module_name}.{name}.json", cast(dict[str, Any], _sorted(schema)))
 
 
 def _export_one_pandera(
-    module_name: str, name: str, model_cls: type[object], cfg: Cfg, nav: dict
-) -> tuple[Path, dict]:
+    module_name: str, name: str, model_cls: type[object], cfg: Cfg, nav: dict[str, Any]
+) -> tuple[Path, dict[str, Any]]:
     """Export one pandera.
 
     Parameters
@@ -498,18 +502,20 @@ def _export_one_pandera(
     >>> _export_one_pandera(...)
     """
     # Pandera emits JSON string; normalize to dict, enrich, and sort.
+    model_any = cast(Any, model_cls)
     try:
-        schema = json.loads(model_cls.to_schema().to_json())
+        schema_json = model_any.to_schema().to_json()
+        schema_obj = json.loads(schema_json)
     except Exception:
         return (OUT / f"{module_name}.{name}.json", {})
-    schema = dict(schema)
+    schema: dict[str, Any] = dict(schema_obj)
     _apply_headers(schema, module_name, name, cfg.base_url)
     _inject_versions(schema, _nav_versions(module_name, name, nav))
     _inject_examples(schema, _example_for_pandera(model_cls))
-    return (OUT / f"{module_name}.{name}.json", _sorted(schema))
+    return (OUT / f"{module_name}.{name}.json", cast(dict[str, Any], _sorted(schema)))
 
 
-def _iter_models() -> Iterator[tuple[str, str, object]]:
+def _iter_models() -> Iterator[tuple[str, str, type[object]]]:
     """Yield Pydantic and Pandera models discovered under ``TOP_PACKAGES``.
 
     Returns
@@ -528,24 +534,26 @@ def _iter_models() -> Iterator[tuple[str, str, object]]:
             continue
         for name, obj in vars(module).items():
             if is_pydantic_model(obj) or is_pandera_model(obj):
-                yield module_name, name, obj
+                model_cls = cast(type[object], obj)
+                yield module_name, name, model_cls
 
 
 def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     argv : List[str] | None
+    argv : List[str] | None, optional, default=None
         Description for ``argv``.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.export_schemas import main
@@ -553,7 +561,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     import argparse
 
     p = argparse.ArgumentParser()
@@ -588,23 +595,24 @@ def main(argv: list[str] | None = None) -> int:
     changed = False
     produced_paths: set[Path] = set()
 
-    for module_name, name, obj in _iter_models():
+    for module_name, name, model_cls in _iter_models():
         path: Path
-        data: dict
-        if is_pydantic_model(obj):
-            path, data = _export_one_pydantic(module_name, name, obj, cfg, nav)
+        data: dict[str, Any]
+        if is_pydantic_model(model_cls):
+            path, data = _export_one_pydantic(module_name, name, model_cls, cfg, nav)
         else:
-            path, data = _export_one_pandera(module_name, name, obj, cfg, nav)
+            path, data = _export_one_pandera(module_name, name, model_cls, cfg, nav)
         if not data:
             continue
 
         produced_paths.add(path)
 
         # Drift handling
-        old = None
+        old: dict[str, Any] | None = None
         if path.exists():
             try:
-                old = json.loads(path.read_text(encoding="utf-8"))
+                loaded = json.loads(path.read_text(encoding="utf-8"))
+                old = cast(dict[str, Any], loaded)
             except Exception:
                 old = None
 
@@ -616,7 +624,7 @@ def main(argv: list[str] | None = None) -> int:
         wrote, old_text, new_text = _write_if_changed(path, data)
         if wrote:
             drift_summaries[str(path)] = _diff_summary(
-                json.loads(old_text) if old_text else {}, data
+                cast(dict[str, Any], json.loads(old_text)) if old_text else {}, data
             )
             changed = True
 
@@ -627,17 +635,16 @@ def main(argv: list[str] | None = None) -> int:
         old_data: dict[str, Any] = {}
         if stale_path.exists():
             try:
-                old_data = json.loads(stale_path.read_text(encoding="utf-8"))
+                old_loaded = json.loads(stale_path.read_text(encoding="utf-8"))
+                old_data = cast(dict[str, Any], old_loaded)
             except Exception:
                 old_data = {}
         drift_summaries[str(stale_path)] = _diff_summary(old_data, {})
         changed = True
         if cfg.check_drift:
             continue
-        try:
+        with suppress(FileNotFoundError):
             stale_path.unlink()
-        except FileNotFoundError:
-            pass
 
     if drift_summaries:
         DRIFT_OUT.parent.mkdir(parents=True, exist_ok=True)

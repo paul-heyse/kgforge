@@ -11,7 +11,7 @@ spec.loader.exec_module(make_importlinter)
 main = make_importlinter.main
 
 
-def test_main_writes_expected_importlinter(tmp_path):
+def test_main_writes_expected_importlinter(tmp_path: Path) -> None:
     output_path = tmp_path / ".importlinter"
 
     result = main(root_package="fakepkg", output_path=output_path)

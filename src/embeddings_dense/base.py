@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -52,23 +51,23 @@ class DenseEmbeddingModel(Protocol):
     encapsulates behaviour behind a well-defined interface for collaborating components. Instances
     are typically created by factories or runtime orchestrators documented nearby.
     """
-    
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]:
         """Compute encode.
 
         Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         texts : collections.abc.Sequence
+        texts : collections.abc.Sequence
             Description for ``texts``.
-        
+
         Returns
         -------
         numpy.typing.NDArray
             Description of return value.
-        
+
         Examples
         --------
         >>> from embeddings_dense.base import encode
@@ -76,5 +75,4 @@ class DenseEmbeddingModel(Protocol):
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         ...

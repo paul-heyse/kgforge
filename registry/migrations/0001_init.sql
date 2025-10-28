@@ -1,5 +1,5 @@
 
-CREATE TABLE IF NOT EXISTS schema_version (version INTEGER);
+CREATE TABLE IF NOT EXISTS schema_version (version INTEGER PRIMARY KEY);
 INSERT INTO schema_version VALUES (1);
 
 CREATE TABLE model_registry (

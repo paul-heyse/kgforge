@@ -5,7 +5,6 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
@@ -54,7 +53,6 @@ class SparseEncoder(Protocol):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     name: str
 
@@ -62,17 +60,18 @@ class SparseEncoder(Protocol):
         """Compute encode.
 
         Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         texts : List[str]
+        texts : List[str]
             Description for ``texts``.
-        
+
         Returns
         -------
         List[Tuple[List[int], List[float]]]
             Description of return value.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.base import encode
@@ -80,7 +79,6 @@ class SparseEncoder(Protocol):
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         ...
 
 
@@ -92,24 +90,23 @@ class SparseIndex(Protocol):
     behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
-    
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Compute build.
 
         Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         docs_iterable : collections.abc.Iterable
+        docs_iterable : collections.abc.Iterable
             Description for ``docs_iterable``.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.base import build
         >>> build(...)  # doctest: +ELLIPSIS
         """
-        
         ...
 
     def search(
@@ -118,21 +115,24 @@ class SparseIndex(Protocol):
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         query : str
+        query : str
             Description for ``query``.
+        k : int
         k : int
             Description for ``k``.
         fields : Mapping[str, str] | None
+        fields : Mapping[str, str] | None, optional, default=None
             Description for ``fields``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.base import search
@@ -140,5 +140,4 @@ class SparseIndex(Protocol):
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         ...

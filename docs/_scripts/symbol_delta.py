@@ -148,22 +148,23 @@ def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     argv : List[str] | None
+    argv : List[str] | None, optional, default=None
         Description for ``argv``.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Raises
     ------
     SystemExit
         Raised when validation fails.
-    
+
     Examples
     --------
     >>> from docs._scripts.symbol_delta import main
@@ -171,7 +172,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     global DELTA_PATH
 
     parser = argparse.ArgumentParser(description=__doc__)

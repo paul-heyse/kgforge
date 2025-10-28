@@ -283,7 +283,8 @@ def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, Any]:
     --------
     >>> _ensure_navmap_structure(...)
     """
-    navmap = dict(info.navmap)
+    raw_navmap = info.navmap_dict if info.navmap_dict else {}
+    navmap = dict(raw_navmap)
     exports = list(dict.fromkeys(navmap.get("exports", info.exports)))
     navmap["exports"] = exports
 
@@ -291,22 +292,33 @@ def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, Any]:
     remaining = [section for section in sections if section.get("id") != "public-api"]
     navmap["sections"] = [{"id": "public-api", "symbols": exports}] + remaining
 
-    module_meta = {
+    module_meta: dict[str, Any] = dict(navmap.get("module_meta", {}))
+    top_level_meta = {
         key: navmap.get(key)
         for key in ("owner", "stability", "since", "deprecated_in")
         if navmap.get(key) is not None
     }
+    module_meta.update(top_level_meta)
     if module_meta:
         navmap["module_meta"] = module_meta
+        for key in ("owner", "stability", "since", "deprecated_in"):
+            if key in navmap:
+                navmap.pop(key, None)
 
     symbols_meta = dict(navmap.get("symbols", {}))
     for name in exports:
         fields = symbols_meta.setdefault(name, {})
-        fields.setdefault("owner", module_meta.get("owner", "@todo-owner"))
-        fields.setdefault("stability", module_meta.get("stability", "experimental"))
-        fields.setdefault("since", module_meta.get("since", "0.0.0"))
-        if "deprecated_in" not in fields and module_meta.get("deprecated_in") is not None:
-            fields["deprecated_in"] = module_meta["deprecated_in"]
+        owner_default = module_meta.get("owner", "@todo-owner") if module_meta else "@todo-owner"
+        stability_default = (
+            module_meta.get("stability", "experimental") if module_meta else "experimental"
+        )
+        since_default = module_meta.get("since", "0.0.0") if module_meta else "0.0.0"
+        fields.setdefault("owner", owner_default)
+        fields.setdefault("stability", stability_default)
+        fields.setdefault("since", since_default)
+        deprecated_default = module_meta.get("deprecated_in") if module_meta else None
+        if "deprecated_in" not in fields and deprecated_default is not None:
+            fields["deprecated_in"] = deprecated_default
     navmap["symbols"] = symbols_meta
 
     return navmap
@@ -316,19 +328,21 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     """Compute repair module.
 
     Carry out the repair module operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     info : ModuleInfo
+    info : ModuleInfo
         Description for ``info``.
     apply : bool | None
+    apply : bool | None, optional, default=False
         Description for ``apply``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.repair_navmaps import repair_module
@@ -336,13 +350,13 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     path = info.path
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
     tree = _load_tree(path)
 
-    exports = list(dict.fromkeys(info.navmap.get("exports", info.exports)))
+    current_navmap = info.navmap_dict or {}
+    exports = list(dict.fromkeys(current_navmap.get("exports", info.exports)))
     anchors = set(info.anchors)
     definition_lines = _definition_lines(tree)
     messages: list[str] = []
@@ -409,19 +423,21 @@ def repair_all(root: Path, apply: bool) -> list[str]:
     """Compute repair all.
 
     Carry out the repair all operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     root : Path
+    root : Path
         Description for ``root``.
     apply : bool
+    apply : bool
         Description for ``apply``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.repair_navmaps import repair_all
@@ -429,7 +445,6 @@ def repair_all(root: Path, apply: bool) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     messages: list[str] = []
     for info in _collect_modules(root):
         messages.extend(repair_module(info, apply=apply))
@@ -478,17 +493,18 @@ def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     argv : List[str] | None
+    argv : List[str] | None, optional, default=None
         Description for ``argv``.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.repair_navmaps import main
@@ -496,7 +512,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     args = _parse_args(argv)
     root = args.root.resolve()
     messages = repair_all(root, apply=args.apply)

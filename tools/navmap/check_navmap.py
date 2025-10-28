@@ -15,6 +15,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from packaging.version import InvalidVersion, Version
+
 REPO = Path(__file__).resolve().parents[2]
 SRC = REPO / "src"
 INDEX = REPO / "site" / "_build" / "navmap" / "navmap.json"
@@ -24,7 +26,7 @@ SECTION_RE = re.compile(r"^\s*#\s*\[nav:section\s+([a-z0-9]+(?:-[a-z0-9]+)*)\]\s
 ANCHOR_RE = re.compile(r"^\s*#\s*\[nav:anchor\s+([A-Za-z_]\w*)\]\s*$")
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 IDENT_RE = re.compile(r"^[A-Za-z_]\w*$")
-STABILITY = {"stable", "beta", "experimental", "deprecated"}
+STABILITY = {"stable", "beta", "experimental", "deprecated", "internal", "frozen"}
 
 
 class _AllDictTemplate:
@@ -40,18 +42,10 @@ class _AllDictTemplate:
         Parameters
         ----------
         template : typing.Any
+        template : typing.Any
             Description for ``template``.
         """
-        
         self.template = template
-
-
-# Optional PEP 440 validation
-try:
-    from packaging.version import InvalidVersion, Version  # type: ignore
-except Exception:  # pragma: no cover
-    Version = None  # type: ignore
-    InvalidVersion = Exception  # type: ignore
 
 
 def _read_text(py: Path) -> list[str]:
@@ -94,38 +88,38 @@ def _parse_navmap_dict(py: Path) -> dict[str, Any]:
         if isinstance(value, str) and value == "__all__":
             return list(dict.fromkeys(exports))
         if isinstance(value, list):
-            items: list[Any] = []
+            expanded_list: list[Any] = []
             for entry in value:
                 replaced = _expand_placeholders(entry, exports)
                 if isinstance(replaced, list):
-                    items.extend(replaced)
+                    expanded_list.extend(replaced)
                 else:
-                    items.append(replaced)
-            return items
+                    expanded_list.append(replaced)
+            return expanded_list
         if isinstance(value, set):
-            items: set[Any] = set()
+            expanded_set: set[Any] = set()
             for entry in value:
                 replaced = _expand_placeholders(entry, exports)
                 if isinstance(replaced, list):
-                    items.update(replaced)
+                    expanded_set.update(replaced)
                 else:
-                    items.add(replaced)
-            return items
+                    expanded_set.add(replaced)
+            return expanded_set
         if isinstance(value, dict):
             return {k: _expand_placeholders(v, exports) for k, v in value.items()}
         if isinstance(value, _AllDictTemplate):
             template = value.template
-            result: dict[str, Any] = {}
+            template_results: dict[str, Any] = {}
             for name in exports:
                 mapped = _expand_placeholders(template, exports)
                 if isinstance(mapped, dict):
-                    result[name] = mapped
+                    template_results[name] = mapped
                 else:
-                    result[name] = mapped
-            return result
+                    template_results[name] = mapped
+            return template_results
         return value
 
-    def _safe_eval(value: ast.AST) -> Any:
+    def _safe_eval(value: ast.AST | None) -> Any:
         """Safe eval.
 
         Parameters
@@ -147,6 +141,8 @@ def _parse_navmap_dict(py: Path) -> dict[str, Any]:
         --------
         >>> _safe_eval(...)
         """
+        if value is None:
+            raise ValueError("unsupported empty literal")
         if isinstance(value, ast.Constant):
             return value.value
         if isinstance(value, ast.Name) and value.id == "__all__":
@@ -175,17 +171,19 @@ def _parse_navmap_dict(py: Path) -> dict[str, Any]:
         if isinstance(node, ast.Assign):
             if any(isinstance(t, ast.Name) and t.id == "__navmap__" for t in node.targets):
                 try:
-                    value = _safe_eval(node.value)
-                    if isinstance(value, dict):
-                        result = value
+                    evaluated = _safe_eval(node.value)
+                    if isinstance(evaluated, dict):
+                        result = evaluated
                 except Exception:
                     pass
         elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
             if node.target.id == "__navmap__":
+                if node.value is None:
+                    continue
                 try:
-                    value = _safe_eval(node.value)
-                    if isinstance(value, dict):
-                        result = value
+                    evaluated = _safe_eval(node.value)
+                    if isinstance(evaluated, dict):
+                        result = evaluated
                 except Exception:
                     pass
     exports = _parse_all(py)
@@ -211,7 +209,7 @@ def _parse_all(py: Path) -> list[str]:
     except Exception:
         return []
 
-    def _literal(node: ast.AST) -> list[str] | None:
+    def _literal(node: ast.AST | None) -> list[str] | None:
         """Literal.
 
         Parameters
@@ -233,6 +231,8 @@ def _parse_all(py: Path) -> list[str]:
         --------
         >>> _literal(...)
         """
+        if node is None:
+            return None
         if isinstance(node, (ast.List, ast.Tuple)):
             vals: list[str] = []
             for elt in node.elts:
@@ -349,7 +349,7 @@ def _inspect(py: Path) -> list[str]:
         e2 = _validate_pep440(deprec)
         if e2:
             errs.append(f"{py}: symbol '{name}' deprecated_in invalid: {e2}")
-        if Version and since and deprec:
+        if Version is not None and since and deprec:
             try:
                 if Version(str(deprec)) < Version(str(since)):
                     errs.append(f"{py}: symbol '{name}' deprecated_in ({deprec}) < since ({since})")
@@ -363,17 +363,18 @@ def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     argv : List[str] | None
+    argv : List[str] | None, optional, default=None
         Description for ``argv``.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.check_navmap import main
@@ -381,7 +382,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     errors: list[str] = []
     for py in sorted(SRC.rglob("*.py")):
         errors.extend(_inspect(py))
@@ -393,7 +393,7 @@ def main(argv: list[str] | None = None) -> int:
     # Round-trip check: compare freshly built JSON to inline markers
     try:
         # Local import to avoid creating a hard dependency in module scope
-        from tools.navmap.build_navmap import build_index  # type: ignore
+        from tools.navmap.build_navmap import build_index
     except Exception as e:  # pragma: no cover
         print(f"navmap check: unable to import build_navmap for round-trip ({e})", file=sys.stderr)
         return 1

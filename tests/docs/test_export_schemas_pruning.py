@@ -8,6 +8,8 @@ import sys
 from pathlib import Path
 from types import ModuleType
 
+from pytest import MonkeyPatch
+
 
 def _load_exporter() -> ModuleType:
     spec = importlib.util.spec_from_file_location(
@@ -21,7 +23,7 @@ def _load_exporter() -> ModuleType:
     return module
 
 
-def _prepare_environment(monkeypatch, tmp_path: Path) -> tuple[ModuleType, Path, Path]:
+def _prepare_environment(monkeypatch: MonkeyPatch, tmp_path: Path) -> tuple[ModuleType, Path, Path]:
     """Configure the exporter module to operate within ``tmp_path``."""
     export_schemas = _load_exporter()
     out_dir = tmp_path / "schemas"
@@ -37,7 +39,7 @@ def _prepare_environment(monkeypatch, tmp_path: Path) -> tuple[ModuleType, Path,
     return export_schemas, out_dir, drift_out
 
 
-def test_prunes_stale_schema_files(monkeypatch, tmp_path: Path) -> None:
+def test_prunes_stale_schema_files(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
     """Stale schemas are removed and recorded in drift summaries."""
     export_schemas, out_dir, drift_out = _prepare_environment(monkeypatch, tmp_path)
     stale_path = out_dir / "stale.Model.json"
@@ -53,7 +55,7 @@ def test_prunes_stale_schema_files(monkeypatch, tmp_path: Path) -> None:
     assert drift[str(stale_path)]["top_level_removed"] == ["title"]
 
 
-def test_check_drift_flags_stale_files(monkeypatch, tmp_path: Path) -> None:
+def test_check_drift_flags_stale_files(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
     """The --check-drift flag surfaces stale files without deleting them."""
     export_schemas, out_dir, drift_out = _prepare_environment(monkeypatch, tmp_path)
     stale_path = out_dir / "stale.Model.json"

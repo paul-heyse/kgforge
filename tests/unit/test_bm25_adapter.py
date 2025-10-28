@@ -24,7 +24,7 @@ except Exception:
     HAVE_PURE = False
 
 
-def most_frequent_token(limit=10000):
+def most_frequent_token(limit: int = 10000) -> str:
     con = duckdb.connect(database=":memory:")
     try:
         df = con.execute(
@@ -35,7 +35,7 @@ def most_frequent_token(limit=10000):
     finally:
         con.close()
     tok_re = re.compile(r"[A-Za-z]{4,}")
-    freq = {}
+    freq: dict[str, int] = {}
     for t in df["text"]:
         for w in tok_re.findall(t or ""):
             w = w.lower()
@@ -46,7 +46,7 @@ def most_frequent_token(limit=10000):
 
 
 @pytest.mark.skipif(not (HAVE_API_BM25 or HAVE_PURE), reason="BM25 implementations not importable")
-def test_bm25_build_and_search_from_fixtures(tmp_path):
+def test_bm25_build_and_search_from_fixtures(tmp_path: pathlib.Path) -> None:
     q = most_frequent_token()
 
     if HAVE_API_BM25:

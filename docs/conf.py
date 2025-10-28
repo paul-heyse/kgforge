@@ -10,23 +10,36 @@ This file is robust to different repo shapes (``src/<pkg>`` or ``<pkg>`` at root
 """
 
 import collections
+import importlib
 import inspect
 import os
 import subprocess
 import sys
 from collections.abc import Callable, Mapping
 from pathlib import Path
+from typing import Any
 
 import certifi
-from astroid import builder as astroid_builder
-from astroid import manager as astroid_manager
-from astroid.nodes import Module as AstroidModule
-from autoapi import _parser as autoapi_parser  # type: ignore[attr-defined]
 from docutils import nodes
 from docutils.parsers.rst import Directive
-from griffe import Module as GriffeModule
 from sphinx.application import Sphinx
-from sphinxcontrib.serializinghtml import jsonimpl  # type: ignore[attr-defined]
+
+astroid_builder = importlib.import_module("astroid.builder")
+astroid_manager = importlib.import_module("astroid.manager")
+autoapi_parser = importlib.import_module("autoapi._parser")
+griffe_module = importlib.import_module("griffe")
+try:
+    griffe_loader_module = importlib.import_module("griffe.loader")
+except ModuleNotFoundError:
+    griffe_loader_module = None
+jsonimpl = importlib.import_module("sphinxcontrib.serializinghtml.jsonimpl")
+json_module = jsonimpl.json
+
+default_griffe_loader = getattr(griffe_module, "GriffeLoader")
+GriffeLoader = (
+    getattr(griffe_loader_module, "GriffeLoader") if griffe_loader_module else default_griffe_loader
+)
+GriffeModule = griffe_module.Module
 
 # --- Project metadata (override via env if you like)
 project = os.environ.get("PROJECT_NAME", "kgfoundry")
@@ -61,17 +74,23 @@ if TOOLS_DIR.exists() and str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
 try:
-    from detect_pkg import detect_packages, detect_primary
+    from tools.detect_pkg import detect_packages, detect_primary
+except Exception:  # pragma: no cover - fallback when tooling unavailable
 
-    _PACKAGES = []
-    if os.environ.get("DOCS_PKG"):
-        _PACKAGES = [pkg.strip() for pkg in os.environ["DOCS_PKG"].split(",") if pkg.strip()]
-    if not _PACKAGES:
-        _PACKAGES = detect_packages()
-    if not _PACKAGES:
-        _PACKAGES = [detect_primary()]
-except Exception:
-    _PACKAGES = [PKG]
+    def detect_packages() -> list[str]:
+        return []
+
+    def detect_primary() -> str:
+        return PKG
+
+
+_PACKAGES: list[str] = []
+if os.environ.get("DOCS_PKG"):
+    _PACKAGES = [pkg.strip() for pkg in os.environ["DOCS_PKG"].split(",") if pkg.strip()]
+if not _PACKAGES:
+    _PACKAGES = detect_packages()
+if not _PACKAGES:
+    _PACKAGES = [detect_primary()]
 
 extensions = [
     "myst_parser",
@@ -151,13 +170,12 @@ autoapi_ignore: list[str] = [
 
 
 def _autoapi_parse_file(
-    self: autoapi_parser.Parser, file_path: str, condition: Callable[[str], bool]
-) -> AstroidModule:  # pragma: no cover - compatibility shim
+    self: Any, file_path: str, condition: Callable[[str], bool]
+) -> Any:  # pragma: no cover - compatibility shim
     directory, filename = os.path.split(file_path)
-    module_parts = []
+    module_parts: collections.deque[str] = collections.deque()
     if filename not in {"__init__.py", "__init__.pyi"}:
-        module_parts = [os.path.splitext(filename)[0]]
-    module_parts = collections.deque(module_parts)
+        module_parts.append(os.path.splitext(filename)[0])
     while directory and condition(directory):
         directory, module_part = os.path.split(directory)
         if module_part:
@@ -229,32 +247,27 @@ sphinx_gallery_conf = {
 
 # Ensure JSON builder can serialize lru_cache wrappers
 
-_json_default = jsonimpl.json.JSONEncoder.default
+_json_default = json_module.JSONEncoder.default
 
 
-def _json_safe_default(self: jsonimpl.json.JSONEncoder, obj: object) -> object:  # pragma: no cover
+def _json_safe_default(self: Any, obj: object) -> object:  # pragma: no cover
     if obj.__class__.__name__ == "_lru_cache_wrapper":
         return repr(obj)
     return _json_default(self, obj)
 
 
-jsonimpl.json.JSONEncoder.default = _json_safe_default
+json_module.JSONEncoder.default = _json_safe_default
 
 # --- Build deep links per symbol without importing your code (use Griffe)
-try:  #  griffe >=0.45 exposes loader module; fallback for current layout.
-    from griffe.loader import GriffeLoader
-except ImportError:  # pragma: no cover - compatibility shim
-    from griffe import GriffeLoader  # type: ignore[attr-defined]
-
 _loader = GriffeLoader(search_paths=[str(SRC_DIR if SRC_DIR.exists() else ROOT)])
-_MODULE_CACHE: dict[str, GriffeModule | None] = {}
+_MODULE_CACHE: dict[str, Any] = {}
 PKG = _PACKAGES[0]
 
 # Ensure sphinx-gallery backref directory exists to avoid missing-path errors
 (DOCS_DIR / "gen_modules" / "backrefs").mkdir(parents=True, exist_ok=True)
 
 
-def _get_root(module: str | None) -> GriffeModule | None:
+def _get_root(module: str | None) -> Any:
     top = module.split(".", 1)[0] if module else PKG
     if top not in _MODULE_CACHE:
         try:
@@ -264,7 +277,7 @@ def _get_root(module: str | None) -> GriffeModule | None:
     return _MODULE_CACHE[top]
 
 
-def _lookup(module: str, fullname: str) -> tuple[str, int, int] | None:
+def _lookup(module: str | None, fullname: str | None) -> tuple[str, int, int] | None:
     """Return ``(abs_path, start, end)`` for the requested symbol."""
     root = _get_root(module)
     if root is None:
@@ -363,11 +376,11 @@ class GalleryTagsDirective(Directive):
 
     has_content = True
 
-    def run(self) -> list[nodes.Node]:  # type: ignore[override]
+    def run(self) -> list[nodes.Node]:
         """Return an empty node list so Sphinx accepts ``.. tags::`` blocks."""
         return []
 
 
-def setup(app: "Sphinx") -> None:  # pragma: no cover - Sphinx integration hook
+def setup(app: Sphinx) -> None:  # pragma: no cover - Sphinx integration hook
     """Register custom directives when Sphinx loads the config module."""
     app.add_directive("tags", GalleryTagsDirective)

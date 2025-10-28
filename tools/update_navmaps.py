@@ -20,12 +20,12 @@ def iter_python_files() -> list[Path]:
     """Compute iter python files.
 
     Carry out the iter python files operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     List[Path]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.update_navmaps import iter_python_files
@@ -33,7 +33,6 @@ def iter_python_files() -> list[Path]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     search_root = SRC if SRC.exists() else ROOT
     return sorted(path for path in search_root.rglob("*.py") if path.is_file())
 
@@ -42,17 +41,18 @@ def module_docstring(path: Path) -> str | None:
     """Compute module docstring.
 
     Carry out the module docstring operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
+    path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.update_navmaps import module_docstring
@@ -60,7 +60,6 @@ def module_docstring(path: Path) -> str | None:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     try:
         tree = ast.parse(path.read_text(encoding="utf-8"))
     except UnicodeDecodeError:
@@ -72,18 +71,17 @@ def main() -> None:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Raises
     ------
     SystemExit
         Raised when validation fails.
-    
+
     Examples
     --------
     >>> from tools.update_navmaps import main
     >>> main()  # doctest: +ELLIPSIS
     """
-    
     offenders: list[Path] = []
     for file_path in iter_python_files():
         doc = module_docstring(file_path)
