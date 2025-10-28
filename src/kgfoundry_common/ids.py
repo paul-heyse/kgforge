@@ -40,6 +40,11 @@ def urn_doc_from_text(text: str) -> str:
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -85,6 +90,11 @@ def urn_chunk(doc_hash: str, start: int, end: int) -> str:
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 

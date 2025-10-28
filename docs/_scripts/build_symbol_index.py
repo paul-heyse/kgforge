@@ -37,6 +37,11 @@ def iter_packages() -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -85,6 +90,11 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
     object | None
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -121,6 +131,11 @@ def walk(node: Object) -> None:
     node : Object
         Description for ``node``.
     """
+    
+    
+    
+    
+    
 
 
 

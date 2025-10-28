@@ -45,6 +45,11 @@ class Registry(Protocol):
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -77,6 +82,11 @@ class Registry(Protocol):
         rows : int
             Description for ``rows``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -105,6 +115,11 @@ class Registry(Protocol):
         dataset_id : str
             Description for ``dataset_id``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -150,6 +165,11 @@ class Registry(Protocol):
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -182,6 +202,11 @@ class Registry(Protocol):
         notes : str | None
             Description for ``notes``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -210,6 +235,11 @@ class Registry(Protocol):
         docs : List[Doc]
             Description for ``docs``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -238,6 +268,11 @@ class Registry(Protocol):
         assets : List[DoctagsAsset]
             Description for ``assets``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -270,6 +305,11 @@ class Registry(Protocol):
         payload : Mapping[str, object]
             Description for ``payload``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -304,6 +344,11 @@ class Registry(Protocol):
         message : str
             Description for ``message``.
         """
+        
+        
+        
+        
+        
 
 
 

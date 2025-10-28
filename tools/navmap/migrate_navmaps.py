@@ -32,6 +32,11 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -105,6 +110,11 @@ def main(argv: list[str] | None = None) -> int:
     int
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 

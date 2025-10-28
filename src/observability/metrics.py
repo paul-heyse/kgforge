@@ -44,6 +44,11 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             _NoopMetric
                 Description of return value.
             """
+            
+            
+            
+            
+            
 
 
 
@@ -78,6 +83,11 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
+            
+            
+            
+            
+            
 
 
 
@@ -112,6 +122,11 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
+            
+            
+            
+            
+            
 
 
 
@@ -146,6 +161,11 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
+            
+            
+            
+            
+            
 
 
 

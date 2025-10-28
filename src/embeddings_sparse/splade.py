@@ -63,6 +63,11 @@ class SPLADEv3Encoder:
         max_seq_len : int | None
             Description for ``max_seq_len``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -108,6 +113,11 @@ class SPLADEv3Encoder:
         NotImplementedError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -149,6 +159,11 @@ class PureImpactIndex:
         index_dir : str
             Description for ``index_dir``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -202,6 +217,11 @@ class PureImpactIndex:
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -257,6 +277,11 @@ class PureImpactIndex:
 
         Carry out the load operation.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -300,6 +325,11 @@ class PureImpactIndex:
         List[Tuple[str, float]]
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -345,6 +375,11 @@ class LuceneImpactIndex:
         index_dir : str
             Description for ``index_dir``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -409,6 +444,11 @@ class LuceneImpactIndex:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -455,6 +495,11 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
     PureImpactIndex | LuceneImpactIndex
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 

@@ -42,6 +42,11 @@ class DuckDBRegistry:
         db_path : str
             Description for ``db_path``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -79,6 +84,11 @@ class DuckDBRegistry:
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -120,6 +130,11 @@ class DuckDBRegistry:
         rows : int
             Description for ``rows``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -150,6 +165,11 @@ class DuckDBRegistry:
         dataset_id : str
             Description for ``dataset_id``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -195,6 +215,11 @@ class DuckDBRegistry:
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -236,6 +261,11 @@ class DuckDBRegistry:
         notes : str | None
             Description for ``notes``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -266,6 +296,11 @@ class DuckDBRegistry:
         docs : List[Doc]
             Description for ``docs``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -317,6 +352,11 @@ class DuckDBRegistry:
         assets : List[DoctagsAsset]
             Description for ``assets``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -364,6 +404,11 @@ class DuckDBRegistry:
         payload : Mapping[str, object]
             Description for ``payload``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -405,6 +450,11 @@ class DuckDBRegistry:
         message : str
             Description for ``message``.
         """
+        
+        
+        
+        
+        
 
 
 

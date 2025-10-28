@@ -36,6 +36,11 @@ def iter_packages() -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -73,6 +78,11 @@ def write_node(node: Object) -> None:
     node : Object
         Description for ``node``.
     """
+    
+    
+    
+    
+    
 
 
 

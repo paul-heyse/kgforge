@@ -9,9 +9,9 @@ from typing import Final
 import numpy as np
 import typer
 from kgfoundry.embeddings_sparse.bm25 import get_bm25
-from kgfoundry.vectorstore_faiss.gpu import FaissGpuIndex
 
 from kgfoundry_common.navmap_types import NavMap
+from vectorstore_faiss import gpu as faiss_gpu
 
 __all__ = ["api", "e2e", "index_bm25", "index_faiss"]
 
@@ -51,26 +51,7 @@ def index_bm25(
     index_dir : str | None
         Description for ``index_dir``.
     """
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
@@ -128,33 +109,14 @@ def index_faiss(
     index_path : str | None
         Description for ``index_path``.
     """
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
         vecs = json.load(fh)
     keys = [r["key"] for r in vecs]
     vectors = np.array([r["vector"] for r in vecs], dtype="float32")
     # Train and add
-    vs = FaissGpuIndex()
+    vs = faiss_gpu.FaissGpuIndex()
     vs.train(vectors[: min(len(vectors), 10000)])  # small train set
     vs.add(keys, vectors)
     # Save CPU form when possible
@@ -178,26 +140,7 @@ def api(port: int = 8080) -> None:
     port : int | None
         Description for ``port``.
     """
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
@@ -215,26 +158,7 @@ def e2e() -> None:
     typer.Exit
         Raised when validation fails.
     """
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     try:
         from orchestration.flows import e2e_flow
     except ModuleNotFoundError as exc:  # pragma: no cover - defensive messaging

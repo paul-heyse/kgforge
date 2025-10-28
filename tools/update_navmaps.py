@@ -20,6 +20,11 @@ def iter_python_files() -> list[Path]:
     List[Path]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -59,6 +64,11 @@ def module_docstring(path: Path) -> str | None:
     str | None
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -96,6 +106,11 @@ def main() -> None:
     SystemExit
         Raised when validation fails.
     """
+    
+    
+    
+    
+    
 
 
 

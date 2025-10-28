@@ -32,6 +32,11 @@ class _SupportsResponse(Protocol):
 
         Carry out the raise for status operation.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -64,6 +69,11 @@ class _SupportsResponse(Protocol):
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -107,6 +117,11 @@ class _SupportsHttp(Protocol):
         src.search_client.client._SupportsResponse
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -157,6 +172,11 @@ class _SupportsHttp(Protocol):
         src.search_client.client._SupportsResponse
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -206,6 +226,11 @@ class KGFoundryClient:
         http : _SupportsHttp | None
             Description for ``http``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -256,6 +281,11 @@ class KGFoundryClient:
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -307,6 +337,11 @@ class KGFoundryClient:
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -351,6 +386,11 @@ class KGFoundryClient:
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 

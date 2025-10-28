@@ -48,6 +48,11 @@ def toks(text: str) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -100,6 +105,11 @@ class BM25Index:
         b : float | None
             Description for ``b``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -143,6 +153,11 @@ class BM25Index:
         BM25Index
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -233,6 +248,11 @@ class BM25Index:
         path : str
             Description for ``path``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -283,6 +303,11 @@ class BM25Index:
         BM25Index
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -349,6 +374,11 @@ class BM25Index:
         List[Tuple[int, float]]
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -401,6 +431,11 @@ class BM25Index:
         BM25Doc
             Description of return value.
         """
+        
+        
+        
+        
+        
 
 
 

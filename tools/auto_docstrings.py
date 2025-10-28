@@ -169,6 +169,11 @@ def parse_args() -> argparse.Namespace:
     argparse.Namespace
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -198,6 +203,11 @@ def module_name_for(path: Path) -> str:
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -238,6 +248,11 @@ def summarize(name: str, kind: str) -> str:
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -277,6 +292,11 @@ def extended_summary(kind: str, name: str, module_name: str) -> str:
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -331,6 +351,11 @@ def annotation_to_text(node: ast.AST | None) -> str:
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -378,6 +403,11 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     List[Tuple[int, ast.AST, str]]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -411,6 +441,11 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
     List[Tuple[str, str]]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -434,6 +469,11 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
         default : ast.AST | None
             Description for ``default``.
         """
+        
+        
+        
+        
+        
 
 
 
@@ -486,6 +526,11 @@ def detect_raises(node: ast.AST) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -543,6 +588,11 @@ def build_examples(
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -585,6 +635,11 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -696,6 +751,11 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     Tuple[str | None, ast.Expr | None]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -737,6 +797,11 @@ def replace(
     insert_at : int
         Description for ``insert_at``.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -773,6 +838,11 @@ def process_file(path: Path) -> bool:
     bool
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -863,6 +933,11 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
 
 
 

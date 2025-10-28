@@ -48,6 +48,11 @@ def detect_packages() -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -85,6 +90,11 @@ def detect_primary() -> str:
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 

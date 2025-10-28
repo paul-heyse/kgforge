@@ -25,6 +25,11 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
     Tuple[ast.Module, ast.Expr | None]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -74,6 +79,11 @@ def clean_docstring(text: str) -> str:
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -118,6 +128,11 @@ def rewrite_module(path: Path) -> bool:
     bool
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -164,6 +179,11 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
 
 
 

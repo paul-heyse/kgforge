@@ -38,6 +38,11 @@ def load_symbol_candidates() -> set[str]:
     Set[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -132,6 +137,11 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     Mapping[str, List[Mapping[str, object]]]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -205,6 +215,11 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     Mapping[str, List[Mapping[str, object]]]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -241,6 +256,11 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
 
 
 

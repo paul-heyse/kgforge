@@ -38,6 +38,11 @@ def detect_repo() -> tuple[str, str]:
     Tuple[str, str]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -82,6 +87,11 @@ def git_sha() -> str:
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -116,6 +126,11 @@ def gh_url(rel: str, start: int, end: int | None) -> str:
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -135,6 +150,11 @@ def iter_packages() -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -161,6 +181,11 @@ def summarize(node: Object) -> str:
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -187,6 +212,11 @@ def is_public(node: Object) -> bool:
     bool
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -213,6 +243,11 @@ def get_open_link(node: Object, readme_dir: Path) -> str | None:
     str | None
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -248,6 +283,11 @@ def get_view_link(node: Object, readme_dir: Path) -> str | None:
     str | None
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -282,6 +322,11 @@ def iter_public_members(node: Object) -> Iterable[Object]:
     Iterable[Object]
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -495,6 +540,11 @@ def badges_for(qname: str) -> Badges:
     Badges
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -573,6 +623,11 @@ def format_badges(qname: str) -> str:
     str
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -615,6 +670,11 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
     str | None
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -715,6 +775,11 @@ def render_line(node: Object, readme_dir: Path, cfg: Config) -> str | None:
     str | None
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -771,6 +836,11 @@ def write_if_changed(path: Path, content: str) -> bool:
     bool
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -803,6 +873,11 @@ def write_readme(node: Object, cfg: Config) -> bool:
     bool
         Description of return value.
     """
+    
+    
+    
+    
+    
 
 
 

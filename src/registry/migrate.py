@@ -39,6 +39,11 @@ def apply(db: str, migrations_dir: str) -> None:
     migrations_dir : str
         Description for ``migrations_dir``.
     """
+    
+    
+    
+    
+    
 
 
 
@@ -71,6 +76,11 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
 
 
 
