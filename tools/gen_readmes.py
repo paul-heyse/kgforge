@@ -19,6 +19,7 @@ import time
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import urlparse
 from typing import Any, cast
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,14 +71,22 @@ def detect_repo() -> tuple[str, str]:
     if remote.endswith(".git"):
         remote = remote[:-4]
     path = ""
+    host = ""
     if remote.startswith("git@"):
         _, remainder = remote.split("@", 1)
-        path = remainder.split(":", 1)[1]
-    elif remote.startswith("https://"):
-        path = remote.split("https://", 1)[1]
+        host, path = remainder.split(":", 1)
+        host = host.lower()
+    elif "://" in remote:
+        parsed = urlparse(remote)
+        host = (parsed.hostname or "").lower()
+        path = parsed.path.lstrip("/")
+        if not path and parsed.netloc:
+            path = parsed.netloc
 
     if path:
-        parts = path.split("/")
+        parts = [segment for segment in path.split("/") if segment]
+        while host and parts and parts[0].lower() == host:
+            parts = parts[1:]
         if len(parts) >= 2:
             return parts[0], parts[1]
 
