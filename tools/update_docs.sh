@@ -35,14 +35,15 @@ run() {
 }
 
 ensure_tools() {
-  local missing=0
+  local missing_tools=()
   for tool in doq docformatter pydocstyle pydoclint interrogate; do
     if [[ ! -x "$BIN/$tool" ]]; then
-      echo "error: missing '$tool'; install docs extras via 'pip install -e \".[docs]\"' (inside .venv)." >&2
-      missing=1
+      missing_tools+=("$tool")
     fi
   done
-  if [[ $missing -ne 0 ]]; then
+  if ((${#missing_tools[@]} != 0)); then
+    echo "error: missing required tools: ${missing_tools[*]}." >&2
+    echo "       Run 'uv sync --frozen --extra docs' (or './scripts/bootstrap.sh')." >&2
     exit 1
   fi
 }
@@ -50,11 +51,10 @@ ensure_tools() {
 ensure_tools
 
 if [[ ! -x "$BIN/mkdocs" ]]; then
-  echo "warning: mkdocs not installed; skipping mkdocs build (install via 'pip install -e \".[docs-mkdocs]\"')." >&2
-  BUILD_MKDOCS=0
-else
-  BUILD_MKDOCS=1
+  echo "error: missing 'mkdocs'; run 'uv sync --frozen --extra docs --extra docs-mkdocs'." >&2
+  exit 1
 fi
+BUILD_MKDOCS=1
 
 # Ensure we rebuild from a clean slate.
 rm -rf docs/_build site

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+from typing import Sequence
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
@@ -50,7 +51,29 @@ def has_python_files(path: Path) -> bool:
     return any(path.rglob("*.py"))
 
 
-def run_doq(target: Path) -> None:
+def _record_doq_failure(target: Path, cmd: Sequence[str], result: subprocess.CompletedProcess[str]) -> None:
+    """Persist information about a failed DoQ invocation for post-run triage."""
+
+    rel_target = target.relative_to(REPO) if target.is_relative_to(REPO) else target
+    header = (
+        "[docstrings] doq failed for "
+        f"{rel_target} (exit {result.returncode}) running: {' '.join(cmd)}"
+    )
+    print(header, file=sys.stderr)
+    if result.stdout:
+        print(result.stdout, file=sys.stderr)
+    if result.stderr:
+        print(result.stderr, file=sys.stderr)
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    with LOG_FILE.open("a", encoding="utf-8") as log:
+        log.write(header + "\n")
+        if result.stdout:
+            log.write("stdout:\n" + result.stdout + "\n")
+        if result.stderr:
+            log.write("stderr:\n" + result.stderr + "\n")
+
+
+def run_doq(target: Path) -> bool:
     """Compute run doq.
 
     Carry out the run doq operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -79,7 +102,11 @@ def run_doq(target: Path) -> None:
         "-d",
         str(target),
     ]
-    subprocess.run(cmd, check=True)
+    result = subprocess.run(cmd, check=False, text=True, capture_output=True)
+    if result.returncode != 0:
+        _record_doq_failure(target, cmd, result)
+        return False
+    return True
 
 
 def run_fallback(target: Path) -> None:
