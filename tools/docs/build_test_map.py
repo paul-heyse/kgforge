@@ -118,6 +118,10 @@ def load_symbol_candidates() -> set[str]:
     for pyfile in SRC.rglob("*.py"):
         rel = pyfile.relative_to(SRC)
         module = ".".join(rel.with_suffix("").parts)
+        if module.endswith(".__init__"):
+            module = module[: -len(".__init__")]
+        if not module:
+            continue
         if module.startswith(KNOWN_PREFIXES):
             candidates.add(module)
     return candidates
