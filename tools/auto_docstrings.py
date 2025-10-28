@@ -146,67 +146,140 @@ PYDANTIC_ARTIFACT_SUMMARIES: dict[str, str] = {
 
 
 QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
+    # === Project-specific vector store aliases ===
     "FloatArray": "src.vectorstore_faiss.gpu.FloatArray",
     "IntArray": "src.vectorstore_faiss.gpu.IntArray",
     "StrArray": "src.vectorstore_faiss.gpu.StrArray",
     "VecArray": "src.search_api.faiss_adapter.VecArray",
+    # === Project-specific client helpers ===
     "_SupportsHttp": "src.search_client.client._SupportsHttp",
     "_SupportsResponse": "src.search_client.client._SupportsResponse",
-    "kgfoundry.kgfoundry_common.models.Doc": "src.kgfoundry_common.models.Doc",
-    "kgfoundry.kgfoundry_common.models.DoctagsAsset": "src.kgfoundry_common.models.DoctagsAsset",
-    "kgfoundry.kgfoundry_common.models.Chunk": "src.kgfoundry_common.models.Chunk",
-    "kgfoundry.kgfoundry_common.models.LinkAssertion": "src.kgfoundry_common.models.LinkAssertion",
-    "kgfoundry.kgfoundry_common.models.Concept": "src.ontology.catalog.Concept",
-    "NavMap": "src.kgfoundry_common.navmap_types.NavMap",
-    "Doc": "src.kgfoundry_common.models.Doc",
-    "DoctagsAsset": "src.kgfoundry_common.models.DoctagsAsset",
+    # === Project-specific models ===
     "Chunk": "src.kgfoundry_common.models.Chunk",
-    "LinkAssertion": "src.kgfoundry_common.models.LinkAssertion",
-    "DownloadError": "src.kgfoundry_common.errors.DownloadError",
-    "UnsupportedMIMEError": "src.kgfoundry_common.errors.UnsupportedMIMEError",
-    "SparseEncoder": "src.embeddings_sparse.base.SparseEncoder",
-    "SparseIndex": "src.embeddings_sparse.base.SparseIndex",
-    "DenseEmbeddingModel": "src.embeddings_dense.base.DenseEmbeddingModel",
-    "SearchRequest": "src.search_api.schemas.SearchRequest",
-    "SearchResult": "src.search_api.schemas.SearchResult",
-    "FixtureDoc": "src.search_api.fixture_index.FixtureDoc",
-    "SpladeDoc": "src.search_api.splade_index.SpladeDoc",
     "Concept": "src.ontology.catalog.Concept",
     "ConceptMeta": "src.ontology.catalog.ConceptMeta",
+    "DatasetVersion": "src.kgfoundry_common.parquet_io.DatasetVersion",
+    "Doc": "src.kgfoundry_common.models.Doc",
+    "DoctagsAsset": "src.kgfoundry_common.models.DoctagsAsset",
+    "FixtureDoc": "src.search_api.fixture_index.FixtureDoc",
+    "Id": "src.kgfoundry_common.models.Id",
+    "kgfoundry.kgfoundry_common.models.Chunk": "src.kgfoundry_common.models.Chunk",
+    "kgfoundry.kgfoundry_common.models.Concept": "src.ontology.catalog.Concept",
+    "kgfoundry.kgfoundry_common.models.Doc": "src.kgfoundry_common.models.Doc",
+    "kgfoundry.kgfoundry_common.models.DoctagsAsset": "src.kgfoundry_common.models.DoctagsAsset",
+    "kgfoundry.kgfoundry_common.models.LinkAssertion": "src.kgfoundry_common.models.LinkAssertion",
+    "LinkAssertion": "src.kgfoundry_common.models.LinkAssertion",
+    "NavMap": "src.kgfoundry_common.navmap_types.NavMap",
     "Neo4jStore": "src.kg_builder.neo4j_store.Neo4jStore",
     "ParsedSchema": "src.kgfoundry_common.parquet_io.ParsedSchema",
-    "DatasetVersion": "src.kgfoundry_common.parquet_io.DatasetVersion",
-    "Id": "src.kgfoundry_common.models.Id",
+    "SearchRequest": "src.search_api.schemas.SearchRequest",
+    "SearchResult": "src.search_api.schemas.SearchResult",
+    "SpladeDoc": "src.search_api.splade_index.SpladeDoc",
+    # === Project-specific errors ===
+    "DownloadError": "src.kgfoundry_common.errors.DownloadError",
+    "UnsupportedMIMEError": "src.kgfoundry_common.errors.UnsupportedMIMEError",
+    # === Project-specific embedding abstractions ===
+    "DenseEmbeddingModel": "src.embeddings_dense.base.DenseEmbeddingModel",
+    "SparseEncoder": "src.embeddings_sparse.base.SparseEncoder",
+    "SparseIndex": "src.embeddings_sparse.base.SparseIndex",
+    # === Pydantic base models ===
     "BaseModel": "pydantic.BaseModel",
     "pydantic.BaseModel": "pydantic.BaseModel",
+    # === NumPy core ndarray and typing utilities ===
+    "ArrayLike": "numpy.typing.ArrayLike",
     "NDArray": "numpy.typing.NDArray",
-    "numpy.typing.NDArray": "numpy.typing.NDArray",
+    "numpy.dtype": "numpy.dtype",
     "numpy.ndarray": "numpy.ndarray",
+    "numpy.random.Generator": "numpy.random.Generator",
+    "numpy.typing.ArrayLike": "numpy.typing.ArrayLike",
+    "numpy.typing.NDArray": "numpy.typing.NDArray",
+    "np.dtype": "numpy.dtype",
     "np.ndarray": "numpy.ndarray",
     "np.typing.NDArray": "numpy.typing.NDArray",
+    # === NumPy scalar types (fully qualified) ===
+    "numpy.complex128": "numpy.complex128",
+    "numpy.complex64": "numpy.complex64",
+    "numpy.float16": "numpy.float16",
     "numpy.float32": "numpy.float32",
+    "numpy.float64": "numpy.float64",
+    "numpy.int16": "numpy.int16",
+    "numpy.int32": "numpy.int32",
+    "numpy.int64": "numpy.int64",
+    "numpy.int8": "numpy.int8",
+    "numpy.uint16": "numpy.uint16",
+    "numpy.uint32": "numpy.uint32",
+    "numpy.uint64": "numpy.uint64",
+    "numpy.uint8": "numpy.uint8",
+    # === NumPy scalar types (short aliases) ===
+    "np.complex128": "numpy.complex128",
+    "np.complex64": "numpy.complex64",
+    "np.float16": "numpy.float16",
     "np.float32": "numpy.float32",
-    "ArrayLike": "numpy.typing.ArrayLike",
+    "np.float64": "numpy.float64",
+    "np.int16": "numpy.int16",
+    "np.int32": "numpy.int32",
+    "np.int64": "numpy.int64",
+    "np.int8": "numpy.int8",
+    "np.uint16": "numpy.uint16",
+    "np.uint32": "numpy.uint32",
+    "np.uint64": "numpy.uint64",
+    "np.uint8": "numpy.uint8",
+    # === PyArrow core types ===
+    "pyarrow.Array": "pyarrow.Array",
+    "pyarrow.DataType": "pyarrow.DataType",
+    "pyarrow.Field": "pyarrow.Field",
+    "pyarrow.Int64Type": "pyarrow.Int64Type",
+    "pyarrow.RecordBatch": "pyarrow.RecordBatch",
+    "pyarrow.Schema": "pyarrow.Schema",
+    "pyarrow.StringType": "pyarrow.StringType",
+    "pyarrow.Table": "pyarrow.Table",
+    "pyarrow.TimestampType": "pyarrow.TimestampType",
+    "pyarrow.schema": "pyarrow.schema",
+    # === Pydantic helpers and validators ===
+    "pydantic.AliasChoices": "pydantic.AliasChoices",
+    "pydantic.ConfigDict": "pydantic.ConfigDict",
+    "pydantic.Field": "pydantic.Field",
+    "pydantic.TypeAdapter": "pydantic.TypeAdapter",
+    "pydantic.ValidationError": "pydantic.ValidationError",
+    "pydantic.field_validator": "pydantic.field_validator",
+    "pydantic.fields.Field": "pydantic.fields.Field",
+    "pydantic.model_validator": "pydantic.model_validator",
+    # === typing and typing_extensions utilities ===
+    "Annotated": "typing.Annotated",
+    "Any": "typing.Any",
+    "Callable": "collections.abc.Callable",
+    "Final": "typing.Final",
     "Iterable": "collections.abc.Iterable",
     "Iterator": "collections.abc.Iterator",
+    "Literal": "typing.Literal",
     "Mapping": "collections.abc.Mapping",
     "MutableMapping": "collections.abc.MutableMapping",
-    "Sequence": "collections.abc.Sequence",
     "MutableSequence": "collections.abc.MutableSequence",
-    "Set": "collections.abc.Set",
     "Optional": "typing.Optional",
-    "Callable": "collections.abc.Callable",
-    "Any": "typing.Any",
+    "Sequence": "collections.abc.Sequence",
+    "Set": "collections.abc.Set",
     "Type": "typing.Type",
-    "Literal": "typing.Literal",
-    "Final": "typing.Final",
-    "pyarrow.schema": "pyarrow.schema",
-    "pyarrow.Schema": "pyarrow.Schema",
-    "pyarrow.Table": "pyarrow.Table",
+    "typing_extensions.Annotated": "typing_extensions.Annotated",
+    "typing_extensions.NotRequired": "typing_extensions.NotRequired",
+    "typing_extensions.Self": "typing_extensions.Self",
+    "typing_extensions.TypeAlias": "typing_extensions.TypeAlias",
+    "typing_extensions.TypedDict": "typing_extensions.TypedDict",
+    # === Standard library collections and utilities ===
+    "collections.Counter": "collections.Counter",
+    "collections.defaultdict": "collections.defaultdict",
+    "collections.deque": "collections.deque",
+    "collections.OrderedDict": "collections.OrderedDict",
+    "datetime.date": "datetime.date",
+    "datetime.datetime": "datetime.datetime",
+    "datetime.timedelta": "datetime.timedelta",
+    "pathlib.Path": "pathlib.Path",
+    "pathlib.PurePath": "pathlib.PurePath",
+    "uuid.UUID": "uuid.UUID",
+    # === External service integrations ===
     "duckdb.DuckDBPyConnection": "duckdb.DuckDBPyConnection",
-    "HTTPException": "fastapi.HTTPException",
-    "fastapi.HTTPException": "fastapi.HTTPException",
     "Exit": "typer.Exit",
+    "fastapi.HTTPException": "fastapi.HTTPException",
+    "HTTPException": "fastapi.HTTPException",
     "typer.Exit": "typer.Exit",
 }
 
@@ -912,7 +985,7 @@ def process_file(path: Path) -> bool:
         raises: list[str] = []
         if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             parameters = parameters_for(node)
-            return_annotation = annotation_to_text(node.returns)
+            return_annotation: str = annotation_to_text(node.returns)
             if return_annotation not in {"None", "NoReturn"}:
                 returns = return_annotation
             raises = detect_raises(node)
@@ -920,7 +993,10 @@ def process_file(path: Path) -> bool:
         required_sections = _required_sections(kind, parameters, returns, raises)
         needs_update = doc is None or "TODO" in (doc or "") or "NavMap:" in (doc or "")
         if not needs_update and required_sections:
-            needs_update = not all(section in doc for section in required_sections)
+            if doc is None:
+                needs_update = True
+            else:
+                needs_update = not all(section in doc for section in required_sections)
         if not needs_update and doc:
             lower_markers = (" list[", " tuple[", " set[", " dict[", " list ", " dict ")
             if any(marker in doc for marker in lower_markers):
@@ -945,9 +1021,18 @@ def process_file(path: Path) -> bool:
             insert_at = 1 if lines and lines[0].startswith("#!") else 0
             replace(expr, lines, new_lines, indent, insert_at)
         else:
+            if not isinstance(
+                node,
+                (
+                    ast.FunctionDef,
+                    ast.AsyncFunctionDef,
+                    ast.ClassDef,
+                ),
+            ):
+                continue
             indent = " " * (node.col_offset + 4)
             new_lines = build_docstring(kind, node, module_name)
-            body = getattr(node, "body", [])
+            body: list[ast.stmt] = node.body
             insert_at = body[0].lineno - 1 if body else node.lineno
             replace(expr, lines, new_lines, indent, insert_at)
         changed = True
