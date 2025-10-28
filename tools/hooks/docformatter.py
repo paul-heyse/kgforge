@@ -30,6 +30,9 @@ def git_diff_names() -> set[str]:
     
     
     
+    
+    
+    
     result = subprocess.run(
         ["git", "diff", "--name-only"],
         check=True,
@@ -49,6 +52,9 @@ def main() -> int:
     int
         Description of return value.
     """
+    
+    
+    
     
     
     

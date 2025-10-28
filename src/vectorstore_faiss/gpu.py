@@ -69,6 +69,9 @@ class FaissGpuIndex:
         
         
         
+        
+        
+        
         self.factory = factory
         self.nprobe = nprobe
         self.gpu = gpu
@@ -108,6 +111,9 @@ class FaissGpuIndex:
         seed : int | None
             Description for ``seed``.
         """
+        
+        
+        
         
         
         
@@ -163,6 +169,9 @@ class FaissGpuIndex:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
         
         
         
@@ -234,6 +243,9 @@ class FaissGpuIndex:
         
         
         
+        
+        
+        
         q = cast(FloatArray, np.asarray(query, dtype=np.float32, order="C"))
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12
         if self._faiss is None or self._index is None:
@@ -281,6 +293,9 @@ class FaissGpuIndex:
         
         
         
+        
+        
+        
         if self._faiss is None or self._index is None:
             if self._xb is not None and self._idmap is not None:
                 np.savez(index_uri, xb=self._xb, ids=self._idmap)
@@ -309,6 +324,9 @@ class FaissGpuIndex:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
         
         
         

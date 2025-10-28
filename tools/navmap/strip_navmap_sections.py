@@ -38,6 +38,9 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
     
     
     
+    
+    
+    
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if not tree.body:
@@ -67,6 +70,9 @@ def clean_docstring(text: str) -> str:
     str
         Description of return value.
     """
+    
+    
+    
     
     
     
@@ -117,6 +123,9 @@ def rewrite_module(path: Path) -> bool:
     
     
     
+    
+    
+    
     tree, doc_expr = iter_module_nodes(path)
     if doc_expr is None:
         return False
@@ -143,6 +152,9 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
     
     
     

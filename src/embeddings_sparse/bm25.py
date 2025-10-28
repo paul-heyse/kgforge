@@ -109,6 +109,9 @@ class PurePythonBM25:
         
         
         
+        
+        
+        
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -147,6 +150,9 @@ class PurePythonBM25:
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
+        
+        
+        
         
         
         
@@ -211,6 +217,9 @@ class PurePythonBM25:
 
         Carry out the load operation.
         """
+        
+        
+        
         
         
         
@@ -291,6 +300,9 @@ class PurePythonBM25:
         
         
         
+        
+        
+        
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -347,6 +359,9 @@ class LuceneBM25:
         
         
         
+        
+        
+        
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -368,6 +383,9 @@ class LuceneBM25:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
         
         
         
@@ -456,6 +474,9 @@ class LuceneBM25:
         
         
         
+        
+        
+        
         self._ensure_searcher()
         if self._searcher is None:
             message = "Lucene searcher not initialized"
@@ -495,6 +516,9 @@ def get_bm25(
     PurePythonBM25 | LuceneBM25
         Description of return value.
     """
+    
+    
+    
     
     
     
