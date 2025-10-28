@@ -45,15 +45,17 @@ class DuckDBRegistry:
     """Describe DuckDBRegistry."""
 
     def __init__(self, db_path: str) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters.
-
+        """
+        Compute init.
+        
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
+        
         Parameters
         ----------
         db_path : str
             Description for ``db_path``.
         """
+        
         self.db_path = db_path
         self.con = duckdb.connect(db_path, read_only=False)
         self.con.execute("PRAGMA threads=14")

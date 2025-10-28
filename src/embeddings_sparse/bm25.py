@@ -95,10 +95,11 @@ class PurePythonBM25:
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
     ) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters.
-
+        """
+        Compute init.
+        
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
+        
         Parameters
         ----------
         index_dir : str
@@ -110,6 +111,7 @@ class PurePythonBM25:
         field_boosts : Mapping[str, float] | None
             Description for ``field_boosts``.
         """
+        
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -298,10 +300,11 @@ class LuceneBM25:
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
     ) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters.
-
+        """
+        Compute init.
+        
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
+        
         Parameters
         ----------
         index_dir : str
@@ -313,6 +316,7 @@ class LuceneBM25:
         field_boosts : Mapping[str, float] | None
             Description for ``field_boosts``.
         """
+        
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b

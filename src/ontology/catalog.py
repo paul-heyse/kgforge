@@ -49,15 +49,17 @@ class OntologyCatalog:
     """Describe OntologyCatalog."""
 
     def __init__(self, concepts: list[Concept]) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters.
-
+        """
+        Compute init.
+        
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
+        
         Parameters
         ----------
         concepts : List[src.ontology.catalog.Concept]
             Description for ``concepts``.
         """
+        
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
