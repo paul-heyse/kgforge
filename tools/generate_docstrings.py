@@ -38,6 +38,8 @@ def has_python_files(path: Path) -> bool:
     
     
     
+    
+    
 
 
 
@@ -71,6 +73,8 @@ def run_doq(target: Path) -> None:
     target : Path
         Description for ``target``.
     """
+    
+    
     
     
     
@@ -127,6 +131,8 @@ def run_fallback(target: Path) -> None:
     
     
     
+    
+    
 
 
 
@@ -163,6 +169,8 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
     
     
     

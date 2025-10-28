@@ -43,6 +43,8 @@ def load_symbol_candidates() -> set[str]:
     
     
     
+    
+    
 
 
 
@@ -142,6 +144,8 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     
     
     
+    
+    
 
 
 
@@ -220,6 +224,8 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     
     
     
+    
+    
 
 
 
@@ -256,6 +262,8 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
     
     
     

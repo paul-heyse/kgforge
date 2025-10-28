@@ -101,6 +101,8 @@ class PurePythonBM25:
         
         
         
+        
+        
 
 
 
@@ -159,6 +161,8 @@ class PurePythonBM25:
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
+        
+        
         
         
         
@@ -235,6 +239,8 @@ class PurePythonBM25:
 
         Carry out the load operation.
         """
+        
+        
         
         
         
@@ -319,6 +325,8 @@ class PurePythonBM25:
         
         
         
+        
+        
 
 
 
@@ -387,6 +395,8 @@ class LuceneBM25:
         
         
         
+        
+        
 
 
 
@@ -428,6 +438,8 @@ class LuceneBM25:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
         
         
         
@@ -520,6 +532,8 @@ class LuceneBM25:
         
         
         
+        
+        
 
 
 
@@ -579,6 +593,8 @@ def get_bm25(
     PurePythonBM25 | LuceneBM25
         Description of return value.
     """
+    
+    
     
     
     

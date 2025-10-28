@@ -1,7 +1,4 @@
-# --- Docs build artifacts ---
-site/_build/**
-docs/_build/**
-site/api/**
+
 
 
 # --- Python build/packaging artifacts ---
@@ -18,7 +15,7 @@ src/**/*.egg-info/**
 **/.pytest_cache/**
 **/.cache/**
 **/.ipynb_checkpoints/**
-.sphinx/**
+
 
 # --- Virtual envs & package managers ---
 
@@ -31,9 +28,7 @@ models/**
 vectors/**
 cache/**
 downloads/**
-tmp/**
-logs/**
-**/*.log
+
 
 # --- Node / frontend (if present) ---
 node_modules/**
@@ -42,7 +37,6 @@ node_modules/**
 .coverage
 htmlcov/**
 coverage.xml
-pytest-report.xml
 artifacts/**/*.xml
 artifacts/**/*.json
 

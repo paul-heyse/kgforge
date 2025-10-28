@@ -67,6 +67,8 @@ class OpenAccessHarvester:
         
         
         
+        
+        
 
 
 
@@ -121,6 +123,8 @@ class OpenAccessHarvester:
         
         
         
+        
+        
 
 
 
@@ -169,6 +173,8 @@ class OpenAccessHarvester:
         str | None
             Description of return value.
         """
+        
+        
         
         
         
@@ -243,6 +249,8 @@ class OpenAccessHarvester:
         
         
         
+        
+        
 
 
 
@@ -294,6 +302,8 @@ class OpenAccessHarvester:
         List[Doc]
             Description of return value.
         """
+        
+        
         
         
         

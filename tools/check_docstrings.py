@@ -33,6 +33,8 @@ def parse_args() -> argparse.Namespace:
     
     
     
+    
+    
 
 
 
@@ -82,6 +84,8 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
     
     
     
+    
+    
 
 
 
@@ -124,6 +128,8 @@ def check_placeholders() -> int:
     int
         Description of return value.
     """
+    
+    
     
     
     
@@ -178,6 +184,8 @@ def main() -> None:
     SystemExit
         Raised when validation fails.
     """
+    
+    
     
     
     

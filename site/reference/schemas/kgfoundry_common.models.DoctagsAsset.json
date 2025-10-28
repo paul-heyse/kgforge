@@ -1,0 +1,46 @@
+{
+  "description": "Describe DoctagsAsset.",
+  "properties": {
+    "doc_id": {
+      "title": "Doc Id",
+      "type": "string"
+    },
+    "doctags_uri": {
+      "title": "Doctags Uri",
+      "type": "string"
+    },
+    "pages": {
+      "title": "Pages",
+      "type": "integer"
+    },
+    "vlm_model": {
+      "title": "Vlm Model",
+      "type": "string"
+    },
+    "vlm_revision": {
+      "title": "Vlm Revision",
+      "type": "string"
+    },
+    "avg_logprob": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Avg Logprob"
+    }
+  },
+  "required": [
+    "doc_id",
+    "doctags_uri",
+    "pages",
+    "vlm_model",
+    "vlm_revision"
+  ],
+  "title": "DoctagsAsset",
+  "type": "object"
+}
