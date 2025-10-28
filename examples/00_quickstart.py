@@ -1,5 +1,4 @@
 """Quickstart - minimal import smoke test.
-
 ======================================
 
 Run the quickstart import smoke test.

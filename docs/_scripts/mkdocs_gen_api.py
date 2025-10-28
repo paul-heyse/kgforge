@@ -7,21 +7,29 @@ for implementation specifics.
 
 from __future__ import annotations
 
-import importlib
 import sys
+from importlib import import_module
 from pathlib import Path
 from typing import Any, cast
 
 import mkdocs_gen_files
 
-griffe_module = importlib.import_module("griffe")
-loader_module = importlib.import_module("griffe.loader")
-Object = cast(Any, griffe_module.Object)
-GriffeLoader = cast(Any, loader_module.GriffeLoader)
+griffe_module = import_module("griffe")
+Object = cast(Any, getattr(griffe_module, "Object"))
+try:
+    loader_module = import_module("griffe.loader")
+except ModuleNotFoundError:
+    GriffeLoader = cast(Any, getattr(griffe_module, "GriffeLoader"))
+else:
+    GriffeLoader = cast(Any, loader_module.GriffeLoader)
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 TOOLS_DIR = ROOT / "tools"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 

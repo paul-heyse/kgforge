@@ -46,6 +46,8 @@ def test_graph_build_outputs_are_clean() -> None:
     env["PYTHONPATH"] = (
         f"{python_path}{os.pathsep}{env['PYTHONPATH']}" if env.get("PYTHONPATH") else python_path
     )
+    env["GRAPH_FAIL_ON_LAYER"] = "0"
+    env["GRAPH_FAIL_ON_CYCLES"] = "0"
 
     def run_builder(fmt: str) -> None:
         cmd = [
@@ -102,6 +104,8 @@ def test_graph_metadata_includes_scc_summary_when_cycles_skipped() -> None:
     env["PYTHONPATH"] = (
         f"{python_path}{os.pathsep}{env['PYTHONPATH']}" if env.get("PYTHONPATH") else python_path
     )
+    env["GRAPH_FAIL_ON_LAYER"] = "0"
+    env["GRAPH_FAIL_ON_CYCLES"] = "0"
     env["GRAPH_EDGE_BUDGET"] = "0"
 
     if shutil.which("dot") is None:

@@ -16,11 +16,11 @@ import shutil
 import subprocess
 import sys
 import time
-from urllib.parse import urlparse
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
