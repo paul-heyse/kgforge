@@ -25,6 +25,7 @@ build_examples = auto_docstrings.build_examples
 module_name_for = auto_docstrings.module_name_for
 parameters_for = auto_docstrings.parameters_for
 extended_summary = auto_docstrings.extended_summary
+process_file = auto_docstrings.process_file
 
 
 @pytest.fixture()
@@ -79,8 +80,8 @@ def _get_function(code: str) -> ast.FunctionDef:
 @pytest.mark.parametrize(
     ("name", "expected_fragment"),
     [
-        ("__iter__", "Yield each item"),
-        ("__eq__", "Determine whether"),
+        ("__iter__", "Yield each element"),
+        ("__eq__", "Compare the instance"),
         ("__pydantic_core_schema__", "schema object"),
         ("model_dump", "Serialise the model instance"),
     ],
@@ -136,7 +137,7 @@ def process(item: str, limit: int | None = None) -> str:
 
     params = parameters_for(node)
     returns = annotation_to_text(node.returns)
-    required = _required_sections("function", params, returns, [])
+    required = _required_sections("function", params, returns, [], True)
 
     for section in required:
         assert section in docstring
@@ -185,3 +186,23 @@ def test_build_docstring_appends_examples(
     emitted_examples = doc_lines[examples_index + 2 : closing_index]
     for line in expected_lines:
         assert line in emitted_examples
+
+
+def test_process_file_is_idempotent_for_init_method(repo_layout: Path) -> None:
+    module_path = repo_layout / "src" / "pkg" / "example.py"
+    module_path.parent.mkdir(parents=True, exist_ok=True)
+    module_path.write_text(
+        """
+class Example:
+    def __init__(self, value: int) -> None:
+        self.value = value
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+
+    assert process_file(module_path)
+    original_contents = module_path.read_text(encoding="utf-8")
+
+    assert not process_file(module_path)
+    assert module_path.read_text(encoding="utf-8") == original_contents
