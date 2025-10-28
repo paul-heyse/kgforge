@@ -1,9 +1,7 @@
 """Ontology utilities."""
 
-import ontology.catalog as catalog
-import ontology.loader as loader
-
 from kgfoundry_common.navmap_types import NavMap
+from ontology import catalog, loader
 
 __all__ = ["catalog", "loader"]
 
@@ -22,7 +20,18 @@ __navmap__: NavMap = {
         },
     ],
     "symbols": {
-        "catalog": {},
-        "loader": {},
+        "catalog": {
+            "stability": "beta",
+            "owner": "@ontology",
+            "since": "0.1.0",
+        },
+        "loader": {
+            "stability": "beta",
+            "owner": "@ontology",
+            "since": "0.1.0",
+        },
     },
 }
+
+# [nav:anchor catalog]
+# [nav:anchor loader]

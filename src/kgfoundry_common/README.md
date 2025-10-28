@@ -1,49 +1,22 @@
 # `kgfoundry_common`
 
+Kgfoundry Common utilities
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## API
-- **`kgfoundry_common.NavMap`** — Describe NavMap → [open](./navmap_types.py:32:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
-- **`kgfoundry_common.config`** — Config utilities → [open](./config.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/config.py#L1)
-  - **`kgfoundry_common.config.NavMap`** — Describe NavMap → [open](./navmap_types.py:32:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
-  - **`kgfoundry_common.config.load_config`** — Compute load config → [open](./config.py:28:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/config.py#L28-L57)
-- **`kgfoundry_common.errors`** — Errors utilities → [open](./errors.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/errors.py#L1)
-  - **`kgfoundry_common.errors.ChunkingError`** — Describe ChunkingError → [open](./errors.py:78:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/errors.py#L78-L81)
-  - **`kgfoundry_common.errors.DoclingError`** — Describe DoclingError → [open](./errors.py:64:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/errors.py#L64-L67)
-  - **`kgfoundry_common.errors.DownloadError`** — Describe DownloadError → [open](./errors.py:50:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/errors.py#L50-L53)
-  - **`kgfoundry_common.errors.EmbeddingError`** — Describe EmbeddingError → [open](./errors.py:85:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/errors.py#L85-L88)
-  - **`kgfoundry_common.errors.IndexBuildError`** — Describe IndexBuildError → [open](./errors.py:99:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/errors.py#L99-L102)
-  - **`kgfoundry_common.errors.LinkerCalibrationError`** — Describe LinkerCalibrationError → [open](./errors.py:113:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/errors.py#L113-L116)
-  - **`kgfoundry_common.errors.NavMap`** — Describe NavMap → [open](./navmap_types.py:32:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
-  - **`kgfoundry_common.errors.Neo4jError`** — Describe Neo4jError → [open](./errors.py:120:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/errors.py#L120-L123)
-  - **`kgfoundry_common.errors.OCRTimeoutError`** — Describe OCRTimeoutError → [open](./errors.py:71:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/errors.py#L71-L74)
-  - **`kgfoundry_common.errors.OntologyParseError`** — Describe OntologyParseError → [open](./errors.py:106:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/errors.py#L106-L109)
-  - **`kgfoundry_common.errors.SpladeOOMError`** — Describe SpladeOOMError → [open](./errors.py:92:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/errors.py#L92-L95)
-  - **`kgfoundry_common.errors.UnsupportedMIMEError`** — Describe UnsupportedMIMEError → [open](./errors.py:57:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/errors.py#L57-L60)
-- **`kgfoundry_common.exceptions`** — Exceptions utilities → [open](./exceptions.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/exceptions.py#L1)
-  - **`kgfoundry_common.exceptions.DownloadError`** — Describe DownloadError → [open](./exceptions.py:26:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/exceptions.py#L26-L29)
-  - **`kgfoundry_common.exceptions.NavMap`** — Describe NavMap → [open](./navmap_types.py:32:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
-  - **`kgfoundry_common.exceptions.UnsupportedMIMEError`** — Describe UnsupportedMIMEError → [open](./exceptions.py:33:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/exceptions.py#L33-L36)
-- **`kgfoundry_common.ids`** — Ids utilities → [open](./ids.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/ids.py#L1)
-  - **`kgfoundry_common.ids.NavMap`** — Describe NavMap → [open](./navmap_types.py:32:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
-  - **`kgfoundry_common.ids.urn_chunk`** — Compute urn chunk → [open](./ids.py:62:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/ids.py#L62-L94)
-  - **`kgfoundry_common.ids.urn_doc_from_text`** — Compute urn doc from text → [open](./ids.py:28:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/ids.py#L28-L58)
-- **`kgfoundry_common.logging`** — Logging utilities → [open](./logging.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/logging.py#L1)
-  - **`kgfoundry_common.logging.JsonFormatter`** — Describe JsonFormatter → [open](./logging.py:29:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/logging.py#L29-L70)
-  - **`kgfoundry_common.logging.NavMap`** — Describe NavMap → [open](./navmap_types.py:32:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
-  - **`kgfoundry_common.logging.setup_logging`** — Compute setup logging → [open](./logging.py:74:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/logging.py#L74-L99)
-- **`kgfoundry_common.models`** — Models utilities → [open](./models.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/models.py#L1)
-  - **`kgfoundry_common.models.Chunk`** — Describe Chunk → [open](./models.py:61:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/models.py#L61-L70)
-  - **`kgfoundry_common.models.Doc`** — Describe Doc → [open](./models.py:30:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/models.py#L30-L45)
-  - **`kgfoundry_common.models.DoctagsAsset`** — Describe DoctagsAsset → [open](./models.py:49:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/models.py#L49-L57)
-  - **`kgfoundry_common.models.LinkAssertion`** — Describe LinkAssertion → [open](./models.py:74:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/models.py#L74-L84)
-  - **`kgfoundry_common.models.NavMap`** — Describe NavMap → [open](./navmap_types.py:32:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
-- **`kgfoundry_common.navmap_types`** — Navmap Types utilities → [open](./navmap_types.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L1)
-  - **`kgfoundry_common.navmap_types.NavMap`** — Describe NavMap → [open](./navmap_types.py:32:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
-  - **`kgfoundry_common.navmap_types.NavSection`** — Describe NavSection → [open](./navmap_types.py:8:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L8-L13)
-  - **`kgfoundry_common.navmap_types.SymbolMeta`** — Describe SymbolMeta → [open](./navmap_types.py:16:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L16-L29)
-- **`kgfoundry_common.parquet_io`** — Parquet Io utilities → [open](./parquet_io.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/parquet_io.py#L1)
-  - **`kgfoundry_common.parquet_io.NavMap`** — Describe NavMap → [open](./navmap_types.py:32:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
-  - **`kgfoundry_common.parquet_io.ParquetChunkWriter`** — Describe ParquetChunkWriter → [open](./parquet_io.py:275:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/parquet_io.py#L275-L391)
-  - **`kgfoundry_common.parquet_io.ParquetVectorWriter`** — Describe ParquetVectorWriter → [open](./parquet_io.py:35:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/parquet_io.py#L35-L271)
+## Modules
+
+- **`kgfoundry_common.config`** — Config utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/config.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/e7c4e78c19ae05abca7f9008be5089b9da0724b1/src/kgfoundry_common/config.py#L1)
+- **`kgfoundry_common.errors`** — Errors utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/errors.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/e7c4e78c19ae05abca7f9008be5089b9da0724b1/src/kgfoundry_common/errors.py#L1)
+- **`kgfoundry_common.exceptions`** — Exceptions utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/exceptions.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/e7c4e78c19ae05abca7f9008be5089b9da0724b1/src/kgfoundry_common/exceptions.py#L1)
+- **`kgfoundry_common.ids`** — Ids utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/ids.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/e7c4e78c19ae05abca7f9008be5089b9da0724b1/src/kgfoundry_common/ids.py#L1)
+- **`kgfoundry_common.logging`** — Logging utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/logging.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/e7c4e78c19ae05abca7f9008be5089b9da0724b1/src/kgfoundry_common/logging.py#L1)
+- **`kgfoundry_common.models`** — Models utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/models.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/e7c4e78c19ae05abca7f9008be5089b9da0724b1/src/kgfoundry_common/models.py#L1)
+- **`kgfoundry_common.navmap_types`** — Navmap Types utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/e7c4e78c19ae05abca7f9008be5089b9da0724b1/src/kgfoundry_common/navmap_types.py#L1)
+- **`kgfoundry_common.parquet_io`** — Parquet Io utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/parquet_io.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/e7c4e78c19ae05abca7f9008be5089b9da0724b1/src/kgfoundry_common/parquet_io.py#L1)
+
+## Classes
+
+- **`kgfoundry_common.NavMap`** — Describe NavMap → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:32:1) | [view](https://github.com/github.com/paul-heyse/blob/e7c4e78c19ae05abca7f9008be5089b9da0724b1/src/kgfoundry_common/navmap_types.py#L32-L45)
+<!-- agent:readme v1 sha:e7c4e78c19ae05abca7f9008be5089b9da0724b1 content:39ecd0c64237 -->

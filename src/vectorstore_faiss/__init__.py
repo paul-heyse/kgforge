@@ -1,8 +1,7 @@
 """Vectorstore Faiss utilities."""
 
-import vectorstore_faiss.gpu as gpu
-
 from kgfoundry_common.navmap_types import NavMap
+from vectorstore_faiss import gpu
 
 __all__ = ["gpu"]
 
@@ -21,6 +20,12 @@ __navmap__: NavMap = {
         },
     ],
     "symbols": {
-        "gpu": {},
+        "gpu": {
+            "stability": "experimental",
+            "owner": "@vectorstore",
+            "since": "0.1.0",
+        },
     },
 }
+
+# [nav:anchor gpu]

@@ -64,5 +64,3 @@ Thumbs.db
 **/*.npz
 **/*.pkl
 
-# --- Repo-specific ---
-sphinx-warn.log

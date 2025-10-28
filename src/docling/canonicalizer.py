@@ -53,6 +53,9 @@ def canonicalize_text(blocks: list[str]) -> str:
     
     
     
+    
+    
+    
     def norm(s: str) -> str:
         """Compute norm.
 
@@ -68,6 +71,9 @@ def canonicalize_text(blocks: list[str]) -> str:
         str
             Description of return value.
         """
+        
+        
+        
         
         
         

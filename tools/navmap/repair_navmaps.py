@@ -6,9 +6,10 @@ from __future__ import annotations
 import argparse
 import ast
 import sys
+from collections.abc import Iterable
 from pathlib import Path
 from pprint import pformat
-from typing import Any, Iterable
+from typing import Any
 
 REPO = Path(__file__).resolve().parents[2]
 SRC = REPO / "src"
@@ -22,11 +23,53 @@ except ModuleNotFoundError:  # pragma: no cover - fallback for direct execution
 
 
 def _load_tree(path: Path) -> ast.Module:
+    """Load tree.
+
+    Parameters
+    ----------
+    path : Path
+        Description.
+
+    Returns
+    -------
+    ast.Module
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _load_tree(...)
+    """
     text = path.read_text(encoding="utf-8")
     return ast.parse(text, filename=str(path))
 
 
 def _definition_lines(tree: ast.Module) -> dict[str, int]:
+    """Definition lines.
+
+    Parameters
+    ----------
+    tree : ast.Module
+        Description.
+
+    Returns
+    -------
+    dict[str, int]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _definition_lines(...)
+    """
     lines: dict[str, int] = {}
     for node in tree.body:
         match node:
@@ -45,28 +88,97 @@ def _definition_lines(tree: ast.Module) -> dict[str, int]:
 
 
 def _docstring_end(tree: ast.Module) -> int | None:
+    """Docstring end.
+
+    Parameters
+    ----------
+    tree : ast.Module
+        Description.
+
+    Returns
+    -------
+    int | None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _docstring_end(...)
+    """
     if not tree.body:
         return None
     node = tree.body[0]
-    if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant) and isinstance(
-        node.value.value, str
+    if (
+        isinstance(node, ast.Expr)
+        and isinstance(node.value, ast.Constant)
+        and isinstance(node.value.value, str)
     ):
         return getattr(node, "end_lineno", node.lineno)
     return None
 
 
 def _all_assignment_end(tree: ast.Module) -> int | None:
+    """All assignment end.
+
+    Parameters
+    ----------
+    tree : ast.Module
+        Description.
+
+    Returns
+    -------
+    int | None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _all_assignment_end(...)
+    """
     for node in tree.body:
         if isinstance(node, ast.Assign):
             for target in node.targets:
                 if isinstance(target, ast.Name) and target.id == "__all__":
                     return getattr(node, "end_lineno", node.lineno)
-        if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name) and node.target.id == "__all__":
+        if (
+            isinstance(node, ast.AnnAssign)
+            and isinstance(node.target, ast.Name)
+            and node.target.id == "__all__"
+        ):
             return getattr(node, "end_lineno", node.lineno)
     return None
 
 
 def _navmap_assignment_span(tree: ast.Module) -> tuple[int, int] | None:
+    """Navmap assignment span.
+
+    Parameters
+    ----------
+    tree : ast.Module
+        Description.
+
+    Returns
+    -------
+    tuple[int, int] | None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _navmap_assignment_span(...)
+    """
     for node in tree.body:
         if isinstance(node, (ast.Assign, ast.AnnAssign)):
             targets: Iterable[ast.expr]
@@ -83,11 +195,53 @@ def _navmap_assignment_span(tree: ast.Module) -> tuple[int, int] | None:
 
 
 def _serialize_navmap(navmap: dict[str, Any]) -> list[str]:
+    """Serialize navmap.
+
+    Parameters
+    ----------
+    navmap : dict[str, Any]
+        Description.
+
+    Returns
+    -------
+    list[str]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _serialize_navmap(...)
+    """
     literal = "__navmap__ = " + pformat(navmap, width=88, sort_dicts=True)
     return literal.splitlines()
 
 
 def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, Any]:
+    """Ensure navmap structure.
+
+    Parameters
+    ----------
+    info : ModuleInfo
+        Description.
+
+    Returns
+    -------
+    dict[str, Any]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _ensure_navmap_structure(...)
+    """
     navmap = dict(info.navmap)
     exports = list(dict.fromkeys(navmap.get("exports", info.exports)))
     navmap["exports"] = exports
@@ -118,6 +272,22 @@ def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, Any]:
 
 
 def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
+    """Compute repair module.
+
+    Carry out the repair module operation.
+
+    Parameters
+    ----------
+    info : ModuleInfo
+        Description for ``info``.
+    apply : bool | None
+        Description for ``apply``.
+
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    """
     path = info.path
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
@@ -189,6 +359,22 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
 
 
 def repair_all(root: Path, apply: bool) -> list[str]:
+    """Compute repair all.
+
+    Carry out the repair all operation.
+
+    Parameters
+    ----------
+    root : Path
+        Description for ``root``.
+    apply : bool
+        Description for ``apply``.
+
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    """
     messages: list[str] = []
     for info in _collect_modules(root):
         messages.extend(repair_module(info, apply=apply))
@@ -196,6 +382,27 @@ def repair_all(root: Path, apply: bool) -> list[str]:
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse args.
+
+    Parameters
+    ----------
+    argv : list[str] | None
+        Description.
+
+    Returns
+    -------
+    argparse.Namespace
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _parse_args(...)
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--root",
@@ -212,6 +419,20 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Compute main.
+
+    Carry out the main operation.
+
+    Parameters
+    ----------
+    argv : List[str] | None
+        Description for ``argv``.
+
+    Returns
+    -------
+    int
+        Description of return value.
+    """
     args = _parse_args(argv)
     root = args.root.resolve()
     messages = repair_all(root, apply=args.apply)
