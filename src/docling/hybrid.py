@@ -16,9 +16,21 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["HybridChunker"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@docling",
+        "stability": "beta",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "HybridChunker": {
+            "owner": "@docling",
+            "stability": "beta",
+            "since": "0.1.0",
+        },
+    },
 }
 
 

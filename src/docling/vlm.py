@@ -16,9 +16,21 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["GraniteDoclingVLM"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@docling",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "GraniteDoclingVLM": {
+            "owner": "@docling",
+            "stability": "experimental",
+            "since": "0.1.0",
+        },
+    },
 }
 
 
