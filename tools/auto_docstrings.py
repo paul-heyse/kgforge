@@ -1469,40 +1469,40 @@ def _required_sections(
     parameters: list[tuple[str, str]],
     returns: str | None,
     raises: list[str],
+    node_name: str | None,
     include_examples: bool,
 ) -> set[str]:
-    """Compute required sections.
+    """Return placeholder markers emitted by the fallback generator.
 
-    Carry out the required sections operation.
-
-    Parameters
-    ----------
-    kind : str
-        Description for ``kind``.
-    parameters : List[Tuple[str, str]]
-        Description for ``parameters``.
-    returns : str | None
-        Description for ``returns``.
-    raises : List[str]
-        Description for ``raises``.
-
-    Returns
-    -------
-    Set[str]
-        Description of return value.
+    The auto docstring fallback produces deterministic placeholder phrases for
+    sections such as parameter descriptions, return summaries, and the extended
+    "Carry out the … operation." sentence. This helper enumerates those markers
+    so ``process_file`` can distinguish between bespoke docstrings and
+    previously generated placeholders.
     """
     if kind in {"module", "class"}:
         return set()
+
+    markers: set[str] = set()
+    if node_name:
+        operation = _humanize_identifier(node_name).lower()
+        markers.add(f"Carry out the {operation} operation for the surrounding component.")
+        markers.add(
+            "Generated documentation highlights how this helper collaborates with neighbouring utilities.",
+        )
+        markers.add("Callers rely on the routine to remain stable across releases.")
+    for param_name, _ in parameters:
+        markers.add(f"Description for ``{param_name}``.")
     required: set[str] = set()
     if include_examples:
         required.add("Examples")
     if parameters:
         required.add("Parameters")
     if returns:
-        required.add("Returns")
+        markers.add("Description of return value.")
     if raises:
-        required.add("Raises")
-    return required
+        markers.add("Raised when validation fails.")
+    return markers
 
 
 def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
@@ -1640,6 +1640,8 @@ def process_file(path: Path) -> bool:
             if return_annotation not in {"None", "NoReturn"}:
                 returns = return_annotation
             raises = detect_raises(node)
+
+        placeholder_markers = _required_sections(
             include_examples = bool(node_name) and not node_name.startswith("_")
 
         required_sections = _required_sections(
@@ -1647,18 +1649,18 @@ def process_file(path: Path) -> bool:
             parameters,
             returns,
             raises,
+            node_name,
             include_examples,
         )
         needs_update = doc is None or "TODO" in (doc or "") or "NavMap:" in (doc or "")
-        if not needs_update and required_sections:
-            if doc is None:
+        if not needs_update and doc and placeholder_markers:
+            if any(marker in doc for marker in placeholder_markers):
                 needs_update = True
             else:
-                needs_update = not all(section in doc for section in required_sections)
-        if not needs_update and doc:
-            lower_markers = (" list[", " tuple[", " set[", " dict[", " list ", " dict ")
-            if any(marker in doc for marker in lower_markers):
-                needs_update = True
+                lower_doc = doc.lower()
+                lower_markers = tuple(marker.lower() for marker in placeholder_markers)
+                if any(marker in lower_doc for marker in lower_markers):
+                    needs_update = True
         if not needs_update and doc is not None:
             boilerplate_tokens = (
                 "Provide utilities for module.",
