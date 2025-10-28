@@ -555,6 +555,8 @@ constraint conventions required by Sphinx-Gallery.
 - Creates architecture diagrams
 - Maps module relationships and import hierarchies
 - Supports `--format` values `svg` (default) and `png`, with caching keyed per format
+- Invalidates cached renders automatically when the working tree is dirty by blending the last
+  commit hash with a digest of on-disk file metadata
 
 **Generates:** Graph visualizations and diagrams (location TBD based on tool implementation)
 
