@@ -8,7 +8,7 @@ troubleshooting tips for common issues.
 
 ## Quick start checklist
 
-1. Copy the template in [Docstring template](#docstring-template).
+1. Copy the docstring template below.
 2. Update the title and description to match your example.
 3. Tag the example with relevant keywords using the ``.. tags::`` directive.
 4. Describe resource expectations inside the ``Constraints`` section.
@@ -16,7 +16,7 @@ troubleshooting tips for common issues.
 6. Execute `pytest --doctest-modules examples/<your-file>.py` to confirm code
    snippets still run.
 
-## Docstring template
+## Docstring template {#docstring-template}
 
 Each example begins with a module-level docstring that Sphinx-Gallery parses to
 create the page heading. The first non-empty line becomes the HTML title and is
@@ -119,5 +119,5 @@ violations. Missing directories or unsupported flags cause exit code `2`.
 - Ensure every gallery file imports quickly and avoids heavyweight dependencies.
 - Keep example output deterministic so doctest snapshots remain stable.
 
-For a full overview of the automated documentation pipeline, see
-[`README-AUTOMATED-DOCUMENTATION.md`](../../README-AUTOMATED-DOCUMENTATION.md).
+For a full overview of the automated documentation pipeline, see the
+repository's `README-AUTOMATED-DOCUMENTATION.md`.
