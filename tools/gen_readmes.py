@@ -67,6 +67,7 @@ def detect_repo() -> tuple[str, str]:
     
     
     
+    
     try:
         remote = subprocess.check_output(
             ["git", "config", "--get", "remote.origin.url"], cwd=ROOT, text=True
@@ -112,6 +113,7 @@ def git_sha() -> str:
     
     
     
+    
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     except Exception:
@@ -147,6 +149,7 @@ def gh_url(rel_path: str, start: int, end: int | None) -> str:
     
     
     
+    
     fragment = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel_path}{fragment}"
 
@@ -161,6 +164,7 @@ def iter_packages() -> list[str]:
     List[str]
         Description of return value.
     """
+    
     
     
     
@@ -188,6 +192,7 @@ def summarize(node: Object) -> str:
     str
         Description of return value.
     """
+    
     
     
     
@@ -231,6 +236,7 @@ def is_public(node: Object) -> bool:
     
     
     
+    
     return not getattr(node, "name", "").startswith("_")
 
 
@@ -251,6 +257,7 @@ def get_open_link(node: Object, readme_dir: Path) -> str | None:
     str | None
         Description of return value.
     """
+    
     
     
     
@@ -291,6 +298,7 @@ def get_view_link(node: Object) -> str | None:
     
     
     
+    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -320,6 +328,7 @@ def iter_public_members(node: Object) -> Iterable[Object]:
     Iterable[Object]
         Description of return value.
     """
+    
     
     
     
@@ -400,6 +409,7 @@ def parse_config() -> Config:
     Config
         Description of return value.
     """
+    
     
     
     
@@ -539,6 +549,7 @@ def badges_for(qname: str) -> Badges:
     
     
     
+    
     symbol_meta, defaults = _lookup_nav(qname)
     merged = {**defaults, **symbol_meta}
     tests: list[dict[str, Any]] = []
@@ -618,6 +629,7 @@ def format_badges(qname: str, base_length: int = 0) -> str:
     
     
     
+    
     badge = badges_for(qname)
     parts: list[str] = []
     if badge.stability:
@@ -675,6 +687,7 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
     str | None
         Description of return value.
     """
+    
     
     
     
@@ -787,6 +800,7 @@ def render_line(node: Object, readme_dir: Path, cfg: Config) -> str | None:
     
     
     
+    
     qname = getattr(node, "path", "")
     summary = summarize(node)
 
@@ -872,6 +886,7 @@ def write_readme(node: Object, cfg: Config) -> bool:
     bool
         Description of return value.
     """
+    
     
     
     
@@ -992,6 +1007,7 @@ def main() -> None:
     SystemExit
         Raised when validation fails.
     """
+    
     
     
     

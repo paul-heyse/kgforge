@@ -848,7 +848,11 @@
 <span class="normal">277</span>
 <span class="normal">278</span>
 <span class="normal">279</span>
-<span class="normal">280</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">FaissAdapter</span><span class="p">:</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">FaissAdapter</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Describe FaissAdapter.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -870,6 +874,7 @@
 <span class="sd">        metric : str | None</span>
 <span class="sd">            Description for ``metric``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
 
 
 
@@ -935,6 +940,7 @@
 
 
 
+
         <span class="n">vectors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_dense_parquet</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vecs</span> <span class="o">=</span> <span class="n">vectors</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">HAVE_FAISS</span><span class="p">:</span>
@@ -968,6 +974,7 @@
 <span class="sd">        cpu_index_path : str | None</span>
 <span class="sd">            Description for ``cpu_index_path``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
 
 
 
@@ -1015,6 +1022,7 @@
 <span class="sd">        RuntimeError</span>
 <span class="sd">            Raised when validation fails.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
 
 
 
@@ -1115,7 +1123,8 @@ metric : str | None
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
-<span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">117</span>
+<span class="normal">118</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">db_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">factory</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;OPQ64,IVF8192,PQ64&quot;</span><span class="p">,</span>
@@ -1134,6 +1143,7 @@ metric : str | None
 <span class="sd">    metric : str | None</span>
 <span class="sd">        Description for ``metric``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
 
 
 
@@ -1169,8 +1179,7 @@ metric : str | None
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/faiss_adapter.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">160</span>
-<span class="normal">161</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">161</span>
 <span class="normal">162</span>
 <span class="normal">163</span>
 <span class="normal">164</span>
@@ -1201,11 +1210,14 @@ metric : str | None
 <span class="normal">189</span>
 <span class="normal">190</span>
 <span class="normal">191</span>
-<span class="normal">192</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute build.</span>
 
 <span class="sd">    Carry out the build operation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
 
 
 
@@ -1260,9 +1272,7 @@ metric : str | None
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/faiss_adapter.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">194</span>
-<span class="normal">195</span>
-<span class="normal">196</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">196</span>
 <span class="normal">197</span>
 <span class="normal">198</span>
 <span class="normal">199</span>
@@ -1293,7 +1303,10 @@ metric : str | None
 <span class="normal">224</span>
 <span class="normal">225</span>
 <span class="normal">226</span>
-<span class="normal">227</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_or_build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpu_index_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_or_build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpu_index_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute load or build.</span>
 
 <span class="sd">    Carry out the load or build operation.</span>
@@ -1303,6 +1316,7 @@ metric : str | None
 <span class="sd">    cpu_index_path : str | None</span>
 <span class="sd">        Description for ``cpu_index_path``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
 
 
 
@@ -1361,10 +1375,7 @@ k : int | None
 
             <details class="quote">
               <summary>Source code in <code>src/search_api/faiss_adapter.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">229</span>
-<span class="normal">230</span>
-<span class="normal">231</span>
-<span class="normal">232</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">232</span>
 <span class="normal">233</span>
 <span class="normal">234</span>
 <span class="normal">235</span>
@@ -1412,7 +1423,11 @@ k : int | None
 <span class="normal">277</span>
 <span class="normal">278</span>
 <span class="normal">279</span>
-<span class="normal">280</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qvec</span><span class="p">:</span> <span class="n">VecArray</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qvec</span><span class="p">:</span> <span class="n">VecArray</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute search.</span>
 
 <span class="sd">    Carry out the search operation.</span>
@@ -1434,6 +1449,7 @@ k : int | None
 <span class="sd">    RuntimeError</span>
 <span class="sd">        Raised when validation fails.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
 
 
 
