@@ -4,9 +4,10 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API
-- **`ontology.catalog`** — Module for ontology.catalog → [open](./catalog.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/ontology/catalog.py#L1)
-  - **`ontology.catalog.NavMap`** — Structure describing a module navmap → [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/kgfoundry_common/navmap_types.py#L38-L51)
-  - **`ontology.catalog.OntologyCatalog`** — In-memory view of ontology concepts and relationships → [open](./catalog.py:33:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/ontology/catalog.py#L33-L53)
-- **`ontology.loader`** — Module for ontology.loader → [open](./loader.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/ontology/loader.py#L1)
-  - **`ontology.loader.NavMap`** — Structure describing a module navmap → [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/kgfoundry_common/navmap_types.py#L38-L51)
-  - **`ontology.loader.OntologyLoader`** — Placeholder loader for ontology metadata → [open](./loader.py:31:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/ontology/loader.py#L31-L34)
+- **`ontology.NavMap`** — Describe NavMap → [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
+- **`ontology.catalog`** — Catalog utilities → [open](./catalog.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/ontology/catalog.py#L1)
+  - **`ontology.catalog.NavMap`** — Describe NavMap → [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
+  - **`ontology.catalog.OntologyCatalog`** — Describe OntologyCatalog → [open](./catalog.py:27:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/ontology/catalog.py#L27-L104)
+- **`ontology.loader`** — Loader utilities → [open](./loader.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/ontology/loader.py#L1)
+  - **`ontology.loader.NavMap`** — Describe NavMap → [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
+  - **`ontology.loader.OntologyLoader`** — Describe OntologyLoader → [open](./loader.py:26:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/ontology/loader.py#L26-L29)

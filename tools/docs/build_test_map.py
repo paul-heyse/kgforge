@@ -47,6 +47,10 @@ def load_symbol_candidates() -> set[str]:
     
     
     
+    
+    
+    
+    
     candidates: set[str] = set()
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if symbols_json.exists():
@@ -130,6 +134,10 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     
     
     
+    
+    
+    
+    
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -192,6 +200,10 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     
     
     
+    
+    
+    
+    
     table: dict[str, list[dict[str, object]]] = defaultdict(list)
     if not TESTS.exists():
         return {}
@@ -208,6 +220,10 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
     
     
     

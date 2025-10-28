@@ -47,6 +47,10 @@ class DuckDBRegistry:
         
         
         
+        
+        
+        
+        
         self.db_path = db_path
         self.con = duckdb.connect(db_path, read_only=False)
         self.con.execute("PRAGMA threads=14")
@@ -68,6 +72,10 @@ class DuckDBRegistry:
         str
             Description of return value.
         """
+        
+        
+        
+        
         
         
         
@@ -103,6 +111,10 @@ class DuckDBRegistry:
         
         
         
+        
+        
+        
+        
         self.con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
         )
@@ -117,6 +129,10 @@ class DuckDBRegistry:
         dataset_id : str
             Description for ``dataset_id``.
         """
+        
+        
+        
+        
         
         
         
@@ -156,6 +172,10 @@ class DuckDBRegistry:
         
         
         
+        
+        
+        
+        
         run_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -186,6 +206,10 @@ class DuckDBRegistry:
         
         
         
+        
+        
+        
+        
         _ = success  # placeholder until success flag/notes are persisted
         _ = notes
         self.con.execute("UPDATE runs SET finished_at=now() WHERE run_id=?", [run_id])
@@ -200,6 +224,10 @@ class DuckDBRegistry:
         docs : List[Doc]
             Description for ``docs``.
         """
+        
+        
+        
+        
         
         
         
@@ -245,6 +273,10 @@ class DuckDBRegistry:
         
         
         
+        
+        
+        
+        
         for asset in assets:
             self.con.execute(
                 (
@@ -281,6 +313,10 @@ class DuckDBRegistry:
         
         
         
+        
+        
+        
+        
         self.con.execute(
             (
                 "INSERT INTO pipeline_events("
@@ -306,6 +342,10 @@ class DuckDBRegistry:
         message : str
             Description for ``message``.
         """
+        
+        
+        
+        
         
         
         

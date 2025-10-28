@@ -1,7 +1,5 @@
 """Registry utilities."""
 
-from typing import Final
-
 import registry.api as api
 import registry.duckdb_registry as duckdb_registry
 import registry.helper as helper
@@ -11,7 +9,7 @@ from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["api", "duckdb_registry", "helper", "migrate"]
 
-__navmap__: Final[NavMap] = {
+__navmap__: NavMap = {
     "title": "registry",
     "synopsis": "Registry abstractions and DuckDB-backed implementations",
     "exports": __all__,

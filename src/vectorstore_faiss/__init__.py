@@ -1,14 +1,12 @@
 """Vectorstore Faiss utilities."""
 
-from typing import Final
-
 import vectorstore_faiss.gpu as gpu
 
 from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["gpu"]
 
-__navmap__: Final[NavMap] = {
+__navmap__: NavMap = {
     "title": "vectorstore_faiss",
     "synopsis": "FAISS-backed vector store abstractions",
     "exports": __all__,

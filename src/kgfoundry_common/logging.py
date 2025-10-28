@@ -53,6 +53,10 @@ class JsonFormatter(logging.Formatter):
         
         
         
+        
+        
+        
+        
         data = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
             "level": record.levelname,
@@ -77,6 +81,10 @@ def setup_logging(level: int = logging.INFO) -> None:
     level : int | None
         Description for ``level``.
     """
+    
+    
+    
+    
     
     
     

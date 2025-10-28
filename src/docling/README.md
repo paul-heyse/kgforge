@@ -4,12 +4,13 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API
-- **`docling.canonicalizer`** — Module for docling.canonicalizer → [open](./canonicalizer.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/docling/canonicalizer.py#L1)
-  - **`docling.canonicalizer.NavMap`** — Structure describing a module navmap → [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/kgfoundry_common/navmap_types.py#L38-L51)
-  - **`docling.canonicalizer.canonicalize_text`** — Apply NFC, normalize whitespace and bullets, preserve single newlines between blocks → [open](./canonicalizer.py:33:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/docling/canonicalizer.py#L33-L45)
-- **`docling.hybrid`** — Module for docling.hybrid → [open](./hybrid.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/docling/hybrid.py#L1)
-  - **`docling.hybrid.HybridChunker`** — Placeholder hybrid chunker for Docling outputs → [open](./hybrid.py:31:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/docling/hybrid.py#L31-L34)
-  - **`docling.hybrid.NavMap`** — Structure describing a module navmap → [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/kgfoundry_common/navmap_types.py#L38-L51)
-- **`docling.vlm`** — Module for docling.vlm → [open](./vlm.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/docling/vlm.py#L1)
-  - **`docling.vlm.GraniteDoclingVLM`** — Expose unified utilities for Docling-compatible VLMs → [open](./vlm.py:31:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/docling/vlm.py#L31-L34)
-  - **`docling.vlm.NavMap`** — Structure describing a module navmap → [view](https://github.com/paul-heyse/kgfoundry/blob/3cfc09497d78103b489eec9e511c9565aaab698a/src/kgfoundry_common/navmap_types.py#L38-L51)
+- **`docling.NavMap`** — Describe NavMap → [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
+- **`docling.canonicalizer`** — Canonicalizer utilities → [open](./canonicalizer.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/docling/canonicalizer.py#L1)
+  - **`docling.canonicalizer.NavMap`** — Describe NavMap → [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
+  - **`docling.canonicalizer.canonicalize_text`** — Compute canonicalize text → [open](./canonicalizer.py:28:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/docling/canonicalizer.py#L28-L91)
+- **`docling.hybrid`** — Hybrid utilities → [open](./hybrid.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/docling/hybrid.py#L1)
+  - **`docling.hybrid.HybridChunker`** — Describe HybridChunker → [open](./hybrid.py:26:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/docling/hybrid.py#L26-L29)
+  - **`docling.hybrid.NavMap`** — Describe NavMap → [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)
+- **`docling.vlm`** — Vlm utilities → [open](./vlm.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/docling/vlm.py#L1)
+  - **`docling.vlm.GraniteDoclingVLM`** — Describe GraniteDoclingVLM → [open](./vlm.py:26:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/docling/vlm.py#L26-L29)
+  - **`docling.vlm.NavMap`** — Describe NavMap → [view](https://github.com/paul-heyse/kgfoundry/blob/326cba7089fce0d0bc5d078ad95af075ddc7117d/src/kgfoundry_common/navmap_types.py#L32-L45)

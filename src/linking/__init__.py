@@ -1,7 +1,5 @@
 """Linking utilities."""
 
-from typing import Final
-
 import linking.calibration as calibration
 import linking.linker as linker
 
@@ -9,7 +7,7 @@ from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["calibration", "linker"]
 
-__navmap__: Final[NavMap] = {
+__navmap__: NavMap = {
     "title": "linking",
     "synopsis": "Knowledge graph linking orchestration components",
     "exports": __all__,
