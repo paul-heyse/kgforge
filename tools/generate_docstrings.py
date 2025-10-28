@@ -34,7 +34,6 @@ def has_python_files(path: Path) -> bool:
         Description of return value.
     """
     
-    
     return any(path.rglob("*.py"))
 
 
@@ -48,7 +47,6 @@ def run_doq(target: Path) -> None:
     target : Path
         Description for ``target``.
     """
-    
     
     cmd = [
         sys.executable,
@@ -77,7 +75,6 @@ def run_fallback(target: Path) -> None:
         Description for ``target``.
     """
     
-    
     cmd = [
         sys.executable,
         "tools/auto_docstrings.py",
@@ -94,7 +91,6 @@ def main() -> None:
 
     Carry out the main operation.
     """
-    
     
     if LOG_FILE.exists():
         LOG_FILE.unlink()

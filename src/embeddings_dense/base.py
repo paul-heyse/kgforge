@@ -46,5 +46,4 @@ class DenseEmbeddingModel(Protocol):
             Description of return value.
         """
         
-        
         ...

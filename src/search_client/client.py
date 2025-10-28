@@ -36,41 +36,6 @@ class _SupportsResponse(Protocol):
         
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     def json(self) -> dict[str, Any]:
         """Compute json.
@@ -86,41 +51,6 @@ class _SupportsResponse(Protocol):
         
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 class _SupportsHttp(Protocol):
@@ -147,41 +77,6 @@ class _SupportsHttp(Protocol):
         
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     def post(
         self,
@@ -215,41 +110,6 @@ class _SupportsHttp(Protocol):
         
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # [nav:anchor KGFoundryClient]
@@ -278,7 +138,6 @@ class KGFoundryClient:
         http : _SupportsHttp | None
             Description for ``http``.
         """
-        
         
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
@@ -310,7 +169,6 @@ class KGFoundryClient:
         Mapping[str, Any]
             Description of return value.
         """
-        
         
         r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
@@ -344,7 +202,6 @@ class KGFoundryClient:
             Description of return value.
         """
         
-        
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
             f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout
@@ -369,7 +226,6 @@ class KGFoundryClient:
         Mapping[str, Any]
             Description of return value.
         """
-        
         
         r = self._http.post(
             f"{self.base_url}/graph/concepts",

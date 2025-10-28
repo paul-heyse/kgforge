@@ -46,7 +46,6 @@ class Registry(Protocol):
             Description of return value.
         """
         
-        
         ...
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
@@ -64,7 +63,6 @@ class Registry(Protocol):
             Description for ``rows``.
         """
         
-        
         ...
 
     def rollback_dataset(self, dataset_id: str) -> None:
@@ -77,7 +75,6 @@ class Registry(Protocol):
         dataset_id : str
             Description for ``dataset_id``.
         """
-        
         
         ...
 
@@ -109,7 +106,6 @@ class Registry(Protocol):
             Description of return value.
         """
         
-        
         ...
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
@@ -127,7 +123,6 @@ class Registry(Protocol):
             Description for ``notes``.
         """
         
-        
         ...
 
     def register_documents(self, docs: list[Doc]) -> None:
@@ -141,7 +136,6 @@ class Registry(Protocol):
             Description for ``docs``.
         """
         
-        
         ...
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
@@ -154,7 +148,6 @@ class Registry(Protocol):
         assets : List[DoctagsAsset]
             Description for ``assets``.
         """
-        
         
         ...
 
@@ -172,7 +165,6 @@ class Registry(Protocol):
         payload : Mapping[str, object]
             Description for ``payload``.
         """
-        
         
         ...
 
@@ -192,6 +184,5 @@ class Registry(Protocol):
         message : str
             Description for ``message``.
         """
-        
         
         ...

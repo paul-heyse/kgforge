@@ -27,7 +27,6 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
         Description of return value.
     """
     
-    
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -56,7 +55,6 @@ def scan_file(
     Tuple[List[dict[str, object]], List[dict[str, object]], List[dict[str, object]], bool]
         Description of return value.
     """
-    
     
     text, tree = read_ast(path)
     if not text:
@@ -137,7 +135,6 @@ def main() -> None:
 
     Carry out the main operation.
     """
-    
     
     OUT.mkdir(parents=True, exist_ok=True)
     metrics: list[dict[str, object]] = []

@@ -132,7 +132,7 @@ autoapi_options = [
     "private-members",
 ]
 # Include package __init__ modules so AutoAPI emits package-level toctrees.
-autoapi_ignore: list[str] = []
+autoapi_ignore: list[str] = ["tools/navmap/check_navmap.py"]
 
 
 def _autoapi_parse_file(
@@ -163,12 +163,13 @@ autodoc_typehints = "description"
 # Cross-link to Python stdlib docs
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "pydantic": ("https://docs.pydantic.dev/latest/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "pyarrow": ("https://arrow.apache.org/docs/", None),
+    "duckdb": ("https://duckdb.org/docs/", None),
+    "pydantic": ("https://docs.pydantic.dev/latest/", None),
     "fastapi": ("https://fastapi.tiangolo.com/", None),
     "typer": ("https://typer.tiangolo.com/", None),
-    "duckdb": ("https://duckdb.org/docs/", None),
+    "requests": ("https://requests.readthedocs.io/en/latest/", None),
 }
 
 # Show line numbers in rendered source pages (Sphinx >= 7.2)
