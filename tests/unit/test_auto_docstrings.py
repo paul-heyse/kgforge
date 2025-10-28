@@ -6,6 +6,7 @@ import ast
 import importlib.util
 import sys
 from pathlib import Path
+from textwrap import dedent
 
 import pytest
 
@@ -25,6 +26,7 @@ build_examples = auto_docstrings.build_examples
 module_name_for = auto_docstrings.module_name_for
 parameters_for = auto_docstrings.parameters_for
 extended_summary = auto_docstrings.extended_summary
+process_file = auto_docstrings.process_file
 
 
 @pytest.fixture()
@@ -79,8 +81,8 @@ def _get_function(code: str) -> ast.FunctionDef:
 @pytest.mark.parametrize(
     ("name", "expected_fragment"),
     [
-        ("__iter__", "Yield each item"),
-        ("__eq__", "Determine whether"),
+        ("__iter__", "Yield each element"),
+        ("__eq__", "Compare the instance for equality"),
         ("__pydantic_core_schema__", "schema object"),
         ("model_dump", "Serialise the model instance"),
     ],
@@ -136,10 +138,12 @@ def process(item: str, limit: int | None = None) -> str:
 
     params = parameters_for(node)
     returns = annotation_to_text(node.returns)
-    required = _required_sections("function", params, returns, [])
+    markers = _required_sections("function", params, returns, [], node.name)
+    required = _required_sections("function", params, returns, [], True)
 
-    for section in required:
-        assert section in docstring
+    assert markers
+    for marker in markers:
+        assert marker in docstring
 
 
 @pytest.mark.parametrize(
@@ -185,3 +189,133 @@ def test_build_docstring_appends_examples(
     emitted_examples = doc_lines[examples_index + 2 : closing_index]
     for line in expected_lines:
         assert line in emitted_examples
+
+
+def test_process_file_preserves_curated_docstring_without_examples(
+    repo_layout: Path,
+) -> None:
+    module = repo_layout / "src" / "pkg" / "curated.py"
+    module.parent.mkdir(parents=True, exist_ok=True)
+    original = (
+        dedent(
+            '''
+            def curated(value: int) -> list[str]:
+                """Return curated values.
+
+                Parameters
+                ----------
+                value : int
+                    Provide rich guidance for the caller.
+
+                Returns
+                -------
+                list[str]
+                    A carefully filtered collection.
+                """
+                return []
+            '''
+        ).strip()
+        + "\n"
+    )
+    module.write_text(original, encoding="utf-8")
+
+    changed = process_file(module)
+
+    updated = module.read_text(encoding="utf-8")
+    assert "Return curated values." in updated
+    assert "Provide rich guidance for the caller." in updated
+    assert "Description for ``value``." not in updated
+
+
+def test_process_file_preserves_docstring_with_list_and_dict_mentions(
+    repo_layout: Path,
+) -> None:
+    module = repo_layout / "src" / "pkg" / "collections_notes.py"
+    module.parent.mkdir(parents=True, exist_ok=True)
+    original = (
+        dedent(
+            '''
+            def describe(records: list[dict[str, str]]) -> None:
+                """Explain how list and dict collections interact.
+
+                The curated docstring references list and dict intentionally and
+                should not be replaced by the fallback generator.
+                """
+                return None
+            '''
+        ).strip()
+        + "\n"
+    )
+    module.write_text(original, encoding="utf-8")
+
+    changed = process_file(module)
+
+    updated = module.read_text(encoding="utf-8")
+    assert "Explain how list and dict collections interact." in updated
+    assert "should not be replaced by the fallback generator." in updated
+    assert "Description for ``records``." not in updated
+def test_process_file_is_idempotent_for_init_method(repo_layout: Path) -> None:
+    module_path = repo_layout / "src" / "pkg" / "example.py"
+    module_path.parent.mkdir(parents=True, exist_ok=True)
+    module_path.write_text(
+        """
+class Example:
+    def __init__(self, value: int) -> None:
+        self.value = value
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+
+    assert process_file(module_path)
+    original_contents = module_path.read_text(encoding="utf-8")
+
+    assert not process_file(module_path)
+    assert module_path.read_text(encoding="utf-8") == original_contents
+def test_detect_raises_ignores_nested_scopes() -> None:
+    node = _get_function(
+        """
+def outer(flag: bool) -> None:
+    if flag:
+        raise ValueError("bad flag")
+
+    def inner() -> None:
+        raise RuntimeError("inner boom")
+
+    class Inner:
+        def method(self) -> None:
+            raise KeyError("method boom")
+
+    class WithBody:
+        raise LookupError("class body boom")
+"""
+    )
+
+    assert detect_raises(node) == ["ValueError"]
+def test_process_file_preserves_single_blank_line_after_existing_docstring(
+    repo_layout: Path,
+) -> None:
+    """Ensure processing preserves single spacer after an existing docstring."""
+    target = repo_layout / "src" / "package" / "module.py"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        """
+def sample(value: int) -> int:
+    return value
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    assert auto_docstrings.process_file(target)
+    auto_docstrings.process_file(target)
+
+    contents = target.read_text(encoding="utf-8").splitlines()
+    def_index = next(i for i, line in enumerate(contents) if line.startswith("def sample"))
+    delimiter_indices = [
+        i for i in range(def_index + 1, len(contents)) if contents[i].strip() == '"""'
+    ]
+    assert len(delimiter_indices) >= 2
+    closing_index = delimiter_indices[-1]
+
+    assert contents[closing_index + 1].strip() == ""
+    assert contents[closing_index + 2].strip() == "return value"
