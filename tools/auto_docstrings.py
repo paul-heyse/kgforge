@@ -1562,7 +1562,11 @@ def replace(
     >>> replace(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
     formatted = [indent + line + "\n" for line in new_lines]
+    existing_blank_line = False
     if doc_expr is not None:
+        next_line_index = (doc_expr.end_lineno or doc_expr.lineno)
+        if next_line_index < len(lines):
+            existing_blank_line = lines[next_line_index].strip() == ""
         start = doc_expr.lineno - 1
         end = doc_expr.end_lineno or doc_expr.lineno
         del lines[start:end]
@@ -1571,7 +1575,8 @@ def replace(
     else:
         lines[insert_at:insert_at] = formatted
         after_index = insert_at + len(formatted)
-    lines.insert(after_index, indent + "\n")
+    if not existing_blank_line:
+        lines.insert(after_index, indent + "\n")
 
 
 def process_file(path: Path) -> bool:
