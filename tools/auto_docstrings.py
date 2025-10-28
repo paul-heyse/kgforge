@@ -182,6 +182,8 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
     "NDArray": "numpy.typing.NDArray",
     "numpy.typing.NDArray": "numpy.typing.NDArray",
     "numpy.ndarray": "numpy.ndarray",
+    "np.ndarray": "numpy.ndarray",
+    "np.typing.NDArray": "numpy.typing.NDArray",
     "numpy.float32": "numpy.float32",
     "np.float32": "numpy.float32",
     "ArrayLike": "numpy.typing.ArrayLike",
@@ -207,6 +209,79 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
     "Exit": "typer.Exit",
     "typer.Exit": "typer.Exit",
 }
+
+
+def _split_generic_arguments(text: str) -> list[str]:
+    """Return a list of comma-separated generic arguments respecting nesting."""
+
+    parts: list[str] = []
+    current: list[str] = []
+    depth = 0
+    for char in text:
+        if char == "," and depth == 0:
+            part = "".join(current).strip()
+            if part:
+                parts.append(part)
+            current = []
+            continue
+        if char == "[":
+            depth += 1
+        elif char == "]" and depth:
+            depth -= 1
+        current.append(char)
+    tail = "".join(current).strip()
+    if tail:
+        parts.append(tail)
+    return parts
+
+
+def _normalize_qualified_name(text: str) -> str:
+    """Map an annotation string to a fully qualified name when possible."""
+
+    cleaned = text.strip()
+    override = QUALIFIED_NAME_OVERRIDES.get(cleaned)
+    if override:
+        return override
+    if "[" in cleaned and cleaned.endswith("]"):
+        base, remainder = cleaned.split("[", 1)
+        base = base.strip()
+        normalized_base = QUALIFIED_NAME_OVERRIDES.get(base, base)
+        inner = remainder[:-1]
+        arguments = _split_generic_arguments(inner)
+        normalized_args = [
+            _normalize_qualified_name(argument) for argument in arguments
+        ]
+        if QUALIFIED_NAME_OVERRIDES.get(base):
+            # Sphinx cannot resolve cross-references that include generic
+            # parameters, so we fall back to the canonical base name.
+            return normalized_base
+        joined = ", ".join(normalized_args) if normalized_args else ""
+        if joined:
+            return f"{normalized_base}[{joined}]"
+        return normalized_base
+    return cleaned
+
+
+def _format_annotation_string(value: str) -> str:
+    """Normalise an annotation string for consistent documentation output."""
+
+    text = value.strip().replace("typing.", "")
+    replacements = {"list": "List", "dict": "Mapping[str, Any]", "tuple": "Tuple", "set": "Set"}
+    if text in replacements:
+        text = replacements[text]
+    text = text.replace("list[", "List[").replace("tuple[", "Tuple[").replace("set[", "Set[")
+    if text.startswith("dict["):
+        text = text.replace("dict[", "Mapping[")
+    if text.startswith("Optional[") and text.endswith("]"):
+        inner = text[len("Optional[") : -1]
+        inner_text = _normalize_qualified_name(_format_annotation_string(inner))
+        return f"Optional {inner_text}"
+    text = _normalize_qualified_name(text)
+    if text.startswith("Optional[") and text.endswith("]"):
+        inner = text[len("Optional[") : -1]
+        inner_text = _normalize_qualified_name(_format_annotation_string(inner))
+        return f"Optional {inner_text}"
+    return text
 
 
 @dataclass
@@ -406,22 +481,7 @@ def annotation_to_text(node: ast.AST | None) -> str:
         text = ast.unparse(node)
     except Exception:  # pragma: no cover
         return "Any"
-    text = text.replace("typing.", "")
-    if text.startswith("Optional[") and text.endswith("]"):
-        inner = text[len("Optional[") : -1]
-        text = f"Optional {inner}"
-    replacements = {"list": "List", "dict": "Mapping[str, Any]", "tuple": "Tuple", "set": "Set"}
-    if text in replacements:
-        return replacements[text]
-    text = text.replace("list[", "List[").replace("tuple[", "Tuple[").replace("set[", "Set[")
-    if text.startswith("dict["):
-        text = text.replace("dict[", "Mapping[")
-    if text in QUALIFIED_NAME_OVERRIDES:
-        text = QUALIFIED_NAME_OVERRIDES[text]
-    if text.startswith("Optional[") and text.endswith("]"):
-        inner = text[len("Optional[") : -1]
-        return f"Optional {inner}"
-    return text
+    return _format_annotation_string(text)
 
 
 def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
