@@ -48,39 +48,6 @@ def tokenize(text: str) -> list[str]:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -114,39 +81,6 @@ class FixtureIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []
@@ -234,39 +168,6 @@ class FixtureIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         if getattr(self, "N", 0) == 0:
             return []
         qtoks = tokenize(query)
@@ -301,37 +202,4 @@ class FixtureIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         return self.docs[index]

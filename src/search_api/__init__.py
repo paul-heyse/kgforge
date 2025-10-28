@@ -1,16 +1,17 @@
 """Search Api utilities."""
 
-import search_api.app as app
-import search_api.bm25_index as bm25_index
-import search_api.faiss_adapter as faiss_adapter
-import search_api.fixture_index as fixture_index
-import search_api.fusion as fusion
-import search_api.kg_mock as kg_mock
-import search_api.schemas as schemas
-import search_api.service as service
-import search_api.splade_index as splade_index
-
 from kgfoundry_common.navmap_types import NavMap
+from search_api import (
+    app,
+    bm25_index,
+    faiss_adapter,
+    fixture_index,
+    fusion,
+    kg_mock,
+    schemas,
+    service,
+    splade_index,
+)
 
 __all__ = [
     "app",

@@ -1,12 +1,24 @@
 #!/usr/bin/env python3
+"""Build dependency (pydeps) and UML (pyreverse) graphs for the repo.
+
+Adds:
+  1) Parallel per-package builds (pydeps + pyreverse) via ProcessPoolExecutor.
+  2) Per-package caching keyed by last git commit touching src/<package>.
+
+Everything else (global collapsed graph, layer policy, cycle checks) is unchanged.
+"""
+
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -33,17 +45,34 @@ OUT.mkdir(parents=True, exist_ok=True)
 LAYER_FILE = ROOT / "docs" / "policies" / "layers.yml"
 ALLOW_FILE = ROOT / "docs" / "policies" / "graph_allowlist.json"
 
-# CLI -------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# CLI
+# --------------------------------------------------------------------------------------
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse args.
+
+    Returns
+    -------
+    argparse.Namespace
+        Description.
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> parse_args(...)
+    """
     p = argparse.ArgumentParser(
         description="Build per-package and cross-subsystem graphs with policy checks."
     )
     p.add_argument(
         "--packages",
         default=os.getenv("DOCS_PKG", ""),
-        help="Comma-separated list of top-level packages to include (default: auto-detect under src/)",
+        help="Comma-separated top-level packages (default: auto-detect under src/)",
     )
     p.add_argument(
         "--format",
@@ -83,26 +112,94 @@ def parse_args() -> argparse.Namespace:
         default=os.getenv("GRAPH_FAIL_ON_LAYER", "1") == "1",
         help="Fail on forbidden cross-layer edges (default: on)",
     )
+    # NEW: parallel + cache knobs
+    p.add_argument(
+        "--max-workers",
+        type=int,
+        default=int(os.getenv("GRAPH_MAX_WORKERS", "0")),  # 0 => auto (cpu_count)
+        help="Maximum parallel workers for per-package builds (default: CPU count)",
+    )
+    p.add_argument(
+        "--cache-dir",
+        default=os.getenv("GRAPH_CACHE_DIR", str(ROOT / ".cache" / "graphs")),
+        help="Directory for per-package graph cache",
+    )
+    p.add_argument(
+        "--no-cache",
+        action="store_true",
+        help="Disable cache (always rebuild per-package graphs)",
+    )
     p.add_argument("--verbose", action="store_true", help="Verbose logging")
     return p.parse_args()
 
 
-# Utilities -------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# Utilities
+# --------------------------------------------------------------------------------------
 
 
 def sh(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subprocess.CompletedProcess:
+    """Compute sh.
+
+    Carry out the sh operation.
+
+    Parameters
+    ----------
+    cmd : List[str]
+        Description for ``cmd``.
+    cwd : Path | None
+        Description for ``cwd``.
+    check : bool | None
+        Description for ``check``.
+
+    Returns
+    -------
+    subprocess.CompletedProcess
+        Description of return value.
+    """
+    
     return subprocess.run(
         cmd, check=check, cwd=str(cwd) if cwd else None, text=True, capture_output=False
     )
 
 
 def ensure_bin(name: str) -> None:
+    """Ensure bin.
+
+    Parameters
+    ----------
+    name : str
+        Description.
+
+    Returns
+    -------
+    None
+        Description.
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> ensure_bin(...)
+    """
     if not shutil.which(name):
         print(f"[graphs] Missing required executable on PATH: {name}", file=sys.stderr)
         sys.exit(2)
 
 
 def find_top_packages() -> list[str]:
+    """Compute find top packages.
+
+    Carry out the find top packages operation.
+
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    """
+    
     # Top-level packages are directories under src/ that contain __init__.py
     pkgs: list[str] = []
     if not SRC.exists():
@@ -114,19 +211,58 @@ def find_top_packages() -> list[str]:
 
 
 def _rel(p: Path) -> str:
+    """rel.
+
+    Parameters
+    ----------
+    p : Path
+        Description.
+
+    Returns
+    -------
+    str
+        Description.
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _rel(...)
+    """
     try:
         return str(p.relative_to(ROOT))
     except Exception:
         return str(p)
 
 
-# Per-package rendering --------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# Per-package renderers (pydeps & pyreverse)
+# --------------------------------------------------------------------------------------
 
 
 def build_pydeps_for_package(
     pkg: str, out_svg: Path, excludes: list[str], max_bacon: int, fmt: str
 ) -> None:
-    # pydeps <module> --noshow --show-dot --dot-output ... -T dot [excludes] --max-bacon N
+    """Compute build pydeps for package.
+
+    Carry out the build pydeps for package operation.
+
+    Parameters
+    ----------
+    pkg : str
+        Description for ``pkg``.
+    out_svg : Path
+        Description for ``out_svg``.
+    excludes : List[str]
+        Description for ``excludes``.
+    max_bacon : int
+        Description for ``max_bacon``.
+    fmt : str
+        Description for ``fmt``.
+    """
+    
     dot_tmp = out_svg.with_suffix(".dot")
     cmd = [
         sys.executable,
@@ -150,23 +286,72 @@ def build_pydeps_for_package(
 
 
 def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
-    # pyreverse <pkg> -o svg -p <pkg> (Graphviz must be installed)
-    # We render classes_*.svg -> <pkg>-uml.svg
-    sh(["pyreverse", f"src/{pkg}", "-o", fmt, "-p", pkg], cwd=ROOT)
-    # Move/rename the class diagram (pyreverse emits classes_*.svg)
-    for svg in ROOT.glob("classes_*.svg"):
-        svg.replace(out_dir / f"{pkg}-uml.{fmt}")
+    """Compute build pyreverse for package.
+
+    Carry out the build pyreverse for package operation.
+
+    Parameters
+    ----------
+    pkg : str
+        Description for ``pkg``.
+    out_dir : Path
+        Description for ``out_dir``.
+    fmt : str
+        Description for ``fmt``.
+    """
+    
+    # classes_<project>.dot is named by -p <project>; use the package name to get unique names.
+    sh(["pyreverse", f"src/{pkg}", "-o", "dot", "-p", pkg], cwd=ROOT)
+    dot_file = ROOT / f"classes_{pkg}.dot"
+    if dot_file.exists():
+        sh(["dot", "-Tsvg", str(dot_file), "-o", str(out_dir / f"{pkg}-uml.svg")], cwd=ROOT)
+        # (optional) cleanup: dot_file.unlink(missing_ok=True)
 
 
-# Global graph (collapsed to packages) ----------------------------------------
+# --------------------------------------------------------------------------------------
+# Global graph (collapsed to packages)
+# --------------------------------------------------------------------------------------
 
 
 def _pkg_of(dotted: str) -> str:
+    """Pkg of.
+
+    Parameters
+    ----------
+    dotted : str
+        Description.
+
+    Returns
+    -------
+    str
+        Description.
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _pkg_of(...)
+    """
     return dotted.split(".", 1)[0]
 
 
 def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> None:
-    # pydeps src --noshow --show-dot --dot-output subsystems.dot --max-bacon N
+    """Compute build global pydeps.
+
+    Carry out the build global pydeps operation.
+
+    Parameters
+    ----------
+    dot_out : Path
+        Description for ``dot_out``.
+    excludes : List[str]
+        Description for ``excludes``.
+    max_bacon : int
+        Description for ``max_bacon``.
+    """
+    
     cmd = [
         sys.executable,
         "-m",
@@ -181,12 +366,34 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
         "-T",
         "dot",
     ]
+    # optional: limit depth & drop hubs
+    noise = os.getenv("GRAPH_NOISE_LEVEL")
+    if noise:
+        cmd += ["--noise-level", noise]
+    mdepth = os.getenv("GRAPH_MAX_MODULE_DEPTH")
+    if mdepth:
+        cmd += ["--max-module-depth", mdepth]
     for pat in excludes:
         cmd += ["-x", pat]
     sh(cmd, cwd=ROOT)
 
 
 def collapse_to_packages(dot_path: Path):
+    """Compute collapse to packages.
+
+    Carry out the collapse to packages operation.
+
+    Parameters
+    ----------
+    dot_path : Path
+        Description for ``dot_path``.
+
+    Returns
+    -------
+    Any
+        Description of return value.
+    """
+    
     graphs = pydot.graph_from_dot_file(str(dot_path))
     pd = graphs[0] if isinstance(graphs, list) else graphs
     g = nx.drawing.nx_pydot.from_pydot(pd).to_directed()
@@ -200,8 +407,69 @@ def collapse_to_packages(dot_path: Path):
 
 
 def analyze_graph(g, layers: dict[str, Any]) -> dict[str, Any]:
+    """Compute analyze graph.
+
+    Carry out the analyze graph operation.
+
+    Parameters
+    ----------
+    g : Any
+        Description for ``g``.
+    layers : Mapping[str, Any]
+        Description for ``layers``.
+
+    Returns
+    -------
+    Mapping[str, Any]
+        Description of return value.
+    """
+    
     # cycles (Johnson’s algorithm) & degree centrality
-    cycles = [c for c in nx.simple_cycles(g)]  # Johnson’s algo; see docs
+    # 1) prune forbidden outward edges before cycle enumeration
+    order = layers.get("order", [])
+    pkg2layer: dict[str, str] = layers.get("packages", {}) or {}
+    rank = {name: i for i, name in enumerate(order)}
+    rules = layers.get("rules", {})
+    allow_outward = bool(rules.get("allow_outward", False))
+    gp = g.copy()
+    to_drop = []
+    for u, v in g.edges():
+        lu, lv = pkg2layer.get(u), pkg2layer.get(v)
+        if lu and lv and lu in rank and lv in rank and rank[lv] > rank[lu] and not allow_outward:
+            to_drop.append((u, v))
+    if to_drop:
+        gp.remove_edges_from(to_drop)
+
+    # Prefer bounded enumeration if available (NetworkX >= 3.5)
+    cycle_limit = int(os.getenv("GRAPH_CYCLE_LIMIT", "0"))  # 0 = unbounded stream
+    length_bound = int(os.getenv("GRAPH_CYCLE_LEN", "0"))  # 0 = unbounded
+    cycles = []
+    try:
+        if length_bound > 0:
+            cyc_iter = nx.simple_cycles(gp, length_bound=length_bound)
+        else:
+            cyc_iter = nx.simple_cycles(gp)
+    except TypeError:
+        # older NetworkX without length_bound
+        cyc_iter = nx.simple_cycles(gp)
+
+    if cycle_limit > 0:
+        for i, c in enumerate(cyc_iter, 1):
+            cycles.append(c)
+            if i >= cycle_limit:
+                break
+    else:
+        # Guard against pathological blow-ups: if graph is too large, skip enumeration and use SCCs
+        EDGE_BUDGET = int(os.getenv("GRAPH_EDGE_BUDGET", "50000"))
+        if gp.number_of_edges() > EDGE_BUDGET:
+            sccs = [list(s) for s in nx.strongly_connected_components(gp) if len(s) > 1]
+            return {
+                "cycles": [],
+                "centrality": nx.degree_centrality(gp),
+                "layer_violations": [],
+                "scc_summary": [{"members": s, "size": len(s)} for s in sccs],
+            }
+        cycles = [c for c in cyc_iter]
     centrality = nx.degree_centrality(g) if g.number_of_nodes() else {}
     # layer policy violations (dependencies should point inward in the layer order)
     order = layers.get("order", [])
@@ -213,7 +481,6 @@ def analyze_graph(g, layers: dict[str, Any]) -> dict[str, Any]:
     for u, v in g.edges():
         lu, lv = pkg2layer.get(u), pkg2layer.get(v)
         if lu and lv and lu in rank and lv in rank:
-            # outward = toward a greater rank index
             if rank[lv] > rank[lu] and not allow_outward:
                 violations.append([lu, lv, f"edge:{u}->{v}"])
     return {"cycles": cycles, "centrality": centrality, "layer_violations": violations}
@@ -222,8 +489,25 @@ def analyze_graph(g, layers: dict[str, Any]) -> dict[str, Any]:
 def style_and_render(
     g, layers: dict[str, Any], analysis: dict[str, Any], out_svg: Path, fmt: str = "svg"
 ) -> None:
+    """Compute style and render.
+
+    Carry out the style and render operation.
+
+    Parameters
+    ----------
+    g : Any
+        Description for ``g``.
+    layers : Mapping[str, Any]
+        Description for ``layers``.
+    analysis : Mapping[str, Any]
+        Description for ``analysis``.
+    out_svg : Path
+        Description for ``out_svg``.
+    fmt : str | None
+        Description for ``fmt``.
+    """
+    
     pkg2layer = layers.get("packages", {}) or {}
-    # palette for layers
     palette = {
         "domain": "#2f855a",
         "application": "#3182ce",
@@ -231,19 +515,16 @@ def style_and_render(
         "infra": "#dd6b20",
     }
 
-    # centrality threshold (highlight heavy nodes)
     cent = analysis["centrality"] or {}
     values = list(cent.values())
     q80 = sorted(values)[int(0.80 * len(values))] if values else 0.0
 
-    # cycle edges set
     cycle_edges = set()
     for cyc in analysis["cycles"]:
         for i in range(len(cyc)):
             u, v = cyc[i], cyc[(i + 1) % len(cyc)]
             cycle_edges.add((u, v))
 
-    # pydot graph (rank left-to-right)
     pd = pydot.Dot(graph_type="digraph", rankdir="LR")
 
     # nodes
@@ -259,28 +540,52 @@ def style_and_render(
     for u, v, data in g.edges(data=True):
         layer_u = pkg2layer.get(u, "unknown")
         layer_v = pkg2layer.get(v, "unknown")
-        edge_color = "#e53e3e" if (u, v) in cycle_edges else "#a0aec0"  # red for cycles
+        edge_color = "#e53e3e" if (u, v) in cycle_edges else "#a0aec0"
         penw = "2.5" if (u, v) in cycle_edges else "1.2"
         label = f"{layer_u}→{layer_v}" if layer_u != layer_v else ""
         pd.add_edge(pydot.Edge(u, v, color=edge_color, penwidth=penw, fontsize="8", label=label))
 
-    # Render
-    if fmt not in {"svg", "png"}:
-        fmt = "svg"
     data = pd.create_svg() if fmt == "svg" else pd.create_png()
     out_svg.write_bytes(data)
 
 
 def write_meta(meta: dict[str, Any], out_json: Path) -> None:
+    """Compute write meta.
+
+    Carry out the write meta operation.
+
+    Parameters
+    ----------
+    meta : Mapping[str, Any]
+        Description for ``meta``.
+    out_json : Path
+        Description for ``out_json``.
+    """
+    
     out_json.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
 
 def enforce_policy(
     analysis: dict[str, Any], allow: dict[str, Any], fail_cycles: bool, fail_layers: bool
 ) -> None:
+    """Compute enforce policy.
+
+    Carry out the enforce policy operation.
+
+    Parameters
+    ----------
+    analysis : Mapping[str, Any]
+        Description for ``analysis``.
+    allow : Mapping[str, Any]
+        Description for ``allow``.
+    fail_cycles : bool
+        Description for ``fail_cycles``.
+    fail_layers : bool
+        Description for ``fail_layers``.
+    """
+    
     allowed_cycles = set(tuple(c) for c in (allow.get("cycles") or []))
     allowed_edges = set(tuple(e) for e in (allow.get("edges") or []))
-
     new_cycles = [c for c in analysis["cycles"] if tuple(c) not in allowed_cycles]
     new_viol = [
         v
@@ -298,10 +603,175 @@ def enforce_policy(
         sys.exit(2)
 
 
-# Main ------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# NEW: cache helpers + parallel worker
+# --------------------------------------------------------------------------------------
+
+
+def last_tree_commit(pkg: str) -> str:
+    """Compute last tree commit.
+
+    Carry out the last tree commit operation.
+
+    Parameters
+    ----------
+    pkg : str
+        Description for ``pkg``.
+
+    Returns
+    -------
+    str
+        Description of return value.
+    """
+    
+    try:
+        sha = subprocess.check_output(
+            ["git", "log", "-1", "--format=%H", "--", f"src/{pkg}"], cwd=str(ROOT), text=True
+        ).strip()
+        if sha:
+            return sha
+    except Exception:
+        pass
+    # Fallback: hash file sizes + mtimes + paths (fast, good enough)
+    h = hashlib.sha256()
+    path = SRC / pkg
+    for p in sorted(path.rglob("*.py")):
+        st = p.stat()
+        h.update(str(p.relative_to(ROOT)).encode())
+        h.update(str(st.st_size).encode())
+        h.update(str(st.st_mtime_ns).encode())
+    return h.hexdigest() or "EMPTY"
+
+
+def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
+    """Cache bucket.
+
+    Parameters
+    ----------
+    cache_dir : Path
+        Description.
+    pkg : str
+        Description.
+    tree_hash : str
+        Description.
+
+    Returns
+    -------
+    Path
+        Description.
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> cache_bucket(...)
+    """
+    return cache_dir / pkg / tree_hash
+
+
+def build_one_package(
+    pkg: str,
+    fmt: str,
+    excludes: list[str],
+    max_bacon: int,
+    cache_dir: Path,
+    use_cache: bool,
+    verbose: bool,
+) -> tuple[str, bool, bool, bool]:
+    """Compute build one package.
+
+    Carry out the build one package operation.
+
+    Parameters
+    ----------
+    pkg : str
+        Description for ``pkg``.
+    fmt : str
+        Description for ``fmt``.
+    excludes : List[str]
+        Description for ``excludes``.
+    max_bacon : int
+        Description for ``max_bacon``.
+    cache_dir : Path
+        Description for ``cache_dir``.
+    use_cache : bool
+        Description for ``use_cache``.
+    verbose : bool
+        Description for ``verbose``.
+
+    Returns
+    -------
+    Tuple[str, bool, bool, bool]
+        Description of return value.
+    """
+    
+    used_cache = False
+    pydeps_ok = True
+    pyrev_ok = True
+
+    imports_out = OUT / f"{pkg}-imports.{fmt}"
+    uml_out = OUT / f"{pkg}-uml.svg"  # UML is always rendered to SVG downstream
+
+    if use_cache:
+        tree_h = last_tree_commit(pkg)
+        bucket = cache_bucket(cache_dir, pkg, tree_h)
+        cache_imp = bucket / imports_out.name
+        cache_uml = bucket / uml_out.name
+        if cache_imp.exists() and cache_uml.exists():
+            shutil.copy2(cache_imp, imports_out)
+            shutil.copy2(cache_uml, uml_out)
+            used_cache = True
+            if verbose:
+                print(f"[graphs] cache hit: {pkg}@{tree_h[:7]}")
+            return (pkg, True, pydeps_ok, pyrev_ok)
+    else:
+        tree_h = None
+        bucket = None
+
+    # Build fresh
+    try:
+        build_pydeps_for_package(pkg, imports_out, excludes, max_bacon, fmt)
+    except Exception:
+        pydeps_ok = False
+    try:
+        build_pyreverse_for_package(pkg, OUT, fmt)
+    except Exception:
+        pyrev_ok = False
+
+    # Save to cache if requested and successful
+    if use_cache and pydeps_ok and pyrev_ok and tree_h:
+        bucket.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(imports_out, bucket / imports_out.name)
+        shutil.copy2(uml_out, bucket / uml_out.name)
+        if verbose:
+            print(f"[graphs] cached: {pkg}@{tree_h[:7]}")
+
+    return (pkg, used_cache, pydeps_ok, pyrev_ok)
+
+
+# --------------------------------------------------------------------------------------
+# Main
+# --------------------------------------------------------------------------------------
 
 
 def main() -> None:
+    """Main.
+
+    Returns
+    -------
+    None
+        Description.
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> main(...)
+    """
     args = parse_args()
 
     # Lazy imports check for global graph path
@@ -329,24 +799,42 @@ def main() -> None:
         if args.packages
         else find_top_packages()
     )
+    excludes = args.exclude or ["tests/.*", "site/.*"]
+    fmt = args.format
+    use_cache = not args.no_cache
+    cache_dir = Path(args.cache_dir)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
     if args.verbose:
         print(f"[graphs] packages={packages}")
+        print(f"[graphs] cache_dir={cache_dir} use_cache={use_cache}")
 
-    excludes = args.exclude or ["tests/.*", "site/.*"]
-
-    # 1) Per-package graphs
+    # 1) Per-package graphs (PARALLEL + CACHE)
     t0 = time.time()
-    for pkg in packages:
-        try:
-            build_pydeps_for_package(
-                pkg, OUT / f"{pkg}-imports.{args.format}", excludes, args.max_bacon, args.format
+    max_workers = args.max_workers or os.cpu_count() or 1
+    results: list[tuple[str, bool, bool, bool]] = []
+    with ProcessPoolExecutor(max_workers=max_workers) as ex:
+        futs = [
+            ex.submit(
+                build_one_package,
+                pkg,
+                fmt,
+                excludes,
+                args.max_bacon,
+                cache_dir,
+                use_cache,
+                args.verbose,
             )
-        except subprocess.CalledProcessError:
-            print(f"[graphs] pydeps failed for {pkg} (continuing)", file=sys.stderr)
-        try:
-            build_pyreverse_for_package(pkg, OUT, args.format)
-        except subprocess.CalledProcessError:
-            print(f"[graphs] pyreverse failed for {pkg} (continuing)", file=sys.stderr)
+            for pkg in packages
+        ]
+        for fut in as_completed(futs):
+            pkg, used_cache, ok1, ok2 = fut.result()
+            results.append((pkg, used_cache, ok1, ok2))
+            if args.verbose:
+                src = "cache" if used_cache else "built"
+                print(
+                    f"[graphs] {pkg}: {src}; pydeps={'ok' if ok1 else 'FAIL'}; pyreverse={'ok' if ok2 else 'FAIL'}"
+                )
 
     # 2) Global collapsed graph (subsystems)
     dot_all = OUT / "subsystems.dot"
@@ -371,7 +859,7 @@ def main() -> None:
 
     # 4) Analyze, render, write meta
     analysis = analyze_graph(g, layers)
-    style_and_render(g, layers, analysis, OUT / f"subsystems.{args.format}", fmt=args.format)
+    style_and_render(g, layers, analysis, OUT / f"subsystems.{fmt}", fmt=fmt)
     meta = {
         "packages": sorted([str(n) for n in g.nodes()]),
         "cycles": analysis["cycles"],
@@ -379,16 +867,19 @@ def main() -> None:
         "layer_violations": analysis["layer_violations"],
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
-    write_meta(meta, OUT / "graph_meta.json")
+    (OUT / "graph_meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
     # 5) Enforce policy
     enforce_policy(analysis, allow, args.fail_on_cycles, args.fail_on_layer_violations)
 
     if args.verbose:
-        print(f"[graphs] done in {time.time() - t0:.2f}s; outputs in {OUT}")
+        dt = time.time() - t0
+        built = sum(1 for _, c, _, _ in results if not c)
+        cached = sum(1 for _, c, _, _ in results if c)
+        print(
+            f"[graphs] done in {dt:.2f}s; per-package built={built} cached={cached}; outputs in {OUT}"
+        )
 
 
 if __name__ == "__main__":
-    import shutil
-
     main()

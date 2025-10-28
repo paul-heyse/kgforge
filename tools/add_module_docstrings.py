@@ -26,39 +26,6 @@ def module_name(path: Path) -> str:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     rel = path.relative_to(SRC).with_suffix("")
     return str(rel).replace("/", ".")
 
@@ -80,39 +47,6 @@ def needs_docstring(text: str) -> bool:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     try:
         tree = ast.parse(text)
     except SyntaxError:
@@ -137,39 +71,6 @@ def insert_docstring(path: Path) -> bool:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     text = path.read_text()
     if not needs_docstring(text):
         return False
@@ -193,39 +94,6 @@ def main() -> None:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     for path in SRC.rglob("*.py"):
         insert_docstring(path)
 

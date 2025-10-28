@@ -19,39 +19,6 @@ def git_diff_names() -> set[str]:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     result = subprocess.run(
         ["git", "diff", "--name-only"],
         check=True,
@@ -73,39 +40,6 @@ def main() -> int:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     repo = subprocess.run(
         ["git", "rev-parse", "--show-toplevel"],
         check=True,

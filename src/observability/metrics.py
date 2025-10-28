@@ -46,39 +46,6 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             """
             
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
@@ -95,39 +62,6 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             """
             
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             return
 
         def inc(self, *args: object, **kwargs: object) -> None:
@@ -144,39 +78,6 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             """
             
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
@@ -193,39 +94,6 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             """
             
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             return
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:

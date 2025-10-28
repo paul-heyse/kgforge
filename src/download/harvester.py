@@ -65,7 +65,6 @@ class OpenAccessHarvester:
         """
         
         
-        
         self.ua = user_agent
         self.email = contact_email
         self.openalex = openalex_base.rstrip("/")
@@ -97,7 +96,6 @@ class OpenAccessHarvester:
         """
         
         
-        
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
             "topic": topic,
@@ -126,7 +124,6 @@ class OpenAccessHarvester:
         str | None
             Description of return value.
         """
-        
         
         
         best = work.get("best_oa_location") or {}
@@ -175,7 +172,6 @@ class OpenAccessHarvester:
         """
         
         
-        
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
             message = f"Bad status {response.status_code} for {url}"
@@ -207,7 +203,6 @@ class OpenAccessHarvester:
         List[Doc]
             Description of return value.
         """
-        
         
         
         docs: list[Doc] = []

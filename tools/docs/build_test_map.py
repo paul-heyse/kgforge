@@ -40,39 +40,6 @@ def load_symbol_candidates() -> set[str]:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     candidates: set[str] = set()
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if symbols_json.exists():
@@ -149,39 +116,6 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -237,39 +171,6 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     table: dict[str, list[dict[str, object]]] = defaultdict(list)
     if not TESTS.exists():
         return {}
@@ -288,39 +189,6 @@ def main() -> None:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     symbols = load_symbol_candidates()
     OUTFILE.parent.mkdir(parents=True, exist_ok=True)
     OUTFILE.write_text(json.dumps(build_test_map(symbols), indent=2) + "\n", encoding="utf-8")

@@ -1,14 +1,15 @@
 """Kgfoundry Common utilities."""
 
-import kgfoundry_common.config as config
-import kgfoundry_common.errors as errors
-import kgfoundry_common.exceptions as exceptions
-import kgfoundry_common.ids as ids
-import kgfoundry_common.logging as logging
-import kgfoundry_common.models as models
-import kgfoundry_common.navmap_types as navmap_types
-import kgfoundry_common.parquet_io as parquet_io
-
+from kgfoundry_common import (
+    config,
+    errors,
+    exceptions,
+    ids,
+    logging,
+    models,
+    navmap_types,
+    parquet_io,
+)
 from kgfoundry_common.navmap_types import NavMap
 
 __all__ = [

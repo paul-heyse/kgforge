@@ -1,8 +1,6 @@
 """Embeddings Dense utilities."""
 
-import embeddings_dense.base as base
-import embeddings_dense.qwen3 as qwen3
-
+from embeddings_dense import base, qwen3
 from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["base", "qwen3"]

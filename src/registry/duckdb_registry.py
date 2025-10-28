@@ -44,35 +44,6 @@ class DuckDBRegistry:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.db_path = db_path
         self.con = duckdb.connect(db_path, read_only=False)
         self.con.execute("PRAGMA threads=14")
@@ -96,35 +67,6 @@ class DuckDBRegistry:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         dataset_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -152,35 +94,6 @@ class DuckDBRegistry:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
         )
@@ -197,35 +110,6 @@ class DuckDBRegistry:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
 
     def insert_run(
@@ -257,35 +141,6 @@ class DuckDBRegistry:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         run_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -313,35 +168,6 @@ class DuckDBRegistry:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         _ = success  # placeholder until success flag/notes are persisted
         _ = notes
         self.con.execute("UPDATE runs SET finished_at=now() WHERE run_id=?", [run_id])
@@ -358,35 +184,6 @@ class DuckDBRegistry:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         for doc in docs:
             self.con.execute(
                 (
@@ -424,35 +221,6 @@ class DuckDBRegistry:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         for asset in assets:
             self.con.execute(
                 (
@@ -486,35 +254,6 @@ class DuckDBRegistry:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.con.execute(
             (
                 "INSERT INTO pipeline_events("
@@ -542,35 +281,6 @@ class DuckDBRegistry:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.con.execute(
             (
                 "INSERT INTO incidents("

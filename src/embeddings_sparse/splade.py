@@ -65,39 +65,6 @@ class SPLADEv3Encoder:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.model_id = model_id
         self.device = device
         self.topk = topk
@@ -125,39 +92,6 @@ class SPLADEv3Encoder:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
@@ -181,39 +115,6 @@ class PureImpactIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -249,39 +150,6 @@ class PureImpactIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -319,39 +187,6 @@ class PureImpactIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         with open(os.path.join(self.index_dir, "impact.pkl"), "rb") as handle:
             data = pickle.load(handle)
         self.df = data["df"]
@@ -377,39 +212,6 @@ class PureImpactIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
         for token in tokens:
@@ -437,39 +239,6 @@ class LuceneImpactIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.index_dir = index_dir
         self._searcher: Any | None = None
 
@@ -516,39 +285,6 @@ class LuceneImpactIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
@@ -577,39 +313,6 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     if backend == "lucene":
         try:
             return LuceneImpactIndex(index_dir)

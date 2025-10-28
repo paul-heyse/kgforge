@@ -1,9 +1,7 @@
 """Linking utilities."""
 
-import linking.calibration as calibration
-import linking.linker as linker
-
 from kgfoundry_common.navmap_types import NavMap
+from linking import calibration, linker
 
 __all__ = ["calibration", "linker"]
 
