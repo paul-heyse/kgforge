@@ -56,6 +56,7 @@ class DuckDBRegistry:
         """
         
         
+        
         self.db_path = db_path
         self.con = duckdb.connect(db_path, read_only=False)
         self.con.execute("PRAGMA threads=14")

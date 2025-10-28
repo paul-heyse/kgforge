@@ -97,11 +97,12 @@ class SpladeIndex:
         ----------
         db_path : str
             Description for ``db_path``.
-        chunks_dataset_root : str | None
+        chunks_dataset_root : str | None, optional, default=None
             Description for ``chunks_dataset_root``.
-        sparse_root : str | None
+        sparse_root : str | None, optional, default=None
             Description for ``sparse_root``.
         """
+        
         
         
         _ = sparse_root  # retained for interface compatibility
