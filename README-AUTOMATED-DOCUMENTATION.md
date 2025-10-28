@@ -64,7 +64,7 @@ generation pipeline, explaining every component, tool, and step in the process.
    - [Workflow 2: Update Function Signature](#workflow-2-update-function-signature)
    - [Workflow 3: Add Navigation Structure](#workflow-3-add-navigation-structure)
    - [Workflow 4: Fix Docstring Style Issues](#workflow-4-fix-docstring-style-issues)
-   - [Workflow 5: Regenerate Only READMEs](#workflow-5-regenerate-only-readmes)
+  - [Workflow 5: Regenerate Package READMEs](#workflow-5-regenerate-package-readmes)
    - [Workflow 6: Validate Documentation Quality](#workflow-6-validate-documentation-quality)
 
 5. **[Performance Characteristics](#performance-characteristics)**
@@ -1246,53 +1246,72 @@ Enforces consistency and correctness:
 
 ### README Generation: `tools/gen_readmes.py`
 
-Package-level documentation with hierarchical API listings.
+Package-level documentation with metadata badges, deterministic grouping, and
+deep links. The section pairs with the contributor guide in
+[`docs/how-to/read-package-readmes.md`](docs/how-to/read-package-readmes.md).
 
 **Detection phase:**
-- Uses `tools/detect_pkg.py` to find packages
-- Prefers packages in `src/` directory
-- Loads each package with Griffe (no imports)
+
+- Uses `tools/detect_pkg.py` (and `DOCS_PKG` overrides) to determine which
+  packages to document.
+- Loads each package via Griffe without executing imports.
 
 **Rendering phase:**
 
 For each package and sub-package:
 
 1. **Header:**
-   ```markdown
-   # `kgfoundry_common`
-   
-   <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-   <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-   
-   ## API
-   ```
+   - H1 ``# `<package>` ``
+   - Synopsis: first sentence of `__init__` docstring or deterministic fallback.
+   - DocToc markers that can be populated later via `--run-doctoc` or manual
+     `doctoc` invocation.
+2. **Section grouping:**
+   - Buckets public symbols into Modules, Classes, Functions, Exceptions.
+   - Exception detection relies on MRO/`Error` suffix heuristics.
+3. **Entries:**
+   - Format: ``- **`fully.qualified.name`** — Summary`` followed by metadata
+     badges.
+   - Badge order: stability → owner → section → since → deprecated → tested-by.
+   - Badges wrap onto newline when the combined line would exceed 80 characters
+     (continuation indented by four spaces).
+   - `[open]` link respects `--editor` (`vscode` or `relative`).
+   - `[view]` link is a GitHub permalink anchored to the detected line range.
 
-2. **Symbol entries:**
-   - Hierarchical bullets (0, 2, 4, 6... space indentation)
-   - Format: `**`fully.qualified.name`**` — Summary → [open](link) | [view](link)
-   - Includes modules, classes, and functions
-   - Skips private symbols (underscore-prefixed)
+**Metadata sources:**
 
-3. **Link generation:**
-   - `[open]`: Relative path with line/column (e.g., `./config.py:15:1`)
-   - `[view]`: GitHub permalink or relative path depending on mode
-   - Automatically resolves file paths via Griffe
+- **NavMap** (`site/_build/navmap/navmap.json`) supplies ownership, stability,
+  section, and version badges. Module-level defaults cascade automatically.
+- **TestMap** (`docs/_build/test_map.json`) contributes up to three `tested-by`
+  entries per symbol (file + first line number).
 
-**Example output:**
+**Runtime behaviour:**
+
+- `--run-doctoc` runs the DocToc CLI after writing each README when installed.
+- `--fail-on-metadata-miss` collects missing owner/stability metadata and exits
+  with code 2 when any public symbol is incomplete.
+- Missing NavMap/TestMap files emit warnings but generation continues with empty
+  badges (graceful degradation).
+- Content hashes in the footer keep writes idempotent for CI and tests.
+
+**Example output excerpt:**
 
 ```markdown
 # `kgfoundry_common`
 
-## API
+Kgfoundry Common utilities
 
-- **`kgfoundry_common.config`** — Configuration management utilities → [open](./config.py:1:1) | [view](https://github.com/org/repo/blob/abc123.../src/kgfoundry_common/config.py#L1-L48)
-  - **`kgfoundry_common.config.load_config`** — Load configuration from YAML file → [open](./config.py:15:1) | [view](https://github.com/.../config.py#L15-L25)
-  - **`kgfoundry_common.config.ConfigSchema`** — Represent application configuration → [open](./config.py:28:1) | [view](https://github.com/.../config.py#L28-L45)
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Modules
+
+- **`kgfoundry_common.config`** — Config helpers
+    `stability:stable` `owner:@docs` `section:config`
+    `tested-by: tests/unit/test_config.py:12`
+    → [open](vscode://file/.../config.py:1:1) | [view](https://github.com/org/repo/blob/SHA/src/kgfoundry_common/config.py#L1-L80)
 ```
 
-**Post-processing:**
-- Optional `doctoc` run to populate TOC
-- Gracefully skips if doctoc not installed
+Refer to the contributor guide for badge/link semantics and troubleshooting tips.
 
 ### Symbol Index: `docs/_scripts/build_symbol_index.py`
 
@@ -2248,22 +2267,31 @@ docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i src/
 tools/update_docs.sh
 ```
 
-### Workflow 5: Regenerate Only READMEs
+### Workflow 5: Regenerate Package READMEs
 
-When only package README.md files need updating:
+When badge metadata, docstrings, or package structure changes and you only need
+fresh READMEs:
 
 ```bash
-# Fast: just regenerate READMEs
-make readmes
+# 1. Rebuild metadata (optional but recommended)
+python tools/navmap/build_navmap.py
+python tools/docs/build_test_map.py
 
-# Or with doctoc TOC updates (if installed)
-make readmes && doctoc src/mypackage/
+# 2. Regenerate READMEs for relevant packages
+DOCS_PKG=kgfoundry_common,download \
+python tools/gen_readmes.py --link-mode both --editor vscode
+
+# 3. (Optional) Populate TOCs automatically
+python tools/gen_readmes.py --link-mode both --editor vscode --run-doctoc
 ```
 
-**Use case:**
-- Docstrings already up to date
-- Only need to refresh deep links
-- Faster than full pipeline
+Refer to [`docs/how-to/read-package-readmes.md`](docs/how-to/read-package-readmes.md)
+for badge/link definitions and troubleshooting tips.
+
+**Use cases:**
+- Sync README summaries with updated docstrings
+- Surface new NavMap/TestMap metadata without running the entire pipeline
+- Validate link formatting differences (VSCode vs relative paths)
 
 ### Workflow 6: Validate Documentation Quality
 
@@ -2341,23 +2369,40 @@ pre-commit run --all-files
 
 **Critical:** Stages 5-7 enforce documentation consistency on every commit.
 
+**Optional hook:** `readme-generator (changed packages only)` lives in the local
+repo section. Install it via `pre-commit install` (already covered by the base
+setup) and it will:
+
+1. Detect staged files under `src/` to infer affected packages.
+2. Export `DOCS_PKG` with the comma-separated package list.
+3. Run `python tools/gen_readmes.py --link-mode github --editor relative`.
+4. Stage updated `src/**/README.md` files automatically.
+
+Skip installing pre-commit (or skip the hook manually) when README regeneration
+is undesirable—for example during large refactors where READMEs will be updated
+later or when CI validation is sufficient.
+
 ### CI/CD Integration
 
-For continuous integration:
+For continuous integration we now enforce README freshness in addition to the
+full documentation rebuild:
 
 ```bash
 # Full documentation rebuild
 tools/update_docs.sh
 
-# Check that nothing changed (docs up to date)
-git diff --exit-code docs/ src/
+# Validate package READMEs are current
+python tools/gen_readmes.py --link-mode github --editor relative
+git diff --quiet --exit-code -- src/**/README.md
 ```
 
-**CI workflow:**
-1. Run `tools/update_docs.sh`
-2. Check for uncommitted changes
-3. Fail if docs are out of sync
-4. Forces developers to regenerate before merging
+**CI workflow highlights:**
+1. Run `tools/update_docs.sh` (Sphinx, NavMap, TestMap, etc.).
+2. Execute the README generator in GitHub-only mode to avoid editor-specific
+   links.
+3. Inspect `git diff -- src/**/README.md`; when differences exist the workflow
+   prints a regeneration command and fails with exit code 1.
+4. Keeps READMEs in sync with metadata and code changes before merge.
 
 ### Local Development
 
