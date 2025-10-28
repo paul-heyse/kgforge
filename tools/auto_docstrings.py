@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import os
 from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
@@ -81,22 +82,21 @@ def _pydantic_summary(purpose: str, behaviour: str) -> str:
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SRC_ROOT = REPO_ROOT / "src"
+ENV_PROTECTED = "KGFOUNDRY_DOCSTRINGS_PROTECTED"
 
 
 def _humanize_identifier(value: str) -> str:
-    """Compute humanize identifier.
-
-    Carry out the humanize identifier operation.
+    """Return a human-readable phrase derived from ``value``.
 
     Parameters
     ----------
     value : str
-        Description for ``value``.
+        Identifier to transform into prose.
 
     Returns
     -------
     str
-        Description of return value.
+        The cleaned identifier with underscores replaced by single spaces.
     """
     cleaned = value.replace("_", " ").strip()
     return " ".join(cleaned.split())
@@ -947,53 +947,44 @@ def _format_annotation_string(value: str) -> str:
 
 @dataclass
 class DocstringChange:
-    """Describe DocstringChange."""
+    """Record a file that changed during docstring generation."""
 
     path: Path
 
 
 def parse_args() -> argparse.Namespace:
-    """Compute parse args.
+    """Return the parsed CLI arguments for the docstring generator."""
 
-    Carry out the parse args operation.
-
-    Returns
-    -------
-    argparse.Namespace
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import parse_args
-    >>> result = parse_args()
-    >>> result  # doctest: +ELLIPSIS
-    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", required=True, type=Path, help="Directory to process.")
     parser.add_argument("--log", required=False, type=Path, help="Log file for changed paths.")
+    parser.add_argument(
+        "--skip",
+        action="append",
+        default=[],
+        type=Path,
+        help="Specific files that should be ignored even if they appear under the target.",
+    )
     return parser.parse_args()
 
 
 def module_name_for(path: Path) -> str:
-    """Compute module name for.
-
-    Carry out the module name for operation.
+    """Return the dotted module name that corresponds to ``path``.
 
     Parameters
     ----------
     path : Path
-        Description for ``path``.
+        File whose import-friendly module name should be derived.
 
     Returns
     -------
     str
-        Description of return value.
+        The resolved module path relative to the repository root.
 
     Examples
     --------
-    >>> from tools.auto_docstrings import module_name_for
-    >>> result = module_name_for(...)
-    >>> result  # doctest: +ELLIPSIS
+    >>> module_name_for(Path("src/kgfoundry/__init__.py"))
+    'kgfoundry'
     """
     try:
         relative = path.relative_to(REPO_ROOT)
@@ -1013,27 +1004,19 @@ def module_name_for(path: Path) -> str:
 
 
 def summarize(name: str, kind: str) -> str:
-    """Compute summarize.
-
-    Carry out the summarize operation.
+    """Return an imperative one-line summary for ``name`` and ``kind``.
 
     Parameters
     ----------
     name : str
-        Description for ``name``.
+        The symbol name that should be described in natural language.
     kind : str
-        Description for ``kind``.
+        The type of node being summarised (module, class, or function).
 
     Returns
     -------
     str
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import summarize
-    >>> result = summarize(..., ...)
-    >>> result  # doctest: +ELLIPSIS
+        A short descriptive sentence suitable for the docstring summary line.
     """
     base = _humanize_identifier(name) or "value"
     if kind == "module":
@@ -1048,31 +1031,23 @@ def summarize(name: str, kind: str) -> str:
 
 
 def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | None = None) -> str:
-    """Compute extended summary.
-
-    Carry out the extended summary operation.
+    """Build an extended summary paragraph tailored to the discovered symbol.
 
     Parameters
     ----------
     kind : str
-        Description for ``kind``.
+        The kind of AST node being documented (module, class, or function).
     name : str
-        Description for ``name``.
+        Name of the symbol that needs narrative context.
     module_name : str
-        Description for ``module_name``.
+        Fully-qualified module name used for additional hints.
     node : ast.AST | None
-        Description for ``node``.
+        Original AST node when more detailed inspection is required.
 
     Returns
     -------
     str
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import extended_summary
-    >>> result = extended_summary(..., ..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
+        A multi-sentence paragraph that explains the symbol's behaviour and role.
     """
     pretty = _humanize_identifier(name)
     if kind == "module":
@@ -1138,25 +1113,17 @@ def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | Non
 
 
 def annotation_to_text(node: ast.AST | None) -> str:
-    """Compute annotation to text.
-
-    Carry out the annotation to text operation.
+    """Render an annotation ``node`` into a human-friendly string.
 
     Parameters
     ----------
     node : ast.AST | None
-        Description for ``node``.
+        Annotation node extracted from the AST tree.
 
     Returns
     -------
     str
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import annotation_to_text
-    >>> result = annotation_to_text(...)
-    >>> result  # doctest: +ELLIPSIS
+        Normalised annotation text with common aliases resolved.
     """
     if node is None:
         return "Any"
@@ -1168,25 +1135,17 @@ def annotation_to_text(node: ast.AST | None) -> str:
 
 
 def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
-    """Compute iter docstring nodes.
-
-    Carry out the iter docstring nodes operation.
+    """Enumerate candidate docstring locations within ``tree``.
 
     Parameters
     ----------
     tree : ast.Module
-        Description for ``tree``.
+        Parsed module whose definitions should be inspected.
 
     Returns
     -------
-    List[Tuple[int, ast.AST, str]]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import iter_docstring_nodes
-    >>> result = iter_docstring_nodes(...)
-    >>> result  # doctest: +ELLIPSIS
+    list[tuple[int, ast.AST, str]]
+        Tuples containing the node line number, AST node, and node kind.
     """
     items: list[tuple[int, ast.AST, str]] = [(0, tree, "module")]
     for node in ast.walk(tree):
@@ -1199,45 +1158,30 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
 
 
 def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[str, str]]:
-    """Compute parameters for.
-
-    Carry out the parameters for operation.
+    """Return parameter names and annotations for ``node``.
 
     Parameters
     ----------
     node : ast.FunctionDef | ast.AsyncFunctionDef
-        Description for ``node``.
+        Function or coroutine definition extracted from the AST.
 
     Returns
     -------
-    List[Tuple[str, str]]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import parameters_for
-    >>> result = parameters_for(...)
-    >>> result  # doctest: +ELLIPSIS
+    list[tuple[str, str]]
+        Ordered pairs of parameter name and rendered annotation text.
     """
     params: list[tuple[str, str]] = []
     args = node.args
 
     def add(arg: ast.arg, default: ast.AST | None) -> None:
-        """Compute add.
-
-        Carry out the add operation.
+        """Append an argument and its annotation to ``params``.
 
         Parameters
         ----------
         arg : ast.arg
-            Description for ``arg``.
+            AST argument definition discovered in the signature.
         default : ast.AST | None
-            Description for ``default``.
-
-        Examples
-        --------
-        >>> from tools.auto_docstrings import add
-        >>> add(..., ...)  # doctest: +ELLIPSIS
+            Default value expression if one is provided.
         """
         name = arg.arg
         if name in {"self", "cls"}:
@@ -1269,25 +1213,17 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
 
 
 def detect_raises(node: ast.AST) -> list[str]:
-    """Compute detect raises.
-
-    Carry out the detect raises operation.
+    """Collect exception names raised within ``node``.
 
     Parameters
     ----------
     node : ast.AST
-        Description for ``node``.
+        The AST subtree inspected for ``raise`` statements.
 
     Returns
     -------
-    List[str]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import detect_raises
-    >>> result = detect_raises(...)
-    >>> result  # doctest: +ELLIPSIS
+    list[str]
+        Unique exception names discovered while traversing the node.
     """
     seen: OrderedDict[str, None] = OrderedDict()
     for child in ast.walk(node):
@@ -1318,31 +1254,23 @@ def detect_raises(node: ast.AST) -> list[str]:
 def build_examples(
     module_name: str, name: str, parameters: list[tuple[str, str]], has_return: bool
 ) -> list[str]:
-    """Compute build examples.
-
-    Carry out the build examples operation.
+    """Construct an ``Examples`` section scaffold for the generated docstring.
 
     Parameters
     ----------
     module_name : str
-        Description for ``module_name``.
+        Qualified module that exposes the callable being documented.
     name : str
-        Description for ``name``.
-    parameters : List[Tuple[str, str]]
-        Description for ``parameters``.
+        Name of the callable.
+    parameters : list[tuple[str, str]]
+        Parameter metadata gathered from :func:`parameters_for`.
     has_return : bool
-        Description for ``has_return``.
+        Whether the callable returns a value that should be displayed in the example.
 
     Returns
     -------
-    List[str]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import build_examples
-    >>> result = build_examples(..., ..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
+    list[str]
+        Example section lines ready to be inserted into the docstring body.
     """
     lines: list[str] = ["Examples", "--------"]
     if module_name and not name.startswith("__"):
@@ -1360,29 +1288,21 @@ def build_examples(
 
 
 def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
-    """Compute build docstring.
-
-    Carry out the build docstring operation.
+    """Assemble the full NumPy-style docstring for ``node``.
 
     Parameters
     ----------
     kind : str
-        Description for ``kind``.
+        Type of object being documented (module, class, or function).
     node : ast.AST
-        Description for ``node``.
+        AST node representing the object.
     module_name : str
-        Description for ``module_name``.
+        Module that owns the node, used for import examples.
 
     Returns
     -------
-    List[str]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import build_docstring
-    >>> result = build_docstring(..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
+    list[str]
+        Lines that make up the complete docstring body including quotes.
     """
     if kind == "module":
         module_display = module_name.split(".")[-1] if module_name else "module"
@@ -1448,25 +1368,23 @@ def _required_sections(
     returns: str | None,
     raises: list[str],
 ) -> set[str]:
-    """Compute required sections.
-
-    Carry out the required sections operation.
+    """Determine which docstring sections must be emitted for the object.
 
     Parameters
     ----------
     kind : str
-        Description for ``kind``.
-    parameters : List[Tuple[str, str]]
-        Description for ``parameters``.
+        Node classification, such as ``"function"`` or ``"class"``.
+    parameters : list[tuple[str, str]]
+        Parameters detected for callable nodes.
     returns : str | None
-        Description for ``returns``.
-    raises : List[str]
-        Description for ``raises``.
+        Rendered return annotation if one exists.
+    raises : list[str]
+        Exception names that were detected while scanning the node.
 
     Returns
     -------
-    Set[str]
-        Description of return value.
+    set[str]
+        Required section headings for the generated docstring.
     """
     if kind in {"module", "class"}:
         return set()
@@ -1481,25 +1399,17 @@ def _required_sections(
 
 
 def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
-    """Compute docstring text.
-
-    Carry out the docstring text operation.
+    """Extract the existing docstring literal from ``node`` if present.
 
     Parameters
     ----------
     node : ast.AST
-        Description for ``node``.
+        AST node whose first statement may contain a docstring.
 
     Returns
     -------
-    Tuple[str | None, ast.Expr | None]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import docstring_text
-    >>> result = docstring_text(...)
-    >>> result  # doctest: +ELLIPSIS
+    tuple[str | None, ast.Expr | None]
+        The docstring text and the expression node that owns it, if found.
     """
     body = getattr(node, "body", [])
     if not body:
@@ -1517,27 +1427,20 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
 def replace(
     doc_expr: ast.Expr | None, lines: list[str], new_lines: list[str], indent: str, insert_at: int
 ) -> None:
-    """Compute replace.
-
-    Carry out the replace operation.
+    """Splice ``new_lines`` into ``lines`` while preserving indentation.
 
     Parameters
     ----------
     doc_expr : ast.Expr | None
-        Description for ``doc_expr``.
-    lines : List[str]
-        Description for ``lines``.
-    new_lines : List[str]
-        Description for ``new_lines``.
+        Existing docstring expression to replace, if one exists.
+    lines : list[str]
+        Current file contents split into lines.
+    new_lines : list[str]
+        Fresh docstring content ready to insert.
     indent : str
-        Description for ``indent``.
+        Leading whitespace that should prefix each docstring line.
     insert_at : int
-        Description for ``insert_at``.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import replace
-    >>> replace(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
+        Index where a new docstring should be inserted when one is missing.
     """
     formatted = [indent + line + "\n" for line in new_lines]
     if doc_expr is not None:
@@ -1552,27 +1455,12 @@ def replace(
     lines.insert(after_index, indent + "\n")
 
 
-def process_file(path: Path) -> bool:
-    """Compute process file.
+def process_file(path: Path, *, skip: set[Path] | None = None) -> bool:
+    """Generate docstrings for ``path`` when it is not listed in ``skip``."""
 
-    Carry out the process file operation.
-
-    Parameters
-    ----------
-    path : Path
-        Description for ``path``.
-
-    Returns
-    -------
-    bool
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import process_file
-    >>> result = process_file(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+    resolved = path.resolve()
+    if skip and resolved in skip:
+        return False
     try:
         text = path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
@@ -1663,21 +1551,26 @@ def process_file(path: Path) -> bool:
 
 
 def main() -> None:
-    """Compute main.
+    """Parse CLI options and update docstrings for the requested directory."""
 
-    Carry out the main operation.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import main
-    >>> main()  # doctest: +ELLIPSIS
-    """
     args = parse_args()
     target = args.target.resolve()
+    skip: set[Path] = {value.resolve() for value in args.skip}
+    env_values = os.environ.get(ENV_PROTECTED)
+    if env_values:
+        for raw in env_values.split(os.pathsep):
+            if not raw:
+                continue
+            candidate = Path(raw)
+            if not candidate.is_absolute():
+                candidate = (REPO_ROOT / candidate).resolve()
+            else:
+                candidate = candidate.resolve()
+            skip.add(candidate)
     changed: list[DocstringChange] = []
 
     for file_path in sorted(target.rglob("*.py")):
-        if process_file(file_path):
+        if process_file(file_path, skip=skip):
             changed.append(DocstringChange(file_path))
 
     if args.log:
