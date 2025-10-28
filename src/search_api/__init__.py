@@ -29,9 +29,6 @@ __navmap__: NavMap = {
     "title": "search_api",
     "synopsis": "Search service endpoints and retrieval adapters",
     "exports": __all__,
-    "owner": "@search-api",
-    "stability": "experimental",
-    "since": "0.1.0",
     "sections": [
         {
             "id": "public-api",
@@ -39,5 +36,17 @@ __navmap__: NavMap = {
             "symbols": __all__,
         },
     ],
-    "symbols": {name: {} for name in __all__},
+    "module_meta": {
+        "owner": "@search-api",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@search-api",
+            "stability": "experimental",
+            "since": "0.1.0",
+        }
+        for name in __all__
+    },
 }

@@ -9,9 +9,6 @@ __navmap__: NavMap = {
     "title": "docling",
     "synopsis": "Public surface for docling preprocessing utilities",
     "exports": __all__,
-    "owner": "@docling",
-    "stability": "experimental",
-    "since": "0.1.0",
     "sections": [
         {
             "id": "public-api",
@@ -19,6 +16,11 @@ __navmap__: NavMap = {
             "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@docling",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
     "symbols": {
         "canonicalizer": {
             "stability": "beta",

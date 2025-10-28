@@ -9,9 +9,6 @@ __navmap__: NavMap = {
     "title": "orchestration",
     "synopsis": "Prefect flows and CLI entrypoints for kgfoundry orchestrations",
     "exports": __all__,
-    "owner": "@orchestration",
-    "stability": "experimental",
-    "since": "0.1.0",
     "sections": [
         {
             "id": "public-api",
@@ -19,6 +16,11 @@ __navmap__: NavMap = {
             "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@orchestration",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
     "symbols": {
         "cli": {
             "stability": "beta",

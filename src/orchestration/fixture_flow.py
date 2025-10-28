@@ -23,22 +23,28 @@ __all__ = [
 
 __navmap__: Final[NavMap] = {
     "title": "orchestration.fixture_flow",
-    "synopsis": "Prefect tasks that generate fixture parquet datasets and register them.",
+    "synopsis": "Prefect flows that build local fixture datasets",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": [
-                "t_prepare_dirs",
-                "t_write_fixture_chunks",
-                "t_write_fixture_dense",
-                "t_write_fixture_splade",
-                "t_register_in_duckdb",
-                "fixture_pipeline",
-            ],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@orchestration",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@orchestration",
+            "stability": "experimental",
+            "since": "0.1.0",
+        }
+        for name in __all__
+    },
 }
 
 

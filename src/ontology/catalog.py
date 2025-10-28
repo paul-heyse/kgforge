@@ -26,9 +26,21 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["OntologyCatalog"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@ontology",
+        "stability": "beta",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "OntologyCatalog": {
+            "owner": "@ontology",
+            "stability": "beta",
+            "since": "0.1.0",
+        },
+    },
 }
 
 

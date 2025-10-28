@@ -12,7 +12,7 @@ __all__ = ["Chunk", "Doc", "DoctagsAsset", "LinkAssertion"]
 
 __navmap__: Final[NavMap] = {
     "title": "kgfoundry_common.models",
-    "synopsis": "Module for kgfoundry_common.models",
+    "synopsis": "Typed models shared across kgfoundry services",
     "exports": __all__,
     "sections": [
         {
@@ -21,6 +21,33 @@ __navmap__: Final[NavMap] = {
             "symbols": ["Doc", "DoctagsAsset", "Chunk", "LinkAssertion"],
         },
     ],
+    "module_meta": {
+        "owner": "@kgfoundry-common",
+        "stability": "stable",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "Doc": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+        "DoctagsAsset": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+        "Chunk": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+        "LinkAssertion": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+    },
 }
 
 Id = str

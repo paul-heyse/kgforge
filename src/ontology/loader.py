@@ -10,15 +10,27 @@ __all__ = ["OntologyLoader"]
 
 __navmap__: Final[NavMap] = {
     "title": "ontology.loader",
-    "synopsis": "Module for ontology.loader",
+    "synopsis": "Ontology ingest and caching helpers",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["OntologyLoader"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@ontology",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "OntologyLoader": {
+            "owner": "@ontology",
+            "stability": "experimental",
+            "since": "0.1.0",
+        },
+    },
 }
 
 
