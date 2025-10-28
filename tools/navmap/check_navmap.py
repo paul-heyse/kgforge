@@ -1,17 +1,5 @@
 #!/usr/bin/env python
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``tools.navmap.check_navmap`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-tools.navmap.check_navmap
-"""
-
+"""Check Navmap utilities."""
 
 from __future__ import annotations
 
@@ -41,34 +29,16 @@ SYMBOL_RE = re.compile(r"^[A-Za-z_]\w*$")
 def _extract_string(node: ast.AST) -> str | None:
     """Return extract string.
 
-    Auto-generated reference for the ``_extract_string`` callable defined in ``tools.navmap.check_navmap``.
-    
     Parameters
     ----------
     node : ast.AST
         Description for ``node``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.check_navmap import _extract_string
-    >>> result = _extract_string(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.check_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
         return node.value
     return None
@@ -77,34 +47,16 @@ def _extract_string(node: ast.AST) -> str | None:
 def _extract_strings(node: ast.AST) -> list[str]:
     """Return extract strings.
 
-    Auto-generated reference for the ``_extract_strings`` callable defined in ``tools.navmap.check_navmap``.
-    
     Parameters
     ----------
     node : ast.AST
         Description for ``node``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.check_navmap import _extract_strings
-    >>> result = _extract_strings(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.check_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     match node:
         case ast.List(elts=elts) | ast.Tuple(elts=elts):
             return [s for elt in elts if (s := _extract_string(elt)) is not None]
@@ -115,41 +67,23 @@ def _extract_strings(node: ast.AST) -> list[str]:
 def _literal_eval(node: ast.AST, names: Mapping[str, object]) -> object:
     """Return literal eval.
 
-    Auto-generated reference for the ``_literal_eval`` callable defined in ``tools.navmap.check_navmap``.
-    
     Parameters
     ----------
     node : ast.AST
         Description for ``node``.
     names : Mapping[str, object]
         Description for ``names``.
-    
+
     Returns
     -------
     object
         Description of return value.
-    
+
     Raises
     ------
     ValueError
         Raised when validation fails.
-    
-    Examples
-    --------
-    >>> from tools.navmap.check_navmap import _literal_eval
-    >>> result = _literal_eval(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.check_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     match node:
         case ast.Constant(value=value):
             return value
@@ -174,34 +108,16 @@ def _literal_eval(node: ast.AST, names: Mapping[str, object]) -> object:
 def _inspect(py: Path) -> ModuleInfo | None:  # noqa: C901, PLR0912
     """Return inspect.
 
-    Auto-generated reference for the ``_inspect`` callable defined in ``tools.navmap.check_navmap``.
-    
     Parameters
     ----------
     py : Path
         Description for ``py``.
-    
+
     Returns
     -------
     ModuleInfo | None
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.check_navmap import _inspect
-    >>> result = _inspect(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.check_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     text = py.read_text(encoding="utf-8")
     tree = ast.parse(text, filename=str(py))
 
@@ -268,29 +184,11 @@ def _inspect(py: Path) -> ModuleInfo | None:  # noqa: C901, PLR0912
 def main() -> int:
     """Return main.
 
-    Auto-generated reference for the ``main`` callable defined in ``tools.navmap.check_navmap``.
-    
     Returns
     -------
     int
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.check_navmap import main
-    >>> result = main()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.check_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     errors: list[str] = []
     for py in SRC.rglob("*.py"):
         errors.extend(_inspect(py))

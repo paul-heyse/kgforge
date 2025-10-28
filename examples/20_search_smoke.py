@@ -11,4 +11,3 @@ Network: no
 """
 
 from __future__ import annotations
-

@@ -6,15 +6,8 @@ src.docling
 .. autoapi-nested-parse::
 
    
-   Provide utilities for module.
+   Docling utilities.
 
-   Auto-generated API documentation for the ``src.docling`` module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`src.docling`
 
 
 

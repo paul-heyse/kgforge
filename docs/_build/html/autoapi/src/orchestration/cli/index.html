@@ -475,100 +475,61 @@
                   
   <section id="module-src.orchestration.cli">
 <span id="src-orchestration-cli"></span><h1>src.orchestration.cli<a class="headerlink" href="#module-src.orchestration.cli" title="Link to this heading">#</a></h1>
-<p>Provide utilities for module.</p>
-<p class="rubric">Notes</p>
-<p>This module exposes the primary interfaces for the package.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">orchestration.cli</span></code></p>
-</div>
+<p>Cli utilities.</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.orchestration.cli.index_bm25">
-<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">index_bm25</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunks_parquet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Argument(...,</span> <span class="pre">help='Path</span> <span class="pre">to</span> <span class="pre">Parquet/JSONL</span> <span class="pre">with</span> <span class="pre">chunks')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('lucene',</span> <span class="pre">help='lucene|pure')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('./_indices/bm25',</span> <span class="pre">help='Output</span> <span class="pre">index</span> <span class="pre">directory')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#index_bm25"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/orchestration/cli.py:45:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.index_bm25" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">index_bm25</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunks_parquet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Argument(...,</span> <span class="pre">help='Path</span> <span class="pre">to</span> <span class="pre">Parquet/JSONL</span> <span class="pre">with</span> <span class="pre">chunks')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('lucene',</span> <span class="pre">help='lucene|pure')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('./_indices/bm25',</span> <span class="pre">help='Output</span> <span class="pre">index</span> <span class="pre">directory')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#index_bm25"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/orchestration/cli.py:35:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.index_bm25" title="Link to this definition">#</a></dt>
 <dd><p>Return index bm25.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>chunks_parquet</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Description for <code class="docutils literal notranslate"><span class="pre">chunks_parquet</span></code>.</p></li>
-<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Description for <code class="docutils literal notranslate"><span class="pre">backend</span></code>.</p></li>
-<li><p><strong>index_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Description for <code class="docutils literal notranslate"><span class="pre">index_dir</span></code>.</p></li>
+<li><p><strong>chunks_parquet</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Description for <code class="docutils literal notranslate"><span class="pre">chunks_parquet</span></code>.</p></li>
+<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Description for <code class="docutils literal notranslate"><span class="pre">backend</span></code>.</p></li>
+<li><p><strong>index_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Description for <code class="docutils literal notranslate"><span class="pre">index_dir</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">orchestration.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">index_bm25</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">index_bm25</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">orchestration.cli</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.orchestration.cli.index_faiss">
-<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">index_faiss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dense_vectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Argument(...,</span> <span class="pre">help='Path</span> <span class="pre">to</span> <span class="pre">dense</span> <span class="pre">vectors</span> <span class="pre">JSON</span> <span class="pre">(skeleton)')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('./_indices/faiss/shard_000.idx',</span> <span class="pre">help='Output</span> <span class="pre">index</span> <span class="pre">(CPU</span> <span class="pre">.idx)')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#index_faiss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/orchestration/cli.py:115:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.index_faiss" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">index_faiss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dense_vectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Argument(...,</span> <span class="pre">help='Path</span> <span class="pre">to</span> <span class="pre">dense</span> <span class="pre">vectors</span> <span class="pre">JSON</span> <span class="pre">(skeleton)')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typer.Option('./_indices/faiss/shard_000.idx',</span> <span class="pre">help='Output</span> <span class="pre">index</span> <span class="pre">(CPU</span> <span class="pre">.idx)')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#index_faiss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/orchestration/cli.py:91:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.index_faiss" title="Link to this definition">#</a></dt>
 <dd><p>Return index faiss.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dense_vectors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Description for <code class="docutils literal notranslate"><span class="pre">dense_vectors</span></code>.</p></li>
-<li><p><strong>index_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Description for <code class="docutils literal notranslate"><span class="pre">index_path</span></code>.</p></li>
+<li><p><strong>dense_vectors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Description for <code class="docutils literal notranslate"><span class="pre">dense_vectors</span></code>.</p></li>
+<li><p><strong>index_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Description for <code class="docutils literal notranslate"><span class="pre">index_path</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">orchestration.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">index_faiss</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">index_faiss</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">orchestration.cli</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.orchestration.cli.api">
-<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8080</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#api"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/orchestration/cli.py:164:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.api" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8080</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#api"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/orchestration/cli.py:126:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.api" title="Link to this definition">#</a></dt>
 <dd><p>Return api.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Description for <code class="docutils literal notranslate"><span class="pre">port</span></code>.</p>
+<dd class="field-odd"><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Description for <code class="docutils literal notranslate"><span class="pre">port</span></code>.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">orchestration.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">api</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">api</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">orchestration.cli</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.orchestration.cli.e2e">
-<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">e2e</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#e2e"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/orchestration/cli.py:193:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.e2e" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.orchestration.cli.</span></span><span class="sig-name descname"><span class="pre">e2e</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/orchestration/cli.html#e2e"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/orchestration/cli.py:141:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.orchestration.cli.e2e" title="Link to this definition">#</a></dt>
 <dd><p>Return e2e.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
@@ -578,17 +539,6 @@
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">orchestration.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">e2e</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">e2e</span><span class="p">()</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">orchestration.cli</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 </section>

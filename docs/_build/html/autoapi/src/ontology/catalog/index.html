@@ -475,102 +475,32 @@
                   
   <section id="module-src.ontology.catalog">
 <span id="src-ontology-catalog"></span><h1>src.ontology.catalog<a class="headerlink" href="#module-src.ontology.catalog" title="Link to this heading">#</a></h1>
-<p>Provide utilities for module.</p>
-<p class="rubric">Notes</p>
-<p>This module exposes the primary interfaces for the package.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ontology.catalog</span></code></p>
-</div>
+<p>Catalog utilities.</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.ontology.catalog.OntologyCatalog">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.ontology.catalog.</span></span><span class="sig-name descname"><span class="pre">OntologyCatalog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concepts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/ontology/catalog.html#OntologyCatalog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/ontology/catalog.py:38:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ontology.catalog.OntologyCatalog" title="Link to this definition">#</a></dt>
-<dd><p>Represent OntologyCatalog.</p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.ontology.catalog.</span></span><span class="sig-name descname"><span class="pre">OntologyCatalog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concepts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/ontology/catalog.html#OntologyCatalog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/ontology/catalog.py:28:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ontology.catalog.OntologyCatalog" title="Link to this definition">#</a></dt>
+<dd><p>Describe OntologyCatalog.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>concepts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><em>kgfoundry.kgfoundry_common.models.Concept</em><em>]</em>)</p>
 </dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.ontology.catalog.OntologyCatalog.None">
-<span class="sig-name descname"><span class="pre">None</span></span><a class="headerlink" href="#src.ontology.catalog.OntologyCatalog.None" title="Link to this definition">#</a></dt>
-<dd><p>No public attributes documented.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.ontology.catalog.OntologyCatalog.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/ontology/catalog.html#OntologyCatalog.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/ontology/catalog.py:73:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ontology.catalog.OntologyCatalog.__init__" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>concepts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><em>kgfoundry.kgfoundry_common.models.Concept</em><em>]</em>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.ontology.catalog.OntologyCatalog.neighbors">
-<span class="sig-name descname"><span class="pre">neighbors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/ontology/catalog.html#OntologyCatalog.neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/ontology/catalog.py:98:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ontology.catalog.OntologyCatalog.neighbors" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>concept_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)">set</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.ontology.catalog.OntologyCatalog.hydrate">
-<span class="sig-name descname"><span class="pre">hydrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/ontology/catalog.html#OntologyCatalog.hydrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/ontology/catalog.py:133:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ontology.catalog.OntologyCatalog.hydrate" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>concept_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, Any]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">ontology.catalog</span><span class="w"> </span><span class="kn">import</span> <span class="n">OntologyCatalog</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">OntologyCatalog</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ontology.catalog</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Document class invariants and lifecycle details here.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.ontology.catalog.OntologyCatalog.by_id">
-<span class="sig-name descname"><span class="pre">by_id</span></span><a class="reference internal" href="../../../../_modules/src/ontology/catalog.html#OntologyCatalog.by_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/ontology/catalog.py:96:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ontology.catalog.OntologyCatalog.by_id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">by_id</span></span><a class="reference internal" href="../../../../_modules/src/ontology/catalog.html#OntologyCatalog.by_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/ontology/catalog.py:39:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ontology.catalog.OntologyCatalog.by_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">neighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concept_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/ontology/catalog.html#OntologyCatalog.neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/ontology/catalog.py:98:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="src.ontology.catalog.OntologyCatalog.neighbors">
+<span class="sig-name descname"><span class="pre">neighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concept_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/ontology/catalog.html#OntologyCatalog.neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/ontology/catalog.py:41:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ontology.catalog.OntologyCatalog.neighbors" title="Link to this definition">#</a></dt>
 <dd><p>Return neighbors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>concept_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Description for <code class="docutils literal notranslate"><span class="pre">concept_id</span></code>.</p></li>
-<li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Description for <code class="docutils literal notranslate"><span class="pre">depth</span></code>.</p></li>
+<li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Description for <code class="docutils literal notranslate"><span class="pre">depth</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -580,24 +510,11 @@
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)">set</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">ontology.catalog</span><span class="w"> </span><span class="kn">import</span> <span class="n">neighbors</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">neighbors</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ontology.catalog</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">hydrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concept_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/ontology/catalog.html#OntologyCatalog.hydrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/ontology/catalog.py:133:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="src.ontology.catalog.OntologyCatalog.hydrate">
+<span class="sig-name descname"><span class="pre">hydrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concept_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/ontology/catalog.html#OntologyCatalog.hydrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/ontology/catalog.py:59:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ontology.catalog.OntologyCatalog.hydrate" title="Link to this definition">#</a></dt>
 <dd><p>Return hydrate.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -610,19 +527,6 @@
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, Any]</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">ontology.catalog</span><span class="w"> </span><span class="kn">import</span> <span class="n">hydrate</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">hydrate</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ontology.catalog</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 </dd></dl>
@@ -661,13 +565,9 @@
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.ontology.catalog.OntologyCatalog"><code class="docutils literal notranslate"><span class="pre">OntologyCatalog</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.ontology.catalog.OntologyCatalog.None"><code class="docutils literal notranslate"><span class="pre">OntologyCatalog.None</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.ontology.catalog.OntologyCatalog.__init__"><code class="docutils literal notranslate"><span class="pre">OntologyCatalog.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.ontology.catalog.OntologyCatalog.by_id"><code class="docutils literal notranslate"><span class="pre">OntologyCatalog.by_id</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.ontology.catalog.OntologyCatalog.neighbors"><code class="docutils literal notranslate"><span class="pre">OntologyCatalog.neighbors()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.ontology.catalog.OntologyCatalog.hydrate"><code class="docutils literal notranslate"><span class="pre">OntologyCatalog.hydrate()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.ontology.catalog.OntologyCatalog.by_id"><code class="docutils literal notranslate"><span class="pre">OntologyCatalog.by_id</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">OntologyCatalog.neighbors()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">OntologyCatalog.hydrate()</span></code></a></li>
 </ul>
 </li>
 </ul>

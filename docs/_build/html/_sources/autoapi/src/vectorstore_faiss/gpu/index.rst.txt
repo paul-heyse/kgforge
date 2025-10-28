@@ -5,13 +5,7 @@ src.vectorstore_faiss.gpu
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`vectorstore_faiss.gpu`
+   Gpu utilities.
 
    ..
        !! processed by numpydoc !!
@@ -25,52 +19,8 @@ Module Contents
 .. py:class:: FaissGpuIndex(factory = 'OPQ64,IVF8192,PQ64', nprobe = 64, gpu = True, cuvs = True)
 
    
-   Represent FaissGpuIndex.
+   Describe FaissGpuIndex.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: __init__()
-
-      Method description.
-
-   .. method:: _ensure_resources()
-
-      Method description.
-
-   .. method:: train()
-
-      Method description.
-
-   .. method:: add()
-
-      Method description.
-
-   .. method:: search()
-
-      Method description.
-
-   .. method:: save()
-
-      Method description.
-
-   .. method:: load()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from vectorstore_faiss.gpu import FaissGpuIndex
-   >>> result = FaissGpuIndex()
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`vectorstore_faiss.gpu`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -144,16 +94,6 @@ Module Contents
       
       Return ensure resources.
 
-      .. rubric:: Examples
-
-      >>> from vectorstore_faiss.gpu import _ensure_resources
-      >>> _ensure_resources()  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`vectorstore_faiss.gpu`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -179,20 +119,9 @@ Module Contents
       Return train.
 
       :param train_vectors: Description for ``train_vectors``.
-      :type train_vectors: FloatArray
+      :type train_vectors: src.vectorstore_faiss.gpu.FloatArray
       :param seed: Description for ``seed``.
-      :type seed: int, optional
-
-      .. rubric:: Examples
-
-      >>> from vectorstore_faiss.gpu import train
-      >>> train(..., ...)  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`vectorstore_faiss.gpu`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
+      :type seed: int | None
 
 
 
@@ -220,20 +149,9 @@ Module Contents
       :param keys: Description for ``keys``.
       :type keys: List[str]
       :param vectors: Description for ``vectors``.
-      :type vectors: FloatArray
+      :type vectors: src.vectorstore_faiss.gpu.FloatArray
 
       :raises RuntimeError: Raised when validation fails.
-
-      .. rubric:: Examples
-
-      >>> from vectorstore_faiss.gpu import add
-      >>> add(..., ...)  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`vectorstore_faiss.gpu`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -259,26 +177,13 @@ Module Contents
       Return search.
 
       :param query: Description for ``query``.
-      :type query: FloatArray
+      :type query: src.vectorstore_faiss.gpu.FloatArray
       :param k: Description for ``k``.
       :type k: int
 
       :returns: *List[Tuple[str, float]]* -- Description of return value.
 
       :raises RuntimeError: Raised when validation fails.
-
-      .. rubric:: Examples
-
-      >>> from vectorstore_faiss.gpu import search
-      >>> result = search(..., ...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`vectorstore_faiss.gpu`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -306,20 +211,9 @@ Module Contents
       :param index_uri: Description for ``index_uri``.
       :type index_uri: str
       :param idmap_uri: Description for ``idmap_uri``.
-      :type idmap_uri: str | None, optional
+      :type idmap_uri: str | None
 
       :raises RuntimeError: Raised when validation fails.
-
-      .. rubric:: Examples
-
-      >>> from vectorstore_faiss.gpu import save
-      >>> save(..., ...)  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`vectorstore_faiss.gpu`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -347,20 +241,9 @@ Module Contents
       :param index_uri: Description for ``index_uri``.
       :type index_uri: str
       :param idmap_uri: Description for ``idmap_uri``.
-      :type idmap_uri: str | None, optional
+      :type idmap_uri: str | None
 
       :raises RuntimeError: Raised when validation fails.
-
-      .. rubric:: Examples
-
-      >>> from vectorstore_faiss.gpu import load
-      >>> load(..., ...)  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`vectorstore_faiss.gpu`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 

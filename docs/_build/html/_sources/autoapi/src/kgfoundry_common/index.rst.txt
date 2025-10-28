@@ -6,13 +6,8 @@ src.kgfoundry_common
 .. autoapi-nested-parse::
 
    
-   Provide utilities for module.
+   Kgfoundry Common utilities.
 
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`kgfoundry_common`
 
 
 

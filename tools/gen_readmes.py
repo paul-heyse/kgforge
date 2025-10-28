@@ -1,16 +1,4 @@
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``tools.gen_readmes`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-tools.gen_readmes
-"""
-
+"""Gen Readmes utilities."""
 
 import os
 import subprocess
@@ -36,29 +24,11 @@ ENV_PKGS = os.environ.get("DOCS_PKG")
 def detect_repo() -> tuple[str, str]:
     """Return detect repo.
 
-    Auto-generated reference for the ``detect_repo`` callable defined in ``tools.gen_readmes``.
-    
     Returns
     -------
     Tuple[str, str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.gen_readmes import detect_repo
-    >>> result = detect_repo()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.gen_readmes
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     try:
         remote = subprocess.check_output(
             ["git", "config", "--get", "remote.origin.url"], cwd=str(ROOT), text=True
@@ -92,29 +62,11 @@ def detect_repo() -> tuple[str, str]:
 def git_sha() -> str:
     """Return git sha.
 
-    Auto-generated reference for the ``git_sha`` callable defined in ``tools.gen_readmes``.
-    
     Returns
     -------
     str
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.gen_readmes import git_sha
-    >>> result = git_sha()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.gen_readmes
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     try:
         return subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=str(ROOT), text=True
@@ -130,8 +82,6 @@ SHA = git_sha()
 def gh_url(rel: str, start: int, end: int | None) -> str:
     """Return gh url.
 
-    Auto-generated reference for the ``gh_url`` callable defined in ``tools.gen_readmes``.
-    
     Parameters
     ----------
     rel : str
@@ -140,28 +90,12 @@ def gh_url(rel: str, start: int, end: int | None) -> str:
         Description for ``start``.
     end : int | None
         Description for ``end``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.gen_readmes import gh_url
-    >>> result = gh_url(..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.gen_readmes
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     rng = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel}{rng}"
 
@@ -169,29 +103,11 @@ def gh_url(rel: str, start: int, end: int | None) -> str:
 def iter_packages() -> list[str]:
     """Return iter packages.
 
-    Auto-generated reference for the ``iter_packages`` callable defined in ``tools.gen_readmes``.
-    
     Returns
     -------
     List[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.gen_readmes import iter_packages
-    >>> result = iter_packages()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.gen_readmes
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     return detect_packages() or [detect_primary()]
@@ -203,34 +119,16 @@ loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
 def summarize(node: Object) -> str:
     """Return summarize.
 
-    Auto-generated reference for the ``summarize`` callable defined in ``tools.gen_readmes``.
-    
     Parameters
     ----------
     node : Object
         Description for ``node``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.gen_readmes import summarize
-    >>> result = summarize(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.gen_readmes
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     doc = getattr(node, "docstring", None)
     if doc and getattr(doc, "value", None):
         summary = doc.value.strip().splitlines()[0].strip()
@@ -241,34 +139,16 @@ def summarize(node: Object) -> str:
 def is_public(node: Object) -> bool:
     """Return is public.
 
-    Auto-generated reference for the ``is_public`` callable defined in ``tools.gen_readmes``.
-    
     Parameters
     ----------
     node : Object
         Description for ``node``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.gen_readmes import is_public
-    >>> result = is_public(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.gen_readmes
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     name = getattr(node, "name", "")
     return not name.startswith("_")
 
@@ -276,36 +156,18 @@ def is_public(node: Object) -> bool:
 def get_open_link(node: Object, readme_dir: Path) -> str | None:
     """Return get open link.
 
-    Auto-generated reference for the ``get_open_link`` callable defined in ``tools.gen_readmes``.
-    
     Parameters
     ----------
     node : Object
         Description for ``node``.
     readme_dir : Path
         Description for ``readme_dir``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.gen_readmes import get_open_link
-    >>> result = get_open_link(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.gen_readmes
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -323,36 +185,18 @@ def get_open_link(node: Object, readme_dir: Path) -> str | None:
 def get_view_link(node: Object, readme_dir: Path) -> str | None:
     """Return get view link.
 
-    Auto-generated reference for the ``get_view_link`` callable defined in ``tools.gen_readmes``.
-    
     Parameters
     ----------
     node : Object
         Description for ``node``.
     readme_dir : Path
         Description for ``readme_dir``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.gen_readmes import get_view_link
-    >>> result = get_view_link(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.gen_readmes
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -370,34 +214,16 @@ def get_view_link(node: Object, readme_dir: Path) -> str | None:
 def iter_public_members(node: Object) -> Iterable[Object]:
     """Return iter public members.
 
-    Auto-generated reference for the ``iter_public_members`` callable defined in ``tools.gen_readmes``.
-    
     Parameters
     ----------
     node : Object
         Description for ``node``.
-    
+
     Returns
     -------
     Iterable[Object]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.gen_readmes import iter_public_members
-    >>> result = iter_public_members(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.gen_readmes
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     members = getattr(node, "members", {})
     return sorted([m for m in members.values() if is_public(m)], key=lambda child: child.name)
 
@@ -405,8 +231,6 @@ def iter_public_members(node: Object) -> Iterable[Object]:
 def render_member(node: Object, *, indent: int, lines: list[str], readme_dir: Path) -> None:
     """Return render member.
 
-    Auto-generated reference for the ``render_member`` callable defined in ``tools.gen_readmes``.
-    
     Parameters
     ----------
     node : Object
@@ -417,21 +241,7 @@ def render_member(node: Object, *, indent: int, lines: list[str], readme_dir: Pa
         Description for ``lines``.
     readme_dir : Path
         Description for ``readme_dir``.
-    
-    Examples
-    --------
-    >>> from tools.gen_readmes import render_member
-    >>> render_member(..., ..., ..., ...)  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    tools.gen_readmes
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     open_link = get_open_link(node, readme_dir)
     view_link = get_view_link(node, readme_dir)
     if not open_link and not view_link:
@@ -463,27 +273,11 @@ def render_member(node: Object, *, indent: int, lines: list[str], readme_dir: Pa
 def write_readme(node: Object) -> None:
     """Return write readme.
 
-    Auto-generated reference for the ``write_readme`` callable defined in ``tools.gen_readmes``.
-    
     Parameters
     ----------
     node : Object
         Description for ``node``.
-    
-    Examples
-    --------
-    >>> from tools.gen_readmes import write_readme
-    >>> write_readme(...)  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    tools.gen_readmes
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"
     lines = [

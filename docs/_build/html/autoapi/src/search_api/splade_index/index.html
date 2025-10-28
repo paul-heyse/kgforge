@@ -475,18 +475,12 @@
                   
   <section id="module-src.search_api.splade_index">
 <span id="src-search-api-splade-index"></span><h1>src.search_api.splade_index<a class="headerlink" href="#module-src.search_api.splade_index" title="Link to this heading">#</a></h1>
-<p>Provide utilities for module.</p>
-<p class="rubric">Notes</p>
-<p>This module exposes the primary interfaces for the package.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_api.splade_index</span></code></p>
-</div>
+<p>Splade Index utilities.</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.search_api.splade_index.tok">
-<span class="sig-prename descclassname"><span class="pre">src.search_api.splade_index.</span></span><span class="sig-name descname"><span class="pre">tok</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#tok"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:43:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.tok" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.search_api.splade_index.</span></span><span class="sig-name descname"><span class="pre">tok</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#tok"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:33:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.tok" title="Link to this definition">#</a></dt>
 <dd><p>Return tok.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -499,51 +493,38 @@
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">search_api.splade_index</span><span class="w"> </span><span class="kn">import</span> <span class="n">tok</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">tok</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_api.splade_index</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="src.search_api.splade_index.SpladeDoc">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.search_api.splade_index.</span></span><span class="sig-name descname"><span class="pre">SpladeDoc</span></span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeDoc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:77:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeDoc" title="Link to this definition">#</a></dt>
-<dd><p>Represent SpladeDoc.</p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.search_api.splade_index.</span></span><span class="sig-name descname"><span class="pre">SpladeDoc</span></span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeDoc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:50:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeDoc" title="Link to this definition">#</a></dt>
+<dd><p>Describe SpladeDoc.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.splade_index.SpladeDoc.chunk_id">
-<span class="sig-name descname"><span class="pre">chunk_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeDoc.chunk_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:94:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeDoc.chunk_id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">chunk_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeDoc.chunk_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:54:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeDoc.chunk_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.splade_index.SpladeDoc.doc_id">
-<span class="sig-name descname"><span class="pre">doc_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeDoc.doc_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:95:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeDoc.doc_id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">doc_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeDoc.doc_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:55:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeDoc.doc_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.splade_index.SpladeDoc.section">
-<span class="sig-name descname"><span class="pre">section</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeDoc.section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:96:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeDoc.section" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">section</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeDoc.section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:56:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeDoc.section" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.splade_index.SpladeDoc.text">
-<span class="sig-name descname"><span class="pre">text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeDoc.text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:97:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeDoc.text" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeDoc.text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:57:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeDoc.text" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="src.search_api.splade_index.SpladeIndex">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.search_api.splade_index.</span></span><span class="sig-name descname"><span class="pre">SpladeIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks_dataset_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:101:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex" title="Link to this definition">#</a></dt>
-<dd><p>Represent SpladeIndex.</p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.search_api.splade_index.</span></span><span class="sig-name descname"><span class="pre">SpladeIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks_dataset_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:61:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex" title="Link to this definition">#</a></dt>
+<dd><p>Describe SpladeIndex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -553,111 +534,29 @@
 </ul>
 </dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.search_api.splade_index.SpladeIndex.None">
-<span class="sig-name descname"><span class="pre">None</span></span><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.None" title="Link to this definition">#</a></dt>
-<dd><p>No public attributes documented.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.search_api.splade_index.SpladeIndex.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:138:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.__init__" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>db_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>chunks_dataset_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>sparse_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.search_api.splade_index.SpladeIndex._load">
-<span class="sig-name descname"><span class="pre">_load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex._load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:176:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex._load" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>chunks_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.search_api.splade_index.SpladeIndex.search">
-<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:228:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.search" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.search_api.splade_index.SpladeIndex.doc">
-<span class="sig-name descname"><span class="pre">doc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:279:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.doc" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#src.search_api.splade_index.SpladeDoc" title="src.search_api.splade_index.SpladeDoc">SpladeDoc</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">search_api.splade_index</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpladeIndex</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">SpladeIndex</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_api.splade_index</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Document class invariants and lifecycle details here.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.splade_index.SpladeIndex.db_path">
-<span class="sig-name descname"><span class="pre">db_path</span></span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.db_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:170:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.db_path" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">db_path</span></span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.db_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:82:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.db_path" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.splade_index.SpladeIndex.docs">
-<span class="sig-name descname"><span class="pre">docs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#src.search_api.splade_index.SpladeDoc" title="src.search_api.splade_index.SpladeDoc"><span class="pre">SpladeDoc</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.docs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:171:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.docs" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">docs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#src.search_api.splade_index.SpladeDoc" title="src.search_api.splade_index.SpladeDoc"><span class="pre">SpladeDoc</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.docs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:83:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.docs" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.splade_index.SpladeIndex.df">
-<span class="sig-name descname"><span class="pre">df</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:172:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.df" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">df</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:84:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.df" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.search_api.splade_index.SpladeIndex.N">
-<span class="sig-name descname"><span class="pre">N</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.N"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:173:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.N" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">N</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.N"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:85:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.N" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunks_root</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex._load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:176:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="src.search_api.splade_index.SpladeIndex._load">
+<span class="sig-name descname"><span class="pre">_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunks_root</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex._load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:88:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex._load" title="Link to this definition">#</a></dt>
 <dd><p>Return load.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -667,28 +566,17 @@
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">search_api.splade_index</span><span class="w"> </span><span class="kn">import</span> <span class="n">_load</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">_load</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_api.splade_index</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:228:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="src.search_api.splade_index.SpladeIndex.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:126:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.search" title="Link to this definition">#</a></dt>
 <dd><p>Return search.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Description for <code class="docutils literal notranslate"><span class="pre">query</span></code>.</p></li>
-<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Description for <code class="docutils literal notranslate"><span class="pre">k</span></code>.</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Description for <code class="docutils literal notranslate"><span class="pre">k</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -698,49 +586,23 @@
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">search_api.splade_index</span><span class="w"> </span><span class="kn">import</span> <span class="n">search</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">search</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_api.splade_index</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:279:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="src.search_api.splade_index.SpladeIndex.doc">
+<span class="sig-name descname"><span class="pre">doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/splade_index.html#SpladeIndex.doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/splade_index.py:160:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.splade_index.SpladeIndex.doc" title="Link to this definition">#</a></dt>
 <dd><p>Return doc.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Description for <code class="docutils literal notranslate"><span class="pre">index</span></code>.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>SpladeDoc</em> – Description of return value.</p>
+<dd class="field-even"><p><em>src.search_api.splade_index.SpladeDoc</em> – Description of return value.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#src.search_api.splade_index.SpladeDoc" title="src.search_api.splade_index.SpladeDoc">SpladeDoc</a></p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">search_api.splade_index</span><span class="w"> </span><span class="kn">import</span> <span class="n">doc</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">doc</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_api.splade_index</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 </dd></dl>
@@ -787,18 +649,13 @@
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.search_api.splade_index.SpladeIndex"><code class="docutils literal notranslate"><span class="pre">SpladeIndex</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.search_api.splade_index.SpladeIndex.None"><code class="docutils literal notranslate"><span class="pre">SpladeIndex.None</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.search_api.splade_index.SpladeIndex.__init__"><code class="docutils literal notranslate"><span class="pre">SpladeIndex.__init__()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.search_api.splade_index.SpladeIndex._load"><code class="docutils literal notranslate"><span class="pre">SpladeIndex._load()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.search_api.splade_index.SpladeIndex.search"><code class="docutils literal notranslate"><span class="pre">SpladeIndex.search()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.search_api.splade_index.SpladeIndex.doc"><code class="docutils literal notranslate"><span class="pre">SpladeIndex.doc()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.search_api.splade_index.SpladeIndex.db_path"><code class="docutils literal notranslate"><span class="pre">SpladeIndex.db_path</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.search_api.splade_index.SpladeIndex.docs"><code class="docutils literal notranslate"><span class="pre">SpladeIndex.docs</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.search_api.splade_index.SpladeIndex.df"><code class="docutils literal notranslate"><span class="pre">SpladeIndex.df</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.search_api.splade_index.SpladeIndex.N"><code class="docutils literal notranslate"><span class="pre">SpladeIndex.N</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">SpladeIndex._load()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">SpladeIndex.search()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id2"><code class="docutils literal notranslate"><span class="pre">SpladeIndex.doc()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.search_api.splade_index.SpladeIndex._load"><code class="docutils literal notranslate"><span class="pre">SpladeIndex._load()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.search_api.splade_index.SpladeIndex.search"><code class="docutils literal notranslate"><span class="pre">SpladeIndex.search()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.search_api.splade_index.SpladeIndex.doc"><code class="docutils literal notranslate"><span class="pre">SpladeIndex.doc()</span></code></a></li>
 </ul>
 </li>
 </ul>

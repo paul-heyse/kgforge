@@ -5,15 +5,7 @@ src.embeddings_dense.qwen3
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   Auto-generated API documentation for the ``src.embeddings_dense.qwen3`` module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`src.embeddings_dense.qwen3`
+   Qwen3 utilities.
 
    ..
        !! processed by numpydoc !!
@@ -27,7 +19,7 @@ Module Contents
 .. py:class:: Qwen3Embedder
 
    
-   Represent Qwen3Embedder.
+   Describe Qwen3Embedder.
 
 
 

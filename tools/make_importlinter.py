@@ -1,16 +1,4 @@
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``tools.make_importlinter`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-tools.make_importlinter
-"""
-
+"""Make Importlinter utilities."""
 
 from pathlib import Path
 

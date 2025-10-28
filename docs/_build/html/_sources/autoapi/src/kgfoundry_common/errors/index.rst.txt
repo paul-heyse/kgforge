@@ -5,13 +5,7 @@ src.kgfoundry_common.errors
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`kgfoundry_common.errors`
+   Errors utilities.
 
    ..
        !! processed by numpydoc !!
@@ -28,7 +22,7 @@ Module Contents
 
 
    
-   Represent DownloadError.
+   Describe DownloadError.
 
 
 
@@ -54,7 +48,7 @@ Module Contents
 
 
    
-   Represent UnsupportedMIMEError.
+   Describe UnsupportedMIMEError.
 
 
 
@@ -80,7 +74,7 @@ Module Contents
 
 
    
-   Represent DoclingError.
+   Describe DoclingError.
 
 
 
@@ -106,7 +100,7 @@ Module Contents
 
 
    
-   Represent OCRTimeoutError.
+   Describe OCRTimeoutError.
 
 
 
@@ -132,7 +126,7 @@ Module Contents
 
 
    
-   Represent ChunkingError.
+   Describe ChunkingError.
 
 
 
@@ -158,7 +152,7 @@ Module Contents
 
 
    
-   Represent EmbeddingError.
+   Describe EmbeddingError.
 
 
 
@@ -184,7 +178,7 @@ Module Contents
 
 
    
-   Represent SpladeOOMError.
+   Describe SpladeOOMError.
 
 
 
@@ -210,7 +204,7 @@ Module Contents
 
 
    
-   Represent IndexBuildError.
+   Describe IndexBuildError.
 
 
 
@@ -236,7 +230,7 @@ Module Contents
 
 
    
-   Represent OntologyParseError.
+   Describe OntologyParseError.
 
 
 
@@ -262,7 +256,7 @@ Module Contents
 
 
    
-   Represent LinkerCalibrationError.
+   Describe LinkerCalibrationError.
 
 
 
@@ -288,7 +282,7 @@ Module Contents
 
 
    
-   Represent Neo4jError.
+   Describe Neo4jError.
 
 
 

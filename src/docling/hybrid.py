@@ -1,16 +1,4 @@
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``src.docling.hybrid`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-src.docling.hybrid
-"""
-
+"""Hybrid utilities."""
 
 from __future__ import annotations
 
@@ -37,19 +25,5 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor HybridChunker]
 class HybridChunker:
     """Describe HybridChunker."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...

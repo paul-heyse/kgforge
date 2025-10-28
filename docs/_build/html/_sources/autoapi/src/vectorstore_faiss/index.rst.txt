@@ -6,13 +6,8 @@ src.vectorstore_faiss
 .. autoapi-nested-parse::
 
    
-   Provide utilities for module.
+   Vectorstore Faiss utilities.
 
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`vectorstore_faiss`
 
 
 

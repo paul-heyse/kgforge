@@ -5,15 +5,7 @@ src.embeddings_sparse.splade
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   Auto-generated API documentation for the ``src.embeddings_sparse.splade`` module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`src.embeddings_sparse.splade`
+   Splade utilities.
 
    ..
        !! processed by numpydoc !!
@@ -29,33 +21,8 @@ Module Contents
 .. py:class:: SPLADEv3Encoder(model_id = 'naver/splade-v3-distilbert', device = 'cuda', topk = 256, max_seq_len = 512)
 
    
-   Represent SPLADEv3Encoder.
+   Describe SPLADEv3Encoder.
 
-   .. attribute:: name
-
-      Attribute description.
-
-      :type: Any
-
-   .. method:: __init__()
-
-      Method description.
-
-   .. method:: encode()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from embeddings_sparse.splade import SPLADEv3Encoder
-   >>> result = SPLADEv3Encoder()
-   >>> result  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`embeddings_sparse.splade`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -111,18 +78,6 @@ Module Contents
 
       :raises NotImplementedError: Raised when validation fails.
 
-      .. rubric:: Examples
-
-      >>> from embeddings_sparse.splade import encode
-      >>> result = encode(...)
-      >>> result  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`embeddings_sparse.splade`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -144,43 +99,8 @@ Module Contents
 .. py:class:: PureImpactIndex(index_dir)
 
    
-   Represent PureImpactIndex.
+   Describe PureImpactIndex.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: __init__()
-
-      Method description.
-
-   .. method:: _tokenize()
-
-      Method description.
-
-   .. method:: build()
-
-      Method description.
-
-   .. method:: load()
-
-      Method description.
-
-   .. method:: search()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from embeddings_sparse.splade import PureImpactIndex
-   >>> result = PureImpactIndex()
-   >>> result  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`embeddings_sparse.splade`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -226,18 +146,6 @@ Module Contents
       :type text: str
 
       :returns: *List[str]* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from embeddings_sparse.splade import _tokenize
-      >>> result = _tokenize(...)
-      >>> result  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`embeddings_sparse.splade`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -288,16 +196,6 @@ Module Contents
       
       Return load.
 
-      .. rubric:: Examples
-
-      >>> from embeddings_sparse.splade import load
-      >>> load()  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`embeddings_sparse.splade`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -329,18 +227,6 @@ Module Contents
 
       :returns: *List[Tuple[str, float]]* -- Description of return value.
 
-      .. rubric:: Examples
-
-      >>> from embeddings_sparse.splade import search
-      >>> result = search(..., ...)
-      >>> result  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`embeddings_sparse.splade`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -362,35 +248,8 @@ Module Contents
 .. py:class:: LuceneImpactIndex(index_dir)
 
    
-   Represent LuceneImpactIndex.
+   Describe LuceneImpactIndex.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: __init__()
-
-      Method description.
-
-   .. method:: _ensure()
-
-      Method description.
-
-   .. method:: search()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from embeddings_sparse.splade import LuceneImpactIndex
-   >>> result = LuceneImpactIndex()
-   >>> result  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`embeddings_sparse.splade`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -425,17 +284,6 @@ Module Contents
 
       :raises RuntimeError: Raised when validation fails.
 
-      .. rubric:: Examples
-
-      >>> from embeddings_sparse.splade import _ensure
-      >>> _ensure()  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`embeddings_sparse.splade`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -468,18 +316,6 @@ Module Contents
 
       :raises RuntimeError: Raised when validation fails.
 
-      .. rubric:: Examples
-
-      >>> from embeddings_sparse.splade import search
-      >>> result = search(..., ...)
-      >>> result  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`embeddings_sparse.splade`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -509,18 +345,6 @@ Module Contents
    :type index_dir: str
 
    :returns: *PureImpactIndex | LuceneImpactIndex* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from embeddings_sparse.splade import get_splade
-   >>> result = get_splade(..., ...)
-   >>> result  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`embeddings_sparse.splade`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 

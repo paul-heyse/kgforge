@@ -5,13 +5,7 @@ src.ontology.catalog
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`ontology.catalog`
+   Catalog utilities.
 
    ..
        !! processed by numpydoc !!
@@ -25,36 +19,8 @@ Module Contents
 .. py:class:: OntologyCatalog(concepts)
 
    
-   Represent OntologyCatalog.
+   Describe OntologyCatalog.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: __init__()
-
-      Method description.
-
-   .. method:: neighbors()
-
-      Method description.
-
-   .. method:: hydrate()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from ontology.catalog import OntologyCatalog
-   >>> result = OntologyCatalog()
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`ontology.catalog`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -84,22 +50,9 @@ Module Contents
       :param concept_id: Description for ``concept_id``.
       :type concept_id: str
       :param depth: Description for ``depth``.
-      :type depth: int, optional
+      :type depth: int | None
 
       :returns: *Set[str]* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from ontology.catalog import neighbors
-      >>> result = neighbors(..., ...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`ontology.catalog`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -128,19 +81,6 @@ Module Contents
       :type concept_id: str
 
       :returns: *Mapping[str, Any]* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from ontology.catalog import hydrate
-      >>> result = hydrate(...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`ontology.catalog`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 

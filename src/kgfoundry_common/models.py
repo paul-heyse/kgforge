@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-kgfoundry_common.models
-"""
-
+"""Models utilities."""
 
 from __future__ import annotations
 
@@ -39,21 +29,6 @@ Id = str
 # [nav:anchor Doc]
 class Doc(BaseModel):
     """Describe Doc."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     id: Id
     openalex_id: str | None = None
@@ -73,21 +48,6 @@ class Doc(BaseModel):
 # [nav:anchor DoctagsAsset]
 class DoctagsAsset(BaseModel):
     """Describe DoctagsAsset."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     doc_id: Id
     doctags_uri: str
@@ -100,21 +60,6 @@ class DoctagsAsset(BaseModel):
 # [nav:anchor Chunk]
 class Chunk(BaseModel):
     """Describe Chunk."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     id: Id
     doc_id: Id
@@ -128,21 +73,6 @@ class Chunk(BaseModel):
 # [nav:anchor LinkAssertion]
 class LinkAssertion(BaseModel):
     """Describe LinkAssertion."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     id: Id
     chunk_id: Id

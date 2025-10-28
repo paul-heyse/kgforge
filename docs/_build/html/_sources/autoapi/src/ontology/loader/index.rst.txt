@@ -5,13 +5,7 @@ src.ontology.loader
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`ontology.loader`
+   Loader utilities.
 
    ..
        !! processed by numpydoc !!
@@ -25,7 +19,7 @@ Module Contents
 .. py:class:: OntologyLoader
 
    
-   Represent OntologyLoader.
+   Describe OntologyLoader.
 
 
 

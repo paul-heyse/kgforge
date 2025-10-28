@@ -1,16 +1,4 @@
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``tools.docs.export_schemas`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-tools.docs.export_schemas
-"""
-
+"""Export Schemas utilities."""
 
 from __future__ import annotations
 
@@ -42,35 +30,16 @@ TOP_PACKAGES = (
 def is_pydantic_model(obj: object) -> bool:
     """Return is pydantic model.
 
-    Auto-generated reference for the ``is_pydantic_model`` callable defined in ``tools.docs.export_schemas``.
-    
     Parameters
     ----------
     obj : object
         Description for ``obj``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.docs.export_schemas import is_pydantic_model
-    >>> result = is_pydantic_model(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.docs.export_schemas
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-
     try:
         from pydantic import BaseModel
     except Exception:
@@ -81,35 +50,16 @@ def is_pydantic_model(obj: object) -> bool:
 def is_pandera_model(obj: object) -> bool:
     """Return is pandera model.
 
-    Auto-generated reference for the ``is_pandera_model`` callable defined in ``tools.docs.export_schemas``.
-    
     Parameters
     ----------
     obj : object
         Description for ``obj``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.docs.export_schemas import is_pandera_model
-    >>> result = is_pandera_model(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.docs.export_schemas
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-
     try:
         import pandera as pa
     except Exception:
@@ -123,30 +73,11 @@ def is_pandera_model(obj: object) -> bool:
 def iter_packages() -> list[str]:
     """Return iter packages.
 
-    Auto-generated reference for the ``iter_packages`` callable defined in ``tools.docs.export_schemas``.
-    
     Returns
     -------
     List[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.docs.export_schemas import iter_packages
-    >>> result = iter_packages()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.docs.export_schemas
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-
     discovered: list[str] = []
     for pkg in TOP_PACKAGES:
         try:
@@ -163,8 +94,6 @@ def iter_packages() -> list[str]:
 def export_schema(module_name: str, name: str, obj: object) -> None:
     """Return export schema.
 
-    Auto-generated reference for the ``export_schema`` callable defined in ``tools.docs.export_schemas``.
-    
     Parameters
     ----------
     module_name : str
@@ -173,22 +102,7 @@ def export_schema(module_name: str, name: str, obj: object) -> None:
         Description for ``name``.
     obj : object
         Description for ``obj``.
-    
-    Examples
-    --------
-    >>> from tools.docs.export_schemas import export_schema
-    >>> export_schema(..., ..., ...)  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    tools.docs.export_schemas
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-
     filename = f"{module_name}.{name}.json"
     path = OUT / filename
     if is_pydantic_model(obj):
@@ -206,25 +120,7 @@ def export_schema(module_name: str, name: str, obj: object) -> None:
 
 
 def main() -> None:
-    """Return main.
-
-    Auto-generated reference for the ``main`` callable defined in ``tools.docs.export_schemas``.
-    
-    Examples
-    --------
-    >>> from tools.docs.export_schemas import main
-    >>> main()  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    tools.docs.export_schemas
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
-    """
-    
-
+    """Return main."""
     exported = 0
     for module_name in iter_packages():
         try:

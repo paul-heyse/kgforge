@@ -5,13 +5,7 @@ src.kgfoundry_common.parquet_io
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
+   Parquet Io utilities.
 
    ..
        !! processed by numpydoc !!
@@ -25,44 +19,8 @@ Module Contents
 .. py:class:: ParquetVectorWriter(root)
 
    
-   Represent ParquetVectorWriter.
+   Describe ParquetVectorWriter.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: dense_schema()
-
-      Method description.
-
-   .. method:: __init__()
-
-      Method description.
-
-   .. method:: write_dense()
-
-      Method description.
-
-   .. method:: splade_schema()
-
-      Method description.
-
-   .. method:: write_splade()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from kgfoundry_common.parquet_io import ParquetVectorWriter
-   >>> result = ParquetVectorWriter()
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -92,19 +50,6 @@ Module Contents
       :type dim: int
 
       :returns: *pa.schema* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from kgfoundry_common.parquet_io import dense_schema
-      >>> result = dense_schema(...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -141,22 +86,9 @@ Module Contents
       :param records: Description for ``records``.
       :type records: Iterable[Tuple[str, List[float], float]]
       :param shard: Description for ``shard``.
-      :type shard: int, optional
+      :type shard: int | None
 
       :returns: *str* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from kgfoundry_common.parquet_io import write_dense
-      >>> result = write_dense(..., ..., ..., ..., ...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -184,19 +116,6 @@ Module Contents
       Return splade schema.
 
       :returns: *pa.schema* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from kgfoundry_common.parquet_io import splade_schema
-      >>> result = splade_schema()
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -228,22 +147,9 @@ Module Contents
       :param records: Description for ``records``.
       :type records: Iterable[Tuple[str, List[int], List[float]]]
       :param shard: Description for ``shard``.
-      :type shard: int, optional
+      :type shard: int | None
 
       :returns: *str* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from kgfoundry_common.parquet_io import write_splade
-      >>> result = write_splade(..., ..., ..., ...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -266,36 +172,8 @@ Module Contents
 .. py:class:: ParquetChunkWriter(root, model = 'docling_hybrid', run_id = 'dev')
 
    
-   Represent ParquetChunkWriter.
+   Describe ParquetChunkWriter.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: chunk_schema()
-
-      Method description.
-
-   .. method:: __init__()
-
-      Method description.
-
-   .. method:: write()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from kgfoundry_common.parquet_io import ParquetChunkWriter
-   >>> result = ParquetChunkWriter()
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -322,19 +200,6 @@ Module Contents
       Return chunk schema.
 
       :returns: *pa.schema* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from kgfoundry_common.parquet_io import chunk_schema
-      >>> result = chunk_schema()
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -366,19 +231,6 @@ Module Contents
       :type rows: Iterable[dict[str, Any]]
 
       :returns: *str* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from kgfoundry_common.parquet_io import write
-      >>> result = write(...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 

@@ -5,13 +5,7 @@ src.search_api.splade_index
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`search_api.splade_index`
+   Splade Index utilities.
 
    ..
        !! processed by numpydoc !!
@@ -34,19 +28,6 @@ Module Contents
 
    :returns: *List[str]* -- Description of return value.
 
-   .. rubric:: Examples
-
-   >>> from search_api.splade_index import tok
-   >>> result = tok(...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.splade_index`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -67,7 +48,7 @@ Module Contents
 .. py:class:: SpladeDoc
 
    
-   Represent SpladeDoc.
+   Describe SpladeDoc.
 
 
 
@@ -106,40 +87,8 @@ Module Contents
 .. py:class:: SpladeIndex(db_path, chunks_dataset_root = None, sparse_root = None)
 
    
-   Represent SpladeIndex.
+   Describe SpladeIndex.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: __init__()
-
-      Method description.
-
-   .. method:: _load()
-
-      Method description.
-
-   .. method:: search()
-
-      Method description.
-
-   .. method:: doc()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from search_api.splade_index import SpladeIndex
-   >>> result = SpladeIndex()
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.splade_index`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -184,17 +133,6 @@ Module Contents
       :param chunks_root: Description for ``chunks_root``.
       :type chunks_root: str | None
 
-      .. rubric:: Examples
-
-      >>> from search_api.splade_index import _load
-      >>> _load(...)  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`search_api.splade_index`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -221,22 +159,9 @@ Module Contents
       :param query: Description for ``query``.
       :type query: str
       :param k: Description for ``k``.
-      :type k: int, optional
+      :type k: int | None
 
       :returns: *List[Tuple[int, float]]* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from search_api.splade_index import search
-      >>> result = search(..., ...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`search_api.splade_index`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -264,20 +189,7 @@ Module Contents
       :param index: Description for ``index``.
       :type index: int
 
-      :returns: *SpladeDoc* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from search_api.splade_index import doc
-      >>> result = doc(...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`search_api.splade_index`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
+      :returns: *src.search_api.splade_index.SpladeDoc* -- Description of return value.
 
 
 

@@ -5,13 +5,7 @@ src.search_api.app
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`search_api.app`
+   App utilities.
 
    ..
        !! processed by numpydoc !!
@@ -28,20 +22,9 @@ Module Contents
    Return auth.
 
    :param authorization: Description for ``authorization``.
-   :type authorization: str | None, optional
+   :type authorization: str | None
 
    :raises HTTPException: Raised when validation fails.
-
-   .. rubric:: Examples
-
-   >>> from search_api.app import auth
-   >>> auth(...)  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`search_api.app`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -66,19 +49,6 @@ Module Contents
    Return healthz.
 
    :returns: *Mapping[str, Any]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from search_api.app import healthz
-   >>> result = healthz()
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.app`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -109,19 +79,6 @@ Module Contents
 
    :returns: *Mapping[str, float]* -- Description of return value.
 
-   .. rubric:: Examples
-
-   >>> from search_api.app import rrf_fuse
-   >>> result = rrf_fuse(..., ...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.app`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -149,24 +106,11 @@ Module Contents
    :param query: Description for ``query``.
    :type query: str
    :param direct: Description for ``direct``.
-   :type direct: float, optional
+   :type direct: float | None
    :param one_hop: Description for ``one_hop``.
-   :type one_hop: float, optional
+   :type one_hop: float | None
 
    :returns: *Mapping[str, float]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from search_api.app import apply_kg_boosts
-   >>> result = apply_kg_boosts(..., ..., ..., ...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.app`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -191,24 +135,11 @@ Module Contents
    Return search.
 
    :param req: Description for ``req``.
-   :type req: SearchRequest
+   :type req: src.search_api.schemas.SearchRequest
    :param _: Description for ``_``.
-   :type _: None, optional
+   :type _: None | None
 
    :returns: *Mapping[str, Any]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from search_api.app import search
-   >>> result = search(..., ...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.app`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -235,22 +166,9 @@ Module Contents
    :param body: Description for ``body``.
    :type body: Mapping[str, Any]
    :param _: Description for ``_``.
-   :type _: None, optional
+   :type _: None | None
 
    :returns: *Mapping[str, Any]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from search_api.app import graph_concepts
-   >>> result = graph_concepts(..., ...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.app`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 

@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-registry.duckdb_registry
-"""
-
+"""Duckdb Registry utilities."""
 
 from __future__ import annotations
 
@@ -40,53 +30,7 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DuckDBRegistry]
 class DuckDBRegistry:
-    """Represent DuckDBRegistry.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-    
-    Methods
-    -------
-    __init__()
-        Method description.
-    begin_dataset()
-        Method description.
-    commit_dataset()
-        Method description.
-    rollback_dataset()
-        Method description.
-    insert_run()
-        Method description.
-    close_run()
-        Method description.
-    register_documents()
-        Method description.
-    register_doctags()
-        Method description.
-    emit_event()
-        Method description.
-    incident()
-        Method description.
-    
-    Examples
-    --------
-    >>> from registry.duckdb_registry import DuckDBRegistry
-    >>> result = DuckDBRegistry()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    registry.duckdb_registry
-    
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
-    
-    
+    """Describe DuckDBRegistry."""
 
     def __init__(self, db_path: str) -> None:
         """Return init.
@@ -95,21 +39,7 @@ class DuckDBRegistry:
         ----------
         db_path : str
             Description for ``db_path``.
-        
-        Examples
-        --------
-        >>> from registry.duckdb_registry import __init__
-        >>> __init__(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.duckdb_registry
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.db_path = db_path
         self.con = duckdb.connect(db_path, read_only=False)
         self.con.execute("PRAGMA threads=14")
@@ -123,28 +53,12 @@ class DuckDBRegistry:
             Description for ``kind``.
         run_id : str
             Description for ``run_id``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
-        Examples
-        --------
-        >>> from registry.duckdb_registry import begin_dataset
-        >>> result = begin_dataset(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        registry.duckdb_registry
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         dataset_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -167,21 +81,7 @@ class DuckDBRegistry:
             Description for ``parquet_root``.
         rows : int
             Description for ``rows``.
-        
-        Examples
-        --------
-        >>> from registry.duckdb_registry import commit_dataset
-        >>> commit_dataset(..., ..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.duckdb_registry
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
         )
@@ -193,21 +93,7 @@ class DuckDBRegistry:
         ----------
         dataset_id : str
             Description for ``dataset_id``.
-        
-        Examples
-        --------
-        >>> from registry.duckdb_registry import rollback_dataset
-        >>> rollback_dataset(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.duckdb_registry
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
 
     def insert_run(
@@ -229,28 +115,12 @@ class DuckDBRegistry:
             Description for ``revision``.
         config : Mapping[str, object]
             Description for ``config``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
-        Examples
-        --------
-        >>> from registry.duckdb_registry import insert_run
-        >>> result = insert_run(..., ..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        registry.duckdb_registry
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         run_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -271,23 +141,9 @@ class DuckDBRegistry:
             Description for ``run_id``.
         success : bool
             Description for ``success``.
-        notes : str | None, optional
+        notes : str | None
             Description for ``notes``.
-        
-        Examples
-        --------
-        >>> from registry.duckdb_registry import close_run
-        >>> close_run(..., ..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.duckdb_registry
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         _ = success  # placeholder until success flag/notes are persisted
         _ = notes
         self.con.execute("UPDATE runs SET finished_at=now() WHERE run_id=?", [run_id])
@@ -299,22 +155,7 @@ class DuckDBRegistry:
         ----------
         docs : List[Doc]
             Description for ``docs``.
-        
-        Examples
-        --------
-        >>> from registry.duckdb_registry import register_documents
-        >>> register_documents(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.duckdb_registry
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         for doc in docs:
             self.con.execute(
                 (
@@ -347,22 +188,7 @@ class DuckDBRegistry:
         ----------
         assets : List[DoctagsAsset]
             Description for ``assets``.
-        
-        Examples
-        --------
-        >>> from registry.duckdb_registry import register_doctags
-        >>> register_doctags(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.duckdb_registry
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         for asset in assets:
             self.con.execute(
                 (
@@ -391,21 +217,7 @@ class DuckDBRegistry:
             Description for ``subject_id``.
         payload : Mapping[str, object]
             Description for ``payload``.
-        
-        Examples
-        --------
-        >>> from registry.duckdb_registry import emit_event
-        >>> emit_event(..., ..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.duckdb_registry
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.con.execute(
             (
                 "INSERT INTO pipeline_events("
@@ -428,21 +240,7 @@ class DuckDBRegistry:
             Description for ``error_class``.
         message : str
             Description for ``message``.
-        
-        Examples
-        --------
-        >>> from registry.duckdb_registry import incident
-        >>> incident(..., ..., ..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.duckdb_registry
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.con.execute(
             (
                 "INSERT INTO incidents("

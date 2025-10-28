@@ -5,13 +5,7 @@ src.kgfoundry_common.config
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`kgfoundry_common.config`
+   Config utilities.
 
    ..
        !! processed by numpydoc !!
@@ -31,19 +25,6 @@ Module Contents
    :type path: str
 
    :returns: *Mapping[str, Any]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from kgfoundry_common.config import load_config
-   >>> result = load_config(...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`kgfoundry_common.config`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 

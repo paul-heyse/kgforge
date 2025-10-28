@@ -6,13 +6,8 @@ src.kgfoundry
 .. autoapi-nested-parse::
 
    
-   Provide utilities for module.
+   Kgfoundry utilities.
 
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`kgfoundry`
 
 
 
@@ -54,19 +49,6 @@ Package Contents
 
    :returns: *object* -- Description of return value.
 
-   .. rubric:: Examples
-
-   >>> from kgfoundry import _load
-   >>> result = _load(...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`kgfoundry`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -96,19 +78,6 @@ Package Contents
 
    :raises AttributeError: Raised when validation fails.
 
-   .. rubric:: Examples
-
-   >>> from kgfoundry import __getattr__
-   >>> result = __getattr__(...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`kgfoundry`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -132,19 +101,6 @@ Package Contents
    Return dir.
 
    :returns: *List[str]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from kgfoundry import __dir__
-   >>> result = __dir__()
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`kgfoundry`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -170,17 +126,6 @@ Package Contents
 
    :param name: Description for ``name``.
    :type name: str
-
-   .. rubric:: Examples
-
-   >>> from kgfoundry import _ensure_namespace_alias
-   >>> _ensure_namespace_alias(...)  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`kgfoundry`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 

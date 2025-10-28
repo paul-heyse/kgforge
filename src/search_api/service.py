@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-search_api.service
-"""
-
+"""Service utilities."""
 
 from __future__ import annotations
 
@@ -70,31 +60,14 @@ def rrf_fuse(
         Description for ``dense``.
     sparse : List[Tuple[str, float]]
         Description for ``sparse``.
-    k : int, optional
+    k : int | None
         Description for ``k``.
-    
+
     Returns
     -------
     List[Tuple[str, float]]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.service import rrf_fuse
-    >>> result = rrf_fuse(..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.service
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     # NOTE: implement stable RRF across rankers when ranker outputs are wired
     return []
 
@@ -109,29 +82,12 @@ def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[st
         Description for ``fused``.
     query : str
         Description for ``query``.
-    
+
     Returns
     -------
     List[Tuple[str, float]]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.service import apply_kg_boosts
-    >>> result = apply_kg_boosts(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.service
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     # NOTE: apply boosts for direct & one-hop concept matches once KG signals exist
     return fused
 
@@ -146,30 +102,13 @@ def mmr_deduplicate(
     ----------
     results : List[Tuple[str, float]]
         Description for ``results``.
-    lambda_ : float, optional
+    lambda_ : float | None
         Description for ``lambda_``.
-    
+
     Returns
     -------
     List[Tuple[str, float]]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.service import mmr_deduplicate
-    >>> result = mmr_deduplicate(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.service
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     # NOTE: add doc-level diversity via MMR when result scoring is available
     return results

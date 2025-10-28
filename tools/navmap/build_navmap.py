@@ -1,17 +1,5 @@
 #!/usr/bin/env python
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``tools.navmap.build_navmap`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-tools.navmap.build_navmap
-"""
-
+"""Build Navmap utilities."""
 
 from __future__ import annotations
 
@@ -36,17 +24,6 @@ SECTION_RE = re.compile(r"^\s*#\s*\[nav:section\s+([a-z0-9]+(?:-[a-z0-9]+)*)\]")
 @dataclass(slots=True)
 class ModuleInfo:
     """Describe ModuleInfo."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     path: Path
     module: str
@@ -59,34 +36,16 @@ class ModuleInfo:
 def _extract_string(node: ast.AST) -> str | None:
     """Return extract string.
 
-    Auto-generated reference for the ``_extract_string`` callable defined in ``tools.navmap.build_navmap``.
-    
     Parameters
     ----------
     node : ast.AST
         Description for ``node``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.build_navmap import _extract_string
-    >>> result = _extract_string(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.build_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
         return node.value
     return None
@@ -95,34 +54,16 @@ def _extract_string(node: ast.AST) -> str | None:
 def _extract_strings(node: ast.AST) -> list[str]:
     """Return extract strings.
 
-    Auto-generated reference for the ``_extract_strings`` callable defined in ``tools.navmap.build_navmap``.
-    
     Parameters
     ----------
     node : ast.AST
         Description for ``node``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.build_navmap import _extract_strings
-    >>> result = _extract_strings(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.build_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     match node:
         case ast.List(elts=elts) | ast.Tuple(elts=elts):
             return [s for elt in elts if (s := _extract_string(elt)) is not None]
@@ -133,41 +74,23 @@ def _extract_strings(node: ast.AST) -> list[str]:
 def _literal_eval(node: ast.AST, names: Mapping[str, object]) -> object:
     """Return literal eval.
 
-    Auto-generated reference for the ``_literal_eval`` callable defined in ``tools.navmap.build_navmap``.
-    
     Parameters
     ----------
     node : ast.AST
         Description for ``node``.
     names : Mapping[str, object]
         Description for ``names``.
-    
+
     Returns
     -------
     object
         Description of return value.
-    
+
     Raises
     ------
     ValueError
         Raised when validation fails.
-    
-    Examples
-    --------
-    >>> from tools.navmap.build_navmap import _literal_eval
-    >>> result = _literal_eval(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.build_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     match node:
         case ast.Constant(value=value):
             return value
@@ -192,34 +115,16 @@ def _literal_eval(node: ast.AST, names: Mapping[str, object]) -> object:
 def _module_name(py: Path) -> str | None:
     """Return module name.
 
-    Auto-generated reference for the ``_module_name`` callable defined in ``tools.navmap.build_navmap``.
-    
     Parameters
     ----------
     py : Path
         Description for ``py``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.build_navmap import _module_name
-    >>> result = _module_name(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.build_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     try:
         rel = py.relative_to(SRC)
     except ValueError:
@@ -233,97 +138,43 @@ def _module_name(py: Path) -> str | None:
 def _rel(path: Path) -> str:
     """Return rel.
 
-    Auto-generated reference for the ``_rel`` callable defined in ``tools.navmap.build_navmap``.
-    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.build_navmap import _rel
-    >>> result = _rel(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.build_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     return path.relative_to(REPO).as_posix()
 
 
 def _git_sha() -> str:
     """Return git sha.
 
-    Auto-generated reference for the ``_git_sha`` callable defined in ``tools.navmap.build_navmap``.
-    
     Returns
     -------
     str
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.build_navmap import _git_sha
-    >>> result = _git_sha()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.build_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO).decode("utf-8").strip()
 
 
 def _parse_module(py: Path) -> ModuleInfo | None:  # noqa: C901, PLR0912
     """Return parse module.
 
-    Auto-generated reference for the ``_parse_module`` callable defined in ``tools.navmap.build_navmap``.
-    
     Parameters
     ----------
     py : Path
         Description for ``py``.
-    
+
     Returns
     -------
     ModuleInfo | None
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.build_navmap import _parse_module
-    >>> result = _parse_module(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.build_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     module = _module_name(py)
     if not module:
         return None
@@ -380,29 +231,11 @@ def _parse_module(py: Path) -> ModuleInfo | None:  # noqa: C901, PLR0912
 def _collect_modules() -> list[ModuleInfo]:
     """Return collect modules.
 
-    Auto-generated reference for the ``_collect_modules`` callable defined in ``tools.navmap.build_navmap``.
-    
     Returns
     -------
     List[ModuleInfo]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.build_navmap import _collect_modules
-    >>> result = _collect_modules()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.build_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     modules: list[ModuleInfo] = []
     for py in SRC.rglob("*.py"):
         info = _parse_module(py)
@@ -414,29 +247,11 @@ def _collect_modules() -> list[ModuleInfo]:
 def build_index() -> dict[str, Any]:
     """Return build index.
 
-    Auto-generated reference for the ``build_index`` callable defined in ``tools.navmap.build_navmap``.
-    
     Returns
     -------
     Mapping[str, Any]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.build_navmap import build_index
-    >>> result = build_index()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.build_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     sha = _git_sha()
     data: dict[str, Any] = {"commit": sha, "modules": {}}
 
@@ -462,24 +277,7 @@ def build_index() -> dict[str, Any]:
 
 
 def main() -> None:
-    """Return main.
-
-    Auto-generated reference for the ``main`` callable defined in ``tools.navmap.build_navmap``.
-    
-    Examples
-    --------
-    >>> from tools.navmap.build_navmap import main
-    >>> main()  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    tools.navmap.build_navmap
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
-    """
-    
+    """Return main."""
     index = build_index()
     OUT.mkdir(parents=True, exist_ok=True)
     out_path = OUT / "navmap.json"

@@ -5,13 +5,7 @@ src.search_api.schemas
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`search_api.schemas`
+   Schemas utilities.
 
    ..
        !! processed by numpydoc !!
@@ -28,7 +22,7 @@ Module Contents
 
 
    
-   Represent SearchRequest.
+   Describe SearchRequest.
 
 
 
@@ -78,7 +72,7 @@ Module Contents
 
 
    
-   Represent SearchResult.
+   Describe SearchResult.
 
 
 

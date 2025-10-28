@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-kgfoundry_common.navmap_types
-"""
-
+"""Navmap Types utilities."""
 
 from __future__ import annotations
 
@@ -17,21 +7,6 @@ from typing import Literal, NotRequired, TypedDict
 
 class NavSection(TypedDict):
     """Describe NavSection."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     id: str
     title: str
@@ -40,21 +15,6 @@ class NavSection(TypedDict):
 
 class SymbolMeta(TypedDict, total=False):
     """Describe SymbolMeta."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     since: str
     stability: Literal["frozen", "stable", "experimental", "internal"]
@@ -71,21 +31,6 @@ class SymbolMeta(TypedDict, total=False):
 
 class NavMap(TypedDict, total=False):
     """Describe NavMap."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     title: str
     synopsis: str

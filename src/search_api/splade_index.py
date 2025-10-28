@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-search_api.splade_index
-"""
-
+"""Splade Index utilities."""
 
 from __future__ import annotations
 
@@ -47,29 +37,12 @@ def tok(text: str) -> list[str]:
     ----------
     text : str
         Description for ``text``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.splade_index import tok
-    >>> result = tok(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.splade_index
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     return [token.lower() for token in TOKEN.findall(text or "")]
 
 
@@ -77,21 +50,6 @@ def tok(text: str) -> list[str]:
 @dataclass
 class SpladeDoc:
     """Describe SpladeDoc."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     chunk_id: str
     doc_id: str
@@ -101,41 +59,7 @@ class SpladeDoc:
 
 # [nav:anchor SpladeIndex]
 class SpladeIndex:
-    """Represent SpladeIndex.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-    
-    Methods
-    -------
-    __init__()
-        Method description.
-    _load()
-        Method description.
-    search()
-        Method description.
-    doc()
-        Method description.
-    
-    Examples
-    --------
-    >>> from search_api.splade_index import SpladeIndex
-    >>> result = SpladeIndex()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.splade_index
-    
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
-    
-    
+    """Describe SpladeIndex."""
 
     def __init__(
         self,
@@ -149,25 +73,11 @@ class SpladeIndex:
         ----------
         db_path : str
             Description for ``db_path``.
-        chunks_dataset_root : str | None, optional
+        chunks_dataset_root : str | None
             Description for ``chunks_dataset_root``.
-        sparse_root : str | None, optional
+        sparse_root : str | None
             Description for ``sparse_root``.
-        
-        Examples
-        --------
-        >>> from search_api.splade_index import __init__
-        >>> __init__(..., ..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        search_api.splade_index
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -182,21 +92,7 @@ class SpladeIndex:
         ----------
         chunks_root : str | None
             Description for ``chunks_root``.
-        
-        Examples
-        --------
-        >>> from search_api.splade_index import _load
-        >>> _load(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        search_api.splade_index
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         _ = chunks_root  # optional override currently unused
         if not Path(self.db_path).exists():
             return
@@ -234,31 +130,14 @@ class SpladeIndex:
         ----------
         query : str
             Description for ``query``.
-        k : int, optional
+        k : int | None
             Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[int, float]]
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_api.splade_index import search
-        >>> result = search(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_api.splade_index
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         if self.N == 0:
             return []
         terms = tok(query)
@@ -285,26 +164,10 @@ class SpladeIndex:
         ----------
         index : int
             Description for ``index``.
-        
+
         Returns
         -------
-        SpladeDoc
+        src.search_api.splade_index.SpladeDoc
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_api.splade_index import doc
-        >>> result = doc(...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_api.splade_index
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         return self.docs[index]

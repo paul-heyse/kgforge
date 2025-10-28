@@ -1,16 +1,4 @@
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``docs._scripts.build_symbol_index`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-docs._scripts.build_symbol_index
-"""
-
+"""Build Symbol Index utilities."""
 
 from __future__ import annotations
 
@@ -42,30 +30,11 @@ loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
 def iter_packages() -> list[str]:
     """Return iter packages.
 
-    Auto-generated reference for the ``iter_packages`` callable defined in ``docs._scripts.build_symbol_index``.
-    
     Returns
     -------
     List[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from docs._scripts.build_symbol_index import iter_packages
-    >>> result = iter_packages()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    docs._scripts.build_symbol_index
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     packages = detect_packages()
@@ -78,39 +47,20 @@ rows: list[dict[str, object | None]] = []
 def safe_attr(node: Object, attr: str, default: object | None = None) -> object | None:
     """Return safe attr.
 
-    Auto-generated reference for the ``safe_attr`` callable defined in ``docs._scripts.build_symbol_index``.
-    
     Parameters
     ----------
     node : Object
         Description for ``node``.
     attr : str
         Description for ``attr``.
-    default : object, optional
+    default : object | None
         Description for ``default``.
-    
+
     Returns
     -------
     object | None
         Description of return value.
-    
-    Examples
-    --------
-    >>> from docs._scripts.build_symbol_index import safe_attr
-    >>> result = safe_attr(..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    docs._scripts.build_symbol_index
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-
     try:
         return getattr(node, attr)
     except Exception:
@@ -120,28 +70,11 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
 def walk(node: Object) -> None:
     """Return walk.
 
-    Auto-generated reference for the ``walk`` callable defined in ``docs._scripts.build_symbol_index``.
-    
     Parameters
     ----------
     node : Object
         Description for ``node``.
-    
-    Examples
-    --------
-    >>> from docs._scripts.build_symbol_index import walk
-    >>> walk(...)  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    docs._scripts.build_symbol_index
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-
     doc = safe_attr(node, "docstring")
     file_rel = safe_attr(node, "relative_package_filepath")
     rows.append(

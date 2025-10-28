@@ -5,13 +5,7 @@ src.orchestration.fixture_flow
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`orchestration.fixture_flow`
+   Fixture Flow utilities.
 
    ..
        !! processed by numpydoc !!
@@ -31,19 +25,6 @@ Module Contents
    :type root: str
 
    :returns: *Mapping[str, bool]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from orchestration.fixture_flow import t_prepare_dirs
-   >>> result = t_prepare_dirs(...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`orchestration.fixture_flow`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -72,19 +53,6 @@ Module Contents
 
    :returns: *Tuple[str, int]* -- Description of return value.
 
-   .. rubric:: Examples
-
-   >>> from orchestration.fixture_flow import t_write_fixture_chunks
-   >>> result = t_write_fixture_chunks(...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`orchestration.fixture_flow`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -112,19 +80,6 @@ Module Contents
 
    :returns: *Tuple[str, int]* -- Description of return value.
 
-   .. rubric:: Examples
-
-   >>> from orchestration.fixture_flow import t_write_fixture_dense
-   >>> result = t_write_fixture_dense(...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`orchestration.fixture_flow`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -151,19 +106,6 @@ Module Contents
    :type sparse_root: str
 
    :returns: *Tuple[str, int]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from orchestration.fixture_flow import t_write_fixture_splade
-   >>> result = t_write_fixture_splade(...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`orchestration.fixture_flow`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -198,19 +140,6 @@ Module Contents
 
    :returns: *Mapping[str, List[str]]* -- Description of return value.
 
-   .. rubric:: Examples
-
-   >>> from orchestration.fixture_flow import t_register_in_duckdb
-   >>> result = t_register_in_duckdb(..., ..., ..., ...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`orchestration.fixture_flow`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -234,24 +163,11 @@ Module Contents
    Return fixture pipeline.
 
    :param root: Description for ``root``.
-   :type root: str, optional
+   :type root: str | None
    :param db_path: Description for ``db_path``.
-   :type db_path: str, optional
+   :type db_path: str | None
 
    :returns: *Mapping[str, List[str]]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from orchestration.fixture_flow import fixture_pipeline
-   >>> result = fixture_pipeline(..., ...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`orchestration.fixture_flow`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 

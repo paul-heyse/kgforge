@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-registry.migrate
-"""
-
+"""Migrate utilities."""
 
 from __future__ import annotations
 
@@ -46,21 +36,7 @@ def apply(db: str, migrations_dir: str) -> None:
         Description for ``db``.
     migrations_dir : str
         Description for ``migrations_dir``.
-    
-    Examples
-    --------
-    >>> from registry.migrate import apply
-    >>> apply(..., ...)  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    registry.migrate
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
         con.execute(p.read_text())
@@ -69,22 +45,7 @@ def apply(db: str, migrations_dir: str) -> None:
 
 # [nav:anchor main]
 def main() -> None:
-    """Return main.
-
-    Examples
-    --------
-    >>> from registry.migrate import main
-    >>> main()  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    registry.migrate
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
-    """
-    
+    """Return main."""
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
     a = sp.add_parser("apply")

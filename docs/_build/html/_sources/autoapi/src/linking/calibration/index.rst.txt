@@ -5,13 +5,7 @@ src.linking.calibration
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`linking.calibration`
+   Calibration utilities.
 
    ..
        !! processed by numpydoc !!
@@ -31,19 +25,6 @@ Module Contents
    :type pairs: List[Tuple[float, int]]
 
    :returns: *Mapping[str, object]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from linking.calibration import isotonic_calibrate
-   >>> result = isotonic_calibrate(...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`linking.calibration`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 

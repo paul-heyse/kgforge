@@ -6,15 +6,8 @@ src.download
 .. autoapi-nested-parse::
 
    
-   Provide utilities for module.
+   Download utilities.
 
-   Auto-generated API documentation for the ``src.download`` module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`src.download`
 
 
 

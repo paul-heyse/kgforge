@@ -5,15 +5,7 @@ src.download.cli
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   Auto-generated API documentation for the ``src.download.cli`` module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`src.download.cli`
+   Cli utilities.
 
    ..
        !! processed by numpydoc !!
@@ -32,20 +24,9 @@ Module Contents
    :param topic: Description for ``topic``.
    :type topic: str
    :param years: Description for ``years``.
-   :type years: str, optional
+   :type years: str | None
    :param max_works: Description for ``max_works``.
-   :type max_works: int, optional
-
-   .. rubric:: Examples
-
-   >>> from download.cli import harvest
-   >>> harvest(..., ..., ...)  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`download.cli`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
+   :type max_works: int | None
 
 
 

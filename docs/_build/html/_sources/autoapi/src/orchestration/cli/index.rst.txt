@@ -5,13 +5,7 @@ src.orchestration.cli
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`orchestration.cli`
+   Cli utilities.
 
    ..
        !! processed by numpydoc !!
@@ -28,22 +22,11 @@ Module Contents
    Return index bm25.
 
    :param chunks_parquet: Description for ``chunks_parquet``.
-   :type chunks_parquet: str, optional
+   :type chunks_parquet: str | None
    :param backend: Description for ``backend``.
-   :type backend: str, optional
+   :type backend: str | None
    :param index_dir: Description for ``index_dir``.
-   :type index_dir: str, optional
-
-   .. rubric:: Examples
-
-   >>> from orchestration.cli import index_bm25
-   >>> index_bm25(..., ..., ...)  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`orchestration.cli`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
+   :type index_dir: str | None
 
 
 
@@ -68,20 +51,9 @@ Module Contents
    Return index faiss.
 
    :param dense_vectors: Description for ``dense_vectors``.
-   :type dense_vectors: str, optional
+   :type dense_vectors: str | None
    :param index_path: Description for ``index_path``.
-   :type index_path: str, optional
-
-   .. rubric:: Examples
-
-   >>> from orchestration.cli import index_faiss
-   >>> index_faiss(..., ...)  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`orchestration.cli`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
+   :type index_path: str | None
 
 
 
@@ -106,18 +78,7 @@ Module Contents
    Return api.
 
    :param port: Description for ``port``.
-   :type port: int, optional
-
-   .. rubric:: Examples
-
-   >>> from orchestration.cli import api
-   >>> api(...)  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`orchestration.cli`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
+   :type port: int | None
 
 
 
@@ -142,17 +103,6 @@ Module Contents
    Return e2e.
 
    :raises typer.Exit: Raised when validation fails.
-
-   .. rubric:: Examples
-
-   >>> from orchestration.cli import e2e
-   >>> e2e()  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`orchestration.cli`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 

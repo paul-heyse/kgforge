@@ -5,13 +5,7 @@ src.kgfoundry_common.ids
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`kgfoundry_common.ids`
+   Ids utilities.
 
    ..
        !! processed by numpydoc !!
@@ -31,19 +25,6 @@ Module Contents
    :type text: str
 
    :returns: *str* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from kgfoundry_common.ids import urn_doc_from_text
-   >>> result = urn_doc_from_text(...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`kgfoundry_common.ids`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -75,19 +56,6 @@ Module Contents
    :type end: int
 
    :returns: *str* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from kgfoundry_common.ids import urn_chunk
-   >>> result = urn_chunk(..., ..., ...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`kgfoundry_common.ids`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 

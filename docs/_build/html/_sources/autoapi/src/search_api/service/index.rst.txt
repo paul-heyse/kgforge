@@ -5,13 +5,7 @@ src.search_api.service
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`search_api.service`
+   Service utilities.
 
    ..
        !! processed by numpydoc !!
@@ -32,22 +26,9 @@ Module Contents
    :param sparse: Description for ``sparse``.
    :type sparse: List[Tuple[str, float]]
    :param k: Description for ``k``.
-   :type k: int, optional
+   :type k: int | None
 
    :returns: *List[Tuple[str, float]]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from search_api.service import rrf_fuse
-   >>> result = rrf_fuse(..., ..., ...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.service`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -78,19 +59,6 @@ Module Contents
 
    :returns: *List[Tuple[str, float]]* -- Description of return value.
 
-   .. rubric:: Examples
-
-   >>> from search_api.service import apply_kg_boosts
-   >>> result = apply_kg_boosts(..., ...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.service`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -116,22 +84,9 @@ Module Contents
    :param results: Description for ``results``.
    :type results: List[Tuple[str, float]]
    :param lambda_: Description for ``lambda_``.
-   :type lambda_: float, optional
+   :type lambda_: float | None
 
    :returns: *List[Tuple[str, float]]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from search_api.service import mmr_deduplicate
-   >>> result = mmr_deduplicate(..., ...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.service`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 

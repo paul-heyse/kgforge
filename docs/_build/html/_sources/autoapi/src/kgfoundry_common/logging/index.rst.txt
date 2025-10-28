@@ -5,13 +5,7 @@ src.kgfoundry_common.logging
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`kgfoundry_common.logging`
+   Logging utilities.
 
    ..
        !! processed by numpydoc !!
@@ -30,28 +24,8 @@ Module Contents
 
 
    
-   Represent JsonFormatter.
+   Describe JsonFormatter.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: format()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from kgfoundry_common.logging import JsonFormatter
-   >>> result = JsonFormatter()
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`kgfoundry_common.logging`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -80,19 +54,6 @@ Module Contents
 
       :returns: *str* -- Description of return value.
 
-      .. rubric:: Examples
-
-      >>> from kgfoundry_common.logging import format
-      >>> result = format(...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`kgfoundry_common.logging`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -117,18 +78,7 @@ Module Contents
    Return setup logging.
 
    :param level: Description for ``level``.
-   :type level: int, optional
-
-   .. rubric:: Examples
-
-   >>> from kgfoundry_common.logging import setup_logging
-   >>> setup_logging(...)  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`kgfoundry_common.logging`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
+   :type level: int | None
 
 
 

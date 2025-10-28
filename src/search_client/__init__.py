@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-search_client
-"""
-
+"""Search Client utilities."""
 
 from kgfoundry_common.navmap_types import NavMap
 from search_client.client import KGFoundryClient as _KGFoundryClient

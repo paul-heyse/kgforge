@@ -5,13 +5,7 @@ src.linking.linker
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`linking.linker`
+   Linker utilities.
 
    ..
        !! processed by numpydoc !!
@@ -25,7 +19,7 @@ Module Contents
 .. py:class:: Linker
 
    
-   Represent Linker.
+   Describe Linker.
 
 
 

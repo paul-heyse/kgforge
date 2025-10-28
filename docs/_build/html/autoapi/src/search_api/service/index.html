@@ -475,25 +475,19 @@
                   
   <section id="module-src.search_api.service">
 <span id="src-search-api-service"></span><h1>src.search_api.service<a class="headerlink" href="#module-src.search_api.service" title="Link to this heading">#</a></h1>
-<p>Provide utilities for module.</p>
-<p class="rubric">Notes</p>
-<p>This module exposes the primary interfaces for the package.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_api.service</span></code></p>
-</div>
+<p>Service utilities.</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.search_api.service.rrf_fuse">
-<span class="sig-prename descclassname"><span class="pre">src.search_api.service.</span></span><span class="sig-name descname"><span class="pre">rrf_fuse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/service.html#rrf_fuse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/service.py:62:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.service.rrf_fuse" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.search_api.service.</span></span><span class="sig-name descname"><span class="pre">rrf_fuse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dense</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/service.html#rrf_fuse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/service.py:52:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.service.rrf_fuse" title="Link to this definition">#</a></dt>
 <dd><p>Return rrf fuse.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dense</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>]</em>) – Description for <code class="docutils literal notranslate"><span class="pre">dense</span></code>.</p></li>
 <li><p><strong>sparse</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>]</em>) – Description for <code class="docutils literal notranslate"><span class="pre">sparse</span></code>.</p></li>
-<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Description for <code class="docutils literal notranslate"><span class="pre">k</span></code>.</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Description for <code class="docutils literal notranslate"><span class="pre">k</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -503,24 +497,11 @@
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">search_api.service</span><span class="w"> </span><span class="kn">import</span> <span class="n">rrf_fuse</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">rrf_fuse</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_api.service</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.search_api.service.apply_kg_boosts">
-<span class="sig-prename descclassname"><span class="pre">src.search_api.service.</span></span><span class="sig-name descname"><span class="pre">apply_kg_boosts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fused</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/service.html#apply_kg_boosts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/service.py:103:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.service.apply_kg_boosts" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.search_api.service.</span></span><span class="sig-name descname"><span class="pre">apply_kg_boosts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fused</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/service.html#apply_kg_boosts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/service.py:76:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.service.apply_kg_boosts" title="Link to this definition">#</a></dt>
 <dd><p>Return apply kg boosts.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -536,30 +517,17 @@
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">search_api.service</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_kg_boosts</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">apply_kg_boosts</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_api.service</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.search_api.service.mmr_deduplicate">
-<span class="sig-prename descclassname"><span class="pre">src.search_api.service.</span></span><span class="sig-name descname"><span class="pre">mmr_deduplicate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/service.html#mmr_deduplicate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/service.py:140:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.service.mmr_deduplicate" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.search_api.service.</span></span><span class="sig-name descname"><span class="pre">mmr_deduplicate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/search_api/service.html#mmr_deduplicate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/search_api/service.py:96:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.search_api.service.mmr_deduplicate" title="Link to this definition">#</a></dt>
 <dd><p>Return mmr deduplicate.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>results</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>]</em>) – Description for <code class="docutils literal notranslate"><span class="pre">results</span></code>.</p></li>
-<li><p><strong>lambda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Description for <code class="docutils literal notranslate"><span class="pre">lambda_</span></code>.</p></li>
+<li><p><strong>lambda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>) – Description for <code class="docutils literal notranslate"><span class="pre">lambda_</span></code>.</p></li>
 <li><p><strong>lambda_</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
 </ul>
 </dd>
@@ -570,19 +538,6 @@
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">search_api.service</span><span class="w"> </span><span class="kn">import</span> <span class="n">mmr_deduplicate</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">mmr_deduplicate</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_api.service</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 </section>

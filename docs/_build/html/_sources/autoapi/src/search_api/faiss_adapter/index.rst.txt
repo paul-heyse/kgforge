@@ -5,13 +5,7 @@ src.search_api.faiss_adapter
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`search_api.faiss_adapter`
+   Faiss Adapter utilities.
 
    ..
        !! processed by numpydoc !!
@@ -25,7 +19,7 @@ Module Contents
 .. py:class:: DenseVecs
 
    
-   Represent DenseVecs.
+   Describe DenseVecs.
 
 
 
@@ -56,44 +50,8 @@ Module Contents
 .. py:class:: FaissAdapter(db_path, factory = 'OPQ64,IVF8192,PQ64', metric = 'ip')
 
    
-   Represent FaissAdapter.
+   Describe FaissAdapter.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: __init__()
-
-      Method description.
-
-   .. method:: _load_dense_parquet()
-
-      Method description.
-
-   .. method:: build()
-
-      Method description.
-
-   .. method:: load_or_build()
-
-      Method description.
-
-   .. method:: search()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from search_api.faiss_adapter import FaissAdapter
-   >>> result = FaissAdapter()
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.faiss_adapter`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -152,19 +110,6 @@ Module Contents
 
       :raises RuntimeError: Raised when validation fails.
 
-      .. rubric:: Examples
-
-      >>> from search_api.faiss_adapter import _load_dense_parquet
-      >>> result = _load_dense_parquet()
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`search_api.faiss_adapter`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -188,16 +133,6 @@ Module Contents
       
       Return build.
 
-      .. rubric:: Examples
-
-      >>> from search_api.faiss_adapter import build
-      >>> build()  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`search_api.faiss_adapter`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -223,18 +158,7 @@ Module Contents
       Return load or build.
 
       :param cpu_index_path: Description for ``cpu_index_path``.
-      :type cpu_index_path: str | None, optional
-
-      .. rubric:: Examples
-
-      >>> from search_api.faiss_adapter import load_or_build
-      >>> load_or_build(...)  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`search_api.faiss_adapter`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
+      :type cpu_index_path: str | None
 
 
 
@@ -260,26 +184,13 @@ Module Contents
       Return search.
 
       :param qvec: Description for ``qvec``.
-      :type qvec: VecArray
+      :type qvec: src.search_api.faiss_adapter.VecArray
       :param k: Description for ``k``.
-      :type k: int, optional
+      :type k: int | None
 
       :returns: *List[Tuple[str, float]]* -- Description of return value.
 
       :raises RuntimeError: Raised when validation fails.
-
-      .. rubric:: Examples
-
-      >>> from search_api.faiss_adapter import search
-      >>> result = search(..., ...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`search_api.faiss_adapter`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 

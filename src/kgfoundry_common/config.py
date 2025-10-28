@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-kgfoundry_common.config
-"""
-
+"""Config utilities."""
 
 from __future__ import annotations
 
@@ -42,28 +32,11 @@ def load_config(path: str) -> dict[str, Any]:
     ----------
     path : str
         Description for ``path``.
-    
+
     Returns
     -------
     Mapping[str, Any]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from kgfoundry_common.config import load_config
-    >>> result = load_config(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    kgfoundry_common.config
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f)

@@ -1,16 +1,4 @@
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``src.download.cli`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-src.download.cli
-"""
-
+"""Cli utilities."""
 
 from __future__ import annotations
 
@@ -47,23 +35,10 @@ def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
     ----------
     topic : str
         Description for ``topic``.
-    years : str, optional
+    years : str | None
         Description for ``years``.
-    max_works : int, optional
+    max_works : int | None
         Description for ``max_works``.
-
-    Examples
-    --------
-    >>> from download.cli import harvest
-    >>> harvest(..., ..., ...)  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    download.cli
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
     typer.echo(f"[dry-run] would harvest topic={topic!r}, years={years}, max_works={max_works}")
 

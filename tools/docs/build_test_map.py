@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-tools.docs.build_test_map
-"""
-
+"""Build Test Map utilities."""
 
 from __future__ import annotations
 
@@ -45,24 +35,7 @@ def load_symbol_candidates() -> set[str]:
     -------
     Set[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.docs.build_test_map import load_symbol_candidates
-    >>> result = load_symbol_candidates()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.docs.build_test_map
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-
     candidates: set[str] = set()
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if symbols_json.exists():
@@ -92,29 +65,12 @@ def _names_from_ast(tree: ast.AST) -> set[str]:
     ----------
     tree : ast.AST
         Description for ``tree``.
-    
+
     Returns
     -------
     Set[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.docs.build_test_map import _names_from_ast
-    >>> result = _names_from_ast(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.docs.build_test_map
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-
     names: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -138,37 +94,18 @@ def _names_from_ast(tree: ast.AST) -> set[str]:
 def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     """Return scan test file.
 
-    Auto-generated reference for the ``scan_test_file`` callable defined in ``tools.docs.build_test_map``.
-    
     Parameters
     ----------
     path : Path
         Description for ``path``.
     symbols : Set[str]
         Description for ``symbols``.
-    
+
     Returns
     -------
     Mapping[str, List[Mapping[str, object]]]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.docs.build_test_map import scan_test_file
-    >>> result = scan_test_file(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.docs.build_test_map
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -210,35 +147,16 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
 def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     """Return build test map.
 
-    Auto-generated reference for the ``build_test_map`` callable defined in ``tools.docs.build_test_map``.
-    
     Parameters
     ----------
     symbols : Set[str]
         Description for ``symbols``.
-    
+
     Returns
     -------
     Mapping[str, List[Mapping[str, object]]]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.docs.build_test_map import build_test_map
-    >>> result = build_test_map(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.docs.build_test_map
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-
     table: dict[str, list[dict[str, object]]] = defaultdict(list)
     if not TESTS.exists():
         return {}
@@ -251,22 +169,7 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
 
 
 def main() -> None:
-    """Return main.
-
-    Examples
-    --------
-    >>> from tools.docs.build_test_map import main
-    >>> main()  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    tools.docs.build_test_map
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
-    """
-    
+    """Return main."""
     symbols = load_symbol_candidates()
     OUTFILE.parent.mkdir(parents=True, exist_ok=True)
     OUTFILE.write_text(json.dumps(build_test_map(symbols), indent=2) + "\n", encoding="utf-8")

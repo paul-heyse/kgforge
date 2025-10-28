@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-search_api.kg_mock
-"""
-
+"""Kg Mock utilities."""
 
 from __future__ import annotations
 
@@ -34,21 +24,6 @@ __navmap__: Final[NavMap] = {
 
 class ConceptMeta(TypedDict):
     """Describe ConceptMeta."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     label: str
     keywords: list[str]
@@ -74,29 +49,12 @@ def detect_query_concepts(query: str) -> set[str]:
     ----------
     query : str
         Description for ``query``.
-    
+
     Returns
     -------
     Set[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.kg_mock import detect_query_concepts
-    >>> result = detect_query_concepts(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.kg_mock
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     lowered = query.lower()
     hits: set[str] = set()
     for concept_id, meta in CONCEPTS.items():
@@ -113,29 +71,12 @@ def linked_concepts_for_text(text: str) -> list[str]:
     ----------
     text : str
         Description for ``text``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.kg_mock import linked_concepts_for_text
-    >>> result = linked_concepts_for_text(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.kg_mock
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     lowered = text.lower()
     hits = []
     for concept_id, meta in CONCEPTS.items():
@@ -159,32 +100,15 @@ def kg_boost(
         Description for ``query_concepts``.
     chunk_concepts : List[str]
         Description for ``chunk_concepts``.
-    direct : float, optional
+    direct : float | None
         Description for ``direct``.
-    one_hop : float, optional
+    one_hop : float | None
         Description for ``one_hop``.
-    
+
     Returns
     -------
     float
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.kg_mock import kg_boost
-    >>> result = kg_boost(..., ..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.kg_mock
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-search_client.client
-"""
-
+"""Client utilities."""
 
 from __future__ import annotations
 
@@ -35,55 +25,10 @@ __navmap__: Final[NavMap] = {
 
 
 class _SupportsResponse(Protocol):
-    """Represent SupportsResponse.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-    
-    Methods
-    -------
-    raise_for_status()
-        Method description.
-    json()
-        Method description.
-    
-    Examples
-    --------
-    >>> from search_client.client import _SupportsResponse
-    >>> result = _SupportsResponse()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_client.client
-    
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
-    
-    
+    """Describe SupportsResponse."""
 
     def raise_for_status(self) -> None:
-        """Return raise for status.
-
-        Examples
-        --------
-        >>> from search_client.client import raise_for_status
-        >>> raise_for_status()  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        search_client.client
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
-        """
-        
+        """Return raise for status."""
 
     def json(self) -> dict[str, Any]:
         """Return json.
@@ -92,58 +37,11 @@ class _SupportsResponse(Protocol):
         -------
         Mapping[str, Any]
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_client.client import json
-        >>> result = json()
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_client.client
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
 
 
 class _SupportsHttp(Protocol):
-    """Represent SupportsHttp.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-    
-    Methods
-    -------
-    get()
-        Method description.
-    post()
-        Method description.
-    
-    Examples
-    --------
-    >>> from search_client.client import _SupportsHttp
-    >>> result = _SupportsHttp()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_client.client
-    
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
-    
-    
+    """Describe SupportsHttp."""
 
     def get(self, url: str, *, timeout: float) -> _SupportsResponse:
         """Return get.
@@ -154,28 +52,12 @@ class _SupportsHttp(Protocol):
             Description for ``url``.
         timeout : float
             Description for ``timeout``.
-        
+
         Returns
         -------
-        _SupportsResponse
+        src.search_client.client._SupportsResponse
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_client.client import get
-        >>> result = get(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_client.client
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
 
     def post(
         self,
@@ -197,70 +79,17 @@ class _SupportsHttp(Protocol):
             Description for ``headers``.
         timeout : float
             Description for ``timeout``.
-        
+
         Returns
         -------
-        _SupportsResponse
+        src.search_client.client._SupportsResponse
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_client.client import post
-        >>> result = post(..., ..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_client.client
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
 
 
 # [nav:anchor KGFoundryClient]
 class KGFoundryClient:
-    """Represent KGFoundryClient.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-    
-    Methods
-    -------
-    __init__()
-        Method description.
-    _headers()
-        Method description.
-    healthz()
-        Method description.
-    search()
-        Method description.
-    concepts()
-        Method description.
-    
-    Examples
-    --------
-    >>> from search_client.client import KGFoundryClient
-    >>> result = KGFoundryClient()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_client.client
-    
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
-    
-    
+    """Describe KGFoundryClient."""
 
     def __init__(
         self,
@@ -273,29 +102,15 @@ class KGFoundryClient:
 
         Parameters
         ----------
-        base_url : str, optional
+        base_url : str | None
             Description for ``base_url``.
-        api_key : str | None, optional
+        api_key : str | None
             Description for ``api_key``.
-        timeout : float, optional
+        timeout : float | None
             Description for ``timeout``.
-        http : _SupportsHttp | None, optional
+        http : _SupportsHttp | None
             Description for ``http``.
-        
-        Examples
-        --------
-        >>> from search_client.client import __init__
-        >>> __init__(..., ..., ..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        search_client.client
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
@@ -308,24 +123,7 @@ class KGFoundryClient:
         -------
         Mapping[str, str]
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_client.client import _headers
-        >>> result = _headers()
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_client.client
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         h = {"Content-Type": "application/json"}
         if self.api_key:
             h["Authorization"] = f"Bearer {self.api_key}"
@@ -338,24 +136,7 @@ class KGFoundryClient:
         -------
         Mapping[str, Any]
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_client.client import healthz
-        >>> result = healthz()
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_client.client
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
         return r.json()
@@ -373,35 +154,18 @@ class KGFoundryClient:
         ----------
         query : str
             Description for ``query``.
-        k : int, optional
+        k : int | None
             Description for ``k``.
-        filters : Mapping[str, Any] | None, optional
+        filters : Mapping[str, Any] | None
             Description for ``filters``.
-        explain : bool, optional
+        explain : bool | None
             Description for ``explain``.
-        
+
         Returns
         -------
         Mapping[str, Any]
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_client.client import search
-        >>> result = search(..., ..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_client.client
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
             f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout
@@ -416,31 +180,14 @@ class KGFoundryClient:
         ----------
         q : str
             Description for ``q``.
-        limit : int, optional
+        limit : int | None
             Description for ``limit``.
-        
+
         Returns
         -------
         Mapping[str, Any]
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_client.client import concepts
-        >>> result = concepts(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_client.client
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         r = self._http.post(
             f"{self.base_url}/graph/concepts",
             json={"q": q, "limit": limit},

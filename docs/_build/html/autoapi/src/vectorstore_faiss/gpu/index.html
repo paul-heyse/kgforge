@@ -475,19 +475,13 @@
                   
   <section id="module-src.vectorstore_faiss.gpu">
 <span id="src-vectorstore-faiss-gpu"></span><h1>src.vectorstore_faiss.gpu<a class="headerlink" href="#module-src.vectorstore_faiss.gpu" title="Link to this heading">#</a></h1>
-<p>Provide utilities for module.</p>
-<p class="rubric">Notes</p>
-<p>This module exposes the primary interfaces for the package.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vectorstore_faiss.gpu</span></code></p>
-</div>
+<p>Gpu utilities.</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.vectorstore_faiss.gpu.</span></span><span class="sig-name descname"><span class="pre">FaissGpuIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'OPQ64,IVF8192,PQ64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nprobe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuvs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:44:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex" title="Link to this definition">#</a></dt>
-<dd><p>Represent FaissGpuIndex.</p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.vectorstore_faiss.gpu.</span></span><span class="sig-name descname"><span class="pre">FaissGpuIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'OPQ64,IVF8192,PQ64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nprobe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuvs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:34:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex" title="Link to this definition">#</a></dt>
+<dd><p>Describe FaissGpuIndex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -499,34 +493,54 @@
 </dd>
 </dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.None">
-<span class="sig-name descname"><span class="pre">None</span></span><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.None" title="Link to this definition">#</a></dt>
-<dd><p>No public attributes documented.</p>
-</dd></dl>
+<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.factory">
+<span class="sig-name descname"><span class="pre">factory</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'OPQ64,IVF8192,PQ64'</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.factory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:57:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.factory" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:87:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.__init__" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>factory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>nprobe</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>gpu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>cuvs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.nprobe">
+<span class="sig-name descname"><span class="pre">nprobe</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">64</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.nprobe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:58:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.nprobe" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.gpu">
+<span class="sig-name descname"><span class="pre">gpu</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.gpu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:59:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.gpu" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.cuvs">
+<span class="sig-name descname"><span class="pre">cuvs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.cuvs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:60:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.cuvs" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex._faiss">
+<span class="sig-name descname"><span class="pre">_faiss</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex._faiss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:69:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._faiss" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex._res">
+<span class="sig-name descname"><span class="pre">_res</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex._res"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:62:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._res" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex._index">
+<span class="sig-name descname"><span class="pre">_index</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex._index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:63:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._index" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex._idmap">
+<span class="sig-name descname"><span class="pre">_idmap</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">StrArray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex._idmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:64:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._idmap" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex._xb">
+<span class="sig-name descname"><span class="pre">_xb</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">FloatArray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex._xb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:65:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._xb" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex._ensure_resources">
-<span class="sig-name descname"><span class="pre">_ensure_resources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex._ensure_resources"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:137:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._ensure_resources" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
+<span class="sig-name descname"><span class="pre">_ensure_resources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex._ensure_resources"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:73:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._ensure_resources" title="Link to this definition">#</a></dt>
+<dd><p>Return ensure resources.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
@@ -536,13 +550,13 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.train">
-<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:160:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.train" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_vectors</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:81:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.train" title="Link to this definition">#</a></dt>
+<dd><p>Return train.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>train_vectors</strong> (<em>FloatArray</em>)</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>train_vectors</strong> (<em>src.vectorstore_faiss.gpu.FloatArray</em>) – Description for <code class="docutils literal notranslate"><span class="pre">train_vectors</span></code>.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Description for <code class="docutils literal notranslate"><span class="pre">seed</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -553,189 +567,13 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.add">
-<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:209:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.add" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>)</p></li>
-<li><p><strong>vectors</strong> (<em>FloatArray</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.search">
-<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:262:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.search" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>query</strong> (<em>FloatArray</em>)</p></li>
-<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.save">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:316:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.save" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>index_uri</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>idmap_uri</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.load">
-<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:356:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.load" title="Link to this definition">#</a></dt>
-<dd><p>Method description.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>index_uri</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>idmap_uri</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">vectorstore_faiss.gpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">FaissGpuIndex</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">FaissGpuIndex</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vectorstore_faiss.gpu</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Document class invariants and lifecycle details here.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.factory">
-<span class="sig-name descname"><span class="pre">factory</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'OPQ64,IVF8192,PQ64'</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.factory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:121:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.factory" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.nprobe">
-<span class="sig-name descname"><span class="pre">nprobe</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">64</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.nprobe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:122:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.nprobe" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.gpu">
-<span class="sig-name descname"><span class="pre">gpu</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.gpu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:123:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.gpu" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.cuvs">
-<span class="sig-name descname"><span class="pre">cuvs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.cuvs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:124:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.cuvs" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex._faiss">
-<span class="sig-name descname"><span class="pre">_faiss</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.None" title="src.vectorstore_faiss.gpu.FaissGpuIndex.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex._faiss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:133:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._faiss" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex._res">
-<span class="sig-name descname"><span class="pre">_res</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.None" title="src.vectorstore_faiss.gpu.FaissGpuIndex.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex._res"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:126:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._res" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex._index">
-<span class="sig-name descname"><span class="pre">_index</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.None" title="src.vectorstore_faiss.gpu.FaissGpuIndex.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex._index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:127:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._index" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex._idmap">
-<span class="sig-name descname"><span class="pre">_idmap</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">StrArray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.None" title="src.vectorstore_faiss.gpu.FaissGpuIndex.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex._idmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:128:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._idmap" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex._xb">
-<span class="sig-name descname"><span class="pre">_xb</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">FloatArray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.None" title="src.vectorstore_faiss.gpu.FaissGpuIndex.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex._xb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:129:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._xb" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">_ensure_resources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex._ensure_resources"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:137:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
-<dd><p>Return ensure resources.</p>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">vectorstore_faiss.gpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ensure_resources</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">_ensure_resources</span><span class="p">()</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vectorstore_faiss.gpu</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_vectors</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:160:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Link to this definition">#</a></dt>
-<dd><p>Return train.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>train_vectors</strong> (<em>FloatArray</em>) – Description for <code class="docutils literal notranslate"><span class="pre">train_vectors</span></code>.</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Description for <code class="docutils literal notranslate"><span class="pre">seed</span></code>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">vectorstore_faiss.gpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">train</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vectorstore_faiss.gpu</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:209:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:116:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.add" title="Link to this definition">#</a></dt>
 <dd><p>Return add.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>keys</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – Description for <code class="docutils literal notranslate"><span class="pre">keys</span></code>.</p></li>
-<li><p><strong>vectors</strong> (<em>FloatArray</em>) – Description for <code class="docutils literal notranslate"><span class="pre">vectors</span></code>.</p></li>
+<li><p><strong>vectors</strong> (<em>src.vectorstore_faiss.gpu.FloatArray</em>) – Description for <code class="docutils literal notranslate"><span class="pre">vectors</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -745,27 +583,16 @@
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">vectorstore_faiss.gpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">add</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">add</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vectorstore_faiss.gpu</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:262:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:154:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.search" title="Link to this definition">#</a></dt>
 <dd><p>Return search.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>query</strong> (<em>FloatArray</em>) – Description for <code class="docutils literal notranslate"><span class="pre">query</span></code>.</p></li>
+<li><p><strong>query</strong> (<em>src.vectorstore_faiss.gpu.FloatArray</em>) – Description for <code class="docutils literal notranslate"><span class="pre">query</span></code>.</p></li>
 <li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Description for <code class="docutils literal notranslate"><span class="pre">k</span></code>.</p></li>
 </ul>
 </dd>
@@ -779,30 +606,17 @@
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">vectorstore_faiss.gpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">search</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">search</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
-<span class="gp">...</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vectorstore_faiss.gpu</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id4">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index_uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idmap_uri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:316:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index_uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idmap_uri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:191:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.save" title="Link to this definition">#</a></dt>
 <dd><p>Return save.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>index_uri</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Description for <code class="docutils literal notranslate"><span class="pre">index_uri</span></code>.</p></li>
-<li><p><strong>idmap_uri</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em><em>, </em><em>optional</em>) – Description for <code class="docutils literal notranslate"><span class="pre">idmap_uri</span></code>.</p></li>
+<li><p><strong>idmap_uri</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Description for <code class="docutils literal notranslate"><span class="pre">idmap_uri</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -812,28 +626,17 @@
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">vectorstore_faiss.gpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">save</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vectorstore_faiss.gpu</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id5">
-<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index_uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idmap_uri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:356:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="src.vectorstore_faiss.gpu.FaissGpuIndex.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index_uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idmap_uri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/vectorstore_faiss/gpu.html#FaissGpuIndex.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/vectorstore_faiss/gpu.py:217:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.load" title="Link to this definition">#</a></dt>
 <dd><p>Return load.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>index_uri</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Description for <code class="docutils literal notranslate"><span class="pre">index_uri</span></code>.</p></li>
-<li><p><strong>idmap_uri</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em><em>, </em><em>optional</em>) – Description for <code class="docutils literal notranslate"><span class="pre">idmap_uri</span></code>.</p></li>
+<li><p><strong>idmap_uri</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Description for <code class="docutils literal notranslate"><span class="pre">idmap_uri</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -843,17 +646,6 @@
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">vectorstore_faiss.gpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">load</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">load</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vectorstore_faiss.gpu</span></code></p>
-</div>
-<p class="rubric">Notes</p>
-<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 </dd></dl>
@@ -892,14 +684,6 @@
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.None"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.None</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.__init__"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.__init__()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._ensure_resources"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex._ensure_resources()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.train"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.train()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.add"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.add()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.search"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.search()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.save"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.save()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.load"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.load()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.factory"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.factory</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.nprobe"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.nprobe</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.gpu"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.gpu</span></code></a></li>
@@ -909,12 +693,12 @@
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._index"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex._index</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._idmap"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex._idmap</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._xb"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex._xb</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex._ensure_resources()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.train()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id2"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.add()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id3"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.search()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.save()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.load()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex._ensure_resources"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex._ensure_resources()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.train"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.train()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.add"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.add()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.search"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.search()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.save"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.save()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#src.vectorstore_faiss.gpu.FaissGpuIndex.load"><code class="docutils literal notranslate"><span class="pre">FaissGpuIndex.load()</span></code></a></li>
 </ul>
 </li>
 </ul>

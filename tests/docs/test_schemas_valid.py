@@ -15,4 +15,3 @@ def test_all_jsonschemas_are_valid() -> None:
     for path in files:
         data = json.loads(path.read_text())
         jsonschema.Draft202012Validator.check_schema(data)
-

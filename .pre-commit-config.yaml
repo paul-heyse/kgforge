@@ -59,19 +59,19 @@ repos:
         pass_filenames: false
         always_run: true
       - id: docs-build-test-map
-        name: docs: build test map
+        name: "docs: build test map"
         entry: python tools/docs/build_test_map.py
         language: system
         pass_filenames: false
         always_run: true
       - id: docs-observability-scan
-        name: docs: observability scan
+        name: "docs: observability scan"
         entry: python tools/docs/scan_observability.py
         language: system
         pass_filenames: false
         always_run: true
       - id: docs-export-schemas
-        name: docs: export schemas
+        name: "docs: export schemas"
         entry: python tools/docs/export_schemas.py
         language: system
         pass_filenames: false

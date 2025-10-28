@@ -6,13 +6,8 @@ src.observability
 .. autoapi-nested-parse::
 
    
-   Provide utilities for module.
+   Observability utilities.
 
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`observability`
 
 
 

@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-search_api.bm25_index
-"""
-
+"""Bm25 Index utilities."""
 
 from __future__ import annotations
 
@@ -50,29 +40,12 @@ def toks(text: str) -> list[str]:
     ----------
     text : str
         Description for ``text``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.bm25_index import toks
-    >>> result = toks(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.bm25_index
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -80,21 +53,6 @@ def toks(text: str) -> list[str]:
 @dataclass
 class BM25Doc:
     """Describe BM25Doc."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     chunk_id: str
     doc_id: str
@@ -106,74 +64,18 @@ class BM25Doc:
 
 # [nav:anchor BM25Index]
 class BM25Index:
-    """Represent BM25Index.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-    
-    Methods
-    -------
-    __init__()
-        Method description.
-    build_from_duckdb()
-        Method description.
-    _build()
-        Method description.
-    save()
-        Method description.
-    load()
-        Method description.
-    _idf()
-        Method description.
-    search()
-        Method description.
-    doc()
-        Method description.
-    
-    Examples
-    --------
-    >>> from search_api.bm25_index import BM25Index
-    >>> result = BM25Index()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.bm25_index
-    
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
-    
-    
+    """Describe BM25Index."""
 
     def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
         """Return init.
 
         Parameters
         ----------
-        k1 : float, optional
+        k1 : float | None
             Description for ``k1``.
-        b : float, optional
+        b : float | None
             Description for ``b``.
-        
-        Examples
-        --------
-        >>> from search_api.bm25_index import __init__
-        >>> __init__(..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        search_api.bm25_index
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -189,28 +91,12 @@ class BM25Index:
         ----------
         db_path : str
             Description for ``db_path``.
-        
+
         Returns
         -------
         BM25Index
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_api.bm25_index import build_from_duckdb
-        >>> result = build_from_duckdb(...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_api.bm25_index
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         index = cls()
         con = duckdb.connect(db_path)
         try:
@@ -238,23 +124,9 @@ class BM25Index:
 
         Parameters
         ----------
-        rows : Iterable[tuple[str, str, str, str, str]]
+        rows : Iterable[Tuple[str, str, str, str, str]]
             Description for ``rows``.
-        
-        Examples
-        --------
-        >>> from search_api.bm25_index import _build
-        >>> _build(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        search_api.bm25_index
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.docs.clear()
         self.df.clear()
         dl_sum = 0.0
@@ -290,21 +162,7 @@ class BM25Index:
         ----------
         path : str
             Description for ``path``.
-        
-        Examples
-        --------
-        >>> from search_api.bm25_index import save
-        >>> save(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        search_api.bm25_index
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as handle:
             pickle.dump(
@@ -327,28 +185,12 @@ class BM25Index:
         ----------
         path : str
             Description for ``path``.
-        
+
         Returns
         -------
         BM25Index
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_api.bm25_index import load
-        >>> result = load(...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_api.bm25_index
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         with open(path, "rb") as handle:
             payload = pickle.load(handle)
         index = cls(payload.get("k1", 0.9), payload.get("b", 0.4))
@@ -365,28 +207,12 @@ class BM25Index:
         ----------
         term : str
             Description for ``term``.
-        
+
         Returns
         -------
         float
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_api.bm25_index import _idf
-        >>> result = _idf(...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_api.bm25_index
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         df = self.df.get(term, 0)
         if self.N == 0 or df == 0:
             return 0.0
@@ -399,31 +225,14 @@ class BM25Index:
         ----------
         query : str
             Description for ``query``.
-        k : int, optional
+        k : int | None
             Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[int, float]]
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_api.bm25_index import search
-        >>> result = search(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_api.bm25_index
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         if self.N == 0:
             return []
         terms = toks(query)
@@ -448,26 +257,10 @@ class BM25Index:
         ----------
         index : int
             Description for ``index``.
-        
+
         Returns
         -------
         BM25Doc
             Description of return value.
-        
-        Examples
-        --------
-        >>> from search_api.bm25_index import doc
-        >>> result = doc(...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_api.bm25_index
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         return self.docs[index]

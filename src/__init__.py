@@ -1,13 +1,3 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-__init__
-"""
-
+"""Init utilities."""
 
 __all__: list[str] = []

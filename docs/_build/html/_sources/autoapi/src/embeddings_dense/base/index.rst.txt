@@ -5,15 +5,7 @@ src.embeddings_dense.base
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   Auto-generated API documentation for the ``src.embeddings_dense.base`` module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`src.embeddings_dense.base`
+   Base utilities.
 
    ..
        !! processed by numpydoc !!
@@ -30,27 +22,8 @@ Module Contents
 
 
    
-   Represent DenseEmbeddingModel.
+   Describe DenseEmbeddingModel.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: encode()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from embeddings_dense.base import DenseEmbeddingModel
-   >>> result = DenseEmbeddingModel()
-   >>> result  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`embeddings_dense.base`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -78,18 +51,6 @@ Module Contents
       :type texts: Sequence[str]
 
       :returns: *NDArray[np.float32]* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from embeddings_dense.base import encode
-      >>> result = encode(...)
-      >>> result  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`embeddings_dense.base`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 

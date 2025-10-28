@@ -6,13 +6,8 @@ src.search_api
 .. autoapi-nested-parse::
 
    
-   Provide utilities for module.
+   Search Api utilities.
 
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`search_api`
 
 
 

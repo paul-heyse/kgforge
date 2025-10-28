@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-kgfoundry_common.parquet_io
-"""
-
+"""Parquet Io utilities."""
 
 from __future__ import annotations
 
@@ -43,43 +33,7 @@ ROW_GROUP_SIZE = 4096
 
 # [nav:anchor ParquetVectorWriter]
 class ParquetVectorWriter:
-    """Represent ParquetVectorWriter.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-    
-    Methods
-    -------
-    dense_schema()
-        Method description.
-    __init__()
-        Method description.
-    write_dense()
-        Method description.
-    splade_schema()
-        Method description.
-    write_splade()
-        Method description.
-    
-    Examples
-    --------
-    >>> from kgfoundry_common.parquet_io import ParquetVectorWriter
-    >>> result = ParquetVectorWriter()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    kgfoundry_common.parquet_io
-    
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
-    
-    
+    """Describe ParquetVectorWriter."""
 
     @staticmethod
     def dense_schema(dim: int) -> pa.schema:
@@ -89,28 +43,12 @@ class ParquetVectorWriter:
         ----------
         dim : int
             Description for ``dim``.
-        
+
         Returns
         -------
         pa.schema
             Description of return value.
-        
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import dense_schema
-        >>> result = dense_schema(...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        kgfoundry_common.parquet_io
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -130,21 +68,7 @@ class ParquetVectorWriter:
         ----------
         root : str
             Description for ``root``.
-        
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import __init__
-        >>> __init__(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        kgfoundry_common.parquet_io
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.root = Path(root)
 
     def write_dense(
@@ -167,31 +91,14 @@ class ParquetVectorWriter:
             Description for ``dim``.
         records : Iterable[Tuple[str, List[float], float]]
             Description for ``records``.
-        shard : int, optional
+        shard : int | None
             Description for ``shard``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import write_dense
-        >>> result = write_dense(..., ..., ..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        kgfoundry_common.parquet_io
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -225,23 +132,7 @@ class ParquetVectorWriter:
         -------
         pa.schema
             Description of return value.
-        
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import splade_schema
-        >>> result = splade_schema()
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        kgfoundry_common.parquet_io
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -271,31 +162,14 @@ class ParquetVectorWriter:
             Description for ``run_id``.
         records : Iterable[Tuple[str, List[int], List[float]]]
             Description for ``records``.
-        shard : int, optional
+        shard : int | None
             Description for ``shard``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import write_splade
-        >>> result = write_splade(..., ..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        kgfoundry_common.parquet_io
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -324,39 +198,7 @@ class ParquetVectorWriter:
 
 # [nav:anchor ParquetChunkWriter]
 class ParquetChunkWriter:
-    """Represent ParquetChunkWriter.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-    
-    Methods
-    -------
-    chunk_schema()
-        Method description.
-    __init__()
-        Method description.
-    write()
-        Method description.
-    
-    Examples
-    --------
-    >>> from kgfoundry_common.parquet_io import ParquetChunkWriter
-    >>> result = ParquetChunkWriter()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    kgfoundry_common.parquet_io
-    
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
-    
-    
+    """Describe ParquetChunkWriter."""
 
     @staticmethod
     def chunk_schema() -> pa.schema:
@@ -366,23 +208,7 @@ class ParquetChunkWriter:
         -------
         pa.schema
             Description of return value.
-        
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import chunk_schema
-        >>> result = chunk_schema()
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        kgfoundry_common.parquet_io
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -413,25 +239,11 @@ class ParquetChunkWriter:
         ----------
         root : str
             Description for ``root``.
-        model : str, optional
+        model : str | None
             Description for ``model``.
-        run_id : str, optional
+        run_id : str | None
             Description for ``run_id``.
-        
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import __init__
-        >>> __init__(..., ..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        kgfoundry_common.parquet_io
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
@@ -442,28 +254,12 @@ class ParquetChunkWriter:
         ----------
         rows : Iterable[dict[str, Any]]
             Description for ``rows``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import write
-        >>> result = write(...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        kgfoundry_common.parquet_io
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(
             table,

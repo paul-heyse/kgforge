@@ -1,16 +1,4 @@
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``src.docling.canonicalizer`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-src.docling.canonicalizer
-"""
-
+"""Canonicalizer utilities."""
 
 from __future__ import annotations
 
@@ -49,20 +37,6 @@ def canonicalize_text(blocks: list[str]) -> str:
     -------
     str
         Description of return value.
-
-    Examples
-    --------
-    >>> from docling.canonicalizer import canonicalize_text
-    >>> result = canonicalize_text(...)
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    docling.canonicalizer
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
 
     def norm(s: str) -> str:
@@ -77,20 +51,6 @@ def canonicalize_text(blocks: list[str]) -> str:
         -------
         str
             Description of return value.
-
-        Examples
-        --------
-        >>> from docling.canonicalizer import norm
-        >>> result = norm(...)
-        >>> result  # doctest: +ELLIPSIS
-
-        See Also
-        --------
-        docling.canonicalizer
-
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
         s = unicodedata.normalize("NFC", s)
         s = s.replace("\r\n", "\n").replace("\r", "\n")

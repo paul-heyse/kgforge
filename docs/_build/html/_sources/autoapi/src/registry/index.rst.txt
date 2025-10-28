@@ -6,13 +6,8 @@ src.registry
 .. autoapi-nested-parse::
 
    
-   Provide utilities for module.
+   Registry utilities.
 
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`registry`
 
 
 
