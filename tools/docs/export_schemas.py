@@ -598,6 +598,7 @@ def main(argv: list[str] | None = None) -> int:
     nav = _load_navmap()
     drift_summaries: dict[str, Any] = {}
     changed = False
+    produced_paths: set[Path] = set()
 
     for module_name, name, obj in _iter_models():
         path: Path
@@ -608,6 +609,8 @@ def main(argv: list[str] | None = None) -> int:
             path, data = _export_one_pandera(module_name, name, obj, cfg, nav)
         if not data:
             continue
+
+        produced_paths.add(path)
 
         # Drift handling
         old = None
@@ -628,6 +631,25 @@ def main(argv: list[str] | None = None) -> int:
                 json.loads(old_text) if old_text else {}, data
             )
             changed = True
+
+    # Remove any schema files that were not regenerated in this run.
+    existing_paths = {p for p in OUT.glob("*.json")}
+    stale_paths = existing_paths - produced_paths
+    for stale_path in sorted(stale_paths):
+        old_data: dict[str, Any] = {}
+        if stale_path.exists():
+            try:
+                old_data = json.loads(stale_path.read_text(encoding="utf-8"))
+            except Exception:
+                old_data = {}
+        drift_summaries[str(stale_path)] = _diff_summary(old_data, {})
+        changed = True
+        if cfg.check_drift:
+            continue
+        try:
+            stale_path.unlink()
+        except FileNotFoundError:
+            pass
 
     if drift_summaries:
         DRIFT_OUT.parent.mkdir(parents=True, exist_ok=True)
