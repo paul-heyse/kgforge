@@ -23,8 +23,24 @@ __navmap__: NavMap = {
         },
     ],
     "symbols": {
-        "base": {},
-        "bm25": {},
-        "splade": {},
+        "base": {
+            "stability": "beta",
+            "owner": "@embeddings",
+            "since": "0.1.0",
+        },
+        "bm25": {
+            "stability": "beta",
+            "owner": "@embeddings",
+            "since": "0.1.0",
+        },
+        "splade": {
+            "stability": "experimental",
+            "owner": "@embeddings",
+            "since": "0.2.0",
+        },
     },
 }
+
+# [nav:anchor base]
+# [nav:anchor bm25]
+# [nav:anchor splade]

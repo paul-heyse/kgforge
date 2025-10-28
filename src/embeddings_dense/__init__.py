@@ -22,7 +22,18 @@ __navmap__: NavMap = {
         },
     ],
     "symbols": {
-        "base": {},
-        "qwen3": {},
+        "base": {
+            "stability": "beta",
+            "owner": "@embeddings",
+            "since": "0.1.0",
+        },
+        "qwen3": {
+            "stability": "experimental",
+            "owner": "@embeddings",
+            "since": "0.2.0",
+        },
     },
 }
+
+# [nav:anchor base]
+# [nav:anchor qwen3]

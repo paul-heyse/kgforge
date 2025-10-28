@@ -22,7 +22,18 @@ __navmap__: NavMap = {
         },
     ],
     "symbols": {
-        "calibration": {},
-        "linker": {},
+        "calibration": {
+            "stability": "experimental",
+            "owner": "@linking",
+            "since": "0.1.0",
+        },
+        "linker": {
+            "stability": "experimental",
+            "owner": "@linking",
+            "since": "0.1.0",
+        },
     },
 }
+
+# [nav:anchor calibration]
+# [nav:anchor linker]
