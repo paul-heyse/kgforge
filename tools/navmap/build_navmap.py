@@ -75,11 +75,25 @@ def _replace_placeholders(value: Any, exports: list[str]) -> Any:
     if value is PLACEHOLDER_ALL:
         return list(dict.fromkeys(exports))
     if isinstance(value, list):
-        return [_replace_placeholders(v, exports) for v in value]
+        items: list[Any] = []
+        for entry in value:
+            replaced = _replace_placeholders(entry, exports)
+            if isinstance(replaced, list):
+                items.extend(replaced)
+            else:
+                items.append(replaced)
+        return items
     if isinstance(value, dict):
         return {k: _replace_placeholders(v, exports) for k, v in value.items()}
     if isinstance(value, set):
-        return {_replace_placeholders(v, exports) for v in value}
+        items: set[Any] = set()
+        for entry in value:
+            replaced = _replace_placeholders(entry, exports)
+            if isinstance(replaced, list):
+                items.update(replaced)
+            else:
+                items.add(replaced)
+        return items
     return value
 
 
@@ -195,8 +209,7 @@ def _literal_list_of_strs(node: ast.AST) -> list[str] | None:
 def _parse_py(py: Path) -> tuple[dict[str, Any], list[str]]:
     """Return (__navmap__ dict, __all__ list or [])."""
     try:
-        text = py.read_text(encoding="utf-8")
-        tree = ast.parse(text)
+        tree = ast.parse(py.read_text(encoding="utf-8"))
     except Exception:
         return {}, []
 
@@ -205,11 +218,12 @@ def _parse_py(py: Path) -> tuple[dict[str, Any], list[str]]:
 
     for node in tree.body:
         if isinstance(node, ast.Assign):
-            if any(isinstance(t, ast.Name) and t.id == "__all__" for t in node.targets):
+            targets = [t.id for t in node.targets if isinstance(t, ast.Name)]
+            if "__all__" in targets:
                 vals = _literal_list_of_strs(node.value)
                 if vals is not None:
                     exports = vals
-            if any(isinstance(t, ast.Name) and t.id == "__navmap__" for t in node.targets):
+            if "__navmap__" in targets:
                 try:
                     nav_raw = _literal_eval_navmap(node.value)
                     if not isinstance(nav_raw, dict):
@@ -229,9 +243,20 @@ def _parse_py(py: Path) -> tuple[dict[str, Any], list[str]]:
                 except Exception:
                     nav_raw = {}
 
-    nav = nav_raw or {}
-    if nav:
-        nav = _replace_placeholders(nav, exports or nav.get("exports", []))
+    nav: dict[str, Any] = {}
+    exports = list(dict.fromkeys(exports))
+    if nav_raw:
+        exports_hint = exports
+        if not exports_hint:
+            raw_exports = nav_raw.get("exports") if isinstance(nav_raw, dict) else None
+            if isinstance(raw_exports, list):
+                exports_hint = [x for x in raw_exports if isinstance(x, str)]
+        try:
+            nav = _replace_placeholders(nav_raw, exports_hint)
+        except Exception:
+            nav = {}
+        if isinstance(nav.get("exports"), list):
+            exports = list(dict.fromkeys(x for x in nav["exports"] if isinstance(x, str)))
     return nav, exports
 
 

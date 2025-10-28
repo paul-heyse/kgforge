@@ -77,11 +77,35 @@ def _parse_navmap_dict(py: Path) -> dict[str, Any]:
     except Exception:
         return {}
     result: dict[str, Any] = {}
+
+    def _safe_eval(value: ast.AST) -> Any:
+        if isinstance(value, ast.Constant):
+            return value.value
+        if isinstance(value, ast.Name) and value.id == "__all__":
+            return "__all__"
+        if isinstance(value, (ast.List, ast.Tuple)):
+            return [_safe_eval(elt) for elt in value.elts]
+        if isinstance(value, ast.Set):
+            return {_safe_eval(elt) for elt in value.elts}
+        if isinstance(value, ast.Dict):
+            return {
+                _safe_eval(k): _safe_eval(v) for k, v in zip(value.keys, value.values, strict=False)
+            }
+        raise ValueError(ast.dump(value))
+
     for node in tree.body:
         if isinstance(node, ast.Assign):
             if any(isinstance(t, ast.Name) and t.id == "__navmap__" for t in node.targets):
                 try:
-                    value = ast.literal_eval(node.value)
+                    value = _safe_eval(node.value)
+                    if isinstance(value, dict):
+                        result = value
+                except Exception:
+                    pass
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            if node.target.id == "__navmap__":
+                try:
+                    value = _safe_eval(node.value)
                     if isinstance(value, dict):
                         result = value
                 except Exception:
@@ -97,30 +121,41 @@ def _parse_all(py: Path) -> list[str]:
         tree = ast.parse(py.read_text(encoding="utf-8"))
     except Exception:
         return []
+
+    def _literal(node: ast.AST) -> list[str] | None:
+        if isinstance(node, (ast.List, ast.Tuple)):
+            vals: list[str] = []
+            for elt in node.elts:
+                if isinstance(elt, ast.Constant) and isinstance(elt.value, str):
+                    vals.append(elt.value)
+                elif isinstance(elt, ast.Name) and IDENT_RE.match(elt.id):
+                    vals.append(elt.id)
+                else:
+                    return None
+            return vals
+        return None
+
     for node in tree.body:
         if isinstance(node, ast.Assign):
             if any(isinstance(t, ast.Name) and t.id == "__all__" for t in node.targets):
-                try:
-                    if isinstance(node.value, (ast.List, ast.Tuple)):
-                        vals: list[str] = []
-                        for elt in node.value.elts:
-                            if isinstance(elt, ast.Constant) and isinstance(elt.value, str):
-                                vals.append(elt.value)
-                            elif isinstance(elt, ast.Name) and IDENT_RE.match(elt.id):
-                                vals.append(elt.id)
-                            else:
-                                return []
-                        return vals
-                except Exception:
-                    return []
+                vals = _literal(node.value)
+                if vals is not None:
+                    return vals
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            if node.target.id == "__all__":
+                vals = _literal(node.value)
+                if vals is not None:
+                    return vals
     return []
 
 
 def _exports_for(py: Path, nav: dict[str, Any]) -> list[str]:
     """Derive the export list from ``__navmap__`` or ``__all__`` definitions."""
     nav_exports = nav.get("exports")
-    if isinstance(nav_exports, list) and all(isinstance(x, str) for x in nav_exports):
-        return list(dict.fromkeys(nav_exports))
+    if isinstance(nav_exports, list):
+        vals = [x for x in nav_exports if isinstance(x, str)]
+        if vals:
+            return list(dict.fromkeys(vals))
     all_list = _parse_all(py)
     if all_list:
         return list(dict.fromkeys(all_list))
@@ -229,7 +264,6 @@ def main(argv: list[str] | None = None) -> int:
     int
         Description of return value.
     """
-    
     errors: list[str] = []
     for py in sorted(SRC.rglob("*.py")):
         errors.extend(_inspect(py))
