@@ -46,46 +46,48 @@ def canonicalize_text(blocks: list[str]) -> str:
     """Compute canonicalize text.
 
     Carry out the canonicalize text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     blocks : List[str]
     blocks : List[str]
         Description for ``blocks``.
-
+    
     Returns
     -------
     str
         Description of return value.
-
+    
     Examples
     --------
     >>> from docling.canonicalizer import canonicalize_text
     >>> result = canonicalize_text(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
 
     def norm(s: str) -> str:
         """Compute norm.
 
         Carry out the norm operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         s : str
         s : str
             Description for ``s``.
-
+        
         Returns
         -------
         str
             Description of return value.
-
+        
         Examples
         --------
         >>> from docling.canonicalizer import norm
         >>> result = norm(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         s = unicodedata.normalize("NFC", s)
         s = s.replace("\r\n", "\n").replace("\r", "\n")

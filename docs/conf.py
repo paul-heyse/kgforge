@@ -17,6 +17,7 @@ import subprocess
 import sys
 from collections.abc import Callable, Mapping
 from pathlib import Path
+from types import ModuleType
 from typing import Any
 
 import certifi
@@ -28,6 +29,7 @@ astroid_builder = importlib.import_module("astroid.builder")
 astroid_manager = importlib.import_module("astroid.manager")
 autoapi_parser = importlib.import_module("autoapi._parser")
 griffe_module = importlib.import_module("griffe")
+griffe_loader_module: ModuleType | None
 try:
     griffe_loader_module = importlib.import_module("griffe.loader")
 except ModuleNotFoundError:

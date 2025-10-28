@@ -242,17 +242,18 @@ def load_policy() -> dict[str, Any]:
     """Compute load policy.
 
     Carry out the load policy operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.scan_observability import load_policy
     >>> result = load_policy()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
@@ -706,23 +707,24 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     """Compute read ast.
 
     Carry out the read ast operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     path : Path
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     Tuple[str, ast.AST | None]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.scan_observability import read_ast
     >>> result = read_ast(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     try:
         text = path.read_text(encoding="utf-8")
@@ -741,7 +743,7 @@ def scan_file(
     """Compute scan file.
 
     Carry out the scan file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     path : Path
@@ -750,17 +752,18 @@ def scan_file(
     policy : collections.abc.Mapping
     policy : collections.abc.Mapping
         Description for ``policy``.
-
+    
     Returns
     -------
     Tuple[List[LogRow], List[MetricRow], List[TraceRow]]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.scan_observability import scan_file
     >>> result = scan_file(..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     text, tree = read_ast(path)
     if not text or tree is None:

@@ -59,23 +59,24 @@ def t_prepare_dirs(root: str) -> dict[str, bool]:
     """Compute t prepare dirs.
 
     Carry out the t prepare dirs operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     root : str
     root : str
         Description for ``root``.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from orchestration.fixture_flow import t_prepare_dirs
     >>> result = t_prepare_dirs(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     path = Path(root)
     (path / "parquet" / "dense").mkdir(parents=True, exist_ok=True)
@@ -91,23 +92,24 @@ def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
     """Compute t write fixture chunks.
 
     Carry out the t write fixture chunks operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     chunks_root : str
     chunks_root : str
         Description for ``chunks_root``.
-
+    
     Returns
     -------
     Tuple[str, int]
         Description of return value.
-
+    
     Examples
     --------
     >>> from orchestration.fixture_flow import t_write_fixture_chunks
     >>> result = t_write_fixture_chunks(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     writer = ParquetChunkWriter(chunks_root, model="docling_hybrid", run_id="fixture")
     rows = [
@@ -133,23 +135,24 @@ def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
     """Compute t write fixture dense.
 
     Carry out the t write fixture dense operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     dense_root : str
     dense_root : str
         Description for ``dense_root``.
-
+    
     Returns
     -------
     Tuple[str, int]
         Description of return value.
-
+    
     Examples
     --------
     >>> from orchestration.fixture_flow import t_write_fixture_dense
     >>> result = t_write_fixture_dense(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     writer = ParquetVectorWriter(dense_root)
     vector = [0.0] * 2560
@@ -165,23 +168,24 @@ def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
     """Compute t write fixture splade.
 
     Carry out the t write fixture splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     sparse_root : str
     sparse_root : str
         Description for ``sparse_root``.
-
+    
     Returns
     -------
     Tuple[str, int]
         Description of return value.
-
+    
     Examples
     --------
     >>> from orchestration.fixture_flow import t_write_fixture_splade
     >>> result = t_write_fixture_splade(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     writer = ParquetVectorWriter(sparse_root)
     out_root = writer.write_splade(
@@ -204,7 +208,7 @@ def t_register_in_duckdb(
     """Compute t register in duckdb.
 
     Carry out the t register in duckdb operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     db_path : str
@@ -219,17 +223,18 @@ def t_register_in_duckdb(
     sparse_info : Tuple[str, int]
     sparse_info : Tuple[str, int]
         Description for ``sparse_info``.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from orchestration.fixture_flow import t_register_in_duckdb
     >>> result = t_register_in_duckdb(..., ..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     registry = DuckDBRegistryHelper(db_path)
     dense_run = registry.new_run("dense_embed", "Qwen3-Embedding-4B", "main", {"dim": 2560})
@@ -276,7 +281,7 @@ def fixture_pipeline(
     """Compute fixture pipeline.
 
     Carry out the fixture pipeline operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     root : str | None
@@ -285,17 +290,18 @@ def fixture_pipeline(
     db_path : str | None
     db_path : str | None, optional, default='/data/catalog/catalog.duckdb'
         Description for ``db_path``.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from orchestration.fixture_flow import fixture_pipeline
     >>> result = fixture_pipeline()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     t_prepare_dirs(root)
     chunks_info = t_write_fixture_chunks(f"{root}/parquet/chunks")

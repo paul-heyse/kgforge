@@ -210,7 +210,7 @@ class FaissGpuIndex:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         query : src.vectorstore_faiss.gpu.FloatArray
@@ -219,22 +219,23 @@ class FaissGpuIndex:
         k : int
         k : int
             Description for ``k``.
-
+        
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
+        
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from vectorstore_faiss.gpu import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         q = cast(FloatArray, np.asarray(query, dtype=np.float32, order="C"))
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12

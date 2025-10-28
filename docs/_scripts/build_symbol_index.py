@@ -73,17 +73,18 @@ def iter_packages() -> list[str]:
     """Compute iter packages.
 
     Carry out the iter packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from docs._scripts.build_symbol_index import iter_packages
     >>> result = iter_packages()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
@@ -95,7 +96,7 @@ def safe_attr(node: Any, attr: str, default: object | None = None) -> object | N
     """Compute safe attr.
 
     Carry out the safe attr operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     node : typing.Any
@@ -107,17 +108,18 @@ def safe_attr(node: Any, attr: str, default: object | None = None) -> object | N
     default : object | None
     default : object | None, optional, default=None
         Description for ``default``.
-
+    
     Returns
     -------
     object | None
         Description of return value.
-
+    
     Examples
     --------
     >>> from docs._scripts.build_symbol_index import safe_attr
     >>> result = safe_attr(..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     try:
         return getattr(node, attr)
@@ -467,17 +469,18 @@ def main() -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     int
         Description of return value.
-
+    
     Examples
     --------
     >>> from docs._scripts.build_symbol_index import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     nav_lookup = _load_navmap()
     test_map = _load_test_map()

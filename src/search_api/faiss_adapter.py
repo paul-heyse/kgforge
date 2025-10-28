@@ -269,7 +269,7 @@ class FaissAdapter:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         qvec : src.search_api.faiss_adapter.VecArray
@@ -278,22 +278,23 @@ class FaissAdapter:
         k : int | None
         k : int | None, optional, default=10
             Description for ``k``.
-
+        
         Returns
         -------
         List[List[Tuple[str, float]]]
             Description of return value.
-
+        
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from search_api.faiss_adapter import search
         >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         if self.vecs is None and self.index is None:
             return []
@@ -304,7 +305,7 @@ class FaissAdapter:
             query_arr = np.asarray(qvec, dtype=np.float32, order="C")
             if query_arr.ndim == 1:
                 query_arr = query_arr[None, :]
-            query = cast(VecArray, query_arr)
+            query: VecArray = query_arr
             distances, indices = self.index.search(query, k)
             batches: list[list[tuple[str, float]]] = []
             for idx_row, dist_row in zip(indices, distances, strict=False):

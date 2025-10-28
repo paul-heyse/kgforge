@@ -7,17 +7,17 @@ Overview of search api.
 
 ## Modules
 
-- **`search_api.app`** — Overview of app. → [open](vscode://file//home/paul/kgfoundry/src/search_api/app.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/93d48ee805023a7f998c81b563b5d8307afeeda4/src/search_api/app.py#L1)
-- **`search_api.bm25_index`** — Overview of bm25 index. → [open](vscode://file//home/paul/kgfoundry/src/search_api/bm25_index.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/93d48ee805023a7f998c81b563b5d8307afeeda4/src/search_api/bm25_index.py#L1)
-- **`search_api.faiss_adapter`** — Overview of faiss adapter. → [open](vscode://file//home/paul/kgfoundry/src/search_api/faiss_adapter.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/93d48ee805023a7f998c81b563b5d8307afeeda4/src/search_api/faiss_adapter.py#L1)
-- **`search_api.fixture_index`** — Overview of fixture index. → [open](vscode://file//home/paul/kgfoundry/src/search_api/fixture_index.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/93d48ee805023a7f998c81b563b5d8307afeeda4/src/search_api/fixture_index.py#L1)
-- **`search_api.fusion`** — Overview of fusion. → [open](vscode://file//home/paul/kgfoundry/src/search_api/fusion.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/93d48ee805023a7f998c81b563b5d8307afeeda4/src/search_api/fusion.py#L1)
-- **`search_api.kg_mock`** — Overview of kg mock. → [open](vscode://file//home/paul/kgfoundry/src/search_api/kg_mock.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/93d48ee805023a7f998c81b563b5d8307afeeda4/src/search_api/kg_mock.py#L1)
-- **`search_api.schemas`** — Overview of schemas. → [open](vscode://file//home/paul/kgfoundry/src/search_api/schemas.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/93d48ee805023a7f998c81b563b5d8307afeeda4/src/search_api/schemas.py#L1)
-- **`search_api.service`** — Overview of service. → [open](vscode://file//home/paul/kgfoundry/src/search_api/service.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/93d48ee805023a7f998c81b563b5d8307afeeda4/src/search_api/service.py#L1)
-- **`search_api.splade_index`** — Overview of splade index. → [open](vscode://file//home/paul/kgfoundry/src/search_api/splade_index.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/93d48ee805023a7f998c81b563b5d8307afeeda4/src/search_api/splade_index.py#L1)
+- **`search_api.app`** — Overview of app. → [open](vscode://file//home/paul/kgfoundry/src/search_api/app.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/47722a9714a8f78361b16ace021e51eb9b0a1e18/src/search_api/app.py#L1)
+- **`search_api.bm25_index`** — Overview of bm25 index. → [open](vscode://file//home/paul/kgfoundry/src/search_api/bm25_index.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/47722a9714a8f78361b16ace021e51eb9b0a1e18/src/search_api/bm25_index.py#L1)
+- **`search_api.faiss_adapter`** — Overview of faiss adapter. → [open](vscode://file//home/paul/kgfoundry/src/search_api/faiss_adapter.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/47722a9714a8f78361b16ace021e51eb9b0a1e18/src/search_api/faiss_adapter.py#L1)
+- **`search_api.fixture_index`** — Overview of fixture index. → [open](vscode://file//home/paul/kgfoundry/src/search_api/fixture_index.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/47722a9714a8f78361b16ace021e51eb9b0a1e18/src/search_api/fixture_index.py#L1)
+- **`search_api.fusion`** — Overview of fusion. → [open](vscode://file//home/paul/kgfoundry/src/search_api/fusion.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/47722a9714a8f78361b16ace021e51eb9b0a1e18/src/search_api/fusion.py#L1)
+- **`search_api.kg_mock`** — Overview of kg mock. → [open](vscode://file//home/paul/kgfoundry/src/search_api/kg_mock.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/47722a9714a8f78361b16ace021e51eb9b0a1e18/src/search_api/kg_mock.py#L1)
+- **`search_api.schemas`** — Overview of schemas. → [open](vscode://file//home/paul/kgfoundry/src/search_api/schemas.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/47722a9714a8f78361b16ace021e51eb9b0a1e18/src/search_api/schemas.py#L1)
+- **`search_api.service`** — Overview of service. → [open](vscode://file//home/paul/kgfoundry/src/search_api/service.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/47722a9714a8f78361b16ace021e51eb9b0a1e18/src/search_api/service.py#L1)
+- **`search_api.splade_index`** — Overview of splade index. → [open](vscode://file//home/paul/kgfoundry/src/search_api/splade_index.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/47722a9714a8f78361b16ace021e51eb9b0a1e18/src/search_api/splade_index.py#L1)
 
 ## Classes
 
-- **`search_api.NavMap`** — Model the NavMap. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:60:1) | [view](https://github.com/github.com/paul-heyse/blob/93d48ee805023a7f998c81b563b5d8307afeeda4/src/kgfoundry_common/navmap_types.py#L60-L79)
-<!-- agent:readme v1 sha:93d48ee805023a7f998c81b563b5d8307afeeda4 content:352d9972842f -->
+- **`search_api.NavMap`** — Model the NavMap. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:60:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/47722a9714a8f78361b16ace021e51eb9b0a1e18/src/kgfoundry_common/navmap_types.py#L60-L79)
+<!-- agent:readme v1 sha:47722a9714a8f78361b16ace021e51eb9b0a1e18 content:d9c86daea430 -->

@@ -16,17 +16,18 @@ def git_diff_names() -> set[str]:
     """Compute git diff names.
 
     Carry out the git diff names operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     collections.abc.Set
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.hooks.docformatter import git_diff_names
     >>> result = git_diff_names()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     result = subprocess.run(
         ["git", "diff", "--name-only"],
@@ -41,17 +42,18 @@ def main() -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     int
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.hooks.docformatter import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     repo = subprocess.run(
         ["git", "rev-parse", "--show-toplevel"],

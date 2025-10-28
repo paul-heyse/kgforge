@@ -1,3 +1,4 @@
+import importlib
 import pathlib
 import re
 
@@ -8,11 +9,11 @@ try:
 except ModuleNotFoundError:  # pragma: no cover - optional dependency
     pytest.skip("fastapi is required for smoke tests", allow_module_level=True)
 
+from kgfoundry.embeddings_sparse.bm25 import PurePythonBM25
+
 duckdb = pytest.importorskip("duckdb")
 pytest.importorskip("fastapi")
 httpx = pytest.importorskip("httpx")
-
-from kgfoundry.embeddings_sparse.bm25 import PurePythonBM25
 
 FIXTURES = pathlib.Path(__file__).resolve().parents[1] / "fixtures"
 CHUNKS = str(FIXTURES / "chunks.parquet")
@@ -39,8 +40,6 @@ def pick_query_token() -> str:
 @pytest.mark.smoke
 def test_search_endpoint_smoke() -> None:
     # Import app after optional env wiring (app uses fixtures by default).
-    import importlib
-
     import kgfoundry.search_api.app as search_app_module
 
     search_app = importlib.reload(search_app_module)

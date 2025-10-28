@@ -60,23 +60,24 @@ class SparseEncoder(Protocol):
         """Compute encode.
 
         Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         texts : List[str]
         texts : List[str]
             Description for ``texts``.
-
+        
         Returns
         -------
         List[Tuple[List[int], List[float]]]
             Description of return value.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.base import encode
         >>> result = encode(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         ...
 
@@ -114,7 +115,7 @@ class SparseIndex(Protocol):
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         query : str
@@ -126,16 +127,17 @@ class SparseIndex(Protocol):
         fields : Mapping[str, str] | None
         fields : Mapping[str, str] | None, optional, default=None
             Description for ``fields``.
-
+        
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.base import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         ...

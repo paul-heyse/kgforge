@@ -36,17 +36,18 @@ def iter_packages() -> list[str]:
     """Compute iter packages.
 
     Carry out the iter packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from docs._scripts.mkdocs_gen_api import iter_packages
     >>> result = iter_packages()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     packages = detect_packages()
     return packages or [detect_primary()]

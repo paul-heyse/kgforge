@@ -268,7 +268,7 @@ class PurePythonBM25:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         query : str
@@ -280,17 +280,18 @@ class PurePythonBM25:
         fields : Mapping[str, str] | None
         fields : Mapping[str, str] | None, optional, default=None
             Description for ``fields``.
-
+        
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.bm25 import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
@@ -413,7 +414,7 @@ class LuceneBM25:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         query : str
@@ -425,22 +426,23 @@ class LuceneBM25:
         fields : Mapping[str, str] | None
         fields : Mapping[str, str] | None, optional, default=None
             Description for ``fields``.
-
+        
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
+        
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.bm25 import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         self._ensure_searcher()
         if self._searcher is None:
@@ -462,7 +464,7 @@ def get_bm25(
     """Compute get bm25.
 
     Carry out the get bm25 operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     backend : str
@@ -480,17 +482,18 @@ def get_bm25(
     field_boosts : Mapping[str, float] | None
     field_boosts : Mapping[str, float] | None, optional, default=None
         Description for ``field_boosts``.
-
+    
     Returns
     -------
     PurePythonBM25 | LuceneBM25
         Description of return value.
-
+    
     Examples
     --------
     >>> from embeddings_sparse.bm25 import get_bm25
     >>> result = get_bm25(..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     if backend == "lucene":
         try:

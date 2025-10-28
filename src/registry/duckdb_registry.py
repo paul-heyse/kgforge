@@ -73,7 +73,7 @@ class DuckDBRegistry:
         """Compute begin dataset.
 
         Carry out the begin dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         kind : str
@@ -82,17 +82,18 @@ class DuckDBRegistry:
         run_id : str
         run_id : str
             Description for ``run_id``.
-
+        
         Returns
         -------
         str
             Description of return value.
-
+        
         Examples
         --------
         >>> from registry.duckdb_registry import begin_dataset
         >>> result = begin_dataset(..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         dataset_id = str(uuid.uuid4())
         self.con.execute(
@@ -159,7 +160,7 @@ class DuckDBRegistry:
         """Compute insert run.
 
         Carry out the insert run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         purpose : str
@@ -174,17 +175,18 @@ class DuckDBRegistry:
         config : collections.abc.Mapping
         config : collections.abc.Mapping
             Description for ``config``.
-
+        
         Returns
         -------
         str
             Description of return value.
-
+        
         Examples
         --------
         >>> from registry.duckdb_registry import insert_run
         >>> result = insert_run(..., ..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         run_id = str(uuid.uuid4())
         self.con.execute(

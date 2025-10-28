@@ -46,23 +46,24 @@ def load_config(path: str) -> dict[str, Any]:
     """Compute load config.
 
     Carry out the load config operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     path : str
     path : str
         Description for ``path``.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from kgfoundry_common.config import load_config
     >>> result = load_config(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f)

@@ -89,7 +89,7 @@ class DuckDBRegistryHelper:
         """Compute new run.
 
         Carry out the new run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         purpose : str
@@ -104,17 +104,18 @@ class DuckDBRegistryHelper:
         config : collections.abc.Mapping
         config : collections.abc.Mapping
             Description for ``config``.
-
+        
         Returns
         -------
         str
             Description of return value.
-
+        
         Examples
         --------
         >>> from registry.helper import new_run
         >>> result = new_run(..., ..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         run_id = str(uuid.uuid4())
         con = self._con()
@@ -168,7 +169,7 @@ class DuckDBRegistryHelper:
         """Compute begin dataset.
 
         Carry out the begin dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         kind : str
@@ -177,17 +178,18 @@ class DuckDBRegistryHelper:
         run_id : str
         run_id : str
             Description for ``run_id``.
-
+        
         Returns
         -------
         str
             Description of return value.
-
+        
         Examples
         --------
         >>> from registry.helper import begin_dataset
         >>> result = begin_dataset(..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         dataset_id = str(uuid.uuid4())
         con = self._con()

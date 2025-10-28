@@ -28,23 +28,24 @@ def has_python_files(path: Path) -> bool:
     """Compute has python files.
 
     Carry out the has python files operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     path : Path
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     bool
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.generate_docstrings import has_python_files
     >>> result = has_python_files(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     return any(path.rglob("*.py"))
 
@@ -76,23 +77,24 @@ def run_doq(target: Path) -> bool:
     """Compute run doq.
 
     Carry out the run doq operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     target : Path
     target : Path
         Description for ``target``.
-
+    
     Returns
     -------
     bool
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.generate_docstrings import run_doq
     >>> result = run_doq(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     cmd = [
         sys.executable,

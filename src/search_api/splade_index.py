@@ -52,23 +52,24 @@ def tok(text: str) -> list[str]:
     """Compute tok.
 
     Carry out the tok operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     text : str
     text : str
         Description for ``text``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from search_api.splade_index import tok
     >>> result = tok(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     return [token.lower() for token in TOKEN.findall(text or "")]
 
@@ -171,7 +172,7 @@ class SpladeIndex:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         query : str
@@ -180,17 +181,18 @@ class SpladeIndex:
         k : int | None
         k : int | None, optional, default=10
             Description for ``k``.
-
+        
         Returns
         -------
         List[Tuple[int, float]]
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_api.splade_index import search
         >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         if self.N == 0:
             return []
@@ -215,22 +217,23 @@ class SpladeIndex:
         """Compute doc.
 
         Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         index : int
         index : int
             Description for ``index``.
-
+        
         Returns
         -------
         src.search_api.splade_index.SpladeDoc
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_api.splade_index import doc
         >>> result = doc(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         return self.docs[index]

@@ -93,23 +93,24 @@ def is_pydantic_model(obj: object) -> bool:
     """Compute is pydantic model.
 
     Carry out the is pydantic model operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     obj : object
     obj : object
         Description for ``obj``.
-
+    
     Returns
     -------
     bool
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.export_schemas import is_pydantic_model
     >>> result = is_pydantic_model(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     try:
         from pydantic import BaseModel
@@ -122,23 +123,24 @@ def is_pandera_model(obj: object) -> bool:
     """Compute is pandera model.
 
     Carry out the is pandera model operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     obj : object
     obj : object
         Description for ``obj``.
-
+    
     Returns
     -------
     bool
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.export_schemas import is_pandera_model
     >>> result = is_pandera_model(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     try:
         import pandera as pa
@@ -369,23 +371,24 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
         """Compute prop keys.
 
         Carry out the prop keys operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         d : collections.abc.Mapping
         d : collections.abc.Mapping
             Description for ``d``.
-
+        
         Returns
         -------
         collections.abc.Set
             Description of return value.
-
+        
         Examples
         --------
         >>> from tools.docs.export_schemas import prop_keys
         >>> result = prop_keys(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         props = d.get("properties")
         return set(props.keys()) if isinstance(props, dict) else set()
@@ -538,23 +541,24 @@ def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     argv : List[str] | None
     argv : List[str] | None, optional, default=None
         Description for ``argv``.
-
+    
     Returns
     -------
     int
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.export_schemas import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     import argparse
 
