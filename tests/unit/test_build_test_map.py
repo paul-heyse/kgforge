@@ -1,13 +1,17 @@
+"""Tests for ``tools.docs.build_test_map`` utilities."""
+
 from __future__ import annotations
 
 import importlib.util
+import os
 from pathlib import Path
 
 MODULE_PATH = Path(__file__).resolve().parents[2] / "tools" / "docs" / "build_test_map.py"
-SPEC = importlib.util.spec_from_file_location("build_test_map_under_test", MODULE_PATH)
-assert SPEC and SPEC.loader  # pragma: no cover - hard failure if module cannot be loaded
-build_test_map = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(build_test_map)
+
+spec = importlib.util.spec_from_file_location("tools.docs.build_test_map", MODULE_PATH)
+assert spec and spec.loader  # pragma: no cover - module must load for tests
+build_test_map = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(build_test_map)
 
 
 def test_load_symbol_candidates_strips_init(tmp_path, monkeypatch):
@@ -26,26 +30,11 @@ def test_load_symbol_candidates_strips_init(tmp_path, monkeypatch):
     assert "kgfoundry.__init__" not in candidates
 
 
-"""Tests for ``tools.docs.build_test_map`` utilities."""
-
-from __future__ import annotations
-
-import importlib.util
-import os
-from pathlib import Path
-
-MODULE_PATH = Path(__file__).resolve().parents[2] / "tools" / "docs" / "build_test_map.py"
-SPEC = importlib.util.spec_from_file_location("build_test_map", MODULE_PATH)
-assert SPEC and SPEC.loader
-_MODULE = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(_MODULE)  # type: ignore[arg-type]
-
-
 def _normalize_repo_rel(path_like: str) -> str:
-    return _MODULE._normalize_repo_rel(path_like)
+    return build_test_map._normalize_repo_rel(path_like)
 
 
-ROOT = _MODULE.ROOT
+ROOT = build_test_map.ROOT
 
 
 def test_normalize_repo_rel_with_prefixed_root() -> None:

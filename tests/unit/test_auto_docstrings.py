@@ -1,15 +1,30 @@
+"""Tests for ``tools.auto_docstrings`` helpers."""
+
 from __future__ import annotations
 
+import ast
+import importlib.util
 import sys
 from pathlib import Path
 
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+MODULE_PATH = ROOT / "tools" / "auto_docstrings.py"
 
-from tools import auto_docstrings
+spec = importlib.util.spec_from_file_location("tools.auto_docstrings", MODULE_PATH)
+assert spec and spec.loader  # pragma: no cover - module must load for tests
+auto_docstrings = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = auto_docstrings
+spec.loader.exec_module(auto_docstrings)
+
+_required_sections = auto_docstrings._required_sections
+annotation_to_text = auto_docstrings.annotation_to_text
+build_docstring = auto_docstrings.build_docstring
+build_examples = auto_docstrings.build_examples
+module_name_for = auto_docstrings.module_name_for
+parameters_for = auto_docstrings.parameters_for
+extended_summary = auto_docstrings.extended_summary
 
 
 @pytest.fixture()
@@ -30,7 +45,7 @@ def test_module_name_for_src_package(repo_layout: Path) -> None:
     file_path.parent.mkdir(parents=True, exist_ok=True)
     file_path.write_text("", encoding="utf-8")
 
-    module = auto_docstrings.module_name_for(file_path)
+    module = module_name_for(file_path)
 
     assert module == "kgfoundry_common.config"
 
@@ -40,7 +55,7 @@ def test_module_name_for_src_dunder_init(repo_layout: Path) -> None:
     file_path.parent.mkdir(parents=True, exist_ok=True)
     file_path.write_text("", encoding="utf-8")
 
-    module = auto_docstrings.module_name_for(file_path)
+    module = module_name_for(file_path)
 
     assert module == "kgfoundry_common"
 
@@ -49,35 +64,9 @@ def test_module_name_for_non_src_files(repo_layout: Path) -> None:
     file_path = repo_layout / "docs" / "_scripts" / "render.py"
     file_path.write_text("", encoding="utf-8")
 
-    module = auto_docstrings.module_name_for(file_path)
+    module = module_name_for(file_path)
 
     assert module == "docs._scripts.render"
-
-
-"""Tests for ``tools.auto_docstrings`` helpers."""
-
-from __future__ import annotations
-
-import ast
-import importlib.util
-import sys
-from pathlib import Path
-
-import pytest
-
-MODULE_PATH = Path(__file__).resolve().parents[2] / "tools" / "auto_docstrings.py"
-spec = importlib.util.spec_from_file_location("auto_docstrings", MODULE_PATH)
-auto_docstrings = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = auto_docstrings
-assert spec.loader is not None
-spec.loader.exec_module(auto_docstrings)
-
-_required_sections = auto_docstrings._required_sections
-annotation_to_text = auto_docstrings.annotation_to_text
-build_docstring = auto_docstrings.build_docstring
-build_examples = auto_docstrings.build_examples
-parameters_for = auto_docstrings.parameters_for
-extended_summary = auto_docstrings.extended_summary
 
 
 def _get_function(code: str) -> ast.FunctionDef:
@@ -153,18 +142,6 @@ def process(item: str, limit: int | None = None) -> str:
         assert section in docstring
 
 
-import sys
-from importlib import util
-from pathlib import Path
-
-AUTO_DOCSTRINGS_PATH = Path(__file__).resolve().parents[2] / "tools" / "auto_docstrings.py"
-_SPEC = util.spec_from_file_location("tools.auto_docstrings", AUTO_DOCSTRINGS_PATH)
-assert _SPEC and _SPEC.loader  # pragma: no cover - loading guard
-auto_docstrings = util.module_from_spec(_SPEC)
-sys.modules[_SPEC.name] = auto_docstrings
-_SPEC.loader.exec_module(auto_docstrings)
-
-
 @pytest.mark.parametrize(
     "source, module_name, expected_lines",
     [
@@ -198,7 +175,7 @@ def test_build_docstring_appends_examples(
 ) -> None:
     """Ensure Examples block is appended for functions and async functions."""
     node = ast.parse(source).body[0]
-    doc_lines = auto_docstrings.build_docstring("function", node, module_name)
+    doc_lines = build_docstring("function", node, module_name)
 
     assert "Examples" in doc_lines
     examples_index = doc_lines.index("Examples")
