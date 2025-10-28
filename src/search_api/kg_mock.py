@@ -70,6 +70,10 @@ def detect_query_concepts(query: str) -> set[str]:
     Set[str]
         Description of return value.
     """
+    
+    
+    
+    
     lowered = query.lower()
     hits: set[str] = set()
     for concept_id, meta in CONCEPTS.items():
@@ -94,6 +98,10 @@ def linked_concepts_for_text(text: str) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
     lowered = text.lower()
     hits = []
     for concept_id, meta in CONCEPTS.items():
@@ -129,5 +137,9 @@ def kg_boost(
     float
         Description of return value.
     """
+    
+    
+    
+    
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

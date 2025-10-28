@@ -61,6 +61,10 @@ class JsonFormatter(logging.Formatter):
         str
             Description of return value.
         """
+        
+        
+        
+        
         data = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
             "level": record.levelname,
@@ -85,6 +89,10 @@ def setup_logging(level: int = logging.INFO) -> None:
     level : int | None
         Description for ``level``.
     """
+    
+    
+    
+    
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())
     logging.basicConfig(level=level, handlers=[handler])

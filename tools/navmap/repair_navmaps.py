@@ -23,6 +23,29 @@ except ModuleNotFoundError:  # pragma: no cover - fallback for direct execution
 
 
 def _collect_modules(root: Path) -> list[ModuleInfo]:
+    """Collect modules.
+
+    Parameters
+    ----------
+    root : Path
+        Description.
+
+    Returns
+    -------
+
+
+    list[ModuleInfo]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _collect_modules(...)
+    """
     modules: list[ModuleInfo] = []
     for py in sorted(root.rglob("*.py")):
         info = _collect_module(py)
@@ -41,6 +64,8 @@ def _load_tree(path: Path) -> ast.Module:
 
     Returns
     -------
+
+
     ast.Module
         Description.
 
@@ -67,6 +92,8 @@ def _definition_lines(tree: ast.Module) -> dict[str, int]:
 
     Returns
     -------
+
+
     dict[str, int]
         Description.
 
@@ -106,6 +133,8 @@ def _docstring_end(tree: ast.Module) -> int | None:
 
     Returns
     -------
+
+
     int | None
         Description.
 
@@ -140,6 +169,8 @@ def _all_assignment_end(tree: ast.Module) -> int | None:
 
     Returns
     -------
+
+
     int | None
         Description.
 
@@ -176,6 +207,8 @@ def _navmap_assignment_span(tree: ast.Module) -> tuple[int, int] | None:
 
     Returns
     -------
+
+
     tuple[int, int] | None
         Description.
 
@@ -213,6 +246,8 @@ def _serialize_navmap(navmap: dict[str, Any]) -> list[str]:
 
     Returns
     -------
+
+
     list[str]
         Description.
 
@@ -239,6 +274,8 @@ def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, Any]:
 
     Returns
     -------
+
+
     dict[str, Any]
         Description.
 
@@ -294,9 +331,15 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
 
     Returns
     -------
+
+
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
     path = info.path
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
@@ -381,9 +424,15 @@ def repair_all(root: Path, apply: bool) -> list[str]:
 
     Returns
     -------
+
+
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
     messages: list[str] = []
     for info in _collect_modules(root):
         messages.extend(repair_module(info, apply=apply))
@@ -400,6 +449,8 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
     Returns
     -------
+
+
     argparse.Namespace
         Description.
 
@@ -439,9 +490,15 @@ def main(argv: list[str] | None = None) -> int:
 
     Returns
     -------
+
+
     int
         Description of return value.
     """
+    
+    
+    
+    
     args = _parse_args(argv)
     root = args.root.resolve()
     messages = repair_all(root, apply=args.apply)
