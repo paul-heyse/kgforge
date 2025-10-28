@@ -15,11 +15,20 @@ REPO = Path(__file__).resolve().parents[2]
 SRC = REPO / "src"
 
 try:
-    from tools.navmap.build_navmap import ModuleInfo, _collect_modules
+    from tools.navmap.build_navmap import ModuleInfo, _collect_module
 except ModuleNotFoundError:  # pragma: no cover - fallback for direct execution
     if str(REPO) not in sys.path:
         sys.path.insert(0, str(REPO))
-    from tools.navmap.build_navmap import ModuleInfo, _collect_modules
+    from tools.navmap.build_navmap import ModuleInfo, _collect_module
+
+
+def _collect_modules(root: Path) -> list[ModuleInfo]:
+    modules: list[ModuleInfo] = []
+    for py in sorted(root.rglob("*.py")):
+        info = _collect_module(py)
+        if info:
+            modules.append(info)
+    return modules
 
 
 def _load_tree(path: Path) -> ast.Module:
@@ -288,7 +297,6 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     List[str]
         Description of return value.
     """
-    
     path = info.path
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
@@ -376,7 +384,6 @@ def repair_all(root: Path, apply: bool) -> list[str]:
     List[str]
         Description of return value.
     """
-    
     messages: list[str] = []
     for info in _collect_modules(root):
         messages.extend(repair_module(info, apply=apply))
@@ -435,7 +442,6 @@ def main(argv: list[str] | None = None) -> int:
     int
         Description of return value.
     """
-    
     args = _parse_args(argv)
     root = args.root.resolve()
     messages = repair_all(root, apply=args.apply)
