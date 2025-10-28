@@ -25,6 +25,8 @@ build_examples = auto_docstrings.build_examples
 module_name_for = auto_docstrings.module_name_for
 parameters_for = auto_docstrings.parameters_for
 extended_summary = auto_docstrings.extended_summary
+describe_parameters = auto_docstrings.describe_parameters
+describe_return = auto_docstrings.describe_return
 
 
 @pytest.fixture()
@@ -135,11 +137,58 @@ def process(item: str, limit: int | None = None) -> str:
     docstring = "\n".join(lines)
 
     params = parameters_for(node)
+    parameter_docs = describe_parameters(params)
     returns = annotation_to_text(node.returns)
-    required = _required_sections("function", params, returns, [])
+    return_description = describe_return(returns)
+    required = _required_sections("function", parameter_docs, return_description, [])
 
     for section in required:
         assert section in docstring
+
+
+def test_build_docstring_infers_parameter_description() -> None:
+    node = _get_function(
+        """
+def summarise(retrieved_items: list[str]) -> list[str]:
+    return retrieved_items
+"""
+    )
+
+    lines = build_docstring("function", node, "pkg.module")
+    docstring = "\n".join(lines)
+
+    assert "retrieved_items : List[str]" in docstring
+    assert "Items retrieved from upstream operations. Accepts a list of str." in docstring
+
+
+def test_build_docstring_infers_return_description() -> None:
+    node = _get_function(
+        """
+def check_ready(status: bool) -> bool:
+    return status
+"""
+    )
+
+    lines = build_docstring("function", node, "pkg.module")
+    docstring = "\n".join(lines)
+
+    assert "Returns" in docstring
+    assert "Boolean flag indicating success." in docstring
+
+
+def test_build_docstring_omits_uninformative_sections() -> None:
+    node = _get_function(
+        """
+def passthrough(value: Any) -> Any:
+    return value
+"""
+    )
+
+    lines = build_docstring("function", node, "pkg.module")
+    docstring = "\n".join(lines)
+
+    assert "Parameters" not in docstring
+    assert "Returns" not in docstring
 
 
 @pytest.mark.parametrize(

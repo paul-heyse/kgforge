@@ -102,6 +102,369 @@ def _humanize_identifier(value: str) -> str:
     return " ".join(cleaned.split())
 
 
+GENERIC_PARAMETER_NAMES = {"args", "kwargs"}
+GENERIC_NOUNS = {"value", "item", "data", "object", "parameter", "arg"}
+NOUN_OVERRIDES = {
+    "cfg": "Configuration",
+    "config": "Configuration",
+    "count": "Count",
+    "error": "Error",
+    "errors": "Errors",
+    "id": "Identifier",
+    "ids": "Identifiers",
+    "item": "Item",
+    "items": "Items",
+    "message": "Message",
+    "messages": "Messages",
+    "name": "Name",
+    "names": "Names",
+    "node": "Node",
+    "path": "Path",
+    "paths": "Paths",
+    "payload": "Payload",
+    "result": "Result",
+    "results": "Results",
+    "status": "Status",
+    "timeout": "Timeout",
+    "token": "Token",
+    "tokens": "Tokens",
+    "url": "URL",
+    "uri": "URI",
+    "user": "User",
+    "users": "Users",
+}
+
+
+def _identifier_words(name: str) -> list[str]:
+    """Split ``name`` into lowercase words suitable for heuristics."""
+
+    cleaned = name.strip("_").replace("__", "_")
+    if not cleaned:
+        return []
+    parts = [part for part in cleaned.split("_") if part]
+    return [part.lower() for part in parts]
+
+
+def _noun_from_word(word: str) -> str:
+    """Return a human readable noun derived from ``word``."""
+
+    override = NOUN_OVERRIDES.get(word.lower())
+    if override:
+        return override
+    text = _humanize_identifier(word)
+    return text.capitalize() if text else "Value"
+
+
+def _noun_lower(noun: str) -> str:
+    """Return ``noun`` lowercased when safe for inclusion in sentences."""
+
+    if noun.isupper():
+        return noun
+    return noun.lower()
+
+
+def _context_description(noun: str, context: list[str]) -> str:
+    """Compose a phrase describing ``noun`` using ``context`` modifiers."""
+
+    if not context:
+        return noun
+
+    pretty_parts = [_humanize_identifier(part) for part in context]
+    lower_parts = [part.lower() for part in pretty_parts]
+    first = lower_parts[0]
+    remainder = pretty_parts[1:]
+    remainder_text = " ".join(part.lower() for part in remainder).strip()
+    noun_lower = _noun_lower(noun)
+
+    if first in {"max", "maximum"}:
+        return f"Maximum {noun_lower} allowed"
+    if first in {"min", "minimum"}:
+        return f"Minimum {noun_lower} required"
+    if first in {"default"}:
+        return f"Default {noun_lower}"
+    if first in {"previous", "prior"}:
+        return f"{noun} from the previous step"
+    if first in {"next"}:
+        return f"{noun} for the next step"
+    if first in {"new"}:
+        return f"New {noun_lower}"
+    if first in {"old", "current"}:
+        return f"Current {noun_lower}" if first == "current" else f"Previous {noun_lower}"
+    if first in {"num", "number", "count"}:
+        target = remainder_text if remainder_text else noun_lower
+        return f"Number of {target}"
+    if first in {"target", "source"}:
+        text = " ".join(part.lower() for part in pretty_parts).strip()
+        return f"{noun} for the {text}"
+    if first in {"input", "output"}:
+        suffix = f" {remainder_text}" if remainder_text else ""
+        return f"{noun} for {first}{suffix}"
+    if first in {"expected"}:
+        return f"Expected {noun_lower}"
+    if first in {"actual"}:
+        return f"Observed {noun_lower}"
+    if first in {"retrieved", "fetched", "loaded", "cached"}:
+        text = " ".join(part.lower() for part in pretty_parts)
+        return f"{noun} {text} from upstream operations"
+    if first in {"selected", "chosen"}:
+        return f"{noun} {first} for processing"
+    if first.endswith("ed"):
+        text = " ".join(part.lower() for part in pretty_parts)
+        return f"{noun} {text} from upstream operations"
+    if first.endswith("ing"):
+        text = " ".join(part.lower() for part in pretty_parts)
+        return f"{noun} used for {text}"
+
+    text = " ".join(part.lower() for part in pretty_parts)
+    if text:
+        return f"{noun} for {text}"
+    return noun
+
+
+def _combine_sentence(phrase: str, type_info: str | None) -> str:
+    """Return a polished sentence from ``phrase`` and ``type_info``."""
+
+    base = phrase.strip()
+    if not base:
+        return ""
+    sentence = base[0].upper() + base[1:]
+    if not sentence.endswith("."):
+        sentence += "."
+    if type_info:
+        info = type_info.strip()
+        if not info.endswith("."):
+            info += "."
+        sentence = f"{sentence} {info}".strip()
+    return sentence
+
+
+def _parse_annotation(annotation: str) -> tuple[str, str, str | None, bool]:
+    """Return parsed components of ``annotation`` for downstream heuristics."""
+
+    text = annotation.strip()
+    optional = False
+    base_text = text
+    if text.startswith("Optional "):
+        optional = True
+        base_text = text[len("Optional ") :].strip()
+    else:
+        parts = [part.strip() for part in text.split("|") if part.strip()]
+        non_none = [part for part in parts if part != "None"]
+        if non_none and len(non_none) != len(parts):
+            optional = True
+            if len(non_none) == 1:
+                base_text = non_none[0]
+            else:
+                base_text = " | ".join(non_none)
+
+    inner: str | None = None
+    base = base_text
+    if "[" in base_text and base_text.endswith("]"):
+        base, remainder = base_text.split("[", 1)
+        inner = remainder[:-1].strip()
+    base_key = base.split(".")[-1].strip().lower()
+    return base.strip(), base_key, inner, optional
+
+
+def _type_expectation(annotation: str) -> str | None:
+    """Generate a short expectation sentence derived from ``annotation``."""
+
+    if not annotation:
+        return None
+    base, key, inner, optional = _parse_annotation(annotation)
+    expectation: str | None = None
+    if key == "str":
+        expectation = "Accepts a string value."
+    elif key == "int":
+        expectation = "Accepts an integer."
+    elif key == "float":
+        expectation = "Accepts a floating-point number."
+    elif key == "bool":
+        expectation = "Treat as a boolean flag."
+    elif key in {"path", "pathlike"}:
+        expectation = "Accepts a filesystem path."
+    elif key in {"list", "tuple", "set", "sequence"}:
+        container = "list" if key == "list" else key
+        if inner:
+            expectation = f"Accepts a {container} of {inner}."
+        else:
+            expectation = f"Accepts a {container} of values."
+    elif key in {"dict", "mapping"}:
+        expectation = "Accepts a mapping of keys to values."
+    elif key == "iterable":
+        expectation = "Accepts an iterable of values."
+    elif key == "callable":
+        expectation = "Accepts a callable."
+
+    if expectation:
+        if optional:
+            return f"Optional parameter. {expectation}"
+        return expectation
+    if optional:
+        return "Optional parameter."
+    return None
+
+
+def _type_result(annotation: str) -> str | None:
+    """Generate a short return description derived from ``annotation``."""
+
+    if not annotation:
+        return None
+    base, key, inner, optional = _parse_annotation(annotation)
+    description: str | None = None
+    if key == "bool":
+        description = "Boolean flag indicating success"
+    elif key == "str":
+        description = "String result"
+    elif key == "int":
+        description = "Integer value"
+    elif key == "float":
+        description = "Floating-point value"
+    elif key in {"list", "tuple", "set", "sequence"}:
+        container = {
+            "list": "List",
+            "tuple": "Tuple",
+            "set": "Set",
+            "sequence": "Sequence",
+        }[key]
+        if inner:
+            description = f"{container} of {inner}"
+        else:
+            description = f"{container} of values"
+    elif key in {"dict", "mapping"}:
+        description = "Mapping of keys to values"
+    elif key in {"path", "pathlike"}:
+        description = "Filesystem path"
+
+    if description:
+        if optional:
+            return f"{description} or ``None``."
+        return f"{description}."
+    if optional:
+        return "Result may be ``None``."
+    return None
+
+
+def describe_parameter(name: str, annotation: str) -> "ParameterDoc" | None:
+    """
+    Compute describe parameter.
+    
+    Carry out the describe parameter operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
+    Parameters
+    ----------
+    name : str
+        Name. Accepts a string value.
+    annotation : str
+        Annotation. Accepts a string value.
+    
+    Returns
+    -------
+    'ParameterDoc' | None
+        Result may be ``None``.
+    
+    Examples
+    --------
+    >>> from tools.auto_docstrings import describe_parameter
+    >>> result = describe_parameter(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    """
+    
+
+    cleaned_name = name.lstrip("*")
+    if cleaned_name in GENERIC_PARAMETER_NAMES:
+        return None
+    words = _identifier_words(cleaned_name)
+    if not words:
+        return None
+    noun = _noun_from_word(words[-1])
+    context = words[:-1]
+    phrase = _context_description(noun, context)
+    type_info = _type_expectation(annotation)
+    description = _combine_sentence(phrase, type_info)
+    if not description:
+        return None
+    if not context and not type_info and noun.lower() in GENERIC_NOUNS:
+        return None
+    return ParameterDoc(name=name, annotation=annotation, description=description)
+
+
+def describe_parameters(parameters: list[tuple[str, str]]) -> list["ParameterDoc"]:
+    """
+    Compute describe parameters.
+    
+    Carry out the describe parameters operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
+    Parameters
+    ----------
+    parameters : List[Tuple[str, str]]
+        Parameters. Accepts a list of Tuple[str, str].
+    
+    Returns
+    -------
+    List['ParameterDoc']
+        List of 'ParameterDoc'.
+    
+    Examples
+    --------
+    >>> from tools.auto_docstrings import describe_parameters
+    >>> result = describe_parameters(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    """
+    
+
+    documented: list[ParameterDoc] = []
+    for name, annotation in parameters:
+        doc = describe_parameter(name, annotation)
+        if doc:
+            documented.append(doc)
+    return documented
+
+
+def describe_return(annotation: str | None) -> str | None:
+    """
+    Compute describe return.
+    
+    Carry out the describe return operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
+    Parameters
+    ----------
+    annotation : str | None
+        Annotation. Optional parameter. Accepts a string value.
+    
+    Returns
+    -------
+    str | None
+        String result or ``None``.
+    
+    Examples
+    --------
+    >>> from tools.auto_docstrings import describe_return
+    >>> result = describe_return(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    """
+    
+
+    if not annotation:
+        return None
+    _, key, _, _ = _parse_annotation(annotation)
+    if key == "any":
+        return None
+    description = _type_result(annotation)
+    if description:
+        return description
+    fallback = _humanize_identifier(annotation)
+    if not fallback:
+        return None
+    text = fallback.capitalize()
+    if text.lower() in GENERIC_NOUNS | {"any"}:
+        return None
+    return f"{text} result."
+
+
 def _is_magic(name: str | None) -> bool:
     """Return whether ``name`` is a Python magic method."""
     return bool(name and name.startswith("__") and name.endswith("__"))
@@ -946,6 +1309,15 @@ def _format_annotation_string(value: str) -> str:
 
 
 @dataclass
+class ParameterDoc:
+    """Store rendered documentation details for a single parameter."""
+
+    name: str
+    annotation: str
+    description: str
+
+
+@dataclass
 class DocstringChange:
     """Describe DocstringChange."""
 
@@ -1394,13 +1766,16 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
         extended = extended_summary(kind, object_name, module_name, node)
 
     parameters: list[tuple[str, str]] = []
-    returns: str | None = None
+    parameter_docs: list[ParameterDoc] = []
+    return_annotation: str | None = None
+    return_description: str | None = None
     raises: list[str] = []
     if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         parameters = parameters_for(node)
+        parameter_docs = describe_parameters(parameters)
         return_annotation = annotation_to_text(node.returns)
         if return_annotation not in {"None", "NoReturn"}:
-            returns = return_annotation
+            return_description = describe_return(return_annotation)
         raises = detect_raises(node)
 
     lines: list[str] = ['"""', summary]
@@ -1415,14 +1790,14 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
         lines.append('"""')
         return lines
 
-    if parameters:
+    if parameter_docs:
         lines.extend(["", "Parameters", "----------"])
-        for param_name, annotation in parameters:
-            lines.append(f"{param_name} : {annotation}")
-            lines.append(f"    Description for ``{param_name}``.")
+        for param in parameter_docs:
+            lines.append(f"{param.name} : {param.annotation}")
+            lines.append(f"    {param.description}")
 
-    if returns:
-        lines.extend(["", "Returns", "-------", returns, "    Description of return value."])
+    if return_annotation and return_description:
+        lines.extend(["", "Returns", "-------", return_annotation, f"    {return_description}"])
 
     if raises:
         lines.extend(["", "Raises", "------"])
@@ -1434,7 +1809,7 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
         name = getattr(node, "name", "")
         is_public = bool(name) and not name.startswith("_")
         if is_public:
-            example_lines = build_examples(module_name, name, parameters, bool(returns))
+            example_lines = build_examples(module_name, name, parameters, bool(return_annotation))
             if example_lines:
                 lines.extend(["", *example_lines])
 
@@ -1444,8 +1819,8 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
 
 def _required_sections(
     kind: str,
-    parameters: list[tuple[str, str]],
-    returns: str | None,
+    parameters: list[ParameterDoc],
+    return_description: str | None,
     raises: list[str],
 ) -> set[str]:
     """Compute required sections.
@@ -1473,7 +1848,7 @@ def _required_sections(
     required: set[str] = {"Examples"}
     if parameters:
         required.add("Parameters")
-    if returns:
+    if return_description:
         required.add("Returns")
     if raises:
         required.add("Raises")
@@ -1601,16 +1976,18 @@ def process_file(path: Path) -> bool:
 
         doc, expr = docstring_text(node)
         parameters: list[tuple[str, str]] = []
-        returns: str | None = None
+        parameter_docs: list[ParameterDoc] = []
+        return_description: str | None = None
         raises: list[str] = []
         if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             parameters = parameters_for(node)
-            return_annotation: str = annotation_to_text(node.returns)
+            parameter_docs = describe_parameters(parameters)
+            return_annotation = annotation_to_text(node.returns)
             if return_annotation not in {"None", "NoReturn"}:
-                returns = return_annotation
+                return_description = describe_return(return_annotation)
             raises = detect_raises(node)
 
-        required_sections = _required_sections(kind, parameters, returns, raises)
+        required_sections = _required_sections(kind, parameter_docs, return_description, raises)
         needs_update = doc is None or "TODO" in (doc or "") or "NavMap:" in (doc or "")
         if not needs_update and required_sections:
             if doc is None:

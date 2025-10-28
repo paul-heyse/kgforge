@@ -366,14 +366,15 @@ def _normalize_repo_rel(path_like: str) -> str:
 
 
 def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]]]:
-    """Compute load coverage.
-
+    """
+    Compute load coverage.
+    
     Carry out the load coverage operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
     
     Returns
     -------
     Tuple[dict[str, collections.abc.Set], dict[Tuple[str, int], collections.abc.Set]]
-        Description of return value.
+        Tuple of dict[str, collections.abc.Set], dict[Tuple[str, int], collections.abc.Set].
     
     Examples
     --------
@@ -382,6 +383,7 @@ def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     
     
     if not COV_JSON.exists():
