@@ -55,6 +55,9 @@ uv sync                       # installs from uv.lock / pyproject
 - Package README generation: `python tools/gen_readmes.py` (see
   [Automated Documentation](README-AUTOMATED-DOCUMENTATION.md#readme-generation-toolsgen_readmespy)
   for full workflow details).
+- Gallery examples live in `examples/`; follow
+  [`docs/how-to/contributing-gallery-examples.md`](docs/how-to/contributing-gallery-examples.md)
+  and run `python tools/validate_gallery.py --strict` before building docs.
 
 ---
 

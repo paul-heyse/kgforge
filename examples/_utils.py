@@ -1,8 +1,18 @@
-"""Utility helpers used by Sphinx gallery examples.
+"""Utility helpers used by Sphinx gallery examples
+===============================================
 
 The helpers in this module must stay import-safe, deterministic, and CPU-only so
 that doctest and gallery generation remain fast. Keep the data tiny and avoid
 network or GPU side effects.
+
+.. tags:: utils, helpers
+
+Constraints
+-----------
+
+- Time: <1s
+- GPU: no
+- Network: no
 """
 
 from __future__ import annotations

@@ -21,7 +21,10 @@ from astroid import builder as astroid_builder
 from astroid import manager as astroid_manager
 from astroid.nodes import Module as AstroidModule
 from autoapi import _parser as autoapi_parser  # type: ignore[attr-defined]
+from docutils import nodes
+from docutils.parsers.rst import Directive
 from griffe import Module as GriffeModule
+from sphinx.application import Sphinx
 from sphinxcontrib.serializinghtml import jsonimpl  # type: ignore[attr-defined]
 
 # --- Project metadata (override via env if you like)
@@ -107,6 +110,8 @@ html_theme = os.environ.get("SPHINX_THEME", "pydata_sphinx_theme")
 
 # MyST (Markdown) features
 myst_enable_extensions = ["colon_fence", "deflist", "linkify"]
+# Generate id attributes for headings up to h3 so intra-page links stay stable.
+myst_heading_anchors = 3
 
 # AutoAPI: scan each detected package directory so module names match import paths
 autoapi_type = "python"
@@ -190,6 +195,14 @@ sphinx_gallery_conf = {
     "run_stale_examples": False,
     "plot_gallery": False,
     "backreferences_dir": "gen_modules/backrefs",
+    "first_notebook_cell": None,  # Do not prepend setup cells to rendered notebooks.
+    "line_numbers": False,  # Produce cleaner code blocks in gallery pages.
+    "reference_url": {  # Keep cross-reference targets local to this project.
+        "sphinx_gallery": None,
+    },
+    "capture_repr": (),  # Avoid capturing repr output unless explicitly requested.
+    "expected_failing_examples": [],  # Fail the build if an example regresses unexpectedly.
+    "min_reported_time": 0,  # Always surface execution timing metadata in reports.
 }
 
 # Ensure JSON builder can serialize lru_cache wrappers
@@ -321,3 +334,18 @@ nitpick_ignore_regex = [
     ("py:class", r"kgfoundry\\.kgfoundry_common\\..*"),
     ("py:class", r"kgfoundry\\.kgfoundry_common\\.models\\.Id"),
 ]
+
+
+class GalleryTagsDirective(Directive):
+    """Lightweight directive so ``.. tags::`` blocks parse without warnings."""
+
+    has_content = True
+
+    def run(self) -> list[nodes.Node]:  # type: ignore[override]
+        """Return an empty node list so Sphinx accepts ``.. tags::`` blocks."""
+        return []
+
+
+def setup(app: "Sphinx") -> None:  # pragma: no cover - Sphinx integration hook
+    """Register custom directives when Sphinx loads the config module."""
+    app.add_directive("tags", GalleryTagsDirective)

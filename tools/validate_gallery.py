@@ -1,0 +1,253 @@
+#!/usr/bin/env python3
+"""Validate Sphinx-Gallery example docstrings before documentation builds.
+
+The validator enforces the conventions that Sphinx-Gallery relies on to extract
+page titles and generate stable cross-reference anchors. It checks every Python
+module in the ``examples/`` directory and reports actionable error messages when
+the format drifts.
+"""
+
+from __future__ import annotations
+
+import argparse
+import ast
+import inspect
+import re
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Iterable
+
+TITLE_MAX_LENGTH = 79
+UNDERLINE_TOLERANCE = 1
+
+TITLE_UNDERLINE_PATTERN = re.compile(r"^(?P<char>=)\1*$")
+CUSTOM_LABEL_PATTERN = re.compile(r"(?m)^\.\.\s+_gallery_[\w-]+:\s*$")
+TAGS_PATTERN = re.compile(r"(?m)^\.\.\s+tags::\s*")
+CONSTRAINTS_HEADER_PATTERN = re.compile(
+    r"(?m)^Constraints\s*\n(?P<rule>[-=~`'^\"]{3,})\s*$",
+)
+
+__navmap__ = {
+    "category": "docs",
+    "stability": "stable",
+    "exports": ["main", "validate_example_file"],
+    "synopsis": "Validate Sphinx-Gallery examples for title and directive compliance.",
+}
+
+__all__ = [
+    "GalleryValidationError",
+    "check_custom_labels",
+    "check_orphan_directive",
+    "main",
+    "validate_example_file",
+    "validate_title_format",
+]
+
+
+@dataclass
+class ValidationResult:
+    """Holds validation errors collected for an example file."""
+
+    path: Path
+    errors: list[str]
+
+    def extend(self, messages: Iterable[str]) -> None:
+        """Append messages to the error list."""
+
+        self.errors.extend(messages)
+
+    @property
+    def ok(self) -> bool:
+        """Return ``True`` when the file has no validation errors."""
+
+        return not self.errors
+
+
+class GalleryValidationError(RuntimeError):
+    """Raised when a gallery example fails validation."""
+
+
+def validate_title_format(docstring: str) -> tuple[bool, str]:
+    """Validate the title + underline structure in a docstring."""
+
+    lines = [line.rstrip() for line in inspect.cleandoc(docstring).splitlines()]
+    while lines and not lines[0].strip():
+        lines.pop(0)
+    if not lines:
+        return False, "docstring is empty"
+
+    title = lines[0]
+    if len(title) > TITLE_MAX_LENGTH:
+        return False, f"title exceeds {TITLE_MAX_LENGTH} characters"
+
+    if len(lines) < 2:
+        return False, "missing underline under the title"
+
+    underline = lines[1]
+    if not TITLE_UNDERLINE_PATTERN.fullmatch(underline):
+        return False, "title underline must be composed of '=' characters"
+
+    if abs(len(underline) - len(title)) > UNDERLINE_TOLERANCE:
+        return False, "title underline length must match the title (±1 character)"
+
+    if len(lines) < 3 or lines[2].strip():
+        return False, "expected a blank line after the title underline"
+
+    return True, ""
+
+
+def check_orphan_directive(docstring: str) -> bool:
+    """Return ``True`` when the docstring still contains the ``:orphan:`` directive."""
+
+    return ":orphan:" in docstring
+
+
+def check_custom_labels(docstring: str) -> list[str]:
+    """Return custom ``.. _gallery_*:`` labels present in the docstring."""
+
+    return CUSTOM_LABEL_PATTERN.findall(docstring)
+
+
+def _has_tags_directive(docstring: str) -> bool:
+    """Return ``True`` if the docstring declares a ``.. tags::`` directive."""
+
+    return TAGS_PATTERN.search(docstring) is not None
+
+
+def _has_constraints_section(docstring: str) -> bool:
+    """Return ``True`` if a ``Constraints`` section header is present."""
+
+    match = CONSTRAINTS_HEADER_PATTERN.search(docstring)
+    return bool(match and set(match.group("rule")) == {"-"})
+
+
+def _load_docstring(path: Path) -> str | None:
+    """Extract the module docstring from ``path`` using ``ast`` parsing."""
+
+    try:
+        module = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    except SyntaxError as exc:  # pragma: no cover - should never happen for examples
+        raise GalleryValidationError(f"{path}: failed to parse module ({exc})") from exc
+    return ast.get_docstring(module, clean=False)
+
+
+def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]:
+    """Validate ``file_path`` and return a list of human-readable errors."""
+
+    errors: list[str] = []
+    docstring = _load_docstring(file_path)
+    if docstring is None:
+        return ["missing module docstring"]
+
+    ok, message = validate_title_format(docstring)
+    if not ok:
+        errors.append(message)
+
+    if check_orphan_directive(docstring):
+        errors.append("remove ':orphan:' directive (Sphinx-Gallery manages references)")
+
+    labels = check_custom_labels(docstring)
+    if labels:
+        errors.append("remove custom '.. _gallery_*:' labels (Sphinx-Gallery generates them)")
+
+    if not _has_tags_directive(docstring):
+        errors.append("add a '.. tags::' directive describing the example")
+
+    if not _has_constraints_section(docstring):
+        errors.append("add a 'Constraints' section with a dashed underline")
+
+    if strict:
+        lines = inspect.cleandoc(docstring).splitlines()
+        if lines and lines[0].endswith("."):
+            errors.append("remove trailing period from the title")
+        if sum(1 for line in lines if line.strip().startswith("- ")) < 1:
+            errors.append("constraints section should enumerate at least one bullet")
+
+    return errors
+
+
+def _iter_example_files(examples_dir: Path) -> Iterable[Path]:
+    """Yield Python files inside ``examples_dir`` (non-recursive)."""
+
+    for path in sorted(examples_dir.glob("*.py")):
+        if path.name.startswith("."):
+            continue
+        yield path
+
+
+def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> int:
+    """Validate gallery examples located in ``examples_dir``."""
+
+    results: list[ValidationResult] = []
+    exit_code = 0
+    for path in _iter_example_files(examples_dir):
+        messages = validate_example_file(path, strict=strict)
+        result = ValidationResult(path=path, errors=messages)
+        results.append(result)
+        if result.ok:
+            if verbose:
+                print(f"✔ {path}")
+            continue
+        exit_code = 1
+        for message in result.errors:
+            print(f"✖ {path}: {message}", file=sys.stderr)
+
+    if exit_code == 0 and verbose:
+        print("All gallery examples passed validation.")
+    elif exit_code != 0:
+        total = sum(len(result.errors) for result in results if not result.ok)
+        failing = sum(1 for result in results if not result.ok)
+        print(
+            f"Found {total} issue(s) across {failing} file(s).",
+            file=sys.stderr,
+        )
+    return exit_code
+
+
+def _parse_args(argv: list[str]) -> argparse.Namespace:
+    """Parse CLI arguments."""
+
+    parser = argparse.ArgumentParser(
+        description="Validate Sphinx-Gallery example docstrings for kgfoundry.",
+    )
+    parser.add_argument(
+        "--examples-dir",
+        type=Path,
+        default=Path("examples"),
+        help="Directory containing gallery examples (default: examples/).",
+    )
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Enable stricter validation rules (title punctuation, constraints bullets).",
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Print success messages for passing files.",
+    )
+    parser.add_argument(
+        "--fix",
+        action="store_true",
+        help="Reserved for future automatic fixes.",
+    )
+    return parser.parse_args(argv)
+
+
+def _run_from_cli(argv: list[str]) -> int:
+    """Entry point used by ``if __name__ == '__main__'`` guard."""
+
+    args = _parse_args(argv)
+    if args.fix:
+        print("Automatic fixing is not implemented yet.", file=sys.stderr)
+        return 2
+    examples_dir = args.examples_dir.resolve()
+    if not examples_dir.exists():
+        print(f"Examples directory not found: {examples_dir}", file=sys.stderr)
+        return 2
+    return main(examples_dir, strict=args.strict, verbose=args.verbose)
+
+
+if __name__ == "__main__":  # pragma: no cover - CLI invocation
+    sys.exit(_run_from_cli(sys.argv[1:]))
