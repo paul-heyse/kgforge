@@ -85,17 +85,16 @@ def _load_json(path: Path) -> Any:
 
 
 def load_symbol_candidates() -> set[str]:
-    """Compute load symbol candidates.
-
+    """
+    Compute load symbol candidates.
+    
     Carry out the load symbol candidates operation.
-
+    
     Returns
     -------
     Set[str]
         Description of return value.
     """
-    
-    
     candidates: set[str] = set()
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if symbols_json.exists():
@@ -119,17 +118,16 @@ def load_symbol_candidates() -> set[str]:
 
 
 def load_symbol_spans() -> dict[str, dict[str, Any]]:
-    """Compute load symbol spans.
-
+    """
+    Compute load symbol spans.
+    
     Carry out the load symbol spans operation.
-
+    
     Returns
     -------
     Mapping[str, Mapping[str, Any]]
         Description of return value.
     """
-    
-    
     out: dict[str, dict[str, Any]] = {}
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if not symbols_json.exists():
@@ -150,17 +148,16 @@ def load_symbol_spans() -> dict[str, dict[str, Any]]:
 
 
 def load_public_symbols() -> set[str]:
-    """Compute load public symbols.
-
+    """
+    Compute load public symbols.
+    
     Carry out the load public symbols operation.
-
+    
     Returns
     -------
     Set[str]
         Description of return value.
     """
-    
-    
     nav = ROOT / "site" / "_build" / "navmap" / "navmap.json"
     if not nav.exists():
         return set()
@@ -223,24 +220,23 @@ def _names_from_ast(tree: ast.AST | None) -> set[str]:
 
 
 def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, object]]]:
-    """Compute scan test file.
-
+    """
+    Compute scan test file.
+    
     Carry out the scan test file operation.
-
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
     symbols : Set[str]
         Description for ``symbols``.
-
+    
     Returns
     -------
     Mapping[str, List[Mapping[str, object]]]
         Description of return value.
     """
-    
-    
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -327,17 +323,16 @@ def _normalize_repo_rel(path_like: str) -> str:
 
 
 def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]]]:
-    """Compute load coverage.
-
+    """
+    Compute load coverage.
+    
     Carry out the load coverage operation.
-
+    
     Returns
     -------
     Tuple[dict[str, Set[int]], dict[Tuple[str, int], Set[str]]]
         Description of return value.
     """
-    
-    
     if not COV_JSON.exists():
         return ({}, {})
     data = _load_json(COV_JSON)
@@ -364,22 +359,21 @@ def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]
 
 
 def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
-    """Compute build test map.
-
+    """
+    Compute build test map.
+    
     Carry out the build test map operation.
-
+    
     Parameters
     ----------
     symbols : Set[str]
         Description for ``symbols``.
-
+    
     Returns
     -------
     Mapping[str, List[Mapping[str, object]]]
         Description of return value.
     """
-    
-    
     table: dict[str, list[dict[str, object]]] = defaultdict(list)
     if not TESTS.exists():
         return {}
@@ -397,10 +391,11 @@ def attach_coverage(
     executed: dict[str, set[int]],
     ctx_by_line: dict[tuple[str, int], set[str]],
 ) -> dict[str, dict[str, Any]]:
-    """Compute attach coverage.
-
+    """
+    Compute attach coverage.
+    
     Carry out the attach coverage operation.
-
+    
     Parameters
     ----------
     symbol_spans : Mapping[str, Mapping[str, Any]]
@@ -409,14 +404,12 @@ def attach_coverage(
         Description for ``executed``.
     ctx_by_line : Mapping[Tuple[str, int], Set[str]]
         Description for ``ctx_by_line``.
-
+    
     Returns
     -------
     Mapping[str, Mapping[str, Any]]
         Description of return value.
     """
-    
-    
     result: dict[str, dict[str, Any]] = {}
     for sym, meta in symbol_spans.items():
         f = meta.get("file")
@@ -452,10 +445,11 @@ def summarize(
     coverage: dict[str, dict[str, Any]],
     budget: int,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    """Compute summarize.
-
+    """
+    Compute summarize.
+    
     Carry out the summarize operation.
-
+    
     Parameters
     ----------
     public_syms : Set[str]
@@ -466,14 +460,12 @@ def summarize(
         Description for ``coverage``.
     budget : int
         Description for ``budget``.
-
+    
     Returns
     -------
     Tuple[dict[str, Any], List[dict[str, Any]]]
         Description of return value.
     """
-    
-    
     # group by module
     by_mod: dict[str, list[str]] = defaultdict(list)
     for s in public_syms:

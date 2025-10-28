@@ -43,26 +43,21 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor urn_doc_from_text]
 def urn_doc_from_text(text: str) -> str:
-    """Compute urn doc from text.
-
+    """
+    Compute urn doc from text.
+    
     Carry out the urn doc from text operation.
-
+    
     Parameters
     ----------
     text : str
         Description for ``text``.
-
+    
     Returns
     -------
     str
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     h = hashlib.sha256(text.encode("utf-8")).digest()[:16]
     b32 = base64.b32encode(h).decode("ascii").strip("=").lower()
     return f"urn:doc:sha256:{b32}"
@@ -70,10 +65,11 @@ def urn_doc_from_text(text: str) -> str:
 
 # [nav:anchor urn_chunk]
 def urn_chunk(doc_hash: str, start: int, end: int) -> str:
-    """Compute urn chunk.
-
+    """
+    Compute urn chunk.
+    
     Carry out the urn chunk operation.
-
+    
     Parameters
     ----------
     doc_hash : str
@@ -82,16 +78,10 @@ def urn_chunk(doc_hash: str, start: int, end: int) -> str:
         Description for ``start``.
     end : int
         Description for ``end``.
-
+    
     Returns
     -------
     str
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     return f"urn:chunk:{doc_hash.split(':')[-1]}:{start}-{end}"

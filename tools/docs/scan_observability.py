@@ -49,7 +49,7 @@ LINK_MODE = os.getenv("DOCS_LINK_MODE", "both").lower()  # editor|github|both
 
 
 def _rel(p: Path) -> str:
-    """rel.
+    """Rel.
 
     Parameters
     ----------
@@ -78,7 +78,7 @@ def _rel(p: Path) -> str:
 
 
 def _sha() -> str:
-    """sha.
+    """Sha.
 
     Returns
     -------
@@ -207,21 +207,16 @@ POLICY_PATH = ROOT / "docs" / "policies" / "observability.yml"
 
 
 def load_policy() -> dict[str, Any]:
-    """Compute load policy.
-
+    """
+    Compute load policy.
+    
     Carry out the load policy operation.
-
+    
     Returns
     -------
     Mapping[str, Any]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
     try:
@@ -251,6 +246,7 @@ class MetricRow:
     --------
     >>> MetricRow(...)
     """
+
     name: str
     type: str | None
     unit: str | None
@@ -280,6 +276,7 @@ class LogRow:
     --------
     >>> LogRow(...)
     """
+
     logger: str | None
     level: str
     message_template: str
@@ -308,6 +305,7 @@ class TraceRow:
     --------
     >>> TraceRow(...)
     """
+
     span_name: str | None
     attributes: list[str]
     file: str
@@ -695,26 +693,21 @@ def _lint_trace(policy: dict, row: TraceRow) -> list[dict]:
 
 
 def read_ast(path: Path) -> tuple[str, ast.AST | None]:
-    """Compute read ast.
-
+    """
+    Compute read ast.
+    
     Carry out the read ast operation.
-
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     Tuple[str, ast.AST | None]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     try:
         text = path.read_text(encoding="utf-8")
     except OSError:
@@ -727,28 +720,23 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
 
 
 def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], list[TraceRow]]:
-    """Compute scan file.
-
+    """
+    Compute scan file.
+    
     Carry out the scan file operation.
-
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
     policy : Mapping[str, Any]
         Description for ``policy``.
-
+    
     Returns
     -------
     Tuple[List[LogRow], List[MetricRow], List[TraceRow]]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     text, tree = read_ast(path)
     if not text or tree is None:
         return ([], [], [])

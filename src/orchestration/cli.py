@@ -51,10 +51,11 @@ def index_bm25(
     backend: str = typer.Option("lucene", help="lucene|pure"),
     index_dir: str = typer.Option("./_indices/bm25", help="Output index directory"),
 ) -> None:
-    """Compute index bm25.
-
+    """
+    Compute index bm25.
+    
     Carry out the index bm25 operation.
-
+    
     Parameters
     ----------
     chunks_parquet : str | None
@@ -64,12 +65,6 @@ def index_bm25(
     index_dir : str | None
         Description for ``index_dir``.
     """
-    
-    
-    
-    
-    
-    
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
@@ -116,10 +111,11 @@ def index_faiss(
         "./_indices/faiss/shard_000.idx", help="Output index (CPU .idx)"
     ),
 ) -> None:
-    """Compute index faiss.
-
+    """
+    Compute index faiss.
+    
     Carry out the index faiss operation.
-
+    
     Parameters
     ----------
     dense_vectors : str | None
@@ -127,12 +123,6 @@ def index_faiss(
     index_path : str | None
         Description for ``index_path``.
     """
-    
-    
-    
-    
-    
-    
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
         vecs = json.load(fh)
@@ -154,21 +144,16 @@ def index_faiss(
 # [nav:anchor api]
 @app.command()
 def api(port: int = 8080) -> None:
-    """Compute api.
-
+    """
+    Compute api.
+    
     Carry out the api operation.
-
+    
     Parameters
     ----------
     port : int | None
         Description for ``port``.
     """
-    
-    
-    
-    
-    
-    
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
@@ -177,21 +162,16 @@ def api(port: int = 8080) -> None:
 # [nav:anchor e2e]
 @app.command()
 def e2e() -> None:
-    """Compute e2e.
-
+    """
+    Compute e2e.
+    
     Carry out the e2e operation.
-
+    
     Raises
     ------
     typer.Exit
         Raised when validation fails.
     """
-    
-    
-    
-    
-    
-    
     try:
         from orchestration.flows import e2e_flow
     except ModuleNotFoundError as exc:  # pragma: no cover - defensive messaging

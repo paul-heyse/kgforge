@@ -11,26 +11,21 @@ SRC = ROOT / "src"
 
 
 def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
-    """Compute iter module nodes.
-
+    """
+    Compute iter module nodes.
+    
     Carry out the iter module nodes operation.
-
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     Tuple[ast.Module, ast.Expr | None]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if not tree.body:
@@ -46,26 +41,21 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
 
 
 def clean_docstring(text: str) -> str:
-    """Compute clean docstring.
-
+    """
+    Compute clean docstring.
+    
     Carry out the clean docstring operation.
-
+    
     Parameters
     ----------
     text : str
         Description for ``text``.
-
+    
     Returns
     -------
     str
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     lines: list[str] = []
     for raw in text.splitlines():
         if raw.strip().startswith("NavMap:"):
@@ -76,26 +66,21 @@ def clean_docstring(text: str) -> str:
 
 
 def rewrite_module(path: Path) -> bool:
-    """Compute rewrite module.
-
+    """
+    Compute rewrite module.
+    
     Carry out the rewrite module operation.
-
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     bool
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     tree, doc_expr = iter_module_nodes(path)
     if doc_expr is None:
         return False
@@ -118,16 +103,11 @@ def rewrite_module(path: Path) -> bool:
 
 
 def main() -> None:
-    """Compute main.
-
+    """
+    Compute main.
+    
     Carry out the main operation.
     """
-    
-    
-    
-    
-    
-    
     changed = 0
     for file_path in sorted(SRC.rglob("*.py")):
         if rewrite_module(file_path):

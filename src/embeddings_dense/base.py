@@ -43,24 +43,19 @@ class DenseEmbeddingModel(Protocol):
     """Describe DenseEmbeddingModel."""
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]:
-        """Compute encode.
-
+        """
+        Compute encode.
+        
         Carry out the encode operation.
-
+        
         Parameters
         ----------
         texts : Sequence[str]
             Description for ``texts``.
-
+        
         Returns
         -------
         NDArray[np.float32]
             Description of return value.
         """
-        
-        
-        
-        
-        
-        
         ...

@@ -39,24 +39,20 @@ class MockKG:
     """Describe MockKG."""
 
     def __init__(self) -> None:
-        """Compute init.
-
+        """
+        Compute init.
+        
         Initialise a new instance with validated parameters.
         """
-        
-        
-        
-        
-        
-        
         self.chunk2concepts: dict[str, set[str]] = {}
         self.neighbors: dict[str, set[str]] = {}
 
     def add_mention(self, chunk_id: str, concept_id: str) -> None:
-        """Compute add mention.
-
+        """
+        Compute add mention.
+        
         Carry out the add mention operation.
-
+        
         Parameters
         ----------
         chunk_id : str
@@ -64,19 +60,14 @@ class MockKG:
         concept_id : str
             Description for ``concept_id``.
         """
-        
-        
-        
-        
-        
-        
         self.chunk2concepts.setdefault(chunk_id, set()).add(concept_id)
 
     def add_edge(self, a: str, b: str) -> None:
-        """Compute add edge.
-
+        """
+        Compute add edge.
+        
         Carry out the add edge operation.
-
+        
         Parameters
         ----------
         a : str
@@ -84,57 +75,41 @@ class MockKG:
         b : str
             Description for ``b``.
         """
-        
-        
-        
-        
-        
-        
         self.neighbors.setdefault(a, set()).add(b)
         self.neighbors.setdefault(b, set()).add(a)
 
     def linked_concepts(self, chunk_id: str) -> list[str]:
-        """Compute linked concepts.
-
+        """
+        Compute linked concepts.
+        
         Carry out the linked concepts operation.
-
+        
         Parameters
         ----------
         chunk_id : str
             Description for ``chunk_id``.
-
+        
         Returns
         -------
         List[str]
             Description of return value.
         """
-        
-        
-        
-        
-        
-        
         return sorted(self.chunk2concepts.get(chunk_id, set()))
 
     def one_hop(self, concept_id: str) -> list[str]:
-        """Compute one hop.
-
+        """
+        Compute one hop.
+        
         Carry out the one hop operation.
-
+        
         Parameters
         ----------
         concept_id : str
             Description for ``concept_id``.
-
+        
         Returns
         -------
         List[str]
             Description of return value.
         """
-        
-        
-        
-        
-        
-        
         return sorted(self.neighbors.get(concept_id, set()))

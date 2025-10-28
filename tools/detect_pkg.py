@@ -39,21 +39,16 @@ def _candidate_names() -> list[str]:
 
 
 def detect_packages() -> list[str]:
-    """Compute detect packages.
-
+    """
+    Compute detect packages.
+    
     Carry out the detect packages operation.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     candidates = _candidate_names()
     lowers = [c for c in candidates if c.islower()]
     base = lowers or candidates
@@ -62,21 +57,16 @@ def detect_packages() -> list[str]:
 
 
 def detect_primary() -> str:
-    """Compute detect primary.
-
+    """
+    Compute detect primary.
+    
     Carry out the detect primary operation.
-
+    
     Returns
     -------
     str
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     packages = detect_packages()
     return packages[0]
 

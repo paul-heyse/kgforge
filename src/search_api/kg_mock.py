@@ -56,26 +56,21 @@ CONCEPTS: Final[dict[str, ConceptMeta]] = {
 
 # [nav:anchor detect_query_concepts]
 def detect_query_concepts(query: str) -> set[str]:
-    """Compute detect query concepts.
-
+    """
+    Compute detect query concepts.
+    
     Carry out the detect query concepts operation.
-
+    
     Parameters
     ----------
     query : str
         Description for ``query``.
-
+    
     Returns
     -------
     Set[str]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     lowered = query.lower()
     hits: set[str] = set()
     for concept_id, meta in CONCEPTS.items():
@@ -86,26 +81,21 @@ def detect_query_concepts(query: str) -> set[str]:
 
 # [nav:anchor linked_concepts_for_text]
 def linked_concepts_for_text(text: str) -> list[str]:
-    """Compute linked concepts for text.
-
+    """
+    Compute linked concepts for text.
+    
     Carry out the linked concepts for text operation.
-
+    
     Parameters
     ----------
     text : str
         Description for ``text``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     lowered = text.lower()
     hits = []
     for concept_id, meta in CONCEPTS.items():
@@ -121,10 +111,11 @@ def kg_boost(
     direct: float = 0.08,
     one_hop: float = 0.04,
 ) -> float:
-    """Compute kg boost.
-
+    """
+    Compute kg boost.
+    
     Carry out the kg boost operation.
-
+    
     Parameters
     ----------
     query_concepts : List[str]
@@ -135,17 +126,11 @@ def kg_boost(
         Description for ``direct``.
     one_hop : float | None
         Description for ``one_hop``.
-
+    
     Returns
     -------
     float
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

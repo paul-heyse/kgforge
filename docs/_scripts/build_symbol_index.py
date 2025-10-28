@@ -52,21 +52,16 @@ class NavLookup:
 
 
 def iter_packages() -> list[str]:
-    """Compute iter packages.
-
+    """
+    Compute iter packages.
+    
     Carry out the iter packages operation.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     packages = detect_packages()
@@ -74,10 +69,11 @@ def iter_packages() -> list[str]:
 
 
 def safe_attr(node: Object, attr: str, default: object | None = None) -> object | None:
-    """Compute safe attr.
-
+    """
+    Compute safe attr.
+    
     Carry out the safe attr operation.
-
+    
     Parameters
     ----------
     node : Object
@@ -86,18 +82,12 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
         Description for ``attr``.
     default : object | None
         Description for ``default``.
-
+    
     Returns
     -------
     object | None
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     try:
         return getattr(node, attr)
     except Exception:
@@ -306,7 +296,7 @@ def _collect_rows(nav: NavLookup, test_map: dict[str, Any]) -> list[dict[str, An
     rows: dict[str, dict[str, Any]] = {}
 
     def _walk(node: Object) -> None:
-        """walk.
+        """Walk.
 
         Parameters
         ----------
@@ -437,21 +427,16 @@ def _write_json_if_changed(path: Path, data: Any) -> bool:
 
 
 def main() -> int:
-    """Compute main.
-
+    """
+    Compute main.
+    
     Carry out the main operation.
-
+    
     Returns
     -------
     int
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     nav_lookup = _load_navmap()
     test_map = _load_test_map()
 

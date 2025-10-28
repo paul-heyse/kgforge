@@ -1,6 +1,15 @@
 """Search Api utilities."""
 
 from kgfoundry_common.navmap_types import NavMap
+
+# [nav:anchor app]
+# [nav:anchor bm25_index]
+# [nav:anchor faiss_adapter]
+# [nav:anchor fixture_index]
+# [nav:anchor fusion]
+# [nav:anchor kg_mock]
+# [nav:anchor schemas]
+# [nav:anchor service]
 from search_api import (
     app,
     bm25_index,
@@ -12,6 +21,8 @@ from search_api import (
     service,
     splade_index,
 )
+
+# [nav:anchor splade_index]
 
 __all__ = [
     "app",

@@ -34,7 +34,6 @@ fake_detect_pkg.detect_primary = lambda: "pkg"
 sys.modules.setdefault("detect_pkg", fake_detect_pkg)
 
 import pytest
-
 from tools import gen_readmes as gr
 
 
@@ -150,34 +149,48 @@ def _package_tree(src: Path) -> SimpleNamespace:
     return pkg
 
 
-def test_write_readme_is_deterministic(readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch) -> None:
+def test_write_readme_is_deterministic(
+    readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch
+) -> None:
     pkg = _package_tree(readme_env["src"])
-    monkeypatch.setattr(gr, "NAVMAP", {
-        "modules": {
-            "pkg.module": {
-                "meta": {
-                    "pkg.module": {"stability": "stable", "owner": "@docs", "section": "modules"},
-                    "pkg.module.Widget": {
-                        "stability": "beta",
-                        "owner": "@widgets",
-                        "since": "1.2.0",
-                        "deprecated_in": "2.0.0",
+    monkeypatch.setattr(
+        gr,
+        "NAVMAP",
+        {
+            "modules": {
+                "pkg.module": {
+                    "meta": {
+                        "pkg.module": {
+                            "stability": "stable",
+                            "owner": "@docs",
+                            "section": "modules",
+                        },
+                        "pkg.module.Widget": {
+                            "stability": "beta",
+                            "owner": "@widgets",
+                            "since": "1.2.0",
+                            "deprecated_in": "2.0.0",
+                        },
+                        "pkg.module.make_widget": {"owner": "@widgets"},
                     },
-                    "pkg.module.make_widget": {"owner": "@widgets"},
-                },
-                "module_meta": {"stability": "experimental"},
+                    "module_meta": {"stability": "experimental"},
+                }
             }
-        }
-    })
-    monkeypatch.setattr(gr, "TEST_MAP", {
-        "pkg.module": [{"file": "tests/unit/test_module.py", "lines": [5]}],
-        "pkg.module.Widget": [
-            {"file": "tests/unit/test_widget.py", "lines": [42]},
-            {"file": "tests/e2e/test_widget.py", "lines": [100]},
-            {"file": "tests/api/test_widget.py", "lines": [12]},
-            {"file": "tests/extra/test_widget.py", "lines": [1]},
-        ],
-    })
+        },
+    )
+    monkeypatch.setattr(
+        gr,
+        "TEST_MAP",
+        {
+            "pkg.module": [{"file": "tests/unit/test_module.py", "lines": [5]}],
+            "pkg.module.Widget": [
+                {"file": "tests/unit/test_widget.py", "lines": [42]},
+                {"file": "tests/e2e/test_widget.py", "lines": [100]},
+                {"file": "tests/api/test_widget.py", "lines": [12]},
+                {"file": "tests/extra/test_widget.py", "lines": [1]},
+            ],
+        },
+    )
 
     cfg = gr.Config(
         packages=["pkg"],
@@ -206,21 +219,29 @@ def test_write_readme_is_deterministic(readme_env: dict[str, Path], monkeypatch:
     assert "    `stability:stable`" in content_1
 
 
-def test_format_badges_handles_partial_metadata(readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(gr, "NAVMAP", {
-        "modules": {
-            "pkg.module": {
-                "meta": {"pkg.module.Widget": {"owner": "@docs"}},
-                "module_meta": {"stability": "stable"},
+def test_format_badges_handles_partial_metadata(
+    readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        gr,
+        "NAVMAP",
+        {
+            "modules": {
+                "pkg.module": {
+                    "meta": {"pkg.module.Widget": {"owner": "@docs"}},
+                    "module_meta": {"stability": "stable"},
+                }
             }
-        }
-    })
+        },
+    )
     monkeypatch.setattr(gr, "TEST_MAP", {})
     badge_text = gr.format_badges("pkg.module.Widget", base_length=10)
     assert badge_text.strip() == "`stability:stable` `owner:@docs`"
 
 
-def test_render_line_respects_link_modes(readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch) -> None:
+def test_render_line_respects_link_modes(
+    readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch
+) -> None:
     node = _node(
         path="pkg.module.func",
         kind="function",
@@ -237,7 +258,10 @@ def test_render_line_respects_link_modes(readme_env: dict[str, Path], monkeypatc
 
     cfg_github = gr.Config(["pkg"], "github", "vscode", False, False, False, False)
     line = gr.render_line(node, pkg_dir, cfg_github)
-    assert "[view](https://github.com/acme/kgfoundry/blob/deadbeefcafebabe/src/pkg/module.py#L12-L18)" in line
+    assert (
+        "[view](https://github.com/acme/kgfoundry/blob/deadbeefcafebabe/src/pkg/module.py#L12-L18)"
+        in line
+    )
     assert "[open]" not in line
 
     cfg_editor = gr.Config(["pkg"], "editor", "relative", False, False, False, False)
@@ -265,7 +289,9 @@ def test_bucket_for_assignments() -> None:
     assert gr.bucket_for(func) == "Functions"
 
 
-def test_render_line_wraps_badges(readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch) -> None:
+def test_render_line_wraps_badges(
+    readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch
+) -> None:
     readme_dir = readme_env["src"] / "pkg"
     readme_dir.mkdir(exist_ok=True)
     (readme_dir / "widget.py").write_text("class Widget: ...\n", encoding="utf-8")
@@ -313,14 +339,16 @@ def test_render_line_wraps_badges(readme_env: dict[str, Path], monkeypatch: pyte
     assert "tested-by" in line
 
 
-def test_fail_on_metadata_miss_exits(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+def test_fail_on_metadata_miss_exits(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     pkg = _package_tree(tmp_path / "src")
 
     class Loader:
         def __init__(self, *args: object, **kwargs: object) -> None:
             pass
 
-        def load(self, name: str) -> SimpleNamespace:  # noqa: D401 - simple stub
+        def load(self, name: str) -> SimpleNamespace:
             return pkg
 
     monkeypatch.setattr(gr, "GriffeLoader", Loader)
@@ -340,7 +368,9 @@ def test_fail_on_metadata_miss_exits(tmp_path: Path, monkeypatch: pytest.MonkeyP
     assert "Missing owner/stability" in output
 
 
-def test_fail_on_metadata_miss_passes_when_complete(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_fail_on_metadata_miss_passes_when_complete(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     pkg = _package_tree(tmp_path / "src")
 
     class Loader:
@@ -386,7 +416,9 @@ def test_fail_on_metadata_miss_passes_when_complete(tmp_path: Path, monkeypatch:
     gr.main()
 
 
-def test_missing_navmap_and_testmap_warn(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+def test_missing_navmap_and_testmap_warn(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     pkg = _package_tree(tmp_path / "src")
 
     class Loader:
@@ -412,7 +444,9 @@ def test_missing_navmap_and_testmap_warn(tmp_path: Path, monkeypatch: pytest.Mon
     assert "Warning: Test map not found" in output
 
 
-def test_dry_run_reports_without_writing(readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+def test_dry_run_reports_without_writing(
+    readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     pkg = _package_tree(readme_env["src"])
     monkeypatch.setattr(gr, "NAVMAP", {})
     monkeypatch.setattr(gr, "TEST_MAP", {})
@@ -424,7 +458,9 @@ def test_dry_run_reports_without_writing(readme_env: dict[str, Path], monkeypatc
     assert not (readme_env["src"] / "pkg" / "README.md").exists()
 
 
-def test_package_synopsis_fallback(readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch) -> None:
+def test_package_synopsis_fallback(
+    readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch
+) -> None:
     pkg = _package_tree(readme_env["src"])
     pkg.docstring = None
     monkeypatch.setattr(gr, "NAVMAP", {})
@@ -435,7 +471,9 @@ def test_package_synopsis_fallback(readme_env: dict[str, Path], monkeypatch: pyt
     assert gr.DEFAULT_SYNOPSIS in content
 
 
-def test_doctoc_invoked_when_enabled(readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch) -> None:
+def test_doctoc_invoked_when_enabled(
+    readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch
+) -> None:
     pkg = _package_tree(readme_env["src"])
     monkeypatch.setattr(gr, "NAVMAP", {})
     monkeypatch.setattr(gr, "TEST_MAP", {})
