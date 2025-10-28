@@ -36,6 +36,10 @@ OUTFILE_COV = OUTDIR / "test_map_coverage.json"
 OUTFILE_SUM = OUTDIR / "test_map_summary.json"
 OUTFILE_LINT = OUTDIR / "test_map_lint.json"
 
+
+class NavMapLoadError(RuntimeError):
+    """Raised when the navigation map cannot be loaded."""
+
 # Restrict symbol discovery to known project namespaces to keep noise low.
 KNOWN_PREFIXES = (
     "kgfoundry",
@@ -179,11 +183,15 @@ def load_public_symbols() -> set[str]:
     """
     nav = ROOT / "site" / "_build" / "navmap" / "navmap.json"
     if not nav.exists():
-        return set()
+        raise NavMapLoadError(
+            "navmap.json is missing. Build the documentation navigation map before running this script.",
+        )
     try:
         j = json.loads(nav.read_text(encoding="utf-8"))
-    except Exception:
-        return set()
+    except json.JSONDecodeError as exc:
+        raise NavMapLoadError(f"Failed to parse {nav}: {exc}") from exc
+    except OSError as exc:
+        raise NavMapLoadError(f"Failed to read {nav}: {exc}") from exc
     exports: set[str] = set()
     mods = (j.get("modules") or {}).items()
     for mod, entry in mods:
@@ -570,7 +578,11 @@ def main() -> None:
     """
     symbols = load_symbol_candidates()
     spans = load_symbol_spans()
-    public_syms = load_public_symbols()
+    try:
+        public_syms = load_public_symbols()
+    except NavMapLoadError as exc:
+        print(f"[testmap] ERROR: {exc}", file=sys.stderr)
+        sys.exit(1)
 
     # 1) heuristic test map
     heuristic = build_test_map(symbols)
