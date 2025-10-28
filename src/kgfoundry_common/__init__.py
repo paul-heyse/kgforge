@@ -27,9 +27,6 @@ __navmap__: NavMap = {
     "title": "kgfoundry_common",
     "synopsis": "Shared utilities and data structures used across kgfoundry",
     "exports": __all__,
-    "owner": "@kgfoundry-common",
-    "stability": "experimental",
-    "since": "0.1.0",
     "sections": [
         {
             "id": "public-api",
@@ -37,5 +34,17 @@ __navmap__: NavMap = {
             "symbols": __all__,
         },
     ],
-    "symbols": {name: {} for name in __all__},
+    "module_meta": {
+        "owner": "@kgfoundry-common",
+        "stability": "stable",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        }
+        for name in __all__
+    },
 }

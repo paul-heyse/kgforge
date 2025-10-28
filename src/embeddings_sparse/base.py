@@ -11,15 +11,32 @@ __all__ = ["SparseEncoder", "SparseIndex"]
 
 __navmap__: Final[NavMap] = {
     "title": "embeddings_sparse.base",
-    "synopsis": "Module for embeddings_sparse.base",
+    "synopsis": "Protocols for sparse embedding encoders and indices",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["SparseEncoder", "SparseIndex"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@embeddings",
+        "stability": "beta",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "SparseEncoder": {
+            "owner": "@embeddings",
+            "stability": "beta",
+            "since": "0.1.0",
+        },
+        "SparseIndex": {
+            "owner": "@embeddings",
+            "stability": "beta",
+            "since": "0.1.0",
+        },
+    },
 }
 
 
@@ -44,7 +61,6 @@ class SparseEncoder(Protocol):
         List[Tuple[List[int], List[float]]]
             Description of return value.
         """
-        
         ...
 
 
@@ -62,7 +78,6 @@ class SparseIndex(Protocol):
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
-        
         ...
 
     def search(
@@ -86,5 +101,4 @@ class SparseIndex(Protocol):
         List[Tuple[str, float]]
             Description of return value.
         """
-        
         ...

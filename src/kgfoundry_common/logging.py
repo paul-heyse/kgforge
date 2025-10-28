@@ -19,9 +19,26 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["JsonFormatter", "setup_logging"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@kgfoundry-common",
+        "stability": "stable",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "JsonFormatter": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+        "setup_logging": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+    },
 }
 
 
@@ -44,7 +61,6 @@ class JsonFormatter(logging.Formatter):
         str
             Description of return value.
         """
-        
         data = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
             "level": record.levelname,
@@ -69,7 +85,6 @@ def setup_logging(level: int = logging.INFO) -> None:
     level : int | None
         Description for ``level``.
     """
-    
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())
     logging.basicConfig(level=level, handlers=[handler])

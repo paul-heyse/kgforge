@@ -28,21 +28,22 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": [
-                "DownloadError",
-                "UnsupportedMIMEError",
-                "DoclingError",
-                "OCRTimeoutError",
-                "ChunkingError",
-                "EmbeddingError",
-                "SpladeOOMError",
-                "IndexBuildError",
-                "OntologyParseError",
-                "LinkerCalibrationError",
-                "Neo4jError",
-            ],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@kgfoundry-common",
+        "stability": "stable",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        }
+        for name in __all__
+    },
 }
 
 
