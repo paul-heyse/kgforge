@@ -100,6 +100,7 @@ def load_symbol_candidates() -> set[str]:
     
     
     
+    
     candidates: set[str] = set()
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if symbols_json.exists():
@@ -117,6 +118,10 @@ def load_symbol_candidates() -> set[str]:
     for pyfile in SRC.rglob("*.py"):
         rel = pyfile.relative_to(SRC)
         module = ".".join(rel.with_suffix("").parts)
+        if module.endswith(".__init__"):
+            module = module[: -len(".__init__")]
+        if not module:
+            continue
         if module.startswith(KNOWN_PREFIXES):
             candidates.add(module)
     return candidates
@@ -132,6 +137,7 @@ def load_symbol_spans() -> dict[str, dict[str, Any]]:
     Mapping[str, Mapping[str, Any]]
         Description of return value.
     """
+    
     
     
     
@@ -167,6 +173,7 @@ def load_public_symbols() -> set[str]:
     Set[str]
         Description of return value.
     """
+    
     
     
     
@@ -257,6 +264,7 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     
     
     
+    
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -334,9 +342,11 @@ def _normalize_repo_rel(path_like: str) -> str:
     except Exception:
         # coverage JSON often records absolute paths; make repo-relative if possible
         try:
-            idx = str(p).rfind(str(SRC))
+            raw = str(p)
+            root = str(ROOT)
+            idx = raw.find(root)
             if idx != -1:
-                return str(p)[idx - len(str(ROOT)) :].lstrip(os.sep)
+                return raw[idx + len(root) :].lstrip(os.sep)
         except Exception:
             pass
         return str(p)
@@ -352,6 +362,7 @@ def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]
     Tuple[dict[str, Set[int]], dict[Tuple[str, int], Set[str]]]
         Description of return value.
     """
+    
     
     
     
@@ -404,6 +415,7 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     
     
     
+    
     table: dict[str, list[dict[str, object]]] = defaultdict(list)
     if not TESTS.exists():
         return {}
@@ -439,6 +451,7 @@ def attach_coverage(
     Mapping[str, Mapping[str, Any]]
         Description of return value.
     """
+    
     
     
     
@@ -500,6 +513,7 @@ def summarize(
     Tuple[dict[str, Any], List[dict[str, Any]]]
         Description of return value.
     """
+    
     
     
     

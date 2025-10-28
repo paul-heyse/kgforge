@@ -66,6 +66,7 @@ def rrf_fuse(
     
     
     
+    
     # NOTE: implement stable RRF across rankers when ranker outputs are wired
     return []
 
@@ -88,6 +89,7 @@ def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[st
     List[Tuple[str, float]]
         Description of return value.
     """
+    
     
     
     
@@ -118,6 +120,7 @@ def mmr_deduplicate(
     List[Tuple[str, float]]
         Description of return value.
     """
+    
     
     
     
