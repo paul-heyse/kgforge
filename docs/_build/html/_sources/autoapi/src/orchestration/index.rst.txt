@@ -6,13 +6,8 @@ src.orchestration
 .. autoapi-nested-parse::
 
    
-   Provide utilities for module.
+   Orchestration utilities.
 
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`orchestration`
 
 
 

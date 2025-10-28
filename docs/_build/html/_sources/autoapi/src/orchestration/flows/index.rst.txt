@@ -5,13 +5,7 @@ src.orchestration.flows
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`orchestration.flows`
+   Flows utilities.
 
    ..
        !! processed by numpydoc !!
@@ -31,19 +25,6 @@ Module Contents
    :type msg: str
 
    :returns: *str* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from orchestration.flows import t_echo
-   >>> result = t_echo(...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`orchestration.flows`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -68,19 +49,6 @@ Module Contents
    Return e2e flow.
 
    :returns: *List[str]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from orchestration.flows import e2e_flow
-   >>> result = e2e_flow()
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`orchestration.flows`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 

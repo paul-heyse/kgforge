@@ -1,16 +1,4 @@
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``tools.docs.scan_observability`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-tools.docs.scan_observability
-"""
-
+"""Scan Observability utilities."""
 
 from __future__ import annotations
 
@@ -26,35 +14,16 @@ OUT = ROOT / "docs" / "_build"
 def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     """Return read ast.
 
-    Auto-generated reference for the ``read_ast`` callable defined in ``tools.docs.scan_observability``.
-    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     Tuple[str, ast.AST | None]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.docs.scan_observability import read_ast
-    >>> result = read_ast(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.docs.scan_observability
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -66,37 +35,21 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     return (text, tree)
 
 
-def scan_file(path: Path) -> tuple[list[dict[str, object]], list[dict[str, object]], list[dict[str, object]], bool]:
+def scan_file(
+    path: Path,
+) -> tuple[list[dict[str, object]], list[dict[str, object]], list[dict[str, object]], bool]:
     """Return scan file.
 
-    Auto-generated reference for the ``scan_file`` callable defined in ``tools.docs.scan_observability``.
-    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     Tuple[List[dict[str, object]], List[dict[str, object]], List[dict[str, object]], bool]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.docs.scan_observability import scan_file
-    >>> result = scan_file(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.docs.scan_observability
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     text, tree = read_ast(path)
     if not text:
         return ([], [], [], False)
@@ -160,7 +113,9 @@ def scan_file(path: Path) -> tuple[list[dict[str, object]], list[dict[str, objec
 
         if isinstance(node, ast.Name) and node.id in {"BaseSettings", "SettingsConfigDict"}:
             config_hit = True
-        if isinstance(node, ast.Attribute) and getattr(node.attr, "lower", lambda: "")().startswith("env"):
+        if isinstance(node, ast.Attribute) and getattr(node.attr, "lower", lambda: "")().startswith(
+            "env"
+        ):
             config_hit = config_hit or "environ" in ast.get_source_segment(text, node) or ""
 
     if "BaseSettings" in text or "pydantic_settings" in text:
@@ -170,25 +125,7 @@ def scan_file(path: Path) -> tuple[list[dict[str, object]], list[dict[str, objec
 
 
 def main() -> None:
-    """Return main.
-
-    Auto-generated reference for the ``main`` callable defined in ``tools.docs.scan_observability``.
-    
-    Examples
-    --------
-    >>> from tools.docs.scan_observability import main
-    >>> main()  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    tools.docs.scan_observability
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
-    """
-    
-
+    """Return main."""
     OUT.mkdir(parents=True, exist_ok=True)
     metrics: list[dict[str, object]] = []
     logs: list[dict[str, object]] = []
@@ -215,7 +152,9 @@ def main() -> None:
 
     config_md = "# Config surfaces (quick index)\n\n"
     config_md += "\n".join(f"- `{path}`" for path in sorted(set(configs)))
-    (OUT / "config.md").write_text(config_md + ("\n" if not config_md.endswith("\n") else ""), encoding="utf-8")
+    (OUT / "config.md").write_text(
+        config_md + ("\n" if not config_md.endswith("\n") else ""), encoding="utf-8"
+    )
 
 
 if __name__ == "__main__":

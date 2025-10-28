@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-search_api.faiss_adapter
-"""
-
+"""Faiss Adapter utilities."""
 
 from __future__ import annotations
 
@@ -60,21 +50,6 @@ type IndexArray = NDArray[np.int64]
 @dataclass
 class DenseVecs:
     """Describe DenseVecs."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ids: list[str]
     mat: VecArray
@@ -82,43 +57,7 @@ class DenseVecs:
 
 # [nav:anchor FaissAdapter]
 class FaissAdapter:
-    """Represent FaissAdapter.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-    
-    Methods
-    -------
-    __init__()
-        Method description.
-    _load_dense_parquet()
-        Method description.
-    build()
-        Method description.
-    load_or_build()
-        Method description.
-    search()
-        Method description.
-    
-    Examples
-    --------
-    >>> from search_api.faiss_adapter import FaissAdapter
-    >>> result = FaissAdapter()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.faiss_adapter
-    
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
-    
-    
+    """Describe FaissAdapter."""
 
     def __init__(
         self,
@@ -132,25 +71,11 @@ class FaissAdapter:
         ----------
         db_path : str
             Description for ``db_path``.
-        factory : str, optional
+        factory : str | None
             Description for ``factory``.
-        metric : str, optional
+        metric : str | None
             Description for ``metric``.
-        
-        Examples
-        --------
-        >>> from search_api.faiss_adapter import __init__
-        >>> __init__(..., ..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        search_api.faiss_adapter
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
@@ -165,28 +90,12 @@ class FaissAdapter:
         -------
         DenseVecs
             Description of return value.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-        
-        Examples
-        --------
-        >>> from search_api.faiss_adapter import _load_dense_parquet
-        >>> result = _load_dense_parquet()
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_api.faiss_adapter
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         if not Path(self.db_path).exists():
             message = "DuckDB registry not found"
             raise RuntimeError(message)
@@ -214,22 +123,7 @@ class FaissAdapter:
         return DenseVecs(ids=ids, mat=normalized)
 
     def build(self) -> None:
-        """Return build.
-
-        Examples
-        --------
-        >>> from search_api.faiss_adapter import build
-        >>> build()  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        search_api.faiss_adapter
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
-        """
-        
+        """Return build."""
         vectors = self._load_dense_parquet()
         self.vecs = vectors
         if not HAVE_FAISS:
@@ -258,23 +152,9 @@ class FaissAdapter:
 
         Parameters
         ----------
-        cpu_index_path : str | None, optional
+        cpu_index_path : str | None
             Description for ``cpu_index_path``.
-        
-        Examples
-        --------
-        >>> from search_api.faiss_adapter import load_or_build
-        >>> load_or_build(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        search_api.faiss_adapter
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         try:
             if HAVE_FAISS and cpu_index_path and Path(cpu_index_path).exists():
                 cpu = faiss.read_index(cpu_index_path)
@@ -299,38 +179,21 @@ class FaissAdapter:
 
         Parameters
         ----------
-        qvec : VecArray
+        qvec : src.search_api.faiss_adapter.VecArray
             Description for ``qvec``.
-        k : int, optional
+        k : int | None
             Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-        
-        Examples
-        --------
-        >>> from search_api.faiss_adapter import search
-        >>> result = search(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        search_api.faiss_adapter
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         if self.vecs is None and self.index is None:
             return []
         if HAVE_FAISS and self.index is not None:

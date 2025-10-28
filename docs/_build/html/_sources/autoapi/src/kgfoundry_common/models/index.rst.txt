@@ -5,13 +5,7 @@ src.kgfoundry_common.models
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`kgfoundry_common.models`
+   Models utilities.
 
    ..
        !! processed by numpydoc !!
@@ -28,7 +22,7 @@ Module Contents
 
 
    
-   Represent Doc.
+   Describe Doc.
 
 
 
@@ -130,7 +124,7 @@ Module Contents
 
 
    
-   Represent DoctagsAsset.
+   Describe DoctagsAsset.
 
 
 
@@ -182,7 +176,7 @@ Module Contents
 
 
    
-   Represent Chunk.
+   Describe Chunk.
 
 
 
@@ -236,7 +230,7 @@ Module Contents
 
 
    
-   Represent LinkAssertion.
+   Describe LinkAssertion.
 
 
 

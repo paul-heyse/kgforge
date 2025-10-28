@@ -5,13 +5,7 @@ src.search_api.kg_mock
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`search_api.kg_mock`
+   Kg Mock utilities.
 
    ..
        !! processed by numpydoc !!
@@ -31,19 +25,6 @@ Module Contents
    :type query: str
 
    :returns: *Set[str]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from search_api.kg_mock import detect_query_concepts
-   >>> result = detect_query_concepts(...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.kg_mock`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -72,19 +53,6 @@ Module Contents
 
    :returns: *List[str]* -- Description of return value.
 
-   .. rubric:: Examples
-
-   >>> from search_api.kg_mock import linked_concepts_for_text
-   >>> result = linked_concepts_for_text(...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.kg_mock`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -112,24 +80,11 @@ Module Contents
    :param chunk_concepts: Description for ``chunk_concepts``.
    :type chunk_concepts: List[str]
    :param direct: Description for ``direct``.
-   :type direct: float, optional
+   :type direct: float | None
    :param one_hop: Description for ``one_hop``.
-   :type one_hop: float, optional
+   :type one_hop: float | None
 
    :returns: *float* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from search_api.kg_mock import kg_boost
-   >>> result = kg_boost(..., ..., ..., ...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.kg_mock`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 

@@ -6,13 +6,8 @@ src.ontology
 .. autoapi-nested-parse::
 
    
-   Provide utilities for module.
+   Ontology utilities.
 
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`ontology`
 
 
 

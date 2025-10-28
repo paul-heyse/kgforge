@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-search_api.schemas
-"""
-
+"""Schemas utilities."""
 
 from __future__ import annotations
 
@@ -37,21 +27,6 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor SearchRequest]
 class SearchRequest(BaseModel):
     """Describe SearchRequest."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     query: str = Field(min_length=1)
     k: int = 10
@@ -62,21 +37,6 @@ class SearchRequest(BaseModel):
 # [nav:anchor SearchResult]
 class SearchResult(BaseModel):
     """Describe SearchResult."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     doc_id: str
     chunk_id: str

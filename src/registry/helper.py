@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-registry.helper
-"""
-
+"""Helper utilities."""
 
 from __future__ import annotations
 
@@ -40,53 +30,7 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DuckDBRegistryHelper]
 class DuckDBRegistryHelper:
-    """Represent DuckDBRegistryHelper.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-    
-    Methods
-    -------
-    __init__()
-        Method description.
-    _con()
-        Method description.
-    new_run()
-        Method description.
-    close_run()
-        Method description.
-    begin_dataset()
-        Method description.
-    commit_dataset()
-        Method description.
-    rollback_dataset()
-        Method description.
-    register_documents()
-        Method description.
-    register_doctags()
-        Method description.
-    emit_event()
-        Method description.
-    
-    Examples
-    --------
-    >>> from registry.helper import DuckDBRegistryHelper
-    >>> result = DuckDBRegistryHelper()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    registry.helper
-    
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
-    
-    
+    """Describe DuckDBRegistryHelper."""
 
     def __init__(self, db_path: str) -> None:
         """Return init.
@@ -95,21 +39,7 @@ class DuckDBRegistryHelper:
         ----------
         db_path : str
             Description for ``db_path``.
-        
-        Examples
-        --------
-        >>> from registry.helper import __init__
-        >>> __init__(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.helper
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.db_path = db_path
 
     def _con(self) -> duckdb.DuckDBPyConnection:
@@ -119,23 +49,7 @@ class DuckDBRegistryHelper:
         -------
         duckdb.DuckDBPyConnection
             Description of return value.
-        
-        Examples
-        --------
-        >>> from registry.helper import _con
-        >>> result = _con()
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        registry.helper
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         return duckdb.connect(self.db_path)
 
     def new_run(
@@ -157,28 +71,12 @@ class DuckDBRegistryHelper:
             Description for ``revision``.
         config : Mapping[str, object]
             Description for ``config``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
-        Examples
-        --------
-        >>> from registry.helper import new_run
-        >>> result = new_run(..., ..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        registry.helper
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         run_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -201,23 +99,9 @@ class DuckDBRegistryHelper:
             Description for ``run_id``.
         success : bool
             Description for ``success``.
-        notes : str | None, optional
+        notes : str | None
             Description for ``notes``.
-        
-        Examples
-        --------
-        >>> from registry.helper import close_run
-        >>> close_run(..., ..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.helper
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         con = self._con()
         con.execute("UPDATE runs SET finished_at=CURRENT_TIMESTAMP WHERE run_id=?", [run_id])
         con.execute(
@@ -240,28 +124,12 @@ class DuckDBRegistryHelper:
             Description for ``kind``.
         run_id : str
             Description for ``run_id``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
-        Examples
-        --------
-        >>> from registry.helper import begin_dataset
-        >>> result = begin_dataset(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        registry.helper
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         dataset_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -286,21 +154,7 @@ class DuckDBRegistryHelper:
             Description for ``parquet_root``.
         rows : int
             Description for ``rows``.
-        
-        Examples
-        --------
-        >>> from registry.helper import commit_dataset
-        >>> commit_dataset(..., ..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.helper
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         con = self._con()
         con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
@@ -323,21 +177,7 @@ class DuckDBRegistryHelper:
         ----------
         dataset_id : str
             Description for ``dataset_id``.
-        
-        Examples
-        --------
-        >>> from registry.helper import rollback_dataset
-        >>> rollback_dataset(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.helper
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         con = self._con()
         con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
         con.execute(
@@ -353,22 +193,7 @@ class DuckDBRegistryHelper:
         ----------
         docs : List[Doc]
             Description for ``docs``.
-        
-        Examples
-        --------
-        >>> from registry.helper import register_documents
-        >>> register_documents(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.helper
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         con = self._con()
         for doc in docs:
             con.execute(
@@ -401,22 +226,7 @@ class DuckDBRegistryHelper:
         ----------
         assets : List[DoctagsAsset]
             Description for ``assets``.
-        
-        Examples
-        --------
-        >>> from registry.helper import register_doctags
-        >>> register_doctags(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.helper
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         con = self._con()
         for asset in assets:
             con.execute(
@@ -443,21 +253,7 @@ class DuckDBRegistryHelper:
             Description for ``subject_id``.
         payload : Mapping[str, object]
             Description for ``payload``.
-        
-        Examples
-        --------
-        >>> from registry.helper import emit_event
-        >>> emit_event(..., ..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        registry.helper
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         con = self._con()
         con.execute(
             "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",

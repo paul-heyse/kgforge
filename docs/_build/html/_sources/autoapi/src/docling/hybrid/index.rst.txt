@@ -5,15 +5,7 @@ src.docling.hybrid
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   Auto-generated API documentation for the ``src.docling.hybrid`` module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`src.docling.hybrid`
+   Hybrid utilities.
 
    ..
        !! processed by numpydoc !!
@@ -27,7 +19,7 @@ Module Contents
 .. py:class:: HybridChunker
 
    
-   Represent HybridChunker.
+   Describe HybridChunker.
 
 
 

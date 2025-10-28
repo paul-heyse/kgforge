@@ -1,17 +1,5 @@
 #!/usr/bin/env python
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``tools.hooks.docformatter`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-tools.hooks.docformatter
-"""
-
+"""Docformatter utilities."""
 
 from __future__ import annotations
 
@@ -22,29 +10,11 @@ import sys
 def git_diff_names() -> set[str]:
     """Return git diff names.
 
-    Auto-generated reference for the ``git_diff_names`` callable defined in ``tools.hooks.docformatter``.
-    
     Returns
     -------
     Set[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.hooks.docformatter import git_diff_names
-    >>> result = git_diff_names()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.hooks.docformatter
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     result = subprocess.run(
         ["git", "diff", "--name-only"],
         check=True,
@@ -57,29 +27,11 @@ def git_diff_names() -> set[str]:
 def main() -> int:
     """Return main.
 
-    Auto-generated reference for the ``main`` callable defined in ``tools.hooks.docformatter``.
-    
     Returns
     -------
     int
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.hooks.docformatter import main
-    >>> result = main()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.hooks.docformatter
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     repo = subprocess.run(
         ["git", "rev-parse", "--show-toplevel"],
         check=True,

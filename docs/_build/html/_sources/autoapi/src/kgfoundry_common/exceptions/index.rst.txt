@@ -5,13 +5,7 @@ src.kgfoundry_common.exceptions
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`kgfoundry_common.exceptions`
+   Exceptions utilities.
 
    ..
        !! processed by numpydoc !!
@@ -28,7 +22,7 @@ Module Contents
 
 
    
-   Represent DownloadError.
+   Describe DownloadError.
 
 
 
@@ -54,7 +48,7 @@ Module Contents
 
 
    
-   Represent UnsupportedMIMEError.
+   Describe UnsupportedMIMEError.
 
 
 

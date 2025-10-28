@@ -5,13 +5,7 @@ src.kgfoundry_common.navmap_types
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`kgfoundry_common.navmap_types`
+   Navmap Types utilities.
 
    ..
        !! processed by numpydoc !!
@@ -28,7 +22,7 @@ Module Contents
 
 
    
-   Represent NavSection.
+   Describe NavSection.
 
 
 
@@ -66,7 +60,7 @@ Module Contents
 
 
    
-   Represent SymbolMeta.
+   Describe SymbolMeta.
 
 
 
@@ -136,7 +130,7 @@ Module Contents
 
 
    
-   Represent NavMap.
+   Describe NavMap.
 
 
 

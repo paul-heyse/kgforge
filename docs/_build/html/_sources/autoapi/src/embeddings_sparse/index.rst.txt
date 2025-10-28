@@ -6,15 +6,8 @@ src.embeddings_sparse
 .. autoapi-nested-parse::
 
    
-   Provide utilities for module.
+   Embeddings Sparse utilities.
 
-   Auto-generated API documentation for the ``src.embeddings_sparse`` module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`src.embeddings_sparse`
 
 
 

@@ -1,16 +1,4 @@
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``src.kg_builder.neo4j_store`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-src.kg_builder.neo4j_store
-"""
-
+"""Neo4J Store utilities."""
 
 from __future__ import annotations
 
@@ -37,16 +25,5 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor Neo4jStore]
 class Neo4jStore:
     """Describe Neo4jStore."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...

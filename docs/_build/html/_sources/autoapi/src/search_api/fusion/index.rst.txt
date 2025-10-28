@@ -5,13 +5,7 @@ src.search_api.fusion
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`search_api.fusion`
+   Fusion utilities.
 
    ..
        !! processed by numpydoc !!
@@ -30,22 +24,9 @@ Module Contents
    :param rankers: Description for ``rankers``.
    :type rankers: List[List[Tuple[str, float]]]
    :param k: Description for ``k``.
-   :type k: int, optional
+   :type k: int | None
 
    :returns: *Mapping[str, float]* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from search_api.fusion import rrf_fuse
-   >>> result = rrf_fuse(..., ...)
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_api.fusion`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 

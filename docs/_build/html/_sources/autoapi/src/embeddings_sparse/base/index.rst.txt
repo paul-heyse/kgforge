@@ -5,15 +5,7 @@ src.embeddings_sparse.base
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   Auto-generated API documentation for the ``src.embeddings_sparse.base`` module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`src.embeddings_sparse.base`
+   Base utilities.
 
    ..
        !! processed by numpydoc !!
@@ -30,29 +22,8 @@ Module Contents
 
 
    
-   Represent SparseEncoder.
+   Describe SparseEncoder.
 
-   .. attribute:: name
-
-      Attribute description.
-
-      :type: str
-
-   .. method:: encode()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from embeddings_sparse.base import SparseEncoder
-   >>> result = SparseEncoder()
-   >>> result  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`embeddings_sparse.base`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -85,18 +56,6 @@ Module Contents
 
       :returns: *List[Tuple[List[int], List[float]]]* -- Description of return value.
 
-      .. rubric:: Examples
-
-      >>> from embeddings_sparse.base import encode
-      >>> result = encode(...)
-      >>> result  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`embeddings_sparse.base`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -121,31 +80,8 @@ Module Contents
 
 
    
-   Represent SparseIndex.
+   Describe SparseIndex.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: build()
-
-      Method description.
-
-   .. method:: search()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from embeddings_sparse.base import SparseIndex
-   >>> result = SparseIndex()
-   >>> result  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`embeddings_sparse.base`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -200,21 +136,9 @@ Module Contents
       :param k: Description for ``k``.
       :type k: int
       :param fields: Description for ``fields``.
-      :type fields: Mapping[str, str] | None, optional
+      :type fields: Mapping[str, str] | None
 
       :returns: *List[Tuple[str, float]]* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from embeddings_sparse.base import search
-      >>> result = search(..., ..., ...)
-      >>> result  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`embeddings_sparse.base`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 

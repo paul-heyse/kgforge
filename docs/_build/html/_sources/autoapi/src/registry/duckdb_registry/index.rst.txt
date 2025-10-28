@@ -5,13 +5,7 @@ src.registry.duckdb_registry
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`registry.duckdb_registry`
+   Duckdb Registry utilities.
 
    ..
        !! processed by numpydoc !!
@@ -25,64 +19,8 @@ Module Contents
 .. py:class:: DuckDBRegistry(db_path)
 
    
-   Represent DuckDBRegistry.
+   Describe DuckDBRegistry.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: __init__()
-
-      Method description.
-
-   .. method:: begin_dataset()
-
-      Method description.
-
-   .. method:: commit_dataset()
-
-      Method description.
-
-   .. method:: rollback_dataset()
-
-      Method description.
-
-   .. method:: insert_run()
-
-      Method description.
-
-   .. method:: close_run()
-
-      Method description.
-
-   .. method:: register_documents()
-
-      Method description.
-
-   .. method:: register_doctags()
-
-      Method description.
-
-   .. method:: emit_event()
-
-      Method description.
-
-   .. method:: incident()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from registry.duckdb_registry import DuckDBRegistry
-   >>> result = DuckDBRegistry()
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`registry.duckdb_registry`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -119,19 +57,6 @@ Module Contents
 
       :returns: *str* -- Description of return value.
 
-      .. rubric:: Examples
-
-      >>> from registry.duckdb_registry import begin_dataset
-      >>> result = begin_dataset(..., ...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`registry.duckdb_registry`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -162,17 +87,6 @@ Module Contents
       :param rows: Description for ``rows``.
       :type rows: int
 
-      .. rubric:: Examples
-
-      >>> from registry.duckdb_registry import commit_dataset
-      >>> commit_dataset(..., ..., ...)  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`registry.duckdb_registry`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -198,17 +112,6 @@ Module Contents
 
       :param dataset_id: Description for ``dataset_id``.
       :type dataset_id: str
-
-      .. rubric:: Examples
-
-      >>> from registry.duckdb_registry import rollback_dataset
-      >>> rollback_dataset(...)  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`registry.duckdb_registry`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -244,19 +147,6 @@ Module Contents
 
       :returns: *str* -- Description of return value.
 
-      .. rubric:: Examples
-
-      >>> from registry.duckdb_registry import insert_run
-      >>> result = insert_run(..., ..., ..., ...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`registry.duckdb_registry`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -285,18 +175,7 @@ Module Contents
       :param success: Description for ``success``.
       :type success: bool
       :param notes: Description for ``notes``.
-      :type notes: str | None, optional
-
-      .. rubric:: Examples
-
-      >>> from registry.duckdb_registry import close_run
-      >>> close_run(..., ..., ...)  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`registry.duckdb_registry`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
+      :type notes: str | None
 
 
 
@@ -324,17 +203,6 @@ Module Contents
       :param docs: Description for ``docs``.
       :type docs: List[Doc]
 
-      .. rubric:: Examples
-
-      >>> from registry.duckdb_registry import register_documents
-      >>> register_documents(...)  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`registry.duckdb_registry`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -360,17 +228,6 @@ Module Contents
 
       :param assets: Description for ``assets``.
       :type assets: List[DoctagsAsset]
-
-      .. rubric:: Examples
-
-      >>> from registry.duckdb_registry import register_doctags
-      >>> register_doctags(...)  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`registry.duckdb_registry`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -401,17 +258,6 @@ Module Contents
       :type subject_id: str
       :param payload: Description for ``payload``.
       :type payload: Mapping[str, object]
-
-      .. rubric:: Examples
-
-      >>> from registry.duckdb_registry import emit_event
-      >>> emit_event(..., ..., ...)  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`registry.duckdb_registry`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -444,17 +290,6 @@ Module Contents
       :type error_class: str
       :param message: Description for ``message``.
       :type message: str
-
-      .. rubric:: Examples
-
-      >>> from registry.duckdb_registry import incident
-      >>> incident(..., ..., ..., ...)  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`registry.duckdb_registry`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 

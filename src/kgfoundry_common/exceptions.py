@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-kgfoundry_common.exceptions
-"""
-
+"""Exceptions utilities."""
 
 from __future__ import annotations
 
@@ -35,21 +25,6 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor DownloadError]
 class DownloadError(Exception):
     """Describe DownloadError."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...
 
@@ -57,20 +32,5 @@ class DownloadError(Exception):
 # [nav:anchor UnsupportedMIMEError]
 class UnsupportedMIMEError(Exception):
     """Describe UnsupportedMIMEError."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...

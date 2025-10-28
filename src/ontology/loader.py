@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-ontology.loader
-"""
-
+"""Loader utilities."""
 
 from __future__ import annotations
 
@@ -35,20 +25,5 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor OntologyLoader]
 class OntologyLoader:
     """Describe OntologyLoader."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...

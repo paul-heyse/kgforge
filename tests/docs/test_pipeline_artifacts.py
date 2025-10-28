@@ -25,4 +25,3 @@ def test_graph_svgs_exist() -> None:
     assert graphs.exists(), "graph outputs missing; run tools/docs/build_graphs.py"
     assert any(graphs.glob("*-imports.svg")), "no import graphs present"
     assert any(graphs.glob("*-uml.svg")), "no UML graphs present"
-

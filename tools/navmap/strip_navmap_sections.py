@@ -1,17 +1,5 @@
 #!/usr/bin/env python
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``tools.navmap.strip_navmap_sections`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-tools.navmap.strip_navmap_sections
-"""
-
+"""Strip Navmap Sections utilities."""
 
 from __future__ import annotations
 
@@ -25,34 +13,16 @@ SRC = ROOT / "src"
 def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
     """Return iter module nodes.
 
-    Auto-generated reference for the ``iter_module_nodes`` callable defined in ``tools.navmap.strip_navmap_sections``.
-    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     Tuple[ast.Module, ast.Expr | None]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.strip_navmap_sections import iter_module_nodes
-    >>> result = iter_module_nodes(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.strip_navmap_sections
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if not tree.body:
@@ -70,34 +40,16 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
 def clean_docstring(text: str) -> str:
     """Return clean docstring.
 
-    Auto-generated reference for the ``clean_docstring`` callable defined in ``tools.navmap.strip_navmap_sections``.
-    
     Parameters
     ----------
     text : str
         Description for ``text``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.strip_navmap_sections import clean_docstring
-    >>> result = clean_docstring(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.strip_navmap_sections
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     lines: list[str] = []
     for raw in text.splitlines():
         if raw.strip().startswith("NavMap:"):
@@ -110,34 +62,16 @@ def clean_docstring(text: str) -> str:
 def rewrite_module(path: Path) -> bool:
     """Return rewrite module.
 
-    Auto-generated reference for the ``rewrite_module`` callable defined in ``tools.navmap.strip_navmap_sections``.
-    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.navmap.strip_navmap_sections import rewrite_module
-    >>> result = rewrite_module(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.navmap.strip_navmap_sections
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     tree, doc_expr = iter_module_nodes(path)
     if doc_expr is None:
         return False
@@ -160,24 +94,7 @@ def rewrite_module(path: Path) -> bool:
 
 
 def main() -> None:
-    """Return main.
-
-    Auto-generated reference for the ``main`` callable defined in ``tools.navmap.strip_navmap_sections``.
-    
-    Examples
-    --------
-    >>> from tools.navmap.strip_navmap_sections import main
-    >>> main()  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    tools.navmap.strip_navmap_sections
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
-    """
-    
+    """Return main."""
     changed = 0
     for file_path in sorted(SRC.rglob("*.py")):
         if rewrite_module(file_path):

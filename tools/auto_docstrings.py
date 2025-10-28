@@ -1,16 +1,5 @@
 #!/usr/bin/env python
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``tools.auto_docstrings`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-tools.auto_docstrings
-"""
+"""Auto Docstrings utilities."""
 
 from __future__ import annotations
 
@@ -29,6 +18,7 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
     "StrArray": "src.vectorstore_faiss.gpu.StrArray",
     "VecArray": "src.search_api.faiss_adapter.VecArray",
     "_SupportsHttp": "src.search_client.client._SupportsHttp",
+    "_SupportsResponse": "src.search_client.client._SupportsResponse",
     "NavMap": "src.kgfoundry_common.navmap_types.NavMap",
     "Doc": "src.kgfoundry_common.models.Doc",
     "DoctagsAsset": "src.kgfoundry_common.models.DoctagsAsset",
@@ -39,16 +29,28 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
     "SparseEncoder": "src.embeddings_sparse.base.SparseEncoder",
     "SparseIndex": "src.embeddings_sparse.base.SparseIndex",
     "DenseEmbeddingModel": "src.embeddings_dense.base.DenseEmbeddingModel",
+    "SearchRequest": "src.search_api.schemas.SearchRequest",
+    "SearchResult": "src.search_api.schemas.SearchResult",
+    "FixtureDoc": "src.search_api.fixture_index.FixtureDoc",
+    "SpladeDoc": "src.search_api.splade_index.SpladeDoc",
+    "Concept": "src.ontology.catalog.ConceptMeta",
+    "Neo4jStore": "src.kg_builder.neo4j_store.Neo4jStore",
     "BaseModel": "pydantic.BaseModel",
     "NDArray": "numpy.typing.NDArray",
-    "List": "typing.List",
-    "Dict": "typing.Dict",
-    "Tuple": "typing.Tuple",
+    "ArrayLike": "numpy.typing.ArrayLike",
     "Iterable": "typing.Iterable",
+    "Iterator": "typing.Iterator",
     "Mapping": "typing.Mapping",
-    "Optional": "typing.Optional",
+    "MutableMapping": "typing.MutableMapping",
     "Sequence": "typing.Sequence",
+    "MutableSequence": "typing.MutableSequence",
+    "Optional": "typing.Optional",
+    "Callable": "typing.Callable",
+    "Any": "typing.Any",
+    "duckdb.DuckDBPyConnection": "duckdb.DuckDBPyConnection",
     "DuckDBPyConnection": "duckdb.DuckDBPyConnection",
+    "pyarrow.Schema": "pyarrow.Schema",
+    "pyarrow.schema": "pyarrow.schema",
     "HTTPException": "fastapi.HTTPException",
     "Exit": "typer.Exit",
 }
@@ -57,9 +59,6 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
 @dataclass
 class DocstringChange:
     """Describe DocstringChange."""
-    
-    
-    
 
     path: Path
 
@@ -67,26 +66,10 @@ class DocstringChange:
 def parse_args() -> argparse.Namespace:
     """Return parse args.
 
-    Auto-generated reference for the ``parse_args`` callable defined in ``tools.auto_docstrings``.
-
     Returns
     -------
     argparse.Namespace
         Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import parse_args
-    >>> result = parse_args()
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    tools.auto_docstrings
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", required=True, type=Path, help="Directory to process.")
@@ -97,8 +80,6 @@ def parse_args() -> argparse.Namespace:
 def module_name_for(path: Path) -> str:
     """Return module name for.
 
-    Auto-generated reference for the ``module_name_for`` callable defined in ``tools.auto_docstrings``.
-
     Parameters
     ----------
     path : Path
@@ -108,20 +89,6 @@ def module_name_for(path: Path) -> str:
     -------
     str
         Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import module_name_for
-    >>> result = module_name_for(...)
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    tools.auto_docstrings
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
     try:
         relative = path.relative_to(REPO_ROOT)
@@ -153,8 +120,6 @@ def summarize(name: str, kind: str) -> str:
     str
         Description of return value.
     """
-    
-    
     base = " ".join(name.replace("_", " ").split()).strip()
     if kind == "class":
         text = f"Describe {base or 'object'}."
@@ -182,15 +147,11 @@ def extended_summary(kind: str, name: str, module_name: str) -> str:
     str
         Description of return value.
     """
-    
-    
     return ""
 
 
 def annotation_to_text(node: ast.AST | None) -> str:
     """Return annotation to text.
-
-    Auto-generated reference for the ``annotation_to_text`` callable defined in ``tools.auto_docstrings``.
 
     Parameters
     ----------
@@ -201,20 +162,6 @@ def annotation_to_text(node: ast.AST | None) -> str:
     -------
     str
         Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import annotation_to_text
-    >>> result = annotation_to_text(...)
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    tools.auto_docstrings
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
     if node is None:
         return "Any"
@@ -242,8 +189,6 @@ def annotation_to_text(node: ast.AST | None) -> str:
 def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     """Return iter docstring nodes.
 
-    Auto-generated reference for the ``iter_docstring_nodes`` callable defined in ``tools.auto_docstrings``.
-
     Parameters
     ----------
     tree : ast.Module
@@ -253,20 +198,6 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     -------
     List[Tuple[int, ast.AST, str]]
         Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import iter_docstring_nodes
-    >>> result = iter_docstring_nodes(...)
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    tools.auto_docstrings
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
     items: list[tuple[int, ast.AST, str]] = [(0, tree, "module")]
     for node in ast.walk(tree):
@@ -281,8 +212,6 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
 def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[str, str]]:
     """Return parameters for.
 
-    Auto-generated reference for the ``parameters_for`` callable defined in ``tools.auto_docstrings``.
-
     Parameters
     ----------
     node : ast.FunctionDef | ast.AsyncFunctionDef
@@ -292,20 +221,6 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
     -------
     List[Tuple[str, str]]
         Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import parameters_for
-    >>> result = parameters_for(...)
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    tools.auto_docstrings
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
     params: list[tuple[str, str]] = []
     args = node.args
@@ -313,37 +228,24 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
     def add(arg: ast.arg, default: ast.AST | None) -> None:
         """Return add.
 
-        Auto-generated reference for the ``add`` callable defined in ``tools.auto_docstrings``.
-
         Parameters
         ----------
         arg : ast.arg
             Description for ``arg``.
         default : ast.AST | None
             Description for ``default``.
-
-        Examples
-        --------
-        >>> from tools.auto_docstrings import add
-        >>> add(..., ...)  # doctest: +ELLIPSIS
-
-        See Also
-        --------
-        tools.auto_docstrings
-
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
         name = arg.arg
         if name in {"self", "cls"}:
             return
         annotation = annotation_to_text(arg.annotation)
-        if default is not None:
-            if annotation.endswith(" | None"):
-                annotation = annotation[: -len(" | None")]
-            annotation = f"Optional {annotation}"
-        params.append((name, annotation))
+        is_optional = default is not None
+        if is_optional and annotation.endswith(" | None"):
+            annotation = annotation[: -len(" | None")]
+        if is_optional:
+            cleaned = annotation or "Any"
+            annotation = f"{cleaned} | None"
+        params.append((name, annotation or "Any"))
 
     positional = args.posonlyargs + args.args
     defaults = [None] * (len(positional) - len(args.defaults)) + list(args.defaults)
@@ -351,21 +253,19 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
         add(arg, default)
 
     if args.vararg:
-        params.append((f"*{args.vararg.arg}", "Optional Any"))
+        params.append((f"*{args.vararg.arg}", "Any"))
 
     for arg, default in zip(args.kwonlyargs, args.kw_defaults, strict=True):
         add(arg, default)
 
     if args.kwarg:
-        params.append((f"**{args.kwarg.arg}", "Optional Any"))
+        params.append((f"**{args.kwarg.arg}", "Any"))
 
     return params
 
 
 def detect_raises(node: ast.AST) -> list[str]:
     """Return detect raises.
-
-    Auto-generated reference for the ``detect_raises`` callable defined in ``tools.auto_docstrings``.
 
     Parameters
     ----------
@@ -376,20 +276,6 @@ def detect_raises(node: ast.AST) -> list[str]:
     -------
     List[str]
         Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import detect_raises
-    >>> result = detect_raises(...)
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    tools.auto_docstrings
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
     seen: OrderedDict[str, None] = OrderedDict()
     for child in ast.walk(node):
@@ -422,8 +308,6 @@ def build_examples(
 ) -> list[str]:
     """Return build examples.
 
-    Auto-generated reference for the ``build_examples`` callable defined in ``tools.auto_docstrings``.
-
     Parameters
     ----------
     module_name : str
@@ -439,20 +323,6 @@ def build_examples(
     -------
     List[str]
         Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import build_examples
-    >>> result = build_examples(..., ..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    tools.auto_docstrings
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
     lines: list[str] = ["Examples", "--------"]
     if module_name and not name.startswith("__"):
@@ -472,8 +342,6 @@ def build_examples(
 def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     """Return build docstring.
 
-    Auto-generated reference for the ``build_docstring`` callable defined in ``tools.auto_docstrings``.
-
     Parameters
     ----------
     kind : str
@@ -487,20 +355,6 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     -------
     List[str]
         Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import build_docstring
-    >>> result = build_docstring(..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    tools.auto_docstrings
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
     if kind == "module":
         module_display = module_name.split(".")[-1] if module_name else "module"
@@ -560,8 +414,6 @@ def _required_sections(
 ) -> set[str]:
     """Return required sections.
 
-    Auto-generated reference for the ``_required_sections`` callable defined in ``tools.auto_docstrings``.
-
     Parameters
     ----------
     kind : str
@@ -577,41 +429,21 @@ def _required_sections(
     -------
     Set[str]
         Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import _required_sections
-    >>> result = _required_sections(..., ..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    tools.auto_docstrings
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    required: set[str] = set()
-    if kind == "module":
-        required.update({"Notes", "See Also"})
-    elif kind == "class":
-        required.update({"Attributes", "Methods", "Examples", "See Also", "Notes"})
-    else:
-        required.update({"Examples", "See Also", "Notes"})
-        if parameters:
-            required.add("Parameters")
-        if returns:
-            required.add("Returns")
-        if raises:
-            required.add("Raises")
+    if kind in {"module", "class"}:
+        return set()
+    required: set[str] = {"Examples"}
+    if parameters:
+        required.add("Parameters")
+    if returns:
+        required.add("Returns")
+    if raises:
+        required.add("Raises")
     return required
 
 
 def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     """Return docstring text.
-
-    Auto-generated reference for the ``docstring_text`` callable defined in ``tools.auto_docstrings``.
 
     Parameters
     ----------
@@ -622,20 +454,6 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     -------
     Tuple[str | None, ast.Expr | None]
         Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import docstring_text
-    >>> result = docstring_text(...)
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    tools.auto_docstrings
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
     body = getattr(node, "body", [])
     if not body:
@@ -655,8 +473,6 @@ def replace(
 ) -> None:
     """Return replace.
 
-    Auto-generated reference for the ``replace`` callable defined in ``tools.auto_docstrings``.
-
     Parameters
     ----------
     doc_expr : ast.Expr | None
@@ -669,19 +485,6 @@ def replace(
         Description for ``indent``.
     insert_at : int
         Description for ``insert_at``.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import replace
-    >>> replace(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    tools.auto_docstrings
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
     formatted = [indent + line + "\n" for line in new_lines]
     if doc_expr is not None:
@@ -699,8 +502,6 @@ def replace(
 def process_file(path: Path) -> bool:
     """Return process file.
 
-    Auto-generated reference for the ``process_file`` callable defined in ``tools.auto_docstrings``.
-
     Parameters
     ----------
     path : Path
@@ -710,20 +511,6 @@ def process_file(path: Path) -> bool:
     -------
     bool
         Description of return value.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import process_file
-    >>> result = process_file(...)
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    tools.auto_docstrings
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
     try:
         text = path.read_text(encoding="utf-8")
@@ -756,6 +543,17 @@ def process_file(path: Path) -> bool:
             lower_markers = (" list[", " tuple[", " set[", " dict[", " list ", " dict ")
             if any(marker in doc for marker in lower_markers):
                 needs_update = True
+        if not needs_update and doc:
+            boilerplate_tokens = (
+                "Provide utilities for module.",
+                "This module exposes the primary interfaces for the package.",
+                "See Also\n--------\n",
+                "Attributes\n----------\nNone",
+                "Method description.",
+                "Provide usage considerations, constraints, or complexity notes.",
+            )
+            if any(token in doc for token in boilerplate_tokens):
+                needs_update = True
         if not needs_update:
             continue
 
@@ -778,23 +576,7 @@ def process_file(path: Path) -> bool:
 
 
 def main() -> None:
-    """Return main.
-
-    Auto-generated reference for the ``main`` callable defined in ``tools.auto_docstrings``.
-
-    Examples
-    --------
-    >>> from tools.auto_docstrings import main
-    >>> main()  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    tools.auto_docstrings
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
-    """
+    """Return main."""
     args = parse_args()
     target = args.target.resolve()
     changed: list[DocstringChange] = []

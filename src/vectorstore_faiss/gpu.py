@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-vectorstore_faiss.gpu
-"""
-
+"""Gpu utilities."""
 
 from __future__ import annotations
 
@@ -42,47 +32,7 @@ type StrArray = NDArray[np.str_]
 
 # [nav:anchor FaissGpuIndex]
 class FaissGpuIndex:
-    """Represent FaissGpuIndex.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-    
-    Methods
-    -------
-    __init__()
-        Method description.
-    _ensure_resources()
-        Method description.
-    train()
-        Method description.
-    add()
-        Method description.
-    search()
-        Method description.
-    save()
-        Method description.
-    load()
-        Method description.
-    
-    Examples
-    --------
-    >>> from vectorstore_faiss.gpu import FaissGpuIndex
-    >>> result = FaissGpuIndex()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    vectorstore_faiss.gpu
-    
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
-    
-    
+    """Describe FaissGpuIndex."""
 
     def __init__(
         self,
@@ -95,29 +45,15 @@ class FaissGpuIndex:
 
         Parameters
         ----------
-        factory : str, optional
+        factory : str | None
             Description for ``factory``.
-        nprobe : int, optional
+        nprobe : int | None
             Description for ``nprobe``.
-        gpu : bool, optional
+        gpu : bool | None
             Description for ``gpu``.
-        cuvs : bool, optional
+        cuvs : bool | None
             Description for ``cuvs``.
-        
-        Examples
-        --------
-        >>> from vectorstore_faiss.gpu import __init__
-        >>> __init__(..., ..., ..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        vectorstore_faiss.gpu
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.factory = factory
         self.nprobe = nprobe
         self.gpu = gpu
@@ -135,22 +71,7 @@ class FaissGpuIndex:
             self._faiss = None
 
     def _ensure_resources(self) -> None:
-        """Return ensure resources.
-
-        Examples
-        --------
-        >>> from vectorstore_faiss.gpu import _ensure_resources
-        >>> _ensure_resources()  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        vectorstore_faiss.gpu
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
-        """
-        
+        """Return ensure resources."""
         if not self._faiss or not self.gpu:
             return
         if self._res is None:
@@ -162,25 +83,11 @@ class FaissGpuIndex:
 
         Parameters
         ----------
-        train_vectors : FloatArray
+        train_vectors : src.vectorstore_faiss.gpu.FloatArray
             Description for ``train_vectors``.
-        seed : int, optional
+        seed : int | None
             Description for ``seed``.
-        
-        Examples
-        --------
-        >>> from vectorstore_faiss.gpu import train
-        >>> train(..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        vectorstore_faiss.gpu
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         if self._faiss is None:
             return
         train_mat = cast(FloatArray, np.asarray(train_vectors, dtype=np.float32, order="C"))
@@ -213,29 +120,14 @@ class FaissGpuIndex:
         ----------
         keys : List[str]
             Description for ``keys``.
-        vectors : FloatArray
+        vectors : src.vectorstore_faiss.gpu.FloatArray
             Description for ``vectors``.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-        
-        Examples
-        --------
-        >>> from vectorstore_faiss.gpu import add
-        >>> add(..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        vectorstore_faiss.gpu
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         vec_array = cast(FloatArray, np.asarray(vectors, dtype=np.float32, order="C"))
         if self._faiss is None:
             self._xb = cast(FloatArray, np.array(vec_array, copy=True))
@@ -264,38 +156,21 @@ class FaissGpuIndex:
 
         Parameters
         ----------
-        query : FloatArray
+        query : src.vectorstore_faiss.gpu.FloatArray
             Description for ``query``.
         k : int
             Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-        
-        Examples
-        --------
-        >>> from vectorstore_faiss.gpu import search
-        >>> result = search(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        ...
-        
-        See Also
-        --------
-        vectorstore_faiss.gpu
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         q = cast(FloatArray, np.asarray(query, dtype=np.float32, order="C"))
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12
         if self._faiss is None or self._index is None:
@@ -320,28 +195,14 @@ class FaissGpuIndex:
         ----------
         index_uri : str
             Description for ``index_uri``.
-        idmap_uri : str | None, optional
+        idmap_uri : str | None
             Description for ``idmap_uri``.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-        
-        Examples
-        --------
-        >>> from vectorstore_faiss.gpu import save
-        >>> save(..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        vectorstore_faiss.gpu
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         if self._faiss is None or self._index is None:
             if self._xb is not None and self._idmap is not None:
                 np.savez(index_uri, xb=self._xb, ids=self._idmap)
@@ -360,28 +221,14 @@ class FaissGpuIndex:
         ----------
         index_uri : str
             Description for ``index_uri``.
-        idmap_uri : str | None, optional
+        idmap_uri : str | None
             Description for ``idmap_uri``.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-        
-        Examples
-        --------
-        >>> from vectorstore_faiss.gpu import load
-        >>> load(..., ...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        vectorstore_faiss.gpu
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
-        
         if self._faiss is None:
             if os.path.exists(index_uri + ".npz"):
                 data = np.load(index_uri + ".npz", allow_pickle=True)

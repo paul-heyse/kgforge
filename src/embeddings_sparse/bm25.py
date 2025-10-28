@@ -1,16 +1,4 @@
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``src.embeddings_sparse.bm25`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-src.embeddings_sparse.bm25
-"""
-
+"""Bm25 utilities."""
 
 from __future__ import annotations
 
@@ -76,17 +64,6 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 @dataclass
 class BM25Doc:
     """Describe BM25Doc."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     doc_id: str
     length: int
@@ -95,42 +72,7 @@ class BM25Doc:
 
 # [nav:anchor PurePythonBM25]
 class PurePythonBM25:
-    """Represent PurePythonBM25.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-
-    Methods
-    -------
-    __init__()
-        Method description.
-    _tokenize()
-        Method description.
-    build()
-        Method description.
-    load()
-        Method description.
-    _idf()
-        Method description.
-    search()
-        Method description.
-
-    Examples
-    --------
-    >>> from embeddings_sparse.bm25 import PurePythonBM25
-    >>> result = PurePythonBM25()
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    embeddings_sparse.bm25
-
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    """Describe PurePythonBM25."""
 
     def __init__(
         self,
@@ -145,25 +87,12 @@ class PurePythonBM25:
         ----------
         index_dir : str
             Description for ``index_dir``.
-        k1 : float, optional
+        k1 : float | None
             Description for ``k1``.
-        b : float, optional
+        b : float | None
             Description for ``b``.
-        field_boosts : Mapping[str, float] | None, optional
+        field_boosts : Mapping[str, float] | None
             Description for ``field_boosts``.
-
-        Examples
-        --------
-        >>> from embeddings_sparse.bm25 import __init__
-        >>> __init__(..., ..., ..., ...)  # doctest: +ELLIPSIS
-
-        See Also
-        --------
-        embeddings_sparse.bm25
-
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
         self.index_dir = index_dir
         self.k1 = k1
@@ -188,20 +117,6 @@ class PurePythonBM25:
         -------
         List[str]
             Description of return value.
-
-        Examples
-        --------
-        >>> from embeddings_sparse.bm25 import _tokenize
-        >>> result = _tokenize(...)
-        >>> result  # doctest: +ELLIPSIS
-
-        See Also
-        --------
-        embeddings_sparse.bm25
-
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
@@ -213,17 +128,6 @@ class PurePythonBM25:
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
@@ -271,21 +175,7 @@ class PurePythonBM25:
             )
 
     def load(self) -> None:
-        """Return load.
-
-        Examples
-        --------
-        >>> from embeddings_sparse.bm25 import load
-        >>> load()  # doctest: +ELLIPSIS
-
-        See Also
-        --------
-        embeddings_sparse.bm25
-
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
-        """
+        """Return load."""
         path = os.path.join(self.index_dir, "pure_bm25.pkl")
         with open(path, "rb") as f:
             data = pickle.load(f)
@@ -310,20 +200,6 @@ class PurePythonBM25:
         -------
         float
             Description of return value.
-
-        Examples
-        --------
-        >>> from embeddings_sparse.bm25 import _idf
-        >>> result = _idf(...)
-        >>> result  # doctest: +ELLIPSIS
-
-        See Also
-        --------
-        embeddings_sparse.bm25
-
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
         n_t = self.df.get(term, 0)
         if n_t == 0:
@@ -342,27 +218,13 @@ class PurePythonBM25:
             Description for ``query``.
         k : int
             Description for ``k``.
-        fields : Mapping[str, str] | None, optional
+        fields : Mapping[str, str] | None
             Description for ``fields``.
 
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
-        Examples
-        --------
-        >>> from embeddings_sparse.bm25 import search
-        >>> result = search(..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-
-        See Also
-        --------
-        embeddings_sparse.bm25
-
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
@@ -383,38 +245,7 @@ class PurePythonBM25:
 
 # [nav:anchor LuceneBM25]
 class LuceneBM25:
-    """Represent LuceneBM25.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-
-    Methods
-    -------
-    __init__()
-        Method description.
-    build()
-        Method description.
-    _ensure_searcher()
-        Method description.
-    search()
-        Method description.
-
-    Examples
-    --------
-    >>> from embeddings_sparse.bm25 import LuceneBM25
-    >>> result = LuceneBM25()
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    embeddings_sparse.bm25
-
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    """Describe LuceneBM25."""
 
     def __init__(
         self,
@@ -429,25 +260,12 @@ class LuceneBM25:
         ----------
         index_dir : str
             Description for ``index_dir``.
-        k1 : float, optional
+        k1 : float | None
             Description for ``k1``.
-        b : float, optional
+        b : float | None
             Description for ``b``.
-        field_boosts : Mapping[str, float] | None, optional
+        field_boosts : Mapping[str, float] | None
             Description for ``field_boosts``.
-
-        Examples
-        --------
-        >>> from embeddings_sparse.bm25 import __init__
-        >>> __init__(..., ..., ..., ...)  # doctest: +ELLIPSIS
-
-        See Also
-        --------
-        embeddings_sparse.bm25
-
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
         self.index_dir = index_dir
         self.k1 = k1
@@ -468,17 +286,6 @@ class LuceneBM25:
         RuntimeError
             Raised when validation fails.
         """
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         try:
             from pyserini.analysis import get_lucene_analyzer
             from pyserini.index import IndexWriter
@@ -504,21 +311,7 @@ class LuceneBM25:
         writer.close()
 
     def _ensure_searcher(self) -> None:
-        """Return ensure searcher.
-
-        Examples
-        --------
-        >>> from embeddings_sparse.bm25 import _ensure_searcher
-        >>> _ensure_searcher()  # doctest: +ELLIPSIS
-
-        See Also
-        --------
-        embeddings_sparse.bm25
-
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
-        """
+        """Return ensure searcher."""
         if self._searcher is not None:
             return
         from pyserini.search.lucene import LuceneSearcher
@@ -537,7 +330,7 @@ class LuceneBM25:
             Description for ``query``.
         k : int
             Description for ``k``.
-        fields : Mapping[str, str] | None, optional
+        fields : Mapping[str, str] | None
             Description for ``fields``.
 
         Returns
@@ -549,20 +342,6 @@ class LuceneBM25:
         ------
         RuntimeError
             Raised when validation fails.
-
-        Examples
-        --------
-        >>> from embeddings_sparse.bm25 import search
-        >>> result = search(..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-
-        See Also
-        --------
-        embeddings_sparse.bm25
-
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
         self._ensure_searcher()
         if self._searcher is None:
@@ -589,31 +368,17 @@ def get_bm25(
         Description for ``backend``.
     index_dir : str
         Description for ``index_dir``.
-    k1 : float, optional
+    k1 : float | None
         Description for ``k1``.
-    b : float, optional
+    b : float | None
         Description for ``b``.
-    field_boosts : Mapping[str, float] | None, optional
+    field_boosts : Mapping[str, float] | None
         Description for ``field_boosts``.
 
     Returns
     -------
     PurePythonBM25 | LuceneBM25
         Description of return value.
-
-    Examples
-    --------
-    >>> from embeddings_sparse.bm25 import get_bm25
-    >>> result = get_bm25(..., ..., ..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    embeddings_sparse.bm25
-
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
     if backend == "lucene":
         try:

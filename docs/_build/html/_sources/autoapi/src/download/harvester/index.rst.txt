@@ -5,15 +5,7 @@ src.download.harvester
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   Auto-generated API documentation for the ``src.download.harvester`` module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`src.download.harvester`
+   Harvester utilities.
 
    ..
        !! processed by numpydoc !!
@@ -27,43 +19,8 @@ Module Contents
 .. py:class:: OpenAccessHarvester(user_agent, contact_email, openalex_base = 'https://api.openalex.org', unpaywall_base = 'https://api.unpaywall.org', pdf_host_base = None, out_dir = '/data/pdfs')
 
    
-   Represent OpenAccessHarvester.
+   Describe OpenAccessHarvester.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: __init__()
-
-      Method description.
-
-   .. method:: search()
-
-      Method description.
-
-   .. method:: resolve_pdf()
-
-      Method description.
-
-   .. method:: download_pdf()
-
-      Method description.
-
-   .. method:: run()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from download.harvester import OpenAccessHarvester
-   >>> result = OpenAccessHarvester()
-   >>> result  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`download.harvester`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -125,18 +82,6 @@ Module Contents
 
       :returns: *List[dict[str, Any]]* -- Description of return value.
 
-      .. rubric:: Examples
-
-      >>> from download.harvester import search
-      >>> result = search(..., ..., ...)
-      >>> result  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`download.harvester`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -164,18 +109,6 @@ Module Contents
       :type work: Mapping[str, Any]
 
       :returns: *str | None* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from download.harvester import resolve_pdf
-      >>> result = resolve_pdf(...)
-      >>> result  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`download.harvester`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -210,18 +143,6 @@ Module Contents
       :raises DownloadError: Raised when validation fails.
       :raises UnsupportedMIMEError: Raised when validation fails.
 
-      .. rubric:: Examples
-
-      >>> from download.harvester import download_pdf
-      >>> result = download_pdf(..., ...)
-      >>> result  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`download.harvester`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -253,18 +174,6 @@ Module Contents
       :type max_works: int
 
       :returns: *List[Doc]* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from download.harvester import run
-      >>> result = run(..., ..., ...)
-      >>> result  # doctest: +ELLIPSIS
-
-      .. seealso:: :py:obj:`download.harvester`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 

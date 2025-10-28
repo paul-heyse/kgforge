@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-search_api.app
-"""
-
+"""App utilities."""
 
 from __future__ import annotations
 
@@ -122,28 +112,14 @@ def auth(authorization: str | None = Header(default=None)) -> None:
 
     Parameters
     ----------
-    authorization : str | None, optional
+    authorization : str | None
         Description for ``authorization``.
-    
+
     Raises
     ------
     HTTPException
         Raised when validation fails.
-    
-    Examples
-    --------
-    >>> from search_api.app import auth
-    >>> auth(...)  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    search_api.app
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     if not API_KEYS:
         return  # disabled in skeleton
     if not authorization or not authorization.startswith("Bearer "):
@@ -162,24 +138,7 @@ def healthz() -> dict[str, Any]:
     -------
     Mapping[str, Any]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.app import healthz
-    >>> result = healthz()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.app
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     return {
         "status": "ok",
         "components": {
@@ -202,29 +161,12 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
         Description for ``lists``.
     k_rrf : int
         Description for ``k_rrf``.
-    
+
     Returns
     -------
     Mapping[str, float]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.app import rrf_fuse
-    >>> result = rrf_fuse(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.app
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     scores: dict[str, float] = {}
     for hits in lists:
         for rank, (doc_id, _score) in enumerate(hits, start=1):
@@ -247,33 +189,16 @@ def apply_kg_boosts(
         Description for ``cands``.
     query : str
         Description for ``query``.
-    direct : float, optional
+    direct : float | None
         Description for ``direct``.
-    one_hop : float, optional
+    one_hop : float | None
         Description for ``one_hop``.
-    
+
     Returns
     -------
     Mapping[str, float]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.app import apply_kg_boosts
-    >>> result = apply_kg_boosts(..., ..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.app
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     q_concepts = set()
     for w in query.lower().split():
         if w.startswith("concept"):
@@ -300,33 +225,16 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
 
     Parameters
     ----------
-    req : SearchRequest
+    req : src.search_api.schemas.SearchRequest
         Description for ``req``.
-    _ : None, optional
+    _ : None | None
         Description for ``_``.
-    
+
     Returns
     -------
     Mapping[str, Any]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.app import search
-    >>> result = search(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.app
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
     dense_hits: list[tuple[str, float]] = []
@@ -393,31 +301,14 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     ----------
     body : Mapping[str, Any]
         Description for ``body``.
-    _ : None, optional
+    _ : None | None
         Description for ``_``.
-    
+
     Returns
     -------
     Mapping[str, Any]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.app import graph_concepts
-    >>> result = graph_concepts(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.app
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring
     concepts = [

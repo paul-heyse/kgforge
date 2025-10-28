@@ -473,82 +473,57 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for src.download.cli</h1><div class="highlight"><pre>
-<span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Provide utilities for module.</span>
+<span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Cli utilities.&quot;&quot;&quot;</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="sd">Auto-generated API documentation for the ``src.download.cli`` module.</span>
+<span class="linenos"> 3</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 <span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="sd">Notes</span>
-<span class="linenos"> 6</span><span class="sd">-----</span>
-<span class="linenos"> 7</span><span class="sd">This module exposes the primary interfaces for the package.</span>
+<span class="linenos"> 5</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="kn">import</span><span class="w"> </span><span class="nn">typer</span>
 <span class="linenos"> 8</span>
-<span class="linenos"> 9</span><span class="sd">See Also</span>
-<span class="linenos">10</span><span class="sd">--------</span>
-<span class="linenos">11</span><span class="sd">src.download.cli</span>
-<span class="linenos">12</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="linenos">13</span>
-<span class="linenos">14</span>
-<span class="linenos">15</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-<span class="linenos">16</span>
-<span class="linenos">17</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span>
-<span class="linenos">18</span>
-<span class="linenos">19</span><span class="kn">import</span><span class="w"> </span><span class="nn">typer</span>
-<span class="linenos">20</span>
-<span class="linenos">21</span><span class="kn">from</span><span class="w"> </span><span class="nn">kgfoundry_common.navmap_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NavMap</span>
-<span class="linenos">22</span>
-<span class="linenos">23</span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;harvest&quot;</span><span class="p">]</span>
-<span class="linenos">24</span>
-<span class="linenos">25</span><span class="n">__navmap__</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">NavMap</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-<span class="linenos">26</span>    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;download.cli&quot;</span><span class="p">,</span>
-<span class="linenos">27</span>    <span class="s2">&quot;synopsis&quot;</span><span class="p">:</span> <span class="s2">&quot;Module for download.cli&quot;</span><span class="p">,</span>
-<span class="linenos">28</span>    <span class="s2">&quot;exports&quot;</span><span class="p">:</span> <span class="n">__all__</span><span class="p">,</span>
-<span class="linenos">29</span>    <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[</span>
-<span class="linenos">30</span>        <span class="p">{</span>
-<span class="linenos">31</span>            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;public-api&quot;</span><span class="p">,</span>
-<span class="linenos">32</span>            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Public API&quot;</span><span class="p">,</span>
-<span class="linenos">33</span>            <span class="s2">&quot;symbols&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;harvest&quot;</span><span class="p">],</span>
-<span class="linenos">34</span>        <span class="p">},</span>
-<span class="linenos">35</span>    <span class="p">],</span>
-<span class="linenos">36</span><span class="p">}</span>
-<span class="linenos">37</span>
-<span class="linenos">38</span><span class="n">app</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Typer</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s2">&quot;Downloader &amp; harvester CLI (skeleton).&quot;</span><span class="p">)</span>
-<span class="linenos">39</span>
-<span class="linenos">40</span>
-<span class="linenos">41</span><span class="c1"># [nav:anchor harvest]</span>
-<span class="linenos">42</span><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="linenos"> 9</span><span class="kn">from</span><span class="w"> </span><span class="nn">kgfoundry_common.navmap_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NavMap</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;harvest&quot;</span><span class="p">]</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="n">__navmap__</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">NavMap</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+<span class="linenos">14</span>    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;download.cli&quot;</span><span class="p">,</span>
+<span class="linenos">15</span>    <span class="s2">&quot;synopsis&quot;</span><span class="p">:</span> <span class="s2">&quot;Module for download.cli&quot;</span><span class="p">,</span>
+<span class="linenos">16</span>    <span class="s2">&quot;exports&quot;</span><span class="p">:</span> <span class="n">__all__</span><span class="p">,</span>
+<span class="linenos">17</span>    <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[</span>
+<span class="linenos">18</span>        <span class="p">{</span>
+<span class="linenos">19</span>            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;public-api&quot;</span><span class="p">,</span>
+<span class="linenos">20</span>            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Public API&quot;</span><span class="p">,</span>
+<span class="linenos">21</span>            <span class="s2">&quot;symbols&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;harvest&quot;</span><span class="p">],</span>
+<span class="linenos">22</span>        <span class="p">},</span>
+<span class="linenos">23</span>    <span class="p">],</span>
+<span class="linenos">24</span><span class="p">}</span>
+<span class="linenos">25</span>
+<span class="linenos">26</span><span class="n">app</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Typer</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s2">&quot;Downloader &amp; harvester CLI (skeleton).&quot;</span><span class="p">)</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>
+<span class="linenos">29</span><span class="c1"># [nav:anchor harvest]</span>
+<span class="linenos">30</span><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="linenos">31</span><span class="k">def</span><span class="w"> </span><span class="nf">harvest</span><span class="p">(</span><span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">years</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&gt;=2018&quot;</span><span class="p">,</span> <span class="n">max_works</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">32</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return harvest.</span>
 <div class="viewcode-block" id="harvest">
 <a class="viewcode-back" href="../../../autoapi/src/download/cli/index.html#src.download.cli.harvest">[docs]</a>
-<span class="linenos">43</span><span class="k">def</span><span class="w"> </span><span class="nf">harvest</span><span class="p">(</span><span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">years</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&gt;=2018&quot;</span><span class="p">,</span> <span class="n">max_works</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="linenos">44</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return harvest.</span>
+<span class="linenos">33</span>
+<span class="linenos">34</span><span class="sd">    Parameters</span>
+<span class="linenos">35</span><span class="sd">    ----------</span>
+<span class="linenos">36</span><span class="sd">    topic : str</span>
+<span class="linenos">37</span><span class="sd">        Description for ``topic``.</span>
+<span class="linenos">38</span><span class="sd">    years : str | None</span>
+<span class="linenos">39</span><span class="sd">        Description for ``years``.</span>
+<span class="linenos">40</span><span class="sd">    max_works : int | None</span>
+<span class="linenos">41</span><span class="sd">        Description for ``max_works``.</span>
+<span class="linenos">42</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">43</span>    <span class="n">typer</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[dry-run] would harvest topic=</span><span class="si">{</span><span class="n">topic</span><span class="si">!r}</span><span class="s2">, years=</span><span class="si">{</span><span class="n">years</span><span class="si">}</span><span class="s2">, max_works=</span><span class="si">{</span><span class="n">max_works</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">44</span>
 <span class="linenos">45</span>
-<span class="linenos">46</span><span class="sd">    Parameters</span>
-<span class="linenos">47</span><span class="sd">    ----------</span>
-<span class="linenos">48</span><span class="sd">    topic : str</span>
-<span class="linenos">49</span><span class="sd">        Description for ``topic``.</span>
-<span class="linenos">50</span><span class="sd">    years : str, optional</span>
-<span class="linenos">51</span><span class="sd">        Description for ``years``.</span>
-<span class="linenos">52</span><span class="sd">    max_works : int, optional</span>
-<span class="linenos">53</span><span class="sd">        Description for ``max_works``.</span>
-<span class="linenos">54</span>
-<span class="linenos">55</span><span class="sd">    Examples</span>
-<span class="linenos">56</span><span class="sd">    --------</span>
-<span class="linenos">57</span><span class="sd">    &gt;&gt;&gt; from download.cli import harvest</span>
-<span class="linenos">58</span><span class="sd">    &gt;&gt;&gt; harvest(..., ..., ...)  # doctest: +ELLIPSIS</span>
-<span class="linenos">59</span>
-<span class="linenos">60</span><span class="sd">    See Also</span>
-<span class="linenos">61</span><span class="sd">    --------</span>
-<span class="linenos">62</span><span class="sd">    download.cli</span>
-<span class="linenos">63</span>
-<span class="linenos">64</span><span class="sd">    Notes</span>
-<span class="linenos">65</span><span class="sd">    -----</span>
-<span class="linenos">66</span><span class="sd">    Provide usage considerations, constraints, or complexity notes.</span>
-<span class="linenos">67</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">68</span>    <span class="n">typer</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[dry-run] would harvest topic=</span><span class="si">{</span><span class="n">topic</span><span class="si">!r}</span><span class="s2">, years=</span><span class="si">{</span><span class="n">years</span><span class="si">}</span><span class="s2">, max_works=</span><span class="si">{</span><span class="n">max_works</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+<span class="linenos">46</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="linenos">47</span>    <span class="n">app</span><span class="p">()</span>
+</pre></div></div>
 
-<span class="linenos">69</span>
-<span class="linenos">70</span>
-<span class="linenos">71</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-<span class="linenos">72</span>    <span class="n">app</span><span class="p">()</span>
-</pre></div>
 
                 </article>
               

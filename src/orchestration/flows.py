@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-orchestration.flows
-"""
-
+"""Flows utilities."""
 
 from __future__ import annotations
 
@@ -43,28 +33,12 @@ def t_echo(msg: str) -> str:
     ----------
     msg : str
         Description for ``msg``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
-    Examples
-    --------
-    >>> from orchestration.flows import t_echo
-    >>> result = t_echo(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    orchestration.flows
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     return msg
 
 
@@ -77,24 +51,7 @@ def e2e_flow() -> list[str]:
     -------
     List[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from orchestration.flows import e2e_flow
-    >>> result = e2e_flow()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    orchestration.flows
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     return [
         t_echo.submit(x).result()
         for x in [

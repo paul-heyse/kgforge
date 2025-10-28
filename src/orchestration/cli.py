@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-orchestration.cli
-"""
-
+"""Cli utilities."""
 
 from __future__ import annotations
 
@@ -52,27 +42,13 @@ def index_bm25(
 
     Parameters
     ----------
-    chunks_parquet : str, optional
+    chunks_parquet : str | None
         Description for ``chunks_parquet``.
-    backend : str, optional
+    backend : str | None
         Description for ``backend``.
-    index_dir : str, optional
+    index_dir : str | None
         Description for ``index_dir``.
-    
-    Examples
-    --------
-    >>> from orchestration.cli import index_bm25
-    >>> index_bm25(..., ..., ...)  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    orchestration.cli
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
@@ -123,25 +99,11 @@ def index_faiss(
 
     Parameters
     ----------
-    dense_vectors : str, optional
+    dense_vectors : str | None
         Description for ``dense_vectors``.
-    index_path : str, optional
+    index_path : str | None
         Description for ``index_path``.
-    
-    Examples
-    --------
-    >>> from orchestration.cli import index_faiss
-    >>> index_faiss(..., ...)  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    orchestration.cli
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
         vecs = json.load(fh)
@@ -167,23 +129,9 @@ def api(port: int = 8080) -> None:
 
     Parameters
     ----------
-    port : int, optional
+    port : int | None
         Description for ``port``.
-    
-    Examples
-    --------
-    >>> from orchestration.cli import api
-    >>> api(...)  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    orchestration.cli
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
@@ -198,21 +146,7 @@ def e2e() -> None:
     ------
     typer.Exit
         Raised when validation fails.
-    
-    Examples
-    --------
-    >>> from orchestration.cli import e2e
-    >>> e2e()  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    orchestration.cli
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     try:
         from orchestration.flows import e2e_flow
     except ModuleNotFoundError as exc:  # pragma: no cover - defensive messaging

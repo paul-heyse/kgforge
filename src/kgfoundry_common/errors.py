@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-kgfoundry_common.errors
-"""
-
+"""Errors utilities."""
 
 from __future__ import annotations
 
@@ -59,21 +49,6 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor DownloadError]
 class DownloadError(Exception):
     """Describe DownloadError."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...
 
@@ -81,21 +56,6 @@ class DownloadError(Exception):
 # [nav:anchor UnsupportedMIMEError]
 class UnsupportedMIMEError(Exception):
     """Describe UnsupportedMIMEError."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...
 
@@ -103,21 +63,6 @@ class UnsupportedMIMEError(Exception):
 # [nav:anchor DoclingError]
 class DoclingError(Exception):
     """Describe DoclingError."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...
 
@@ -125,21 +70,6 @@ class DoclingError(Exception):
 # [nav:anchor OCRTimeoutError]
 class OCRTimeoutError(Exception):
     """Describe OCRTimeoutError."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...
 
@@ -147,21 +77,6 @@ class OCRTimeoutError(Exception):
 # [nav:anchor ChunkingError]
 class ChunkingError(Exception):
     """Describe ChunkingError."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...
 
@@ -169,21 +84,6 @@ class ChunkingError(Exception):
 # [nav:anchor EmbeddingError]
 class EmbeddingError(Exception):
     """Describe EmbeddingError."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...
 
@@ -191,21 +91,6 @@ class EmbeddingError(Exception):
 # [nav:anchor SpladeOOMError]
 class SpladeOOMError(Exception):
     """Describe SpladeOOMError."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...
 
@@ -213,21 +98,6 @@ class SpladeOOMError(Exception):
 # [nav:anchor IndexBuildError]
 class IndexBuildError(Exception):
     """Describe IndexBuildError."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...
 
@@ -235,21 +105,6 @@ class IndexBuildError(Exception):
 # [nav:anchor OntologyParseError]
 class OntologyParseError(Exception):
     """Describe OntologyParseError."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...
 
@@ -257,21 +112,6 @@ class OntologyParseError(Exception):
 # [nav:anchor LinkerCalibrationError]
 class LinkerCalibrationError(Exception):
     """Describe LinkerCalibrationError."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...
 
@@ -279,20 +119,5 @@ class LinkerCalibrationError(Exception):
 # [nav:anchor Neo4jError]
 class Neo4jError(Exception):
     """Describe Neo4jError."""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     ...

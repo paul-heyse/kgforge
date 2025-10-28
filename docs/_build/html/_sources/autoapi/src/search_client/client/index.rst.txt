@@ -5,13 +5,7 @@ src.search_client.client
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`search_client.client`
+   Client utilities.
 
    ..
        !! processed by numpydoc !!
@@ -25,44 +19,8 @@ Module Contents
 .. py:class:: KGFoundryClient(base_url = 'http://localhost:8080', api_key = None, timeout = 30.0, http = None)
 
    
-   Represent KGFoundryClient.
+   Describe KGFoundryClient.
 
-   .. attribute:: None
-
-      No public attributes documented.
-
-   .. method:: __init__()
-
-      Method description.
-
-   .. method:: _headers()
-
-      Method description.
-
-   .. method:: healthz()
-
-      Method description.
-
-   .. method:: search()
-
-      Method description.
-
-   .. method:: concepts()
-
-      Method description.
-
-   .. rubric:: Examples
-
-   >>> from search_client.client import KGFoundryClient
-   >>> result = KGFoundryClient()
-   >>> result  # doctest: +ELLIPSIS
-   ...
-
-   .. seealso:: :py:obj:`search_client.client`
-
-   .. rubric:: Notes
-
-   Document class invariants and lifecycle details here.
 
 
 
@@ -107,19 +65,6 @@ Module Contents
 
       :returns: *Mapping[str, str]* -- Description of return value.
 
-      .. rubric:: Examples
-
-      >>> from search_client.client import _headers
-      >>> result = _headers()
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`search_client.client`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
-
 
 
 
@@ -144,19 +89,6 @@ Module Contents
       Return healthz.
 
       :returns: *Mapping[str, Any]* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from search_client.client import healthz
-      >>> result = healthz()
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`search_client.client`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -184,26 +116,13 @@ Module Contents
       :param query: Description for ``query``.
       :type query: str
       :param k: Description for ``k``.
-      :type k: int, optional
+      :type k: int | None
       :param filters: Description for ``filters``.
-      :type filters: Mapping[str, Any] | None, optional
+      :type filters: Mapping[str, Any] | None
       :param explain: Description for ``explain``.
-      :type explain: bool, optional
+      :type explain: bool | None
 
       :returns: *Mapping[str, Any]* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from search_client.client import search
-      >>> result = search(..., ..., ..., ...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`search_client.client`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 
@@ -231,22 +150,9 @@ Module Contents
       :param q: Description for ``q``.
       :type q: str
       :param limit: Description for ``limit``.
-      :type limit: int, optional
+      :type limit: int | None
 
       :returns: *Mapping[str, Any]* -- Description of return value.
-
-      .. rubric:: Examples
-
-      >>> from search_client.client import concepts
-      >>> result = concepts(..., ...)
-      >>> result  # doctest: +ELLIPSIS
-      ...
-
-      .. seealso:: :py:obj:`search_client.client`
-
-      .. rubric:: Notes
-
-      Provide usage considerations, constraints, or complexity notes.
 
 
 

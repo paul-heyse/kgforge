@@ -1,16 +1,4 @@
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``tools.docs.build_graphs`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-tools.docs.build_graphs
-"""
-
+"""Build Graphs utilities."""
 
 from __future__ import annotations
 
@@ -37,56 +25,22 @@ GRAPH_PACKAGES = {
 def run(cmd: list[str]) -> None:
     """Return run.
 
-    Auto-generated reference for the ``run`` callable defined in ``tools.docs.build_graphs``.
-    
     Parameters
     ----------
     cmd : List[str]
         Description for ``cmd``.
-    
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import run
-    >>> run(...)  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    tools.docs.build_graphs
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     subprocess.run(cmd, check=True, cwd=ROOT)
 
 
 def top_level_packages() -> set[str]:
     """Return top level packages.
 
-    Auto-generated reference for the ``top_level_packages`` callable defined in ``tools.docs.build_graphs``.
-    
     Returns
     -------
     Set[str]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import top_level_packages
-    >>> result = top_level_packages()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    tools.docs.build_graphs
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     packages: set[str] = set()
     if not SRC.exists():
         return packages
@@ -106,27 +60,11 @@ def top_level_packages() -> set[str]:
 def build_pydeps(pkg: str) -> None:
     """Return build pydeps.
 
-    Auto-generated reference for the ``build_pydeps`` callable defined in ``tools.docs.build_graphs``.
-    
     Parameters
     ----------
     pkg : str
         Description for ``pkg``.
-    
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import build_pydeps
-    >>> build_pydeps(...)  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    tools.docs.build_graphs
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     dot_path = OUT / f"{pkg}.dot"
     svg_path = OUT / f"{pkg}-imports.svg"
     cmd = [
@@ -151,27 +89,11 @@ def build_pydeps(pkg: str) -> None:
 def build_pyreverse(pkg: str) -> None:
     """Return build pyreverse.
 
-    Auto-generated reference for the ``build_pyreverse`` callable defined in ``tools.docs.build_graphs``.
-    
     Parameters
     ----------
     pkg : str
         Description for ``pkg``.
-    
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import build_pyreverse
-    >>> build_pyreverse(...)  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    tools.docs.build_graphs
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     cmd = [
         sys.executable,
         "-m",
@@ -193,24 +115,7 @@ def build_pyreverse(pkg: str) -> None:
 
 
 def main() -> None:
-    """Return main.
-
-    Auto-generated reference for the ``main`` callable defined in ``tools.docs.build_graphs``.
-    
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import main
-    >>> main()  # doctest: +ELLIPSIS
-    
-    See Also
-    --------
-    tools.docs.build_graphs
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
-    """
-    
+    """Return main."""
     for pkg in sorted(top_level_packages()):
         try:
             build_pydeps(pkg)

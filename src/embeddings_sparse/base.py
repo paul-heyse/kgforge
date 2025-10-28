@@ -1,16 +1,4 @@
-"""Provide utilities for module.
-
-Auto-generated API documentation for the ``src.embeddings_sparse.base`` module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-src.embeddings_sparse.base
-"""
-
+"""Base utilities."""
 
 from __future__ import annotations
 
@@ -37,32 +25,7 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor SparseEncoder]
 class SparseEncoder(Protocol):
-    """Represent SparseEncoder.
-
-    Attributes
-    ----------
-    name : str
-        Attribute description.
-
-    Methods
-    -------
-    encode()
-        Method description.
-
-    Examples
-    --------
-    >>> from embeddings_sparse.base import SparseEncoder
-    >>> result = SparseEncoder()
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    embeddings_sparse.base
-
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    """Describe SparseEncoder."""
 
     name: str
 
@@ -78,54 +41,13 @@ class SparseEncoder(Protocol):
         -------
         List[Tuple[List[int], List[float]]]
             Description of return value.
-
-        Examples
-        --------
-        >>> from embeddings_sparse.base import encode
-        >>> result = encode(...)
-        >>> result  # doctest: +ELLIPSIS
-
-        See Also
-        --------
-        embeddings_sparse.base
-
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
         ...
 
 
 # [nav:anchor SparseIndex]
 class SparseIndex(Protocol):
-    """Represent SparseIndex.
-
-    Attributes
-    ----------
-    None
-        No public attributes documented.
-
-    Methods
-    -------
-    build()
-        Method description.
-    search()
-        Method description.
-
-    Examples
-    --------
-    >>> from embeddings_sparse.base import SparseIndex
-    >>> result = SparseIndex()
-    >>> result  # doctest: +ELLIPSIS
-
-    See Also
-    --------
-    embeddings_sparse.base
-
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    """Describe SparseIndex."""
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Return build.
@@ -135,17 +57,6 @@ class SparseIndex(Protocol):
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         ...
 
     def search(
@@ -159,26 +70,12 @@ class SparseIndex(Protocol):
             Description for ``query``.
         k : int
             Description for ``k``.
-        fields : Mapping[str, str] | None, optional
+        fields : Mapping[str, str] | None
             Description for ``fields``.
 
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
-        Examples
-        --------
-        >>> from embeddings_sparse.base import search
-        >>> result = search(..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-
-        See Also
-        --------
-        embeddings_sparse.base
-
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
         ...

@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-search_api.fusion
-"""
-
+"""Fusion utilities."""
 
 from __future__ import annotations
 
@@ -40,31 +30,14 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, f
     ----------
     rankers : List[List[Tuple[str, float]]]
         Description for ``rankers``.
-    k : int, optional
+    k : int | None
         Description for ``k``.
-    
+
     Returns
     -------
     Mapping[str, float]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from search_api.fusion import rrf_fuse
-    >>> result = rrf_fuse(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    search_api.fusion
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     agg: dict[str, float] = {}
     for ranked in rankers:
         for r, (key, _score) in enumerate(ranked, start=1):

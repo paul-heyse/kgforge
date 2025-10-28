@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-kgfoundry_common.ids
-"""
-
+"""Ids utilities."""
 
 from __future__ import annotations
 
@@ -42,28 +32,12 @@ def urn_doc_from_text(text: str) -> str:
     ----------
     text : str
         Description for ``text``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
-    Examples
-    --------
-    >>> from kgfoundry_common.ids import urn_doc_from_text
-    >>> result = urn_doc_from_text(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    kgfoundry_common.ids
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     h = hashlib.sha256(text.encode("utf-8")).digest()[:16]
     b32 = base64.b32encode(h).decode("ascii").strip("=").lower()
     return f"urn:doc:sha256:{b32}"
@@ -81,26 +55,10 @@ def urn_chunk(doc_hash: str, start: int, end: int) -> str:
         Description for ``start``.
     end : int
         Description for ``end``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
-    Examples
-    --------
-    >>> from kgfoundry_common.ids import urn_chunk
-    >>> result = urn_chunk(..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    kgfoundry_common.ids
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
     return f"urn:chunk:{doc_hash.split(':')[-1]}:{start}-{end}"

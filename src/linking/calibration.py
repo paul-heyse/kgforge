@@ -1,14 +1,4 @@
-"""Provide utilities for module.
-
-Notes
------
-This module exposes the primary interfaces for the package.
-
-See Also
---------
-linking.calibration
-"""
-
+"""Calibration utilities."""
 
 from __future__ import annotations
 
@@ -40,28 +30,11 @@ def isotonic_calibrate(pairs: list[tuple[float, int]]) -> dict[str, object]:
     ----------
     pairs : List[Tuple[float, int]]
         Description for ``pairs``.
-    
+
     Returns
     -------
     Mapping[str, object]
         Description of return value.
-    
-    Examples
-    --------
-    >>> from linking.calibration import isotonic_calibrate
-    >>> result = isotonic_calibrate(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    
-    See Also
-    --------
-    linking.calibration
-    
-    Notes
-    -----
-    Provide usage considerations, constraints, or complexity notes.
     """
-    
-    
     # NOTE: fit isotonic regression parameters when calibrator is implemented
     return {"kind": "isotonic", "params": []}

@@ -5,15 +5,7 @@ src.docling.vlm
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   Auto-generated API documentation for the ``src.docling.vlm`` module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`src.docling.vlm`
+   Vlm utilities.
 
    ..
        !! processed by numpydoc !!
@@ -27,7 +19,7 @@ Module Contents
 .. py:class:: GraniteDoclingVLM
 
    
-   Represent GraniteDoclingVLM.
+   Describe GraniteDoclingVLM.
 
 
 

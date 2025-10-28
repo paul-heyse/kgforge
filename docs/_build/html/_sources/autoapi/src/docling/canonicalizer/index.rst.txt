@@ -5,15 +5,7 @@ src.docling.canonicalizer
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   Auto-generated API documentation for the ``src.docling.canonicalizer`` module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`src.docling.canonicalizer`
+   Canonicalizer utilities.
 
    ..
        !! processed by numpydoc !!
@@ -33,18 +25,6 @@ Module Contents
    :type blocks: List[str]
 
    :returns: *str* -- Description of return value.
-
-   .. rubric:: Examples
-
-   >>> from docling.canonicalizer import canonicalize_text
-   >>> result = canonicalize_text(...)
-   >>> result  # doctest: +ELLIPSIS
-
-   .. seealso:: :py:obj:`docling.canonicalizer`
-
-   .. rubric:: Notes
-
-   Provide usage considerations, constraints, or complexity notes.
 
 
 

@@ -5,15 +5,7 @@ src.kg_builder.neo4j_store
 
 .. autoapi-nested-parse::
 
-   Provide utilities for module.
-
-   Auto-generated API documentation for the ``src.kg_builder.neo4j_store`` module.
-
-   .. rubric:: Notes
-
-   This module exposes the primary interfaces for the package.
-
-   .. seealso:: :py:obj:`src.kg_builder.neo4j_store`
+   Neo4J Store utilities.
 
    ..
        !! processed by numpydoc !!
@@ -27,7 +19,7 @@ Module Contents
 .. py:class:: Neo4jStore
 
    
-   Represent Neo4jStore.
+   Describe Neo4jStore.
 
 
 
