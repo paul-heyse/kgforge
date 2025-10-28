@@ -47,33 +47,16 @@ def _is_pydantic_model(node: ast.ClassDef) -> bool:
     return False
 
 
-def _is_pydantic_field(name: str | None) -> bool:
-    """Return whether ``name`` matches pydantic auto attributes."""
-    return bool(name and name.startswith("model_"))
-
-
 def _is_pydantic_artifact(name: str | None) -> bool:
     """Return ``True`` when ``name`` refers to a Pydantic helper attribute."""
     if not name:
         return False
-    return (
+    return bool(
         name.startswith("model_")
         or name.startswith("__pydantic_")
+        or name in PYDANTIC_ARTIFACT_SUMMARIES
         or name
         in {
-            "model_dump",
-            "model_dump_json",
-            "model_validate",
-            "model_validate_json",
-            "model_copy",
-            "model_construct",
-            "model_serializer",
-            "schema",
-            "schema_json",
-            "model_json_schema",
-            "dict",
-            "json",
-            "copy",
             "__class_vars__",
             "__private_attributes__",
             "__signature__",
@@ -93,6 +76,73 @@ def _is_dataclass_artifact(name: str | None) -> bool:
         "astuple",
         "replace",
     }
+
+
+MAGIC_METHOD_EXTENDED_SUMMARIES: dict[str, str] = {
+    "__repr__": "Return an unambiguous representation useful for debugging.",
+    "__str__": "Render a human-readable string describing the instance.",
+    "__len__": "Report the number of items stored on the instance.",
+    "__iter__": "Yield each item from the instance in order.",
+    "__aiter__": "Yield items from the instance asynchronously.",
+    "__next__": "Return the next value produced by the iterator.",
+    "__anext__": "Return the next value produced by the asynchronous iterator.",
+    "__getitem__": "Fetch a value by key or positional index.",
+    "__setitem__": "Store a value for the provided key or positional index.",
+    "__delitem__": "Remove the value associated with the provided key or index.",
+    "__contains__": "Report whether the provided value exists on the instance.",
+    "__bool__": "Indicate whether the instance should be treated as truthy.",
+    "__eq__": "Determine whether two instances represent the same value.",
+    "__ne__": "Determine whether two instances represent different values.",
+    "__lt__": "Compare whether this instance is ordered before another.",
+    "__le__": "Compare whether this instance is ordered before or equal to another.",
+    "__gt__": "Compare whether this instance is ordered after another.",
+    "__ge__": "Compare whether this instance is ordered after or equal to another.",
+    "__hash__": "Produce the hash used when storing the instance in sets or dictionaries.",
+    "__call__": "Invoke the instance as though it were a function.",
+    "__enter__": "Enter the runtime context and return the managed resource.",
+    "__exit__": "Clean up the runtime context when the block finishes.",
+    "__aenter__": "Enter the asynchronous runtime context for the instance.",
+    "__aexit__": "Leave the asynchronous runtime context and release resources.",
+    "__await__": "Enable awaiting the instance to obtain a result.",
+    "__copy__": "Produce a shallow copy of the instance.",
+    "__deepcopy__": "Produce a deep copy of the instance and its contents.",
+}
+
+
+PYDANTIC_ARTIFACT_SUMMARIES: dict[str, str] = {
+    "model_config": "Configuration options controlling validation and serialisation.",
+    "model_fields": "Mapping describing each field declared on the model.",
+    "model_computed_fields": "Mapping of computed field descriptors registered on the model.",
+    "model_fields_set": "Set of field names provided when the instance was created.",
+    "model_extra": "Dictionary containing extra values captured during validation.",
+    "model_post_init": "Hook executed once Pydantic completes ``__init__`` validation.",
+    "model_rebuild": "Trigger Pydantic to rebuild the cached schema information.",
+    "model_parametrized_name": "Return the runtime generated name for parametrised models.",
+    "model_dump": "Serialise the model instance into a standard Python mapping.",
+    "model_dump_json": "Serialise the model instance into a JSON string.",
+    "model_validate": "Construct an instance from validated input data.",
+    "model_validate_json": "Parse a JSON string and return a validated model instance.",
+    "model_copy": "Return a shallow or deep copy of the model instance.",
+    "model_construct": "Instantiate the model without performing validation.",
+    "model_serializer": "Return the serializer callable registered for the model.",
+    "model_json_schema": "Generate the JSON Schema describing the model structure.",
+    "schema": "Generate a JSON-compatible schema describing the model.",
+    "schema_json": "Return the model schema as a JSON string.",
+    "dict": "Serialise the model into a dictionary of field values.",
+    "json": "Serialise the model into a JSON string.",
+    "copy": "Return a shallow copy of the model instance.",
+    "__pydantic_core_schema__": "Low-level schema object created by Pydantic's core runtime.",
+    "__pydantic_core_config__": "Core configuration driving validation for this model.",
+    "__pydantic_decorators__": "Registry tracking validators and serializers declared on the model.",
+    "__pydantic_extra__": "Container storing extra attributes permitted on the model.",
+    "__pydantic_fields_set__": "Set recording which fields were explicitly provided by the caller.",
+    "__pydantic_parent_namespace__": "Namespace used by Pydantic to resolve forward references.",
+    "__pydantic_generic_metadata__": "Metadata describing how the generic model was specialised.",
+    "__pydantic_model_complete__": "Flag indicating whether Pydantic finished configuring the model.",
+    "__pydantic_serializer__": "Callable responsible for serialising model instances.",
+    "__pydantic_validator__": "Callable responsible for validating model instances.",
+    "__pydantic_custom_init__": "Marker showing that the model defines a custom ``__init__``.",
+}
 
 
 QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
@@ -308,12 +358,17 @@ def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | Non
             if pretty
             else "Core data structure used within kgfoundry."
         )
+    if _is_pydantic_artifact(name):
+        return PYDANTIC_ARTIFACT_SUMMARIES.get(
+            name,
+            "Internal helper generated by Pydantic for model configuration and validation.",
+        )
     if kind == "function" and name == "__init__":
         return "Initialise a new instance with validated parameters."
+    if kind == "function" and name in MAGIC_METHOD_EXTENDED_SUMMARIES:
+        return MAGIC_METHOD_EXTENDED_SUMMARIES[name]
     if kind == "function" and _is_magic(name):
         return "Special method customising Python's object protocol for this class."
-    if kind == "function" and _is_pydantic_field(name):
-        return "Internal helper generated by Pydantic for model configuration and validation."
     if kind == "function":
         return (
             f"Carry out the {pretty.lower()} operation."
@@ -646,17 +701,6 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
             example_lines = build_examples(module_name, name, parameters, bool(returns))
             if example_lines:
                 lines.extend(["", *example_lines])
-    if (
-        kind == "function"
-        and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
-    ):
-        examples = build_examples(
-            module_name,
-            getattr(node, "name", "value"),
-            parameters,
-            bool(returns),
-        )
-        lines.extend(["", *examples])
 
     lines.append('"""')
     return lines
