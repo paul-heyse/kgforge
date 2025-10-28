@@ -674,21 +674,58 @@ def enforce_policy(
 # --------------------------------------------------------------------------------------
 
 
-def last_tree_commit(pkg: str) -> str:
-    """Compute last tree commit.
+def package_snapshot_digest(pkg: str) -> str:
+    """Compute package snapshot digest.
 
-    Carry out the last tree commit operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+    Carry out the package snapshot digest operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
     Parameters
     ----------
     pkg : str
         Description for ``pkg``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import package_snapshot_digest
+    >>> result = package_snapshot_digest(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    """
+
+    h = hashlib.sha256()
+    path = SRC / pkg
+    if not path.exists():
+        return "EMPTY"
+    for entry in sorted(path.rglob("*")):
+        if not entry.is_file():
+            continue
+        st = entry.stat()
+        h.update(str(entry.relative_to(ROOT)).encode())
+        h.update(str(st.st_size).encode())
+        h.update(str(st.st_mtime_ns).encode())
+    return h.hexdigest() or "EMPTY"
+
+
+def last_tree_commit(pkg: str) -> str:
+    """Compute last tree commit.
+
+    Carry out the last tree commit operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+    Parameters
+    ----------
+    pkg : str
+        Description for ``pkg``.
+
+    Returns
+    -------
+    str
+        Description of return value.
+
     Examples
     --------
     >>> from tools.docs.build_graphs import last_tree_commit
@@ -696,24 +733,40 @@ def last_tree_commit(pkg: str) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
+
+    sha = ""
     try:
         sha = subprocess.check_output(
             ["git", "log", "-1", "--format=%H", "--", f"src/{pkg}"], cwd=str(ROOT), text=True
         ).strip()
-        if sha:
-            return sha
     except Exception:
-        pass
-    # Fallback: hash file sizes + mtimes + paths (fast, good enough)
-    h = hashlib.sha256()
-    path = SRC / pkg
-    for p in sorted(path.rglob("*.py")):
-        st = p.stat()
-        h.update(str(p.relative_to(ROOT)).encode())
-        h.update(str(st.st_size).encode())
-        h.update(str(st.st_mtime_ns).encode())
-    return h.hexdigest() or "EMPTY"
+        sha = ""
+
+    dirty = False
+    if sha:
+        try:
+            dirty = bool(
+                subprocess.check_output(
+                    ["git", "status", "--porcelain", "--", f"src/{pkg}"],
+                    cwd=str(ROOT),
+                    text=True,
+                ).strip()
+            )
+        except Exception:
+            dirty = True
+    else:
+        dirty = True
+
+    snapshot_digest = package_snapshot_digest(pkg)
+    if not sha:
+        return snapshot_digest
+    if not dirty:
+        return sha
+
+    blended = hashlib.sha256()
+    blended.update(sha.encode())
+    blended.update(snapshot_digest.encode())
+    return blended.hexdigest()
 
 
 def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
@@ -796,6 +849,8 @@ def build_one_package(
     imports_out = OUT / f"{pkg}-imports.{fmt}"
     uml_out = OUT / f"{pkg}-uml.{fmt}"
 
+    tree_h: str | None = None
+    bucket: Path | None = None
     if use_cache:
         tree_h = last_tree_commit(pkg)
         bucket = cache_bucket(cache_dir, pkg, tree_h)
@@ -808,9 +863,6 @@ def build_one_package(
             if verbose:
                 print(f"[graphs] cache hit: {pkg}@{tree_h[:7]}")
             return (pkg, True, pydeps_ok, pyrev_ok)
-    else:
-        tree_h = None
-        bucket = None
 
     # Build fresh
     imports_out.unlink(missing_ok=True)
@@ -830,7 +882,7 @@ def build_one_package(
                 partial.unlink()
 
     # Save to cache if requested and successful
-    if use_cache and pydeps_ok and pyrev_ok and tree_h:
+    if use_cache and pydeps_ok and pyrev_ok and tree_h and bucket is not None:
         bucket.mkdir(parents=True, exist_ok=True)
         shutil.copy2(imports_out, bucket / imports_out.name)
         shutil.copy2(uml_out, bucket / uml_out.name)
