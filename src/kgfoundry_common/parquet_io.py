@@ -88,16 +88,16 @@ class ParquetVectorWriter:
         )
 
     def __init__(self, root: str) -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-        
+
         Parameters
         ----------
         root : str
             Description for ``root``.
         """
+        
         
         self.root = Path(root)
 
@@ -299,11 +299,10 @@ class ParquetChunkWriter:
         )
 
     def __init__(self, root: str, model: str = "docling_hybrid", run_id: str = "dev") -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-        
+
         Parameters
         ----------
         root : str
@@ -313,6 +312,7 @@ class ParquetChunkWriter:
         run_id : str | None
             Description for ``run_id``.
         """
+        
         
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)

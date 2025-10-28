@@ -89,11 +89,10 @@ class SpladeIndex:
         chunks_dataset_root: str | None = None,
         sparse_root: str | None = None,
     ) -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-        
+
         Parameters
         ----------
         db_path : str
@@ -103,6 +102,7 @@ class SpladeIndex:
         sparse_root : str | None
             Description for ``sparse_root``.
         """
+        
         
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path

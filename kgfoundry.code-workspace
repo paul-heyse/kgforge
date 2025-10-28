@@ -130,14 +130,7 @@
       {
         "label": "env: setup (uv)",
         "type": "shell",
-        "command": "uv venv .venv && uv pip install -e . && uv pip install -e .[docs]",
-        "options": { "cwd": "${workspaceFolder:kgfoundry}" },
-        "problemMatcher": []
-      },
-      {
-        "label": "env: setup (micromamba)",
-        "type": "shell",
-        "command": "micromamba create -y -p ./.venv -f environment.yml && micromamba run -p ./.venv pip install -e .[dev,docs]",
+        "command": "uv python pin 3.13 && uv venv && uv sync --frozen --extra docs && uvx pre-commit install -t pre-commit -t pre-push",
         "options": { "cwd": "${workspaceFolder:kgfoundry}" },
         "problemMatcher": []
       },

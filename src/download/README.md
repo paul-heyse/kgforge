@@ -7,9 +7,10 @@ Download utilities.
 
 ## Modules
 
-- **`download.cli`** — Cli utilities.
-    `stability:beta` `owner:@download` `section:public-api` `since:0.1.0` → [view](https://github.com/github.com/paul-heyse/blob/6a57bb80fdddf484976754d42b8f1e9ef561d9cf/src/download/cli.py#L1)
-- **`download.harvester`** — Harvester utilities.
-    `stability:experimental` `owner:@download` `section:public-api`
-    `since:0.1.0` → [view](https://github.com/github.com/paul-heyse/blob/6a57bb80fdddf484976754d42b8f1e9ef561d9cf/src/download/harvester.py#L1)
-<!-- agent:readme v1 sha:6a57bb80fdddf484976754d42b8f1e9ef561d9cf content:6814d67ab5ff -->
+- **`download.cli`** — Cli utilities. → [open](vscode://file//home/paul/kgfoundry/src/download/cli.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/25400af9f406b604328b2f5167de732ab3793fca/src/download/cli.py#L1)
+- **`download.harvester`** — Harvester utilities. → [open](vscode://file//home/paul/kgfoundry/src/download/harvester.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/25400af9f406b604328b2f5167de732ab3793fca/src/download/harvester.py#L1)
+
+## Classes
+
+- **`download.NavMap`** — Describe NavMap. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:32:1) | [view](https://github.com/github.com/paul-heyse/blob/25400af9f406b604328b2f5167de732ab3793fca/src/kgfoundry_common/navmap_types.py#L32-L45)
+<!-- agent:readme v1 sha:25400af9f406b604328b2f5167de732ab3793fca content:6a9a692df92c -->

@@ -1,0 +1,58 @@
+{
+  "$id": "https://kgfoundry/schemas/registry.duckdb_registry.DoctagsAsset.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Describe DoctagsAsset.",
+  "examples": [
+    {
+      "avg_logprob": {},
+      "doc_id": null,
+      "doctags_uri": null,
+      "pages": null,
+      "vlm_model": null,
+      "vlm_revision": null
+    }
+  ],
+  "properties": {
+    "avg_logprob": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Avg Logprob"
+    },
+    "doc_id": {
+      "title": "Doc Id",
+      "type": "string"
+    },
+    "doctags_uri": {
+      "title": "Doctags Uri",
+      "type": "string"
+    },
+    "pages": {
+      "title": "Pages",
+      "type": "integer"
+    },
+    "vlm_model": {
+      "title": "Vlm Model",
+      "type": "string"
+    },
+    "vlm_revision": {
+      "title": "Vlm Revision",
+      "type": "string"
+    }
+  },
+  "required": [
+    "doc_id",
+    "doctags_uri",
+    "pages",
+    "vlm_model",
+    "vlm_revision"
+  ],
+  "title": "DoctagsAsset",
+  "type": "object"
+}

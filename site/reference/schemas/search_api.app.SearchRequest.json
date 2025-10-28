@@ -1,0 +1,48 @@
+{
+  "$id": "https://kgfoundry/schemas/search_api.app.SearchRequest.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Describe SearchRequest.",
+  "examples": [
+    {
+      "explain": false,
+      "filters": {},
+      "k": 10,
+      "query": null
+    }
+  ],
+  "properties": {
+    "explain": {
+      "default": false,
+      "title": "Explain",
+      "type": "boolean"
+    },
+    "filters": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Filters"
+    },
+    "k": {
+      "default": 10,
+      "title": "K",
+      "type": "integer"
+    },
+    "query": {
+      "minLength": 1,
+      "title": "Query",
+      "type": "string"
+    }
+  },
+  "required": [
+    "query"
+  ],
+  "title": "SearchRequest",
+  "type": "object"
+}

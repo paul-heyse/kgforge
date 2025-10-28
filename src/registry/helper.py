@@ -45,16 +45,16 @@ class DuckDBRegistryHelper:
     """Describe DuckDBRegistryHelper."""
 
     def __init__(self, db_path: str) -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-        
+
         Parameters
         ----------
         db_path : str
             Description for ``db_path``.
         """
+        
         
         self.db_path = db_path
 
