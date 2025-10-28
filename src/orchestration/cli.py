@@ -17,15 +17,28 @@ __all__ = ["api", "e2e", "index_bm25", "index_faiss"]
 
 __navmap__: Final[NavMap] = {
     "title": "orchestration.cli",
-    "synopsis": "Module for orchestration.cli",
+    "synopsis": "Prefect command-line entrypoints for orchestration flows",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["index_bm25", "index_faiss", "api", "e2e"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@orchestration",
+        "stability": "beta",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@orchestration",
+            "stability": "beta",
+            "since": "0.1.0",
+        }
+        for name in __all__
+    },
 }
 
 app = typer.Typer(help="kgfoundry orchestration CLI")

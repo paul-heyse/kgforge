@@ -7,11 +7,8 @@ __all__ = ["calibration", "linker"]
 
 __navmap__: NavMap = {
     "title": "linking",
-    "synopsis": "Knowledge graph linking orchestration components",
+    "synopsis": "Entity linking calibration and production pipelines",
     "exports": __all__,
-    "owner": "@linking",
-    "stability": "experimental",
-    "since": "0.1.0",
     "sections": [
         {
             "id": "public-api",
@@ -19,14 +16,19 @@ __navmap__: NavMap = {
             "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@linking",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
     "symbols": {
         "calibration": {
-            "stability": "experimental",
+            "stability": "beta",
             "owner": "@linking",
             "since": "0.1.0",
         },
         "linker": {
-            "stability": "experimental",
+            "stability": "beta",
             "owner": "@linking",
             "since": "0.1.0",
         },

@@ -9,9 +9,6 @@ __navmap__: NavMap = {
     "title": "embeddings_sparse",
     "synopsis": "Sparse embedding adapters and indices",
     "exports": __all__,
-    "owner": "@embeddings",
-    "stability": "experimental",
-    "since": "0.1.0",
     "sections": [
         {
             "id": "public-api",
@@ -19,6 +16,11 @@ __navmap__: NavMap = {
             "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@embeddings",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
     "symbols": {
         "base": {
             "stability": "beta",

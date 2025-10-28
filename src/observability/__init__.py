@@ -8,11 +8,8 @@ __all__ = ["metrics"]
 
 __navmap__: NavMap = {
     "title": "observability",
-    "synopsis": "Metrics and tracing utilities for kgfoundry services",
+    "synopsis": "Observability metrics and instrumentation helpers",
     "exports": __all__,
-    "owner": "@observability",
-    "stability": "experimental",
-    "since": "0.1.0",
     "sections": [
         {
             "id": "public-api",
@@ -20,6 +17,11 @@ __navmap__: NavMap = {
             "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@observability",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
     "symbols": {
         "metrics": {
             "stability": "beta",

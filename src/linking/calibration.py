@@ -16,9 +16,21 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["isotonic_calibrate"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@linking",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "isotonic_calibrate": {
+            "owner": "@linking",
+            "stability": "experimental",
+            "since": "0.1.0",
+        },
+    },
 }
 
 

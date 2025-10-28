@@ -10,15 +10,27 @@ __all__ = ["Linker"]
 
 __navmap__: Final[NavMap] = {
     "title": "linking.linker",
-    "synopsis": "Module for linking.linker",
+    "synopsis": "Linking orchestrations and scoring helpers",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["Linker"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@linking",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "Linker": {
+            "owner": "@linking",
+            "stability": "experimental",
+            "since": "0.1.0",
+        },
+    },
 }
 
 

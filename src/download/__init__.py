@@ -12,9 +12,6 @@ __navmap__: NavMap = {
     "title": "download",
     "synopsis": "Public modules for the download and harvesting pipeline",
     "exports": __all__,
-    "owner": "@download",
-    "stability": "experimental",
-    "since": "0.1.0",
     "sections": [
         {
             "id": "public-api",
@@ -22,6 +19,11 @@ __navmap__: NavMap = {
             "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@download",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
     "symbols": {
         "cli": {
             "stability": "beta",

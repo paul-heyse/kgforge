@@ -9,9 +9,6 @@ __navmap__: NavMap = {
     "title": "kg_builder",
     "synopsis": "Knowledge graph builder components and interfaces",
     "exports": __all__,
-    "owner": "@kg-builder",
-    "stability": "experimental",
-    "since": "0.1.0",
     "sections": [
         {
             "id": "public-api",
@@ -19,6 +16,11 @@ __navmap__: NavMap = {
             "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@kg-builder",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
     "symbols": {
         "mock_kg": {
             "stability": "experimental",
