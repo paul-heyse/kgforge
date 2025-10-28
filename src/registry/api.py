@@ -52,6 +52,12 @@ class Registry(Protocol):
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -91,6 +97,12 @@ class Registry(Protocol):
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -119,6 +131,12 @@ class Registry(Protocol):
         dataset_id : str
             Description for ``dataset_id``.
         """
+        
+        
+        
+        
+        
+        
         
         
         
@@ -178,6 +196,12 @@ class Registry(Protocol):
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -210,6 +234,12 @@ class Registry(Protocol):
         notes : str | None
             Description for ``notes``.
         """
+        
+        
+        
+        
+        
+        
         
         
         
@@ -252,6 +282,12 @@ class Registry(Protocol):
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -280,6 +316,12 @@ class Registry(Protocol):
         assets : List[DoctagsAsset]
             Description for ``assets``.
         """
+        
+        
+        
+        
+        
+        
         
         
         
@@ -326,6 +368,12 @@ class Registry(Protocol):
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -360,6 +408,12 @@ class Registry(Protocol):
         message : str
             Description for ``message``.
         """
+        
+        
+        
+        
+        
+        
         
         
         

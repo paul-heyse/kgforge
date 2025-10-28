@@ -44,6 +44,12 @@ def iter_packages() -> list[str]:
     
     
     
+    
+    
+    
+    
+    
+    
 
 
 
@@ -99,6 +105,12 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
     
     
     
+    
+    
+    
+    
+    
+    
 
 
 
@@ -135,6 +147,12 @@ def walk(node: Object) -> None:
     node : Object
         Description for ``node``.
     """
+    
+    
+    
+    
+    
+    
     
     
     

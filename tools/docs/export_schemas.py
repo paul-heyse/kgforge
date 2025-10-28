@@ -49,6 +49,12 @@ def is_pydantic_model(obj: object) -> bool:
     
     
     
+    
+    
+    
+    
+    
+    
 
 
 
@@ -98,6 +104,12 @@ def is_pandera_model(obj: object) -> bool:
     
     
     
+    
+    
+    
+    
+    
+    
 
 
 
@@ -138,6 +150,12 @@ def iter_packages() -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     
     
     
@@ -199,6 +217,12 @@ def export_schema(module_name: str, name: str, obj: object) -> None:
     
     
     
+    
+    
+    
+    
+    
+    
 
 
 
@@ -240,6 +264,12 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
+    
     
     
     

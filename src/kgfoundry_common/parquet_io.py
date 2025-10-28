@@ -58,6 +58,12 @@ class ParquetVectorWriter:
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -100,6 +106,12 @@ class ParquetVectorWriter:
         root : str
             Description for ``root``.
         """
+        
+        
+        
+        
+        
+        
         
         
         
@@ -159,6 +171,12 @@ class ParquetVectorWriter:
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         
         
         
@@ -229,6 +247,12 @@ class ParquetVectorWriter:
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -288,6 +312,12 @@ class ParquetVectorWriter:
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         
         
         
@@ -363,6 +393,12 @@ class ParquetChunkWriter:
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -427,6 +463,12 @@ class ParquetChunkWriter:
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -465,6 +507,12 @@ class ParquetChunkWriter:
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         
         
         

@@ -64,6 +64,12 @@ def detect_query_concepts(query: str) -> set[str]:
     
     
     
+    
+    
+    
+    
+    
+    
 
 
 
@@ -108,6 +114,12 @@ def linked_concepts_for_text(text: str) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     
     
     
@@ -170,6 +182,12 @@ def kg_boost(
     float
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     
     
     

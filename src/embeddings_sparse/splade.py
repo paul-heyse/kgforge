@@ -70,6 +70,12 @@ class SPLADEv3Encoder:
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -122,6 +128,12 @@ class SPLADEv3Encoder:
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -163,6 +175,12 @@ class PureImpactIndex:
         index_dir : str
             Description for ``index_dir``.
         """
+        
+        
+        
+        
+        
+        
         
         
         
@@ -223,6 +241,12 @@ class PureImpactIndex:
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
+        
+        
+        
+        
+        
+        
         
         
         
@@ -292,6 +316,12 @@ class PureImpactIndex:
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -335,6 +365,12 @@ class PureImpactIndex:
         List[Tuple[str, float]]
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         
         
         
@@ -387,6 +423,12 @@ class LuceneImpactIndex:
         index_dir : str
             Description for ``index_dir``.
         """
+        
+        
+        
+        
+        
+        
         
         
         
@@ -465,6 +507,12 @@ class LuceneImpactIndex:
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -511,6 +559,12 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
     PureImpactIndex | LuceneImpactIndex
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     
     
     
