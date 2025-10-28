@@ -44,7 +44,8 @@ HTTP_OK = 200
 
 # [nav:anchor OpenAccessHarvester]
 class OpenAccessHarvester:
-    """Download documents via OpenAlex and raise :class:`kgfoundry_common.errors.DownloadError` when retrieval fails."""
+    """Download documents via OpenAlex and raise :class:`kgfoundry_common.errors.DownloadError` when
+    retrieval fails."""
 
     def __init__(
         self,
@@ -55,11 +56,10 @@ class OpenAccessHarvester:
         pdf_host_base: str | None = None,
         out_dir: str = "/data/pdfs",
     ) -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters.
-        
+
         Parameters
         ----------
         user_agent : str
@@ -75,6 +75,12 @@ class OpenAccessHarvester:
         out_dir : str | None
             Description for ``out_dir``.
         """
+        
+        
+        
+        
+        
+        
         self.ua = user_agent
         self.email = contact_email
         self.openalex = openalex_base.rstrip("/")
@@ -86,11 +92,10 @@ class OpenAccessHarvester:
         self.session.headers.update({"User-Agent": f"{self.ua} ({self.email})"})
 
     def search(self, topic: str, years: str, max_works: int) -> list[dict[str, Any]]:
-        """
-        Compute search.
-        
+        """Compute search.
+
         Carry out the search operation.
-        
+
         Parameters
         ----------
         topic : str
@@ -99,12 +104,18 @@ class OpenAccessHarvester:
             Description for ``years``.
         max_works : int
             Description for ``max_works``.
-        
+
         Returns
         -------
         List[dict[str, Any]]
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
             "topic": topic,
@@ -119,21 +130,26 @@ class OpenAccessHarvester:
         return data.get("results", [])[:max_works]
 
     def resolve_pdf(self, work: dict[str, Any]) -> str | None:
-        """
-        Compute resolve pdf.
-        
+        """Compute resolve pdf.
+
         Carry out the resolve pdf operation.
-        
+
         Parameters
         ----------
         work : Mapping[str, Any]
             Description for ``work``.
-        
+
         Returns
         -------
         str | None
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         best = work.get("best_oa_location") or {}
         if best and best.get("pdf_url"):
             return best["pdf_url"]
@@ -155,23 +171,22 @@ class OpenAccessHarvester:
         return None
 
     def download_pdf(self, url: str, target_path: str) -> str:
-        """
-        Compute download pdf.
-        
+        """Compute download pdf.
+
         Carry out the download pdf operation.
-        
+
         Parameters
         ----------
         url : str
             Description for ``url``.
         target_path : str
             Description for ``target_path``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
+
         Raises
         ------
         DownloadError
@@ -179,6 +194,12 @@ class OpenAccessHarvester:
         UnsupportedMIMEError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
+        
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
             message = f"Bad status {response.status_code} for {url}"
@@ -192,11 +213,10 @@ class OpenAccessHarvester:
         return target_path
 
     def run(self, topic: str, years: str, max_works: int) -> list[Doc]:
-        """
-        Compute run.
-        
+        """Compute run.
+
         Carry out the run operation.
-        
+
         Parameters
         ----------
         topic : str
@@ -205,12 +225,18 @@ class OpenAccessHarvester:
             Description for ``years``.
         max_works : int
             Description for ``max_works``.
-        
+
         Returns
         -------
         List[Doc]
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)
         for work in works:

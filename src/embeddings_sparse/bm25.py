@@ -95,11 +95,10 @@ class PurePythonBM25:
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
     ) -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters.
-        
+
         Parameters
         ----------
         index_dir : str
@@ -111,6 +110,12 @@ class PurePythonBM25:
         field_boosts : Mapping[str, float] | None
             Description for ``field_boosts``.
         """
+        
+        
+        
+        
+        
+        
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -140,16 +145,21 @@ class PurePythonBM25:
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """
-        Compute build.
-        
+        """Compute build.
+
         Carry out the build operation.
-        
+
         Parameters
         ----------
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
+        
+        
+        
+        
+        
+        
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
@@ -197,11 +207,16 @@ class PurePythonBM25:
             )
 
     def load(self) -> None:
-        """
-        Compute load.
-        
+        """Compute load.
+
         Carry out the load operation.
         """
+        
+        
+        
+        
+        
+        
         path = os.path.join(self.index_dir, "pure_bm25.pkl")
         with open(path, "rb") as f:
             data = pickle.load(f)
@@ -238,11 +253,10 @@ class PurePythonBM25:
     def search(
         self, query: str, k: int, fields: Mapping[str, str] | None = None
     ) -> list[tuple[str, float]]:
-        """
-        Compute search.
-        
+        """Compute search.
+
         Carry out the search operation.
-        
+
         Parameters
         ----------
         query : str
@@ -251,12 +265,18 @@ class PurePythonBM25:
             Description for ``k``.
         fields : Mapping[str, str] | None
             Description for ``fields``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -285,11 +305,10 @@ class LuceneBM25:
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
     ) -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters.
-        
+
         Parameters
         ----------
         index_dir : str
@@ -301,6 +320,12 @@ class LuceneBM25:
         field_boosts : Mapping[str, float] | None
             Description for ``field_boosts``.
         """
+        
+        
+        
+        
+        
+        
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -308,21 +333,26 @@ class LuceneBM25:
         self._searcher: Any | None = None
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """
-        Compute build.
-        
+        """Compute build.
+
         Carry out the build operation.
-        
+
         Parameters
         ----------
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
+        
         try:
             from pyserini.analysis import get_lucene_analyzer
             from pyserini.index import IndexWriter
@@ -362,11 +392,10 @@ class LuceneBM25:
     def search(
         self, query: str, k: int, fields: dict[str, str] | None = None
     ) -> list[tuple[str, float]]:
-        """
-        Compute search.
-        
+        """Compute search.
+
         Carry out the search operation.
-        
+
         Parameters
         ----------
         query : str
@@ -375,17 +404,23 @@ class LuceneBM25:
             Description for ``k``.
         fields : Mapping[str, str] | None
             Description for ``fields``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
+        
         self._ensure_searcher()
         if self._searcher is None:
             message = "Lucene searcher not initialized"
@@ -403,11 +438,10 @@ def get_bm25(
     b: float = 0.4,
     field_boosts: dict[str, float] | None = None,
 ) -> PurePythonBM25 | LuceneBM25:
-    """
-    Compute get bm25.
-    
+    """Compute get bm25.
+
     Carry out the get bm25 operation.
-    
+
     Parameters
     ----------
     backend : str
@@ -420,12 +454,18 @@ def get_bm25(
         Description for ``b``.
     field_boosts : Mapping[str, float] | None
         Description for ``field_boosts``.
-    
+
     Returns
     -------
     PurePythonBM25 | LuceneBM25
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     if backend == "lucene":
         try:
             return LuceneBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)

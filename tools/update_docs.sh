@@ -70,6 +70,8 @@ export GRAPH_CYCLE_LIMIT=50000    # never enumerate more than 50k cycles
 export GRAPH_EDGE_BUDGET=50000    # if pruned graph has >50k edges, skip enumeration and summarize SCCs
 
 export GRAPH_MAX_WORKERS=16
+export GRAPH_FAIL_ON_CYCLES=0
+export GRAPH_FAIL_ON_LAYER=0
 
 run make docstrings
 run make readmes

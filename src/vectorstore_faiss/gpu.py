@@ -53,11 +53,10 @@ class FaissGpuIndex:
         gpu: bool = True,
         cuvs: bool = True,
     ) -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters.
-        
+
         Parameters
         ----------
         factory : str | None
@@ -69,6 +68,12 @@ class FaissGpuIndex:
         cuvs : bool | None
             Description for ``cuvs``.
         """
+        
+        
+        
+        
+        
+        
         self.factory = factory
         self.nprobe = nprobe
         self.gpu = gpu
@@ -97,11 +102,10 @@ class FaissGpuIndex:
             self._res = faiss.StandardGpuResources()
 
     def train(self, train_vectors: FloatArray, *, seed: int = 42) -> None:
-        """
-        Compute train.
-        
+        """Compute train.
+
         Carry out the train operation.
-        
+
         Parameters
         ----------
         train_vectors : src.vectorstore_faiss.gpu.FloatArray
@@ -109,6 +113,12 @@ class FaissGpuIndex:
         seed : int | None
             Description for ``seed``.
         """
+        
+        
+        
+        
+        
+        
         if self._faiss is None:
             return
         train_mat = cast(FloatArray, np.asarray(train_vectors, dtype=np.float32, order="C"))
@@ -135,23 +145,28 @@ class FaissGpuIndex:
             pass
 
     def add(self, keys: list[str], vectors: FloatArray) -> None:
-        """
-        Compute add.
-        
+        """Compute add.
+
         Carry out the add operation.
-        
+
         Parameters
         ----------
         keys : List[str]
             Description for ``keys``.
         vectors : src.vectorstore_faiss.gpu.FloatArray
             Description for ``vectors``.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
+        
         vec_array = cast(FloatArray, np.asarray(vectors, dtype=np.float32, order="C"))
         if self._faiss is None:
             self._xb = cast(FloatArray, np.array(vec_array, copy=True))
@@ -176,28 +191,33 @@ class FaissGpuIndex:
             self._index.add(vec_array)
 
     def search(self, query: FloatArray, k: int) -> list[tuple[str, float]]:
-        """
-        Compute search.
-        
+        """Compute search.
+
         Carry out the search operation.
-        
+
         Parameters
         ----------
         query : src.vectorstore_faiss.gpu.FloatArray
             Description for ``query``.
         k : int
             Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
+        
         q = cast(FloatArray, np.asarray(query, dtype=np.float32, order="C"))
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12
         if self._faiss is None or self._index is None:
@@ -216,23 +236,28 @@ class FaissGpuIndex:
         return [(str(ids[i]), float(scores[i])) for i in range(len(ids)) if ids[i] != -1]
 
     def save(self, index_uri: str, idmap_uri: str | None = None) -> None:
-        """
-        Compute save.
-        
+        """Compute save.
+
         Carry out the save operation.
-        
+
         Parameters
         ----------
         index_uri : str
             Description for ``index_uri``.
         idmap_uri : str | None
             Description for ``idmap_uri``.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
+        
         if self._faiss is None or self._index is None:
             if self._xb is not None and self._idmap is not None:
                 np.savez(index_uri, xb=self._xb, ids=self._idmap)
@@ -245,23 +270,28 @@ class FaissGpuIndex:
         faiss.write_index(target_index, index_uri)
 
     def load(self, index_uri: str, idmap_uri: str | None = None) -> None:
-        """
-        Compute load.
-        
+        """Compute load.
+
         Carry out the load operation.
-        
+
         Parameters
         ----------
         index_uri : str
             Description for ``index_uri``.
         idmap_uri : str | None
             Description for ``idmap_uri``.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
+        
         if self._faiss is None:
             if os.path.exists(index_uri + ".npz"):
                 data = np.load(index_uri + ".npz", allow_pickle=True)

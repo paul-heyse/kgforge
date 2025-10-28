@@ -41,11 +41,10 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor apply]
 def apply(db: str, migrations_dir: str) -> None:
-    """
-    Compute apply.
-    
+    """Compute apply.
+
     Carry out the apply operation.
-    
+
     Parameters
     ----------
     db : str
@@ -53,6 +52,12 @@ def apply(db: str, migrations_dir: str) -> None:
     migrations_dir : str
         Description for ``migrations_dir``.
     """
+    
+    
+    
+    
+    
+    
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
         con.execute(p.read_text())
@@ -61,11 +66,16 @@ def apply(db: str, migrations_dir: str) -> None:
 
 # [nav:anchor main]
 def main() -> None:
-    """
-    Compute main.
-    
+    """Compute main.
+
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
+    
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
     a = sp.add_parser("apply")

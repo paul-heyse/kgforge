@@ -307,23 +307,28 @@ def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, Any]:
 
 
 def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
-    """
-    Compute repair module.
-    
+    """Compute repair module.
+
     Carry out the repair module operation.
-    
+
     Parameters
     ----------
     info : ModuleInfo
         Description for ``info``.
     apply : bool | None
         Description for ``apply``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     path = info.path
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
@@ -393,23 +398,28 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
 
 
 def repair_all(root: Path, apply: bool) -> list[str]:
-    """
-    Compute repair all.
-    
+    """Compute repair all.
+
     Carry out the repair all operation.
-    
+
     Parameters
     ----------
     root : Path
         Description for ``root``.
     apply : bool
         Description for ``apply``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     messages: list[str] = []
     for info in _collect_modules(root):
         messages.extend(repair_module(info, apply=apply))
@@ -455,21 +465,26 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """
-    Compute main.
-    
+    """Compute main.
+
     Carry out the main operation.
-    
+
     Parameters
     ----------
     argv : List[str] | None
         Description for ``argv``.
-    
+
     Returns
     -------
     int
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     args = _parse_args(argv)
     root = args.root.resolve()
     messages = repair_all(root, apply=args.apply)

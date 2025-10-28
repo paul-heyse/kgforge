@@ -76,11 +76,10 @@ class SPLADEv3Encoder:
         topk: int = 256,
         max_seq_len: int = 512,
     ) -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters.
-        
+
         Parameters
         ----------
         model_id : str | None
@@ -92,32 +91,43 @@ class SPLADEv3Encoder:
         max_seq_len : int | None
             Description for ``max_seq_len``.
         """
+        
+        
+        
+        
+        
+        
         self.model_id = model_id
         self.device = device
         self.topk = topk
         self.max_seq_len = max_seq_len
 
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
-        """
-        Compute encode.
-        
+        """Compute encode.
+
         Carry out the encode operation.
-        
+
         Parameters
         ----------
         texts : List[str]
             Description for ``texts``.
-        
+
         Returns
         -------
         List[Tuple[List[int], List[float]]]
             Description of return value.
-        
+
         Raises
         ------
         NotImplementedError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
+        
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
@@ -130,16 +140,21 @@ class PureImpactIndex:
     """Describe PureImpactIndex."""
 
     def __init__(self, index_dir: str) -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters.
-        
+
         Parameters
         ----------
         index_dir : str
             Description for ``index_dir``.
         """
+        
+        
+        
+        
+        
+        
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -164,16 +179,21 @@ class PureImpactIndex:
         return [token.lower() for token in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """
-        Compute build.
-        
+        """Compute build.
+
         Carry out the build operation.
-        
+
         Parameters
         ----------
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
+        
+        
+        
+        
+        
+        
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -205,11 +225,16 @@ class PureImpactIndex:
             )
 
     def load(self) -> None:
-        """
-        Compute load.
-        
+        """Compute load.
+
         Carry out the load operation.
         """
+        
+        
+        
+        
+        
+        
         with open(os.path.join(self.index_dir, "impact.pkl"), "rb") as handle:
             data = pickle.load(handle)
         self.df = data["df"]
@@ -217,23 +242,28 @@ class PureImpactIndex:
         self.postings = data["postings"]
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
-        """
-        Compute search.
-        
+        """Compute search.
+
         Carry out the search operation.
-        
+
         Parameters
         ----------
         query : str
             Description for ``query``.
         k : int
             Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
         for token in tokens:
@@ -250,16 +280,21 @@ class LuceneImpactIndex:
     """Describe LuceneImpactIndex."""
 
     def __init__(self, index_dir: str) -> None:
-        """
-        Compute init.
-        
+        """Compute init.
+
         Initialise a new instance with validated parameters.
-        
+
         Parameters
         ----------
         index_dir : str
             Description for ``index_dir``.
         """
+        
+        
+        
+        
+        
+        
         self.index_dir = index_dir
         self._searcher: Any | None = None
 
@@ -283,28 +318,33 @@ class LuceneImpactIndex:
         self._searcher = LuceneImpactSearcher(self.index_dir)
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
-        """
-        Compute search.
-        
+        """Compute search.
+
         Carry out the search operation.
-        
+
         Parameters
         ----------
         query : str
             Description for ``query``.
         k : int
             Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
+        
         self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
@@ -315,23 +355,28 @@ class LuceneImpactIndex:
 
 # [nav:anchor get_splade]
 def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIndex:
-    """
-    Compute get splade.
-    
+    """Compute get splade.
+
     Carry out the get splade operation.
-    
+
     Parameters
     ----------
     backend : str
         Description for ``backend``.
     index_dir : str
         Description for ``index_dir``.
-    
+
     Returns
     -------
     PureImpactIndex | LuceneImpactIndex
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     if backend == "lucene":
         try:
             return LuceneImpactIndex(index_dir)

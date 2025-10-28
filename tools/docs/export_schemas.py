@@ -62,11 +62,21 @@ def _sorted(obj: Any) -> Any:
         return {k: _sorted(obj[k]) for k in sorted(obj.keys())}
     if isinstance(obj, list):
         return [_sorted(x) for x in obj]
+    try:
+        from pydantic_core import PydanticUndefined
+
+        if obj is PydanticUndefined:
+            return None
+    except Exception:
+        pass
     return obj
 
 
 def _write_if_changed(path: Path, data: dict[str, Any]) -> tuple[bool, str | None, str | None]:
-    """Write JSON with sorted keys + trailing newline if content changed. Return (changed, old, new)."""
+    """Write JSON with sorted keys + trailing newline if content changed.
+
+    Return (changed, old, new).
+    """
     new_text = json.dumps(data, indent=2, ensure_ascii=False) + "\n"
     old_text = path.read_text(encoding="utf-8") if path.exists() else None
     if old_text == new_text:
@@ -114,7 +124,7 @@ def is_pydantic_model(obj: object) -> bool:
         from pydantic import BaseModel
     except Exception:
         return False
-    return inspect.isclass(obj) and issubclass(obj, BaseModel)
+    return inspect.isclass(obj) and issubclass(obj, BaseModel) and obj is not BaseModel
 
 
 def is_pandera_model(obj: object) -> bool:
@@ -173,7 +183,8 @@ def _load_navmap() -> dict[str, Any]:
 
 
 def _nav_versions(module_name: str, class_name: str, nav: dict[str, Any]) -> dict[str, Any] | None:
-    """Find {x-version-introduced, x-deprecated-in} from navmap meta (module + symbol name match)."""
+    """Find {x-version-introduced, x-deprecated-in} from navmap meta (module + symbol name
+    match)."""
     mods = nav.get("modules") or {}
     entry = mods.get(module_name)
     if not entry:
@@ -191,7 +202,8 @@ def _nav_versions(module_name: str, class_name: str, nav: dict[str, Any]) -> dic
 
 
 def _placeholder(py_type: Any) -> Any:
-    """Best-effort placeholders for builtins; nested models become {} or [] to avoid heavy imports."""
+    """Best-effort placeholders for builtins; nested models become {} or [] to avoid heavy
+    imports."""
     origin = getattr(py_type, "__origin__", None)
     if origin in (list, set, tuple):
         return []
@@ -356,21 +368,25 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
     out["top_level_removed"] = del_keys
 
     def prop_keys(d: dict) -> set[str]:
-        """
-        Compute prop keys.
-        
+        """Compute prop keys.
+
         Carry out the prop keys operation.
-        
+
         Parameters
         ----------
         d : Mapping[str, Any]
             Description for ``d``.
-        
+
         Returns
         -------
         Set[str]
             Description of return value.
         """
+        
+        
+        
+        
+        
         props = d.get("properties")
         return set(props.keys()) if isinstance(props, dict) else set()
 
@@ -525,21 +541,25 @@ def _iter_models() -> Iterator[tuple[str, str, object]]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """
-    Run the export-schemas CLI.
-    
+    """Compute main.
+
     Carry out the main operation.
-    
+
     Parameters
     ----------
     argv : List[str] | None
         Description for ``argv``.
-    
+
     Returns
     -------
     int
         Description of return value.
     """
+    
+    
+    
+    
+    
     import argparse
 
     p = argparse.ArgumentParser()

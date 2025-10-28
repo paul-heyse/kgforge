@@ -1,16 +1,16 @@
 # `kg_builder`
 
-Kg Builder utilities
+Kg Builder utilities.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Modules
 
-- **`kg_builder.mock_kg`** — Mock Kg utilities → [open](vscode://file//home/paul/kgfoundry/src/kg_builder/mock_kg.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/76e1eddf04c4cdc08124bc10a468b37f3c1e863d/src/kg_builder/mock_kg.py#L1)
-- **`kg_builder.neo4j_store`** — Neo4J Store utilities → [open](vscode://file//home/paul/kgfoundry/src/kg_builder/neo4j_store.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/76e1eddf04c4cdc08124bc10a468b37f3c1e863d/src/kg_builder/neo4j_store.py#L1)
+- **`kg_builder.mock_kg`** — Mock Kg utilities. → [open](vscode://file//home/paul/kgfoundry/src/kg_builder/mock_kg.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/00d42020723b01e0bdbe530d959bc3f75350eb3f/src/kg_builder/mock_kg.py#L1)
+- **`kg_builder.neo4j_store`** — Neo4J Store utilities. → [open](vscode://file//home/paul/kgfoundry/src/kg_builder/neo4j_store.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/00d42020723b01e0bdbe530d959bc3f75350eb3f/src/kg_builder/neo4j_store.py#L1)
 
 ## Classes
 
-- **`kg_builder.NavMap`** — Describe NavMap → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:32:1) | [view](https://github.com/github.com/paul-heyse/blob/76e1eddf04c4cdc08124bc10a468b37f3c1e863d/src/kgfoundry_common/navmap_types.py#L32-L45)
-<!-- agent:readme v1 sha:76e1eddf04c4cdc08124bc10a468b37f3c1e863d content:e06e061496df -->
+- **`kg_builder.NavMap`** — Describe NavMap. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:32:1) | [view](https://github.com/github.com/paul-heyse/blob/00d42020723b01e0bdbe530d959bc3f75350eb3f/src/kgfoundry_common/navmap_types.py#L32-L45)
+<!-- agent:readme v1 sha:00d42020723b01e0bdbe530d959bc3f75350eb3f content:1fcb686fddaa -->
