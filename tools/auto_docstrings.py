@@ -8,6 +8,7 @@ import ast
 from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 
 def _paragraph(*sentences: str) -> str:
@@ -1289,29 +1290,50 @@ def detect_raises(node: ast.AST) -> list[str]:
     >>> result = detect_raises(...)
     >>> result  # doctest: +ELLIPSIS
     """
-    seen: OrderedDict[str, None] = OrderedDict()
-    for child in ast.walk(node):
-        if not isinstance(child, ast.Raise):
-            continue
-        exc = child.exc
+
+    def _exception_name(exc: ast.AST | None) -> str:
         if exc is None:
-            name = "Exception"
-        elif isinstance(exc, ast.Call):
+            return "Exception"
+        if isinstance(exc, ast.Call):
             func = exc.func
             if isinstance(func, ast.Name):
-                name = func.id
-            elif isinstance(func, ast.Attribute):
-                name = ast.unparse(func)
-            else:  # pragma: no cover - defensive
-                name = "Exception"
-        elif isinstance(exc, ast.Name):
-            name = exc.id
-        elif isinstance(exc, ast.Attribute):
-            name = ast.unparse(exc)
-        else:
-            name = "Exception"
-        if name not in seen:
-            seen[name] = None
+                return func.id
+            if isinstance(func, ast.Attribute):
+                return ast.unparse(func)
+            return "Exception"  # pragma: no cover - defensive
+        if isinstance(exc, ast.Name):
+            return exc.id
+        if isinstance(exc, ast.Attribute):
+            return ast.unparse(exc)
+        return "Exception"
+
+    seen: OrderedDict[str, None] = OrderedDict()
+
+    class RaiseCollector(ast.NodeVisitor):
+        """Collect ``raise`` statements while respecting scope boundaries."""
+
+        _NESTED_SCOPES = (
+            ast.FunctionDef,
+            ast.AsyncFunctionDef,
+            ast.ClassDef,
+            ast.Lambda,
+        )
+
+        def __init__(self, root: ast.AST) -> None:
+            self._root = root
+
+        def visit(self, current: ast.AST) -> Any:
+            if current is not self._root and isinstance(current, self._NESTED_SCOPES):
+                return None
+            return super().visit(current)
+
+        def visit_Raise(self, raise_node: ast.Raise) -> None:  # noqa: D401 - short override
+            name = _exception_name(raise_node.exc)
+            if name not in seen:
+                seen[name] = None
+            self.generic_visit(raise_node)
+
+    RaiseCollector(node).visit(node)
     return list(seen.keys())
 
 
@@ -1448,6 +1470,7 @@ def _required_sections(
     returns: str | None,
     raises: list[str],
     node_name: str | None,
+    include_examples: bool,
 ) -> set[str]:
     """Return placeholder markers emitted by the fallback generator.
 
@@ -1470,6 +1493,11 @@ def _required_sections(
         markers.add("Callers rely on the routine to remain stable across releases.")
     for param_name, _ in parameters:
         markers.add(f"Description for ``{param_name}``.")
+    required: set[str] = set()
+    if include_examples:
+        required.add("Examples")
+    if parameters:
+        required.add("Parameters")
     if returns:
         markers.add("Description of return value.")
     if raises:
@@ -1537,7 +1565,11 @@ def replace(
     >>> replace(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
     formatted = [indent + line + "\n" for line in new_lines]
+    existing_blank_line = False
     if doc_expr is not None:
+        next_line_index = (doc_expr.end_lineno or doc_expr.lineno)
+        if next_line_index < len(lines):
+            existing_blank_line = lines[next_line_index].strip() == ""
         start = doc_expr.lineno - 1
         end = doc_expr.end_lineno or doc_expr.lineno
         del lines[start:end]
@@ -1546,7 +1578,8 @@ def replace(
     else:
         lines[insert_at:insert_at] = formatted
         after_index = insert_at + len(formatted)
-    lines.insert(after_index, indent + "\n")
+    if not existing_blank_line:
+        lines.insert(after_index, indent + "\n")
 
 
 def process_file(path: Path) -> bool:
@@ -1600,6 +1633,7 @@ def process_file(path: Path) -> bool:
         parameters: list[tuple[str, str]] = []
         returns: str | None = None
         raises: list[str] = []
+        include_examples = False
         if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             parameters = parameters_for(node)
             return_annotation: str = annotation_to_text(node.returns)
@@ -1608,11 +1642,15 @@ def process_file(path: Path) -> bool:
             raises = detect_raises(node)
 
         placeholder_markers = _required_sections(
+            include_examples = bool(node_name) and not node_name.startswith("_")
+
+        required_sections = _required_sections(
             kind,
             parameters,
             returns,
             raises,
             node_name,
+            include_examples,
         )
         needs_update = doc is None or "TODO" in (doc or "") or "NavMap:" in (doc or "")
         if not needs_update and doc and placeholder_markers:

@@ -139,6 +139,7 @@ def process(item: str, limit: int | None = None) -> str:
     params = parameters_for(node)
     returns = annotation_to_text(node.returns)
     markers = _required_sections("function", params, returns, [], node.name)
+    required = _required_sections("function", params, returns, [], True)
 
     assert markers
     for marker in markers:
@@ -253,3 +254,68 @@ def test_process_file_preserves_docstring_with_list_and_dict_mentions(
     assert "Explain how list and dict collections interact." in updated
     assert "should not be replaced by the fallback generator." in updated
     assert "Description for ``records``." not in updated
+def test_process_file_is_idempotent_for_init_method(repo_layout: Path) -> None:
+    module_path = repo_layout / "src" / "pkg" / "example.py"
+    module_path.parent.mkdir(parents=True, exist_ok=True)
+    module_path.write_text(
+        """
+class Example:
+    def __init__(self, value: int) -> None:
+        self.value = value
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+
+    assert process_file(module_path)
+    original_contents = module_path.read_text(encoding="utf-8")
+
+    assert not process_file(module_path)
+    assert module_path.read_text(encoding="utf-8") == original_contents
+def test_detect_raises_ignores_nested_scopes() -> None:
+    node = _get_function(
+        """
+def outer(flag: bool) -> None:
+    if flag:
+        raise ValueError("bad flag")
+
+    def inner() -> None:
+        raise RuntimeError("inner boom")
+
+    class Inner:
+        def method(self) -> None:
+            raise KeyError("method boom")
+
+    class WithBody:
+        raise LookupError("class body boom")
+"""
+    )
+
+    assert detect_raises(node) == ["ValueError"]
+def test_process_file_preserves_single_blank_line_after_existing_docstring(
+    repo_layout: Path,
+) -> None:
+    """Ensure processing preserves single spacer after an existing docstring."""
+    target = repo_layout / "src" / "package" / "module.py"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        """
+def sample(value: int) -> int:
+    return value
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    assert auto_docstrings.process_file(target)
+    auto_docstrings.process_file(target)
+
+    contents = target.read_text(encoding="utf-8").splitlines()
+    def_index = next(i for i, line in enumerate(contents) if line.startswith("def sample"))
+    delimiter_indices = [
+        i for i in range(def_index + 1, len(contents)) if contents[i].strip() == '"""'
+    ]
+    assert len(delimiter_indices) >= 2
+    closing_index = delimiter_indices[-1]
+
+    assert contents[closing_index + 1].strip() == ""
+    assert contents[closing_index + 2].strip() == "return value"
