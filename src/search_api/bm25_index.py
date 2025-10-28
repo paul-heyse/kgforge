@@ -67,6 +67,7 @@ def toks(text: str) -> list[str]:
     
     
     
+    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -105,6 +106,7 @@ class BM25Index:
         
         
         
+        
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -128,6 +130,7 @@ class BM25Index:
         BM25Index
             Description of return value.
         """
+        
         
         
         
@@ -210,6 +213,7 @@ class BM25Index:
         
         
         
+        
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as handle:
             pickle.dump(
@@ -240,6 +244,7 @@ class BM25Index:
         BM25Index
             Description of return value.
         """
+        
         
         
         
@@ -298,6 +303,7 @@ class BM25Index:
         
         
         
+        
         if self.N == 0:
             return []
         terms = toks(query)
@@ -330,6 +336,7 @@ class BM25Index:
         BM25Doc
             Description of return value.
         """
+        
         
         
         

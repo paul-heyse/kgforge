@@ -64,6 +64,7 @@ def tok(text: str) -> list[str]:
     
     
     
+    
     return [token.lower() for token in TOKEN.findall(text or "")]
 
 
@@ -101,6 +102,7 @@ class SpladeIndex:
         sparse_root : str | None
             Description for ``sparse_root``.
         """
+        
         
         
         
@@ -177,6 +179,7 @@ class SpladeIndex:
         
         
         
+        
         if self.N == 0:
             return []
         terms = tok(query)
@@ -211,6 +214,7 @@ class SpladeIndex:
         src.search_api.splade_index.SpladeDoc
             Description of return value.
         """
+        
         
         
         
