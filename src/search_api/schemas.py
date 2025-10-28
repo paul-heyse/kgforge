@@ -1,4 +1,10 @@
-"""Schemas utilities."""
+"""Overview of schemas.
+
+This module bundles schemas logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -39,7 +45,13 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor SearchRequest]
 class SearchRequest(BaseModel):
-    """Describe SearchRequest."""
+    """Model the SearchRequest.
+
+    Pydantic model defining the structured payload used across the system. Validation ensures inputs
+    conform to the declared schema while producing clear error messages. Use this class when
+    serialising or parsing data for the surrounding feature.
+    """
+    
 
     query: str = Field(min_length=1)
     k: int = 10
@@ -49,7 +61,13 @@ class SearchRequest(BaseModel):
 
 # [nav:anchor SearchResult]
 class SearchResult(BaseModel):
-    """Describe SearchResult."""
+    """Model the SearchResult.
+
+    Pydantic model defining the structured payload used across the system. Validation ensures inputs
+    conform to the declared schema while producing clear error messages. Use this class when
+    serialising or parsing data for the surrounding feature.
+    """
+    
 
     doc_id: str
     chunk_id: str

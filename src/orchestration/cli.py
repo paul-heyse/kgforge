@@ -1,4 +1,10 @@
-"""Cli utilities."""
+"""Overview of cli.
+
+This module bundles cli logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -53,8 +59,8 @@ def index_bm25(
 ) -> None:
     """Compute index bm25.
 
-    Carry out the index bm25 operation.
-
+    Carry out the index bm25 operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     chunks_parquet : str | None
@@ -63,12 +69,13 @@ def index_bm25(
         Description for ``backend``.
     index_dir : str | None
         Description for ``index_dir``.
-
+    
     Examples
     --------
     >>> from orchestration.cli import index_bm25
-    >>> index_bm25(..., ..., ...)  # doctest: +ELLIPSIS
+    >>> index_bm25()  # doctest: +ELLIPSIS
     """
+    
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
@@ -117,20 +124,21 @@ def index_faiss(
 ) -> None:
     """Compute index faiss.
 
-    Carry out the index faiss operation.
-
+    Carry out the index faiss operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     dense_vectors : str | None
         Description for ``dense_vectors``.
     index_path : str | None
         Description for ``index_path``.
-
+    
     Examples
     --------
     >>> from orchestration.cli import index_faiss
-    >>> index_faiss(..., ...)  # doctest: +ELLIPSIS
+    >>> index_faiss()  # doctest: +ELLIPSIS
     """
+    
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
         vecs = json.load(fh)
@@ -154,18 +162,19 @@ def index_faiss(
 def api(port: int = 8080) -> None:
     """Compute api.
 
-    Carry out the api operation.
-
+    Carry out the api operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     port : int | None
         Description for ``port``.
-
+    
     Examples
     --------
     >>> from orchestration.cli import api
-    >>> api(...)  # doctest: +ELLIPSIS
+    >>> api()  # doctest: +ELLIPSIS
     """
+    
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
@@ -176,18 +185,19 @@ def api(port: int = 8080) -> None:
 def e2e() -> None:
     """Compute e2e.
 
-    Carry out the e2e operation.
-
+    Carry out the e2e operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Raises
     ------
     typer.Exit
         Raised when validation fails.
-
+    
     Examples
     --------
     >>> from orchestration.cli import e2e
     >>> e2e()  # doctest: +ELLIPSIS
     """
+    
     try:
         from orchestration.flows import e2e_flow
     except ModuleNotFoundError as exc:  # pragma: no cover - defensive messaging

@@ -1,4 +1,10 @@
-"""Client utilities."""
+"""Overview of client.
+
+This module bundles client logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -42,24 +48,25 @@ class _SupportsResponse(Protocol):
     def raise_for_status(self) -> None:
         """Compute raise for status.
 
-        Carry out the raise for status operation.
-
+        Carry out the raise for status operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Examples
         --------
         >>> from search_client.client import raise_for_status
         >>> raise_for_status()  # doctest: +ELLIPSIS
         """
+        
 
     def json(self) -> dict[str, Any]:
         """Compute json.
 
-        Serialise the model into a JSON string.
-
+        Serialise the instance to JSON text. It respects include and exclude options so APIs can shape their payloads precisely. Pydantic populates this attribute during model construction, so applications should treat it as read-only metadata.
+        
         Returns
         -------
         collections.abc.Mapping
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_client.client import json
@@ -67,6 +74,7 @@ class _SupportsResponse(Protocol):
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
 
 
 class _SupportsHttp(Protocol):
@@ -75,20 +83,20 @@ class _SupportsHttp(Protocol):
     def get(self, url: str, *, timeout: float) -> _SupportsResponse:
         """Compute get.
 
-        Carry out the get operation.
-
+        Carry out the get operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         url : str
             Description for ``url``.
         timeout : float
             Description for ``timeout``.
-
+        
         Returns
         -------
         src.search_client.client._SupportsResponse
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_client.client import get
@@ -96,6 +104,7 @@ class _SupportsHttp(Protocol):
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
 
     def post(
         self,
@@ -107,8 +116,8 @@ class _SupportsHttp(Protocol):
     ) -> _SupportsResponse:
         """Compute post.
 
-        Carry out the post operation.
-
+        Carry out the post operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         url : str
@@ -119,12 +128,12 @@ class _SupportsHttp(Protocol):
             Description for ``headers``.
         timeout : float
             Description for ``timeout``.
-
+        
         Returns
         -------
         src.search_client.client._SupportsResponse
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_client.client import post
@@ -132,11 +141,18 @@ class _SupportsHttp(Protocol):
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
 
 
 # [nav:anchor KGFoundryClient]
 class KGFoundryClient:
-    """Describe KGFoundryClient."""
+    """Model the KGFoundryClient.
+
+    Represent the kgfoundryclient data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     def __init__(
         self,
@@ -163,6 +179,7 @@ class KGFoundryClient:
         
         
         
+        
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
@@ -186,13 +203,13 @@ class KGFoundryClient:
     def healthz(self) -> dict[str, Any]:
         """Compute healthz.
 
-        Carry out the healthz operation.
-
+        Carry out the healthz operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Returns
         -------
         collections.abc.Mapping
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_client.client import healthz
@@ -200,6 +217,7 @@ class KGFoundryClient:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
         return r.json()
@@ -213,8 +231,8 @@ class KGFoundryClient:
     ) -> dict[str, Any]:
         """Compute search.
 
-        Carry out the search operation.
-
+        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         query : str
@@ -225,19 +243,20 @@ class KGFoundryClient:
             Description for ``filters``.
         explain : bool | None
             Description for ``explain``.
-
+        
         Returns
         -------
         collections.abc.Mapping
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_client.client import search
-        >>> result = search(..., ..., ..., ...)
+        >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
             f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout
@@ -248,27 +267,28 @@ class KGFoundryClient:
     def concepts(self, q: str, limit: int = 50) -> dict[str, Any]:
         """Compute concepts.
 
-        Carry out the concepts operation.
-
+        Carry out the concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         q : str
             Description for ``q``.
         limit : int | None
             Description for ``limit``.
-
+        
         Returns
         -------
         collections.abc.Mapping
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_client.client import concepts
-        >>> result = concepts(..., ...)
+        >>> result = concepts(...)
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         r = self._http.post(
             f"{self.base_url}/graph/concepts",
             json={"q": q, "limit": limit},

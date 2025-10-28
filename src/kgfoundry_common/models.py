@@ -1,4 +1,10 @@
-"""Models utilities."""
+"""Overview of models.
+
+This module bundles models logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -55,7 +61,13 @@ Id = str
 
 # [nav:anchor Doc]
 class Doc(BaseModel):
-    """Describe Doc."""
+    """Model the Doc.
+
+    Pydantic model defining the structured payload used across the system. Validation ensures inputs
+    conform to the declared schema while producing clear error messages. Use this class when
+    serialising or parsing data for the surrounding feature.
+    """
+    
 
     id: Id
     openalex_id: str | None = None
@@ -74,7 +86,13 @@ class Doc(BaseModel):
 
 # [nav:anchor DoctagsAsset]
 class DoctagsAsset(BaseModel):
-    """Describe DoctagsAsset."""
+    """Model the DoctagsAsset.
+
+    Pydantic model defining the structured payload used across the system. Validation ensures inputs
+    conform to the declared schema while producing clear error messages. Use this class when
+    serialising or parsing data for the surrounding feature.
+    """
+    
 
     doc_id: Id
     doctags_uri: str
@@ -86,7 +104,13 @@ class DoctagsAsset(BaseModel):
 
 # [nav:anchor Chunk]
 class Chunk(BaseModel):
-    """Describe Chunk."""
+    """Model the Chunk.
+
+    Pydantic model defining the structured payload used across the system. Validation ensures inputs
+    conform to the declared schema while producing clear error messages. Use this class when
+    serialising or parsing data for the surrounding feature.
+    """
+    
 
     id: Id
     doc_id: Id
@@ -99,7 +123,13 @@ class Chunk(BaseModel):
 
 # [nav:anchor LinkAssertion]
 class LinkAssertion(BaseModel):
-    """Describe LinkAssertion."""
+    """Model the LinkAssertion.
+
+    Pydantic model defining the structured payload used across the system. Validation ensures inputs
+    conform to the declared schema while producing clear error messages. Use this class when
+    serialising or parsing data for the surrounding feature.
+    """
+    
 
     id: Id
     chunk_id: Id

@@ -1,4 +1,10 @@
-"""Bm25 utilities."""
+"""Overview of bm25.
+
+This module bundles bm25 logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -77,7 +83,13 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 # [nav:anchor BM25Doc]
 @dataclass
 class BM25Doc:
-    """Describe BM25Doc."""
+    """Model the BM25Doc.
+
+    Represent the bm25doc data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     doc_id: str
     length: int
@@ -86,7 +98,13 @@ class BM25Doc:
 
 # [nav:anchor PurePythonBM25]
 class PurePythonBM25:
-    """Describe PurePythonBM25."""
+    """Model the PurePythonBM25.
+
+    Represent the purepythonbm25 data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     def __init__(
         self,
@@ -110,6 +128,7 @@ class PurePythonBM25:
         field_boosts : Mapping[str, float] | None, optional, default=None
             Description for ``field_boosts``.
         """
+        
         
         
         
@@ -144,18 +163,19 @@ class PurePythonBM25:
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Compute build.
 
-        Carry out the build operation.
-
+        Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         docs_iterable : collections.abc.Iterable
             Description for ``docs_iterable``.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.bm25 import build
         >>> build(...)  # doctest: +ELLIPSIS
         """
+        
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
@@ -205,13 +225,14 @@ class PurePythonBM25:
     def load(self) -> None:
         """Compute load.
 
-        Carry out the load operation.
-
+        Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Examples
         --------
         >>> from embeddings_sparse.bm25 import load
         >>> load()  # doctest: +ELLIPSIS
         """
+        
         path = os.path.join(self.index_dir, "pure_bm25.pkl")
         with open(path, "rb") as f:
             data = pickle.load(f)
@@ -250,8 +271,8 @@ class PurePythonBM25:
     ) -> list[tuple[str, float]]:
         """Compute search.
 
-        Carry out the search operation.
-
+        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         query : str
@@ -260,19 +281,20 @@ class PurePythonBM25:
             Description for ``k``.
         fields : Mapping[str, str] | None
             Description for ``fields``.
-
+        
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.bm25 import search
-        >>> result = search(..., ..., ...)
+        >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -292,7 +314,13 @@ class PurePythonBM25:
 
 # [nav:anchor LuceneBM25]
 class LuceneBM25:
-    """Describe LuceneBM25."""
+    """Model the LuceneBM25.
+
+    Represent the lucenebm25 data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     def __init__(
         self,
@@ -319,6 +347,7 @@ class LuceneBM25:
         
         
         
+        
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -328,23 +357,24 @@ class LuceneBM25:
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Compute build.
 
-        Carry out the build operation.
-
+        Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         docs_iterable : collections.abc.Iterable
             Description for ``docs_iterable``.
-
+        
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.bm25 import build
         >>> build(...)  # doctest: +ELLIPSIS
         """
+        
         try:
             from pyserini.analysis import get_lucene_analyzer
             from pyserini.index import IndexWriter
@@ -386,8 +416,8 @@ class LuceneBM25:
     ) -> list[tuple[str, float]]:
         """Compute search.
 
-        Carry out the search operation.
-
+        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         query : str
@@ -396,24 +426,25 @@ class LuceneBM25:
             Description for ``k``.
         fields : Mapping[str, str] | None
             Description for ``fields``.
-
+        
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
+        
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.bm25 import search
-        >>> result = search(..., ..., ...)
+        >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         self._ensure_searcher()
         if self._searcher is None:
             message = "Lucene searcher not initialized"
@@ -433,8 +464,8 @@ def get_bm25(
 ) -> PurePythonBM25 | LuceneBM25:
     """Compute get bm25.
 
-    Carry out the get bm25 operation.
-
+    Carry out the get bm25 operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     backend : str
@@ -447,19 +478,20 @@ def get_bm25(
         Description for ``b``.
     field_boosts : Mapping[str, float] | None
         Description for ``field_boosts``.
-
+    
     Returns
     -------
     PurePythonBM25 | LuceneBM25
         Description of return value.
-
+    
     Examples
     --------
     >>> from embeddings_sparse.bm25 import get_bm25
-    >>> result = get_bm25(..., ..., ..., ..., ...)
+    >>> result = get_bm25(..., ...)
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     if backend == "lucene":
         try:
             return LuceneBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)

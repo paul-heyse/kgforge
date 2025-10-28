@@ -1,4 +1,10 @@
-"""Base utilities."""
+"""Overview of base.
+
+This module bundles base logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -42,25 +48,31 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor SparseEncoder]
 class SparseEncoder(Protocol):
-    """Describe SparseEncoder."""
+    """Model the SparseEncoder.
+
+    Represent the sparseencoder data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     name: str
 
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
         """Compute encode.
 
-        Carry out the encode operation.
-
+        Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         texts : List[str]
             Description for ``texts``.
-
+        
         Returns
         -------
         List[Tuple[List[int], List[float]]]
             Description of return value.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.base import encode
@@ -68,28 +80,36 @@ class SparseEncoder(Protocol):
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         ...
 
 
 # [nav:anchor SparseIndex]
 class SparseIndex(Protocol):
-    """Describe SparseIndex."""
+    """Model the SparseIndex.
+
+    Represent the sparseindex data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Compute build.
 
-        Carry out the build operation.
-
+        Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         docs_iterable : collections.abc.Iterable
             Description for ``docs_iterable``.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.base import build
         >>> build(...)  # doctest: +ELLIPSIS
         """
+        
         ...
 
     def search(
@@ -97,8 +117,8 @@ class SparseIndex(Protocol):
     ) -> list[tuple[str, float]]:
         """Compute search.
 
-        Carry out the search operation.
-
+        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         query : str
@@ -107,17 +127,18 @@ class SparseIndex(Protocol):
             Description for ``k``.
         fields : Mapping[str, str] | None
             Description for ``fields``.
-
+        
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.base import search
-        >>> result = search(..., ..., ...)
+        >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         ...
