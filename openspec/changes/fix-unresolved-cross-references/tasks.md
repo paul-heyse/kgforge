@@ -22,109 +22,109 @@
 
 ## 2. Expand `QUALIFIED_NAME_OVERRIDES` Dictionary
 
-- [ ] 2.1 Add numpy scalar types (12 types)
-  - [ ] 2.1.1 Add `numpy.int8` → `numpy.int8`
-  - [ ] 2.1.2 Add `numpy.int16` → `numpy.int16`
-  - [ ] 2.1.3 Add `numpy.int32` → `numpy.int32`
-  - [ ] 2.1.4 Add `numpy.int64` → `numpy.int64`
-  - [ ] 2.1.5 Add `numpy.uint8` → `numpy.uint8`
-  - [ ] 2.1.6 Add `numpy.uint16` → `numpy.uint16`
-  - [ ] 2.1.7 Add `numpy.uint32` → `numpy.uint32`
-  - [ ] 2.1.8 Add `numpy.uint64` → `numpy.uint64`
-  - [ ] 2.1.9 Add `numpy.float16` → `numpy.float16`
-  - [ ] 2.1.10 Add `numpy.float64` → `numpy.float64`
-  - [ ] 2.1.11 Add `numpy.complex64` → `numpy.complex64`
-  - [ ] 2.1.12 Add `numpy.complex128` → `numpy.complex128`
+- [x] 2.1 Add numpy scalar types (12 types)
+  - [x] 2.1.1 Add `numpy.int8` → `numpy.int8`
+  - [x] 2.1.2 Add `numpy.int16` → `numpy.int16`
+  - [x] 2.1.3 Add `numpy.int32` → `numpy.int32`
+  - [x] 2.1.4 Add `numpy.int64` → `numpy.int64`
+  - [x] 2.1.5 Add `numpy.uint8` → `numpy.uint8`
+  - [x] 2.1.6 Add `numpy.uint16` → `numpy.uint16`
+  - [x] 2.1.7 Add `numpy.uint32` → `numpy.uint32`
+  - [x] 2.1.8 Add `numpy.uint64` → `numpy.uint64`
+  - [x] 2.1.9 Add `numpy.float16` → `numpy.float16`
+  - [x] 2.1.10 Add `numpy.float64` → `numpy.float64`
+  - [x] 2.1.11 Add `numpy.complex64` → `numpy.complex64`
+  - [x] 2.1.12 Add `numpy.complex128` → `numpy.complex128`
 
-- [ ] 2.2 Add numpy scalar short aliases (12 types)
-  - [ ] 2.2.1 Add `np.int8` → `numpy.int8`
-  - [ ] 2.2.2 Add `np.int16` → `numpy.int16`
-  - [ ] 2.2.3 Add `np.int32` → `numpy.int32`
-  - [ ] 2.2.4 Add `np.int64` → `numpy.int64`
-  - [ ] 2.2.5 Add `np.uint8` → `numpy.uint8`
-  - [ ] 2.2.6 Add `np.uint16` → `numpy.uint16`
-  - [ ] 2.2.7 Add `np.uint32` → `numpy.uint32`
-  - [ ] 2.2.8 Add `np.uint64` → `numpy.uint64`
-  - [ ] 2.2.9 Add `np.float16` → `numpy.float16`
-  - [ ] 2.2.10 Add `np.float64` → `numpy.float64`
-  - [ ] 2.2.11 Add `np.complex64` → `numpy.complex64`
-  - [ ] 2.2.12 Add `np.complex128` → `numpy.complex128`
+- [x] 2.2 Add numpy scalar short aliases (12 types)
+  - [x] 2.2.1 Add `np.int8` → `numpy.int8`
+  - [x] 2.2.2 Add `np.int16` → `numpy.int16`
+  - [x] 2.2.3 Add `np.int32` → `numpy.int32`
+  - [x] 2.2.4 Add `np.int64` → `numpy.int64`
+  - [x] 2.2.5 Add `np.uint8` → `numpy.uint8`
+  - [x] 2.2.6 Add `np.uint16` → `numpy.uint16`
+  - [x] 2.2.7 Add `np.uint32` → `numpy.uint32`
+  - [x] 2.2.8 Add `np.uint64` → `numpy.uint64`
+  - [x] 2.2.9 Add `np.float16` → `numpy.float16`
+  - [x] 2.2.10 Add `np.float64` → `numpy.float64`
+  - [x] 2.2.11 Add `np.complex64` → `numpy.complex64`
+  - [x] 2.2.12 Add `np.complex128` → `numpy.complex128`
 
-- [ ] 2.3 Add numpy typing variations (5 types)
-  - [ ] 2.3.1 Add `ArrayLike` → `numpy.typing.ArrayLike` (if not already present)
-  - [ ] 2.3.2 Add `numpy.typing.ArrayLike` → `numpy.typing.ArrayLike`
-  - [ ] 2.3.3 Add `numpy.dtype` → `numpy.dtype`
-  - [ ] 2.3.4 Add `np.dtype` → `numpy.dtype`
-  - [ ] 2.3.5 Add `numpy.random.Generator` → `numpy.random.Generator`
+- [x] 2.3 Add numpy typing variations (5 types)
+  - [x] 2.3.1 Add `ArrayLike` → `numpy.typing.ArrayLike` (if not already present)
+  - [x] 2.3.2 Add `numpy.typing.ArrayLike` → `numpy.typing.ArrayLike`
+  - [x] 2.3.3 Add `numpy.dtype` → `numpy.dtype`
+  - [x] 2.3.4 Add `np.dtype` → `numpy.dtype`
+  - [x] 2.3.5 Add `numpy.random.Generator` → `numpy.random.Generator`
 
-- [ ] 2.4 Add pyarrow core types (8 types)
-  - [ ] 2.4.1 Add `pyarrow.Table` → `pyarrow.Table`
-  - [ ] 2.4.2 Add `pyarrow.Field` → `pyarrow.Field`
-  - [ ] 2.4.3 Add `pyarrow.DataType` → `pyarrow.DataType`
-  - [ ] 2.4.4 Add `pyarrow.Array` → `pyarrow.Array`
-  - [ ] 2.4.5 Add `pyarrow.Int64Type` → `pyarrow.Int64Type`
-  - [ ] 2.4.6 Add `pyarrow.StringType` → `pyarrow.StringType`
-  - [ ] 2.4.7 Add `pyarrow.TimestampType` → `pyarrow.TimestampType`
-  - [ ] 2.4.8 Add `pyarrow.RecordBatch` → `pyarrow.RecordBatch`
+- [x] 2.4 Add pyarrow core types (8 types)
+  - [x] 2.4.1 Add `pyarrow.Table` → `pyarrow.Table`
+  - [x] 2.4.2 Add `pyarrow.Field` → `pyarrow.Field`
+  - [x] 2.4.3 Add `pyarrow.DataType` → `pyarrow.DataType`
+  - [x] 2.4.4 Add `pyarrow.Array` → `pyarrow.Array`
+  - [x] 2.4.5 Add `pyarrow.Int64Type` → `pyarrow.Int64Type`
+  - [x] 2.4.6 Add `pyarrow.StringType` → `pyarrow.StringType`
+  - [x] 2.4.7 Add `pyarrow.TimestampType` → `pyarrow.TimestampType`
+  - [x] 2.4.8 Add `pyarrow.RecordBatch` → `pyarrow.RecordBatch`
 
-- [ ] 2.5 Add pydantic types (8 types)
-  - [ ] 2.5.1 Add `pydantic.Field` → `pydantic.Field`
-  - [ ] 2.5.2 Add `pydantic.ValidationError` → `pydantic.ValidationError`
-  - [ ] 2.5.3 Add `pydantic.ConfigDict` → `pydantic.ConfigDict`
-  - [ ] 2.5.4 Add `pydantic.field_validator` → `pydantic.field_validator`
-  - [ ] 2.5.5 Add `pydantic.model_validator` → `pydantic.model_validator`
-  - [ ] 2.5.6 Add `pydantic.Field` → `pydantic.fields.Field` (alternative import)
-  - [ ] 2.5.7 Add `pydantic.AliasChoices` → `pydantic.AliasChoices`
-  - [ ] 2.5.8 Add `pydantic.TypeAdapter` → `pydantic.TypeAdapter`
+- [x] 2.5 Add pydantic types (8 types)
+  - [x] 2.5.1 Add `pydantic.Field` → `pydantic.Field`
+  - [x] 2.5.2 Add `pydantic.ValidationError` → `pydantic.ValidationError`
+  - [x] 2.5.3 Add `pydantic.ConfigDict` → `pydantic.ConfigDict`
+  - [x] 2.5.4 Add `pydantic.field_validator` → `pydantic.field_validator`
+  - [x] 2.5.5 Add `pydantic.model_validator` → `pydantic.model_validator`
+  - [x] 2.5.6 Add `pydantic.Field` → `pydantic.fields.Field` (alternative import)
+  - [x] 2.5.7 Add `pydantic.AliasChoices` → `pydantic.AliasChoices`
+  - [x] 2.5.8 Add `pydantic.TypeAdapter` → `pydantic.TypeAdapter`
 
-- [ ] 2.6 Add typing_extensions types (5 types)
-  - [ ] 2.6.1 Add `typing_extensions.Self` → `typing_extensions.Self`
-  - [ ] 2.6.2 Add `typing_extensions.TypeAlias` → `typing_extensions.TypeAlias`
-  - [ ] 2.6.3 Add `typing_extensions.TypedDict` → `typing_extensions.TypedDict`
-  - [ ] 2.6.4 Add `typing_extensions.Annotated` → `typing_extensions.Annotated`
-  - [ ] 2.6.5 Add `typing_extensions.NotRequired` → `typing_extensions.NotRequired`
+- [x] 2.6 Add typing_extensions types (5 types)
+  - [x] 2.6.1 Add `typing_extensions.Self` → `typing_extensions.Self`
+  - [x] 2.6.2 Add `typing_extensions.TypeAlias` → `typing_extensions.TypeAlias`
+  - [x] 2.6.3 Add `typing_extensions.TypedDict` → `typing_extensions.TypedDict`
+  - [x] 2.6.4 Add `typing_extensions.Annotated` → `typing_extensions.Annotated`
+  - [x] 2.6.5 Add `typing_extensions.NotRequired` → `typing_extensions.NotRequired`
 
-- [ ] 2.7 Add standard library types (10 types)
-  - [ ] 2.7.1 Add `collections.defaultdict` → `collections.defaultdict`
-  - [ ] 2.7.2 Add `collections.Counter` → `collections.Counter`
-  - [ ] 2.7.3 Add `collections.OrderedDict` → `collections.OrderedDict`
-  - [ ] 2.7.4 Add `collections.deque` → `collections.deque`
-  - [ ] 2.7.5 Add `pathlib.Path` → `pathlib.Path`
-  - [ ] 2.7.6 Add `pathlib.PurePath` → `pathlib.PurePath`
-  - [ ] 2.7.7 Add `datetime.datetime` → `datetime.datetime`
-  - [ ] 2.7.8 Add `datetime.date` → `datetime.date`
-  - [ ] 2.7.9 Add `datetime.timedelta` → `datetime.timedelta`
-  - [ ] 2.7.10 Add `uuid.UUID` → `uuid.UUID`
+- [x] 2.7 Add standard library types (10 types)
+  - [x] 2.7.1 Add `collections.defaultdict` → `collections.defaultdict`
+  - [x] 2.7.2 Add `collections.Counter` → `collections.Counter`
+  - [x] 2.7.3 Add `collections.OrderedDict` → `collections.OrderedDict`
+  - [x] 2.7.4 Add `collections.deque` → `collections.deque`
+  - [x] 2.7.5 Add `pathlib.Path` → `pathlib.Path`
+  - [x] 2.7.6 Add `pathlib.PurePath` → `pathlib.PurePath`
+  - [x] 2.7.7 Add `datetime.datetime` → `datetime.datetime`
+  - [x] 2.7.8 Add `datetime.date` → `datetime.date`
+  - [x] 2.7.9 Add `datetime.timedelta` → `datetime.timedelta`
+  - [x] 2.7.10 Add `uuid.UUID` → `uuid.UUID`
 
-- [ ] 2.8 Organize and format dictionary
-  - [ ] 2.8.1 Group entries by category (numpy, pyarrow, pydantic, stdlib, custom)
-  - [ ] 2.8.2 Add inline comments documenting each category
-  - [ ] 2.8.3 Sort entries within each category alphabetically
-  - [ ] 2.8.4 Verify no duplicate keys
-  - [ ] 2.8.5 Verify all values are valid fully-qualified names
+- [x] 2.8 Organize and format dictionary
+  - [x] 2.8.1 Group entries by category (numpy, pyarrow, pydantic, stdlib, custom)
+  - [x] 2.8.2 Add inline comments documenting each category
+  - [x] 2.8.3 Sort entries within each category alphabetically
+  - [x] 2.8.4 Verify no duplicate keys
+  - [x] 2.8.5 Verify all values are valid fully-qualified names
 
 ## 3. Update Sphinx Configuration (`docs/conf.py`)
 
 - [ ] 3.1 Expand intersphinx mappings
-  - [ ] 3.1.1 Add `scipy` intersphinx mapping: `"scipy": ("https://docs.scipy.org/doc/scipy/", None)`
-  - [ ] 3.1.2 Add `pandas` intersphinx mapping: `"pandas": ("https://pandas.pydata.org/docs/", None)`
-  - [ ] 3.1.3 Add `httpx` intersphinx mapping: `"httpx": ("https://www.python-httpx.org/", None)`
-  - [ ] 3.1.4 Add `pytest` intersphinx mapping: `"pytest": ("https://docs.pytest.org/en/stable/", None)`
+  - [x] 3.1.1 Add `scipy` intersphinx mapping: `"scipy": ("https://docs.scipy.org/doc/scipy/", None)`
+  - [x] 3.1.2 Add `pandas` intersphinx mapping: `"pandas": ("https://pandas.pydata.org/docs/", None)`
+  - [x] 3.1.3 Add `httpx` intersphinx mapping: `"httpx": ("https://www.python-httpx.org/", None)`
+  - [x] 3.1.4 Add `pytest` intersphinx mapping: `"pytest": ("https://docs.pytest.org/en/stable/", None)`
   - [ ] 3.1.5 Test each mapping URL is accessible and has `objects.inv` file
-  - [ ] 3.1.6 Document why each intersphinx mapping is needed (inline comments)
+  - [x] 3.1.6 Document why each intersphinx mapping is needed (inline comments)
 
 - [ ] 3.2 Configure AutoAPI to exclude `exceptions.py`
-  - [ ] 3.2.1 Add `autoapi_ignore` configuration if not already present
-  - [ ] 3.2.2 Add `"*/kgfoundry_common/exceptions.py"` to ignore list
-  - [ ] 3.2.3 Add inline comment explaining why (legacy aliases, use errors.py as canonical)
-  - [ ] 3.2.4 Verify pattern matches correctly (test with glob patterns)
+  - [x] 3.2.1 Add `autoapi_ignore` configuration if not already present
+  - [x] 3.2.2 Add `"*/kgfoundry_common/exceptions.py"` to ignore list
+  - [x] 3.2.3 Add inline comment explaining why (legacy aliases, use errors.py as canonical)
+  - [x] 3.2.4 Verify pattern matches correctly (test with glob patterns)
 
 - [ ] 3.3 Add `extlinks` for fallback resolution
-  - [ ] 3.3.1 Add `extlinks` configuration dict if not already present
-  - [ ] 3.3.2 Add `"numpy-type"` link template: `("https://numpy.org/doc/stable/reference/generated/%s.html", "%s")`
-  - [ ] 3.3.3 Add `"pyarrow-type"` link template: `("https://arrow.apache.org/docs/python/generated/%s.html", "%s")`
-  - [ ] 3.3.4 Add inline comment explaining usage (manual fallback for types not in intersphinx)
-  - [ ] 3.3.5 Test link templates with sample type names
+  - [x] 3.3.1 Add `extlinks` configuration dict if not already present
+  - [x] 3.3.2 Add `"numpy-type"` link template: `("https://numpy.org/doc/stable/reference/generated/%s.html", "%s")`
+  - [x] 3.3.3 Add `"pyarrow-type"` link template: `("https://arrow.apache.org/docs/python/generated/%s.html", "%s")`
+  - [x] 3.3.4 Add inline comment explaining usage (manual fallback for types not in intersphinx)
+  - [x] 3.3.5 Test link templates with sample type names
 
 - [ ] 3.4 Document configuration changes
   - [ ] 3.4.1 Add docstring to `intersphinx_mapping` explaining purpose
@@ -135,41 +135,41 @@
 ## 4. Testing & Validation
 
 - [ ] 4.1 Create test file `tests/unit/test_type_resolution.py`
-  - [ ] 4.1.1 Import necessary modules and fixtures
-  - [ ] 4.1.2 Create fixture for QUALIFIED_NAME_OVERRIDES dictionary
+  - [x] 4.1.1 Import necessary modules and fixtures
+  - [x] 4.1.2 Create fixture for QUALIFIED_NAME_OVERRIDES dictionary
 
 - [ ] 4.2 Test numpy type resolution
-  - [ ] 4.2.1 Test all numpy scalar types have mappings
-  - [ ] 4.2.2 Test numpy short aliases (`np.`) resolve correctly
-  - [ ] 4.2.3 Test numpy typing types have mappings
+  - [x] 4.2.1 Test all numpy scalar types have mappings
+  - [x] 4.2.2 Test numpy short aliases (`np.`) resolve correctly
+  - [x] 4.2.3 Test numpy typing types have mappings
   - [ ] 4.2.4 Test numpy types resolve without warnings
 
 - [ ] 4.3 Test pyarrow type resolution
-  - [ ] 4.3.1 Test all pyarrow core types have mappings
-  - [ ] 4.3.2 Test pyarrow.Schema and pyarrow.schema both resolve
+  - [x] 4.3.1 Test all pyarrow core types have mappings
+  - [x] 4.3.2 Test pyarrow.Schema and pyarrow.schema both resolve
   - [ ] 4.3.3 Test pyarrow types resolve without warnings
 
 - [ ] 4.4 Test pydantic type resolution
-  - [ ] 4.4.1 Test all pydantic types have mappings
-  - [ ] 4.4.2 Test pydantic import variations resolve correctly
+  - [x] 4.4.1 Test all pydantic types have mappings
+  - [x] 4.4.2 Test pydantic import variations resolve correctly
   - [ ] 4.4.3 Test pydantic types resolve without warnings
 
 - [ ] 4.5 Test custom type resolution
-  - [ ] 4.5.1 Test VecArray, StrArray, FloatArray, IntArray resolve
-  - [ ] 4.5.2 Test custom exception types resolve
-  - [ ] 4.5.3 Test custom model types (Doc, Chunk, Concept) resolve
+  - [x] 4.5.1 Test VecArray, StrArray, FloatArray, IntArray resolve
+  - [x] 4.5.2 Test custom exception types resolve
+  - [x] 4.5.3 Test custom model types (Doc, Chunk, Concept) resolve
 
 - [ ] 4.6 Test duplicate-target resolution
-  - [ ] 4.6.1 Test DownloadError has single canonical target
-  - [ ] 4.6.2 Test UnsupportedMIMEError has single canonical target
-  - [ ] 4.6.3 Test exceptions.py is excluded from AutoAPI
+  - [x] 4.6.1 Test DownloadError has single canonical target
+  - [x] 4.6.2 Test UnsupportedMIMEError has single canonical target
+  - [x] 4.6.3 Test exceptions.py is excluded from AutoAPI
   - [ ] 4.6.4 Test no duplicate-target warnings for these exceptions
 
 - [ ] 4.7 Test intersphinx mappings
   - [ ] 4.7.1 Test each intersphinx URL is accessible
   - [ ] 4.7.2 Test each intersphinx inventory file exists
   - [ ] 4.7.3 Test cross-references to external docs resolve
-  - [ ] 4.7.4 Test fallback extlinks work for types not in inventories
+  - [x] 4.7.4 Test fallback extlinks work for types not in inventories
 
 ## 5. Documentation Build & Verification
 
@@ -204,15 +204,15 @@
 ## 6. Quality Assurance
 
 - [ ] 6.1 Code quality checks
-  - [ ] 6.1.1 Run `ruff check tools/auto_docstrings.py` to verify linting passes
-  - [ ] 6.1.2 Run `ruff format tools/auto_docstrings.py` to verify formatting
+  - [x] 6.1.1 Run `ruff check tools/auto_docstrings.py` to verify linting passes
+  - [x] 6.1.2 Run `ruff format tools/auto_docstrings.py` to verify formatting
   - [ ] 6.1.3 Run `mypy tools/auto_docstrings.py` to verify type checking passes
   - [ ] 6.1.4 Run `black tools/auto_docstrings.py` as safety net
   - [ ] 6.1.5 Fix any linting/formatting/type issues
 
 - [ ] 6.2 Test suite verification
-  - [ ] 6.2.1 Run `pytest tests/unit/test_type_resolution.py -v`
-  - [ ] 6.2.2 Verify 100% test pass rate
+  - [x] 6.2.1 Run `pytest tests/unit/test_type_resolution.py -v`
+  - [x] 6.2.2 Verify 100% test pass rate
   - [ ] 6.2.3 Check test coverage for modified code (aim for >95%)
   - [ ] 6.2.4 Add any missing test cases discovered
 

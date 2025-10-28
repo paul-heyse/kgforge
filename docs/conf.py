@@ -132,7 +132,11 @@ autoapi_options = [
     "private-members",
 ]
 # Include package __init__ modules so AutoAPI emits package-level toctrees.
-autoapi_ignore: list[str] = ["tools/navmap/check_navmap.py"]
+autoapi_ignore: list[str] = [
+    "tools/navmap/check_navmap.py",
+    # Exclude deprecated exception aliases to avoid duplicate documentation targets.
+    "*/kgfoundry_common/exceptions.py",
+]
 
 
 def _autoapi_parse_file(
@@ -170,6 +174,18 @@ intersphinx_mapping = {
     "fastapi": ("https://fastapi.tiangolo.com/", None),
     "typer": ("https://typer.tiangolo.com/", None),
     "requests": ("https://requests.readthedocs.io/en/latest/", None),
+    # Scientific computing stack used throughout vector operations.
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+    "pandas": ("https://pandas.pydata.org/docs/", None),
+    # HTTP and testing stacks referenced in API docs.
+    "httpx": ("https://www.python-httpx.org/", None),
+    "pytest": ("https://docs.pytest.org/en/stable/", None),
+}
+
+# Fallback external links for types missing from upstream inventories.
+extlinks = {
+    "numpy-type": ("https://numpy.org/doc/stable/reference/generated/%s.html", "%s"),
+    "pyarrow-type": ("https://arrow.apache.org/docs/python/generated/%s.html", "%s"),
 }
 
 # Show line numbers in rendered source pages (Sphinx >= 7.2)
