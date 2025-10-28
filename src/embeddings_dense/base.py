@@ -73,6 +73,5 @@ class DenseEmbeddingModel(Protocol):
         >>> from embeddings_dense.base import encode
         >>> result = encode(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         ...

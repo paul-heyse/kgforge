@@ -6,7 +6,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 import argparse
@@ -170,7 +169,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> from docs._scripts.symbol_delta import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     global DELTA_PATH
 

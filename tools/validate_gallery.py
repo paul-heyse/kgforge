@@ -6,7 +6,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 import argparse
@@ -91,7 +90,6 @@ class ValidationResult:
         >>> from tools.validate_gallery import ok
         >>> result = ok()
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         return not self.errors
 
@@ -126,7 +124,6 @@ def validate_title_format(docstring: str) -> tuple[bool, str]:
     >>> from tools.validate_gallery import validate_title_format
     >>> result = validate_title_format(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     lines = [line.rstrip() for line in inspect.cleandoc(docstring).splitlines()]
     while lines and not lines[0].strip():
@@ -175,7 +172,6 @@ def check_orphan_directive(docstring: str) -> bool:
     >>> from tools.validate_gallery import check_orphan_directive
     >>> result = check_orphan_directive(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return ":orphan:" in docstring
 
@@ -201,7 +197,6 @@ def check_custom_labels(docstring: str) -> list[str]:
     >>> from tools.validate_gallery import check_custom_labels
     >>> result = check_custom_labels(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return CUSTOM_LABEL_PATTERN.findall(docstring)
 
@@ -254,7 +249,6 @@ def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]
     >>> from tools.validate_gallery import validate_example_file
     >>> result = validate_example_file(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     errors: list[str] = []
     docstring = _load_docstring(file_path)
@@ -323,7 +317,6 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
     >>> from tools.validate_gallery import main
     >>> result = main(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     results: list[ValidationResult] = []
     exit_code = 0

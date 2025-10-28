@@ -294,7 +294,6 @@ class FaissAdapter:
         >>> from search_api.faiss_adapter import search
         >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         if self.vecs is None and self.index is None:
             return []

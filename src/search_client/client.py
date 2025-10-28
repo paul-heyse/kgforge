@@ -70,7 +70,6 @@ class _SupportsResponse(Protocol):
         >>> from search_client.client import json
         >>> result = json()
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
 
 
@@ -101,7 +100,6 @@ class _SupportsHttp(Protocol):
         >>> from search_client.client import get
         >>> result = get(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
 
     def post(
@@ -141,7 +139,6 @@ class _SupportsHttp(Protocol):
         >>> from search_client.client import post
         >>> result = post(..., ..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
 
 
@@ -215,7 +212,6 @@ class KGFoundryClient:
         >>> from search_client.client import healthz
         >>> result = healthz()
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
@@ -257,7 +253,6 @@ class KGFoundryClient:
         >>> from search_client.client import search
         >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
@@ -290,7 +285,6 @@ class KGFoundryClient:
         >>> from search_client.client import concepts
         >>> result = concepts(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         r = self._http.post(
             f"{self.base_url}/graph/concepts",

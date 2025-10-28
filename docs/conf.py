@@ -35,10 +35,8 @@ except ModuleNotFoundError:
 jsonimpl = importlib.import_module("sphinxcontrib.serializinghtml.jsonimpl")
 json_module = jsonimpl.json
 
-default_griffe_loader = getattr(griffe_module, "GriffeLoader")
-GriffeLoader = (
-    getattr(griffe_loader_module, "GriffeLoader") if griffe_loader_module else default_griffe_loader
-)
+default_griffe_loader = griffe_module.GriffeLoader
+GriffeLoader = griffe_loader_module.GriffeLoader if griffe_loader_module else default_griffe_loader
 GriffeModule = griffe_module.Module
 
 # --- Project metadata (override via env if you like)

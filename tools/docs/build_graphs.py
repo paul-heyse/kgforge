@@ -6,7 +6,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 import argparse
@@ -78,7 +77,7 @@ _PYTHONWARNINGS = "PYTHONWARNINGS"
 _PYSERINI_WARNING = "ignore::SyntaxWarning:pyserini.trectools._base"
 
 # Ensure child interpreters (pydeps/pyreverse) inherit the targeted suppression.
-if _PYTHONWARNINGS in os.environ and os.environ[_PYTHONWARNINGS]:
+if os.environ.get(_PYTHONWARNINGS):
     os.environ[_PYTHONWARNINGS] = ",".join(
         [os.environ[_PYTHONWARNINGS], _PYSERINI_WARNING],
     )
@@ -109,7 +108,6 @@ def parse_args() -> argparse.Namespace:
     >>> from tools.docs.build_graphs import parse_args
     >>> result = parse_args()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     p = argparse.ArgumentParser(
         description="Build per-package and cross-subsystem graphs with policy checks."
@@ -212,7 +210,6 @@ def sh(
     >>> from tools.docs.build_graphs import sh
     >>> result = sh(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return subprocess.run(
         cmd, check=check, cwd=str(cwd) if cwd else None, text=True, capture_output=False
@@ -259,7 +256,6 @@ def find_top_packages() -> list[str]:
     >>> from tools.docs.build_graphs import find_top_packages
     >>> result = find_top_packages()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     # Top-level packages are directories under src/ that contain __init__.py
     pkgs: list[str] = []
@@ -502,7 +498,6 @@ def collapse_to_packages(dot_path: Path) -> Any:
     >>> from tools.docs.build_graphs import collapse_to_packages
     >>> result = collapse_to_packages(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     if nx is None or pydot is None:
         raise RuntimeError("networkx and pydot are required to collapse graphs")
@@ -585,7 +580,6 @@ def analyze_graph(g: Any, layers: dict[str, Any]) -> dict[str, Any]:
     >>> from tools.docs.build_graphs import analyze_graph
     >>> result = analyze_graph(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     if nx is None:
         raise RuntimeError("networkx is required for graph analysis")
@@ -897,7 +891,6 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
     >>> from tools.docs.build_graphs import cache_bucket
     >>> result = cache_bucket(..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return cache_dir / pkg / tree_hash
 
@@ -949,7 +942,6 @@ def build_one_package(
     >>> from tools.docs.build_graphs import build_one_package
     >>> result = build_one_package(..., ..., ..., ..., ..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     used_cache = False
     pydeps_ok = True

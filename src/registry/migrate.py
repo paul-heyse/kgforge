@@ -49,7 +49,7 @@ def apply(db: str, migrations_dir: str) -> None:
     """Compute apply.
 
     Carry out the apply operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     db : str
@@ -58,18 +58,17 @@ def apply(db: str, migrations_dir: str) -> None:
     migrations_dir : str
     migrations_dir : str
         Description for ``migrations_dir``.
-    
+
     Raises
     ------
     Exception
         Raised when validation fails.
-    
+
     Examples
     --------
     >>> from registry.migrate import apply
     >>> apply(..., ...)  # doctest: +ELLIPSIS
     """
-    
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
         sql = p.read_text()

@@ -65,7 +65,6 @@ def t_echo(msg: str) -> str:
     >>> from orchestration.flows import t_echo
     >>> result = t_echo(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return msg
 
@@ -87,7 +86,6 @@ def e2e_flow() -> list[str]:
     >>> from orchestration.flows import e2e_flow
     >>> result = e2e_flow()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return [
         t_echo.submit(x).result()

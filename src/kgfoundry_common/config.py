@@ -63,7 +63,6 @@ def load_config(path: str) -> dict[str, Any]:
     >>> from kgfoundry_common.config import load_config
     >>> result = load_config(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f)

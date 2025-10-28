@@ -47,7 +47,6 @@ def iter_packages() -> list[str]:
     >>> from docs._scripts.mkdocs_gen_api import iter_packages
     >>> result = iter_packages()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     packages = detect_packages()
     return packages or [detect_primary()]

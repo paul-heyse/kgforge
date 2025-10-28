@@ -74,7 +74,6 @@ class Registry(Protocol):
         >>> from registry.api import begin_dataset
         >>> result = begin_dataset(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         ...
 
@@ -156,7 +155,6 @@ class Registry(Protocol):
         >>> from registry.api import insert_run
         >>> result = insert_run(..., ..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         ...
 

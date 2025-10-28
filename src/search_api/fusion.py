@@ -64,7 +64,6 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, f
     >>> from search_api.fusion import rrf_fuse
     >>> result = rrf_fuse(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     agg: dict[str, float] = {}
     for ranked in rankers:

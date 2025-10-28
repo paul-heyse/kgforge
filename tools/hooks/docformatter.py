@@ -6,7 +6,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 import subprocess
@@ -28,7 +27,6 @@ def git_diff_names() -> set[str]:
     >>> from tools.hooks.docformatter import git_diff_names
     >>> result = git_diff_names()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     result = subprocess.run(
         ["git", "diff", "--name-only"],
@@ -54,7 +52,6 @@ def main() -> int:
     >>> from tools.hooks.docformatter import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     repo = subprocess.run(
         ["git", "rev-parse", "--show-toplevel"],

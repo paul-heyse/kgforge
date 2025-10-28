@@ -235,7 +235,6 @@ class FaissGpuIndex:
         >>> from vectorstore_faiss.gpu import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         q = cast(FloatArray, np.asarray(query, dtype=np.float32, order="C"))
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12

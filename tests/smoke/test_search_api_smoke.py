@@ -40,6 +40,7 @@ def pick_query_token() -> str:
 def test_search_endpoint_smoke() -> None:
     # Import app after optional env wiring (app uses fixtures by default).
     import importlib
+
     import kgfoundry.search_api.app as search_app_module
 
     search_app = importlib.reload(search_app_module)

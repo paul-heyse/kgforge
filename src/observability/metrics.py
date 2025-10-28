@@ -56,7 +56,6 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             >>> from observability.metrics import labels
             >>> result = labels(*args, **kwargs)
             >>> result  # doctest: +ELLIPSIS
-            ...
             """
             return self
 

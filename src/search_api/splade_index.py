@@ -69,7 +69,6 @@ def tok(text: str) -> list[str]:
     >>> from search_api.splade_index import tok
     >>> result = tok(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return [token.lower() for token in TOKEN.findall(text or "")]
 
@@ -192,7 +191,6 @@ class SpladeIndex:
         >>> from search_api.splade_index import search
         >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         if self.N == 0:
             return []
@@ -234,6 +232,5 @@ class SpladeIndex:
         >>> from search_api.splade_index import doc
         >>> result = doc(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         return self.docs[index]

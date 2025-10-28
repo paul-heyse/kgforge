@@ -70,7 +70,6 @@ def tokenize(text: str) -> list[str]:
     >>> from search_api.fixture_index import tokenize
     >>> result = tokenize(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
@@ -207,7 +206,6 @@ class FixtureIndex:
         >>> from search_api.fixture_index import search
         >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         if getattr(self, "N", 0) == 0:
             return []
@@ -247,6 +245,5 @@ class FixtureIndex:
         >>> from search_api.fixture_index import doc
         >>> result = doc(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         return self.docs[index]

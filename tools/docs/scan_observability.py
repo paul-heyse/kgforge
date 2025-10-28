@@ -6,7 +6,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 import ast
@@ -254,7 +253,6 @@ def load_policy() -> dict[str, Any]:
     >>> from tools.docs.scan_observability import load_policy
     >>> result = load_policy()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
@@ -725,7 +723,6 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     >>> from tools.docs.scan_observability import read_ast
     >>> result = read_ast(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         text = path.read_text(encoding="utf-8")
@@ -764,7 +761,6 @@ def scan_file(
     >>> from tools.docs.scan_observability import scan_file
     >>> result = scan_file(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     text, tree = read_ast(path)
     if not text or tree is None:

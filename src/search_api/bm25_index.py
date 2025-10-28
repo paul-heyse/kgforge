@@ -72,7 +72,6 @@ def toks(text: str) -> list[str]:
     >>> from search_api.bm25_index import toks
     >>> result = toks(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
@@ -147,7 +146,6 @@ class BM25Index:
         >>> from search_api.bm25_index import build_from_duckdb
         >>> result = build_from_duckdb(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         index = cls()
         con = duckdb.connect(db_path)
@@ -282,7 +280,6 @@ class BM25Index:
         >>> from search_api.bm25_index import load
         >>> result = load(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         with open(path, "rb") as handle:
             payload = pickle.load(handle)
@@ -337,7 +334,6 @@ class BM25Index:
         >>> from search_api.bm25_index import search
         >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         if self.N == 0:
             return []
@@ -354,11 +350,7 @@ class BM25Index:
                 score += idf * ((tf * (self.k1 + 1.0)) / denom)
             scores[i] = score
         ranked = sorted(enumerate(scores), key=lambda item: item[1], reverse=True)
-        return [
-            (self.docs[index].chunk_id, score)
-            for index, score in ranked[:k]
-            if score > 0.0
-        ]
+        return [(self.docs[index].chunk_id, score) for index, score in ranked[:k] if score > 0.0]
 
     def doc(self, index: int) -> BM25Doc:
         """Compute doc.
@@ -381,6 +373,5 @@ class BM25Index:
         >>> from search_api.bm25_index import doc
         >>> result = doc(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         return self.docs[index]

@@ -6,7 +6,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 import argparse
@@ -45,7 +44,6 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str
     >>> from tools.navmap.migrate_navmaps import migrate_navmaps
     >>> result = migrate_navmaps()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     index = build_index()
     if output:
@@ -106,7 +104,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> from tools.navmap.migrate_navmaps import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     args = _parse_args(argv)
     migrate_navmaps(args.output, pretty=not args.compact)

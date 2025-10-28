@@ -172,7 +172,6 @@ def healthz() -> dict[str, Any]:
     >>> from search_api.app import healthz
     >>> result = healthz()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return {
         "status": "ok",
@@ -211,7 +210,6 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
     >>> from search_api.app import rrf_fuse
     >>> result = rrf_fuse(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     scores: dict[str, float] = {}
     for hits in lists:
@@ -256,7 +254,6 @@ def apply_kg_boosts(
     >>> from search_api.app import apply_kg_boosts
     >>> result = apply_kg_boosts(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     q_concepts = set()
     for w in query.lower().split():
@@ -303,7 +300,6 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     >>> from search_api.app import search
     >>> result = search(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
@@ -388,7 +384,6 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     >>> from search_api.app import graph_concepts
     >>> result = graph_concepts(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring

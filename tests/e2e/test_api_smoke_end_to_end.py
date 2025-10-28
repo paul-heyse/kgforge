@@ -1,14 +1,13 @@
 import importlib
 import os
 from pathlib import Path
-from typing import Any
 
 import duckdb
 import yaml
 from fastapi.testclient import TestClient
+from kgfoundry.embeddings_sparse.bm25 import PurePythonBM25
 from kgfoundry.orchestration.fixture_flow import fixture_pipeline
 from kgfoundry.search_client import KGFoundryClient
-from kgfoundry.embeddings_sparse.bm25 import PurePythonBM25
 
 ROOT = Path(__file__).resolve().parents[2]
 

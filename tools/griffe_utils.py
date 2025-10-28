@@ -33,6 +33,6 @@ def resolve_griffe() -> tuple[GriffeModuleType, GriffeObjectType, GriffeLoaderTy
     except ModuleNotFoundError:
         loader_module = None
 
-    loader_cls = getattr(loader_module, "GriffeLoader", getattr(griffe_module, "GriffeLoader"))
-    object_cls = getattr(griffe_module, "Object")
+    loader_cls = getattr(loader_module, "GriffeLoader", griffe_module.GriffeLoader)
+    object_cls = griffe_module.Object
     return griffe_module, object_cls, loader_cls

@@ -6,7 +6,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 import argparse
@@ -348,7 +347,6 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     >>> from tools.navmap.repair_navmaps import repair_module
     >>> result = repair_module(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     path = info.path
     text = path.read_text(encoding="utf-8")
@@ -443,7 +441,6 @@ def repair_all(root: Path, apply: bool) -> list[str]:
     >>> from tools.navmap.repair_navmaps import repair_all
     >>> result = repair_all(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     messages: list[str] = []
     for info in _collect_modules(root):
@@ -510,7 +507,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> from tools.navmap.repair_navmaps import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     args = _parse_args(argv)
     root = args.root.resolve()

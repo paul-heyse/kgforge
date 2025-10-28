@@ -7,7 +7,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 import re
@@ -380,7 +379,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> from tools.navmap.check_navmap import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     errors: list[str] = []
     for py in sorted(SRC.rglob("*.py")):

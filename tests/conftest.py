@@ -31,12 +31,12 @@ def _ensure_chunks() -> None:
         return
     source = FIXTURES / "chunks_fixture.json"
     data = json.loads(source.read_text(encoding="utf-8"))
-    now = dt.datetime(2024, 1, 1, tzinfo=dt.timezone.utc)
+    now = dt.datetime(2024, 1, 1, tzinfo=dt.UTC)
     rows: list[dict[str, Any]] = []
     for idx, entry in enumerate(data):
         base_text = f"{entry['text']} concept"
         tokens = len(base_text.split())
-        span = {"node_id": f"node-{idx+1}", "start": 0, "end": len(base_text)}
+        span = {"node_id": f"node-{idx + 1}", "start": 0, "end": len(base_text)}
         rows.append(
             {
                 "chunk_id": entry["chunk_id"],
@@ -60,7 +60,7 @@ def _ensure_dense() -> None:
     data = json.loads((FIXTURES / "dense_vectors.json").read_text(encoding="utf-8"))
     dim = len(data[0]["vector"])
     schema = ParquetVectorWriter.dense_schema(dim)
-    now = dt.datetime(2024, 1, 1, tzinfo=dt.timezone.utc)
+    now = dt.datetime(2024, 1, 1, tzinfo=dt.UTC)
     rows: list[dict[str, Any]] = []
     for entry in data:
         vec = np.asarray(entry["vector"], dtype=np.float32)
@@ -91,7 +91,7 @@ def _ensure_sparse() -> None:
             "vocab_ids": [1, 7, 42],
             "weights": [0.3, 0.2, 0.1],
             "nnz": 3,
-            "created_at": dt.datetime(2024, 1, 1, tzinfo=dt.timezone.utc),
+            "created_at": dt.datetime(2024, 1, 1, tzinfo=dt.UTC),
         }
     ]
     _write_table(target, ParquetVectorWriter.splade_schema(), rows)

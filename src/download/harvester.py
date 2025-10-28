@@ -127,7 +127,6 @@ class OpenAccessHarvester:
         >>> from download.harvester import search
         >>> result = search(..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
@@ -163,7 +162,6 @@ class OpenAccessHarvester:
         >>> from download.harvester import resolve_pdf
         >>> result = resolve_pdf(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         best = work.get("best_oa_location") or {}
         if best and best.get("pdf_url"):
@@ -216,7 +214,6 @@ class OpenAccessHarvester:
         >>> from download.harvester import download_pdf
         >>> result = download_pdf(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
@@ -257,7 +254,6 @@ class OpenAccessHarvester:
         >>> from download.harvester import run
         >>> result = run(..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)

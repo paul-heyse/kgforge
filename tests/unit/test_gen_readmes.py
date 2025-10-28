@@ -2,15 +2,16 @@ from __future__ import annotations
 
 import importlib
 import sys
+from collections.abc import Callable
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
-from typing import Callable, TypeVar
 
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
 
 class _LoaderStub:
     def __init__(self, *args: object, **kwargs: object) -> None:

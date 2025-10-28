@@ -100,7 +100,6 @@ class OntologyCatalog:
         >>> from ontology.catalog import neighbors
         >>> result = neighbors(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return set()
@@ -126,6 +125,5 @@ class OntologyCatalog:
         >>> from ontology.catalog import hydrate
         >>> result = hydrate(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         return {}

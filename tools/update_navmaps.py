@@ -6,7 +6,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 import ast
@@ -31,7 +30,6 @@ def iter_python_files() -> list[Path]:
     >>> from tools.update_navmaps import iter_python_files
     >>> result = iter_python_files()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     search_root = SRC if SRC.exists() else ROOT
     return sorted(path for path in search_root.rglob("*.py") if path.is_file())
@@ -58,7 +56,6 @@ def module_docstring(path: Path) -> str | None:
     >>> from tools.update_navmaps import module_docstring
     >>> result = module_docstring(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         tree = ast.parse(path.read_text(encoding="utf-8"))

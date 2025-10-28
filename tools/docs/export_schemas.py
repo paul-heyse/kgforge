@@ -6,7 +6,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 import importlib
@@ -111,7 +110,6 @@ def is_pydantic_model(obj: object) -> bool:
     >>> from tools.docs.export_schemas import is_pydantic_model
     >>> result = is_pydantic_model(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         from pydantic import BaseModel
@@ -141,7 +139,6 @@ def is_pandera_model(obj: object) -> bool:
     >>> from tools.docs.export_schemas import is_pandera_model
     >>> result = is_pandera_model(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         import pandera as pa
@@ -389,7 +386,6 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
         >>> from tools.docs.export_schemas import prop_keys
         >>> result = prop_keys(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         props = d.get("properties")
         return set(props.keys()) if isinstance(props, dict) else set()
@@ -559,7 +555,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> from tools.docs.export_schemas import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     import argparse
 

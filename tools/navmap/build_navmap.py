@@ -6,7 +6,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-
 from __future__ import annotations
 
 import ast
@@ -443,7 +442,6 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
     >>> from tools.navmap.build_navmap import build_index
     >>> result = build_index()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     files = _discover_py_files()
     data: dict[str, Any] = {
@@ -528,7 +526,6 @@ def main() -> int:
     >>> from tools.navmap.build_navmap import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     build_index()
     print(f"navmap built → {INDEX_PATH}")
