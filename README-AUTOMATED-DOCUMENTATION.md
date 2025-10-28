@@ -42,13 +42,13 @@ generation pipeline, explaining every component, tool, and step in the process.
    - [Stage 4: NavMap Index Build](#stage-4-navmap-index-build-python-toolsnavmapbuild_navmappy)
    - [Stage 5: NavMap Validation](#stage-5-navmap-validation-python-toolsnavmapcheck_navmappy)
    - [Stage 6: Example Tests](#stage-6-example-tests-xdoctest)
-   - [Stage 7: Test Map Build](#stage-7-test-map-build-python-toolsdocsbuild_test_mappy)
-   - [Stage 8: Observability Scan](#stage-8-observability-scan-python-toolsdocsscan_observabilitypy)
-   - [Stage 9: Schema Export](#stage-9-schema-export-python-toolsdocsexport_schemaspy)
-   - [Stage 10: Graph Build](#stage-10-graph-build-python-toolsdocsbuild_graphspy)
-   - [Stage 11: Sphinx HTML Build](#stage-11-sphinx-html-build-make-html)
-   - [Stage 12: Sphinx JSON Build](#stage-12-sphinx-json-build-make-json)
-   - [Stage 13: Symbol Index Build](#stage-13-symbol-index-build-make-symbols)
+   - [Stage 7: Symbol Index Build](#stage-7-symbol-index-build-make-symbols)
+   - [Stage 8: Test Map Build](#stage-8-test-map-build-python-toolsdocsbuild_test_mappy)
+   - [Stage 9: Observability Scan](#stage-9-observability-scan-python-toolsdocsscan_observabilitypy)
+   - [Stage 10: Schema Export](#stage-10-schema-export-python-toolsdocsexport_schemaspy)
+   - [Stage 11: Graph Build](#stage-11-graph-build-python-toolsdocsbuild_graphspy)
+   - [Stage 12: Sphinx HTML Build](#stage-12-sphinx-html-build-make-html)
+   - [Stage 13: Sphinx JSON Build](#stage-13-sphinx-json-build-make-json)
    - [Stage 14: MkDocs Build](#stage-14-mkdocs-build-optional)
 
 #### Troubleshooting & Operations
@@ -98,11 +98,11 @@ generation pipeline, explaining every component, tool, and step in the process.
     - [NavMap System: `tools/navmap/`](#navmap-system-toolsnavmap)
     - [README Generation: `tools/gen_readmes.py`](#readme-generation-toolsgen_readmespy)
     - [Example Tests: `pytest --xdoctest`](#example-tests-pytest---xdoctest)
+    - [Symbol Index: `docs/_scripts/build_symbol_index.py`](#symbol-index-docs_scriptsbuild_symbol_indexpy)
     - [Test Map Build: `tools/docs/build_test_map.py`](#test-map-build-toolsdocsbuild_test_mappy)
     - [Observability Scan: `tools/docs/scan_observability.py`](#observability-scan-toolsdocsscan_observabilitypy)
     - [Schema Export: `tools/docs/export_schemas.py`](#schema-export-toolsdocsexport_schemaspy)
     - [Graph Build: `tools/docs/build_graphs.py`](#graph-build-toolsdocsbuild_graphspy)
-    - [Symbol Index: `docs/_scripts/build_symbol_index.py`](#symbol-index-docs_scriptsbuild_symbol_indexpy)
     - [Package Detection: `tools/detect_pkg.py`](#package-detection-toolsdetect_pkgpy)
 
 #### Pre-Commit & Quality
@@ -161,7 +161,7 @@ make bootstrap
 ```bash
 ensure_tools() {
   local missing=0
-  for tool in doq docformatter pydocstyle interrogate; do
+  for tool in doq docformatter pydocstyle pydoclint interrogate; do
     if [[ ! -x "$BIN/$tool" ]]; then
       echo "error: missing '$tool'; install docs extras..." >&2
       missing=1
@@ -174,6 +174,7 @@ ensure_tools() {
 - `doq`: Docstring skeleton generator
 - `docformatter`: Docstring formatting
 - `pydocstyle`: Docstring linting
+- `pydoclint`: Docstring parameter/return parity validation
 - `interrogate`: Coverage enforcement
 
 **Why they're essential:**
@@ -246,6 +247,23 @@ rm -rf docs/_build/html docs/_build/json site
 ### Execution Pipeline
 
 The script executes stages sequentially in a strict order. Each stage must complete successfully (exit code 0) before the next stage begins.
+
+**Complete execution order:**
+
+1. `make docstrings` - Generate and validate docstrings
+2. `make readmes` - Generate package READMEs  
+3. `python tools/update_navmaps.py` - Validate no legacy NavMap sections
+4. `python tools/navmap/build_navmap.py` - Build navmap index
+5. `python tools/navmap/check_navmap.py` - Validate navmap metadata
+6. `pytest --xdoctest examples` - Run doctest examples
+7. `make symbols` - Build symbol index (flat JSON array)
+8. `python tools/docs/build_test_map.py` - Build test coverage map
+9. `python tools/docs/scan_observability.py` - Scan observability instrumentation
+10. `python tools/docs/export_schemas.py` - Export data contract schemas
+11. `python tools/docs/build_graphs.py` - Build dependency graphs
+12. `make html` - Build Sphinx HTML docs
+13. `make json` - Build Sphinx JSON corpus
+14. `mkdocs build` (optional) - Build MkDocs site if available
 
 #### Stage 1: Docstring Generation (`make docstrings`)
 
@@ -396,7 +414,37 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - Halts entire documentation build
 - Ensures examples remain accurate and executable
 
-#### Stage 7: Test Map Build (`python tools/docs/build_test_map.py`)
+#### Stage 7: Symbol Index Build (`make symbols`)
+
+**Purpose:** Generate flat symbol index for fast agent lookup.
+
+**Command:** `python docs/_scripts/build_symbol_index.py`
+
+**What it does:**
+- Uses Griffe to statically load and analyze all packages
+- Walks the complete symbol tree (packages, modules, classes, functions, etc.)
+- Extracts fully qualified name, kind, file path, line range, and docstring summary
+- Writes flat JSON array to `docs/_build/symbols.json`
+- Provides fast symbol lookup without parsing multiple nested JSON files
+
+**Generates:** `docs/_build/symbols.json`
+
+**Exit condition:**
+- Success: Symbol index generated successfully, exit code 0
+- Failure: Analysis errors, exit code 1
+
+**Failure reasons:**
+- Unable to parse source files
+- Griffe analysis errors
+- Permission issues writing output
+
+**Use cases:**
+- Agent symbol lookup ("Where is `load_config`?")
+- Jump to definition (file path + line number)
+- Symbol search and autocomplete
+- Documentation validation
+
+#### Stage 8: Test Map Build (`python tools/docs/build_test_map.py`)
 
 **Purpose:** Generate test coverage map for documentation.
 
@@ -419,7 +467,7 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - Coverage data unavailable
 - Permission issues writing output
 
-#### Stage 8: Observability Scan (`python tools/docs/scan_observability.py`)
+#### Stage 9: Observability Scan (`python tools/docs/scan_observability.py`)
 
 **Purpose:** Scan and document observability instrumentation.
 
@@ -442,7 +490,7 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - Instrumentation pattern detection errors
 - Permission issues writing output
 
-#### Stage 9: Schema Export (`python tools/docs/export_schemas.py`)
+#### Stage 10: Schema Export (`python tools/docs/export_schemas.py`)
 
 **Purpose:** Export data contract schemas for documentation.
 
@@ -466,7 +514,7 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - Schema serialization errors
 - Permission issues writing output
 
-#### Stage 10: Graph Build (`python tools/docs/build_graphs.py`)
+#### Stage 11: Graph Build (`python tools/docs/build_graphs.py`)
 
 **Purpose:** Build dependency and architecture graphs.
 
@@ -490,7 +538,7 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - GraphViz or visualization library unavailable
 - Permission issues writing output
 
-#### Stage 11: Sphinx HTML Build (`make html`)
+#### Stage 12: Sphinx HTML Build (`make html`)
 
 **Purpose:** Generate complete HTML documentation website.
 
@@ -521,7 +569,7 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - AutoAPI analysis errors
 - MyST-Parser Markdown errors
 
-#### Stage 12: Sphinx JSON Build (`make json`)
+#### Stage 13: Sphinx JSON Build (`make json`)
 
 **Purpose:** Generate machine-readable JSON documentation corpus.
 
@@ -547,42 +595,6 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - Automated documentation analysis
 - Search indexing systems
 - Documentation testing
-
-#### Stage 13: Symbol Index Build (`make symbols`)
-
-**Purpose:** Generate flat symbol index for fast agent lookup.
-
-**Executes:** `python docs/_scripts/build_symbol_index.py`
-
-**What it does:**
-- Walks complete symbol tree (all packages, modules, classes, functions)
-- Extracts fully qualified name, kind, file path, line range, docstring
-- Writes flat JSON array (one entry per symbol)
-
-**Generates:** `docs/_build/symbols.json`
-
-**Format:**
-```json
-[
-  {
-    "path": "kgfoundry_common.config.load_config",
-    "kind": "function",
-    "file": "src/kgfoundry_common/config.py",
-    "lineno": 15,
-    "endlineno": 25,
-    "doc": "Load configuration from YAML file."
-  }
-]
-```
-
-**Exit condition:**
-- Succeeds if all packages analyze successfully
-
-**Use cases:**
-- Agent symbol lookup
-- Jump to definition
-- Documentation validation
-- IDE integration
 
 #### Stage 14: MkDocs Build (Optional, Conditional)
 
@@ -1006,17 +1018,17 @@ The single entry point for complete documentation regeneration.
 1. Clean slate: `rm -rf docs/_build site`
 2. `make docstrings` - Generate and validate docstrings
 3. `make readmes` - Generate package READMEs
-4. `python tools/update_navmaps.py` - Ensure docstrings remain free of legacy `NavMap:` sections
+4. `python tools/update_navmaps.py` - Validate no legacy NavMap sections
 5. `python tools/navmap/build_navmap.py` - Build navmap index
 6. `python tools/navmap/check_navmap.py` - Validate navmap
-7. `pytest --xdoctest` - Run doctest examples in examples/
-8. `python tools/docs/build_test_map.py` - Build test coverage map
-9. `python tools/docs/scan_observability.py` - Scan observability instrumentation
-10. `python tools/docs/export_schemas.py` - Export data contract schemas
-11. `python tools/docs/build_graphs.py` - Build dependency and architecture graphs
-12. `make html` - Build Sphinx HTML docs
-13. `make json` - Build Sphinx JSON corpus
-14. `make symbols` - Build symbol index
+7. `pytest --xdoctest examples` - Run doctest examples
+8. `make symbols` - Build symbol index (flat JSON array)
+9. `python tools/docs/build_test_map.py` - Build test coverage map
+10. `python tools/docs/scan_observability.py` - Scan observability instrumentation
+11. `python tools/docs/export_schemas.py` - Export data contract schemas
+12. `python tools/docs/build_graphs.py` - Build dependency graphs
+13. `make html` - Build Sphinx HTML docs
+14. `make json` - Build Sphinx JSON corpus
 15. `mkdocs build` (optional) - Build MkDocs site if available
 
 **Exit behavior:**
@@ -1690,15 +1702,45 @@ The `.pre-commit-config.yaml` file wires in comprehensive quality checks that ru
    - Fails commits when documented parameters diverge from signatures
    - Runs against the full source tree (`language: system`, `pass_filenames: false`)
 
-10. **pydocstyle** - `pydocstyle src`
+10. **docs-doctest** - `pytest --xdoctest examples`
+    - Runs doctest examples in example scripts
+    - Validates that examples produce expected output
+    - Always runs (`always_run: true`)
+    - Ensures examples remain accurate before commit
+
+11. **docs-build-test-map** - `python tools/docs/build_test_map.py`
+    - Builds test coverage map
+    - Maps test functions to source code
+    - Always runs (`always_run: true`)
+    - Keeps test map metadata fresh
+
+12. **docs-observability-scan** - `python tools/docs/scan_observability.py`
+    - Scans for observability instrumentation
+    - Documents logging, metrics, and tracing
+    - Always runs (`always_run: true`)
+    - Maintains observability catalog
+
+13. **docs-export-schemas** - `python tools/docs/export_schemas.py`
+    - Exports Pydantic/Pandera schemas
+    - Generates JSON Schema documentation
+    - Always runs (`always_run: true`)
+    - Keeps schema docs synchronized
+
+14. **pydocstyle** - `pydocstyle src`
     - Lints docstrings against the NumPy convention
     - Ignores: D200, D202, D204, D205, D209, D400, D401
     - Runs after pydoclint/docformatter to catch residual formatting issues
 
-11. **interrogate** - `interrogate -i src --fail-under 90`
+15. **interrogate** - `interrogate -i src --fail-under 90`
     - Enforces 90% docstring coverage on `src/`
     - Interactive mode (`-i`) shows coverage details
     - Fails the build if coverage drops below 90%
+
+16. **readme-generator** (optional) - `bash tools/hooks/run_readme_generator.sh`
+    - Regenerates package READMEs for changed packages
+    - Detects affected packages from staged files
+    - Stages updated README.md files automatically
+    - Can be disabled when READMEs should be updated separately
 
 ### Running manually:
 
@@ -2301,19 +2343,19 @@ Stage 5: NavMap Check (validate metadata) ⚠️ BLOCKING
     ↓
 Stage 6: Example Tests (pytest --xdoctest) ⚠️ BLOCKING
     ↓
-Stage 7: Test Map Build (build_test_map.py)
+Stage 7: Symbol Index (build flat symbol array)
     ↓
-Stage 8: Observability Scan (scan_observability.py)
+Stage 8: Test Map Build (build_test_map.py)
     ↓
-Stage 9: Schema Export (export_schemas.py)
+Stage 9: Observability Scan (scan_observability.py)
     ↓
-Stage 10: Graph Build (build_graphs.py)
+Stage 10: Schema Export (export_schemas.py)
     ↓
-Stage 11: Sphinx HTML (build HTML site)
+Stage 11: Graph Build (build_graphs.py)
     ↓
-Stage 12: Sphinx JSON (build JSON corpus)
+Stage 12: Sphinx HTML (build HTML site)
     ↓
-Stage 13: Symbol Index (build flat symbol array)
+Stage 13: Sphinx JSON (build JSON corpus)
     ↓
 Stage 14: MkDocs (optional, non-blocking)
     ↓
@@ -2327,14 +2369,17 @@ Stage 14: MkDocs (optional, non-blocking)
   - Docstrings → READMEs → NavMap validation → Example tests chain is strict
   - NavMap validation (Stage 5) and example tests (Stage 6) act as gate-keepers
 
-- **Stages 7-10 are sequential but non-critical:**
+- **Stage 7 (Symbol Index) is critical:**
+  - Builds flat symbol array needed by later stages
+  - Must complete successfully before continuing
+
+- **Stages 8-11 are sequential but non-critical:**
   - Generate additional documentation artifacts
   - Build test maps, observability docs, schemas, and graphs
   - Failures may be logged but don't halt the pipeline
 
-- **Stages 11-13 depend on Stages 1-10:**
+- **Stages 12-13 depend on Stages 1-11:**
   - Sphinx builds use docstrings and metadata
-  - Symbol index uses complete symbol tree
   - Cannot proceed if earlier stages failed
 
 - **Stage 14 is optional:**
@@ -2744,14 +2789,14 @@ This table shows all stages, their dependencies, and what they consume/produce:
 | 4 | NavMap Build | `build_navmap.py` | Stage 3 | Source code | `navmap.json` | YES |
 | 5 | NavMap Check | `check_navmap.py` | Stage 4 | `navmap.json` | Validation result | YES |
 | 6 | Example Tests | `pytest --xdoctest` | Stage 5 | Example scripts | Test results | YES |
-| 7 | Test Map Build | `build_test_map.py` | Stage 6 | Test files | Test coverage map | NO |
-| 8 | Observability Scan | `scan_observability.py` | Stage 7 | Source code | Observability docs | NO |
-| 9 | Schema Export | `export_schemas.py` | Stage 8 | Source code | Schema docs | NO |
-| 10 | Graph Build | `build_graphs.py` | Stage 9 | Source code | Dependency graphs | NO |
-| 11 | Sphinx HTML | `make html` | Stage 10 | Docstrings, Markdown | `docs/_build/html/` | NO |
-| 12 | Sphinx JSON | `make json` | Stage 10 | Docstrings, Markdown | `docs/_build/json/` | NO |
-| 13 | Symbol Index | `make symbols` | Stage 10 | Docstrings | `symbols.json` | NO |
-| 14 | MkDocs | `mkdocs build` | Stage 10 | Docstrings, Markdown | `site/` | NO |
+| 7 | Symbol Index | `make symbols` | Stage 6 | Docstrings | `symbols.json` | YES |
+| 8 | Test Map Build | `build_test_map.py` | Stage 7 | Test files | Test coverage map | NO |
+| 9 | Observability Scan | `scan_observability.py` | Stage 8 | Source code | Observability docs | NO |
+| 10 | Schema Export | `export_schemas.py` | Stage 9 | Source code | Schema docs | NO |
+| 11 | Graph Build | `build_graphs.py` | Stage 10 | Source code | Dependency graphs | NO |
+| 12 | Sphinx HTML | `make html` | Stage 11 | Docstrings, Markdown | `docs/_build/html/` | NO |
+| 13 | Sphinx JSON | `make json` | Stage 11 | Docstrings, Markdown | `docs/_build/json/` | NO |
+| 14 | MkDocs | `mkdocs build` | Stage 11 | Docstrings, Markdown | `site/` | NO |
 
 **Legend:**
 - **YES:** Failure halts pipeline
@@ -2782,6 +2827,8 @@ Complete list of all environment variables that affect documentation generation:
 | `GRAPH_CYCLE_LIMIT` | `50000` | `update_docs.sh` | Maximum number of cycles to enumerate |
 | `GRAPH_EDGE_BUDGET` | `50000` | `update_docs.sh` | If pruned graph exceeds this, skip cycle enumeration |
 | `GRAPH_MAX_WORKERS` | `16` | `update_docs.sh` | Maximum worker threads for graph analysis |
+| `GRAPH_FAIL_ON_CYCLES` | `0` | `update_docs.sh` | Exit with error if cycles detected (0=disabled, 1=enabled) |
+| `GRAPH_FAIL_ON_LAYER` | `0` | `update_docs.sh` | Exit with error if layer violations detected (0=disabled, 1=enabled) |
 
 ### Files Generated by Each Stage
 
@@ -2793,13 +2840,13 @@ Complete list of all environment variables that affect documentation generation:
 | NavMap Build | `navmap.json` | `site/_build/navmap/` | 10-100 KB | No (generated) |
 | NavMap Check | Validation report | stdout | N/A | N/A |
 | Example Tests | Test results | stdout | N/A | N/A |
-| Test Map Build | `test_map.json` | `docs/_build/` | 50-500 KB | No (generated) |
-| Observability Scan | Observability docs | `docs/_build/observability/` | Variable | No (generated) |
-| Schema Export | JSON Schema files | `docs/_build/schemas/` | 10-100 KB | No (generated) |
-| Graph Build | Graph images, JSON | `docs/_build/graphs/` | 1-10 MB | No (generated) |
+| Symbol Index | `symbols.json` | `docs/_build/` | 100 KB - 1 MB | No (generated) |
+| Test Map Build | `test_map.json`, coverage JSONs | `docs/_build/` | 50-500 KB | No (generated) |
+| Observability Scan | `metrics.json`, `log_events.json`, `traces.json`, `observability_lint.json` | `docs/_build/` | Variable | No (generated) |
+| Schema Export | JSON Schema files | `docs/reference/schemas/` | 10-100 KB | No (generated) |
+| Graph Build | Graph images, JSON, metadata | `docs/_build/graphs/` | 1-10 MB | No (generated) |
 | Sphinx HTML | HTML pages + assets | `docs/_build/html/` | 5-50 MB | No (generated) |
 | Sphinx JSON | `.fjson` files | `docs/_build/json/` | 1-10 MB | No (generated) |
-| Symbol Index | `symbols.json` | `docs/_build/` | 100 KB - 1 MB | No (generated) |
 | MkDocs | HTML site | `site/` | 5-50 MB | No (generated) |
 
 ---
