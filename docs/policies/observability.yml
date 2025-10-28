@@ -1,3 +1,5 @@
+# This policy file is deep-merged with the defaults in tools/docs/scan_observability.py,
+# so you can override a single field without copying the entire section.
 metric:
   name_regex: '^[a-z][a-z0-9_]*$'      # Prometheus snake_case
   allowed_units: [seconds, bytes, meters, grams, joules, volts, amperes, ratio]
