@@ -36,7 +36,9 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor GraniteDoclingVLM]
 class GraniteDoclingVLM:
-    """Represent GraniteDoclingVLM."""
+    """Describe GraniteDoclingVLM."""
+    
+    
     
     
     

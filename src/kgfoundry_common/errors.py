@@ -58,7 +58,9 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DownloadError]
 class DownloadError(Exception):
-    """Represent DownloadError."""
+    """Describe DownloadError."""
+    
+    
     
     
     
@@ -78,7 +80,9 @@ class DownloadError(Exception):
 
 # [nav:anchor UnsupportedMIMEError]
 class UnsupportedMIMEError(Exception):
-    """Represent UnsupportedMIMEError."""
+    """Describe UnsupportedMIMEError."""
+    
+    
     
     
     
@@ -98,7 +102,9 @@ class UnsupportedMIMEError(Exception):
 
 # [nav:anchor DoclingError]
 class DoclingError(Exception):
-    """Represent DoclingError."""
+    """Describe DoclingError."""
+    
+    
     
     
     
@@ -118,7 +124,9 @@ class DoclingError(Exception):
 
 # [nav:anchor OCRTimeoutError]
 class OCRTimeoutError(Exception):
-    """Represent OCRTimeoutError."""
+    """Describe OCRTimeoutError."""
+    
+    
     
     
     
@@ -138,7 +146,9 @@ class OCRTimeoutError(Exception):
 
 # [nav:anchor ChunkingError]
 class ChunkingError(Exception):
-    """Represent ChunkingError."""
+    """Describe ChunkingError."""
+    
+    
     
     
     
@@ -158,7 +168,9 @@ class ChunkingError(Exception):
 
 # [nav:anchor EmbeddingError]
 class EmbeddingError(Exception):
-    """Represent EmbeddingError."""
+    """Describe EmbeddingError."""
+    
+    
     
     
     
@@ -178,7 +190,9 @@ class EmbeddingError(Exception):
 
 # [nav:anchor SpladeOOMError]
 class SpladeOOMError(Exception):
-    """Represent SpladeOOMError."""
+    """Describe SpladeOOMError."""
+    
+    
     
     
     
@@ -198,7 +212,9 @@ class SpladeOOMError(Exception):
 
 # [nav:anchor IndexBuildError]
 class IndexBuildError(Exception):
-    """Represent IndexBuildError."""
+    """Describe IndexBuildError."""
+    
+    
     
     
     
@@ -218,7 +234,9 @@ class IndexBuildError(Exception):
 
 # [nav:anchor OntologyParseError]
 class OntologyParseError(Exception):
-    """Represent OntologyParseError."""
+    """Describe OntologyParseError."""
+    
+    
     
     
     
@@ -238,7 +256,9 @@ class OntologyParseError(Exception):
 
 # [nav:anchor LinkerCalibrationError]
 class LinkerCalibrationError(Exception):
-    """Represent LinkerCalibrationError."""
+    """Describe LinkerCalibrationError."""
+    
+    
     
     
     
@@ -258,7 +278,9 @@ class LinkerCalibrationError(Exception):
 
 # [nav:anchor Neo4jError]
 class Neo4jError(Exception):
-    """Represent Neo4jError."""
+    """Describe Neo4jError."""
+    
+    
     
     
     

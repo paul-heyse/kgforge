@@ -79,7 +79,9 @@ def toks(text: str) -> list[str]:
 # [nav:anchor BM25Doc]
 @dataclass
 class BM25Doc:
-    """Represent BM25Doc."""
+    """Describe BM25Doc."""
+    
+    
     
     
     

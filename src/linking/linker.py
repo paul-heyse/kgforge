@@ -34,7 +34,9 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Linker]
 class Linker:
-    """Represent Linker."""
+    """Describe Linker."""
+    
+    
     
     
     

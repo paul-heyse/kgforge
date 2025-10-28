@@ -75,7 +75,9 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 # [nav:anchor BM25Doc]
 @dataclass
 class BM25Doc:
-    """Represent BM25Doc."""
+    """Describe BM25Doc."""
+    
+    
     
     
     
@@ -211,6 +213,8 @@ class PurePythonBM25:
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
+        
+        
         
         
         
@@ -464,6 +468,8 @@ class LuceneBM25:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
         
         
         

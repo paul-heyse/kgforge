@@ -267,6 +267,8 @@ class PureImpactIndex:
         
         
         
+        
+        
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))

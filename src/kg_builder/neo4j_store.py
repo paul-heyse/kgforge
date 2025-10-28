@@ -36,7 +36,9 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Neo4jStore]
 class Neo4jStore:
-    """Represent Neo4jStore."""
+    """Describe Neo4jStore."""
+    
+    
     
     
     

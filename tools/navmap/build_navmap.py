@@ -35,7 +35,9 @@ SECTION_RE = re.compile(r"^\s*#\s*\[nav:section\s+([a-z0-9]+(?:-[a-z0-9]+)*)\]")
 
 @dataclass(slots=True)
 class ModuleInfo:
-    """Represent ModuleInfo."""
+    """Describe ModuleInfo."""
+    
+    
     
     
     

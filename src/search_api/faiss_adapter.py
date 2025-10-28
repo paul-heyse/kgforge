@@ -59,7 +59,9 @@ type IndexArray = NDArray[np.int64]
 # [nav:anchor DenseVecs]
 @dataclass
 class DenseVecs:
-    """Represent DenseVecs."""
+    """Describe DenseVecs."""
+    
+    
     
     
     

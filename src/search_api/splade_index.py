@@ -76,7 +76,9 @@ def tok(text: str) -> list[str]:
 # [nav:anchor SpladeDoc]
 @dataclass
 class SpladeDoc:
-    """Represent SpladeDoc."""
+    """Describe SpladeDoc."""
+    
+    
     
     
     

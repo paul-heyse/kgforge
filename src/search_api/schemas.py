@@ -36,7 +36,9 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor SearchRequest]
 class SearchRequest(BaseModel):
-    """Represent SearchRequest."""
+    """Describe SearchRequest."""
+    
+    
     
     
     
@@ -59,7 +61,9 @@ class SearchRequest(BaseModel):
 
 # [nav:anchor SearchResult]
 class SearchResult(BaseModel):
-    """Represent SearchResult."""
+    """Describe SearchResult."""
+    
+    
     
     
     

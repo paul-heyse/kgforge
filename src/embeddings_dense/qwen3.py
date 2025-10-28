@@ -36,7 +36,9 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Qwen3Embedder]
 class Qwen3Embedder:
-    """Represent Qwen3Embedder."""
+    """Describe Qwen3Embedder."""
+    
+    
     
     
     
