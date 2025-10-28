@@ -20,6 +20,7 @@ TARGETS = [
 ]
 LOG_DIR = REPO / "site" / "_build" / "docstrings"
 LOG_FILE = LOG_DIR / "fallback.log"
+ENV_LOG_FILE = "KGFOUNDRY_DOCSTRINGS_LOG"
 ENV_INCLUDE_PROTECTED = "KGFOUNDRY_DOCSTRINGS_INCLUDE_PROTECTED"
 ENV_ADDITIONAL_PROTECTED = "KGFOUNDRY_DOCSTRINGS_PROTECTED"
 DEFAULT_PROTECTED = {
@@ -71,6 +72,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         default=[],
         type=Path,
         help="Additional file paths to exclude from automated docstring generation.",
+    )
+    parser.add_argument(
+        "--log",
+        type=Path,
+        help="Override the fallback generator log destination.",
     )
     return parser.parse_args(argv)
 
@@ -143,13 +149,15 @@ def run_doq(target: Path) -> None:
     subprocess.run(cmd, check=True)
 
 
-def run_fallback(target: Path, skip: Iterable[Path] | None = None) -> None:
+def run_fallback(target: Path, log_file: Path, skip: Iterable[Path] | None = None) -> None:
     """Invoke the auto-docstring fallback generator for ``target``.
 
     Parameters
     ----------
     target : Path
         Directory that should be processed by :mod:`tools.auto_docstrings`.
+    log_file : Path
+        Destination file used to record updated paths.
     skip : Iterable[pathlib.Path], optional
         Explicit file paths that the fallback generator should ignore.
     """
@@ -160,7 +168,7 @@ def run_fallback(target: Path, skip: Iterable[Path] | None = None) -> None:
         "--target",
         str(target),
         "--log",
-        str(LOG_FILE),
+        str(log_file),
     ]
     if skip:
         for path in skip:
@@ -168,7 +176,7 @@ def run_fallback(target: Path, skip: Iterable[Path] | None = None) -> None:
     subprocess.run(cmd, check=True)
 
 
-def generate_docstrings(targets: Iterable[Path], protected: Iterable[Path]) -> None:
+def generate_docstrings(targets: Iterable[Path], protected: Iterable[Path], log_file: Path) -> None:
     """Run the docstring pipeline while leaving ``protected`` files untouched.
 
     Parameters
@@ -177,6 +185,8 @@ def generate_docstrings(targets: Iterable[Path], protected: Iterable[Path]) -> N
         Directories that should be processed.
     protected : Iterable[pathlib.Path]
         Absolute or repository-relative file paths that must be skipped.
+    log_file : Path
+        Destination log file for fallback processing results.
     """
 
     protected_paths = list(_resolve_paths(protected))
@@ -194,7 +204,7 @@ def generate_docstrings(targets: Iterable[Path], protected: Iterable[Path]) -> N
         protected_for_target = list(iter_protected(target, protected_paths))
         with hidden(protected_for_target):
             run_doq(target)
-        run_fallback(target, protected_for_target)
+        run_fallback(target, log_file, protected_for_target)
 
 
 def main(argv: Sequence[str] | None = None) -> None:
@@ -215,10 +225,21 @@ def main(argv: Sequence[str] | None = None) -> None:
 
     targets = args.targets or TARGETS
 
-    if LOG_FILE.exists():
-        LOG_FILE.unlink()
-    LOG_DIR.mkdir(parents=True, exist_ok=True)
-    generate_docstrings(targets, protected)
+    log_file = args.log
+    if log_file is None:
+        env_log = os.environ.get(ENV_LOG_FILE)
+        if env_log:
+            log_file = Path(env_log)
+    if log_file is None:
+        log_file = LOG_FILE
+
+    log_file = _normalize_path(log_file).resolve()
+    log_dir = log_file.parent
+
+    if log_file.exists():
+        log_file.unlink()
+    log_dir.mkdir(parents=True, exist_ok=True)
+    generate_docstrings(targets, protected, log_file)
 
 
 if __name__ == "__main__":

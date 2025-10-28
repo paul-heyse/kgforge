@@ -47,7 +47,7 @@ def test_generate_docstrings_skips_protected(tmp_path: Path, monkeypatch) -> Non
     monkeypatch.setattr(docstrings, "run_doq", fake_run_doq)
     monkeypatch.setattr(docstrings, "run_fallback", fake_run_fallback)
 
-    docstrings.generate_docstrings([target], {protected})
+    docstrings.generate_docstrings([target], {protected}, tmp_path / "fallback.log")
 
     assert protected.read_text(encoding="utf-8") == "print('stay safe')\n"
     updated = unprotected.read_text(encoding="utf-8")

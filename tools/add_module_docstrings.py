@@ -1,4 +1,4 @@
-"""Add Module Docstrings utilities."""
+"""Insert placeholder module docstrings for files that are missing one."""
 
 from __future__ import annotations
 
@@ -10,27 +10,19 @@ SRC = ROOT / "src"
 
 
 def module_name(path: Path) -> str:
-    """Compute module name.
-
-    Carry out the module name operation.
+    """Return the dotted import path for ``path`` relative to ``src/``.
 
     Parameters
     ----------
     path : Path
-        Description for ``path``.
+        Python source file whose module name should be derived.
 
     Returns
     -------
     str
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.add_module_docstrings import module_name
-    >>> result = module_name(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
+        Import path that represents ``path`` without the ``.py`` suffix.
     """
+
     rel = path.relative_to(SRC).with_suffix("")
     parts = list(rel.parts)
     if parts and parts[-1] == "__init__":
@@ -39,27 +31,8 @@ def module_name(path: Path) -> str:
 
 
 def needs_docstring(text: str) -> bool:
-    """Compute needs docstring.
+    """Return ``True`` when ``text`` does not define a module docstring."""
 
-    Carry out the needs docstring operation.
-
-    Parameters
-    ----------
-    text : str
-        Description for ``text``.
-
-    Returns
-    -------
-    bool
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.add_module_docstrings import needs_docstring
-    >>> result = needs_docstring(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    """
     try:
         tree = ast.parse(text)
     except SyntaxError:
@@ -68,28 +41,20 @@ def needs_docstring(text: str) -> bool:
 
 
 def insert_docstring(path: Path) -> bool:
-    """Compute insert docstring.
-
-    Carry out the insert docstring operation.
+    """Insert a placeholder module docstring if ``path`` does not have one.
 
     Parameters
     ----------
     path : Path
-        Description for ``path``.
+        Module that should be updated.
 
     Returns
     -------
     bool
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.add_module_docstrings import insert_docstring
-    >>> result = insert_docstring(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
+        ``True`` when the file was modified, ``False`` otherwise.
     """
-    text = path.read_text()
+
+    text = path.read_text(encoding="utf-8")
     if not needs_docstring(text):
         return False
     name = module_name(path)
@@ -101,20 +66,13 @@ def insert_docstring(path: Path) -> bool:
     if len(lines) > idx and lines[idx].startswith("#") and "coding" in lines[idx]:
         idx += 1
     lines.insert(idx, doc)
-    path.write_text("".join(lines))
+    path.write_text("".join(lines), encoding="utf-8")
     return True
 
 
 def main() -> None:
-    """Compute main.
+    """Ensure every module in ``src/`` has at least a placeholder docstring."""
 
-    Carry out the main operation.
-
-    Examples
-    --------
-    >>> from tools.add_module_docstrings import main
-    >>> main()  # doctest: +ELLIPSIS
-    """
     for path in SRC.rglob("*.py"):
         insert_docstring(path)
 

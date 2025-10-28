@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Check Docstrings utilities."""
+"""Validate docstring quality beyond the automated generation helpers."""
 
 from __future__ import annotations
 
@@ -19,22 +19,8 @@ TARGETS = [
 
 
 def parse_args() -> argparse.Namespace:
-    """Compute parse args.
+    """Return CLI arguments for the docstring validation helper."""
 
-    Carry out the parse args operation.
-
-    Returns
-    -------
-    argparse.Namespace
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.check_docstrings import parse_args
-    >>> result = parse_args()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--no-todo",
@@ -45,27 +31,19 @@ def parse_args() -> argparse.Namespace:
 
 
 def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
-    """Compute iter docstrings.
-
-    Carry out the iter docstrings operation.
+    """Yield module and member docstrings discovered in ``path``.
 
     Parameters
     ----------
     path : Path
-        Description for ``path``.
+        File whose docstrings should be inspected.
 
-    Returns
-    -------
-    collections.abc.Iterable
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.check_docstrings import iter_docstrings
-    >>> result = iter_docstrings(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
+    Yields
+    ------
+    tuple[Path, int, str]
+        The file path, starting line number, and raw docstring text.
     """
+
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if (doc := ast.get_docstring(tree, clean=False)) is not None:
@@ -79,22 +57,8 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
 
 
 def check_placeholders() -> int:
-    """Compute check placeholders.
+    """Return ``1`` if any docstrings contain placeholder keywords."""
 
-    Carry out the check placeholders operation.
-
-    Returns
-    -------
-    int
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.check_docstrings import check_placeholders
-    >>> result = check_placeholders()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    """
     errors: list[str] = []
     keywords = {"TODO", "TBD", "FIXME"}
 
@@ -115,20 +79,8 @@ def check_placeholders() -> int:
 
 
 def main() -> None:
-    """Compute main.
+    """Run Ruff's docstring rules and optional placeholder validation."""
 
-    Carry out the main operation.
-
-    Raises
-    ------
-    SystemExit
-        Raised when validation fails.
-
-    Examples
-    --------
-    >>> from tools.check_docstrings import main
-    >>> main()  # doctest: +ELLIPSIS
-    """
     options = parse_args()
 
     cmd = [
