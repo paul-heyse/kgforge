@@ -352,7 +352,10 @@ def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
 
 def _pkg_of(dotted: str) -> str:
     """Return the top-level package segment from a dotted module path."""
-    return dotted.split(".", 1)[0]
+    head, *_rest = dotted.split(".", 1)
+    if head == "src" and "." in dotted:
+        return dotted.split(".", 2)[1]
+    return head
 
 
 def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> None:
@@ -428,8 +431,22 @@ def collapse_to_packages(dot_path: Path) -> nx.DiGraph:
     pd = graphs[0] if isinstance(graphs, list) else graphs
     g = nx.drawing.nx_pydot.from_pydot(pd).to_directed()
     collapsed = nx.DiGraph()
+
+    def _module_name(node: Any, data: dict[str, Any]) -> str:
+        label = data.get("label")
+        if label:
+            raw = str(label).strip("\"")
+            normalized = raw.replace(r"\n", "\n").replace(r"\.", ".").replace(r"\\", "\\")
+            return normalized.replace("\n", "")
+        return str(node)
+
+    module_names = {node: _module_name(node, data) for node, data in g.nodes(data=True)}
+
+    package_nodes = {_pkg_of(name) for name in module_names.values()}
+    collapsed.add_nodes_from(sorted(package_nodes))
+
     for u, v in g.edges():
-        pu, pv = _pkg_of(str(u)), _pkg_of(str(v))
+        pu, pv = _pkg_of(module_names.get(u, str(u))), _pkg_of(module_names.get(v, str(v)))
         if pu != pv:
             w = collapsed.get_edge_data(pu, pv, {}).get("weight", 0) + 1
             collapsed.add_edge(pu, pv, weight=w)
@@ -584,7 +601,7 @@ def style_and_render(
     pd = pydot.Dot(graph_type="digraph", rankdir="LR")
 
     # nodes
-    for n in g.nodes():
+    for n in sorted(g.nodes()):
         layer = pkg2layer.get(n, "unknown")
         color = palette.get(layer, "#718096")
         width = 2.5 if cent.get(n, 0) >= q80 else 1.2
