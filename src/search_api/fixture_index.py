@@ -47,7 +47,6 @@ def tokenize(text: str) -> list[str]:
         Description of return value.
     """
     
-    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -79,7 +78,6 @@ class FixtureIndex:
         db_path : str | None
             Description for ``db_path``.
         """
-        
         
         self.root = Path(root)
         self.db_path = db_path
@@ -167,7 +165,6 @@ class FixtureIndex:
             Description of return value.
         """
         
-        
         if getattr(self, "N", 0) == 0:
             return []
         qtoks = tokenize(query)
@@ -200,6 +197,5 @@ class FixtureIndex:
         src.search_api.fixture_index.FixtureDoc
             Description of return value.
         """
-        
         
         return self.docs[index]

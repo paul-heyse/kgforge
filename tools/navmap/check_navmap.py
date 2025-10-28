@@ -44,26 +44,7 @@ except Exception:  # pragma: no cover
 
 
 def _read_text(py: Path) -> list[str]:
-    """Read text.
-
-    Parameters
-    ----------
-    py : Path
-        Description.
-
-    Returns
-    -------
-    list[str]
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _read_text(...)
-    """
+    """Return file contents as a list of lines, or an empty list on failure."""
     try:
         return py.read_text(encoding="utf-8").splitlines()
     except Exception:
@@ -109,26 +90,7 @@ def _parse_navmap_dict(py: Path) -> dict[str, Any]:
 
 
 def _parse_all(py: Path) -> list[str]:
-    """Parse all.
-
-    Parameters
-    ----------
-    py : Path
-        Description.
-
-    Returns
-    -------
-    list[str]
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _parse_all(...)
-    """
+    """Return the literal ``__all__`` sequence when it can be safely evaluated."""
     import ast
 
     try:
@@ -155,28 +117,7 @@ def _parse_all(py: Path) -> list[str]:
 
 
 def _exports_for(py: Path, nav: dict[str, Any]) -> list[str]:
-    """Exports for.
-
-    Parameters
-    ----------
-    py : Path
-        Description.
-    nav : dict[str, Any]
-        Description.
-
-    Returns
-    -------
-    list[str]
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _exports_for(...)
-    """
+    """Derive the export list from ``__navmap__`` or ``__all__`` definitions."""
     nav_exports = nav.get("exports")
     if isinstance(nav_exports, list) and all(isinstance(x, str) for x in nav_exports):
         return list(dict.fromkeys(nav_exports))
@@ -187,26 +128,7 @@ def _exports_for(py: Path, nav: dict[str, Any]) -> list[str]:
 
 
 def _module_path(py: Path) -> str | None:
-    """Module path.
-
-    Parameters
-    ----------
-    py : Path
-        Description.
-
-    Returns
-    -------
-    str | None
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _module_path(...)
-    """
+    """Return the dotted module path for ``py`` within ``src/`` if possible."""
     try:
         rel = py.relative_to(SRC)
     except Exception:
@@ -217,26 +139,7 @@ def _module_path(py: Path) -> str | None:
 
 
 def _validate_pep440(field_val: Any) -> str | None:
-    """Validate pep440.
-
-    Parameters
-    ----------
-    field_val : Any
-        Description.
-
-    Returns
-    -------
-    str | None
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _validate_pep440(...)
-    """
+    """Validate PEP 440 version strings and report an error message when invalid."""
     if field_val is None or field_val == "":
         return None
     if Version is None:
@@ -249,26 +152,7 @@ def _validate_pep440(field_val: Any) -> str | None:
 
 
 def _inspect(py: Path) -> list[str]:
-    """inspect.
-
-    Parameters
-    ----------
-    py : Path
-        Description.
-
-    Returns
-    -------
-    list[str]
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _inspect(...)
-    """
+    """Validate a module at ``py`` and return collected violation messages."""
     errs: list[str] = []
     nav = _parse_navmap_dict(py)
     sections_inline, anchors_inline = _scan_inline(py)
@@ -330,22 +214,22 @@ def _inspect(py: Path) -> list[str]:
     return errs
 
 
-def main() -> int:
-    """Main.
+def main(argv: list[str] | None = None) -> int:
+    """Compute main.
+
+    Carry out the main operation.
+
+    Parameters
+    ----------
+    argv : List[str] | None
+        Description for ``argv``.
 
     Returns
     -------
     int
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> main(...)
+        Description of return value.
     """
+    
     errors: list[str] = []
     for py in sorted(SRC.rglob("*.py")):
         errors.extend(_inspect(py))

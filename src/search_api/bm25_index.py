@@ -49,7 +49,6 @@ def toks(text: str) -> list[str]:
         Description of return value.
     """
     
-    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -83,7 +82,6 @@ class BM25Index:
             Description for ``b``.
         """
         
-        
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -107,7 +105,6 @@ class BM25Index:
         BM25Index
             Description of return value.
         """
-        
         
         index = cls()
         con = duckdb.connect(db_path)
@@ -180,7 +177,6 @@ class BM25Index:
             Description for ``path``.
         """
         
-        
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as handle:
             pickle.dump(
@@ -211,7 +207,6 @@ class BM25Index:
         BM25Index
             Description of return value.
         """
-        
         
         with open(path, "rb") as handle:
             payload = pickle.load(handle)
@@ -260,7 +255,6 @@ class BM25Index:
             Description of return value.
         """
         
-        
         if self.N == 0:
             return []
         terms = toks(query)
@@ -293,6 +287,5 @@ class BM25Index:
         BM25Doc
             Description of return value.
         """
-        
         
         return self.docs[index]

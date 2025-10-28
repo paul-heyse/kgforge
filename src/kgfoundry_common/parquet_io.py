@@ -52,7 +52,6 @@ class ParquetVectorWriter:
             Description of return value.
         """
         
-        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -75,7 +74,6 @@ class ParquetVectorWriter:
         root : str
             Description for ``root``.
         """
-        
         
         self.root = Path(root)
 
@@ -109,7 +107,6 @@ class ParquetVectorWriter:
         str
             Description of return value.
         """
-        
         
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
@@ -147,7 +144,6 @@ class ParquetVectorWriter:
         pa.schema
             Description of return value.
         """
-        
         
         return pa.schema(
             [
@@ -188,7 +184,6 @@ class ParquetVectorWriter:
         str
             Description of return value.
         """
-        
         
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
@@ -232,7 +227,6 @@ class ParquetChunkWriter:
             Description of return value.
         """
         
-        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -271,7 +265,6 @@ class ParquetChunkWriter:
             Description for ``run_id``.
         """
         
-        
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
@@ -290,7 +283,6 @@ class ParquetChunkWriter:
         str
             Description of return value.
         """
-        
         
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(

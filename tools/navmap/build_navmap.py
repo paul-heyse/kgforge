@@ -46,6 +46,42 @@ ANCHOR_RE = re.compile(r"^\s*#\s*\[nav:anchor\s+([A-Za-z_]\w*)\]\s*$")
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 IDENT_RE = re.compile(r"^[A-Za-z_]\w*$")
 
+PLACEHOLDER_ALL = object()
+
+
+def _literal_eval_navmap(node: ast.AST) -> Any:
+    if isinstance(node, ast.Constant):
+        return node.value
+    if isinstance(node, ast.Name):
+        if node.id == "__all__":
+            return PLACEHOLDER_ALL
+        raise ValueError(node.id)
+    if isinstance(node, (ast.List, ast.Tuple)):
+        return [_literal_eval_navmap(elt) for elt in node.elts]
+    if isinstance(node, ast.Dict):
+        result: dict[str, Any] = {}
+        for key_node, value_node in zip(node.keys, node.values, strict=False):
+            key = _literal_eval_navmap(key_node)
+            if not isinstance(key, str):
+                raise ValueError(key)
+            result[key] = _literal_eval_navmap(value_node)
+        return result
+    if isinstance(node, ast.Set):
+        return {_literal_eval_navmap(elt) for elt in node.elts}
+    raise ValueError(ast.dump(node))
+
+
+def _replace_placeholders(value: Any, exports: list[str]) -> Any:
+    if value is PLACEHOLDER_ALL:
+        return list(dict.fromkeys(exports))
+    if isinstance(value, list):
+        return [_replace_placeholders(v, exports) for v in value]
+    if isinstance(value, dict):
+        return {k: _replace_placeholders(v, exports) for k, v in value.items()}
+    if isinstance(value, set):
+        return {_replace_placeholders(v, exports) for v in value}
+    return value
+
 
 @dataclass
 class ModuleInfo:
@@ -65,6 +101,7 @@ class ModuleInfo:
     --------
     >>> ModuleInfo(...)
     """
+
     module: str
     path: Path
     exports: list[str]
@@ -74,26 +111,7 @@ class ModuleInfo:
 
 
 def _rel(p: Path) -> str:
-    """rel.
-
-    Parameters
-    ----------
-    p : Path
-        Description.
-
-    Returns
-    -------
-    str
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _rel(...)
-    """
+    """Return ``p`` relative to the repository root when possible."""
     try:
         return str(p.relative_to(REPO))
     except Exception:
@@ -101,21 +119,7 @@ def _rel(p: Path) -> str:
 
 
 def _git_sha() -> str:
-    """Git sha.
-
-    Returns
-    -------
-    str
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _git_sha(...)
-    """
+    """Return the current Git commit hash, falling back to environment overrides."""
     if G_SHA:
         return G_SHA
     try:
@@ -151,6 +155,7 @@ def _module_name(py: Path) -> str | None:
     -------
     str | None
         Description.
+
     Raises
     ------
     Exception
@@ -195,25 +200,39 @@ def _parse_py(py: Path) -> tuple[dict[str, Any], list[str]]:
     except Exception:
         return {}, []
 
-    nav: dict[str, Any] = {}
+    nav_raw: dict[str, Any] | None = None
     exports: list[str] = []
 
     for node in tree.body:
         if isinstance(node, ast.Assign):
-            # __all__
             if any(isinstance(t, ast.Name) and t.id == "__all__" for t in node.targets):
                 vals = _literal_list_of_strs(node.value)
                 if vals is not None:
                     exports = vals
-            # __navmap__
             if any(isinstance(t, ast.Name) and t.id == "__navmap__" for t in node.targets):
                 try:
-                    nav = ast.literal_eval(node.value)  # must be pure-literal
-                    if not isinstance(nav, dict):
-                        nav = {}
+                    nav_raw = _literal_eval_navmap(node.value)
+                    if not isinstance(nav_raw, dict):
+                        nav_raw = {}
                 except Exception:
-                    nav = {}
-    return nav or {}, exports or []
+                    nav_raw = {}
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            if node.target.id == "__all__":
+                vals = _literal_list_of_strs(node.value)
+                if vals is not None:
+                    exports = vals
+            if node.target.id == "__navmap__":
+                try:
+                    nav_raw = _literal_eval_navmap(node.value)
+                    if not isinstance(nav_raw, dict):
+                        nav_raw = {}
+                except Exception:
+                    nav_raw = {}
+
+    nav = nav_raw or {}
+    if nav:
+        nav = _replace_placeholders(nav, exports or nav.get("exports", []))
+    return nav, exports
 
 
 def _scan_inline_markers(py: Path) -> tuple[dict[str, int], dict[str, int]]:
@@ -235,26 +254,7 @@ def _scan_inline_markers(py: Path) -> tuple[dict[str, int], dict[str, int]]:
 
 
 def _kebab(s: str) -> str:
-    """kebab.
-
-    Parameters
-    ----------
-    s : str
-        Description.
-
-    Returns
-    -------
-    str
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _kebab(...)
-    """
+    """Normalize ``s`` into a kebab-case identifier string."""
     s = s.lower()
     s = re.sub(r"[^a-z0-9-]", "-", s)
     s = re.sub(r"-{2,}", "-", s).strip("-")
@@ -262,26 +262,7 @@ def _kebab(s: str) -> str:
 
 
 def _collect_module(py: Path) -> ModuleInfo | None:
-    """Collect module.
-
-    Parameters
-    ----------
-    py : Path
-        Description.
-
-    Returns
-    -------
-    ModuleInfo | None
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _collect_module(...)
-    """
+    """Parse ``py`` and return gathered navmap metadata if it is a module."""
     mod = _module_name(py)
     if not mod:
         return None
@@ -311,21 +292,7 @@ def _collect_module(py: Path) -> ModuleInfo | None:
 
 
 def _discover_py_files() -> list[Path]:
-    """Discover py files.
-
-    Returns
-    -------
-    list[Path]
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _discover_py_files(...)
-    """
+    """Return every Python source file under ``src`` sorted lexicographically."""
     return sorted(p for p in SRC.rglob("*.py") if p.is_file())
 
 
@@ -346,7 +313,6 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
     Mapping[str, Any]
         Description of return value.
     """
-    
     files = _discover_py_files()
     data: dict[str, Any] = {
         "commit": _git_sha(),
@@ -410,6 +376,7 @@ def main() -> int:
     -------
     int
         Description.
+
     Raises
     ------
     Exception

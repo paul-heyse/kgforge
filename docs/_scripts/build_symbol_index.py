@@ -38,7 +38,6 @@ def iter_packages() -> list[str]:
         Description of return value.
     """
     
-    
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     packages = detect_packages()
@@ -68,7 +67,6 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
         Description of return value.
     """
     
-    
     try:
         return getattr(node, attr)
     except Exception:
@@ -85,7 +83,6 @@ def walk(node: Object) -> None:
     node : Object
         Description for ``node``.
     """
-    
     
     doc = safe_attr(node, "docstring")
     file_rel = safe_attr(node, "relative_package_filepath")

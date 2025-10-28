@@ -33,7 +33,6 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str
         Description of return value.
     """
     
-    
     index = build_index()
     if output:
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -87,7 +86,6 @@ def main(argv: list[str] | None = None) -> int:
     int
         Description of return value.
     """
-    
     
     args = _parse_args(argv)
     migrate_navmaps(args.output, pretty=not args.compact)

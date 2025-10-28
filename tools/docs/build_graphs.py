@@ -51,21 +51,16 @@ ALLOW_FILE = ROOT / "docs" / "policies" / "graph_allowlist.json"
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse args.
+    """Compute parse args.
+
+    Carry out the parse args operation.
 
     Returns
     -------
     argparse.Namespace
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> parse_args(...)
+        Description of return value.
     """
+    
     p = argparse.ArgumentParser(
         description="Build per-package and cross-subsystem graphs with policy checks."
     )
@@ -164,26 +159,16 @@ def sh(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subproces
 
 
 def ensure_bin(name: str) -> None:
-    """Ensure bin.
+    """Compute ensure bin.
+
+    Carry out the ensure bin operation.
 
     Parameters
     ----------
     name : str
-        Description.
-
-    Returns
-    -------
-    None
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> ensure_bin(...)
+        Description for ``name``.
     """
+    
     if not shutil.which(name):
         print(f"[graphs] Missing required executable on PATH: {name}", file=sys.stderr)
         sys.exit(2)
@@ -211,26 +196,7 @@ def find_top_packages() -> list[str]:
 
 
 def _rel(p: Path) -> str:
-    """rel.
-
-    Parameters
-    ----------
-    p : Path
-        Description.
-
-    Returns
-    -------
-    str
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _rel(...)
-    """
+    """Return ``p`` relative to the repository root when possible."""
     try:
         return str(p.relative_to(ROOT))
     except Exception:
@@ -314,26 +280,7 @@ def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
 
 
 def _pkg_of(dotted: str) -> str:
-    """Pkg of.
-
-    Parameters
-    ----------
-    dotted : str
-        Description.
-
-    Returns
-    -------
-    str
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _pkg_of(...)
-    """
+    """Return the top-level package segment from a dotted module path."""
     return dotted.split(".", 1)[0]
 
 
@@ -644,30 +591,25 @@ def last_tree_commit(pkg: str) -> str:
 
 
 def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
-    """Cache bucket.
+    """Compute cache bucket.
+
+    Carry out the cache bucket operation.
 
     Parameters
     ----------
     cache_dir : Path
-        Description.
+        Description for ``cache_dir``.
     pkg : str
-        Description.
+        Description for ``pkg``.
     tree_hash : str
-        Description.
+        Description for ``tree_hash``.
 
     Returns
     -------
     Path
-        Description.
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> cache_bucket(...)
+        Description of return value.
     """
+    
     return cache_dir / pkg / tree_hash
 
 
@@ -763,6 +705,7 @@ def main() -> None:
     -------
     None
         Description.
+
     Raises
     ------
     Exception

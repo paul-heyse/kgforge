@@ -32,7 +32,6 @@ class MockKG:
         Initialise a new instance with validated parameters.
         """
         
-        
         self.chunk2concepts: dict[str, set[str]] = {}
         self.neighbors: dict[str, set[str]] = {}
 
@@ -49,7 +48,6 @@ class MockKG:
             Description for ``concept_id``.
         """
         
-        
         self.chunk2concepts.setdefault(chunk_id, set()).add(concept_id)
 
     def add_edge(self, a: str, b: str) -> None:
@@ -64,7 +62,6 @@ class MockKG:
         b : str
             Description for ``b``.
         """
-        
         
         self.neighbors.setdefault(a, set()).add(b)
         self.neighbors.setdefault(b, set()).add(a)
@@ -85,7 +82,6 @@ class MockKG:
             Description of return value.
         """
         
-        
         return sorted(self.chunk2concepts.get(chunk_id, set()))
 
     def one_hop(self, concept_id: str) -> list[str]:
@@ -103,6 +99,5 @@ class MockKG:
         List[str]
             Description of return value.
         """
-        
         
         return sorted(self.neighbors.get(concept_id, set()))
