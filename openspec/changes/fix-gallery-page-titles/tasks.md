@@ -51,45 +51,45 @@
 - [ ] 2.1.9 Document the template in `docs/how-to/contributing-gallery-examples.md`
 
 ### 2.2 Update `examples/00_quickstart.py`
-- [ ] 2.2.1 Remove `:orphan:` directive from docstring
-- [ ] 2.2.2 Remove custom `.. _gallery_quickstart:` reference label
-- [ ] 2.2.3 Reformat first line to plain title: `Quickstart — minimal import smoke test`
-- [ ] 2.2.4 Add title underline: `===============================================`
-- [ ] 2.2.5 Keep description paragraph starting with "Ensure the..."
-- [ ] 2.2.6 Keep `.. tags:: getting-started, smoke` directive
-- [ ] 2.2.7 Move `**Constraints**` section to `Constraints` header
-- [ ] 2.2.8 Keep doctest code block
+- [x] 2.2.1 Remove `:orphan:` directive from docstring
+- [x] 2.2.2 Remove custom `.. _gallery_quickstart:` reference label
+- [x] 2.2.3 Reformat first line to plain title: `Quickstart — minimal import smoke test`
+- [x] 2.2.4 Add title underline: `===============================================`
+- [x] 2.2.5 Keep description paragraph starting with "Ensure the..."
+- [x] 2.2.6 Keep `.. tags:: getting-started, smoke` directive
+- [x] 2.2.7 Move `**Constraints**` section to `Constraints` header
+- [x] 2.2.8 Keep doctest code block
 - [ ] 2.2.9 Verify the file still passes `pytest --doctest-modules examples/00_quickstart.py`
 
 ### 2.3 Update `examples/10_data_contracts_minimal.py`
-- [ ] 2.3.1 Remove `:orphan:` directive from docstring
-- [ ] 2.3.2 Remove custom `.. _gallery_data_contracts_minimal:` reference label
-- [ ] 2.3.3 Reformat first line to plain title: `Data contracts — schema export smoke`
-- [ ] 2.3.4 Add title underline: `========================================`
-- [ ] 2.3.5 Keep description paragraph starting with "Demonstrate..."
-- [ ] 2.3.6 Keep `.. tags:: schema, pydantic` directive
-- [ ] 2.3.7 Move `**Constraints**` section to `Constraints` header
-- [ ] 2.3.8 Keep doctest code block
+- [x] 2.3.1 Remove `:orphan:` directive from docstring
+- [x] 2.3.2 Remove custom `.. _gallery_data_contracts_minimal:` reference label
+- [x] 2.3.3 Reformat first line to plain title: `Data contracts — schema export smoke`
+- [x] 2.3.4 Add title underline: `========================================`
+- [x] 2.3.5 Keep description paragraph starting with "Demonstrate..."
+- [x] 2.3.6 Keep `.. tags:: schema, pydantic` directive
+- [x] 2.3.7 Move `**Constraints**` section to `Constraints` header
+- [x] 2.3.8 Keep doctest code block
 - [ ] 2.3.9 Verify the file still passes `pytest --doctest-modules examples/10_data_contracts_minimal.py`
 
 ### 2.4 Update `examples/20_search_smoke.py`
-- [ ] 2.4.1 Remove `:orphan:` directive from docstring
-- [ ] 2.4.2 Remove custom `.. _gallery_search_smoke:` reference label (if present)
-- [ ] 2.4.3 Reformat first line to plain title (extract from existing docstring)
-- [ ] 2.4.4 Add title underline with correct length
-- [ ] 2.4.5 Keep description paragraph
-- [ ] 2.4.6 Keep or add `.. tags::` directive
-- [ ] 2.4.7 Move `**Constraints**` section to `Constraints` header
-- [ ] 2.4.8 Keep doctest code block
+- [x] 2.4.1 Remove `:orphan:` directive from docstring
+- [x] 2.4.2 Remove custom `.. _gallery_search_smoke:` reference label (if present)
+- [x] 2.4.3 Reformat first line to plain title (extract from existing docstring)
+- [x] 2.4.4 Add title underline with correct length
+- [x] 2.4.5 Keep description paragraph
+- [x] 2.4.6 Keep or add `.. tags::` directive
+- [x] 2.4.7 Move `**Constraints**` section to `Constraints` header
+- [x] 2.4.8 Keep doctest code block
 - [ ] 2.4.9 Verify the file still passes `pytest --doctest-modules examples/20_search_smoke.py`
 
 ### 2.5 Update `examples/_utils.py`
-- [ ] 2.5.1 Check if `:orphan:` or custom labels are present and remove them
-- [ ] 2.5.2 Reformat docstring to start with plain title: `Utility helpers used by Sphinx gallery examples`
-- [ ] 2.5.3 Add title underline: `==================================================`
-- [ ] 2.5.4 Keep description paragraph starting with "The helpers..."
-- [ ] 2.5.5 Add `.. tags:: utils, helpers` directive
-- [ ] 2.5.6 Add `Constraints` section if applicable
+- [x] 2.5.1 Check if `:orphan:` or custom labels are present and remove them
+- [x] 2.5.2 Reformat docstring to start with plain title: `Utility helpers used by Sphinx gallery examples`
+- [x] 2.5.3 Add title underline: `==================================================`
+- [x] 2.5.4 Keep description paragraph starting with "The helpers..."
+- [x] 2.5.5 Add `.. tags:: utils, helpers` directive
+- [x] 2.5.6 Add `Constraints` section if applicable
 - [ ] 2.5.7 Verify the file still passes `pytest --doctest-modules examples/_utils.py`
 
 ### 2.6 Update `examples/GALLERY_HEADER.rst`
@@ -102,13 +102,13 @@
 ## Phase 3: Sphinx-Gallery Configuration Enhancement (2-3 hours)
 
 ### 3.1 Update `docs/conf.py` Configuration
-- [ ] 3.1.1 Add `"first_notebook_cell": None` to `sphinx_gallery_conf`
-- [ ] 3.1.2 Add `"line_numbers": False` to `sphinx_gallery_conf`
-- [ ] 3.1.3 Add `"reference_url": {"sphinx_gallery": None}` to `sphinx_gallery_conf`
-- [ ] 3.1.4 Add `"capture_repr": ()` to prevent unwanted output capture
-- [ ] 3.1.5 Add `"expected_failing_examples": []` for explicit failure tracking
-- [ ] 3.1.6 Add `"min_reported_time": 0` to show all execution times
-- [ ] 3.1.7 Document each configuration option with inline comments
+- [x] 3.1.1 Add `"first_notebook_cell": None` to `sphinx_gallery_conf`
+- [x] 3.1.2 Add `"line_numbers": False` to `sphinx_gallery_conf`
+- [x] 3.1.3 Add `"reference_url": {"sphinx_gallery": None}` to `sphinx_gallery_conf`
+- [x] 3.1.4 Add `"capture_repr": ()` to prevent unwanted output capture
+- [x] 3.1.5 Add `"expected_failing_examples": []` for explicit failure tracking
+- [x] 3.1.6 Add `"min_reported_time": 0` to show all execution times
+- [x] 3.1.7 Document each configuration option with inline comments
 - [ ] 3.1.8 Verify configuration syntax with Python AST parsing
 
 ### 3.2 Test Configuration Changes
@@ -128,50 +128,50 @@
 ## Phase 4: Gallery Validation Tool (4-6 hours)
 
 ### 4.1 Create `tools/validate_gallery.py` Script
-- [ ] 4.1.1 Add module docstring explaining purpose and usage
-- [ ] 4.1.2 Import necessary modules (Path, ast, re, sys)
-- [ ] 4.1.3 Define `GalleryValidationError` exception class
-- [ ] 4.1.4 Define `validate_title_format(docstring: str) -> tuple[bool, str]` function
-- [ ] 4.1.5 Define `check_orphan_directive(docstring: str) -> bool` function
-- [ ] 4.1.6 Define `check_custom_labels(docstring: str) -> list[str]` function
-- [ ] 4.1.7 Define `validate_example_file(file_path: Path) -> list[str]` function
-- [ ] 4.1.8 Define `main(examples_dir: Path) -> int` function
-- [ ] 4.1.9 Add CLI argument parsing with argparse
+- [x] 4.1.1 Add module docstring explaining purpose and usage
+- [x] 4.1.2 Import necessary modules (Path, ast, re, sys)
+- [x] 4.1.3 Define `GalleryValidationError` exception class
+- [x] 4.1.4 Define `validate_title_format(docstring: str) -> tuple[bool, str]` function
+- [x] 4.1.5 Define `check_orphan_directive(docstring: str) -> bool` function
+- [x] 4.1.6 Define `check_custom_labels(docstring: str) -> list[str]` function
+- [x] 4.1.7 Define `validate_example_file(file_path: Path) -> list[str]` function
+- [x] 4.1.8 Define `main(examples_dir: Path) -> int` function
+- [x] 4.1.9 Add CLI argument parsing with argparse
 
 ### 4.2 Implement Title Format Validation
-- [ ] 4.2.1 Parse docstring first line as title
-- [ ] 4.2.2 Check second line is all `=` characters
-- [ ] 4.2.3 Verify underline length matches title length (±1 char tolerance)
-- [ ] 4.2.4 Check title length ≤ 79 characters
-- [ ] 4.2.5 Verify blank line after underline
-- [ ] 4.2.6 Return detailed error message if validation fails
+- [x] 4.2.1 Parse docstring first line as title
+- [x] 4.2.2 Check second line is all `=` characters
+- [x] 4.2.3 Verify underline length matches title length (±1 char tolerance)
+- [x] 4.2.4 Check title length ≤ 79 characters
+- [x] 4.2.5 Verify blank line after underline
+- [x] 4.2.6 Return detailed error message if validation fails
 
 ### 4.3 Implement Directive Checks
-- [ ] 4.3.1 Check for `:orphan:` directive (should not be present)
-- [ ] 4.3.2 Check for custom `.. _gallery_*:` labels (should not be present)
-- [ ] 4.3.3 Check for `.. tags::` directive (optional but recommended)
-- [ ] 4.3.4 Verify docstring structure follows reST conventions
-- [ ] 4.3.5 Return list of found issues
+- [x] 4.3.1 Check for `:orphan:` directive (should not be present)
+- [x] 4.3.2 Check for custom `.. _gallery_*:` labels (should not be present)
+- [x] 4.3.3 Check for `.. tags::` directive (optional but recommended)
+- [x] 4.3.4 Verify docstring structure follows reST conventions
+- [x] 4.3.5 Return list of found issues
 
 ### 4.4 Implement Main Validation Logic
-- [ ] 4.4.1 Scan `examples/` directory for `*.py` files
-- [ ] 4.4.2 Skip `__pycache__` and hidden files
-- [ ] 4.4.3 Extract docstring from each file using AST
-- [ ] 4.4.4 Run all validation checks on each file
-- [ ] 4.4.5 Collect and aggregate errors
-- [ ] 4.4.6 Print summary report
-- [ ] 4.4.7 Return exit code 0 (success) or 1 (failures)
+- [x] 4.4.1 Scan `examples/` directory for `*.py` files
+- [x] 4.4.2 Skip `__pycache__` and hidden files
+- [x] 4.4.3 Extract docstring from each file using AST
+- [x] 4.4.4 Run all validation checks on each file
+- [x] 4.4.5 Collect and aggregate errors
+- [x] 4.4.6 Print summary report
+- [x] 4.4.7 Return exit code 0 (success) or 1 (failures)
 
 ### 4.5 Add CLI and Help Text
-- [ ] 4.5.1 Add `--examples-dir` argument (default: `examples/`)
-- [ ] 4.5.2 Add `--strict` flag for stricter validation
-- [ ] 4.5.3 Add `--fix` flag for automatic fixes (future enhancement)
-- [ ] 4.5.4 Add `--verbose` flag for detailed output
-- [ ] 4.5.5 Add `--help` documentation
+- [x] 4.5.1 Add `--examples-dir` argument (default: `examples/`)
+- [x] 4.5.2 Add `--strict` flag for stricter validation
+- [x] 4.5.3 Add `--fix` flag for automatic fixes (future enhancement)
+- [x] 4.5.4 Add `--verbose` flag for detailed output
+- [x] 4.5.5 Add `--help` documentation
 
 ### 4.6 Test Validation Script
-- [ ] 4.6.1 Run on current `examples/` directory (should fail initially)
-- [ ] 4.6.2 Run on updated `examples/` directory (should pass)
+- [x] 4.6.1 Run on current `examples/` directory (should fail initially)
+- [x] 4.6.2 Run on updated `examples/` directory (should pass)
 - [ ] 4.6.3 Create test examples with known errors
 - [ ] 4.6.4 Verify error messages are clear and actionable
 - [ ] 4.6.5 Test all CLI flags and options
@@ -179,30 +179,30 @@
 ## Phase 5: Integration into Build Pipeline (2-3 hours)
 
 ### 5.1 Add Pre-Commit Hook
-- [ ] 5.1.1 Open `.pre-commit-config.yaml`
-- [ ] 5.1.2 Add new hook entry under `repos` section
-- [ ] 5.1.3 Set `id: validate-gallery`
-- [ ] 5.1.4 Set `name: Validate gallery examples`
-- [ ] 5.1.5 Set `entry: python tools/validate_gallery.py`
-- [ ] 5.1.6 Set `language: system`
-- [ ] 5.1.7 Set `files: ^examples/.*\.py$` to trigger only on example changes
-- [ ] 5.1.8 Set `pass_filenames: false`
+- [x] 5.1.1 Open `.pre-commit-config.yaml`
+- [x] 5.1.2 Add new hook entry under `repos` section
+- [x] 5.1.3 Set `id: validate-gallery`
+- [x] 5.1.4 Set `name: Validate gallery examples`
+- [x] 5.1.5 Set `entry: python tools/validate_gallery.py`
+- [x] 5.1.6 Set `language: system`
+- [x] 5.1.7 Set `files: ^examples/.*\.py$` to trigger only on example changes
+- [x] 5.1.8 Set `pass_filenames: false`
 - [ ] 5.1.9 Test hook with `pre-commit run validate-gallery --all-files`
 
 ### 5.2 Integrate into `tools/update_docs.sh`
-- [ ] 5.2.1 Open `tools/update_docs.sh`
-- [ ] 5.2.2 Find the appropriate section for validation steps
-- [ ] 5.2.3 Add `python tools/validate_gallery.py` before Sphinx build
-- [ ] 5.2.4 Capture exit code and fail build if validation fails
-- [ ] 5.2.5 Add informative error message if validation fails
+- [x] 5.2.1 Open `tools/update_docs.sh`
+- [x] 5.2.2 Find the appropriate section for validation steps
+- [x] 5.2.3 Add `python tools/validate_gallery.py` before Sphinx build
+- [x] 5.2.4 Capture exit code and fail build if validation fails
+- [x] 5.2.5 Add informative error message if validation fails
 - [ ] 5.2.6 Test the entire `update_docs.sh` script
 - [ ] 5.2.7 Verify Sphinx warnings are eliminated
 
 ### 5.3 Update CI Pipeline
-- [ ] 5.3.1 Identify CI configuration file (e.g., `.github/workflows/*.yml`)
-- [ ] 5.3.2 Add `python tools/validate_gallery.py` step before docs build
-- [ ] 5.3.3 Set job to fail if validation fails
-- [ ] 5.3.4 Add step name: "Validate gallery examples"
+- [x] 5.3.1 Identify CI configuration file (e.g., `.github/workflows/*.yml`)
+- [x] 5.3.2 Add `python tools/validate_gallery.py` step before docs build
+- [x] 5.3.3 Set job to fail if validation fails
+- [x] 5.3.4 Add step name: "Validate gallery examples"
 - [ ] 5.3.5 Test CI pipeline with intentionally broken example
 - [ ] 5.3.6 Verify CI fails appropriately
 - [ ] 5.3.7 Test CI pipeline with fixed examples
@@ -211,26 +211,26 @@
 ## Phase 6: Documentation Updates (2-3 hours)
 
 ### 6.1 Create `docs/how-to/contributing-gallery-examples.md`
-- [ ] 6.1.1 Add frontmatter and title
-- [ ] 6.1.2 Write introduction explaining gallery purpose
-- [ ] 6.1.3 Document required docstring format with examples
-- [ ] 6.1.4 Show correct title and underline pattern
-- [ ] 6.1.5 Explain `.. tags::` directive usage
-- [ ] 6.1.6 Document `Constraints` section format
-- [ ] 6.1.7 Provide full working example
-- [ ] 6.1.8 List common validation errors and fixes
-- [ ] 6.1.9 Add section on testing examples locally
-- [ ] 6.1.10 Add section on debugging Sphinx-Gallery issues
+- [x] 6.1.1 Add frontmatter and title
+- [x] 6.1.2 Write introduction explaining gallery purpose
+- [x] 6.1.3 Document required docstring format with examples
+- [x] 6.1.4 Show correct title and underline pattern
+- [x] 6.1.5 Explain `.. tags::` directive usage
+- [x] 6.1.6 Document `Constraints` section format
+- [x] 6.1.7 Provide full working example
+- [x] 6.1.8 List common validation errors and fixes
+- [x] 6.1.9 Add section on testing examples locally
+- [x] 6.1.10 Add section on debugging Sphinx-Gallery issues
 
 ### 6.2 Update `README-AUTOMATED-DOCUMENTATION.md`
-- [ ] 6.2.1 Find the appropriate section for gallery documentation
-- [ ] 6.2.2 Add new subsection: "Gallery Examples: `examples/`"
-- [ ] 6.2.3 Explain Sphinx-Gallery integration
-- [ ] 6.2.4 Document title extraction pattern
-- [ ] 6.2.5 Document cross-reference label generation
-- [ ] 6.2.6 Link to `docs/how-to/contributing-gallery-examples.md`
-- [ ] 6.2.7 Add troubleshooting section for common gallery issues
-- [ ] 6.2.8 Update the pipeline diagram to include gallery validation
+- [x] 6.2.1 Find the appropriate section for gallery documentation
+- [x] 6.2.2 Add new subsection: "Gallery Examples: `examples/`"
+- [x] 6.2.3 Explain Sphinx-Gallery integration
+- [x] 6.2.4 Document title extraction pattern
+- [x] 6.2.5 Document cross-reference label generation
+- [x] 6.2.6 Link to `docs/how-to/contributing-gallery-examples.md`
+- [x] 6.2.7 Add troubleshooting section for common gallery issues
+- [x] 6.2.8 Update the pipeline diagram to include gallery validation
 
 ### 6.3 Update Project README (if applicable)
 - [ ] 6.3.1 Check if `README.md` mentions gallery or examples
@@ -239,9 +239,9 @@
 - [ ] 6.3.4 Mention validation requirements
 
 ### 6.4 Update NavMap Metadata
-- [ ] 6.4.1 Add `__navmap__` to `tools/validate_gallery.py`
-- [ ] 6.4.2 Set `category: "docs"` and `stability: "stable"`
-- [ ] 6.4.3 Run `python tools/update_navmaps.py`
+- [x] 6.4.1 Add `__navmap__` to `tools/validate_gallery.py`
+- [x] 6.4.2 Set `category: "docs"` and `stability: "stable"`
+- [x] 6.4.3 Run `python tools/update_navmaps.py`
 - [ ] 6.4.4 Verify navmap index is updated
 
 ## Phase 7: Testing and Validation (3-4 hours)
@@ -265,8 +265,8 @@
 - [ ] 7.2.6 Test intersphinx links if applicable
 
 ### 7.3 Gallery Validation Script Testing
-- [ ] 7.3.1 Run `python tools/validate_gallery.py` on clean examples
-- [ ] 7.3.2 Verify exit code 0 (success)
+- [x] 7.3.1 Run `python tools/validate_gallery.py` on clean examples
+- [x] 7.3.2 Verify exit code 0 (success)
 - [ ] 7.3.3 Create test example with missing title underline
 - [ ] 7.3.4 Verify validation fails with clear error message
 - [ ] 7.3.5 Create test example with `:orphan:` directive
