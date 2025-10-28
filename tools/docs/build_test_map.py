@@ -99,7 +99,6 @@ def load_symbol_candidates() -> set[str]:
     >>> from tools.docs.build_test_map import load_symbol_candidates
     >>> result = load_symbol_candidates()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     candidates: set[str] = set()
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
@@ -142,7 +141,6 @@ def load_symbol_spans() -> dict[str, dict[str, Any]]:
     >>> from tools.docs.build_test_map import load_symbol_spans
     >>> result = load_symbol_spans()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     out: dict[str, dict[str, Any]] = {}
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
@@ -178,7 +176,6 @@ def load_public_symbols() -> set[str]:
     >>> from tools.docs.build_test_map import load_public_symbols
     >>> result = load_public_symbols()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     nav = ROOT / "site" / "_build" / "navmap" / "navmap.json"
     if not nav.exists():
@@ -263,7 +260,6 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     >>> from tools.docs.build_test_map import scan_test_file
     >>> result = scan_test_file(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         text = path.read_text("utf-8")
@@ -356,21 +352,18 @@ def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]
     """Compute load coverage.
 
     Carry out the load coverage operation.
-    
+
     Returns
     -------
     Tuple[dict[str, collections.abc.Set], dict[Tuple[str, int], collections.abc.Set]]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import load_coverage
     >>> result = load_coverage()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
-    
-    
     if not COV_JSON.exists():
         return ({}, {})
     data = _load_json(COV_JSON)
@@ -416,7 +409,6 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     >>> from tools.docs.build_test_map import build_test_map
     >>> result = build_test_map(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     table: dict[str, list[dict[str, object]]] = defaultdict(list)
     if not TESTS.exists():
@@ -458,7 +450,6 @@ def attach_coverage(
     >>> from tools.docs.build_test_map import attach_coverage
     >>> result = attach_coverage(..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     result: dict[str, dict[str, Any]] = {}
     for sym, meta in symbol_spans.items():
@@ -520,7 +511,6 @@ def summarize(
     >>> from tools.docs.build_test_map import summarize
     >>> result = summarize(..., ..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     # group by module
     by_mod: dict[str, list[str]] = defaultdict(list)

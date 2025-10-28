@@ -1,13 +1,14 @@
 """Tests for :mod:`tools.make_importlinter`."""
 
-import sys
+import importlib.util
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-from tools.make_importlinter import main
+MODULE_PATH = Path(__file__).resolve().parents[2] / "tools" / "make_importlinter.py"
+spec = importlib.util.spec_from_file_location("tools.make_importlinter", MODULE_PATH)
+assert spec and spec.loader  # pragma: no cover - fail fast if script missing
+make_importlinter = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(make_importlinter)
+main = make_importlinter.main
 
 
 def test_main_writes_expected_importlinter(tmp_path):
