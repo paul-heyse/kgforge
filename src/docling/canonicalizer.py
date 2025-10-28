@@ -18,9 +18,21 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["canonicalize_text"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@docling",
+        "stability": "beta",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "canonicalize_text": {
+            "owner": "@docling",
+            "stability": "beta",
+            "since": "0.1.0",
+        },
+    },
 }
 
 
@@ -40,8 +52,7 @@ def canonicalize_text(blocks: list[str]) -> str:
     str
         Description of return value.
     """
-    
-    
+
     def norm(s: str) -> str:
         """Compute norm.
 
@@ -57,7 +68,6 @@ def canonicalize_text(blocks: list[str]) -> str:
         str
             Description of return value.
         """
-        
         s = unicodedata.normalize("NFC", s)
         s = s.replace("\r\n", "\n").replace("\r", "\n")
         s = re.sub(r"[\u2022\u25E6\u2013]", "-", s)  # bullets/dashes

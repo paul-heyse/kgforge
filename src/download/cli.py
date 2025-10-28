@@ -12,15 +12,27 @@ __all__ = ["harvest"]
 
 __navmap__: Final[NavMap] = {
     "title": "download.cli",
-    "synopsis": "Module for download.cli",
+    "synopsis": "Command-line entrypoints for bulk download orchestration",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["harvest"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@download",
+        "stability": "experimental",
+        "since": "0.2.0",
+    },
+    "symbols": {
+        "harvest": {
+            "owner": "@download",
+            "stability": "experimental",
+            "since": "0.2.0",
+        },
+    },
 }
 
 app = typer.Typer(help="Downloader & harvester CLI (skeleton).")
@@ -42,7 +54,6 @@ def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
     max_works : int | None
         Description for ``max_works``.
     """
-    
     typer.echo(f"[dry-run] would harvest topic={topic!r}, years={years}, max_works={max_works}")
 
 
