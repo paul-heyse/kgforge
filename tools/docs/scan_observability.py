@@ -40,6 +40,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 OUT = ROOT / "docs" / "_build"
 OUT.mkdir(parents=True, exist_ok=True)
+CONFIG_MD = OUT / "config.md"
 
 # Linking
 G_ORG = os.getenv("DOCS_GITHUB_ORG")
@@ -863,6 +864,41 @@ def _links_for(path: Path, lineno: int) -> dict[str, str]:
     return out
 
 
+def _write_config_summary(
+    metrics: list[MetricRow], logs: list[LogRow], traces: list[TraceRow]
+) -> None:
+    """Emit a Markdown summary that Sphinx includes in observability docs."""
+
+    if not metrics and not logs and not traces:
+        CONFIG_MD.write_text(
+            "No observability instrumentation detected for this repository.\n",
+            encoding="utf-8",
+        )
+        return
+
+    lines: list[str] = ["# Observability Instrumentation", ""]
+    if metrics:
+        lines.append("## Metrics")
+        lines.append(
+            f"Discovered {len(metrics)} metric definition(s); see `docs/_build/metrics.json`."
+        )
+        lines.append("")
+    if logs:
+        lines.append("## Logs")
+        lines.append(
+            f"Collected {len(logs)} structured log template(s); see `docs/_build/log_events.json`."
+        )
+        lines.append("")
+    if traces:
+        lines.append("## Traces")
+        lines.append(
+            f"Detected {len(traces)} span definition(s); see `docs/_build/traces.json`."
+        )
+        lines.append("")
+
+    CONFIG_MD.write_text("\n".join(lines), encoding="utf-8")
+
+
 def main() -> None:
     """Run the observability scan CLI.
 
@@ -935,6 +971,8 @@ def main() -> None:
     (OUT / "observability_lint.json").write_text(
         json.dumps(lints, indent=2) + "\n", encoding="utf-8"
     )
+    _write_config_summary(all_metrics, all_logs, all_traces)
+    _write_config_summary(all_metrics, all_logs, all_traces)
 
     # Strict mode for CI
     fail = os.getenv("OBS_FAIL_ON_LINT", "0") == "1"

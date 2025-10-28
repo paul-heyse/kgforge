@@ -67,6 +67,7 @@ def iter_packages() -> list[str]:
     
     
     
+    
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     packages = detect_packages()
@@ -92,6 +93,7 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
     object | None
         Description of return value.
     """
+    
     
     
     
@@ -446,6 +448,7 @@ def main() -> int:
     int
         Description of return value.
     """
+    
     
     
     
