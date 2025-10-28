@@ -182,6 +182,7 @@ def parse_args() -> argparse.Namespace:
     
     
     
+    
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", required=True, type=Path, help="Directory to process.")
     parser.add_argument("--log", required=False, type=Path, help="Log file for changed paths.")
@@ -209,18 +210,21 @@ def module_name_for(path: Path) -> str:
     
     
     
+    
     try:
         relative = path.relative_to(REPO_ROOT)
     except ValueError:
         relative = path
+
+    in_src = path.is_relative_to(SRC_ROOT)
     parts = list(relative.with_suffix("").parts)
-    if parts and parts[0] == "src":
+    if in_src and parts and parts[0] == "src":
         parts = parts[1:]
+
     module = ".".join(parts)
     if module.endswith(".__init__"):
         module = module[: -len(".__init__")]
-    if module and path.is_relative_to(SRC_ROOT):
-        module = f"src.{module}" if module else "src"
+
     return module
 
 
@@ -241,6 +245,7 @@ def summarize(name: str, kind: str) -> str:
     str
         Description of return value.
     """
+    
     
     
     
@@ -280,6 +285,7 @@ def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | Non
     str
         Description of return value.
     """
+    
     
     
     
@@ -338,6 +344,7 @@ def annotation_to_text(node: ast.AST | None) -> str:
     
     
     
+    
     if node is None:
         return "Any"
     try:
@@ -383,6 +390,7 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     
     
     
+    
     items: list[tuple[int, ast.AST, str]] = [(0, tree, "module")]
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
@@ -414,6 +422,7 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
     
     
     
+    
     params: list[tuple[str, str]] = []
     args = node.args
 
@@ -429,6 +438,7 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
         default : ast.AST | None
             Description for ``default``.
         """
+        
         
         
         
@@ -479,6 +489,7 @@ def detect_raises(node: ast.AST) -> list[str]:
     List[str]
         Description of return value.
     """
+    
     
     
     
@@ -540,6 +551,7 @@ def build_examples(
     
     
     
+    
     lines: list[str] = ["Examples", "--------"]
     if module_name and not name.startswith("__"):
         lines.append(f">>> from {module_name} import {name}")
@@ -574,6 +586,7 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     List[str]
         Description of return value.
     """
+    
     
     
     
@@ -689,6 +702,7 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     
     
     
+    
     body = getattr(node, "body", [])
     if not body:
         return None, None
@@ -728,6 +742,7 @@ def replace(
     
     
     
+    
     formatted = [indent + line + "\n" for line in new_lines]
     if doc_expr is not None:
         start = doc_expr.lineno - 1
@@ -756,6 +771,7 @@ def process_file(path: Path) -> bool:
     bool
         Description of return value.
     """
+    
     
     
     
@@ -844,6 +860,7 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
     
     
     

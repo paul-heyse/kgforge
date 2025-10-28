@@ -387,6 +387,7 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
         
         
         
+        
         props = d.get("properties")
         return set(props.keys()) if isinstance(props, dict) else set()
 
@@ -555,6 +556,7 @@ def main(argv: list[str] | None = None) -> int:
     int
         Description of return value.
     """
+    
     
     
     
