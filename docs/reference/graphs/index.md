@@ -17,3 +17,7 @@ Below are generated import and UML diagrams for the project packages.
 ```{image} ../../_build/graphs/subsystems.svg
 :alt: Cross-subsystem import graph (cycles red; thickness ~ centrality)
 :width: 100%
+```
+
+```{include} ../../_build/graphs/subsystems_meta.md
+```
