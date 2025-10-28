@@ -626,6 +626,18 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
             lines.append(f"{exc}")
             lines.append("    Raised when validation fails.")
 
+    if (
+        kind == "function"
+        and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+    ):
+        examples = build_examples(
+            module_name,
+            getattr(node, "name", "value"),
+            parameters,
+            bool(returns),
+        )
+        lines.extend(["", *examples])
+
     lines.append('"""')
     return lines
 
