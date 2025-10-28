@@ -1,0 +1,3 @@
+# `kgfoundry`
+
+::: kgfoundry

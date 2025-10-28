@@ -1194,13 +1194,15 @@ def main() -> None:
     # 5) Enforce policy
     enforce_policy(analysis, allow, args.fail_on_cycles, args.fail_on_layer_violations)
 
-    if args.verbose:
-        dt = time.time() - t0
-        built = sum(1 for _, c, _, _ in results if not c)
-        cached = sum(1 for _, c, _, _ in results if c)
+    dt = time.time() - t0
+    built = sum(1 for _, c, _, _ in results if not c)
+    cached = sum(1 for _, c, _, _ in results if c)
+    if use_cache:
         print(
-            f"[graphs] done in {dt:.2f}s; per-package built={built} cached={cached}; outputs in {OUT}"
+            f"[graphs] cache summary: per-package built={built} cached={cached}; cache_dir={cache_dir}"
         )
+    if args.verbose:
+        print(f"[graphs] done in {dt:.2f}s; outputs in {OUT}")
 
 
 if __name__ == "__main__":
