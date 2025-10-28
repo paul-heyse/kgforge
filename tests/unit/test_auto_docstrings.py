@@ -6,6 +6,7 @@ import ast
 import importlib.util
 import sys
 from pathlib import Path
+from textwrap import dedent
 
 import pytest
 
@@ -25,6 +26,7 @@ build_examples = auto_docstrings.build_examples
 module_name_for = auto_docstrings.module_name_for
 parameters_for = auto_docstrings.parameters_for
 extended_summary = auto_docstrings.extended_summary
+process_file = auto_docstrings.process_file
 
 
 @pytest.fixture()
@@ -79,8 +81,8 @@ def _get_function(code: str) -> ast.FunctionDef:
 @pytest.mark.parametrize(
     ("name", "expected_fragment"),
     [
-        ("__iter__", "Yield each item"),
-        ("__eq__", "Determine whether"),
+        ("__iter__", "Yield each element"),
+        ("__eq__", "Compare the instance for equality"),
         ("__pydantic_core_schema__", "schema object"),
         ("model_dump", "Serialise the model instance"),
     ],
@@ -136,10 +138,11 @@ def process(item: str, limit: int | None = None) -> str:
 
     params = parameters_for(node)
     returns = annotation_to_text(node.returns)
-    required = _required_sections("function", params, returns, [])
+    markers = _required_sections("function", params, returns, [], node.name)
 
-    for section in required:
-        assert section in docstring
+    assert markers
+    for marker in markers:
+        assert marker in docstring
 
 
 @pytest.mark.parametrize(
@@ -185,3 +188,68 @@ def test_build_docstring_appends_examples(
     emitted_examples = doc_lines[examples_index + 2 : closing_index]
     for line in expected_lines:
         assert line in emitted_examples
+
+
+def test_process_file_preserves_curated_docstring_without_examples(
+    repo_layout: Path,
+) -> None:
+    module = repo_layout / "src" / "pkg" / "curated.py"
+    module.parent.mkdir(parents=True, exist_ok=True)
+    original = (
+        dedent(
+            '''
+            def curated(value: int) -> list[str]:
+                """Return curated values.
+
+                Parameters
+                ----------
+                value : int
+                    Provide rich guidance for the caller.
+
+                Returns
+                -------
+                list[str]
+                    A carefully filtered collection.
+                """
+                return []
+            '''
+        ).strip()
+        + "\n"
+    )
+    module.write_text(original, encoding="utf-8")
+
+    changed = process_file(module)
+
+    updated = module.read_text(encoding="utf-8")
+    assert "Return curated values." in updated
+    assert "Provide rich guidance for the caller." in updated
+    assert "Description for ``value``." not in updated
+
+
+def test_process_file_preserves_docstring_with_list_and_dict_mentions(
+    repo_layout: Path,
+) -> None:
+    module = repo_layout / "src" / "pkg" / "collections_notes.py"
+    module.parent.mkdir(parents=True, exist_ok=True)
+    original = (
+        dedent(
+            '''
+            def describe(records: list[dict[str, str]]) -> None:
+                """Explain how list and dict collections interact.
+
+                The curated docstring references list and dict intentionally and
+                should not be replaced by the fallback generator.
+                """
+                return None
+            '''
+        ).strip()
+        + "\n"
+    )
+    module.write_text(original, encoding="utf-8")
+
+    changed = process_file(module)
+
+    updated = module.read_text(encoding="utf-8")
+    assert "Explain how list and dict collections interact." in updated
+    assert "should not be replaced by the fallback generator." in updated
+    assert "Description for ``records``." not in updated
