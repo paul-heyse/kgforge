@@ -49,6 +49,15 @@ IDENT_RE = re.compile(r"^[A-Za-z_]\w*$")
 PLACEHOLDER_ALL = object()
 
 
+class AllDictTemplate:
+    """Sentinel representing a __all__-driven dict comprehension."""
+
+    __slots__ = ("template",)
+
+    def __init__(self, template: Any) -> None:
+        self.template = template
+
+
 def _literal_eval_navmap(node: ast.AST) -> Any:
     """Literal eval navmap.
 
@@ -88,6 +97,18 @@ def _literal_eval_navmap(node: ast.AST) -> Any:
                 raise ValueError(key)
             result[key] = _literal_eval_navmap(value_node)
         return result
+    if isinstance(node, ast.DictComp):
+        # Only support comprehension of the form {name: TEMPLATE for name in __all__}
+        if len(node.generators) != 1:
+            raise ValueError("unsupported dict comprehension")
+        target = node.generators[0].target
+        iterator = node.generators[0].iter
+        if not isinstance(target, ast.Name) or not isinstance(iterator, ast.Name):
+            raise ValueError("unsupported dict comprehension target")
+        if iterator.id != "__all__":
+            raise ValueError("unsupported dict comprehension iterator")
+        template = _literal_eval_navmap(node.value)
+        return AllDictTemplate(template)
     if isinstance(node, ast.Set):
         return {_literal_eval_navmap(elt) for elt in node.elts}
     raise ValueError(ast.dump(node))
@@ -120,6 +141,18 @@ def _replace_placeholders(value: Any, exports: list[str]) -> Any:
     """
     if value is PLACEHOLDER_ALL:
         return list(dict.fromkeys(exports))
+    if isinstance(value, AllDictTemplate):
+        template = value.template
+        result: dict[str, Any] = {}
+        for name in exports:
+            resolved = _replace_placeholders(template, exports)
+            if isinstance(resolved, dict):
+                # Deep copy template and inject symbol name if applicable
+                cloned = {k: _replace_placeholders(v, exports) for k, v in resolved.items()}
+                result[name] = cloned
+            else:
+                result[name] = resolved
+        return result
     if isinstance(value, list):
         items: list[Any] = []
         for entry in value:
@@ -385,12 +418,6 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
     Mapping[str, Any]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     files = _discover_py_files()
     data: dict[str, Any] = {
         "commit": _git_sha(),
@@ -423,6 +450,12 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
             for name in list(symbols_meta.keys()):
                 for k, v in module_meta.items():
                     symbols_meta[name].setdefault(k, v)
+        if not symbols_meta:
+            for name in info.exports:
+                fields: dict[str, Any] = {}
+                for k, v in module_meta.items():
+                    fields[k] = v
+                symbols_meta[name] = fields
 
         entry = {
             "path": _rel(info.path),

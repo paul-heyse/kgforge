@@ -19,9 +19,9 @@ generation pipeline, explaining every component, tool, and step in the process.
 ## Table of Contents
 
 ### Quick Navigation
-- **[Getting Started](#getting-started)** - TL;DR and prerequisites
 - **[Master Orchestration Script](#master-orchestration-script-toolsupdatedocssh)** - The main entry point
-- **[The Complete Pipeline](#the-complete-documentation-pipeline)** - All 8 documentation stages
+- **[The Complete Pipeline](#the-complete-documentation-pipeline)** - All 14 documentation stages
+- **[Quick Commands](#quick-commands)** - Common commands reference
 
 ### Detailed Sections
 
@@ -97,6 +97,11 @@ generation pipeline, explaining every component, tool, and step in the process.
     - [Docstring Generation: `tools/generate_docstrings.py`](#docstring-generation-toolsgenerate_docstringspy)
     - [NavMap System: `tools/navmap/`](#navmap-system-toolsnavmap)
     - [README Generation: `tools/gen_readmes.py`](#readme-generation-toolsgen_readmespy)
+    - [Example Tests: `pytest --xdoctest`](#example-tests-pytest---xdoctest)
+    - [Test Map Build: `tools/docs/build_test_map.py`](#test-map-build-toolsdocsbuild_test_mappy)
+    - [Observability Scan: `tools/docs/scan_observability.py`](#observability-scan-toolsdocsscan_observabilitypy)
+    - [Schema Export: `tools/docs/export_schemas.py`](#schema-export-toolsdocsexport_schemaspy)
+    - [Graph Build: `tools/docs/build_graphs.py`](#graph-build-toolsdocsbuild_graphspy)
     - [Symbol Index: `docs/_scripts/build_symbol_index.py`](#symbol-index-docs_scriptsbuild_symbol_indexpy)
     - [Package Detection: `tools/detect_pkg.py`](#package-detection-toolsdetect_pkgpy)
 
@@ -1312,6 +1317,228 @@ Kgfoundry Common utilities
 ```
 
 Refer to the contributor guide for badge/link semantics and troubleshooting tips.
+
+### Example Tests: `pytest --xdoctest`
+
+Validates doctest examples in example scripts using the xdoctest plugin.
+
+**Command:** `pytest -q --xdoctest --xdoctest-options=ELLIPSIS,IGNORE_WHITESPACE,NORMALIZE_WHITESPACE --xdoctest-modules --xdoctest-glob='examples/*.py' examples`
+
+**Purpose:**
+- Ensure example scripts remain accurate and executable
+- Validate that examples produce expected output
+- Catch breaking API changes early in the documentation pipeline
+
+**What it does:**
+- Runs xdoctest plugin on all Python files in `examples/`
+- Executes docstring examples within example files
+- Compares actual output to expected output in doctests
+- Allows flexible matching with ellipsis and whitespace normalization
+
+**Options:**
+- `ELLIPSIS`: Allows `...` in expected output to match any substring
+- `IGNORE_WHITESPACE`: Ignores trailing whitespace in comparisons
+- `NORMALIZE_WHITESPACE`: Collapses multiple spaces to single space for comparison
+
+**Exit behavior:**
+- Success (exit 0): All doctest examples pass
+- Failure (exit 1): Any doctest fails, prints traceback and halts documentation build
+
+**Use cases:**
+- CI validation of example accuracy before documentation publication
+- Documentation quality assurance during development
+- API compatibility testing through executable examples
+- User-facing code validation
+
+### Test Map Build: `tools/docs/build_test_map.py`
+
+Generates comprehensive test coverage maps and linting reports for documentation.
+
+**Purpose:**
+- Document which code is tested and which is not
+- Map test functions to source code symbols
+- Generate test coverage metadata for README badges
+- Enforce testing policies through linting
+
+**What it does:**
+- Uses AST parsing to analyze test files in `tests/` directory
+- Loads symbol candidates from `docs/_build/symbols.json`
+- Maps test functions to source symbols using import analysis and name matching
+- Integrates with coverage.json data when available for execution metrics
+- Generates precision windows showing exact test line ranges
+- Produces lint reports for untested public symbols
+
+**Generated artifacts:**
+- `docs/_build/test_map.json` - Complete mapping: `{symbol: [{file, lines[], windows[], reason}]}`
+- `docs/_build/test_map_coverage.json` - Coverage data: `{symbol: {executed, ratio, hit_lines[], contexts[]}}`
+- `docs/_build/test_map_summary.json` - Per-module summaries: `{module: {untested_top10: [...], coverage_ratio_avg: float}}`
+- `docs/_build/test_map_lint.json` - Policy violations: `[{severity, symbol, rule, message, module, file}]`
+
+**Environment variables:**
+- `TESTMAP_WINDOW=3` - Number of lines on either side for precision windows
+- `TESTMAP_FAIL_BUDGET=5` - Maximum allowed untested public symbols before failing
+- `TESTMAP_FAIL_ON_UNTESTED=1` - Exit with code 2 if budget exceeded
+- `TESTMAP_COVERAGE_JSON=docs/_build/coverage.json` - Path to coverage data
+
+**Exit behavior:**
+- Default: Prints counts, writes JSON files, does not fail the build
+- With `TESTMAP_FAIL_ON_UNTESTED=1`: Exits with code 2 if untested symbols exceed budget
+
+**Use cases:**
+- Identify untested code paths for prioritization
+- Document testing strategy and coverage
+- Generate "tested-by" badges for package READMEs
+- Guide new contributors to areas needing tests
+- Track testing progress over time
+- Enforce minimum testing standards via CI
+
+### Observability Scan: `tools/docs/scan_observability.py`
+
+Scans and documents observability instrumentation (logging, metrics, tracing) with policy enforcement.
+
+**Purpose:**
+- Document all logging, metrics, and tracing instrumentation
+- Identify observability patterns and practices
+- Generate comprehensive observability reference documentation
+- Enforce naming conventions and best practices through policy linting
+
+**What it does:**
+- Uses AST parsing to scan source code for observability calls
+- Identifies `logging` module usage with levels and structured keys
+- Detects metrics definitions (counters, gauges, histograms)
+- Maps OpenTelemetry spans and trace attributes
+- Applies policy rules from `docs/policies/observability.yml`
+- Generates editor and GitHub links for each instrumentation point
+
+**Generated artifacts:**
+- `docs/_build/metrics.json` - Metrics catalog: `[{name, type, unit, labels[], file, lineno, call, recommended_aggregation, source_link}]`
+- `docs/_build/log_events.json` - Logging inventory: `[{logger?, level, message_template, structured_keys[], file, lineno, source_link}]`
+- `docs/_build/traces.json` - Span definitions: `[{span_name, attributes[], file, lineno, call, source_link}]`
+- `docs/_build/observability_lint.json` - Policy violations: `[{severity, kind, name, rule, message, file, lineno}]`
+
+**Policy file:**
+- `docs/policies/observability.yml` - Defines naming rules, reserved labels, high-cardinality keys, etc.
+
+**Environment variables:**
+- `OBS_FAIL_ON_LINT=1` - Exit with code 2 if any error-level lint is present
+- `DOCS_LINK_MODE=editor|github|both` - Controls link generation (default: both)
+- `DOCS_GITHUB_ORG` / `DOCS_GITHUB_REPO` / `DOCS_GITHUB_SHA` - For GitHub permalinks
+
+**Exit behavior:**
+- Default: Prints counts, writes JSON files, does not fail the build
+- With `OBS_FAIL_ON_LINT=1`: Exits with code 2 if error-level policy violations exist
+
+**Use cases:**
+- Understand system observability posture
+- Guide operations team on available metrics and spans
+- Document logging best practices and patterns
+- Track observability coverage across codebase
+- Enforce naming conventions and cardinality limits
+- Generate observability reference for runbook documentation
+
+### Schema Export: `tools/docs/export_schemas.py`
+
+Exports Pydantic and Pandera schemas with stable IDs, examples, and drift detection.
+
+**Purpose:**
+- Document API request/response schemas
+- Export Pydantic models as JSON Schema definitions
+- Generate version-stamped, example-rich schema documentation
+- Detect and report schema drift for contract stability
+
+**What it does:**
+- Walks all subpackages in configured top-level packages
+- Discovers Pydantic BaseModel and Pandera schema classes via introspection
+- Generates JSON Schema with `$id`, `$schema`, and canonicalized structure
+- Integrates NavMap metadata for ownership and stability badges
+- Computes content hashes to detect schema drift
+- Writes schemas to `docs/reference/schemas/<module>.<Class>.json`
+
+**Generated artifacts:**
+- `docs/reference/schemas/<module>.<Class>.json` - Canonicalized JSON Schema files
+- `docs/_build/schema_drift.json` - Per-file drift summaries (only when drift exists)
+
+**Command-line options:**
+- `--ref-template '#/$defs/{model}'` - Pydantic $ref template (default is Pydantic's default)
+- `--base-url 'https://kgfoundry/schemas'` - Base URL for $id field
+- `--check-drift` - Do not write; fail (exit 2) if any drift is detected
+- `--by-alias` - Generate schema using field aliases for Pydantic models
+
+**Environment variables:**
+- `SCHEMA_BASE_URL=https://kgfoundry/schemas` - Override base URL for schema $id
+- `DOCS_LINK_MODE=editor|github` - Consistent with pipeline (unused in this tool)
+
+**Exit behavior:**
+- Default: Writes schemas, reports drift to console and JSON
+- With `--check-drift`: Exits with code 2 if any schema has changed
+
+**Use cases:**
+- API documentation for request/response contracts
+- Client library generation from schemas
+- Contract testing and validation
+- Schema version tracking and drift detection
+- Integration documentation for external consumers
+- Automated API compatibility checking in CI
+
+### Graph Build: `tools/docs/build_graphs.py`
+
+Builds dependency graphs (pydeps) and UML diagrams (pyreverse) with policy enforcement and cycle detection.
+
+**Purpose:**
+- Visualize code dependencies and architecture
+- Generate per-package and cross-subsystem dependency graphs
+- Create UML class diagrams
+- Enforce layering policies and detect cycles
+- Cache graphs for fast incremental builds
+
+**What it does:**
+- Runs `pydeps` and `pyreverse` in parallel via ProcessPoolExecutor
+- Generates per-package graphs with caching keyed by git commit
+- Creates global collapsed graph showing cross-package dependencies
+- Applies layer policy rules from `docs/policies/layers.yml`
+- Uses allowlist from `docs/policies/graph_allowlist.json` for permitted violations
+- Detects and enumerates dependency cycles with configurable limits
+- Computes centrality metrics (betweenness, eigenvector) for important modules
+- Renders graphs as SVG/PNG using GraphViz and pydot
+
+**Generated artifacts:**
+- `docs/_build/graphs/<package>_deps.svg` - Per-package dependency graphs
+- `docs/_build/graphs/<package>_classes.svg` - Per-package UML class diagrams
+- `docs/_build/graphs/global_collapsed.svg` - Cross-package dependency overview
+- `docs/_build/graphs/metadata.json` - Graph metadata and statistics
+- `docs/_build/graphs/cycles.json` - Detected dependency cycles
+- `docs/_build/graphs/policy_violations.json` - Layering policy violations
+
+**Command-line options:**
+- `--packages` - Comma-separated packages (default: auto-detect under src/)
+- `--format svg|png` - Output format (default: svg)
+- `--skip-cache` - Force rebuild even if cached
+- `--no-parallel` - Disable parallel builds
+- `--check-policy` - Fail (exit 2) if policy violations exist
+
+**Environment variables:**
+- `DOCS_PKG` - Override package list
+- `GRAPH_FORMAT=svg|png` - Output format
+- `GRAPH_NOISE_LEVEL=50` - Complexity threshold for graph pruning
+- `GRAPH_MAX_MODULE_DEPTH=1` - Maximum module nesting depth
+- `GRAPH_MAX_BACON=4` - Maximum "bacon number" for dependency traversal
+- `GRAPH_CYCLE_LEN=8` - Maximum cycle length to enumerate
+- `GRAPH_CYCLE_LIMIT=50000` - Maximum number of cycles to enumerate
+- `GRAPH_EDGE_BUDGET=50000` - If pruned graph exceeds this, skip cycle enumeration
+- `GRAPH_MAX_WORKERS=16` - Maximum worker threads for parallel builds
+
+**Exit behavior:**
+- Default: Generates graphs, reports violations to console and JSON
+- With `--check-policy`: Exits with code 2 if unapproved policy violations exist
+
+**Use cases:**
+- Understand system architecture at a glance
+- Identify circular dependencies for refactoring
+- Plan modularization and decoupling efforts
+- Onboard new developers with visual architecture
+- Document architectural decisions and boundaries
+- Enforce layering discipline through CI policy checks
+- Track architectural complexity metrics over time
 
 ### Symbol Index: `docs/_scripts/build_symbol_index.py`
 
@@ -2548,6 +2775,13 @@ Complete list of all environment variables that affect documentation generation:
 | `SPHINX_AUTOBUILD_PORT` | `8000` | User | Port for `make watch` live server |
 | `PROJECT_NAME` | `kgfoundry` | User | Project name in docs |
 | `PROJECT_AUTHOR` | `kgfoundry Maintainers` | User | Author name in docs |
+| `GRAPH_NOISE_LEVEL` | `50` | `update_docs.sh` | Graph complexity threshold for build_graphs.py |
+| `GRAPH_MAX_MODULE_DEPTH` | `1` | `update_docs.sh` | Maximum module depth for dependency graphs |
+| `GRAPH_MAX_BACON` | `4` | `update_docs.sh` | Maximum "bacon number" for dependency traversal |
+| `GRAPH_CYCLE_LEN` | `8` | `update_docs.sh` | Maximum cycle length to enumerate |
+| `GRAPH_CYCLE_LIMIT` | `50000` | `update_docs.sh` | Maximum number of cycles to enumerate |
+| `GRAPH_EDGE_BUDGET` | `50000` | `update_docs.sh` | If pruned graph exceeds this, skip cycle enumeration |
+| `GRAPH_MAX_WORKERS` | `16` | `update_docs.sh` | Maximum worker threads for graph analysis |
 
 ### Files Generated by Each Stage
 
@@ -2555,8 +2789,14 @@ Complete list of all environment variables that affect documentation generation:
 |-------|-------------|----------|------|------------|
 | Docstrings | Updated .py files | `src/`, `tools/`, `docs/_scripts/` | Variable | No |
 | READMEs | `README.md` | `src/*/` | 5-50 KB each | No |
+| NavMap Update | Validation report | stdout | N/A | N/A |
 | NavMap Build | `navmap.json` | `site/_build/navmap/` | 10-100 KB | No (generated) |
 | NavMap Check | Validation report | stdout | N/A | N/A |
+| Example Tests | Test results | stdout | N/A | N/A |
+| Test Map Build | `test_map.json` | `docs/_build/` | 50-500 KB | No (generated) |
+| Observability Scan | Observability docs | `docs/_build/observability/` | Variable | No (generated) |
+| Schema Export | JSON Schema files | `docs/_build/schemas/` | 10-100 KB | No (generated) |
+| Graph Build | Graph images, JSON | `docs/_build/graphs/` | 1-10 MB | No (generated) |
 | Sphinx HTML | HTML pages + assets | `docs/_build/html/` | 5-50 MB | No (generated) |
 | Sphinx JSON | `.fjson` files | `docs/_build/json/` | 1-10 MB | No (generated) |
 | Symbol Index | `symbols.json` | `docs/_build/` | 100 KB - 1 MB | No (generated) |
