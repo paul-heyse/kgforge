@@ -1,4 +1,10 @@
-"""Make Importlinter utilities."""
+"""Overview of make importlinter.
+
+This module bundles make importlinter logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -30,31 +36,32 @@ def main(
 ) -> Path:
     """Compute main.
 
-    Carry out the main operation.
-
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
-    root_package : Optional str | None
+    root_package : str | None
         Description for ``root_package``.
-    output_path : Optional Path | None
+    output_path : Path | None
         Description for ``output_path``.
-    root_dir : Optional Path | None
+    root_dir : Path | None
         Description for ``root_dir``.
-    detect : Optional collections.abc.Callable | None
+    detect : Callable[[], str] | None
         Description for ``detect``.
-
+    
     Returns
     -------
     Path
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.make_importlinter import main
-    >>> result = main(..., ..., ..., ...)
+    >>> result = main()
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     detected_root = root_dir or Path(__file__).resolve().parents[1]
     if root_package is None:
         detect_primary = detect or _import_detect_primary

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Validate Sphinx-Gallery example docstrings before documentation builds.
+"""Overview of validate gallery.
 
-The validator enforces the conventions that Sphinx-Gallery relies on to extract
-page titles and generate stable cross-reference anchors. It checks every Python
-module in the ``examples/`` directory and reports actionable error messages when
-the format drifts.
+This module bundles validate gallery logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
+
 
 from __future__ import annotations
 
@@ -47,7 +47,13 @@ __all__ = [
 
 @dataclass
 class ValidationResult:
-    """Holds validation errors collected for an example file."""
+    """Model the ValidationResult.
+
+    Represent the validationresult data structure used throughout the project. The class
+    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+    are typically created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     path: Path
     errors: list[str]
@@ -67,6 +73,7 @@ class ValidationResult:
         >>> from tools.validate_gallery import extend
         >>> extend(...)  # doctest: +ELLIPSIS
         """
+        
         
         self.errors.extend(messages)
 
@@ -89,11 +96,18 @@ class ValidationResult:
         ...
         """
         
+        
         return not self.errors
 
 
 class GalleryValidationError(RuntimeError):
-    """Raised when a gallery example fails validation."""
+    """Model the GalleryValidationError.
+
+    Represent the galleryvalidationerror data structure used throughout the project. The class
+    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+    are typically created by factories or runtime orchestrators documented nearby.
+    """
+    
 
 
 def validate_title_format(docstring: str) -> tuple[bool, str]:
@@ -118,6 +132,7 @@ def validate_title_format(docstring: str) -> tuple[bool, str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     
     lines = [line.rstrip() for line in inspect.cleandoc(docstring).splitlines()]
     while lines and not lines[0].strip():
@@ -168,6 +183,7 @@ def check_orphan_directive(docstring: str) -> bool:
     ...
     """
     
+    
     return ":orphan:" in docstring
 
 
@@ -193,6 +209,7 @@ def check_custom_labels(docstring: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     
     return CUSTOM_LABEL_PATTERN.findall(docstring)
 
@@ -240,10 +257,11 @@ def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]
     Examples
     --------
     >>> from tools.validate_gallery import validate_example_file
-    >>> result = validate_example_file(..., ...)
+    >>> result = validate_example_file(...)
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     
     errors: list[str] = []
     docstring = _load_docstring(file_path)
@@ -307,10 +325,11 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
     Examples
     --------
     >>> from tools.validate_gallery import main
-    >>> result = main(..., ..., ...)
+    >>> result = main(...)
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     
     results: list[ValidationResult] = []
     exit_code = 0

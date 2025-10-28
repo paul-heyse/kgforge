@@ -1,4 +1,10 @@
-"""Errors utilities."""
+"""Overview of errors.
+
+This module bundles errors logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -49,76 +55,142 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DownloadError]
 class DownloadError(Exception):
-    """Describe DownloadError."""
+    """Model the DownloadError.
+
+    Represent the downloaderror data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     ...
 
 
 # [nav:anchor UnsupportedMIMEError]
 class UnsupportedMIMEError(Exception):
-    """Describe UnsupportedMIMEError."""
+    """Model the UnsupportedMIMEError.
+
+    Represent the unsupportedmimeerror data structure used throughout the project. The class
+    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+    are typically created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     ...
 
 
 # [nav:anchor DoclingError]
 class DoclingError(Exception):
-    """Describe DoclingError."""
+    """Model the DoclingError.
+
+    Represent the doclingerror data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     ...
 
 
 # [nav:anchor OCRTimeoutError]
 class OCRTimeoutError(Exception):
-    """Describe OCRTimeoutError."""
+    """Model the OCRTimeoutError.
+
+    Represent the ocrtimeouterror data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     ...
 
 
 # [nav:anchor ChunkingError]
 class ChunkingError(Exception):
-    """Describe ChunkingError."""
+    """Model the ChunkingError.
+
+    Represent the chunkingerror data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     ...
 
 
 # [nav:anchor EmbeddingError]
 class EmbeddingError(Exception):
-    """Describe EmbeddingError."""
+    """Model the EmbeddingError.
+
+    Represent the embeddingerror data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     ...
 
 
 # [nav:anchor SpladeOOMError]
 class SpladeOOMError(Exception):
-    """Describe SpladeOOMError."""
+    """Model the SpladeOOMError.
+
+    Represent the spladeoomerror data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     ...
 
 
 # [nav:anchor IndexBuildError]
 class IndexBuildError(Exception):
-    """Describe IndexBuildError."""
+    """Model the IndexBuildError.
+
+    Represent the indexbuilderror data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     ...
 
 
 # [nav:anchor OntologyParseError]
 class OntologyParseError(Exception):
-    """Describe OntologyParseError."""
+    """Model the OntologyParseError.
+
+    Represent the ontologyparseerror data structure used throughout the project. The class
+    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+    are typically created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     ...
 
 
 # [nav:anchor LinkerCalibrationError]
 class LinkerCalibrationError(Exception):
-    """Describe LinkerCalibrationError."""
+    """Model the LinkerCalibrationError.
+
+    Represent the linkercalibrationerror data structure used throughout the project. The class
+    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+    are typically created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     ...
 
 
 # [nav:anchor Neo4jError]
 class Neo4jError(Exception):
-    """Describe Neo4jError."""
+    """Model the Neo4jError.
+
+    Represent the neo4jerror data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     ...

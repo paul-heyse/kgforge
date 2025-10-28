@@ -1,24 +1,11 @@
 #!/usr/bin/env python3
+"""Overview of scan observability.
+
+This module bundles scan observability logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
-Observability scanner: logs, metrics, traces (+ policy lints).
 
-Outputs (all under docs/_build/):
-  - metrics.json           # [{name, type, unit, labels[], file, lineno, call, recommended_aggregation, source_link{editor,github}}]
-  - log_events.json        # [{logger?, level, message_template, structured_keys[], file, lineno, source_link{...}}]
-  - traces.json            # [{span_name, attributes[], file, lineno, call, source_link{...}}]
-  - observability_lint.json# [{severity, kind, name, rule, message, file, lineno}]
-
-Policy file:
-  docs/policies/observability.yml  # naming rules, reserved labels, high-cardinality keys, etc.
-
-Exit behavior:
-  - default: prints counts and writes JSON files; does not fail the build
-  - OBS_FAIL_ON_LINT=1 -> exit(2) if any error-level lint is present
-
-Environment for links (consistent with your other tools):
-  DOCS_LINK_MODE=editor|github|both (default: both)
-  DOCS_GITHUB_ORG / DOCS_GITHUB_REPO / DOCS_GITHUB_SHA
-"""
 
 from __future__ import annotations
 
@@ -242,6 +229,7 @@ def load_policy() -> dict[str, Any]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
     try:
@@ -258,22 +246,13 @@ def load_policy() -> dict[str, Any]:
 
 @dataclass
 class MetricRow:
-    """Represent MetricRow.
+    """Model the MetricRow.
 
-    Attributes
-    ----------
-    attribute : type
-        Description.
-
-    Methods
-    -------
-    method()
-        Description.
-
-    Examples
-    --------
-    >>> MetricRow(...)
+    Represent the metricrow data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
     """
+    
 
     name: str
     type: str | None
@@ -288,22 +267,13 @@ class MetricRow:
 
 @dataclass
 class LogRow:
-    """Represent LogRow.
+    """Model the LogRow.
 
-    Attributes
-    ----------
-    attribute : type
-        Description.
-
-    Methods
-    -------
-    method()
-        Description.
-
-    Examples
-    --------
-    >>> LogRow(...)
+    Represent the logrow data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
     """
+    
 
     logger: str | None
     level: str
@@ -317,22 +287,13 @@ class LogRow:
 
 @dataclass
 class TraceRow:
-    """Represent TraceRow.
+    """Model the TraceRow.
 
-    Attributes
-    ----------
-    attribute : type
-        Description.
-
-    Methods
-    -------
-    method()
-        Description.
-
-    Examples
-    --------
-    >>> TraceRow(...)
+    Represent the tracerow data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
     """
+    
 
     span_name: str | None
     attributes: list[str]
@@ -723,24 +684,26 @@ def _lint_trace(policy: dict, row: TraceRow) -> list[dict]:
 def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     """Compute read ast.
 
-    Carry out the read ast operation.
-
+    Carry out the read ast operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     Tuple[str, ast.AST | None]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.scan_observability import read_ast
     >>> result = read_ast(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     try:
         text = path.read_text(encoding="utf-8")
     except OSError:
@@ -755,26 +718,28 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
 def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], list[TraceRow]]:
     """Compute scan file.
 
-    Carry out the scan file operation.
-
+    Carry out the scan file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
     policy : collections.abc.Mapping
         Description for ``policy``.
-
+    
     Returns
     -------
     Tuple[List[LogRow], List[MetricRow], List[TraceRow]]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.scan_observability import scan_file
     >>> result = scan_file(..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     text, tree = read_ast(path)
     if not text or tree is None:
         return ([], [], [])
@@ -916,23 +881,16 @@ def _write_config_summary(
 
 
 def main() -> None:
-    """Run the observability scan CLI.
+    """Compute main.
 
-    Returns
-    -------
-    None
-        Description.
-
-
-    Raises
-    ------
-    Exception
-        Description.
-
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Examples
     --------
-    >>> main(...)
+    >>> from tools.docs.scan_observability import main
+    >>> main()  # doctest: +ELLIPSIS
     """
+    
     policy = load_policy()
     if not SRC.exists():
         return

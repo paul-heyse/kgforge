@@ -1,4 +1,10 @@
-"""Migrate utilities."""
+"""Overview of migrate.
+
+This module bundles migrate logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -43,20 +49,21 @@ __navmap__: Final[NavMap] = {
 def apply(db: str, migrations_dir: str) -> None:
     """Compute apply.
 
-    Carry out the apply operation.
-
+    Carry out the apply operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     db : str
         Description for ``db``.
     migrations_dir : str
         Description for ``migrations_dir``.
-
+    
     Examples
     --------
     >>> from registry.migrate import apply
     >>> apply(..., ...)  # doctest: +ELLIPSIS
     """
+    
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
         con.execute(p.read_text())
@@ -67,13 +74,14 @@ def apply(db: str, migrations_dir: str) -> None:
 def main() -> None:
     """Compute main.
 
-    Carry out the main operation.
-
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Examples
     --------
     >>> from registry.migrate import main
     >>> main()  # doctest: +ELLIPSIS
     """
+    
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
     a = sp.add_parser("apply")

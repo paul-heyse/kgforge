@@ -1,21 +1,12 @@
 #!/usr/bin/env python
 #!/usr/bin/env python3
-"""Validate NavMap conformance against policy and perform a round-trip check.
+"""Overview of check navmap.
 
-Enforces:
-- __navmap__ exists when module has exports
-- first section id == 'public-api'
-- section IDs are kebab-case
-- section symbols are valid Python identifiers and have nearby [nav:anchor]
-- per-exported-symbol meta: owner present; stability in {stable,beta,experimental,deprecated}
-- PEP 440 validation for since/deprecated_in; if both present then deprecated_in >= since
-- round-trip: a freshly built JSON matches inline markers (section_lines & anchors)
-
-Exit codes:
-  0 = OK
-  1 = violations found or round-trip mismatch
-  2 = runtime/installation error (e.g., missing dependency)
+This module bundles check navmap logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
+
 
 from __future__ import annotations
 
@@ -42,27 +33,16 @@ class _AllDictTemplate:
     __slots__ = ("template",)
 
     def __init__(self, template: Any) -> None:
-        """Init  .
+        """Compute init.
+
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
 
         Parameters
         ----------
-        template : Any
-            Description.
-
-        Returns
-        -------
-        None
-            Description.
-
-        Raises
-        ------
-        Exception
-            Description.
-
-        Examples
-        --------
-        >>> __init__(...)
+        template : typing.Any
+            Description for ``template``.
         """
+        
         self.template = template
 
 
@@ -382,25 +362,26 @@ def _inspect(py: Path) -> list[str]:
 def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
-    Carry out the main operation.
-
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     argv : List[str] | None
         Description for ``argv``.
-
+    
     Returns
     -------
     int
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.navmap.check_navmap import main
-    >>> result = main(...)
+    >>> result = main()
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     errors: list[str] = []
     for py in sorted(SRC.rglob("*.py")):
         errors.extend(_inspect(py))

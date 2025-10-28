@@ -1,20 +1,11 @@
 #!/usr/bin/env python3
-"""Export Pydantic & Pandera schemas with stable IDs, examples, and drift summaries.
+"""Overview of export schemas.
 
-Outputs:
-  docs/reference/schemas/<module>.<Class>.json     # canonicalized, version-stamped, example-rich
-  docs/_build/schema_drift.json                    # per-file drift summaries (only when drift exists)
-
-CLI:
-  --ref-template '#/$defs/{model}'   # Pydantic $ref template (default is Pydantic's default)
-  --base-url 'https://kgfoundry/schemas'   # base for $id (env SCHEMA_BASE_URL overrides)
-  --check-drift                      # do not write; fail (exit 2) if any drift is detected
-  --by-alias                         # generate schema using field aliases for Pydantic models
-
-Environment:
-  SCHEMA_BASE_URL=https://kgfoundry/schemas
-  DOCS_LINK_MODE=editor|github (unused here, consistent with pipeline)
+This module bundles export schemas logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
+
 
 from __future__ import annotations
 
@@ -99,27 +90,28 @@ def _module_iter() -> Iterable[str]:
 
 
 def is_pydantic_model(obj: object) -> bool:
-    """Is pydantic model.
+    """Compute is pydantic model.
 
+    Carry out the is pydantic model operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     obj : object
-        Description.
-
+        Description for ``obj``.
+    
     Returns
     -------
     bool
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
+        Description of return value.
+    
     Examples
     --------
-    >>> is_pydantic_model(...)
+    >>> from tools.docs.export_schemas import is_pydantic_model
+    >>> result = is_pydantic_model(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     try:
         from pydantic import BaseModel
     except Exception:
@@ -128,27 +120,28 @@ def is_pydantic_model(obj: object) -> bool:
 
 
 def is_pandera_model(obj: object) -> bool:
-    """Is pandera model.
+    """Compute is pandera model.
 
+    Carry out the is pandera model operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     obj : object
-        Description.
-
+        Description for ``obj``.
+    
     Returns
     -------
     bool
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
+        Description of return value.
+    
     Examples
     --------
-    >>> is_pandera_model(...)
+    >>> from tools.docs.export_schemas import is_pandera_model
+    >>> result = is_pandera_model(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     try:
         import pandera as pa
     except Exception:
@@ -374,24 +367,26 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
     def prop_keys(d: dict) -> set[str]:
         """Compute prop keys.
 
-        Carry out the prop keys operation.
-
+        Carry out the prop keys operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         d : collections.abc.Mapping
             Description for ``d``.
-
+        
         Returns
         -------
         collections.abc.Set
             Description of return value.
-
+        
         Examples
         --------
         >>> from tools.docs.export_schemas import prop_keys
         >>> result = prop_keys(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
+        
         props = d.get("properties")
         return set(props.keys()) if isinstance(props, dict) else set()
 
@@ -408,22 +403,13 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
 
 @dataclass
 class Cfg:
-    """Represent Cfg.
+    """Model the Cfg.
 
-    Attributes
-    ----------
-    attribute : type
-        Description.
-
-    Methods
-    -------
-    method()
-        Description.
-
-    Examples
-    --------
-    >>> Cfg(...)
+    Represent the cfg data structure used throughout the project. The class encapsulates behaviour
+    behind a well-defined interface for collaborating components. Instances are typically created by
+    factories or runtime orchestrators documented nearby.
     """
+    
 
     ref_template: str
     base_url: str
@@ -548,24 +534,26 @@ def _iter_models() -> Iterator[tuple[str, str, object]]:
 def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
-    Carry out the main operation.
-
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     argv : List[str] | None
         Description for ``argv``.
-
+    
     Returns
     -------
     int
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.export_schemas import main
-    >>> result = main(...)
+    >>> result = main()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     import argparse
 
     p = argparse.ArgumentParser()

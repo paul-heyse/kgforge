@@ -1,4 +1,10 @@
-"""Embeddings Dense utilities."""
+"""Overview of embeddings dense.
+
+This module bundles embeddings dense logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
+"""
+
 
 from embeddings_dense import base, qwen3
 from kgfoundry_common.navmap_types import NavMap

@@ -1,5 +1,11 @@
 #!/usr/bin/env python
-"""Repair Navmaps utilities."""
+"""Overview of repair navmaps.
+
+This module bundles repair navmaps logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -309,27 +315,28 @@ def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, Any]:
 def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     """Compute repair module.
 
-    Carry out the repair module operation.
-
+    Carry out the repair module operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     info : ModuleInfo
         Description for ``info``.
     apply : bool | None
         Description for ``apply``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.navmap.repair_navmaps import repair_module
-    >>> result = repair_module(..., ...)
+    >>> result = repair_module(...)
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     path = info.path
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
@@ -401,20 +408,20 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
 def repair_all(root: Path, apply: bool) -> list[str]:
     """Compute repair all.
 
-    Carry out the repair all operation.
-
+    Carry out the repair all operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     root : Path
         Description for ``root``.
     apply : bool
         Description for ``apply``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.navmap.repair_navmaps import repair_all
@@ -422,6 +429,7 @@ def repair_all(root: Path, apply: bool) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     messages: list[str] = []
     for info in _collect_modules(root):
         messages.extend(repair_module(info, apply=apply))
@@ -469,25 +477,26 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
-    Carry out the main operation.
-
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     argv : List[str] | None
         Description for ``argv``.
-
+    
     Returns
     -------
     int
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.navmap.repair_navmaps import main
-    >>> result = main(...)
+    >>> result = main()
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     args = _parse_args(argv)
     root = args.root.resolve()
     messages = repair_all(root, apply=args.apply)
