@@ -52,6 +52,12 @@ repos:
         entry: python tools/navmap/build_navmap.py
         language: system
         pass_filenames: false
+      - id: validate-gallery
+        name: Validate gallery examples
+        entry: python tools/validate_gallery.py
+        language: system
+        files: ^examples/.*\.py$
+        pass_filenames: false
       - id: docs-doctest
         name: doctest (xdoctest via pytest)
         entry: bash -lc 'pytest -q --xdoctest --xdoctest-options=ELLIPSIS,IGNORE_WHITESPACE,NORMALIZE_WHITESPACE --xdoctest-modules --xdoctest-glob="examples/*.py" examples'
