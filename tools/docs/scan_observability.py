@@ -58,10 +58,9 @@ def _rel(p: Path) -> str:
 
     Returns
     -------
-
-
     str
         Description.
+
 
     Raises
     ------
@@ -83,10 +82,9 @@ def _sha() -> str:
 
     Returns
     -------
-
-
     str
         Description.
+
 
     Raises
     ------
@@ -121,10 +119,9 @@ def _gh_link(path: Path, start: int | None) -> str | None:
 
     Returns
     -------
-
-
     str | None
         Description.
+
 
     Raises
     ------
@@ -153,10 +150,9 @@ def _editor_link(path: Path, line: int | None) -> str:
 
     Returns
     -------
-
-
     str
         Description.
+
 
     Raises
     ------
@@ -217,11 +213,11 @@ def load_policy() -> dict[str, Any]:
 
     Returns
     -------
-
-
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
     
     
     
@@ -359,10 +355,9 @@ def _keywords_map(node: ast.Call, text: str) -> dict[str, Any]:
 
     Returns
     -------
-
-
     dict[str, Any]
         Description.
+
 
     Raises
     ------
@@ -396,10 +391,9 @@ def _extract_labels_from_kw(kw_map: dict[str, str]) -> list[str]:
 
     Returns
     -------
-
-
     list[str]
         Description.
+
 
     Raises
     ------
@@ -428,10 +422,9 @@ def _infer_unit_from_name(name: str) -> str | None:
 
     Returns
     -------
-
-
     str | None
         Description.
+
 
     Raises
     ------
@@ -459,10 +452,9 @@ def _recommended_aggregation(mtype: str | None) -> str | None:
 
     Returns
     -------
-
-
     str | None
         Description.
+
 
     Raises
     ------
@@ -525,10 +517,9 @@ def _lint_metric(policy: dict, row: MetricRow) -> list[dict]:
 
     Returns
     -------
-
-
     list[dict]
         Description.
+
 
     Raises
     ------
@@ -629,10 +620,9 @@ def _lint_log(policy: dict, row: LogRow) -> list[dict]:
 
     Returns
     -------
-
-
     list[dict]
         Description.
+
 
     Raises
     ------
@@ -671,10 +661,9 @@ def _lint_trace(policy: dict, row: TraceRow) -> list[dict]:
 
     Returns
     -------
-
-
     list[dict]
         Description.
+
 
     Raises
     ------
@@ -717,11 +706,11 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
 
     Returns
     -------
-
-
     Tuple[str, ast.AST | None]
         Description of return value.
     """
+    
+    
     
     
     
@@ -751,11 +740,11 @@ def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], 
 
     Returns
     -------
-
-
     Tuple[List[LogRow], List[MetricRow], List[TraceRow]]
         Description of return value.
     """
+    
+    
     
     
     
@@ -845,10 +834,9 @@ def _links_for(path: Path, lineno: int) -> dict[str, str]:
 
     Returns
     -------
-
-
     dict[str, str]
         Description.
+
 
     Raises
     ------
@@ -874,10 +862,9 @@ def main() -> None:
 
     Returns
     -------
-
-
     None
         Description.
+
 
     Raises
     ------

@@ -90,6 +90,7 @@ def _parse_navmap_dict(py: Path) -> dict[str, Any]:
         -------
         Any
             Description.
+
         Raises
         ------
         Exception
@@ -154,6 +155,7 @@ def _parse_all(py: Path) -> list[str]:
         -------
         list[str] | None
             Description.
+
         Raises
         ------
         Exception
@@ -301,11 +303,11 @@ def main(argv: list[str] | None = None) -> int:
 
     Returns
     -------
-
-
     int
         Description of return value.
     """
+    
+    
     
     
     

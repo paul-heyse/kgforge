@@ -160,6 +160,8 @@ def main(argv: list[str] | None = None) -> int:
     
     
     
+    
+    
     global DELTA_PATH
 
     parser = argparse.ArgumentParser(description=__doc__)

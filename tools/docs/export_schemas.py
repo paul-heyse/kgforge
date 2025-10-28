@@ -46,6 +46,8 @@ def is_pydantic_model(obj: object) -> bool:
     
     
     
+    
+    
     try:
         from pydantic import BaseModel
     except Exception:
@@ -72,6 +74,8 @@ def is_pandera_model(obj: object) -> bool:
     
     
     
+    
+    
     try:
         import pandera as pa
     except Exception:
@@ -92,6 +96,8 @@ def iter_packages() -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
     
     
     
@@ -127,6 +133,8 @@ def export_schema(module_name: str, name: str, obj: object) -> None:
     
     
     
+    
+    
     filename = f"{module_name}.{name}.json"
     path = OUT / filename
     if is_pydantic_model(obj):
@@ -148,6 +156,8 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
     
     
     

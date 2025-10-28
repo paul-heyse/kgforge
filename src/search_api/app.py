@@ -139,6 +139,8 @@ def auth(authorization: str | None = Header(default=None)) -> None:
     
     
     
+    
+    
     if not API_KEYS:
         return  # disabled in skeleton
     if not authorization or not authorization.startswith("Bearer "):
@@ -160,6 +162,8 @@ def healthz() -> dict[str, Any]:
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
     
     
     
@@ -194,6 +198,8 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
     Mapping[str, float]
         Description of return value.
     """
+    
+    
     
     
     
@@ -236,6 +242,8 @@ def apply_kg_boosts(
     
     
     
+    
+    
     q_concepts = set()
     for w in query.lower().split():
         if w.startswith("concept"):
@@ -274,6 +282,8 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
     
     
     
@@ -354,6 +364,8 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
     
     
     

@@ -32,6 +32,8 @@ def parse_args() -> argparse.Namespace:
     
     
     
+    
+    
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--no-todo",
@@ -60,6 +62,8 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
     
     
     
+    
+    
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if (doc := ast.get_docstring(tree, clean=False)) is not None:
@@ -82,6 +86,8 @@ def check_placeholders() -> int:
     int
         Description of return value.
     """
+    
+    
     
     
     
@@ -115,6 +121,8 @@ def main() -> None:
     SystemExit
         Raised when validation fails.
     """
+    
+    
     
     
     

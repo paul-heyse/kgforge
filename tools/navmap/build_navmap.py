@@ -59,10 +59,9 @@ def _literal_eval_navmap(node: ast.AST) -> Any:
 
     Returns
     -------
-
-
     Any
         Description.
+
 
     Raises
     ------
@@ -106,10 +105,9 @@ def _replace_placeholders(value: Any, exports: list[str]) -> Any:
 
     Returns
     -------
-
-
     Any
         Description.
+
 
     Raises
     ------
@@ -215,10 +213,9 @@ def _module_name(py: Path) -> str | None:
 
     Returns
     -------
-
-
     str | None
         Description.
+
 
     Raises
     ------
@@ -385,11 +382,11 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
 
     Returns
     -------
-
-
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
     
     
     
@@ -455,10 +452,9 @@ def main() -> int:
 
     Returns
     -------
-
-
     int
         Description.
+
 
     Raises
     ------

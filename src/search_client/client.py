@@ -48,6 +48,8 @@ class _SupportsResponse(Protocol):
         
         
         
+        
+        
 
     def json(self) -> dict[str, Any]:
         """Compute json.
@@ -59,6 +61,8 @@ class _SupportsResponse(Protocol):
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
         
         
         
@@ -85,6 +89,8 @@ class _SupportsHttp(Protocol):
         src.search_client.client._SupportsResponse
             Description of return value.
         """
+        
+        
         
         
         
@@ -122,6 +128,8 @@ class _SupportsHttp(Protocol):
         
         
         
+        
+        
 
 
 # [nav:anchor KGFoundryClient]
@@ -150,6 +158,8 @@ class KGFoundryClient:
         http : _SupportsHttp | None
             Description for ``http``.
         """
+        
+        
         
         
         
@@ -184,6 +194,8 @@ class KGFoundryClient:
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
         
         
         
@@ -223,6 +235,8 @@ class KGFoundryClient:
         
         
         
+        
+        
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
             f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout
@@ -247,6 +261,8 @@ class KGFoundryClient:
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
         
         
         
