@@ -36,22 +36,26 @@ def iter_packages() -> list[str]:
     List[str]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     packages = detect_packages()
     return packages or [detect_primary()]
 
@@ -69,22 +73,26 @@ def write_node(node: Object) -> None:
     node : Object
         Description for ``node``.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     rel = node.path.replace(".", "/")
     page = out / rel / "index.md"
     with mkdocs_gen_files.open(page, "w") as f:

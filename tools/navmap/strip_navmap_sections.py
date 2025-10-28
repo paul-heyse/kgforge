@@ -25,22 +25,26 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
     Tuple[ast.Module, ast.Expr | None]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if not tree.body:
@@ -70,22 +74,26 @@ def clean_docstring(text: str) -> str:
     str
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     lines: list[str] = []
     for raw in text.splitlines():
         if raw.strip().startswith("NavMap:"):
@@ -110,22 +118,26 @@ def rewrite_module(path: Path) -> bool:
     bool
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     tree, doc_expr = iter_module_nodes(path)
     if doc_expr is None:
         return False
@@ -152,22 +164,26 @@ def main() -> None:
 
     Carry out the main operation.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     changed = 0
     for file_path in sorted(SRC.rglob("*.py")):
         if rewrite_module(file_path):

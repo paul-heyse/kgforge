@@ -122,22 +122,26 @@ def auth(authorization: str | None = Header(default=None)) -> None:
     HTTPException
         Raised when validation fails.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     if not API_KEYS:
         return  # disabled in skeleton
     if not authorization or not authorization.startswith("Bearer "):
@@ -159,22 +163,26 @@ def healthz() -> dict[str, Any]:
     Mapping[str, Any]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     return {
         "status": "ok",
         "components": {
@@ -205,22 +213,26 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
     Mapping[str, float]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     scores: dict[str, float] = {}
     for hits in lists:
         for rank, (doc_id, _score) in enumerate(hits, start=1):
@@ -255,22 +267,26 @@ def apply_kg_boosts(
     Mapping[str, float]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     q_concepts = set()
     for w in query.lower().split():
         if w.startswith("concept"):
@@ -309,22 +325,26 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     Mapping[str, Any]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
     dense_hits: list[tuple[str, float]] = []
@@ -401,22 +421,26 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     Mapping[str, Any]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring
     concepts = [

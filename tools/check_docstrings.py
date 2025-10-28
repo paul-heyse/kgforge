@@ -28,22 +28,26 @@ def parse_args() -> argparse.Namespace:
     argparse.Namespace
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--no-todo",
@@ -68,22 +72,26 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
     Iterable[Tuple[Path, int, str]]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if (doc := ast.get_docstring(tree, clean=False)) is not None:
@@ -106,22 +114,26 @@ def check_placeholders() -> int:
     int
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     errors: list[str] = []
     keywords = {"TODO", "TBD", "FIXME"}
 
@@ -151,22 +163,26 @@ def main() -> None:
     SystemExit
         Raised when validation fails.
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     options = parse_args()
 
     cmd = [

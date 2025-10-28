@@ -1,8 +1,9 @@
 """Download utilities."""
 
-import download.cli as cli
-import download.harvester as harvester
+from download import cli, harvester
 
+# [nav:anchor cli]
+# [nav:anchor harvester]
 from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["cli", "harvester"]
@@ -22,7 +23,15 @@ __navmap__: NavMap = {
         },
     ],
     "symbols": {
-        "cli": {},
-        "harvester": {},
+        "cli": {
+            "stability": "beta",
+            "owner": "@download",
+            "since": "0.1.0",
+        },
+        "harvester": {
+            "stability": "experimental",
+            "owner": "@download",
+            "since": "0.1.0",
+        },
     },
 }
