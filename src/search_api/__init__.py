@@ -1,7 +1,5 @@
 """Search Api utilities."""
 
-from typing import Final
-
 import search_api.app as app
 import search_api.bm25_index as bm25_index
 import search_api.faiss_adapter as faiss_adapter
@@ -26,7 +24,7 @@ __all__ = [
     "splade_index",
 ]
 
-__navmap__: Final[NavMap] = {
+__navmap__: NavMap = {
     "title": "search_api",
     "synopsis": "Search service endpoints and retrieval adapters",
     "exports": __all__,
