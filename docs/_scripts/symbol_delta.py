@@ -137,7 +137,29 @@ def _write_delta(delta: dict[str, Any]) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI entry point."""
+    """Compute main.
+
+    Carry out the main operation.
+
+    Parameters
+    ----------
+    argv : List[str] | None
+        Description for ``argv``.
+
+    Returns
+    -------
+    int
+        Description of return value.
+
+    Raises
+    ------
+    SystemExit
+        Raised when validation fails.
+    """
+    
+    
+    
+    
     global DELTA_PATH
 
     parser = argparse.ArgumentParser(description=__doc__)

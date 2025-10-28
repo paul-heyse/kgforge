@@ -52,7 +52,21 @@ class NavLookup:
 
 
 def iter_packages() -> list[str]:
-    """Return packages to index based on auto-detection or ``DOCS_PKG`` override."""
+    """Compute iter packages.
+
+    Carry out the iter packages operation.
+
+    Returns
+    -------
+
+
+    List[str]
+        Description of return value.
+    """
+    
+    
+    
+    
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     packages = detect_packages()
@@ -60,7 +74,30 @@ def iter_packages() -> list[str]:
 
 
 def safe_attr(node: Object, attr: str, default: object | None = None) -> object | None:
-    """Safely retrieve ``attr`` from ``node`` while swallowing Griffe edge cases."""
+    """Compute safe attr.
+
+    Carry out the safe attr operation.
+
+    Parameters
+    ----------
+    node : Object
+        Description for ``node``.
+    attr : str
+        Description for ``attr``.
+    default : object | None
+        Description for ``default``.
+
+    Returns
+    -------
+
+
+    object | None
+        Description of return value.
+    """
+    
+    
+    
+    
     try:
         return getattr(node, attr)
     except Exception:
@@ -269,6 +306,26 @@ def _collect_rows(nav: NavLookup, test_map: dict[str, Any]) -> list[dict[str, An
     rows: dict[str, dict[str, Any]] = {}
 
     def _walk(node: Object) -> None:
+        """walk.
+
+        Parameters
+        ----------
+        node : Object
+            Description.
+
+        Returns
+        -------
+        None
+            Description.
+        Raises
+        ------
+        Exception
+            Description.
+
+        Examples
+        --------
+        >>> _walk(...)
+        """
         path = getattr(node, "path", None)
         if not isinstance(path, str):
             return
@@ -379,7 +436,21 @@ def _write_json_if_changed(path: Path, data: Any) -> bool:
 
 
 def main() -> int:
-    """Entry point for the symbol index builder."""
+    """Compute main.
+
+    Carry out the main operation.
+
+    Returns
+    -------
+
+
+    int
+        Description of return value.
+    """
+    
+    
+    
+    
     nav_lookup = _load_navmap()
     test_map = _load_test_map()
 

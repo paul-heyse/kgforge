@@ -49,6 +49,29 @@ LINK_MODE = os.getenv("DOCS_LINK_MODE", "both").lower()  # editor|github|both
 
 
 def _rel(p: Path) -> str:
+    """rel.
+
+    Parameters
+    ----------
+    p : Path
+        Description.
+
+    Returns
+    -------
+
+
+    str
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _rel(...)
+    """
     try:
         return str(p.relative_to(ROOT))
     except Exception:
@@ -56,6 +79,24 @@ def _rel(p: Path) -> str:
 
 
 def _sha() -> str:
+    """sha.
+
+    Returns
+    -------
+
+
+    str
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _sha(...)
+    """
     if G_SHA:
         return G_SHA
     try:
@@ -69,6 +110,31 @@ def _sha() -> str:
 
 
 def _gh_link(path: Path, start: int | None) -> str | None:
+    """Gh link.
+
+    Parameters
+    ----------
+    path : Path
+        Description.
+    start : int | None
+        Description.
+
+    Returns
+    -------
+
+
+    str | None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _gh_link(...)
+    """
     if not (G_ORG and G_REPO):
         return None
     frag = f"#L{start}" if start else ""
@@ -76,6 +142,31 @@ def _gh_link(path: Path, start: int | None) -> str | None:
 
 
 def _editor_link(path: Path, line: int | None) -> str:
+    """Editor link.
+
+    Parameters
+    ----------
+    path : Path
+        Description.
+    line : int | None
+        Description.
+
+    Returns
+    -------
+
+
+    str
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _editor_link(...)
+    """
     ln = max(1, int(line or 1))
     return f"vscode://file/{_rel(path)}:{ln}:1"
 
@@ -120,6 +211,21 @@ POLICY_PATH = ROOT / "docs" / "policies" / "observability.yml"
 
 
 def load_policy() -> dict[str, Any]:
+    """Compute load policy.
+
+    Carry out the load policy operation.
+
+    Returns
+    -------
+
+
+    Mapping[str, Any]
+        Description of return value.
+    """
+    
+    
+    
+    
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
     try:
@@ -133,6 +239,22 @@ def load_policy() -> dict[str, Any]:
 
 @dataclass
 class MetricRow:
+    """Represent MetricRow.
+
+    Attributes
+    ----------
+    attribute : type
+        Description.
+
+    Methods
+    -------
+    method()
+        Description.
+
+    Examples
+    --------
+    >>> MetricRow(...)
+    """
     name: str
     type: str | None
     unit: str | None
@@ -146,6 +268,22 @@ class MetricRow:
 
 @dataclass
 class LogRow:
+    """Represent LogRow.
+
+    Attributes
+    ----------
+    attribute : type
+        Description.
+
+    Methods
+    -------
+    method()
+        Description.
+
+    Examples
+    --------
+    >>> LogRow(...)
+    """
     logger: str | None
     level: str
     message_template: str
@@ -158,6 +296,22 @@ class LogRow:
 
 @dataclass
 class TraceRow:
+    """Represent TraceRow.
+
+    Attributes
+    ----------
+    attribute : type
+        Description.
+
+    Methods
+    -------
+    method()
+        Description.
+
+    Examples
+    --------
+    >>> TraceRow(...)
+    """
     span_name: str | None
     attributes: list[str]
     file: str
@@ -194,6 +348,31 @@ def _first_str(node: ast.AST, text: str) -> str | None:
 
 
 def _keywords_map(node: ast.Call, text: str) -> dict[str, Any]:
+    """Keywords map.
+
+    Parameters
+    ----------
+    node : ast.Call
+        Description.
+    text : str
+        Description.
+
+    Returns
+    -------
+
+
+    dict[str, Any]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _keywords_map(...)
+    """
     out = {}
     for kw in node.keywords or []:
         k = kw.arg
@@ -208,6 +387,29 @@ def _keywords_map(node: ast.Call, text: str) -> dict[str, Any]:
 
 
 def _extract_labels_from_kw(kw_map: dict[str, str]) -> list[str]:
+    """Extract labels from kw.
+
+    Parameters
+    ----------
+    kw_map : dict[str, str]
+        Description.
+
+    Returns
+    -------
+
+
+    list[str]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _extract_labels_from_kw(...)
+    """
     # prometheus_client: labelnames=(), namespace/subsystem help omitted here
     # common: labelnames=["method","status"], or .labels("method","status")—we only see construction here
     s = kw_map.get("labelnames") or kw_map.get("label_names") or ""
@@ -217,6 +419,29 @@ def _extract_labels_from_kw(kw_map: dict[str, str]) -> list[str]:
 
 
 def _infer_unit_from_name(name: str) -> str | None:
+    """Infer unit from name.
+
+    Parameters
+    ----------
+    name : str
+        Description.
+
+    Returns
+    -------
+
+
+    str | None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _infer_unit_from_name(...)
+    """
     # Prometheus best-practice: include base unit in metric name (seconds, bytes, meters, grams, joules, volts, amperes, ratio)
     # and counters end with _total. We'll pull the suffix token.
     parts = name.split("_")
@@ -225,6 +450,29 @@ def _infer_unit_from_name(name: str) -> str | None:
 
 
 def _recommended_aggregation(mtype: str | None) -> str | None:
+    """Recommended aggregation.
+
+    Parameters
+    ----------
+    mtype : str | None
+        Description.
+
+    Returns
+    -------
+
+
+    str | None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _recommended_aggregation(...)
+    """
     if mtype == "counter":
         return "rate(sum by (...) (__metric__[5m]))"
     if mtype == "histogram":
@@ -235,8 +483,9 @@ def _recommended_aggregation(mtype: str | None) -> str | None:
 
 
 def _is_structured_logging(call: ast.Call, text: str) -> tuple[list[str], bool]:
-    """
-    Return (structured_keys, is_structured). Structured if kwargs or 'extra={'...'}' carries keys.
+    """Return (structured_keys, is_structured).
+
+    Structured if kwargs or 'extra={'...'}' carries keys.
     Warn if %-format or f-string is used with positional args (unstructured).
     """
     keys: list[str] = []
@@ -265,6 +514,31 @@ def _is_structured_logging(call: ast.Call, text: str) -> tuple[list[str], bool]:
 
 
 def _lint_metric(policy: dict, row: MetricRow) -> list[dict]:
+    """Lint metric.
+
+    Parameters
+    ----------
+    policy : dict
+        Description.
+    row : MetricRow
+        Description.
+
+    Returns
+    -------
+
+
+    list[dict]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _lint_metric(...)
+    """
     errs = []
     name_rx = re.compile(policy["metric"]["name_regex"])
     if not name_rx.match(row.name or ""):
@@ -344,6 +618,31 @@ def _lint_metric(policy: dict, row: MetricRow) -> list[dict]:
 
 
 def _lint_log(policy: dict, row: LogRow) -> list[dict]:
+    """Lint log.
+
+    Parameters
+    ----------
+    policy : dict
+        Description.
+    row : LogRow
+        Description.
+
+    Returns
+    -------
+
+
+    list[dict]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _lint_log(...)
+    """
     errs = []
     if policy["logs"].get("require_structured", True) and not row.structured_keys:
         errs.append(
@@ -361,6 +660,31 @@ def _lint_log(policy: dict, row: LogRow) -> list[dict]:
 
 
 def _lint_trace(policy: dict, row: TraceRow) -> list[dict]:
+    """Lint trace.
+
+    Parameters
+    ----------
+    policy : dict
+        Description.
+    row : TraceRow
+        Description.
+
+    Returns
+    -------
+
+
+    list[dict]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _lint_trace(...)
+    """
     errs = []
     rx = re.compile(policy["traces"]["name_regex"])
     if row.span_name and not rx.match(row.span_name):
@@ -382,6 +706,26 @@ def _lint_trace(policy: dict, row: TraceRow) -> list[dict]:
 
 
 def read_ast(path: Path) -> tuple[str, ast.AST | None]:
+    """Compute read ast.
+
+    Carry out the read ast operation.
+
+    Parameters
+    ----------
+    path : Path
+        Description for ``path``.
+
+    Returns
+    -------
+
+
+    Tuple[str, ast.AST | None]
+        Description of return value.
+    """
+    
+    
+    
+    
     try:
         text = path.read_text(encoding="utf-8")
     except OSError:
@@ -394,6 +738,28 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
 
 
 def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], list[TraceRow]]:
+    """Compute scan file.
+
+    Carry out the scan file operation.
+
+    Parameters
+    ----------
+    path : Path
+        Description for ``path``.
+    policy : Mapping[str, Any]
+        Description for ``policy``.
+
+    Returns
+    -------
+
+
+    Tuple[List[LogRow], List[MetricRow], List[TraceRow]]
+        Description of return value.
+    """
+    
+    
+    
+    
     text, tree = read_ast(path)
     if not text or tree is None:
         return ([], [], [])
@@ -468,6 +834,31 @@ def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], 
 
 
 def _links_for(path: Path, lineno: int) -> dict[str, str]:
+    """Links for.
+
+    Parameters
+    ----------
+    path : Path
+        Description.
+    lineno : int
+        Description.
+
+    Returns
+    -------
+
+
+    dict[str, str]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _links_for(...)
+    """
     out = {}
     if LINK_MODE in {"editor", "both"}:
         out["editor"] = _editor_link(path, lineno)
@@ -479,6 +870,24 @@ def _links_for(path: Path, lineno: int) -> dict[str, str]:
 
 
 def main() -> None:
+    """Main.
+
+    Returns
+    -------
+
+
+    None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> main(...)
+    """
     policy = load_policy()
     if not SRC.exists():
         return
