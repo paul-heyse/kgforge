@@ -1170,6 +1170,12 @@ Two-stage docstring generation for comprehensive coverage.
   - Optional parameter markers for defaults
   - Return type documentation
 - Logs touched files to `site/_build/docstrings/fallback.log`
+- Preservation rules: the fallback now only overwrites docstrings that still
+  contain its placeholder phrases (for example the "Carry out the …
+  operation." extended summary or "Description for ``param``." entries).
+  Custom narratives—even those without an ``Examples`` block or that discuss
+  ``list``/``dict`` types—remain untouched as long as those boilerplate lines
+  are replaced with hand-written content.
 
 **Why two stages?**
 - doq is faster and more comprehensive for standard functions
