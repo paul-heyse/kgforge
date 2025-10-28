@@ -1605,16 +1605,19 @@ def process_file(path: Path) -> bool:
         raises: list[str] = []
         if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             parameters = parameters_for(node)
-            return_annotation = annotation_to_text(node.returns)
+            return_annotation: str = annotation_to_text(node.returns)
             if return_annotation not in {"None", "NoReturn"}:
                 returns = return_annotation
             raises = detect_raises(node)
 
         required_sections = _required_sections(kind, parameters, returns, raises)
         needs_update = doc is None or "TODO" in (doc or "") or "NavMap:" in (doc or "")
-        if not needs_update and required_sections and doc is not None:
-            needs_update = not all(section in doc for section in required_sections)
-        if not needs_update and doc is not None:
+        if not needs_update and required_sections:
+            if doc is None:
+                needs_update = True
+            else:
+                needs_update = not all(section in doc for section in required_sections)
+        if not needs_update and doc:
             lower_markers = (" list[", " tuple[", " set[", " dict[", " list ", " dict ")
             if any(marker in doc for marker in lower_markers):
                 needs_update = True
@@ -1638,13 +1641,19 @@ def process_file(path: Path) -> bool:
             insert_at = 1 if lines and lines[0].startswith("#!") else 0
             replace(expr, lines, new_lines, indent, insert_at)
         else:
-            col_offset = getattr(node, "col_offset", 0)
-            indent = " " * (int(col_offset) + 4)
+            if not isinstance(
+                node,
+                (
+                    ast.FunctionDef,
+                    ast.AsyncFunctionDef,
+                    ast.ClassDef,
+                ),
+            ):
+                continue
+            indent = " " * (node.col_offset + 4)
             new_lines = build_docstring(kind, node, module_name)
-            body = getattr(node, "body", [])
-            anchor = body[0] if body else node
-            lineno = getattr(anchor, "lineno", 0)
-            insert_at = max(int(lineno) - 1, 0)
+            body: list[ast.stmt] = node.body
+            insert_at = body[0].lineno - 1 if body else node.lineno
             replace(expr, lines, new_lines, indent, insert_at)
         changed = True
 

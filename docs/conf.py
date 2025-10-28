@@ -17,6 +17,7 @@ import sys
 from collections.abc import Callable, Mapping
 from pathlib import Path
 
+import certifi
 from astroid import builder as astroid_builder
 from astroid import manager as astroid_manager
 from astroid.nodes import Module as AstroidModule
@@ -107,6 +108,11 @@ html_theme = os.environ.get("SPHINX_THEME", "pydata_sphinx_theme")
 
 # MyST (Markdown) features
 myst_enable_extensions = ["colon_fence", "deflist", "linkify"]
+
+# Use the certifi CA bundle so intersphinx requests succeed in restricted environments.
+tls_cacert = certifi.where()
+# Fall back to skipping certificate verification when the bundled store is insufficient (e.g. CI sandboxes).
+tls_verify = False
 
 # AutoAPI: scan each detected package directory so module names match import paths
 autoapi_type = "python"

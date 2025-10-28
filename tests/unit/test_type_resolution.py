@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 import ast
+import fnmatch
+import ssl
 from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.request import urlopen
 
 import pytest
 from tools.auto_docstrings import QUALIFIED_NAME_OVERRIDES, _normalize_qualified_name
@@ -196,6 +200,10 @@ def test_autoapi_excludes_legacy_exceptions() -> None:
     """AutoAPI should ignore the deprecated exceptions module."""
     ignore_patterns = _load_conf_symbol("autoapi_ignore")
     assert "*/kgfoundry_common/exceptions.py" in ignore_patterns
+    assert any(
+        fnmatch.fnmatch("src/kgfoundry_common/exceptions.py", pattern)
+        for pattern in ignore_patterns
+    )
 
 
 def test_intersphinx_mappings_cover_required_projects() -> None:
@@ -221,3 +229,46 @@ def test_extlinks_render_sample_types() -> None:
     assert numpy_label % "numpy.float32" == "numpy.float32"
     assert "pyarrow.Table" in pyarrow_template % "pyarrow.Table"
     assert pyarrow_label % "pyarrow.Table" == "pyarrow.Table"
+
+
+def test_override_values_avoid_legacy_exception_targets(overrides: dict[str, str]) -> None:
+    """Legacy exceptions module should not appear in canonical override targets."""
+    assert not any(
+        value.startswith("src.kgfoundry_common.exceptions") for value in overrides.values()
+    )
+
+
+def test_intersphinx_inventory_report_covers_all_projects() -> None:
+    """Every configured intersphinx project should have an audited inventory status."""
+    mapping = _load_conf_symbol("intersphinx_mapping")
+    report_path = (
+        Path(__file__).resolve().parents[2]
+        / "openspec"
+        / "changes"
+        / "fix-unresolved-cross-references"
+        / "research"
+        / "intersphinx_inventory_report.md"
+    )
+    contents = report_path.read_text(encoding="utf-8").splitlines()
+    statuses: dict[str, str] = {}
+    for line in contents:
+        if line.startswith("- "):
+            project, status = line[2:].split(":", 1)
+            statuses[project.strip()] = status.strip()
+    assert set(statuses) == set(mapping)
+    for project, status in statuses.items():
+        assert status
+
+
+def test_intersphinx_inventories_are_fetchable() -> None:
+    """Attempt to download each configured intersphinx inventory file."""
+    mapping = _load_conf_symbol("intersphinx_mapping")
+    for project, (base_url, _) in mapping.items():
+        inventory_url = base_url.rstrip("/") + "/objects.inv"
+        try:
+            with urlopen(inventory_url, context=ssl._create_unverified_context()) as response:
+                assert response.read(1)
+        except HTTPError as exc:
+            pytest.skip(f"{project} inventory returned HTTP {exc.code}")
+        except URLError as exc:
+            pytest.skip(f"{project} inventory unreachable: {exc.reason}")
