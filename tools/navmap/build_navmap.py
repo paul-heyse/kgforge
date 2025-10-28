@@ -30,6 +30,7 @@ G_ORG = os.getenv("DOCS_GITHUB_ORG")
 G_REPO = os.getenv("DOCS_GITHUB_REPO")
 G_SHA = os.getenv("DOCS_GITHUB_SHA")
 LINK_MODE = os.getenv("DOCS_LINK_MODE", "editor").lower()  # editor|github|both
+EDITOR_MODE = os.getenv("DOCS_EDITOR", "vscode").lower()
 
 SECTION_RE = re.compile(r"^\s*#\s*\[nav:section\s+([a-z0-9]+(?:-[a-z0-9]+)*)\]\s*$")
 ANCHOR_RE = re.compile(r"^\s*#\s*\[nav:anchor\s+([A-Za-z_]\w*)\]\s*$")
@@ -231,6 +232,23 @@ def _gh_link(path: Path, start: int | None, end: int | None) -> str | None:
     elif start:
         frag = f"#L{start}"
     return f"https://github.com/{G_ORG}/{G_REPO}/blob/{sha}/{_rel(path)}{frag}"
+
+
+def _editor_link(path: Path, line: int | None = None) -> str | None:
+    """Build an editor deep link respecting ``DOCS_EDITOR`` mode."""
+
+    if EDITOR_MODE == "relative":
+        try:
+            rel_path = path.relative_to(REPO).as_posix()
+        except ValueError:
+            rel_path = path.as_posix()
+        suffix = f":{line}:1" if line else ""
+        return f"./{rel_path}{suffix}"
+    if EDITOR_MODE == "vscode":
+        abs_path = path if path.is_absolute() else (REPO / path).resolve()
+        suffix = f":{line}:1" if line else ""
+        return f"vscode://file/{abs_path}{suffix}"
+    return None
 
 
 def _module_name(py: Path) -> str | None:
@@ -437,9 +455,15 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
             continue
 
         # Build link bundle
-        links = {"source": f"vscode://file/{_rel(info.path)}"}  # VS Code URL scheme
+        links: dict[str, str] = {}
+        if LINK_MODE in ("editor", "both"):
+            editor_link = _editor_link(info.path)
+            if editor_link:
+                links["source"] = editor_link
         if LINK_MODE in ("github", "both"):
-            links["github"] = _gh_link(info.path, None, None)
+            gh_link = _gh_link(info.path, None, None)
+            if gh_link:
+                links["github"] = gh_link
 
         # Per-symbol meta with module defaults inherited
         module_meta = {
