@@ -778,6 +778,8 @@ def build_one_package(
         bucket = None
 
     # Build fresh
+    imports_out.unlink(missing_ok=True)
+    uml_out.unlink(missing_ok=True)
     try:
         build_pydeps_for_package(pkg, imports_out, excludes, max_bacon, fmt)
     except Exception:
@@ -794,6 +796,9 @@ def build_one_package(
         shutil.copy2(uml_out, bucket / uml_out.name)
         if verbose:
             print(f"[graphs] cached: {pkg}@{tree_h[:7]}")
+    elif not (pydeps_ok and pyrev_ok):
+        imports_out.unlink(missing_ok=True)
+        uml_out.unlink(missing_ok=True)
 
     return (pkg, used_cache, pydeps_ok, pyrev_ok)
 
@@ -883,6 +888,23 @@ def main() -> None:
                 print(
                     f"[graphs] {pkg}: {src}; pydeps={'ok' if ok1 else 'FAIL'}; pyreverse={'ok' if ok2 else 'FAIL'}"
                 )
+
+    failures: list[str] = []
+    for pkg, _, ok1, ok2 in results:
+        reasons: list[str] = []
+        if not ok1:
+            reasons.append("pydeps")
+        if not ok2:
+            reasons.append("pyreverse")
+        if reasons:
+            failures.append(f"{pkg} ({', '.join(reasons)})")
+
+    if failures:
+        print(
+            f"[graphs] per-package build failures: {', '.join(sorted(failures))}",
+            file=sys.stderr,
+        )
+        sys.exit(3)
 
     # 2) Global collapsed graph (subsystems)
     dot_all = OUT / "subsystems.dot"
