@@ -207,27 +207,44 @@ DEFAULT_POLICY = {
 POLICY_PATH = ROOT / "docs" / "policies" / "observability.yml"
 
 
-def load_policy() -> dict[str, Any]:
-    """Compute load policy.
+def _deep_merge_dicts(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
+    """Return a deep merge of ``override`` into ``base`` without mutating either mapping."""
 
-    Carry out the load policy operation.
+    merged: dict[str, Any] = {}
+    for key, base_value in base.items():
+        if key in override:
+            override_value = override[key]
+            if isinstance(base_value, dict) and isinstance(override_value, dict):
+                merged[key] = _deep_merge_dicts(base_value, override_value)
+            else:
+                merged[key] = override_value
+        else:
+            merged[key] = base_value
+    for key, override_value in override.items():
+        if key not in base:
+            merged[key] = override_value
+    return merged
+
+
+def load_policy() -> dict[str, Any]:
+    """Load the observability policy, deep-merging overrides into the defaults.
+
+    The YAML file at :data:`POLICY_PATH` is optional. When present, only the fields provided in
+    the file need to be specified because nested mappings are merged recursively with
+    :data:`DEFAULT_POLICY`.
 
     Returns
     -------
-    collections.abc.Mapping
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.docs.scan_observability import load_policy
-    >>> result = load_policy()
-    >>> result  # doctest: +ELLIPSIS
-    ...
+    dict[str, Any]
+        The policy mapping with overrides applied.
     """
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
     try:
-        return {**DEFAULT_POLICY, **(yaml.safe_load(POLICY_PATH.read_text()) or {})}
+        overrides = yaml.safe_load(POLICY_PATH.read_text()) or {}
+        if not isinstance(overrides, dict):
+            return DEFAULT_POLICY
+        return _deep_merge_dicts(DEFAULT_POLICY, overrides)
     except Exception:
         return DEFAULT_POLICY
 
@@ -719,7 +736,6 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     >>> from tools.docs.scan_observability import read_ast
     >>> result = read_ast(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         text = path.read_text(encoding="utf-8")
@@ -754,7 +770,6 @@ def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], 
     >>> from tools.docs.scan_observability import scan_file
     >>> result = scan_file(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     text, tree = read_ast(path)
     if not text or tree is None:
