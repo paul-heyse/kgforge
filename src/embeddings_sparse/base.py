@@ -60,14 +60,14 @@ class SparseEncoder(Protocol):
         -------
         List[Tuple[List[int], List[float]]]
             Description of return value.
+
+        Examples
+        --------
+        >>> from embeddings_sparse.base import encode
+        >>> result = encode(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         ...
 
 
@@ -82,16 +82,14 @@ class SparseIndex(Protocol):
 
         Parameters
         ----------
-        docs_iterable : Iterable[Tuple[str, dict[str, str]]]
+        docs_iterable : collections.abc.Iterable
             Description for ``docs_iterable``.
+
+        Examples
+        --------
+        >>> from embeddings_sparse.base import build
+        >>> build(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         ...
 
     def search(
@@ -114,12 +112,12 @@ class SparseIndex(Protocol):
         -------
         List[Tuple[str, float]]
             Description of return value.
+
+        Examples
+        --------
+        >>> from embeddings_sparse.base import search
+        >>> result = search(..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         ...

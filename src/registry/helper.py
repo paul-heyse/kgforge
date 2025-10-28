@@ -54,13 +54,6 @@ class DuckDBRegistryHelper:
         db_path : str
             Description for ``db_path``.
         """
-        
-        
-        
-        
-        
-        
-        
         self.db_path = db_path
 
     def _con(self) -> duckdb.DuckDBPyConnection:
@@ -94,21 +87,21 @@ class DuckDBRegistryHelper:
             Description for ``model_id``.
         revision : str | None
             Description for ``revision``.
-        config : Mapping[str, object]
+        config : collections.abc.Mapping
             Description for ``config``.
 
         Returns
         -------
         str
             Description of return value.
+
+        Examples
+        --------
+        >>> from registry.helper import new_run
+        >>> result = new_run(..., ..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         run_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -135,14 +128,12 @@ class DuckDBRegistryHelper:
             Description for ``success``.
         notes : str | None
             Description for ``notes``.
+
+        Examples
+        --------
+        >>> from registry.helper import close_run
+        >>> close_run(..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         con = self._con()
         con.execute("UPDATE runs SET finished_at=CURRENT_TIMESTAMP WHERE run_id=?", [run_id])
         con.execute(
@@ -172,14 +163,14 @@ class DuckDBRegistryHelper:
         -------
         str
             Description of return value.
+
+        Examples
+        --------
+        >>> from registry.helper import begin_dataset
+        >>> result = begin_dataset(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         dataset_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -206,14 +197,12 @@ class DuckDBRegistryHelper:
             Description for ``parquet_root``.
         rows : int
             Description for ``rows``.
+
+        Examples
+        --------
+        >>> from registry.helper import commit_dataset
+        >>> commit_dataset(..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         con = self._con()
         con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
@@ -238,14 +227,12 @@ class DuckDBRegistryHelper:
         ----------
         dataset_id : str
             Description for ``dataset_id``.
+
+        Examples
+        --------
+        >>> from registry.helper import rollback_dataset
+        >>> rollback_dataset(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         con = self._con()
         con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
         con.execute(
@@ -261,16 +248,14 @@ class DuckDBRegistryHelper:
 
         Parameters
         ----------
-        docs : List[Doc]
+        docs : List[src.kgfoundry_common.models.Doc]
             Description for ``docs``.
+
+        Examples
+        --------
+        >>> from registry.helper import register_documents
+        >>> register_documents(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         con = self._con()
         for doc in docs:
             con.execute(
@@ -303,16 +288,14 @@ class DuckDBRegistryHelper:
 
         Parameters
         ----------
-        assets : List[DoctagsAsset]
+        assets : List[src.kgfoundry_common.models.DoctagsAsset]
             Description for ``assets``.
+
+        Examples
+        --------
+        >>> from registry.helper import register_doctags
+        >>> register_doctags(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         con = self._con()
         for asset in assets:
             con.execute(
@@ -339,16 +322,14 @@ class DuckDBRegistryHelper:
             Description for ``event_name``.
         subject_id : str
             Description for ``subject_id``.
-        payload : Mapping[str, object]
+        payload : collections.abc.Mapping
             Description for ``payload``.
+
+        Examples
+        --------
+        >>> from registry.helper import emit_event
+        >>> emit_event(..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         con = self._con()
         con.execute(
             "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",

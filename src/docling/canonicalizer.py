@@ -51,15 +51,15 @@ def canonicalize_text(blocks: list[str]) -> str:
     -------
     str
         Description of return value.
+
+    Examples
+    --------
+    >>> from docling.canonicalizer import canonicalize_text
+    >>> result = canonicalize_text(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
-    
+
     def norm(s: str) -> str:
         """Compute norm.
 
@@ -74,14 +74,14 @@ def canonicalize_text(blocks: list[str]) -> str:
         -------
         str
             Description of return value.
+
+        Examples
+        --------
+        >>> from docling.canonicalizer import norm
+        >>> result = norm(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         s = unicodedata.normalize("NFC", s)
         s = s.replace("\r\n", "\n").replace("\r", "\n")
         s = re.sub(r"[\u2022\u25E6\u2013]", "-", s)  # bullets/dashes

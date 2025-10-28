@@ -60,14 +60,14 @@ def iter_packages() -> list[str]:
     -------
     List[str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from docs._scripts.build_symbol_index import iter_packages
+    >>> result = iter_packages()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     packages = detect_packages()
@@ -92,14 +92,14 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
     -------
     object | None
         Description of return value.
+
+    Examples
+    --------
+    >>> from docs._scripts.build_symbol_index import safe_attr
+    >>> result = safe_attr(..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     try:
         return getattr(node, attr)
     except Exception:
@@ -447,14 +447,14 @@ def main() -> int:
     -------
     int
         Description of return value.
+
+    Examples
+    --------
+    >>> from docs._scripts.build_symbol_index import main
+    >>> result = main()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     nav_lookup = _load_navmap()
     test_map = _load_test_map()
 

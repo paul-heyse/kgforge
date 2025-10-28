@@ -1,9 +1,10 @@
 # Data Contract Schemas
 
-```{toctree}
-:maxdepth: 1
-:glob:
+```{eval-rst}
+.. toctree::
+   :maxdepth: 1
+   :glob:
 
-*.json
+   *.json
 ```
 

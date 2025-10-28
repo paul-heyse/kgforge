@@ -43,13 +43,6 @@ class MockKG:
 
         Initialise a new instance with validated parameters.
         """
-        
-        
-        
-        
-        
-        
-        
         self.chunk2concepts: dict[str, set[str]] = {}
         self.neighbors: dict[str, set[str]] = {}
 
@@ -64,14 +57,12 @@ class MockKG:
             Description for ``chunk_id``.
         concept_id : str
             Description for ``concept_id``.
+
+        Examples
+        --------
+        >>> from kg_builder.mock_kg import add_mention
+        >>> add_mention(..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         self.chunk2concepts.setdefault(chunk_id, set()).add(concept_id)
 
     def add_edge(self, a: str, b: str) -> None:
@@ -85,14 +76,12 @@ class MockKG:
             Description for ``a``.
         b : str
             Description for ``b``.
+
+        Examples
+        --------
+        >>> from kg_builder.mock_kg import add_edge
+        >>> add_edge(..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         self.neighbors.setdefault(a, set()).add(b)
         self.neighbors.setdefault(b, set()).add(a)
 
@@ -110,14 +99,14 @@ class MockKG:
         -------
         List[str]
             Description of return value.
+
+        Examples
+        --------
+        >>> from kg_builder.mock_kg import linked_concepts
+        >>> result = linked_concepts(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         return sorted(self.chunk2concepts.get(chunk_id, set()))
 
     def one_hop(self, concept_id: str) -> list[str]:
@@ -134,12 +123,12 @@ class MockKG:
         -------
         List[str]
             Description of return value.
+
+        Examples
+        --------
+        >>> from kg_builder.mock_kg import one_hop
+        >>> result = one_hop(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         return sorted(self.neighbors.get(concept_id, set()))

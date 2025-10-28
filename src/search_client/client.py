@@ -43,36 +43,30 @@ class _SupportsResponse(Protocol):
         """Compute raise for status.
 
         Carry out the raise for status operation.
+
+        Examples
+        --------
+        >>> from search_client.client import raise_for_status
+        >>> raise_for_status()  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
-        
-        
 
     def json(self) -> dict[str, Any]:
         """Compute json.
 
-        Carry out the json operation.
+        Serialise the model into a JSON string.
 
         Returns
         -------
-        Mapping[str, Any]
+        collections.abc.Mapping
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_client.client import json
+        >>> result = json()
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
-        
-        
 
 
 class _SupportsHttp(Protocol):
@@ -94,16 +88,14 @@ class _SupportsHttp(Protocol):
         -------
         src.search_client.client._SupportsResponse
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_client.client import get
+        >>> result = get(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
-        
-        
 
     def post(
         self,
@@ -121,9 +113,9 @@ class _SupportsHttp(Protocol):
         ----------
         url : str
             Description for ``url``.
-        json : Mapping[str, Any]
+        json : collections.abc.Mapping
             Description for ``json``.
-        headers : Mapping[str, str]
+        headers : collections.abc.Mapping
             Description for ``headers``.
         timeout : float
             Description for ``timeout``.
@@ -132,16 +124,14 @@ class _SupportsHttp(Protocol):
         -------
         src.search_client.client._SupportsResponse
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_client.client import post
+        >>> result = post(..., ..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
-        
-        
 
 
 # [nav:anchor KGFoundryClient]
@@ -170,13 +160,6 @@ class KGFoundryClient:
         http : _SupportsHttp | None
             Description for ``http``.
         """
-        
-        
-        
-        
-        
-        
-        
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
@@ -204,16 +187,16 @@ class KGFoundryClient:
 
         Returns
         -------
-        Mapping[str, Any]
+        collections.abc.Mapping
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_client.client import healthz
+        >>> result = healthz()
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
         return r.json()
@@ -242,16 +225,16 @@ class KGFoundryClient:
 
         Returns
         -------
-        Mapping[str, Any]
+        collections.abc.Mapping
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_client.client import search
+        >>> result = search(..., ..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
             f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout
@@ -273,16 +256,16 @@ class KGFoundryClient:
 
         Returns
         -------
-        Mapping[str, Any]
+        collections.abc.Mapping
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_client.client import concepts
+        >>> result = concepts(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         r = self._http.post(
             f"{self.base_url}/graph/concepts",
             json={"q": q, "limit": limit},

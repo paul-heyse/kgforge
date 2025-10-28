@@ -1,6 +1,6 @@
 """.. _gallery_search_smoke:
 
-Search — tiny corpus smoke (no GPU)
+Search — tiny corpus smoke (no GPU).
 ===================================
 
 Exercise the bundled tiny corpus utilities without requiring accelerators.

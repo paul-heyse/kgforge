@@ -374,20 +374,21 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
 
         Parameters
         ----------
-        d : Mapping[str, Any]
+        d : collections.abc.Mapping
             Description for ``d``.
 
         Returns
         -------
-        Set[str]
+        collections.abc.Set
             Description of return value.
+
+        Examples
+        --------
+        >>> from tools.docs.export_schemas import prop_keys
+        >>> result = prop_keys(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
         props = d.get("properties")
         return set(props.keys()) if isinstance(props, dict) else set()
 
@@ -555,13 +556,14 @@ def main(argv: list[str] | None = None) -> int:
     -------
     int
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.export_schemas import main
+    >>> result = main(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
     import argparse
 
     p = argparse.ArgumentParser()

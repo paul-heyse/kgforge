@@ -23,14 +23,14 @@ def module_name(path: Path) -> str:
     -------
     str
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.add_module_docstrings import module_name
+    >>> result = module_name(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     rel = path.relative_to(SRC).with_suffix("")
     parts = list(rel.parts)
     if parts and parts[-1] == "__init__":
@@ -52,14 +52,14 @@ def needs_docstring(text: str) -> bool:
     -------
     bool
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.add_module_docstrings import needs_docstring
+    >>> result = needs_docstring(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     try:
         tree = ast.parse(text)
     except SyntaxError:
@@ -81,14 +81,14 @@ def insert_docstring(path: Path) -> bool:
     -------
     bool
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.add_module_docstrings import insert_docstring
+    >>> result = insert_docstring(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     text = path.read_text()
     if not needs_docstring(text):
         return False
@@ -109,14 +109,12 @@ def main() -> None:
     """Compute main.
 
     Carry out the main operation.
+
+    Examples
+    --------
+    >>> from tools.add_module_docstrings import main
+    >>> main()  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     for path in SRC.rglob("*.py"):
         insert_docstring(path)
 

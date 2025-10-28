@@ -439,16 +439,16 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
 
     Returns
     -------
-    Mapping[str, Any]
+    collections.abc.Mapping
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.navmap.build_navmap import build_index
+    >>> result = build_index(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     files = _discover_py_files()
     data: dict[str, Any] = {
         "commit": _git_sha(),

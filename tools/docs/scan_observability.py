@@ -214,16 +214,16 @@ def load_policy() -> dict[str, Any]:
 
     Returns
     -------
-    Mapping[str, Any]
+    collections.abc.Mapping
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.scan_observability import load_policy
+    >>> result = load_policy()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
     try:
@@ -713,14 +713,14 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     -------
     Tuple[str, ast.AST | None]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.scan_observability import read_ast
+    >>> result = read_ast(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     try:
         text = path.read_text(encoding="utf-8")
     except OSError:
@@ -741,21 +741,21 @@ def scan_file(path: Path, policy: dict) -> tuple[list[LogRow], list[MetricRow], 
     ----------
     path : Path
         Description for ``path``.
-    policy : Mapping[str, Any]
+    policy : collections.abc.Mapping
         Description for ``policy``.
 
     Returns
     -------
     Tuple[List[LogRow], List[MetricRow], List[TraceRow]]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.scan_observability import scan_file
+    >>> result = scan_file(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     text, tree = read_ast(path)
     if not text or tree is None:
         return ([], [], [])
@@ -868,7 +868,6 @@ def _write_config_summary(
     metrics: list[MetricRow], logs: list[LogRow], traces: list[TraceRow]
 ) -> None:
     """Emit a Markdown summary that Sphinx includes in observability docs."""
-
     if not metrics and not logs and not traces:
         CONFIG_MD.write_text(
             "No observability instrumentation detected for this repository.\n",
@@ -891,9 +890,7 @@ def _write_config_summary(
         lines.append("")
     if traces:
         lines.append("## Traces")
-        lines.append(
-            f"Detected {len(traces)} span definition(s); see `docs/_build/traces.json`."
-        )
+        lines.append(f"Detected {len(traces)} span definition(s); see `docs/_build/traces.json`.")
         lines.append("")
 
     CONFIG_MD.write_text("\n".join(lines), encoding="utf-8")
@@ -906,13 +903,13 @@ def main() -> None:
     -------
     None
         Description.
-    
-    
+
+
     Raises
     ------
     Exception
         Description.
-    
+
     Examples
     --------
     >>> main(...)

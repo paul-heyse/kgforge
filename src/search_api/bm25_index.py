@@ -60,14 +60,14 @@ def toks(text: str) -> list[str]:
     -------
     List[str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from search_api.bm25_index import toks
+    >>> result = toks(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -100,13 +100,6 @@ class BM25Index:
         b : float | None
             Description for ``b``.
         """
-        
-        
-        
-        
-        
-        
-        
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -129,14 +122,14 @@ class BM25Index:
         -------
         BM25Index
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_api.bm25_index import build_from_duckdb
+        >>> result = build_from_duckdb(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         index = cls()
         con = duckdb.connect(db_path)
         try:
@@ -206,14 +199,12 @@ class BM25Index:
         ----------
         path : str
             Description for ``path``.
+
+        Examples
+        --------
+        >>> from search_api.bm25_index import save
+        >>> save(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as handle:
             pickle.dump(
@@ -243,14 +234,14 @@ class BM25Index:
         -------
         BM25Index
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_api.bm25_index import load
+        >>> result = load(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         with open(path, "rb") as handle:
             payload = pickle.load(handle)
         index = cls(payload.get("k1", 0.9), payload.get("b", 0.4))
@@ -296,14 +287,14 @@ class BM25Index:
         -------
         List[Tuple[int, float]]
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_api.bm25_index import search
+        >>> result = search(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         if self.N == 0:
             return []
         terms = toks(query)
@@ -335,12 +326,12 @@ class BM25Index:
         -------
         BM25Doc
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_api.bm25_index import doc
+        >>> result = doc(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         return self.docs[index]

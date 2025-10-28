@@ -57,14 +57,14 @@ def tok(text: str) -> list[str]:
     -------
     List[str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from search_api.splade_index import tok
+    >>> result = tok(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     return [token.lower() for token in TOKEN.findall(text or "")]
 
 
@@ -102,13 +102,6 @@ class SpladeIndex:
         sparse_root : str | None
             Description for ``sparse_root``.
         """
-        
-        
-        
-        
-        
-        
-        
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -172,14 +165,14 @@ class SpladeIndex:
         -------
         List[Tuple[int, float]]
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_api.splade_index import search
+        >>> result = search(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         if self.N == 0:
             return []
         terms = tok(query)
@@ -213,12 +206,12 @@ class SpladeIndex:
         -------
         src.search_api.splade_index.SpladeDoc
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_api.splade_index import doc
+        >>> result = doc(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         return self.docs[index]

@@ -32,14 +32,14 @@ def has_python_files(path: Path) -> bool:
     -------
     bool
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.generate_docstrings import has_python_files
+    >>> result = has_python_files(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     return any(path.rglob("*.py"))
 
 
@@ -52,14 +52,12 @@ def run_doq(target: Path) -> None:
     ----------
     target : Path
         Description for ``target``.
+
+    Examples
+    --------
+    >>> from tools.generate_docstrings import run_doq
+    >>> run_doq(...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     cmd = [
         sys.executable,
         "-m",
@@ -85,14 +83,12 @@ def run_fallback(target: Path) -> None:
     ----------
     target : Path
         Description for ``target``.
+
+    Examples
+    --------
+    >>> from tools.generate_docstrings import run_fallback
+    >>> run_fallback(...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     cmd = [
         sys.executable,
         "tools/auto_docstrings.py",
@@ -108,14 +104,12 @@ def main() -> None:
     """Compute main.
 
     Carry out the main operation.
+
+    Examples
+    --------
+    >>> from tools.generate_docstrings import main
+    >>> main()  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     if LOG_FILE.exists():
         LOG_FILE.unlink()
     LOG_DIR.mkdir(parents=True, exist_ok=True)

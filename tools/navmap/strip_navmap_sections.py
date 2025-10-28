@@ -24,14 +24,14 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
     -------
     Tuple[ast.Module, ast.Expr | None]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.navmap.strip_navmap_sections import iter_module_nodes
+    >>> result = iter_module_nodes(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if not tree.body:
@@ -60,14 +60,14 @@ def clean_docstring(text: str) -> str:
     -------
     str
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.navmap.strip_navmap_sections import clean_docstring
+    >>> result = clean_docstring(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     lines: list[str] = []
     for raw in text.splitlines():
         if raw.strip().startswith("NavMap:"):
@@ -91,14 +91,14 @@ def rewrite_module(path: Path) -> bool:
     -------
     bool
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.navmap.strip_navmap_sections import rewrite_module
+    >>> result = rewrite_module(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     tree, doc_expr = iter_module_nodes(path)
     if doc_expr is None:
         return False
@@ -121,14 +121,12 @@ def main() -> None:
     """Compute main.
 
     Carry out the main operation.
+
+    Examples
+    --------
+    >>> from tools.navmap.strip_navmap_sections import main
+    >>> main()  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     changed = 0
     for file_path in sorted(SRC.rglob("*.py")):
         if rewrite_module(file_path):

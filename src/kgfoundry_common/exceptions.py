@@ -44,9 +44,7 @@ __navmap__: Final[NavMap] = {
 }
 # [nav:anchor DownloadError]
 DownloadError = _DownloadError
-DownloadError.__doc__ = (
-    "Compatibility alias for :class:`kgfoundry_common.errors.DownloadError`."
-)
+DownloadError.__doc__ = "Compatibility alias for :class:`kgfoundry_common.errors.DownloadError`."
 
 
 # [nav:anchor UnsupportedMIMEError]

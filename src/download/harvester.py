@@ -44,8 +44,10 @@ HTTP_OK = 200
 
 # [nav:anchor OpenAccessHarvester]
 class OpenAccessHarvester:
-    """Download documents via OpenAlex and raise :class:`kgfoundry_common.errors.DownloadError` when
-    retrieval fails."""
+    """Download documents via OpenAlex.
+
+    Raise :class:`kgfoundry_common.errors.DownloadError` when retrieval fails.
+    """
 
     def __init__(
         self,
@@ -76,12 +78,6 @@ class OpenAccessHarvester:
             Description for ``out_dir``.
         """
         
-        
-        
-        
-        
-        
-        
         self.ua = user_agent
         self.email = contact_email
         self.openalex = openalex_base.rstrip("/")
@@ -108,16 +104,16 @@ class OpenAccessHarvester:
 
         Returns
         -------
-        List[dict[str, Any]]
+        List[dict[str, typing.Any]]
             Description of return value.
+
+        Examples
+        --------
+        >>> from download.harvester import search
+        >>> result = search(..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
             "topic": topic,
@@ -138,21 +134,21 @@ class OpenAccessHarvester:
 
         Parameters
         ----------
-        work : Mapping[str, Any]
+        work : collections.abc.Mapping
             Description for ``work``.
 
         Returns
         -------
         str | None
             Description of return value.
+
+        Examples
+        --------
+        >>> from download.harvester import resolve_pdf
+        >>> result = resolve_pdf(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         best = work.get("best_oa_location") or {}
         if best and best.get("pdf_url"):
             return best["pdf_url"]
@@ -196,14 +192,14 @@ class OpenAccessHarvester:
             Raised when validation fails.
         UnsupportedMIMEError
             Raised when validation fails.
+
+        Examples
+        --------
+        >>> from download.harvester import download_pdf
+        >>> result = download_pdf(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
             message = f"Bad status {response.status_code} for {url}"
@@ -232,16 +228,16 @@ class OpenAccessHarvester:
 
         Returns
         -------
-        List[Doc]
+        List[src.kgfoundry_common.models.Doc]
             Description of return value.
+
+        Examples
+        --------
+        >>> from download.harvester import run
+        >>> result = run(..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)
         for work in works:
