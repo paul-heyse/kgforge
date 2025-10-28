@@ -24,6 +24,10 @@ build/
 .envrc.local
 site/_build/
 KGForge.egg-info/
+docs/_build/
+gallery/
+*.dot
+*.svg~
 
 # IDE
 .vscode/*

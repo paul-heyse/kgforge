@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -43,9 +42,8 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
 # [nav:anchor tokenize]
 def tokenize(text: str) -> list[str]:
-    """
-    Return tokenize.
-    
+    """Return tokenize.
+
     Parameters
     ----------
     text : str
@@ -79,37 +77,16 @@ def tokenize(text: str) -> list[str]:
 # [nav:anchor FixtureDoc]
 @dataclass
 class FixtureDoc:
-    """
-    Represent FixtureDoc.
+    """Represent FixtureDoc."""
     
-    Attributes
-    ----------
-    chunk_id : str
-        Attribute description.
-    doc_id : str
-        Attribute description.
-    title : str
-        Attribute description.
-    section : str
-        Attribute description.
-    text : str
-        Attribute description.
     
-    Examples
-    --------
-    >>> from search_api.fixture_index import FixtureDoc
-    >>> result = FixtureDoc()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    search_api.fixture_index
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -124,9 +101,8 @@ class FixtureDoc:
 
 # [nav:anchor FixtureIndex]
 class FixtureIndex:
-    """
-    Represent FixtureIndex.
-    
+    """Represent FixtureIndex.
+
     Attributes
     ----------
     None
@@ -164,9 +140,8 @@ class FixtureIndex:
     
 
     def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb") -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         root : str, optional
@@ -196,9 +171,8 @@ class FixtureIndex:
         self._load_from_duckdb()
 
     def _load_from_duckdb(self) -> None:
-        """
-        Return load from duckdb.
-        
+        """Return load from duckdb.
+
         Examples
         --------
         >>> from search_api.fixture_index import _load_from_duckdb
@@ -253,9 +227,8 @@ class FixtureIndex:
         self._build_lex()
 
     def _build_lex(self) -> None:
-        """
-        Return build lex.
-        
+        """Return build lex.
+
         Examples
         --------
         >>> from search_api.fixture_index import _build_lex
@@ -283,9 +256,8 @@ class FixtureIndex:
         self.N = len(self.docs)
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """
-        Return search.
-        
+        """Return search.
+
         Parameters
         ----------
         query : str
@@ -333,9 +305,8 @@ class FixtureIndex:
         return [(index, score) for index, score in ranked[:k] if score > 0.0]
 
     def doc(self, index: int) -> FixtureDoc:
-        """
-        Return doc.
-        
+        """Return doc.
+
         Parameters
         ----------
         index : int

@@ -5,13 +5,18 @@ src.embeddings_sparse.base
 
 .. autoapi-nested-parse::
 
-   Module for embeddings_sparse.base.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - SparseEncoder: Protocol for sparse text encoders.
-   - SparseIndex: Protocol describing sparse index interactions.
+   Auto-generated API documentation for the ``src.embeddings_sparse.base`` module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.embeddings_sparse.base`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -24,8 +29,47 @@ Module Contents
    Bases: :py:obj:`Protocol`
 
 
-   Protocol for sparse text encoders.
+   
+   Represent SparseEncoder.
 
+   .. attribute:: name
+
+      Attribute description.
+
+      :type: str
+
+   .. method:: encode()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from embeddings_sparse.base import SparseEncoder
+   >>> result = SparseEncoder()
+   >>> result  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`embeddings_sparse.base`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: name
       :type:  str
@@ -33,8 +77,42 @@ Module Contents
 
    .. py:method:: encode(texts)
 
-      Return sparse encodings for the given texts.
+      
+      Return encode.
 
+      :param texts: Description for ``texts``.
+      :type texts: List[str]
+
+      :returns: *List[Tuple[List[int], List[float]]]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.base import encode
+      >>> result = encode(...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.base`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
 .. py:class:: SparseIndex
@@ -42,18 +120,117 @@ Module Contents
    Bases: :py:obj:`Protocol`
 
 
-   Protocol describing sparse index interactions.
+   
+   Represent SparseIndex.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: build()
+
+      Method description.
+
+   .. method:: search()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from embeddings_sparse.base import SparseIndex
+   >>> result = SparseIndex()
+   >>> result  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`embeddings_sparse.base`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:method:: build(docs_iterable)
 
-      Build the index from the supplied documents.
+      
+      Return build.
 
+      :param docs_iterable: Description for ``docs_iterable``.
+      :type docs_iterable: Iterable[Tuple[str, dict[str, str]]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: search(query, k, fields = None)
 
-      Search the index and return (id, score) tuples.
+      
+      Return search.
 
+      :param query: Description for ``query``.
+      :type query: str
+      :param k: Description for ``k``.
+      :type k: int
+      :param fields: Description for ``fields``.
+      :type fields: Mapping[str, str] | None, optional
+
+      :returns: *List[Tuple[str, float]]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.base import search
+      >>> result = search(..., ..., ...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.base`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 

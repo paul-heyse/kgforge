@@ -5,14 +5,18 @@ src.download.harvester
 
 .. autoapi-nested-parse::
 
-   Module for download.harvester.
+   Provide utilities for module.
 
-   NavMap:
-   - DownloadError: Raised when an external download fails.
-   - UnsupportedMIMEError: Raised when an unsupported MIME type is encountered.
-   - NavMap: Structure describing a module navmap.
-   - OpenAccessHarvester: Coordinate OpenAlex and Unpaywall lookups to persist open-….
+   Auto-generated API documentation for the ``src.download.harvester`` module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.download.harvester`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -22,8 +26,61 @@ Module Contents
 
 .. py:class:: OpenAccessHarvester(user_agent, contact_email, openalex_base = 'https://api.openalex.org', unpaywall_base = 'https://api.unpaywall.org', pdf_host_base = None, out_dir = '/data/pdfs')
 
-   Coordinate OpenAlex and Unpaywall lookups to persist open-access PDFs.
+   
+   Represent OpenAccessHarvester.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: search()
+
+      Method description.
+
+   .. method:: resolve_pdf()
+
+      Method description.
+
+   .. method:: download_pdf()
+
+      Method description.
+
+   .. method:: run()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from download.harvester import OpenAccessHarvester
+   >>> result = OpenAccessHarvester()
+   >>> result  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`download.harvester`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: ua
 
@@ -56,62 +113,174 @@ Module Contents
 
    .. py:method:: search(topic, years, max_works)
 
-      Search OpenAlex for works matching the provided topic and year window.
+      
+      Return search.
 
-      :param topic: OpenAlex topic identifier or free-form search term.
+      :param topic: Description for ``topic``.
       :type topic: str
-      :param years: Publication-year filter expressed in the OpenAlex filter syntax.
+      :param years: Description for ``years``.
       :type years: str
-      :param max_works: Maximum number of works to retrieve.
+      :param max_works: Description for ``max_works``.
       :type max_works: int
 
-      :returns: Work payloads returned by the OpenAlex API.
-      :rtype: list[dict[str, Any]]
+      :returns: *List[dict[str, Any]]* -- Description of return value.
 
+      .. rubric:: Examples
+
+      >>> from download.harvester import search
+      >>> result = search(..., ..., ...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`download.harvester`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: resolve_pdf(work)
 
-      Resolve a PDF URL for an OpenAlex work using API metadata and fallbacks.
+      
+      Return resolve pdf.
 
-      :param work: Work record returned from :meth:`search`.
-      :type work: dict[str, Any]
+      :param work: Description for ``work``.
+      :type work: Mapping[str, Any]
 
-      :returns: Direct PDF URL if one can be resolved; otherwise ``None``.
-      :rtype: str | None
+      :returns: *str | None* -- Description of return value.
 
+      .. rubric:: Examples
+
+      >>> from download.harvester import resolve_pdf
+      >>> result = resolve_pdf(...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`download.harvester`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: download_pdf(url, target_path)
 
-      Download a PDF to the given path and validate the content type.
+      
+      Return download pdf.
 
-      :param url: Direct URL to the PDF.
+      :param url: Description for ``url``.
       :type url: str
-      :param target_path: Absolute path on disk where the PDF should be written.
+      :param target_path: Description for ``target_path``.
       :type target_path: str
 
-      :returns: Path to the stored PDF.
-      :rtype: str
+      :returns: *str* -- Description of return value.
 
-      :raises kgfoundry_common.errors.DownloadError: Raised when the response code indicates a failure.
-      :raises kgfoundry_common.errors.UnsupportedMIMEError: Raised when the response is not a PDF-like MIME type.
+      :raises DownloadError: Raised when validation fails.
+      :raises UnsupportedMIMEError: Raised when validation fails.
 
+      .. rubric:: Examples
+
+      >>> from download.harvester import download_pdf
+      >>> result = download_pdf(..., ...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`download.harvester`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: run(topic, years, max_works)
 
-      Harvest PDFs for matching works and build :class:`Doc` records.
+      
+      Return run.
 
-      :param topic: Topic identifier or search term forwarded to :meth:`search`.
+      :param topic: Description for ``topic``.
       :type topic: str
-      :param years: Publication-year filter string forwarded to :meth:`search`.
+      :param years: Description for ``years``.
       :type years: str
-      :param max_works: Maximum number of works to process.
+      :param max_works: Description for ``max_works``.
       :type max_works: int
 
-      :returns: Documents referencing the downloaded PDFs.
-      :rtype: list[Doc]
+      :returns: *List[Doc]* -- Description of return value.
 
+      .. rubric:: Examples
+
+      >>> from download.harvester import run
+      >>> result = run(..., ..., ...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`download.harvester`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 

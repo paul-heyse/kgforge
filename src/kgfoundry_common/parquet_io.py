@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -44,9 +43,8 @@ ROW_GROUP_SIZE = 4096
 
 # [nav:anchor ParquetVectorWriter]
 class ParquetVectorWriter:
-    """
-    Represent ParquetVectorWriter.
-    
+    """Represent ParquetVectorWriter.
+
     Attributes
     ----------
     None
@@ -85,9 +83,8 @@ class ParquetVectorWriter:
 
     @staticmethod
     def dense_schema(dim: int) -> pa.schema:
-        """
-        Return dense schema.
-        
+        """Return dense schema.
+
         Parameters
         ----------
         dim : int
@@ -127,9 +124,8 @@ class ParquetVectorWriter:
         )
 
     def __init__(self, root: str) -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         root : str
@@ -159,9 +155,8 @@ class ParquetVectorWriter:
         records: Iterable[tuple[str, list[float], float]],
         shard: int = 0,
     ) -> str:
-        """
-        Return write dense.
-        
+        """Return write dense.
+
         Parameters
         ----------
         model : str
@@ -224,9 +219,8 @@ class ParquetVectorWriter:
 
     @staticmethod
     def splade_schema() -> pa.schema:
-        """
-        Return splade schema.
-        
+        """Return splade schema.
+
         Returns
         -------
         pa.schema
@@ -267,9 +261,8 @@ class ParquetVectorWriter:
         records: Iterable[tuple[str, list[int], list[float]]],
         shard: int = 0,
     ) -> str:
-        """
-        Return write splade.
-        
+        """Return write splade.
+
         Parameters
         ----------
         model : str
@@ -331,9 +324,8 @@ class ParquetVectorWriter:
 
 # [nav:anchor ParquetChunkWriter]
 class ParquetChunkWriter:
-    """
-    Represent ParquetChunkWriter.
-    
+    """Represent ParquetChunkWriter.
+
     Attributes
     ----------
     None
@@ -368,9 +360,8 @@ class ParquetChunkWriter:
 
     @staticmethod
     def chunk_schema() -> pa.schema:
-        """
-        Return chunk schema.
-        
+        """Return chunk schema.
+
         Returns
         -------
         pa.schema
@@ -416,9 +407,8 @@ class ParquetChunkWriter:
         )
 
     def __init__(self, root: str, model: str = "docling_hybrid", run_id: str = "dev") -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         root : str
@@ -446,9 +436,8 @@ class ParquetChunkWriter:
         self.root.mkdir(parents=True, exist_ok=True)
 
     def write(self, rows: Iterable[dict[str, Any]]) -> str:
-        """
-        Return write.
-        
+        """Return write.
+
         Parameters
         ----------
         rows : Iterable[dict[str, Any]]

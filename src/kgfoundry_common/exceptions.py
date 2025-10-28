@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -35,29 +34,16 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DownloadError]
 class DownloadError(Exception):
-    """
-    Represent DownloadError.
+    """Represent DownloadError."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.exceptions import DownloadError
-    >>> result = DownloadError()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.exceptions
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -68,29 +54,16 @@ class DownloadError(Exception):
 
 # [nav:anchor UnsupportedMIMEError]
 class UnsupportedMIMEError(Exception):
-    """
-    Represent UnsupportedMIMEError.
+    """Represent UnsupportedMIMEError."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.exceptions import UnsupportedMIMEError
-    >>> result = UnsupportedMIMEError()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.exceptions
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     

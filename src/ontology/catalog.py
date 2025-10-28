@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -37,9 +36,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor OntologyCatalog]
 class OntologyCatalog:
-    """
-    Represent OntologyCatalog.
-    
+    """Represent OntologyCatalog.
+
     Attributes
     ----------
     None
@@ -73,9 +71,8 @@ class OntologyCatalog:
     
 
     def __init__(self, concepts: list[Concept]) -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         concepts : List[Concept]
@@ -99,9 +96,8 @@ class OntologyCatalog:
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
-        """
-        Return neighbors.
-        
+        """Return neighbors.
+
         Parameters
         ----------
         concept_id : str
@@ -135,9 +131,8 @@ class OntologyCatalog:
         return set()
 
     def hydrate(self, concept_id: str) -> dict[str, Any]:
-        """
-        Return hydrate.
-        
+        """Return hydrate.
+
         Parameters
         ----------
         concept_id : str

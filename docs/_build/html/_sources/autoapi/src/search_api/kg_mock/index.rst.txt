@@ -5,15 +5,16 @@ src.search_api.kg_mock
 
 .. autoapi-nested-parse::
 
-   Module for search_api.kg_mock.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - ConceptMeta: Metadata describing a mock concept and its keyword matches.
-   - detect_query_concepts: Extract concept identifiers from ``query`` using simple….
-   - linked_concepts_for_text: Derive concept URNs mentioned in a chunk of indexed text.
-   - kg_boost: Return a boost weight when query and chunk share a concept.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`search_api.kg_mock`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -23,16 +24,127 @@ Module Contents
 
 .. py:function:: detect_query_concepts(query)
 
-   Extract concept identifiers from ``query`` using simple heuristics.
+   
+   Return detect query concepts.
 
+   :param query: Description for ``query``.
+   :type query: str
+
+   :returns: *Set[str]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.kg_mock import detect_query_concepts
+   >>> result = detect_query_concepts(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`search_api.kg_mock`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: linked_concepts_for_text(text)
 
-   Derive concept URNs mentioned in a chunk of indexed text.
+   
+   Return linked concepts for text.
 
+   :param text: Description for ``text``.
+   :type text: str
+
+   :returns: *List[str]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.kg_mock import linked_concepts_for_text
+   >>> result = linked_concepts_for_text(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`search_api.kg_mock`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: kg_boost(query_concepts, chunk_concepts, direct = 0.08, one_hop = 0.04)
 
-   Return a boost weight when query and chunk share a concept.
+   
+   Return kg boost.
 
+   :param query_concepts: Description for ``query_concepts``.
+   :type query_concepts: List[str]
+   :param chunk_concepts: Description for ``chunk_concepts``.
+   :type chunk_concepts: List[str]
+   :param direct: Description for ``direct``.
+   :type direct: float, optional
+   :param one_hop: Description for ``one_hop``.
+   :type one_hop: float, optional
+
+   :returns: *float* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.kg_mock import kg_boost
+   >>> result = kg_boost(..., ..., ..., ...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`search_api.kg_mock`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

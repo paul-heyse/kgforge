@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -35,9 +34,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor isotonic_calibrate]
 def isotonic_calibrate(pairs: list[tuple[float, int]]) -> dict[str, object]:
-    """
-    Return isotonic calibrate.
-    
+    """Return isotonic calibrate.
+
     Parameters
     ----------
     pairs : List[Tuple[float, int]]

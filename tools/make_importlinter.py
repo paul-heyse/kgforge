@@ -1,7 +1,16 @@
-"""Create a .importlinter file with a default layered-architecture contract.
+"""Provide utilities for module.
 
-Detects the root package automatically (prefers src/<pkg>).
+Auto-generated API documentation for the ``tools.make_importlinter`` module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+tools.make_importlinter
 """
+
 
 from pathlib import Path
 

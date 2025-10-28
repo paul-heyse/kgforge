@@ -1,5 +1,6 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
+
+Auto-generated API documentation for the ``src.embeddings_dense.qwen3`` module.
 
 Notes
 -----
@@ -7,7 +8,7 @@ This module exposes the primary interfaces for the package.
 
 See Also
 --------
-embeddings_dense.qwen3
+src.embeddings_dense.qwen3
 """
 
 
@@ -35,29 +36,15 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Qwen3Embedder]
 class Qwen3Embedder:
-    """
-    Represent Qwen3Embedder.
+    """Represent Qwen3Embedder."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from embeddings_dense.qwen3 import Qwen3Embedder
-    >>> result = Qwen3Embedder()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    embeddings_dense.qwen3
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
     
     
     

@@ -5,12 +5,18 @@ src.embeddings_dense.qwen3
 
 .. autoapi-nested-parse::
 
-   Module for embeddings_dense.qwen3.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - Qwen3Embedder: Adapter for Qwen3 dense embedding checkpoints.
+   Auto-generated API documentation for the ``src.embeddings_dense.qwen3`` module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.embeddings_dense.qwen3`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -20,6 +26,24 @@ Module Contents
 
 .. py:class:: Qwen3Embedder
 
-   Adapter for Qwen3 dense embedding checkpoints.
+   
+   Represent Qwen3Embedder.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

@@ -5,8 +5,33 @@ src.embeddings_dense
 
 .. autoapi-nested-parse::
 
-   Module for embeddings_dense.
+   
+   Provide utilities for module.
 
+   Auto-generated API documentation for the ``src.embeddings_dense`` module.
+
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.embeddings_dense`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 Submodules

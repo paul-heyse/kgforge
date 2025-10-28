@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -39,9 +38,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor apply]
 def apply(db: str, migrations_dir: str) -> None:
-    """
-    Return apply.
-    
+    """Return apply.
+
     Parameters
     ----------
     db : str
@@ -71,9 +69,8 @@ def apply(db: str, migrations_dir: str) -> None:
 
 # [nav:anchor main]
 def main() -> None:
-    """
-    Return main.
-    
+    """Return main.
+
     Examples
     --------
     >>> from registry.migrate import main

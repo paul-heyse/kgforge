@@ -216,6 +216,11 @@ docs = [
     "sphinx-inline-tabs>=0.3.0",
     "sphobjinv>=2.3.1.3",
     "graphviz>=0.21",
+    "pydeps>=1.12.20",
+    "pylint>=3.2.0",
+    "sphinx-gallery>=0.17.1",
+    "xdoctest>=1.1.4",
+    "pandera>=0.20.0",
     "griffe",
     "doq",               # generate docstring skeletons
     "pyment",            # fill/convert to preferred style (Google/NumPy/reST)
@@ -230,6 +235,7 @@ docs = [
     "mkdocs-gen-files",
     "mkdocs-literate-nav",
     "mkdocs-section-index",
+    "numpydoc-validation",
 ]
 
 [project.scripts]
@@ -374,6 +380,7 @@ enabled = [
     "sphinx.ext.graphviz",
     "sphinx.ext.inheritance_diagram",
     "sphinxcontrib.mermaid",
+    "numpydoc-validation",
 ]
 optional = [
     "myst_nb",

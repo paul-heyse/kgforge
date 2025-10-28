@@ -5,14 +5,16 @@ src.search_api.bm25_index
 
 .. autoapi-nested-parse::
 
-   Module for search_api.bm25_index.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - toks: Tokenise ``text`` into lowercase alphanumeric terms.
-   - BM25Doc: Container storing fields required for BM25 scoring.
-   - BM25Index: Construct, persist, and query a BM25 index.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`search_api.bm25_index`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -24,13 +26,66 @@ Module Contents
 
 .. py:function:: toks(text)
 
-   Tokenise ``text`` into lowercase alphanumeric terms.
+   
+   Return toks.
 
+   :param text: Description for ``text``.
+   :type text: str
+
+   :returns: *List[str]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.bm25_index import toks
+   >>> result = toks(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`search_api.bm25_index`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:class:: BM25Doc
 
-   Container storing fields required for BM25 scoring.
+   
+   Represent BM25Doc.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: chunk_id
       :type:  str
@@ -58,8 +113,74 @@ Module Contents
 
 .. py:class:: BM25Index(k1 = 0.9, b = 0.4)
 
-   Construct, persist, and query a BM25 index.
+   
+   Represent BM25Index.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: build_from_duckdb()
+
+      Method description.
+
+   .. method:: _build()
+
+      Method description.
+
+   .. method:: save()
+
+      Method description.
+
+   .. method:: load()
+
+      Method description.
+
+   .. method:: _idf()
+
+      Method description.
+
+   .. method:: search()
+
+      Method description.
+
+   .. method:: doc()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from search_api.bm25_index import BM25Index
+   >>> result = BM25Index()
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`search_api.bm25_index`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: k1
       :value: 0.9
@@ -95,33 +216,284 @@ Module Contents
       :classmethod:
 
 
-      Build an index using the most recent chunk dataset in DuckDB.
+      
+      Return build from duckdb.
 
+      :param db_path: Description for ``db_path``.
+      :type db_path: str
+
+      :returns: *BM25Index* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from search_api.bm25_index import build_from_duckdb
+      >>> result = build_from_duckdb(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`search_api.bm25_index`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: _build(rows)
+
+      
+      Return build.
+
+      :param rows: Description for ``rows``.
+      :type rows: Iterable[tuple[str, str, str, str, str]]
+
+      .. rubric:: Examples
+
+      >>> from search_api.bm25_index import _build
+      >>> _build(...)  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`search_api.bm25_index`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: save(path)
 
-      Serialize the index to ``path`` using pickle.
+      
+      Return save.
 
+      :param path: Description for ``path``.
+      :type path: str
+
+      .. rubric:: Examples
+
+      >>> from search_api.bm25_index import save
+      >>> save(...)  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`search_api.bm25_index`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: load(path)
       :classmethod:
 
 
-      Load a pickled index from ``path``.
+      
+      Return load.
 
+      :param path: Description for ``path``.
+      :type path: str
+
+      :returns: *BM25Index* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from search_api.bm25_index import load
+      >>> result = load(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`search_api.bm25_index`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: _idf(term)
+
+      
+      Return idf.
+
+      :param term: Description for ``term``.
+      :type term: str
+
+      :returns: *float* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from search_api.bm25_index import _idf
+      >>> result = _idf(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`search_api.bm25_index`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: search(query, k = 10)
 
-      Score documents for ``query`` and return the top ``k`` hits.
+      
+      Return search.
 
+      :param query: Description for ``query``.
+      :type query: str
+      :param k: Description for ``k``.
+      :type k: int, optional
+
+      :returns: *List[Tuple[int, float]]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from search_api.bm25_index import search
+      >>> result = search(..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`search_api.bm25_index`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: doc(index)
 
-      Return the :class:`BM25Doc` at ``index``.
+      
+      Return doc.
 
+      :param index: Description for ``index``.
+      :type index: int
+
+      :returns: *BM25Doc* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from search_api.bm25_index import doc
+      >>> result = doc(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`search_api.bm25_index`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 

@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -45,9 +44,8 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
 # [nav:anchor toks]
 def toks(text: str) -> list[str]:
-    """
-    Return toks.
-    
+    """Return toks.
+
     Parameters
     ----------
     text : str
@@ -81,39 +79,16 @@ def toks(text: str) -> list[str]:
 # [nav:anchor BM25Doc]
 @dataclass
 class BM25Doc:
-    """
-    Represent BM25Doc.
+    """Represent BM25Doc."""
     
-    Attributes
-    ----------
-    chunk_id : str
-        Attribute description.
-    doc_id : str
-        Attribute description.
-    title : str
-        Attribute description.
-    section : str
-        Attribute description.
-    tf : Mapping[str, float]
-        Attribute description.
-    dl : float
-        Attribute description.
     
-    Examples
-    --------
-    >>> from search_api.bm25_index import BM25Doc
-    >>> result = BM25Doc()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    search_api.bm25_index
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -129,9 +104,8 @@ class BM25Doc:
 
 # [nav:anchor BM25Index]
 class BM25Index:
-    """
-    Represent BM25Index.
-    
+    """Represent BM25Index.
+
     Attributes
     ----------
     None
@@ -175,9 +149,8 @@ class BM25Index:
     
 
     def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         k1 : float, optional
@@ -208,9 +181,8 @@ class BM25Index:
 
     @classmethod
     def build_from_duckdb(cls, db_path: str) -> BM25Index:
-        """
-        Return build from duckdb.
-        
+        """Return build from duckdb.
+
         Parameters
         ----------
         db_path : str
@@ -260,9 +232,8 @@ class BM25Index:
         return index
 
     def _build(self, rows: Iterable[tuple[str, str, str, str, str]]) -> None:
-        """
-        Return build.
-        
+        """Return build.
+
         Parameters
         ----------
         rows : Iterable[tuple[str, str, str, str, str]]
@@ -311,9 +282,8 @@ class BM25Index:
         self.avgdl = (dl_sum / self.N) if self.N > 0 else 0.0
 
     def save(self, path: str) -> None:
-        """
-        Return save.
-        
+        """Return save.
+
         Parameters
         ----------
         path : str
@@ -349,9 +319,8 @@ class BM25Index:
 
     @classmethod
     def load(cls, path: str) -> BM25Index:
-        """
-        Return load.
-        
+        """Return load.
+
         Parameters
         ----------
         path : str
@@ -388,9 +357,8 @@ class BM25Index:
         return index
 
     def _idf(self, term: str) -> float:
-        """
-        Return idf.
-        
+        """Return idf.
+
         Parameters
         ----------
         term : str
@@ -423,9 +391,8 @@ class BM25Index:
         return math.log((self.N - df + 0.5) / (df + 0.5) + 1.0)
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """
-        Return search.
-        
+        """Return search.
+
         Parameters
         ----------
         query : str
@@ -473,9 +440,8 @@ class BM25Index:
         return [(index, score) for index, score in ranked[:k] if score > 0.0]
 
     def doc(self, index: int) -> BM25Doc:
-        """
-        Return doc.
-        
+        """Return doc.
+
         Parameters
         ----------
         index : int

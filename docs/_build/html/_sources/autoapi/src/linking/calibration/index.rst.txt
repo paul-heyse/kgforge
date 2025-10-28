@@ -5,12 +5,16 @@ src.linking.calibration
 
 .. autoapi-nested-parse::
 
-   Module for linking.calibration.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - isotonic_calibrate: Calibrate score/label pairs using an isotonic regression….
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`linking.calibration`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -20,13 +24,41 @@ Module Contents
 
 .. py:function:: isotonic_calibrate(pairs)
 
-   Calibrate score/label pairs using an isotonic regression placeholder.
+   
+   Return isotonic calibrate.
 
-   :param pairs: Sequence of ``(score, label)`` pairs where score is in ``[0, 1]`` and
-                 label is either ``0`` or ``1``.
-   :type pairs: list[tuple[float, int]]
+   :param pairs: Description for ``pairs``.
+   :type pairs: List[Tuple[float, int]]
 
-   :returns: Calibration artefact describing the fitted model (placeholder).
-   :rtype: dict[str, object]
+   :returns: *Mapping[str, object]* -- Description of return value.
 
+   .. rubric:: Examples
+
+   >>> from linking.calibration import isotonic_calibrate
+   >>> result = isotonic_calibrate(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`linking.calibration`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

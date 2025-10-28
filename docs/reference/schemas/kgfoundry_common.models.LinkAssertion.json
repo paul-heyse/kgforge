@@ -1,0 +1,64 @@
+{
+  "description": "Represent LinkAssertion.\n\nAttributes\n----------\nid : Id\n    Attribute description.\nchunk_id : Id\n    Attribute description.\nconcept_id : Id\n    Attribute description.\nscore : float\n    Attribute description.\ndecision : Literal['link', 'reject', 'uncertain']\n    Attribute description.\nevidence_span : str | None\n    Attribute description.\nfeatures : Mapping[str, float]\n    Attribute description.\nrun_id : str\n    Attribute description.\n\nExamples\n--------\n>>> from kgfoundry_common.models import LinkAssertion\n>>> result = LinkAssertion()\n>>> result  # doctest: +ELLIPSIS\n...\n\nSee Also\n--------\nkgfoundry_common.models\n\nNotes\n-----\nDocument class invariants and lifecycle details here.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "chunk_id": {
+      "title": "Chunk Id",
+      "type": "string"
+    },
+    "concept_id": {
+      "title": "Concept Id",
+      "type": "string"
+    },
+    "score": {
+      "title": "Score",
+      "type": "number"
+    },
+    "decision": {
+      "enum": [
+        "link",
+        "reject",
+        "uncertain"
+      ],
+      "title": "Decision",
+      "type": "string"
+    },
+    "evidence_span": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Evidence Span"
+    },
+    "features": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "default": {},
+      "title": "Features",
+      "type": "object"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "chunk_id",
+    "concept_id",
+    "score",
+    "decision",
+    "run_id"
+  ],
+  "title": "LinkAssertion",
+  "type": "object"
+}

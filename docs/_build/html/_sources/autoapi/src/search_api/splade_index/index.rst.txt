@@ -5,14 +5,16 @@ src.search_api.splade_index
 
 .. autoapi-nested-parse::
 
-   Module for search_api.splade_index.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - tok: Tokenise ``text`` into lowercase alphanumeric units.
-   - SpladeDoc: Chunk-level document representation for the sparse index.
-   - SpladeIndex: Load chunk text and expose a sparse similarity search API.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`search_api.splade_index`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -24,13 +26,66 @@ Module Contents
 
 .. py:function:: tok(text)
 
-   Tokenise ``text`` into lowercase alphanumeric units.
+   
+   Return tok.
 
+   :param text: Description for ``text``.
+   :type text: str
+
+   :returns: *List[str]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.splade_index import tok
+   >>> result = tok(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`search_api.splade_index`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:class:: SpladeDoc
 
-   Chunk-level document representation for the sparse index.
+   
+   Represent SpladeDoc.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: chunk_id
       :type:  str
@@ -50,8 +105,58 @@ Module Contents
 
 .. py:class:: SpladeIndex(db_path, chunks_dataset_root = None, sparse_root = None)
 
-   Load chunk text and expose a sparse similarity search API.
+   
+   Represent SpladeIndex.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: _load()
+
+      Method description.
+
+   .. method:: search()
+
+      Method description.
+
+   .. method:: doc()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from search_api.splade_index import SpladeIndex
+   >>> result = SpladeIndex()
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`search_api.splade_index`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: db_path
 
@@ -71,15 +176,124 @@ Module Contents
 
 
 
+   .. py:method:: _load(chunks_root)
+
+      
+      Return load.
+
+      :param chunks_root: Description for ``chunks_root``.
+      :type chunks_root: str | None
+
+      .. rubric:: Examples
+
+      >>> from search_api.splade_index import _load
+      >>> _load(...)  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`search_api.splade_index`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
    .. py:method:: search(query, k = 10)
 
-      Return indices of documents that best match ``query``.
+      
+      Return search.
 
+      :param query: Description for ``query``.
+      :type query: str
+      :param k: Description for ``k``.
+      :type k: int, optional
+
+      :returns: *List[Tuple[int, float]]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from search_api.splade_index import search
+      >>> result = search(..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`search_api.splade_index`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: doc(index)
 
-      Return the :class:`SpladeDoc` at ``index``.
+      
+      Return doc.
 
+      :param index: Description for ``index``.
+      :type index: int
+
+      :returns: *SpladeDoc* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from search_api.splade_index import doc
+      >>> result = doc(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`search_api.splade_index`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 

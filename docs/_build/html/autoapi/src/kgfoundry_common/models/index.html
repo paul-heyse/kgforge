@@ -32,6 +32,10 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
   <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -45,8 +49,6 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/src/kgfoundry_common/models/index';</script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="src.kgfoundry_common.navmap_types" href="../navmap_types/index.html" />
-    <link rel="prev" title="src.kgfoundry_common.logging" href="../logging/index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -146,7 +148,7 @@
 </li>
 
 
-<li class="nav-item current active">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../index.html">
     API Reference
   </a>
@@ -159,6 +161,72 @@
   </a>
 </li>
 
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/test-matrix.html">
+    Test Matrix (symbol → tests)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/observability/metrics.html">
+    Metrics (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/observability/logs.html">
+    Log events (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/observability/traces.html">
+    Traces (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/observability/config.html">
+    Configuration surfaces (Pydantic Settings & env usage)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/schemas/index.html">
+    Data Contract Schemas
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/graphs/index.html">
+    Package Graphs
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../gallery/index.html">
+    Welcome to the kgfoundry examples gallery
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -253,7 +321,7 @@
 </li>
 
 
-<li class="nav-item current active">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../index.html">
     API Reference
   </a>
@@ -263,6 +331,62 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../architecture/index.html">
     Architecture
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/test-matrix.html">
+    Test Matrix (symbol → tests)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/observability/metrics.html">
+    Metrics (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/observability/logs.html">
+    Log events (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/observability/traces.html">
+    Traces (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/observability/config.html">
+    Configuration surfaces (Pydantic Settings & env usage)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/schemas/index.html">
+    Data Contract Schemas
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/graphs/index.html">
+    Package Graphs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../gallery/index.html">
+    Welcome to the kgfoundry examples gallery
   </a>
 </li>
 
@@ -293,98 +417,7 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">src</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../docling/index.html">src.docling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../docling/canonicalizer/index.html">src.docling.canonicalizer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../docling/hybrid/index.html">src.docling.hybrid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../docling/vlm/index.html">src.docling.vlm</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../download/index.html">src.download</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../download/cli/index.html">src.download.cli</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../download/harvester/index.html">src.download.harvester</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../embeddings_dense/index.html">src.embeddings_dense</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../embeddings_dense/base/index.html">src.embeddings_dense.base</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../embeddings_dense/qwen3/index.html">src.embeddings_dense.qwen3</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../embeddings_sparse/index.html">src.embeddings_sparse</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../embeddings_sparse/base/index.html">src.embeddings_sparse.base</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../embeddings_sparse/bm25/index.html">src.embeddings_sparse.bm25</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../embeddings_sparse/splade/index.html">src.embeddings_sparse.splade</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../kg_builder/index.html">src.kg_builder</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../kg_builder/mock_kg/index.html">src.kg_builder.mock_kg</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kg_builder/neo4j_store/index.html">src.kg_builder.neo4j_store</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2"><a class="reference internal" href="../../kgfoundry/index.html">src.kgfoundry</a></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">src.kgfoundry_common</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../config/index.html">src.kgfoundry_common.config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../errors/index.html">src.kgfoundry_common.errors</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../exceptions/index.html">src.kgfoundry_common.exceptions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ids/index.html">src.kgfoundry_common.ids</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../logging/index.html">src.kgfoundry_common.logging</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">src.kgfoundry_common.models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../navmap_types/index.html">src.kgfoundry_common.navmap_types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../parquet_io/index.html">src.kgfoundry_common.parquet_io</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../linking/index.html">src.linking</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../linking/calibration/index.html">src.linking.calibration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../linking/linker/index.html">src.linking.linker</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../observability/index.html">src.observability</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../observability/metrics/index.html">src.observability.metrics</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../ontology/index.html">src.ontology</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../ontology/catalog/index.html">src.ontology.catalog</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ontology/loader/index.html">src.ontology.loader</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../orchestration/index.html">src.orchestration</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../orchestration/cli/index.html">src.orchestration.cli</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../orchestration/fixture_flow/index.html">src.orchestration.fixture_flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../orchestration/flows/index.html">src.orchestration.flows</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../registry/index.html">src.registry</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../registry/api/index.html">src.registry.api</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../registry/duckdb_registry/index.html">src.registry.duckdb_registry</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../registry/helper/index.html">src.registry.helper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../registry/migrate/index.html">src.registry.migrate</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../search_api/index.html">src.search_api</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/app/index.html">src.search_api.app</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/bm25_index/index.html">src.search_api.bm25_index</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/faiss_adapter/index.html">src.search_api.faiss_adapter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/fixture_index/index.html">src.search_api.fixture_index</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/fusion/index.html">src.search_api.fusion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/kg_mock/index.html">src.search_api.kg_mock</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/schemas/index.html">src.search_api.schemas</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/service/index.html">src.search_api.service</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/splade_index/index.html">src.search_api.splade_index</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../search_client/index.html">src.search_client</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../search_client/client/index.html">src.search_client.client</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../vectorstore_faiss/index.html">src.vectorstore_faiss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../vectorstore_faiss/gpu/index.html">src.vectorstore_faiss.gpu</a></li>
-</ul>
-</details></li>
-</ul>
-</details></li>
-</ul>
-</div>
+  <div class="bd-toc-item navbar-nav"></div>
 </nav></div>
     </div>
   
@@ -423,15 +456,6 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    
-    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">API Reference</a></li>
-    
-    
-    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">src</a></li>
-    
-    
-    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">src.kgfoundry_common</a></li>
-    
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">src.kgfoundry_common.models</span></li>
   </ul>
 </nav>
@@ -451,20 +475,20 @@
                   
   <section id="module-src.kgfoundry_common.models">
 <span id="src-kgfoundry-common-models"></span><h1>src.kgfoundry_common.models<a class="headerlink" href="#module-src.kgfoundry_common.models" title="Link to this heading">#</a></h1>
-<p>Module for kgfoundry_common.models.</p>
-<p>NavMap:
-- NavMap: Structure describing a module navmap.
-- Doc: Doc.
-- DoctagsAsset: Doctagsasset.
-- Chunk: Chunk.
-- LinkAssertion: Linkassertion.</p>
+<p>Provide utilities for module.</p>
+<p class="rubric">Notes</p>
+<p>This module exposes the primary interfaces for the package.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kgfoundry_common.models</span></code></p>
+</div>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.models.</span></span><span class="sig-name descname"><span class="pre">Doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:38:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.models.</span></span><span class="sig-name descname"><span class="pre">Doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:40:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
-<p>Doc.</p>
+<p>Represent Doc.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>data</strong> (<em>Any</em>)</p>
@@ -472,76 +496,76 @@
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc.id">
-<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:41:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:56:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc.openalex_id">
-<span class="sig-name descname"><span class="pre">openalex_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.openalex_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:42:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.openalex_id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">openalex_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../download/harvester/index.html#src.download.harvester.OpenAccessHarvester.None" title="src.download.harvester.OpenAccessHarvester.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.openalex_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:57:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.openalex_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc.doi">
-<span class="sig-name descname"><span class="pre">doi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.doi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:43:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.doi" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">doi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../download/harvester/index.html#src.download.harvester.OpenAccessHarvester.None" title="src.download.harvester.OpenAccessHarvester.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.doi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:58:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.doi" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc.arxiv_id">
-<span class="sig-name descname"><span class="pre">arxiv_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.arxiv_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:44:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.arxiv_id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">arxiv_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../download/harvester/index.html#src.download.harvester.OpenAccessHarvester.None" title="src.download.harvester.OpenAccessHarvester.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.arxiv_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:59:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.arxiv_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc.pmcid">
-<span class="sig-name descname"><span class="pre">pmcid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.pmcid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:45:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.pmcid" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">pmcid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../download/harvester/index.html#src.download.harvester.OpenAccessHarvester.None" title="src.download.harvester.OpenAccessHarvester.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.pmcid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:60:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.pmcid" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc.title">
-<span class="sig-name descname"><span class="pre">title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:46:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.title" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:61:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.title" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc.authors">
-<span class="sig-name descname"><span class="pre">authors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.authors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:47:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.authors" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">authors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.authors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:62:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.authors" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc.pub_date">
-<span class="sig-name descname"><span class="pre">pub_date</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.pub_date"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:48:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.pub_date" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">pub_date</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../download/harvester/index.html#src.download.harvester.OpenAccessHarvester.None" title="src.download.harvester.OpenAccessHarvester.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.pub_date"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:63:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.pub_date" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc.license">
-<span class="sig-name descname"><span class="pre">license</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.license"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:49:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.license" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">license</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../download/harvester/index.html#src.download.harvester.OpenAccessHarvester.None" title="src.download.harvester.OpenAccessHarvester.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.license"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:64:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.license" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc.language">
-<span class="sig-name descname"><span class="pre">language</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'en'</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.language"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:50:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.language" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">language</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../download/harvester/index.html#src.download.harvester.OpenAccessHarvester.None" title="src.download.harvester.OpenAccessHarvester.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'en'</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.language"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:65:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.language" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc.pdf_uri">
-<span class="sig-name descname"><span class="pre">pdf_uri</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.pdf_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:51:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.pdf_uri" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">pdf_uri</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.pdf_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:66:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.pdf_uri" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc.source">
-<span class="sig-name descname"><span class="pre">source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unknown'</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:52:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.source" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unknown'</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:67:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.source" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Doc.content_hash">
-<span class="sig-name descname"><span class="pre">content_hash</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.content_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:53:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.content_hash" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">content_hash</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../download/harvester/index.html#src.download.harvester.OpenAccessHarvester.None" title="src.download.harvester.OpenAccessHarvester.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Doc.content_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:68:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Doc.content_hash" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.DoctagsAsset">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.models.</span></span><span class="sig-name descname"><span class="pre">DoctagsAsset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:57:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.models.</span></span><span class="sig-name descname"><span class="pre">DoctagsAsset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:72:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
-<p>Doctagsasset.</p>
+<p>Represent DoctagsAsset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>data</strong> (<em>Any</em>)</p>
@@ -549,41 +573,41 @@
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.DoctagsAsset.doc_id">
-<span class="sig-name descname"><span class="pre">doc_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset.doc_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:60:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset.doc_id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">doc_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset.doc_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:88:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset.doc_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.DoctagsAsset.doctags_uri">
-<span class="sig-name descname"><span class="pre">doctags_uri</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset.doctags_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:61:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset.doctags_uri" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">doctags_uri</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset.doctags_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:89:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset.doctags_uri" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.DoctagsAsset.pages">
-<span class="sig-name descname"><span class="pre">pages</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset.pages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:62:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset.pages" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">pages</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset.pages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:90:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset.pages" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.DoctagsAsset.vlm_model">
-<span class="sig-name descname"><span class="pre">vlm_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset.vlm_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:63:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset.vlm_model" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">vlm_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset.vlm_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:91:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset.vlm_model" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.DoctagsAsset.vlm_revision">
-<span class="sig-name descname"><span class="pre">vlm_revision</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset.vlm_revision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:64:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset.vlm_revision" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">vlm_revision</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset.vlm_revision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:92:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset.vlm_revision" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.DoctagsAsset.avg_logprob">
-<span class="sig-name descname"><span class="pre">avg_logprob</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset.avg_logprob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:65:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset.avg_logprob" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">avg_logprob</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../download/harvester/index.html#src.download.harvester.OpenAccessHarvester.None" title="src.download.harvester.OpenAccessHarvester.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#DoctagsAsset.avg_logprob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:93:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.DoctagsAsset.avg_logprob" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Chunk">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.models.</span></span><span class="sig-name descname"><span class="pre">Chunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:69:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.models.</span></span><span class="sig-name descname"><span class="pre">Chunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:97:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
-<p>Chunk.</p>
+<p>Represent Chunk.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>data</strong> (<em>Any</em>)</p>
@@ -591,46 +615,46 @@
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Chunk.id">
-<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:72:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:113:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Chunk.doc_id">
-<span class="sig-name descname"><span class="pre">doc_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.doc_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:73:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.doc_id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">doc_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.doc_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:114:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.doc_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Chunk.section">
-<span class="sig-name descname"><span class="pre">section</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:74:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.section" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">section</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../download/harvester/index.html#src.download.harvester.OpenAccessHarvester.None" title="src.download.harvester.OpenAccessHarvester.None"><span class="pre">None</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:115:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.section" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Chunk.start_char">
-<span class="sig-name descname"><span class="pre">start_char</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.start_char"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:75:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.start_char" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">start_char</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.start_char"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:116:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.start_char" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Chunk.end_char">
-<span class="sig-name descname"><span class="pre">end_char</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.end_char"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:76:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.end_char" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">end_char</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.end_char"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:117:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.end_char" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Chunk.tokens">
-<span class="sig-name descname"><span class="pre">tokens</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.tokens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:77:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.tokens" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">tokens</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.tokens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:118:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.tokens" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.Chunk.doctags_span">
-<span class="sig-name descname"><span class="pre">doctags_span</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.doctags_span"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:78:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.doctags_span" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">doctags_span</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#Chunk.doctags_span"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:119:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.Chunk.doctags_span" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.LinkAssertion">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.models.</span></span><span class="sig-name descname"><span class="pre">LinkAssertion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:82:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kgfoundry_common.models.</span></span><span class="sig-name descname"><span class="pre">LinkAssertion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:123:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
-<p>Linkassertion.</p>
+<p>Represent LinkAssertion.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>data</strong> (<em>Any</em>)</p>
@@ -638,42 +662,42 @@
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.LinkAssertion.id">
-<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:85:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:139:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.LinkAssertion.chunk_id">
-<span class="sig-name descname"><span class="pre">chunk_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.chunk_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:86:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.chunk_id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">chunk_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.chunk_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:140:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.chunk_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.LinkAssertion.concept_id">
-<span class="sig-name descname"><span class="pre">concept_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.concept_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:87:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.concept_id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">concept_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Id</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.concept_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:141:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.concept_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.LinkAssertion.score">
-<span class="sig-name descname"><span class="pre">score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:88:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.score" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:142:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.score" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.LinkAssertion.decision">
-<span class="sig-name descname"><span class="pre">decision</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'link'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'reject'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'uncertain'</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.decision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:89:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.decision" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">decision</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'link'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'reject'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'uncertain'</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.decision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:143:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.decision" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.LinkAssertion.evidence_span">
-<span class="sig-name descname"><span class="pre">evidence_span</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.evidence_span"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:90:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.evidence_span" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">evidence_span</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../download/harvester/index.html#src.download.harvester.OpenAccessHarvester.None" title="src.download.harvester.OpenAccessHarvester.None"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.evidence_span"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:144:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.evidence_span" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.LinkAssertion.features">
-<span class="sig-name descname"><span class="pre">features</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:91:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.features" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">features</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:145:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.features" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="src.kgfoundry_common.models.LinkAssertion.run_id">
-<span class="sig-name descname"><span class="pre">run_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.run_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:92:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.run_id" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/src/kgfoundry_common/models.html#LinkAssertion.run_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry_common/models.py:146:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry_common.models.LinkAssertion.run_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -691,24 +715,6 @@
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="../logging/index.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">src.kgfoundry_common.logging</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="../navmap_types/index.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">src.kgfoundry_common.navmap_types</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               

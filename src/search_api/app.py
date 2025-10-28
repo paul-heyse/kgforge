@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -119,9 +118,8 @@ kg.add_edge("C:42", "C:99")
 
 # [nav:anchor auth]
 def auth(authorization: str | None = Header(default=None)) -> None:
-    """
-    Return auth.
-    
+    """Return auth.
+
     Parameters
     ----------
     authorization : str | None, optional
@@ -158,9 +156,8 @@ def auth(authorization: str | None = Header(default=None)) -> None:
 # [nav:anchor healthz]
 @app.get("/healthz")
 def healthz() -> dict[str, Any]:
-    """
-    Return healthz.
-    
+    """Return healthz.
+
     Returns
     -------
     Mapping[str, Any]
@@ -197,9 +194,8 @@ def healthz() -> dict[str, Any]:
 
 # [nav:anchor rrf_fuse]
 def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, float]:
-    """
-    Return rrf fuse.
-    
+    """Return rrf fuse.
+
     Parameters
     ----------
     lists : List[List[Tuple[str, float]]]
@@ -243,9 +239,8 @@ def apply_kg_boosts(
     direct: float = 0.08,
     one_hop: float = 0.04,
 ) -> dict[str, float]:
-    """
-    Return apply kg boosts.
-    
+    """Return apply kg boosts.
+
     Parameters
     ----------
     cands : Mapping[str, float]
@@ -301,9 +296,8 @@ def apply_kg_boosts(
 # [nav:anchor search]
 @app.post("/search", response_model=dict)
 def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
-    """
-    Return search.
-    
+    """Return search.
+
     Parameters
     ----------
     req : SearchRequest
@@ -393,9 +387,8 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
 # [nav:anchor graph_concepts]
 @app.post("/graph/concepts", response_model=dict)
 def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str, Any]:
-    """
-    Return graph concepts.
-    
+    """Return graph concepts.
+
     Parameters
     ----------
     body : Mapping[str, Any]

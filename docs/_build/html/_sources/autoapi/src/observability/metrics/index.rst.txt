@@ -5,7 +5,17 @@ src.observability.metrics
 
 .. autoapi-nested-parse::
 
-   Module for observability.metrics.
+   Provide utilities for module.
+
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`observability.metrics`
+
+   ..
+       !! processed by numpydoc !!
+
 
 
 
@@ -15,6 +25,221 @@ Module Contents
 ---------------
 
 .. py:data:: CounterFactory
+
+.. py:class:: _NoopMetric
+
+   
+   Represent NoopMetric.
+
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: labels()
+
+      Method description.
+
+   .. method:: observe()
+
+      Method description.
+
+   .. method:: inc()
+
+      Method description.
+
+   .. method:: set()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from observability.metrics import _NoopMetric
+   >>> result = _NoopMetric()
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`observability.metrics`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:method:: labels(*args, **kwargs)
+
+      
+      Return labels.
+
+      :param \*args: Description for ``*args``.
+      :type \*args: Any, optional
+      :param \*\*kwargs: Description for ``**kwargs``.
+      :type \*\*kwargs: Any, optional
+
+      :returns: *_NoopMetric* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from observability.metrics import labels
+      >>> result = labels()
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`observability.metrics`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: observe(*args, **kwargs)
+
+      
+      Return observe.
+
+      :param \*args: Description for ``*args``.
+      :type \*args: Any, optional
+      :param \*\*kwargs: Description for ``**kwargs``.
+      :type \*\*kwargs: Any, optional
+
+      .. rubric:: Examples
+
+      >>> from observability.metrics import observe
+      >>> observe()  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`observability.metrics`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: inc(*args, **kwargs)
+
+      
+      Return inc.
+
+      :param \*args: Description for ``*args``.
+      :type \*args: Any, optional
+      :param \*\*kwargs: Description for ``**kwargs``.
+      :type \*\*kwargs: Any, optional
+
+      .. rubric:: Examples
+
+      >>> from observability.metrics import inc
+      >>> inc()  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`observability.metrics`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: set(*args, **kwargs)
+
+      
+      Return set.
+
+      :param \*args: Description for ``*args``.
+      :type \*args: Any, optional
+      :param \*\*kwargs: Description for ``**kwargs``.
+      :type \*\*kwargs: Any, optional
+
+      .. rubric:: Examples
+
+      >>> from observability.metrics import set
+      >>> set()  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`observability.metrics`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
 
 .. py:data:: pdf_download_success_total
 

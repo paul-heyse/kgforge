@@ -1,0 +1,133 @@
+{
+  "description": "Represent Doc.\n\nAttributes\n----------\nid : Id\n    Attribute description.\nopenalex_id : str | None\n    Attribute description.\ndoi : str | None\n    Attribute description.\narxiv_id : str | None\n    Attribute description.\npmcid : str | None\n    Attribute description.\ntitle : str\n    Attribute description.\nauthors : List[str]\n    Attribute description.\npub_date : str | None\n    Attribute description.\nlicense : str | None\n    Attribute description.\nlanguage : str | None\n    Attribute description.\npdf_uri : str\n    Attribute description.\nsource : str\n    Attribute description.\ncontent_hash : str | None\n    Attribute description.\n\nExamples\n--------\n>>> from kgfoundry_common.models import Doc\n>>> result = Doc()\n>>> result  # doctest: +ELLIPSIS\n...\n\nSee Also\n--------\nkgfoundry_common.models\n\nNotes\n-----\nDocument class invariants and lifecycle details here.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "openalex_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Openalex Id"
+    },
+    "doi": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Doi"
+    },
+    "arxiv_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Arxiv Id"
+    },
+    "pmcid": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pmcid"
+    },
+    "title": {
+      "default": "",
+      "title": "Title",
+      "type": "string"
+    },
+    "authors": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Authors",
+      "type": "array"
+    },
+    "pub_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pub Date"
+    },
+    "license": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "License"
+    },
+    "language": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "en",
+      "title": "Language"
+    },
+    "pdf_uri": {
+      "default": "",
+      "title": "Pdf Uri",
+      "type": "string"
+    },
+    "source": {
+      "default": "unknown",
+      "title": "Source",
+      "type": "string"
+    },
+    "content_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Content Hash"
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "title": "Doc",
+  "type": "object"
+}

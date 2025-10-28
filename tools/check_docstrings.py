@@ -1,5 +1,17 @@
 #!/usr/bin/env python
-"""Run docstring lint checks across repository directories."""
+"""Provide utilities for module.
+
+Auto-generated API documentation for the ``tools.check_docstrings`` module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+tools.check_docstrings
+"""
+
 
 from __future__ import annotations
 
@@ -19,7 +31,31 @@ TARGETS = [
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse command-line arguments for docstring checks."""
+    """Return parse args.
+
+    Auto-generated reference for the ``parse_args`` callable defined in ``tools.check_docstrings``.
+    
+    Returns
+    -------
+    argparse.Namespace
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.check_docstrings import parse_args
+    >>> result = parse_args()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    tools.check_docstrings
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--no-todo",
@@ -30,7 +66,36 @@ def parse_args() -> argparse.Namespace:
 
 
 def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
-    """Yield module, class, and function docstrings."""
+    """Return iter docstrings.
+
+    Auto-generated reference for the ``iter_docstrings`` callable defined in ``tools.check_docstrings``.
+    
+    Parameters
+    ----------
+    path : Path
+        Description for ``path``.
+    
+    Returns
+    -------
+    Iterable[Tuple[Path, int, str]]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.check_docstrings import iter_docstrings
+    >>> result = iter_docstrings(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    tools.check_docstrings
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if (doc := ast.get_docstring(tree, clean=False)) is not None:
@@ -44,7 +109,31 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
 
 
 def check_placeholders() -> int:
-    """Return non-zero when placeholder text is detected."""
+    """Return check placeholders.
+
+    Auto-generated reference for the ``check_placeholders`` callable defined in ``tools.check_docstrings``.
+    
+    Returns
+    -------
+    int
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.check_docstrings import check_placeholders
+    >>> result = check_placeholders()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    tools.check_docstrings
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     errors: list[str] = []
     keywords = {"TODO", "TBD", "FIXME"}
 
@@ -65,7 +154,29 @@ def check_placeholders() -> int:
 
 
 def main() -> None:
-    """Execute ruff docstring checks for all targets."""
+    """Return main.
+
+    Auto-generated reference for the ``main`` callable defined in ``tools.check_docstrings``.
+    
+    Raises
+    ------
+    SystemExit
+        Raised when validation fails.
+    
+    Examples
+    --------
+    >>> from tools.check_docstrings import main
+    >>> main()  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    tools.check_docstrings
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     options = parse_args()
 
     cmd = [

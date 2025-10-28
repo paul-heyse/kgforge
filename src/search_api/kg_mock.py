@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -34,31 +33,16 @@ __navmap__: Final[NavMap] = {
 
 
 class ConceptMeta(TypedDict):
-    """
-    Represent ConceptMeta.
+    """Represent ConceptMeta."""
     
-    Attributes
-    ----------
-    label : str
-        Attribute description.
-    keywords : List[str]
-        Attribute description.
     
-    Examples
-    --------
-    >>> from search_api.kg_mock import ConceptMeta
-    >>> result = ConceptMeta()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    search_api.kg_mock
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -82,9 +66,8 @@ CONCEPTS: Final[dict[str, ConceptMeta]] = {
 
 # [nav:anchor detect_query_concepts]
 def detect_query_concepts(query: str) -> set[str]:
-    """
-    Return detect query concepts.
-    
+    """Return detect query concepts.
+
     Parameters
     ----------
     query : str
@@ -122,9 +105,8 @@ def detect_query_concepts(query: str) -> set[str]:
 
 # [nav:anchor linked_concepts_for_text]
 def linked_concepts_for_text(text: str) -> list[str]:
-    """
-    Return linked concepts for text.
-    
+    """Return linked concepts for text.
+
     Parameters
     ----------
     text : str
@@ -167,9 +149,8 @@ def kg_boost(
     direct: float = 0.08,
     one_hop: float = 0.04,
 ) -> float:
-    """
-    Return kg boost.
-    
+    """Return kg boost.
+
     Parameters
     ----------
     query_concepts : List[str]

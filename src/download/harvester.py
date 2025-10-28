@@ -1,5 +1,6 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
+
+Auto-generated API documentation for the ``src.download.harvester`` module.
 
 Notes
 -----
@@ -7,7 +8,7 @@ This module exposes the primary interfaces for the package.
 
 See Also
 --------
-download.harvester
+src.download.harvester
 """
 
 
@@ -43,14 +44,13 @@ HTTP_OK = 200
 
 # [nav:anchor OpenAccessHarvester]
 class OpenAccessHarvester:
-    """
-    Represent OpenAccessHarvester.
-    
+    """Represent OpenAccessHarvester.
+
     Attributes
     ----------
     None
         No public attributes documented.
-    
+
     Methods
     -------
     __init__()
@@ -63,24 +63,21 @@ class OpenAccessHarvester:
         Method description.
     run()
         Method description.
-    
+
     Examples
     --------
     >>> from download.harvester import OpenAccessHarvester
     >>> result = OpenAccessHarvester()
     >>> result  # doctest: +ELLIPSIS
-    ...
-    
+
     See Also
     --------
     download.harvester
-    
+
     Notes
     -----
     Document class invariants and lifecycle details here.
     """
-    
-    
 
     def __init__(  # noqa: PLR0913 - parameters mirror external API options
         self,
@@ -91,9 +88,8 @@ class OpenAccessHarvester:
         pdf_host_base: str | None = None,
         out_dir: str = "/data/pdfs",
     ) -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         user_agent : str
@@ -108,21 +104,20 @@ class OpenAccessHarvester:
             Description for ``pdf_host_base``.
         out_dir : str, optional
             Description for ``out_dir``.
-        
+
         Examples
         --------
         >>> from download.harvester import __init__
         >>> __init__(..., ..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
-        
+
         See Also
         --------
         download.harvester
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.ua = user_agent
         self.email = contact_email
         self.openalex = openalex_base.rstrip("/")
@@ -134,9 +129,8 @@ class OpenAccessHarvester:
         self.session.headers.update({"User-Agent": f"{self.ua} ({self.email})"})
 
     def search(self, topic: str, years: str, max_works: int) -> list[dict[str, Any]]:
-        """
-        Return search.
-        
+        """Return search.
+
         Parameters
         ----------
         topic : str
@@ -145,29 +139,26 @@ class OpenAccessHarvester:
             Description for ``years``.
         max_works : int
             Description for ``max_works``.
-        
+
         Returns
         -------
         List[dict[str, Any]]
             Description of return value.
-        
+
         Examples
         --------
         >>> from download.harvester import search
         >>> result = search(..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
-        
+
         See Also
         --------
         download.harvester
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
             "topic": topic,
@@ -182,36 +173,32 @@ class OpenAccessHarvester:
         return data.get("results", [])[:max_works]
 
     def resolve_pdf(self, work: dict[str, Any]) -> str | None:
-        """
-        Return resolve pdf.
-        
+        """Return resolve pdf.
+
         Parameters
         ----------
         work : Mapping[str, Any]
             Description for ``work``.
-        
+
         Returns
         -------
         str | None
             Description of return value.
-        
+
         Examples
         --------
         >>> from download.harvester import resolve_pdf
         >>> result = resolve_pdf(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
-        
+
         See Also
         --------
         download.harvester
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         best = work.get("best_oa_location") or {}
         if best and best.get("pdf_url"):
             return best["pdf_url"]
@@ -233,44 +220,41 @@ class OpenAccessHarvester:
         return None
 
     def download_pdf(self, url: str, target_path: str) -> str:
-        """
-        Return download pdf.
-        
+        """Return download pdf.
+
         Parameters
         ----------
         url : str
             Description for ``url``.
         target_path : str
             Description for ``target_path``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
+
         Raises
         ------
         DownloadError
             Raised when validation fails.
         UnsupportedMIMEError
             Raised when validation fails.
-        
+
         Examples
         --------
         >>> from download.harvester import download_pdf
         >>> result = download_pdf(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
-        
+
         See Also
         --------
         download.harvester
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
             message = f"Bad status {response.status_code} for {url}"
@@ -284,9 +268,8 @@ class OpenAccessHarvester:
         return target_path
 
     def run(self, topic: str, years: str, max_works: int) -> list[Doc]:
-        """
-        Return run.
-        
+        """Return run.
+
         Parameters
         ----------
         topic : str
@@ -295,29 +278,26 @@ class OpenAccessHarvester:
             Description for ``years``.
         max_works : int
             Description for ``max_works``.
-        
+
         Returns
         -------
         List[Doc]
             Description of return value.
-        
+
         Examples
         --------
         >>> from download.harvester import run
         >>> result = run(..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
-        
+
         See Also
         --------
         download.harvester
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)
         for work in works:

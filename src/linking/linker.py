@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -35,29 +34,16 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Linker]
 class Linker:
-    """
-    Represent Linker.
+    """Represent Linker."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from linking.linker import Linker
-    >>> result = Linker()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    linking.linker
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     

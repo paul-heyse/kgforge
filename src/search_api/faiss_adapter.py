@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -60,31 +59,16 @@ type IndexArray = NDArray[np.int64]
 # [nav:anchor DenseVecs]
 @dataclass
 class DenseVecs:
-    """
-    Represent DenseVecs.
+    """Represent DenseVecs."""
     
-    Attributes
-    ----------
-    ids : List[str]
-        Attribute description.
-    mat : VecArray
-        Attribute description.
     
-    Examples
-    --------
-    >>> from search_api.faiss_adapter import DenseVecs
-    >>> result = DenseVecs()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    search_api.faiss_adapter
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -96,9 +80,8 @@ class DenseVecs:
 
 # [nav:anchor FaissAdapter]
 class FaissAdapter:
-    """
-    Represent FaissAdapter.
-    
+    """Represent FaissAdapter.
+
     Attributes
     ----------
     None
@@ -141,9 +124,8 @@ class FaissAdapter:
         factory: str = "OPQ64,IVF8192,PQ64",
         metric: str = "ip",
     ) -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         db_path : str
@@ -175,9 +157,8 @@ class FaissAdapter:
         self.vecs: DenseVecs | None = None
 
     def _load_dense_parquet(self) -> DenseVecs:
-        """
-        Return load dense parquet.
-        
+        """Return load dense parquet.
+
         Returns
         -------
         DenseVecs
@@ -231,9 +212,8 @@ class FaissAdapter:
         return DenseVecs(ids=ids, mat=normalized)
 
     def build(self) -> None:
-        """
-        Return build.
-        
+        """Return build.
+
         Examples
         --------
         >>> from search_api.faiss_adapter import build
@@ -272,9 +252,8 @@ class FaissAdapter:
         self.idmap = vectors.ids
 
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
-        """
-        Return load or build.
-        
+        """Return load or build.
+
         Parameters
         ----------
         cpu_index_path : str | None, optional
@@ -314,9 +293,8 @@ class FaissAdapter:
         self.build()
 
     def search(self, qvec: VecArray, k: int = 10) -> list[tuple[str, float]]:
-        """
-        Return search.
-        
+        """Return search.
+
         Parameters
         ----------
         qvec : VecArray

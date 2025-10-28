@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -63,9 +62,8 @@ __navmap__: Final[NavMap] = {
 def rrf_fuse(
     dense: list[tuple[str, float]], sparse: list[tuple[str, float]], k: int = 60
 ) -> list[tuple[str, float]]:
-    """
-    Return rrf fuse.
-    
+    """Return rrf fuse.
+
     Parameters
     ----------
     dense : List[Tuple[str, float]]
@@ -103,9 +101,8 @@ def rrf_fuse(
 
 # [nav:anchor apply_kg_boosts]
 def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[str, float]]:
-    """
-    Return apply kg boosts.
-    
+    """Return apply kg boosts.
+
     Parameters
     ----------
     fused : List[Tuple[str, float]]
@@ -143,9 +140,8 @@ def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[st
 def mmr_deduplicate(
     results: list[tuple[str, float]], lambda_: float = 0.7
 ) -> list[tuple[str, float]]:
-    """
-    Return mmr deduplicate.
-    
+    """Return mmr deduplicate.
+
     Parameters
     ----------
     results : List[Tuple[str, float]]

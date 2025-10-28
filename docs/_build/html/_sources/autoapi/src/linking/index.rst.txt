@@ -5,8 +5,31 @@ src.linking
 
 .. autoapi-nested-parse::
 
-   Module for linking.
+   
+   Provide utilities for module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`linking`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 Submodules

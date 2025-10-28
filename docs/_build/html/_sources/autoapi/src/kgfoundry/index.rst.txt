@@ -5,8 +5,31 @@ src.kgfoundry
 
 .. autoapi-nested-parse::
 
-   Module for kgfoundry.
+   
+   Provide utilities for module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`kgfoundry`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -16,15 +39,163 @@ src.kgfoundry
 Package Contents
 ----------------
 
+.. py:data:: _ALIASES
+   :type:  dict[str, str]
+
 .. py:data:: __all__
+
+.. py:function:: _load(name)
+
+   
+   Return load.
+
+   :param name: Description for ``name``.
+   :type name: str
+
+   :returns: *object* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from kgfoundry import _load
+   >>> result = _load(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`kgfoundry`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: __getattr__(name)
 
-   Load a lazily requested submodule from the compatibility namespace.
+   
+   Return getattr.
 
+   :param name: Description for ``name``.
+   :type name: str
+
+   :returns: *object* -- Description of return value.
+
+   :raises AttributeError: Raised when validation fails.
+
+   .. rubric:: Examples
+
+   >>> from kgfoundry import __getattr__
+   >>> result = __getattr__(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`kgfoundry`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: __dir__()
 
-   Expose the known compatibility submodules for auto-complete.
+   
+   Return dir.
 
+   :returns: *List[str]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from kgfoundry import __dir__
+   >>> result = __dir__()
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`kgfoundry`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _ensure_namespace_alias(name)
+
+   
+   Return ensure namespace alias.
+
+   :param name: Description for ``name``.
+   :type name: str
+
+   .. rubric:: Examples
+
+   >>> from kgfoundry import _ensure_namespace_alias
+   >>> _ensure_namespace_alias(...)  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`kgfoundry`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

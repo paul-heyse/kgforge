@@ -5,12 +5,18 @@ src.docling.hybrid
 
 .. autoapi-nested-parse::
 
-   Module for docling.hybrid.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - HybridChunker: Placeholder hybrid chunker for Docling outputs.
+   Auto-generated API documentation for the ``src.docling.hybrid`` module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.docling.hybrid`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -20,6 +26,24 @@ Module Contents
 
 .. py:class:: HybridChunker
 
-   Placeholder hybrid chunker for Docling outputs.
+   
+   Represent HybridChunker.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

@@ -5,15 +5,16 @@ src.orchestration.cli
 
 .. autoapi-nested-parse::
 
-   Module for orchestration.cli.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - index_bm25: Build a BM25 index from chunk fixtures (id, title, section,….
-   - index_faiss: Train & build FAISS index from fixture dense vectors.
-   - api: Run the FastAPI app.
-   - e2e: Execute the skeleton Prefect flow and print completed stages.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`orchestration.cli`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -23,23 +24,150 @@ Module Contents
 
 .. py:function:: index_bm25(chunks_parquet = typer.Argument(..., help='Path to Parquet/JSONL with chunks'), backend = typer.Option('lucene', help='lucene|pure'), index_dir = typer.Option('./_indices/bm25', help='Output index directory'))
 
-   Build a BM25 index from chunk fixtures (id, title, section, body).
+   
+   Return index bm25.
 
+   :param chunks_parquet: Description for ``chunks_parquet``.
+   :type chunks_parquet: str, optional
+   :param backend: Description for ``backend``.
+   :type backend: str, optional
+   :param index_dir: Description for ``index_dir``.
+   :type index_dir: str, optional
+
+   .. rubric:: Examples
+
+   >>> from orchestration.cli import index_bm25
+   >>> index_bm25(..., ..., ...)  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`orchestration.cli`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: index_faiss(dense_vectors = typer.Argument(..., help='Path to dense vectors JSON (skeleton)'), index_path = typer.Option('./_indices/faiss/shard_000.idx', help='Output index (CPU .idx)'))
 
-   Train & build FAISS index from fixture dense vectors.
+   
+   Return index faiss.
 
-   In this skeleton we accept a JSON with entries: {key: str, vector: List[float]}.
+   :param dense_vectors: Description for ``dense_vectors``.
+   :type dense_vectors: str, optional
+   :param index_path: Description for ``index_path``.
+   :type index_path: str, optional
 
+   .. rubric:: Examples
+
+   >>> from orchestration.cli import index_faiss
+   >>> index_faiss(..., ...)  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`orchestration.cli`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: api(port = 8080)
 
-   Run the FastAPI app.
+   
+   Return api.
 
+   :param port: Description for ``port``.
+   :type port: int, optional
+
+   .. rubric:: Examples
+
+   >>> from orchestration.cli import api
+   >>> api(...)  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`orchestration.cli`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: e2e()
 
-   Execute the skeleton Prefect flow and print completed stages.
+   
+   Return e2e.
 
+   :raises typer.Exit: Raised when validation fails.
+
+   .. rubric:: Examples
+
+   >>> from orchestration.cli import e2e
+   >>> e2e()  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`orchestration.cli`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

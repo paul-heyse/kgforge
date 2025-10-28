@@ -31,6 +31,10 @@
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
   <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -164,6 +168,72 @@ window.addEventListener("load", () => mermaid.run());
   </a>
 </li>
 
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/test-matrix.html">
+    Test Matrix (symbol → tests)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/observability/metrics.html">
+    Metrics (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/observability/logs.html">
+    Log events (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/observability/traces.html">
+    Traces (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/observability/config.html">
+    Configuration surfaces (Pydantic Settings & env usage)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/schemas/index.html">
+    Data Contract Schemas
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/graphs/index.html">
+    Package Graphs
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../gallery/index.html">
+    Welcome to the kgfoundry examples gallery
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -269,6 +339,62 @@ window.addEventListener("load", () => mermaid.run());
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/test-matrix.html">
+    Test Matrix (symbol → tests)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/observability/metrics.html">
+    Metrics (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/observability/logs.html">
+    Log events (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/observability/traces.html">
+    Traces (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/observability/config.html">
+    Configuration surfaces (Pydantic Settings & env usage)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/schemas/index.html">
+    Data Contract Schemas
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/graphs/index.html">
+    Package Graphs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../gallery/index.html">
+    Welcome to the kgfoundry examples gallery
+  </a>
+</li>
+
   </ul>
 </nav></div>
           
@@ -347,139 +473,182 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for src.kgfoundry_common.navmap_types</h1><div class="highlight"><pre>
-<span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Module for kgfoundry_common.navmap_types.</span>
+<span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Provide utilities for module.</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="sd">NavMap:</span>
-<span class="linenos"> 4</span><span class="sd">- NavSection: Section of a module navmap.</span>
-<span class="linenos"> 5</span><span class="sd">- SymbolMeta: Optional metadata describing a documented symbol.</span>
-<span class="linenos"> 6</span><span class="sd">- NavMap: Structure describing a module navmap.</span>
-<span class="linenos"> 7</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="linenos"> 8</span>
-<span class="linenos"> 9</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-<span class="linenos">10</span>
-<span class="linenos">11</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">NotRequired</span><span class="p">,</span> <span class="n">TypedDict</span>
+<span class="linenos"> 3</span><span class="sd">Notes</span>
+<span class="linenos"> 4</span><span class="sd">-----</span>
+<span class="linenos"> 5</span><span class="sd">This module exposes the primary interfaces for the package.</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="sd">See Also</span>
+<span class="linenos"> 8</span><span class="sd">--------</span>
+<span class="linenos"> 9</span><span class="sd">kgfoundry_common.navmap_types</span>
+<span class="linenos">10</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos">11</span>
 <span class="linenos">12</span>
-<span class="linenos">13</span>
+<span class="linenos">13</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">NotRequired</span><span class="p">,</span> <span class="n">TypedDict</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span>
 <div class="viewcode-block" id="NavSection">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavSection">[docs]</a>
-<span class="linenos">14</span><span class="k">class</span><span class="w"> </span><span class="nc">NavSection</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
-<span class="linenos">15</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Section of a module navmap.&quot;&quot;&quot;</span>
-<span class="linenos">16</span>
+<span class="linenos">18</span><span class="k">class</span><span class="w"> </span><span class="nc">NavSection</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="linenos">19</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represent NavSection.&quot;&quot;&quot;</span>
+<span class="linenos">20</span>    
+<span class="linenos">21</span>    
+<span class="linenos">22</span>    
+<span class="linenos">23</span>    
+<span class="linenos">24</span>    
+<span class="linenos">25</span>    
+<span class="linenos">26</span>    
+<span class="linenos">27</span>    
+<span class="linenos">28</span>    
+<span class="linenos">29</span>    
+<span class="linenos">30</span>    
+<span class="linenos">31</span>    
+<span class="linenos">32</span>    
+<span class="linenos">33</span>
 <div class="viewcode-block" id="NavSection.id">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavSection.id">[docs]</a>
-<span class="linenos">17</span>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span></div>
+<span class="linenos">34</span>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span></div>
 
 <div class="viewcode-block" id="NavSection.title">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavSection.title">[docs]</a>
-<span class="linenos">18</span>    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span></div>
+<span class="linenos">35</span>    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span></div>
 
 <div class="viewcode-block" id="NavSection.symbols">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavSection.symbols">[docs]</a>
-<span class="linenos">19</span>    <span class="n">symbols</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
+<span class="linenos">36</span>    <span class="n">symbols</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
 </div>
 
-<span class="linenos">20</span>
-<span class="linenos">21</span>
+<span class="linenos">37</span>
+<span class="linenos">38</span>
 <div class="viewcode-block" id="SymbolMeta">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.SymbolMeta">[docs]</a>
-<span class="linenos">22</span><span class="k">class</span><span class="w"> </span><span class="nc">SymbolMeta</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="linenos">23</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Optional metadata describing a documented symbol.&quot;&quot;&quot;</span>
-<span class="linenos">24</span>
+<span class="linenos">39</span><span class="k">class</span><span class="w"> </span><span class="nc">SymbolMeta</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="linenos">40</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represent SymbolMeta.&quot;&quot;&quot;</span>
+<span class="linenos">41</span>    
+<span class="linenos">42</span>    
+<span class="linenos">43</span>    
+<span class="linenos">44</span>    
+<span class="linenos">45</span>    
+<span class="linenos">46</span>    
+<span class="linenos">47</span>    
+<span class="linenos">48</span>    
+<span class="linenos">49</span>    
+<span class="linenos">50</span>    
+<span class="linenos">51</span>    
+<span class="linenos">52</span>    
+<span class="linenos">53</span>    
+<span class="linenos">54</span>
 <div class="viewcode-block" id="SymbolMeta.since">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.SymbolMeta.since">[docs]</a>
-<span class="linenos">25</span>    <span class="n">since</span><span class="p">:</span> <span class="nb">str</span></div>
+<span class="linenos">55</span>    <span class="n">since</span><span class="p">:</span> <span class="nb">str</span></div>
 
 <div class="viewcode-block" id="SymbolMeta.stability">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.SymbolMeta.stability">[docs]</a>
-<span class="linenos">26</span>    <span class="n">stability</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;frozen&quot;</span><span class="p">,</span> <span class="s2">&quot;stable&quot;</span><span class="p">,</span> <span class="s2">&quot;experimental&quot;</span><span class="p">,</span> <span class="s2">&quot;internal&quot;</span><span class="p">]</span></div>
+<span class="linenos">56</span>    <span class="n">stability</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;frozen&quot;</span><span class="p">,</span> <span class="s2">&quot;stable&quot;</span><span class="p">,</span> <span class="s2">&quot;experimental&quot;</span><span class="p">,</span> <span class="s2">&quot;internal&quot;</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="SymbolMeta.side_effects">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.SymbolMeta.side_effects">[docs]</a>
-<span class="linenos">27</span>    <span class="n">side_effects</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;fs&quot;</span><span class="p">,</span> <span class="s2">&quot;net&quot;</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;db&quot;</span><span class="p">]]</span></div>
+<span class="linenos">57</span>    <span class="n">side_effects</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;fs&quot;</span><span class="p">,</span> <span class="s2">&quot;net&quot;</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;db&quot;</span><span class="p">]]</span></div>
 
 <div class="viewcode-block" id="SymbolMeta.thread_safety">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.SymbolMeta.thread_safety">[docs]</a>
-<span class="linenos">28</span>    <span class="n">thread_safety</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;reentrant&quot;</span><span class="p">,</span> <span class="s2">&quot;threadsafe&quot;</span><span class="p">,</span> <span class="s2">&quot;not-threadsafe&quot;</span><span class="p">]</span></div>
+<span class="linenos">58</span>    <span class="n">thread_safety</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;reentrant&quot;</span><span class="p">,</span> <span class="s2">&quot;threadsafe&quot;</span><span class="p">,</span> <span class="s2">&quot;not-threadsafe&quot;</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="SymbolMeta.async_ok">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.SymbolMeta.async_ok">[docs]</a>
-<span class="linenos">29</span>    <span class="n">async_ok</span><span class="p">:</span> <span class="nb">bool</span></div>
+<span class="linenos">59</span>    <span class="n">async_ok</span><span class="p">:</span> <span class="nb">bool</span></div>
 
 <div class="viewcode-block" id="SymbolMeta.perf_budget_ms">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.SymbolMeta.perf_budget_ms">[docs]</a>
-<span class="linenos">30</span>    <span class="n">perf_budget_ms</span><span class="p">:</span> <span class="nb">float</span></div>
+<span class="linenos">60</span>    <span class="n">perf_budget_ms</span><span class="p">:</span> <span class="nb">float</span></div>
 
 <div class="viewcode-block" id="SymbolMeta.tests">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.SymbolMeta.tests">[docs]</a>
-<span class="linenos">31</span>    <span class="n">tests</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
+<span class="linenos">61</span>    <span class="n">tests</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="SymbolMeta.replaced_by">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.SymbolMeta.replaced_by">[docs]</a>
-<span class="linenos">32</span>    <span class="n">replaced_by</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
+<span class="linenos">62</span>    <span class="n">replaced_by</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="SymbolMeta.deprecated_msg">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.SymbolMeta.deprecated_msg">[docs]</a>
-<span class="linenos">33</span>    <span class="n">deprecated_msg</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
+<span class="linenos">63</span>    <span class="n">deprecated_msg</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="SymbolMeta.contracts">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.SymbolMeta.contracts">[docs]</a>
-<span class="linenos">34</span>    <span class="n">contracts</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span></div>
+<span class="linenos">64</span>    <span class="n">contracts</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span></div>
 
 <div class="viewcode-block" id="SymbolMeta.coverage_target">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.SymbolMeta.coverage_target">[docs]</a>
-<span class="linenos">35</span>    <span class="n">coverage_target</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span></div>
+<span class="linenos">65</span>    <span class="n">coverage_target</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span></div>
 </div>
 
-<span class="linenos">36</span>
-<span class="linenos">37</span>
+<span class="linenos">66</span>
+<span class="linenos">67</span>
 <div class="viewcode-block" id="NavMap">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavMap">[docs]</a>
-<span class="linenos">38</span><span class="k">class</span><span class="w"> </span><span class="nc">NavMap</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="linenos">39</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Structure describing a module navmap.&quot;&quot;&quot;</span>
-<span class="linenos">40</span>
+<span class="linenos">68</span><span class="k">class</span><span class="w"> </span><span class="nc">NavMap</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="linenos">69</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represent NavMap.&quot;&quot;&quot;</span>
+<span class="linenos">70</span>    
+<span class="linenos">71</span>    
+<span class="linenos">72</span>    
+<span class="linenos">73</span>    
+<span class="linenos">74</span>    
+<span class="linenos">75</span>    
+<span class="linenos">76</span>    
+<span class="linenos">77</span>    
+<span class="linenos">78</span>    
+<span class="linenos">79</span>    
+<span class="linenos">80</span>    
+<span class="linenos">81</span>    
+<span class="linenos">82</span>    
+<span class="linenos">83</span>
 <div class="viewcode-block" id="NavMap.title">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavMap.title">[docs]</a>
-<span class="linenos">41</span>    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span></div>
+<span class="linenos">84</span>    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span></div>
 
 <div class="viewcode-block" id="NavMap.synopsis">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavMap.synopsis">[docs]</a>
-<span class="linenos">42</span>    <span class="n">synopsis</span><span class="p">:</span> <span class="nb">str</span></div>
+<span class="linenos">85</span>    <span class="n">synopsis</span><span class="p">:</span> <span class="nb">str</span></div>
 
 <div class="viewcode-block" id="NavMap.exports">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavMap.exports">[docs]</a>
-<span class="linenos">43</span>    <span class="n">exports</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
+<span class="linenos">86</span>    <span class="n">exports</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="NavMap.sections">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavMap.sections">[docs]</a>
-<span class="linenos">44</span>    <span class="n">sections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NavSection</span><span class="p">]</span></div>
+<span class="linenos">87</span>    <span class="n">sections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NavSection</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="NavMap.see_also">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavMap.see_also">[docs]</a>
-<span class="linenos">45</span>    <span class="n">see_also</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
+<span class="linenos">88</span>    <span class="n">see_also</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="NavMap.tags">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavMap.tags">[docs]</a>
-<span class="linenos">46</span>    <span class="n">tags</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
+<span class="linenos">89</span>    <span class="n">tags</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="NavMap.since">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavMap.since">[docs]</a>
-<span class="linenos">47</span>    <span class="n">since</span><span class="p">:</span> <span class="nb">str</span></div>
+<span class="linenos">90</span>    <span class="n">since</span><span class="p">:</span> <span class="nb">str</span></div>
 
 <div class="viewcode-block" id="NavMap.deprecated">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavMap.deprecated">[docs]</a>
-<span class="linenos">48</span>    <span class="n">deprecated</span><span class="p">:</span> <span class="nb">str</span></div>
+<span class="linenos">91</span>    <span class="n">deprecated</span><span class="p">:</span> <span class="nb">str</span></div>
 
 <div class="viewcode-block" id="NavMap.symbols">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavMap.symbols">[docs]</a>
-<span class="linenos">49</span>    <span class="n">symbols</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SymbolMeta</span><span class="p">]</span></div>
+<span class="linenos">92</span>    <span class="n">symbols</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SymbolMeta</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="NavMap.edit_scopes">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavMap.edit_scopes">[docs]</a>
-<span class="linenos">50</span>    <span class="n">edit_scopes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span></div>
+<span class="linenos">93</span>    <span class="n">edit_scopes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span></div>
 
 <div class="viewcode-block" id="NavMap.deps">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/navmap_types/index.html#src.kgfoundry_common.navmap_types.NavMap.deps">[docs]</a>
-<span class="linenos">51</span>    <span class="n">deps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
+<span class="linenos">94</span>    <span class="n">deps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
 </div>
 
 </pre></div>

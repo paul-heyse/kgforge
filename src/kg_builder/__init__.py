@@ -1,5 +1,6 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
+
+Auto-generated API documentation for the ``src.kg_builder`` module.
 
 Notes
 -----
@@ -7,6 +8,6 @@ This module exposes the primary interfaces for the package.
 
 See Also
 --------
-kg_builder
+src.kg_builder
 """
 

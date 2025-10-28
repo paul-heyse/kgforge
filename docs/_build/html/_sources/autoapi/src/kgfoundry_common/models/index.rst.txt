@@ -5,15 +5,16 @@ src.kgfoundry_common.models
 
 .. autoapi-nested-parse::
 
-   Module for kgfoundry_common.models.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - Doc: Doc.
-   - DoctagsAsset: Doctagsasset.
-   - Chunk: Chunk.
-   - LinkAssertion: Linkassertion.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`kgfoundry_common.models`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -26,8 +27,26 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   Doc.
+   
+   Represent Doc.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: id
       :type:  Id
@@ -110,8 +129,26 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   Doctagsasset.
+   
+   Represent DoctagsAsset.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: doc_id
       :type:  Id
@@ -144,8 +181,26 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   Chunk.
+   
+   Represent Chunk.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: id
       :type:  Id
@@ -180,8 +235,26 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   Linkassertion.
+   
+   Represent LinkAssertion.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: id
       :type:  Id

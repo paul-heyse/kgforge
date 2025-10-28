@@ -32,6 +32,10 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
   <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -45,8 +49,6 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/src/kg_builder/neo4j_store/index';</script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="src.kgfoundry" href="../../kgfoundry/index.html" />
-    <link rel="prev" title="src.kg_builder.mock_kg" href="../mock_kg/index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -146,7 +148,7 @@
 </li>
 
 
-<li class="nav-item current active">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../index.html">
     API Reference
   </a>
@@ -159,6 +161,72 @@
   </a>
 </li>
 
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/test-matrix.html">
+    Test Matrix (symbol → tests)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/observability/metrics.html">
+    Metrics (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/observability/logs.html">
+    Log events (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/observability/traces.html">
+    Traces (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/observability/config.html">
+    Configuration surfaces (Pydantic Settings & env usage)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/schemas/index.html">
+    Data Contract Schemas
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../reference/graphs/index.html">
+    Package Graphs
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../gallery/index.html">
+    Welcome to the kgfoundry examples gallery
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -253,7 +321,7 @@
 </li>
 
 
-<li class="nav-item current active">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../index.html">
     API Reference
   </a>
@@ -263,6 +331,62 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../architecture/index.html">
     Architecture
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/test-matrix.html">
+    Test Matrix (symbol → tests)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/observability/metrics.html">
+    Metrics (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/observability/logs.html">
+    Log events (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/observability/traces.html">
+    Traces (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/observability/config.html">
+    Configuration surfaces (Pydantic Settings & env usage)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/schemas/index.html">
+    Data Contract Schemas
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/graphs/index.html">
+    Package Graphs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../gallery/index.html">
+    Welcome to the kgfoundry examples gallery
   </a>
 </li>
 
@@ -293,98 +417,7 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">src</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../docling/index.html">src.docling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../docling/canonicalizer/index.html">src.docling.canonicalizer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../docling/hybrid/index.html">src.docling.hybrid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../docling/vlm/index.html">src.docling.vlm</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../download/index.html">src.download</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../download/cli/index.html">src.download.cli</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../download/harvester/index.html">src.download.harvester</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../embeddings_dense/index.html">src.embeddings_dense</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../embeddings_dense/base/index.html">src.embeddings_dense.base</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../embeddings_dense/qwen3/index.html">src.embeddings_dense.qwen3</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../embeddings_sparse/index.html">src.embeddings_sparse</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../embeddings_sparse/base/index.html">src.embeddings_sparse.base</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../embeddings_sparse/bm25/index.html">src.embeddings_sparse.bm25</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../embeddings_sparse/splade/index.html">src.embeddings_sparse.splade</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">src.kg_builder</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../mock_kg/index.html">src.kg_builder.mock_kg</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">src.kg_builder.neo4j_store</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2"><a class="reference internal" href="../../kgfoundry/index.html">src.kgfoundry</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../kgfoundry_common/index.html">src.kgfoundry_common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/config/index.html">src.kgfoundry_common.config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/errors/index.html">src.kgfoundry_common.errors</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/exceptions/index.html">src.kgfoundry_common.exceptions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/ids/index.html">src.kgfoundry_common.ids</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/logging/index.html">src.kgfoundry_common.logging</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/models/index.html">src.kgfoundry_common.models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/navmap_types/index.html">src.kgfoundry_common.navmap_types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../kgfoundry_common/parquet_io/index.html">src.kgfoundry_common.parquet_io</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../linking/index.html">src.linking</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../linking/calibration/index.html">src.linking.calibration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../linking/linker/index.html">src.linking.linker</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../observability/index.html">src.observability</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../observability/metrics/index.html">src.observability.metrics</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../ontology/index.html">src.ontology</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../ontology/catalog/index.html">src.ontology.catalog</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ontology/loader/index.html">src.ontology.loader</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../orchestration/index.html">src.orchestration</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../orchestration/cli/index.html">src.orchestration.cli</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../orchestration/fixture_flow/index.html">src.orchestration.fixture_flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../orchestration/flows/index.html">src.orchestration.flows</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../registry/index.html">src.registry</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../registry/api/index.html">src.registry.api</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../registry/duckdb_registry/index.html">src.registry.duckdb_registry</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../registry/helper/index.html">src.registry.helper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../registry/migrate/index.html">src.registry.migrate</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../search_api/index.html">src.search_api</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/app/index.html">src.search_api.app</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/bm25_index/index.html">src.search_api.bm25_index</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/faiss_adapter/index.html">src.search_api.faiss_adapter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/fixture_index/index.html">src.search_api.fixture_index</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/fusion/index.html">src.search_api.fusion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/kg_mock/index.html">src.search_api.kg_mock</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/schemas/index.html">src.search_api.schemas</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/service/index.html">src.search_api.service</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../search_api/splade_index/index.html">src.search_api.splade_index</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../search_client/index.html">src.search_client</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../search_client/client/index.html">src.search_client.client</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../vectorstore_faiss/index.html">src.vectorstore_faiss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../vectorstore_faiss/gpu/index.html">src.vectorstore_faiss.gpu</a></li>
-</ul>
-</details></li>
-</ul>
-</details></li>
-</ul>
-</div>
+  <div class="bd-toc-item navbar-nav"></div>
 </nav></div>
     </div>
   
@@ -423,15 +456,6 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    
-    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">API Reference</a></li>
-    
-    
-    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">src</a></li>
-    
-    
-    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">src.kg_builder</a></li>
-    
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">src.kg_builder.neo4j_store</span></li>
   </ul>
 </nav>
@@ -451,16 +475,20 @@
                   
   <section id="module-src.kg_builder.neo4j_store">
 <span id="src-kg-builder-neo4j-store"></span><h1>src.kg_builder.neo4j_store<a class="headerlink" href="#module-src.kg_builder.neo4j_store" title="Link to this heading">#</a></h1>
-<p>Module for kg_builder.neo4j_store.</p>
-<p>NavMap:
-- NavMap: Structure describing a module navmap.
-- Neo4jStore: Placeholder interface for a Neo4j-backed store.</p>
+<p>Provide utilities for module.</p>
+<p>Auto-generated API documentation for the <code class="docutils literal notranslate"><span class="pre">src.kg_builder.neo4j_store</span></code> module.</p>
+<p class="rubric">Notes</p>
+<p>This module exposes the primary interfaces for the package.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#module-src.kg_builder.neo4j_store" title="src.kg_builder.neo4j_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">src.kg_builder.neo4j_store</span></code></a></p>
+</div>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.kg_builder.neo4j_store.Neo4jStore">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kg_builder.neo4j_store.</span></span><span class="sig-name descname"><span class="pre">Neo4jStore</span></span><a class="reference internal" href="../../../../_modules/src/kg_builder/neo4j_store.html#Neo4jStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kg_builder/neo4j_store.py:31:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kg_builder.neo4j_store.Neo4jStore" title="Link to this definition">#</a></dt>
-<dd><p>Placeholder interface for a Neo4j-backed store.</p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.kg_builder.neo4j_store.</span></span><span class="sig-name descname"><span class="pre">Neo4jStore</span></span><a class="reference internal" href="../../../../_modules/src/kg_builder/neo4j_store.html#Neo4jStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kg_builder/neo4j_store.py:38:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kg_builder.neo4j_store.Neo4jStore" title="Link to this definition">#</a></dt>
+<dd><p>Represent Neo4jStore.</p>
 </dd></dl>
 
 </section>
@@ -476,24 +504,6 @@
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="../mock_kg/index.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">src.kg_builder.mock_kg</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="../../kgfoundry/index.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">src.kgfoundry</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               

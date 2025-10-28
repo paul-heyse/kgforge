@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -49,9 +48,8 @@ def index_bm25(
     backend: str = typer.Option("lucene", help="lucene|pure"),
     index_dir: str = typer.Option("./_indices/bm25", help="Output index directory"),
 ) -> None:
-    """
-    Return index bm25.
-    
+    """Return index bm25.
+
     Parameters
     ----------
     chunks_parquet : str, optional
@@ -121,9 +119,8 @@ def index_faiss(
         "./_indices/faiss/shard_000.idx", help="Output index (CPU .idx)"
     ),
 ) -> None:
-    """
-    Return index faiss.
-    
+    """Return index faiss.
+
     Parameters
     ----------
     dense_vectors : str, optional
@@ -166,9 +163,8 @@ def index_faiss(
 # [nav:anchor api]
 @app.command()
 def api(port: int = 8080) -> None:
-    """
-    Return api.
-    
+    """Return api.
+
     Parameters
     ----------
     port : int, optional
@@ -196,9 +192,8 @@ def api(port: int = 8080) -> None:
 # [nav:anchor e2e]
 @app.command()
 def e2e() -> None:
-    """
-    Return e2e.
-    
+    """Return e2e.
+
     Raises
     ------
     typer.Exit

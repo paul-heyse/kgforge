@@ -1,5 +1,6 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
+
+Auto-generated API documentation for the ``src.embeddings_dense.base`` module.
 
 Notes
 -----
@@ -7,7 +8,7 @@ This module exposes the primary interfaces for the package.
 
 See Also
 --------
-embeddings_dense.base
+src.embeddings_dense.base
 """
 
 
@@ -39,65 +40,58 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DenseEmbeddingModel]
 class DenseEmbeddingModel(Protocol):
-    """
-    Represent DenseEmbeddingModel.
-    
+    """Represent DenseEmbeddingModel.
+
     Attributes
     ----------
     None
         No public attributes documented.
-    
+
     Methods
     -------
     encode()
         Method description.
-    
+
     Examples
     --------
     >>> from embeddings_dense.base import DenseEmbeddingModel
     >>> result = DenseEmbeddingModel()
     >>> result  # doctest: +ELLIPSIS
-    ...
-    
+
     See Also
     --------
     embeddings_dense.base
-    
+
     Notes
     -----
     Document class invariants and lifecycle details here.
     """
-    
-    
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]:
-        """
-        Return encode.
-        
+        """Return encode.
+
         Parameters
         ----------
         texts : Sequence[str]
             Description for ``texts``.
-        
+
         Returns
         -------
         NDArray[np.float32]
             Description of return value.
-        
+
         Examples
         --------
         >>> from embeddings_dense.base import encode
         >>> result = encode(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
-        
+
         See Also
         --------
         embeddings_dense.base
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
         ...

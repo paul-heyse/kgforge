@@ -5,13 +5,16 @@ src.kgfoundry_common.parquet_io
 
 .. autoapi-nested-parse::
 
-   Module for kgfoundry_common.parquet_io.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - ParquetVectorWriter: Persist embedding vectors into partitioned Parquet datasets.
-   - ParquetChunkWriter: Persist chunk metadata and text into Parquet files.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -21,21 +24,104 @@ Module Contents
 
 .. py:class:: ParquetVectorWriter(root)
 
-   Persist embedding vectors into partitioned Parquet datasets.
+   
+   Represent ParquetVectorWriter.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: dense_schema()
+
+      Method description.
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: write_dense()
+
+      Method description.
+
+   .. method:: splade_schema()
+
+      Method description.
+
+   .. method:: write_splade()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from kgfoundry_common.parquet_io import ParquetVectorWriter
+   >>> result = ParquetVectorWriter()
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:method:: dense_schema(dim)
       :staticmethod:
 
 
-      Return the schema used for dense embedding Parquet files.
+      
+      Return dense schema.
 
-      :param dim: Number of dimensions in each dense vector.
+      :param dim: Description for ``dim``.
       :type dim: int
 
-      :returns: Arrow schema describing the dense vector rows.
-      :rtype: pa.schema
+      :returns: *pa.schema* -- Description of return value.
 
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.parquet_io import dense_schema
+      >>> result = dense_schema(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:attribute:: root
@@ -43,67 +129,229 @@ Module Contents
 
    .. py:method:: write_dense(model, run_id, dim, records, shard = 0)
 
-      Write dense embedding vectors to a Parquet shard.
+      
+      Return write dense.
 
-      :param model: Identifier for the embedding model.
+      :param model: Description for ``model``.
       :type model: str
-      :param run_id: Identifier for the batch or run that produced the embeddings.
+      :param run_id: Description for ``run_id``.
       :type run_id: str
-      :param dim: Number of dimensions in the embedding vectors.
+      :param dim: Description for ``dim``.
       :type dim: int
-      :param records: Sequence of ``(chunk_id, vector, l2_norm)`` rows.
-      :type records: Iterable[tuple[str, list[float], float]]
-      :param shard: Shard partition to write, defaults to ``0``.
+      :param records: Description for ``records``.
+      :type records: Iterable[Tuple[str, List[float], float]]
+      :param shard: Description for ``shard``.
       :type shard: int, optional
 
-      :returns: Root directory path as a string.
-      :rtype: str
+      :returns: *str* -- Description of return value.
 
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.parquet_io import write_dense
+      >>> result = write_dense(..., ..., ..., ..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: splade_schema()
       :staticmethod:
 
 
-      Return the schema used for SPLADE sparse vector Parquet files.
+      
+      Return splade schema.
 
-      :returns: Arrow schema describing sparse vocab ids and weights.
-      :rtype: pa.schema
+      :returns: *pa.schema* -- Description of return value.
 
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.parquet_io import splade_schema
+      >>> result = splade_schema()
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: write_splade(model, run_id, records, shard = 0)
 
-      Write SPLADE sparse vector data to a Parquet shard.
+      
+      Return write splade.
 
-      :param model: Identifier for the sparse embedding model.
+      :param model: Description for ``model``.
       :type model: str
-      :param run_id: Identifier for the batch or run that produced the embeddings.
+      :param run_id: Description for ``run_id``.
       :type run_id: str
-      :param records: Sequence of ``(chunk_id, vocab_ids, weights)`` rows.
-      :type records: Iterable[tuple[str, list[int], list[float]]]
-      :param shard: Shard partition to write, defaults to ``0``.
+      :param records: Description for ``records``.
+      :type records: Iterable[Tuple[str, List[int], List[float]]]
+      :param shard: Description for ``shard``.
       :type shard: int, optional
 
-      :returns: Root directory path as a string.
-      :rtype: str
+      :returns: *str* -- Description of return value.
 
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.parquet_io import write_splade
+      >>> result = write_splade(..., ..., ..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
 .. py:class:: ParquetChunkWriter(root, model = 'docling_hybrid', run_id = 'dev')
 
-   Persist chunk metadata and text into Parquet files.
+   
+   Represent ParquetChunkWriter.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: chunk_schema()
+
+      Method description.
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: write()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from kgfoundry_common.parquet_io import ParquetChunkWriter
+   >>> result = ParquetChunkWriter()
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:method:: chunk_schema()
       :staticmethod:
 
 
-      Return the schema describing chunk metadata rows.
+      
+      Return chunk schema.
 
-      :returns: Arrow schema describing chunk metadata and text columns.
-      :rtype: pa.schema
+      :returns: *pa.schema* -- Description of return value.
 
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.parquet_io import chunk_schema
+      >>> result = chunk_schema()
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:attribute:: root
@@ -111,13 +359,42 @@ Module Contents
 
    .. py:method:: write(rows)
 
-      Write chunk rows to Parquet and return the run directory.
+      
+      Return write.
 
-      :param rows: Sequence of dictionaries matching :meth:`chunk_schema`.
+      :param rows: Description for ``rows``.
       :type rows: Iterable[dict[str, Any]]
 
-      :returns: Path (as string) to the containing run directory.
-      :rtype: str
+      :returns: *str* -- Description of return value.
 
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.parquet_io import write
+      >>> result = write(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`kgfoundry_common.parquet_io`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 

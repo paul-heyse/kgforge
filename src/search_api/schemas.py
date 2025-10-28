@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -37,35 +36,16 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor SearchRequest]
 class SearchRequest(BaseModel):
-    """
-    Represent SearchRequest.
+    """Represent SearchRequest."""
     
-    Attributes
-    ----------
-    query : str
-        Attribute description.
-    k : int
-        Attribute description.
-    filters : Mapping[str, object] | None
-        Attribute description.
-    explain : bool
-        Attribute description.
     
-    Examples
-    --------
-    >>> from search_api.schemas import SearchRequest
-    >>> result = SearchRequest()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    search_api.schemas
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -79,43 +59,16 @@ class SearchRequest(BaseModel):
 
 # [nav:anchor SearchResult]
 class SearchResult(BaseModel):
-    """
-    Represent SearchResult.
+    """Represent SearchResult."""
     
-    Attributes
-    ----------
-    doc_id : str
-        Attribute description.
-    chunk_id : str
-        Attribute description.
-    title : str
-        Attribute description.
-    section : str
-        Attribute description.
-    score : float
-        Attribute description.
-    signals : Mapping[str, float]
-        Attribute description.
-    spans : Mapping[str, int]
-        Attribute description.
-    concepts : List[dict[str, str]]
-        Attribute description.
     
-    Examples
-    --------
-    >>> from search_api.schemas import SearchResult
-    >>> result = SearchResult()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    search_api.schemas
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     

@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -32,9 +31,8 @@ __all__ = sorted(_ALIASES)
 
 
 def _load(name: str) -> object:
-    """
-    Return load.
-    
+    """Return load.
+
     Parameters
     ----------
     name : str
@@ -70,9 +68,8 @@ def _load(name: str) -> object:
 
 
 def __getattr__(name: str) -> object:
-    """
-    Return getattr.
-    
+    """Return getattr.
+
     Parameters
     ----------
     name : str
@@ -111,9 +108,8 @@ def __getattr__(name: str) -> object:
 
 
 def __dir__() -> list[str]:
-    """
-    Return dir.
-    
+    """Return dir.
+
     Returns
     -------
     List[str]
@@ -140,9 +136,8 @@ def __dir__() -> list[str]:
 
 
 def _ensure_namespace_alias(name: str) -> None:
-    """
-    Return ensure namespace alias.
-    
+    """Return ensure namespace alias.
+
     Parameters
     ----------
     name : str

@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -56,9 +55,8 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor t_prepare_dirs]
 @task
 def t_prepare_dirs(root: str) -> dict[str, bool]:
-    """
-    Return t prepare dirs.
-    
+    """Return t prepare dirs.
+
     Parameters
     ----------
     root : str
@@ -97,9 +95,8 @@ def t_prepare_dirs(root: str) -> dict[str, bool]:
 # [nav:anchor t_write_fixture_chunks]
 @task
 def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
-    """
-    Return t write fixture chunks.
-    
+    """Return t write fixture chunks.
+
     Parameters
     ----------
     chunks_root : str
@@ -148,9 +145,8 @@ def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
 # [nav:anchor t_write_fixture_dense]
 @task
 def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
-    """
-    Return t write fixture dense.
-    
+    """Return t write fixture dense.
+
     Parameters
     ----------
     dense_root : str
@@ -189,9 +185,8 @@ def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
 # [nav:anchor t_write_fixture_splade]
 @task
 def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
-    """
-    Return t write fixture splade.
-    
+    """Return t write fixture splade.
+
     Parameters
     ----------
     sparse_root : str
@@ -237,9 +232,8 @@ def t_register_in_duckdb(
     dense_info: tuple[str, int],
     sparse_info: tuple[str, int],
 ) -> dict[str, list[str]]:
-    """
-    Return t register in duckdb.
-    
+    """Return t register in duckdb.
+
     Parameters
     ----------
     db_path : str
@@ -315,9 +309,8 @@ def t_register_in_duckdb(
 def fixture_pipeline(
     root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb"
 ) -> dict[str, list[str]]:
-    """
-    Return fixture pipeline.
-    
+    """Return fixture pipeline.
+
     Parameters
     ----------
     root : str, optional

@@ -82,6 +82,7 @@ extensions = [
     "sphinxcontrib.mermaid",
     "numpydoc",
     "numpydoc_validation",
+    "sphinx_gallery.gen_gallery",
 ]
 
 napoleon_google_docstring = False
@@ -107,18 +108,28 @@ html_theme = os.environ.get("SPHINX_THEME", "pydata_sphinx_theme")
 # MyST (Markdown) features
 myst_enable_extensions = ["colon_fence", "deflist", "linkify"]
 
-# AutoAPI: scan source directory (or root if no src/ folder)
+# AutoAPI: scan each detected package directory so module names match import paths
 autoapi_type = "python"
-autoapi_dirs = [str(SRC_DIR if SRC_DIR.exists() else ROOT)]
+_AUTOAPI_DIRS: list[str] = []
+for _pkg in _PACKAGES:
+    _candidate = SRC_DIR / _pkg.replace(".", "/")
+    if _candidate.exists():
+        _AUTOAPI_DIRS.append(str(_candidate))
+if not _AUTOAPI_DIRS:
+    _AUTOAPI_DIRS = [str(SRC_DIR if SRC_DIR.exists() else ROOT)]
+autoapi_dirs = _AUTOAPI_DIRS
 autoapi_root = "autoapi"
 autoapi_output_dir = "autoapi"
 autoapi_add_toctree_entry = True
+autoapi_python_module_prefix = "src."
+autoapi_generate_module_toc = True
 autoapi_options = [
     "members",
     "undoc-members",
     "show-inheritance",
     "special-members",
     "imported-members",
+    "private-members",
 ]
 # Include package __init__ modules so AutoAPI emits package-level toctrees.
 autoapi_ignore: list[str] = []
@@ -159,6 +170,21 @@ viewcode_line_numbers = True
 
 suppress_warnings = ["myst.header", "misc.restructuredtext"]
 
+EXAMPLES_DIR = (DOCS_DIR.parent / "examples").resolve()
+
+sphinx_gallery_conf = {
+    "examples_dirs": str(EXAMPLES_DIR),
+    "gallery_dirs": "gallery",
+    "filename_pattern": r".*\.py",
+    "within_subsection_order": "FileNameSortKey",
+    "download_all_examples": True,
+    "remove_config_comments": True,
+    "doc_module": tuple(_PACKAGES),
+    "run_stale_examples": False,
+    "plot_gallery": False,
+    "backreferences_dir": "gen_modules/backrefs",
+}
+
 # Ensure JSON builder can serialize lru_cache wrappers
 
 _json_default = jsonimpl.json.JSONEncoder.default
@@ -181,6 +207,9 @@ except ImportError:  # pragma: no cover - compatibility shim
 _loader = GriffeLoader(search_paths=[str(SRC_DIR if SRC_DIR.exists() else ROOT)])
 _MODULE_CACHE: dict[str, GriffeModule | None] = {}
 PKG = _PACKAGES[0]
+
+# Ensure sphinx-gallery backref directory exists to avoid missing-path errors
+(DOCS_DIR / "gen_modules" / "backrefs").mkdir(parents=True, exist_ok=True)
 
 
 def _get_root(module: str | None) -> GriffeModule | None:

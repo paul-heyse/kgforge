@@ -5,12 +5,18 @@ src.docling.vlm
 
 .. autoapi-nested-parse::
 
-   Module for docling.vlm.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - GraniteDoclingVLM: Expose unified utilities for Docling-compatible VLMs.
+   Auto-generated API documentation for the ``src.docling.vlm`` module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.docling.vlm`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -20,6 +26,24 @@ Module Contents
 
 .. py:class:: GraniteDoclingVLM
 
-   Expose unified utilities for Docling-compatible VLMs.
+   
+   Represent GraniteDoclingVLM.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

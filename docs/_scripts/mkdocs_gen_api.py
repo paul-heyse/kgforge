@@ -1,4 +1,16 @@
-"""Generate MkDocs API stub pages using Griffe."""
+"""Provide utilities for module.
+
+Auto-generated API documentation for the ``docs._scripts.mkdocs_gen_api`` module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+docs._scripts.mkdocs_gen_api
+"""
+
 
 from __future__ import annotations
 
@@ -27,7 +39,31 @@ with mkdocs_gen_files.open(out / "index.md", "w") as f:
 
 
 def iter_packages() -> list[str]:
-    """Return the packages that should have API pages generated."""
+    """Return iter packages.
+
+    Auto-generated reference for the ``iter_packages`` callable defined in ``docs._scripts.mkdocs_gen_api``.
+    
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from docs._scripts.mkdocs_gen_api import iter_packages
+    >>> result = iter_packages()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    docs._scripts.mkdocs_gen_api
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     packages = detect_packages()
     return packages or [detect_primary()]
 
@@ -36,7 +72,29 @@ loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
 
 
 def write_node(node: Object) -> None:
-    """Write a MkDocs page for the provided Griffe node."""
+    """Return write node.
+
+    Auto-generated reference for the ``write_node`` callable defined in ``docs._scripts.mkdocs_gen_api``.
+    
+    Parameters
+    ----------
+    node : Object
+        Description for ``node``.
+    
+    Examples
+    --------
+    >>> from docs._scripts.mkdocs_gen_api import write_node
+    >>> write_node(...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    docs._scripts.mkdocs_gen_api
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     rel = node.path.replace(".", "/")
     page = out / rel / "index.md"
     with mkdocs_gen_files.open(page, "w") as f:
