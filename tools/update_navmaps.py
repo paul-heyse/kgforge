@@ -27,6 +27,12 @@ def iter_python_files() -> list[Path]:
     
     
     
+    
+    
+    
+    
+    
+    
 
 
 
@@ -73,6 +79,12 @@ def module_docstring(path: Path) -> str | None:
     
     
     
+    
+    
+    
+    
+    
+    
 
 
 
@@ -110,6 +122,12 @@ def main() -> None:
     SystemExit
         Raised when validation fails.
     """
+    
+    
+    
+    
+    
+    
     
     
     

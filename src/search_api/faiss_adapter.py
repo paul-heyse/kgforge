@@ -85,6 +85,12 @@ class FaissAdapter:
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -161,6 +167,12 @@ class FaissAdapter:
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -210,6 +222,12 @@ class FaissAdapter:
         cpu_index_path : str | None
             Description for ``cpu_index_path``.
         """
+        
+        
+        
+        
+        
+        
         
         
         
@@ -274,6 +292,12 @@ class FaissAdapter:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
+        
         
         
         

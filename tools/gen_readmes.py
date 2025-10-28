@@ -1,4 +1,4 @@
-"""Generate enriched package READMEs from static API metadata."""
+"""Generate per-package README files with metadata badges and deep links."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ import os
 import subprocess
 import time
 from collections.abc import Iterable
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -17,7 +17,7 @@ from griffe import Object
 
 try:
     from griffe.loader import GriffeLoader
-except ImportError:  # pragma: no cover - compatibility shim
+except ImportError:  # pragma: no cover
     from griffe import GriffeLoader  # type: ignore[attr-defined]
 
 from detect_pkg import detect_packages, detect_primary
@@ -40,16 +40,6 @@ def detect_repo() -> tuple[str, str]:
     """
     
     
-    
-    
-    
-    
-    
-
-
-
-
-
     try:
         remote = subprocess.check_output(
             ["git", "config", "--get", "remote.origin.url"], cwd=ROOT, text=True
@@ -57,10 +47,10 @@ def detect_repo() -> tuple[str, str]:
     except Exception:
         remote = ""
 
-    owner_override = os.environ.get("DOCS_GITHUB_ORG")
-    repo_override = os.environ.get("DOCS_GITHUB_REPO")
-    if owner_override and repo_override:
-        return owner_override, repo_override
+    override_owner = os.environ.get("DOCS_GITHUB_ORG")
+    override_repo = os.environ.get("DOCS_GITHUB_REPO")
+    if override_owner and override_repo:
+        return override_owner, override_repo
 
     if remote.endswith(".git"):
         remote = remote[:-4]
@@ -76,7 +66,7 @@ def detect_repo() -> tuple[str, str]:
         if len(parts) >= 2:
             return parts[0], parts[1]
 
-    return owner_override or "your-org", repo_override or "your-repo"
+    return override_owner or "your-org", override_repo or "your-repo"
 
 
 def git_sha() -> str:
@@ -91,16 +81,6 @@ def git_sha() -> str:
     """
     
     
-    
-    
-    
-    
-    
-
-
-
-
-
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     except Exception:
@@ -111,15 +91,15 @@ OWNER, REPO = detect_repo()
 SHA = git_sha()
 
 
-def gh_url(rel: str, start: int, end: int | None) -> str:
+def gh_url(rel_path: str, start: int, end: int | None) -> str:
     """Compute gh url.
 
     Carry out the gh url operation.
 
     Parameters
     ----------
-    rel : str
-        Description for ``rel``.
+    rel_path : str
+        Description for ``rel_path``.
     start : int
         Description for ``start``.
     end : int | None
@@ -132,18 +112,8 @@ def gh_url(rel: str, start: int, end: int | None) -> str:
     """
     
     
-    
-    
-    
-    
-    
-
-
-
-
-
     fragment = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
-    return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel}{fragment}"
+    return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel_path}{fragment}"
 
 
 def iter_packages() -> list[str]:
@@ -158,16 +128,6 @@ def iter_packages() -> list[str]:
     """
     
     
-    
-    
-    
-    
-    
-
-
-
-
-
     env_pkgs = os.environ.get("DOCS_PKG")
     if env_pkgs:
         return [pkg.strip() for pkg in env_pkgs.split(",") if pkg.strip()]
@@ -191,16 +151,6 @@ def summarize(node: Object) -> str:
     """
     
     
-    
-    
-    
-    
-    
-
-
-
-
-
     doc = getattr(node, "docstring", None)
     if doc and getattr(doc, "value", None):
         return doc.value.strip().splitlines()[0].strip().rstrip(".")
@@ -224,18 +174,7 @@ def is_public(node: Object) -> bool:
     """
     
     
-    
-    
-    
-    
-    
-
-
-
-
-
-    name = getattr(node, "name", "")
-    return not name.startswith("_")
+    return not getattr(node, "name", "").startswith("_")
 
 
 def get_open_link(node: Object, readme_dir: Path) -> str | None:
@@ -257,16 +196,6 @@ def get_open_link(node: Object, readme_dir: Path) -> str | None:
     """
     
     
-    
-    
-    
-    
-    
-
-
-
-
-
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -280,7 +209,7 @@ def get_open_link(node: Object, readme_dir: Path) -> str | None:
     return f"./{relative}:{start}:1"
 
 
-def get_view_link(node: Object, readme_dir: Path) -> str | None:
+def get_view_link(node: Object) -> str | None:
     """Compute get view link.
 
     Carry out the get view link operation.
@@ -289,8 +218,6 @@ def get_view_link(node: Object, readme_dir: Path) -> str | None:
     ----------
     node : Object
         Description for ``node``.
-    readme_dir : Path
-        Description for ``readme_dir``.
 
     Returns
     -------
@@ -299,16 +226,6 @@ def get_view_link(node: Object, readme_dir: Path) -> str | None:
     """
     
     
-    
-    
-    
-    
-    
-
-
-
-
-
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -340,18 +257,9 @@ def iter_public_members(node: Object) -> Iterable[Object]:
     """
     
     
-    
-    
-    
-    
-    
-
-
-
-
-
     members = getattr(node, "members", {})
-    return sorted([m for m in members.values() if is_public(m)], key=lambda child: child.name)
+    public = [m for m in members.values() if is_public(m)]
+    return sorted(public, key=lambda child: getattr(child, "path", child.name))
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -439,7 +347,7 @@ class Badges:
     section: str | None = None
     since: str | None = None
     deprecated_in: str | None = None
-    tested_by: list[dict[str, Any]] = field(default_factory=list)
+    tested_by: list[dict[str, Any]] = None
 
 
 def parse_config() -> Config:
@@ -471,33 +379,18 @@ def parse_config() -> Config:
         default=os.getenv("DOCS_EDITOR", "vscode"),
         choices=["vscode", "relative"],
     )
-    parser.add_argument(
-        "--fail-on-metadata-miss",
-        action="store_true",
-        default=False,
-        help="Exit with a non-zero status if any public symbol lacks owner/stability metadata.",
-    )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        default=False,
-        help="Report files that would be written without modifying them.",
-    )
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        default=False,
-        help="Print verbose diagnostics.",
-    )
-
+    parser.add_argument("--fail-on-metadata-miss", action="store_true", default=False)
+    parser.add_argument("--dry-run", action="store_true", default=False)
+    parser.add_argument("--verbose", action="store_true", default=False)
     args = parser.parse_args()
-    pkgs = (
+
+    packages = (
         [pkg.strip() for pkg in args.packages.split(",") if pkg.strip()]
         if args.packages
         else iter_packages()
     )
     return Config(
-        packages=pkgs,
+        packages=packages,
         link_mode=args.link_mode,
         editor=args.editor,
         fail_on_metadata_miss=args.fail_on_metadata_miss,
@@ -507,78 +400,93 @@ def parse_config() -> Config:
 
 
 def _lookup_nav(qname: str) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Return symbol metadata and module-level defaults for a qualified name."""
-    modules = NAVMAP.get("modules", {}) if isinstance(NAVMAP, dict) else {}
-    symbol_name = qname.split(".")[-1]
-    for entry in modules.values():
-        if not isinstance(entry, dict):
-            continue
-        meta_table = entry.get("meta", {})
-        if not isinstance(meta_table, dict):
-            continue
-        symbol_meta = meta_table.get(qname) or meta_table.get(symbol_name) or {}
-        if not isinstance(symbol_meta, dict):
-            symbol_meta = {}
-        if symbol_meta:
-            section_id = None
-            for section in entry.get("sections", []) or []:
-                symbols = section.get("symbols") if isinstance(section, dict) else None
-                if isinstance(symbols, list) and symbol_name in symbols:
-                    section_id = section.get("id")
-                    break
-            if section_id and "section" not in symbol_meta:
-                symbol_meta = dict(symbol_meta)
-                symbol_meta["section"] = section_id
-
-            module_defaults: dict[str, Any] = {}
-            module_meta = entry.get("module_meta")
-            if isinstance(module_meta, dict):
-                module_defaults = module_meta
-            else:
-                for key in ("owner", "stability", "since", "deprecated_in"):
-                    if key in entry:
-                        module_defaults[key] = entry[key]
-
-            return symbol_meta, module_defaults
-    return {}, {}
-
-
-def badges_for(qname: str) -> Badges:
-    """Compute badges for.
-
-    Carry out the badges for operation.
+    """Lookup nav.
 
     Parameters
     ----------
     qname : str
-        Description for ``qname``.
+        Description.
+
+    Returns
+    -------
+    tuple[dict[str, Any], dict[str, Any]]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _lookup_nav(...)
+    """
+    modules = NAVMAP.get("modules", {}) if isinstance(NAVMAP, dict) else {}
+    symbol = qname.split(".")[-1]
+    for module in modules.values():
+        if not isinstance(module, dict):
+            continue
+        meta = module.get("meta")
+        if not isinstance(meta, dict):
+            continue
+        symbol_meta = meta.get(qname) or meta.get(symbol) or {}
+        if not isinstance(symbol_meta, dict):
+            symbol_meta = {}
+        if symbol_meta:
+            section_id = None
+            for section in module.get("sections", []) or []:
+                if (
+                    isinstance(section, dict)
+                    and symbol in section.get("symbols", [])
+                    and isinstance(section.get("id"), str)
+                ):
+                    section_id = section["id"]
+                    break
+            if section_id and "section" not in symbol_meta:
+                symbol_meta = {**symbol_meta, "section": section_id}
+
+            defaults: dict[str, Any] = {}
+            module_meta = module.get("module_meta")
+            if isinstance(module_meta, dict):
+                defaults = module_meta
+            else:
+                for key in ("owner", "stability", "since", "deprecated_in"):
+                    if key in module:
+                        defaults[key] = module[key]
+
+            return symbol_meta, defaults
+    return {}, {}
+
+
+def badges_for(qname: str) -> Badges:
+    """Badges for.
+
+    Parameters
+    ----------
+    qname : str
+        Description.
 
     Returns
     -------
     Badges
-        Description of return value.
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> badges_for(...)
     """
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-    meta, defaults = _lookup_nav(qname)
-    merged = {**defaults, **meta}
+    symbol_meta, defaults = _lookup_nav(qname)
+    merged = {**defaults, **symbol_meta}
     tests: list[dict[str, Any]] = []
     if isinstance(TEST_MAP, dict):
-        recorded = TEST_MAP.get(qname)
-        if recorded is None:
-            recorded = TEST_MAP.get(qname.split(".")[-1])
+        recorded = TEST_MAP.get(qname) or TEST_MAP.get(qname.split(".")[-1])
         if isinstance(recorded, list):
-            tests = [t for t in recorded if isinstance(t, dict)][:3]
+            tests = [entry for entry in recorded if isinstance(entry, dict)][:3]
     return Badges(
         stability=merged.get("stability"),
         owner=merged.get("owner"),
@@ -589,12 +497,12 @@ def badges_for(qname: str) -> Badges:
     )
 
 
-def _format_test_badge(entries: list[dict[str, Any]]) -> str | None:
+def _format_test_badge(entries: list[dict[str, Any]] | None) -> str | None:
     """Format test badge.
 
     Parameters
     ----------
-    entries : list[dict[str, Any]]
+    entries : list[dict[str, Any]] | None
         Description.
 
     Returns
@@ -614,9 +522,9 @@ def _format_test_badge(entries: list[dict[str, Any]]) -> str | None:
     if not entries:
         return None
     formatted: list[str] = []
-    for item in entries:
-        file = item.get("file")
-        lines = item.get("lines")
+    for entry in entries:
+        file = entry.get("file")
+        lines = entry.get("lines")
         if not file:
             continue
         if isinstance(lines, list) and lines:
@@ -629,84 +537,73 @@ def _format_test_badge(entries: list[dict[str, Any]]) -> str | None:
 
 
 def format_badges(qname: str) -> str:
-    """Compute format badges.
-
-    Carry out the format badges operation.
+    """Format badges.
 
     Parameters
     ----------
     qname : str
-        Description for ``qname``.
+        Description.
 
     Returns
     -------
     str
-        Description of return value.
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> format_badges(...)
     """
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-    badges = badges_for(qname)
-    tags: list[str] = []
-    if badges.stability:
-        tags.append(f"`stability:{badges.stability}`")
-    if badges.owner:
-        tags.append(f"`owner:{badges.owner}`")
-    if badges.section:
-        tags.append(f"`section:{badges.section}`")
-    if badges.since:
-        tags.append(f"`since:{badges.since}`")
-    if badges.deprecated_in:
-        tags.append(f"`deprecated:{badges.deprecated_in}`")
-    test_tag = _format_test_badge(badges.tested_by)
-    if test_tag:
-        tags.append(test_tag)
-    return (" " + " ".join(tags)) if tags else ""
+    badge = badges_for(qname)
+    parts: list[str] = []
+    if badge.stability:
+        parts.append(f"`stability:{badge.stability}`")
+    if badge.owner:
+        parts.append(f"`owner:{badge.owner}`")
+    if badge.section:
+        parts.append(f"`section:{badge.section}`")
+    if badge.since:
+        parts.append(f"`since:{badge.since}`")
+    if badge.deprecated_in:
+        parts.append(f"`deprecated:{badge.deprecated_in}`")
+    test_badge = _format_test_badge(badge.tested_by)
+    if test_badge:
+        parts.append(test_badge)
+    return (" " + " ".join(parts)) if parts else ""
 
 
 def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
-    """Compute editor link.
-
-    Carry out the editor link operation.
+    """Editor link.
 
     Parameters
     ----------
     abs_path : Path
-        Description for ``abs_path``.
+        Description.
     lineno : int
-        Description for ``lineno``.
+        Description.
     editor_mode : str
-        Description for ``editor_mode``.
+        Description.
 
     Returns
     -------
     str | None
-        Description of return value.
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> editor_link(...)
     """
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
     if editor_mode == "vscode":
         return f"vscode://file/{abs_path}:{lineno}:1"
-    # For 'relative', fall back to caller logic.
     return None
 
 
@@ -781,50 +678,45 @@ def bucket_for(node: Object) -> str:
 
 
 def render_line(node: Object, readme_dir: Path, cfg: Config) -> str | None:
-    """Compute render line.
-
-    Carry out the render line operation.
+    """Render line.
 
     Parameters
     ----------
     node : Object
-        Description for ``node``.
+        Description.
     readme_dir : Path
-        Description for ``readme_dir``.
+        Description.
     cfg : Config
-        Description for ``cfg``.
+        Description.
 
     Returns
     -------
     str | None
-        Description of return value.
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> render_line(...)
     """
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
     qname = getattr(node, "path", "")
     summary = summarize(node)
 
     open_link = get_open_link(node, readme_dir) if cfg.link_mode in {"editor", "both"} else None
-    view_link = get_view_link(node, readme_dir) if cfg.link_mode in {"github", "both"} else None
+    view_link = get_view_link(node) if cfg.link_mode in {"github", "both"} else None
 
     if cfg.link_mode in {"editor", "both"}:
         rel_path = getattr(node, "relative_package_filepath", None)
         if rel_path:
             base = SRC if SRC.exists() else ROOT
             abs_path = (base / rel_path).resolve()
-            override = editor_link(abs_path, int(getattr(node, "lineno", 1) or 1), cfg.editor)
-            if override:
-                open_link = override
+            direct = editor_link(abs_path, int(getattr(node, "lineno", 1) or 1), cfg.editor)
+            if direct:
+                open_link = direct
 
     if not (open_link or view_link):
         return None
@@ -832,9 +724,9 @@ def render_line(node: Object, readme_dir: Path, cfg: Config) -> str | None:
     parts = [f"- **`{qname}`**"]
     if summary:
         parts.append(f"— {summary}")
-    badges = format_badges(qname)
-    if badges:
-        parts.append(badges)
+    badge_text = format_badges(qname)
+    if badge_text:
+        parts.append(badge_text)
 
     links: list[str] = []
     if open_link:
@@ -842,38 +734,33 @@ def render_line(node: Object, readme_dir: Path, cfg: Config) -> str | None:
     if view_link:
         links.append(f"[view]({view_link})")
     tail = f" → {' | '.join(links)}" if links else ""
-    return " ".join(parts).replace("  ", " ").strip() + tail + "\n"
+    return " ".join(parts).strip() + tail + "\n"
 
 
 def write_if_changed(path: Path, content: str) -> bool:
-    """Compute write if changed.
-
-    Carry out the write if changed operation.
+    """Write if changed.
 
     Parameters
     ----------
     path : Path
-        Description for ``path``.
+        Description.
     content : str
-        Description for ``content``.
+        Description.
 
     Returns
     -------
     bool
-        Description of return value.
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> write_if_changed(...)
     """
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
     digest = hashlib.sha256(content.encode("utf-8")).hexdigest()[:12]
     rendered = content.rstrip() + f"\n<!-- agent:readme v1 sha:{SHA} content:{digest} -->\n"
     previous = path.read_text(encoding="utf-8") if path.exists() else ""
@@ -885,52 +772,40 @@ def write_if_changed(path: Path, content: str) -> bool:
 
 
 def write_readme(node: Object, cfg: Config) -> bool:
-    """Compute write readme.
-
-    Carry out the write readme operation.
+    """Write readme.
 
     Parameters
     ----------
     node : Object
-        Description for ``node``.
+        Description.
     cfg : Config
-        Description for ``cfg``.
+        Description.
 
     Returns
     -------
     bool
-        Description of return value.
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> write_readme(...)
     """
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"
 
-    buckets = {
-        "Modules": [],
-        "Classes": [],
-        "Functions": [],
-        "Exceptions": [],
-        "Other": [],
-    }
-
+    buckets = {name: [] for name in ("Modules", "Classes", "Functions", "Exceptions", "Other")}
     children = [
         child
         for child in iter_public_members(node)
         if getattr(getattr(child, "kind", None), "value", "") in KINDS
     ]
 
-    for child in sorted(children, key=lambda c: getattr(c, "path", "")):
+    for child in sorted(children, key=lambda child: getattr(child, "path", "")):
         line = render_line(child, pkg_dir, cfg)
         if line:
             buckets[bucket_for(child)].append(line)
@@ -954,11 +829,9 @@ def write_readme(node: Object, cfg: Config) -> bool:
             lines.append("\n")
 
     content = "".join(lines).rstrip() + "\n"
-
     if cfg.dry_run:
         print(f"[dry-run] would write {readme}")
         return False
-
     changed = write_if_changed(readme, content)
     if changed:
         print(f"Wrote {readme}")
@@ -1019,13 +892,7 @@ def main() -> None:
     """
     cfg = parse_config()
     if not cfg.packages:
-        raise SystemExit("No packages detected; set DOCS_PKG or add source packages under src/.")
-
-    if cfg.verbose:
-        print(
-            f"packages={cfg.packages} link_mode={cfg.link_mode} editor={cfg.editor} "
-            f"fail_on_metadata_miss={cfg.fail_on_metadata_miss} dry_run={cfg.dry_run}"
-        )
+        raise SystemExit("No packages detected; set DOCS_PKG or add packages under src/.")
 
     loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
     missing_meta: set[str] = set()
@@ -1033,13 +900,12 @@ def main() -> None:
     start = time.time()
 
     for pkg in cfg.packages:
-        root = loader.load(pkg)
+        module = loader.load(pkg)
         if cfg.fail_on_metadata_miss:
-            _collect_missing_metadata(root, missing_meta)
+            _collect_missing_metadata(module, missing_meta)
+        changed_any |= write_readme(module, cfg)
 
-        changed_any |= write_readme(root, cfg)
-
-        for member in root.members.values():
+        for member in module.members.values():
             if getattr(member, "is_package", False):
                 if cfg.fail_on_metadata_miss:
                     _collect_missing_metadata(member, missing_meta)

@@ -7,9 +7,9 @@ import time
 from typing import Any, Final
 
 import requests
-from kgfoundry_common.models import Doc
 
 from kgfoundry_common.errors import DownloadError, UnsupportedMIMEError
+from kgfoundry_common.models import Doc
 from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["OpenAccessHarvester"]
@@ -32,7 +32,8 @@ HTTP_OK = 200
 
 # [nav:anchor OpenAccessHarvester]
 class OpenAccessHarvester:
-    """Describe OpenAccessHarvester."""
+    """Download documents via OpenAlex and raise :class:`kgfoundry_common.errors.DownloadError` when
+    retrieval fails."""
 
     def __init__(  # noqa: PLR0913 - parameters mirror external API options
         self,
@@ -63,32 +64,6 @@ class OpenAccessHarvester:
             Description for ``out_dir``.
         """
         
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.ua = user_agent
         self.email = contact_email
         self.openalex = openalex_base.rstrip("/")
@@ -119,32 +94,6 @@ class OpenAccessHarvester:
             Description of return value.
         """
         
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
             "topic": topic,
@@ -174,32 +123,6 @@ class OpenAccessHarvester:
             Description of return value.
         """
         
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         best = work.get("best_oa_location") or {}
         if best and best.get("pdf_url"):
             return best["pdf_url"]
@@ -245,32 +168,6 @@ class OpenAccessHarvester:
             Raised when validation fails.
         """
         
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
             message = f"Bad status {response.status_code} for {url}"
@@ -303,32 +200,6 @@ class OpenAccessHarvester:
             Description of return value.
         """
         
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)
         for work in works:

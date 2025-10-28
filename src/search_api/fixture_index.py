@@ -53,6 +53,12 @@ def tokenize(text: str) -> list[str]:
     
     
     
+    
+    
+    
+    
+    
+    
 
 
 
@@ -104,6 +110,12 @@ class FixtureIndex:
         db_path : str | None
             Description for ``db_path``.
         """
+        
+        
+        
+        
+        
+        
         
         
         
@@ -223,6 +235,12 @@ class FixtureIndex:
         
         
         
+        
+        
+        
+        
+        
+        
 
 
 
@@ -275,6 +293,12 @@ class FixtureIndex:
         src.search_api.fixture_index.FixtureDoc
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         
         
         

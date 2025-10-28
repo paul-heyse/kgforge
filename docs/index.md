@@ -27,11 +27,13 @@ reference/observability/traces
 reference/observability/config
 reference/schemas/index
 reference/graphs/index
+policies/visibility-policy
 ```
 
 ```{toctree}
-::hidden:
-::glob:
+:hidden:
+:glob:
+
 autoapi/src/*/index
 ```
 

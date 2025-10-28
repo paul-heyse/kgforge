@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Final
 
+from kgfoundry_common.errors import DownloadError as _DownloadError
+from kgfoundry_common.errors import UnsupportedMIMEError as _UnsupportedMIMEError
 from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["DownloadError", "UnsupportedMIMEError"]
@@ -23,14 +25,10 @@ __navmap__: Final[NavMap] = {
 
 
 # [nav:anchor DownloadError]
-class DownloadError(Exception):
-    """Describe DownloadError."""
-
-    ...
+class DownloadError(_DownloadError):
+    """Compatibility alias for :class:`kgfoundry_common.errors.DownloadError`."""
 
 
 # [nav:anchor UnsupportedMIMEError]
-class UnsupportedMIMEError(Exception):
-    """Describe UnsupportedMIMEError."""
-
-    ...
+class UnsupportedMIMEError(_UnsupportedMIMEError):
+    """Compatibility alias for :class:`kgfoundry_common.errors.UnsupportedMIMEError`."""

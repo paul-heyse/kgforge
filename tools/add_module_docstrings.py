@@ -31,6 +31,12 @@ def module_name(path: Path) -> str:
     
     
     
+    
+    
+    
+    
+    
+    
 
 
 
@@ -70,6 +76,12 @@ def needs_docstring(text: str) -> bool:
     bool
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     
     
     
@@ -126,6 +138,12 @@ def insert_docstring(path: Path) -> bool:
     
     
     
+    
+    
+    
+    
+    
+    
 
 
 
@@ -167,6 +185,12 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
+    
     
     
     
