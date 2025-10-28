@@ -25,6 +25,7 @@ build_examples = auto_docstrings.build_examples
 module_name_for = auto_docstrings.module_name_for
 parameters_for = auto_docstrings.parameters_for
 extended_summary = auto_docstrings.extended_summary
+detect_raises = auto_docstrings.detect_raises
 
 
 @pytest.fixture()
@@ -185,3 +186,25 @@ def test_build_docstring_appends_examples(
     emitted_examples = doc_lines[examples_index + 2 : closing_index]
     for line in expected_lines:
         assert line in emitted_examples
+
+
+def test_detect_raises_ignores_nested_scopes() -> None:
+    node = _get_function(
+        """
+def outer(flag: bool) -> None:
+    if flag:
+        raise ValueError("bad flag")
+
+    def inner() -> None:
+        raise RuntimeError("inner boom")
+
+    class Inner:
+        def method(self) -> None:
+            raise KeyError("method boom")
+
+    class WithBody:
+        raise LookupError("class body boom")
+"""
+    )
+
+    assert detect_raises(node) == ["ValueError"]
