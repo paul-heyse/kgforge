@@ -118,6 +118,10 @@ def load_symbol_candidates() -> set[str]:
     for pyfile in SRC.rglob("*.py"):
         rel = pyfile.relative_to(SRC)
         module = ".".join(rel.with_suffix("").parts)
+        if module.endswith(".__init__"):
+            module = module[: -len(".__init__")]
+        if not module:
+            continue
         if module.startswith(KNOWN_PREFIXES):
             candidates.add(module)
     return candidates
@@ -338,9 +342,11 @@ def _normalize_repo_rel(path_like: str) -> str:
     except Exception:
         # coverage JSON often records absolute paths; make repo-relative if possible
         try:
-            idx = str(p).rfind(str(SRC))
+            raw = str(p)
+            root = str(ROOT)
+            idx = raw.find(root)
             if idx != -1:
-                return str(p)[idx - len(str(ROOT)) :].lstrip(os.sep)
+                return raw[idx + len(root) :].lstrip(os.sep)
         except Exception:
             pass
         return str(p)
