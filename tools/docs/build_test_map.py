@@ -384,6 +384,7 @@ def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]
     """
     
     
+    
     if not COV_JSON.exists():
         return ({}, {})
     data = _load_json(COV_JSON)
