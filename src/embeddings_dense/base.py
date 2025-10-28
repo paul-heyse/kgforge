@@ -61,4 +61,6 @@ class DenseEmbeddingModel(Protocol):
         
         
         
+        
+        
         ...

@@ -42,6 +42,8 @@ def detect_repo() -> tuple[str, str]:
     
     
     
+    
+    
     try:
         remote = subprocess.check_output(
             ["git", "config", "--get", "remote.origin.url"], cwd=ROOT, text=True
@@ -85,6 +87,8 @@ def git_sha() -> str:
     
     
     
+    
+    
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     except Exception:
@@ -118,6 +122,8 @@ def gh_url(rel_path: str, start: int, end: int | None) -> str:
     
     
     
+    
+    
     fragment = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel_path}{fragment}"
 
@@ -132,6 +138,8 @@ def iter_packages() -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
     
     
     
@@ -161,6 +169,8 @@ def summarize(node: Object) -> str:
     
     
     
+    
+    
     doc = getattr(node, "docstring", None)
     if doc and getattr(doc, "value", None):
         return doc.value.strip().splitlines()[0].strip().rstrip(".")
@@ -186,6 +196,8 @@ def is_public(node: Object) -> bool:
     
     
     
+    
+    
     return not getattr(node, "name", "").startswith("_")
 
 
@@ -206,6 +218,8 @@ def get_open_link(node: Object, readme_dir: Path) -> str | None:
     str | None
         Description of return value.
     """
+    
+    
     
     
     
@@ -242,6 +256,8 @@ def get_view_link(node: Object) -> str | None:
     
     
     
+    
+    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -271,6 +287,8 @@ def iter_public_members(node: Object) -> Iterable[Object]:
     Iterable[Object]
         Description of return value.
     """
+    
+    
     
     
     

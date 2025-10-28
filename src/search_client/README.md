@@ -7,9 +7,9 @@ Search Client utilities
 
 ## Modules
 
-- **`search_client.client`** — Client utilities → [open](vscode://file//home/paul/kgfoundry/src/search_client/client.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/0bc2e0dd842a7a6aee1dc816d9b492a155452c5b/src/search_client/client.py#L1)
+- **`search_client.client`** — Client utilities → [open](vscode://file//home/paul/kgfoundry/src/search_client/client.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/76e1eddf04c4cdc08124bc10a468b37f3c1e863d/src/search_client/client.py#L1)
 
 ## Classes
 
-- **`search_client.NavMap`** — Describe NavMap → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:32:1) | [view](https://github.com/github.com/paul-heyse/blob/0bc2e0dd842a7a6aee1dc816d9b492a155452c5b/src/kgfoundry_common/navmap_types.py#L32-L45)
-<!-- agent:readme v1 sha:0bc2e0dd842a7a6aee1dc816d9b492a155452c5b content:c73c01a28a02 -->
+- **`search_client.NavMap`** — Describe NavMap → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:32:1) | [view](https://github.com/github.com/paul-heyse/blob/76e1eddf04c4cdc08124bc10a468b37f3c1e863d/src/kgfoundry_common/navmap_types.py#L32-L45)
+<!-- agent:readme v1 sha:76e1eddf04c4cdc08124bc10a468b37f3c1e863d content:4160ef121c38 -->

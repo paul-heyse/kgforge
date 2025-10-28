@@ -58,11 +58,11 @@ def iter_packages() -> list[str]:
 
     Returns
     -------
-
-
     List[str]
         Description of return value.
     """
+    
+    
     
     
     
@@ -89,11 +89,11 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
 
     Returns
     -------
-
-
     object | None
         Description of return value.
     """
+    
+    
     
     
     
@@ -317,6 +317,7 @@ def _collect_rows(nav: NavLookup, test_map: dict[str, Any]) -> list[dict[str, An
         -------
         None
             Description.
+
         Raises
         ------
         Exception
@@ -442,11 +443,11 @@ def main() -> int:
 
     Returns
     -------
-
-
     int
         Description of return value.
     """
+    
+    
     
     
     
