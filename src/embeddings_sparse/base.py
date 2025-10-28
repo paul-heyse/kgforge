@@ -46,39 +46,6 @@ class SparseEncoder(Protocol):
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ...
 
 
@@ -98,39 +65,6 @@ class SparseIndex(Protocol):
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ...
 
     def search(
@@ -156,37 +90,4 @@ class SparseIndex(Protocol):
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ...

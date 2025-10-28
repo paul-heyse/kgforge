@@ -1,71 +1,30 @@
 ---
 title: NavMap Visibility Policy
-status: draft
-version: 1
+status: stable
+version: 2
 ---
 
 # NavMap Visibility Policy
 
-This document captures the normative rules that govern the NavMap metadata
-toolchain. The companion machine-parsable schema lives at
-`docs/policies/visibility-policy.json`.
+# Visibility Policy (NavMap)
 
-The policy applies to every Python module under `src/` that declares public
-exports.
+This repository treats **public API** as the union of:
+1) `__all__` in each module, and
+2) `__navmap__["exports"]` (may reference `__all__` but must match set-wise).
 
-## 1. Module Surface
+**Required per exported symbol**:
+- `owner`: team handle (e.g., `@core-search`)
+- `stability`: `stable` \| `beta` \| `experimental` \| `deprecated`
+- `since`: PEP 440 version string (e.g., `0.8.0`)
+- `deprecated_in` (optional): PEP 440; if present, must be **>=** `since`.
 
-- `__all__` is the canonical list of exported symbols.
-- `__navmap__["exports"]` MUST be present and equal to `set(__all__)`.
-- Each module MAY provide module-level metadata fields (`owner`, `stability`,
-  `since`, `deprecated_in`). When present they act as defaults for symbols that
-  omit the same keys.
+**Sections**
+- First section **must** be `public-api`.
+- Section IDs must be **kebab-case** (e.g., `domain-models`).
+- Each section symbol must have a nearby inline anchor: `# [nav:anchor Name]`.
 
-## 2. Sections
+**Links**
+- Editor: `vscode://file/<path>:<line>:<col>` (official scheme).
+- GitHub: `https://github.com/<org>/<repo>/blob/<sha>/<path>#Lstart-Lend` (permalink with `#L` anchors).
 
-- `__navmap__["sections"]` lists ordered groups of symbols by visibility. Each
-  section is an object `{"id": "<kebab-case>", "symbols": ["Name", ...]}`.
-- The first section MUST be `public-api`.
-- Section ids MUST match `^[a-z0-9]+(?:-[a-z0-9]+)*$`.
-
-## 3. Symbols
-
-- Every exported symbol MUST appear in at least one section.
-- For every symbol in a section an inline comment `# [nav:anchor Symbol]` MUST
-  exist adjacent to the definition line.
-- Symbol names MUST be valid Python identifiers (`^[A-Za-z_]\w*$`).
-- Each symbol MUST define:
-  - `stability` ∈ {`stable`, `beta`, `experimental`, `deprecated`}
-  - `owner`: non-empty string (team handle preferred)
-  - `since`: PEP 440 compliant version string
-  - `deprecated_in`: optional PEP 440 compliant version string with
-    `deprecated_in >= since` when provided
-
-## 4. Links
-
-- Editor links use the VS Code `vscode://file/<path>` scheme.
-- GitHub permalinks MUST target a fixed commit (`blob/<sha>#Lstart-Lend`).
-- Link mode is configured via `DOCS_LINK_MODE` (`editor`, `github`, or `both`).
-
-## 5. Anchors and Sections in Source
-
-- Section markers in source take the form `# [nav:section slug]` and MUST be
-  present for every section listed in `__navmap__`.
-- Anchor and section line numbers stored in `navmap.json` MUST match the source
-  of truth in the module.
-
-## 6. Enforcement
-
-- `tools/navmap/build_navmap.py` emits the policy version, link mode, module
-  defaults, and per-symbol metadata.
-- `tools/navmap/check_navmap.py` validates this policy, including PEP 440
-  version checks.
-- `tools/navmap/repair_navmaps.py` can auto-insert missing anchors, sections,
-  and minimal `__navmap__` scaffolding.
-- Round-trip verification ensures source annotations and JSON stay in sync.
-
-## 7. Change Management
-
-- Policy updates MUST bump the `version` front-matter field.
-- Tooling reads `visibility-policy.json`; update both documents atomically.
-
+Violations are reported by `tools/navmap/check_navmap.py`.

@@ -59,6 +59,18 @@ fi
 # Ensure we rebuild from a clean slate.
 rm -rf docs/_build site
 
+# keep graph small
+export GRAPH_NOISE_LEVEL=50
+export GRAPH_MAX_MODULE_DEPTH=1
+export GRAPH_MAX_BACON=4
+
+# cycle safety
+export GRAPH_CYCLE_LEN=8          # only cycles up to length 8
+export GRAPH_CYCLE_LIMIT=50000    # never enumerate more than 50k cycles
+export GRAPH_EDGE_BUDGET=50000    # if pruned graph has >50k edges, skip enumeration and summarize SCCs
+
+export GRAPH_MAX_WORKERS=16
+
 run make docstrings
 run make readmes
 run "$PY" tools/update_navmaps.py

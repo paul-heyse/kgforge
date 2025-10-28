@@ -47,39 +47,6 @@ def tok(text: str) -> list[str]:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     return [token.lower() for token in TOKEN.findall(text or "")]
 
 
@@ -119,39 +86,6 @@ class SpladeIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -218,39 +152,6 @@ class SpladeIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         if self.N == 0:
             return []
         terms = tok(query)
@@ -287,37 +188,4 @@ class SpladeIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         return self.docs[index]

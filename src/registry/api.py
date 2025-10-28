@@ -47,35 +47,6 @@ class Registry(Protocol):
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ...
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
@@ -94,35 +65,6 @@ class Registry(Protocol):
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ...
 
     def rollback_dataset(self, dataset_id: str) -> None:
@@ -137,35 +79,6 @@ class Registry(Protocol):
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ...
 
     def insert_run(
@@ -197,35 +110,6 @@ class Registry(Protocol):
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ...
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
@@ -244,35 +128,6 @@ class Registry(Protocol):
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ...
 
     def register_documents(self, docs: list[Doc]) -> None:
@@ -287,35 +142,6 @@ class Registry(Protocol):
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ...
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
@@ -330,35 +156,6 @@ class Registry(Protocol):
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ...
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
@@ -377,35 +174,6 @@ class Registry(Protocol):
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ...
 
     def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
@@ -426,33 +194,4 @@ class Registry(Protocol):
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ...

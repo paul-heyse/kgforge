@@ -47,6 +47,9 @@ class _SupportsResponse(Protocol):
         
         
         
+        
+        
+        
 
 
 
@@ -79,6 +82,9 @@ class _SupportsResponse(Protocol):
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
+        
         
         
         
@@ -137,6 +143,9 @@ class _SupportsHttp(Protocol):
         src.search_client.client._SupportsResponse
             Description of return value.
         """
+        
+        
+        
         
         
         
@@ -217,6 +226,9 @@ class _SupportsHttp(Protocol):
         
         
         
+        
+        
+        
 
 
 
@@ -268,39 +280,6 @@ class KGFoundryClient:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
@@ -333,39 +312,6 @@ class KGFoundryClient:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
         return r.json()
@@ -399,39 +345,6 @@ class KGFoundryClient:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
             f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout
@@ -458,39 +371,6 @@ class KGFoundryClient:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         r = self._http.post(
             f"{self.base_url}/graph/concepts",
             json={"q": q, "limit": limit},

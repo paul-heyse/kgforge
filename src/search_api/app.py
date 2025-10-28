@@ -12,10 +12,10 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 from kgfoundry.embeddings_sparse.bm25 import PurePythonBM25, get_bm25
 from kgfoundry.embeddings_sparse.splade import get_splade
 from kgfoundry.kg_builder.mock_kg import MockKG
-from vectorstore_faiss import gpu as faiss_gpu
 
 from kgfoundry_common.navmap_types import NavMap
 from search_api.schemas import SearchRequest, SearchResult
+from vectorstore_faiss import gpu as faiss_gpu
 
 __all__ = [
     "apply_kg_boosts",
@@ -124,39 +124,6 @@ def auth(authorization: str | None = Header(default=None)) -> None:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     if not API_KEYS:
         return  # disabled in skeleton
     if not authorization or not authorization.startswith("Bearer "):
@@ -180,39 +147,6 @@ def healthz() -> dict[str, Any]:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     return {
         "status": "ok",
         "components": {
@@ -245,39 +179,6 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     scores: dict[str, float] = {}
     for hits in lists:
         for rank, (doc_id, _score) in enumerate(hits, start=1):
@@ -314,39 +215,6 @@ def apply_kg_boosts(
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     q_concepts = set()
     for w in query.lower().split():
         if w.startswith("concept"):
@@ -387,39 +255,6 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
     dense_hits: list[tuple[str, float]] = []
@@ -498,39 +333,6 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring
     concepts = [

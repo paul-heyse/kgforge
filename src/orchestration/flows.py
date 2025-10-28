@@ -43,39 +43,6 @@ def t_echo(msg: str) -> str:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     return msg
 
 
@@ -93,39 +60,6 @@ def e2e_flow() -> list[str]:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     return [
         t_echo.submit(x).result()
         for x in [

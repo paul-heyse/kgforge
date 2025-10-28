@@ -44,35 +44,6 @@ class DuckDBRegistryHelper:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.db_path = db_path
 
     def _con(self) -> duckdb.DuckDBPyConnection:
@@ -116,35 +87,6 @@ class DuckDBRegistryHelper:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         run_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -174,35 +116,6 @@ class DuckDBRegistryHelper:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         con = self._con()
         con.execute("UPDATE runs SET finished_at=CURRENT_TIMESTAMP WHERE run_id=?", [run_id])
         con.execute(
@@ -235,35 +148,6 @@ class DuckDBRegistryHelper:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         dataset_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -293,35 +177,6 @@ class DuckDBRegistryHelper:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         con = self._con()
         con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
@@ -349,35 +204,6 @@ class DuckDBRegistryHelper:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         con = self._con()
         con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
         con.execute(
@@ -398,35 +224,6 @@ class DuckDBRegistryHelper:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         con = self._con()
         for doc in docs:
             con.execute(
@@ -464,35 +261,6 @@ class DuckDBRegistryHelper:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         con = self._con()
         for asset in assets:
             con.execute(
@@ -524,35 +292,6 @@ class DuckDBRegistryHelper:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         con = self._con()
         con.execute(
             "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",

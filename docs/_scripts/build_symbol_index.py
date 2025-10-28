@@ -39,39 +39,6 @@ def iter_packages() -> list[str]:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     packages = detect_packages()
@@ -102,39 +69,6 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     try:
         return getattr(node, attr)
     except Exception:
@@ -153,39 +87,6 @@ def walk(node: Object) -> None:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     doc = safe_attr(node, "docstring")
     file_rel = safe_attr(node, "relative_package_filepath")
     rows.append(

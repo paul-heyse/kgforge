@@ -28,39 +28,6 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -91,39 +58,6 @@ def scan_file(
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     text, tree = read_ast(path)
     if not text:
         return ([], [], [], False)
@@ -205,39 +139,6 @@ def main() -> None:
     """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     OUT.mkdir(parents=True, exist_ok=True)
     metrics: list[dict[str, object]] = []
     logs: list[dict[str, object]] = []

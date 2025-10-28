@@ -1,245 +1,383 @@
 #!/usr/bin/env python
-"""Check Navmap utilities."""
+#!/usr/bin/env python3
+"""Validate NavMap conformance against policy and perform a round-trip check.
+
+Enforces:
+- __navmap__ exists when module has exports
+- first section id == 'public-api'
+- section IDs are kebab-case
+- section symbols are valid Python identifiers and have nearby [nav:anchor]
+- per-exported-symbol meta: owner present; stability in {stable,beta,experimental,deprecated}
+- PEP 440 validation for since/deprecated_in; if both present then deprecated_in >= since
+- round-trip: a freshly built JSON matches inline markers (section_lines & anchors)
+
+Exit codes:
+  0 = OK
+  1 = violations found or round-trip mismatch
+  2 = runtime/installation error (e.g., missing dependency)
+"""
 
 from __future__ import annotations
 
-import ast
 import re
 import sys
-from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
 REPO = Path(__file__).resolve().parents[2]
-
-try:
-    from tools.navmap.build_navmap import ModuleInfo
-except ModuleNotFoundError:  # pragma: no cover - fallback for direct script execution
-    if str(REPO) not in sys.path:
-        sys.path.insert(0, str(REPO))
-    from tools.navmap.build_navmap import ModuleInfo
-
-
 SRC = REPO / "src"
-ANCHOR_RE = re.compile(r"^\s*#\s*\[nav:anchor\s+([A-Za-z_]\w*)\]")
+INDEX = REPO / "site" / "_build" / "navmap" / "navmap.json"
+
+# Regexes
+SECTION_RE = re.compile(r"^\s*#\s*\[nav:section\s+([a-z0-9]+(?:-[a-z0-9]+)*)\]\s*$")
+ANCHOR_RE = re.compile(r"^\s*#\s*\[nav:anchor\s+([A-Za-z_]\w*)\]\s*$")
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
-SYMBOL_RE = re.compile(r"^[A-Za-z_]\w*$")
+IDENT_RE = re.compile(r"^[A-Za-z_]\w*$")
+STABILITY = {"stable", "beta", "experimental", "deprecated"}
+
+# Optional PEP 440 validation
+try:
+    from packaging.version import InvalidVersion, Version  # type: ignore
+except Exception:  # pragma: no cover
+    Version = None  # type: ignore
+    InvalidVersion = Exception  # type: ignore
 
 
-def _extract_string(node: ast.AST) -> str | None:
-    """Compute extract string.
-
-    Carry out the extract string operation.
-
-    Parameters
-    ----------
-    node : ast.AST
-        Description for ``node``.
-
-    Returns
-    -------
-    str | None
-        Description of return value.
-    """
-    if isinstance(node, ast.Constant) and isinstance(node.value, str):
-        return node.value
-    return None
-
-
-def _extract_strings(node: ast.AST) -> list[str]:
-    """Compute extract strings.
-
-    Carry out the extract strings operation.
-
-    Parameters
-    ----------
-    node : ast.AST
-        Description for ``node``.
-
-    Returns
-    -------
-    List[str]
-        Description of return value.
-    """
-    match node:
-        case ast.List(elts=elts) | ast.Tuple(elts=elts):
-            return [s for elt in elts if (s := _extract_string(elt)) is not None]
-        case _:
-            return []
-
-
-def _literal_eval(node: ast.AST, names: Mapping[str, object]) -> object:
-    """Compute literal eval.
-
-    Carry out the literal eval operation.
-
-    Parameters
-    ----------
-    node : ast.AST
-        Description for ``node``.
-    names : Mapping[str, object]
-        Description for ``names``.
-
-    Returns
-    -------
-    object
-        Description of return value.
-
-    Raises
-    ------
-    ValueError
-        Raised when validation fails.
-    """
-    match node:
-        case ast.Constant(value=value):
-            return value
-        case ast.List(elts=elts):
-            return [_literal_eval(elt, names) for elt in elts]
-        case ast.Tuple(elts=elts):
-            return tuple(_literal_eval(elt, names) for elt in elts)
-        case ast.Set(elts=elts):
-            return {_literal_eval(elt, names) for elt in elts}
-        case ast.Dict(keys=keys, values=values):
-            return {
-                _literal_eval(key, names): _literal_eval(value, names)
-                for key, value in zip(keys, values, strict=True)
-            }
-        case ast.Name(id=name) if name in names:
-            return names[name]
-        case _:
-            message = f"Unsupported literal in navmap: {ast.dump(node)}"
-            raise ValueError(message)
-
-
-def _inspect(py: Path) -> ModuleInfo | None:  # noqa: C901, PLR0912
-    """Compute inspect.
-
-    Carry out the inspect operation.
+def _read_text(py: Path) -> list[str]:
+    """Read text.
 
     Parameters
     ----------
     py : Path
-        Description for ``py``.
+        Description.
 
     Returns
     -------
-    ModuleInfo | None
-        Description of return value.
+    list[str]
+        Description.
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _read_text(...)
     """
-    text = py.read_text(encoding="utf-8")
-    tree = ast.parse(text, filename=str(py))
-
-    exports: set[str] = set()
-    navmap: dict[str, Any] | None = None
-
-    for node in tree.body:
-        if isinstance(node, ast.Assign):
-            for target in node.targets:
-                if isinstance(target, ast.Name) and target.id == "__all__":
-                    exports = set(_extract_strings(node.value))
-                if isinstance(target, ast.Name) and target.id == "__navmap__":
-                    names = {"__all__": list(exports)}
-                    try:
-                        navmap = _literal_eval(node.value, names)
-                    except Exception:
-                        navmap = None
-        if (
-            isinstance(node, ast.AnnAssign)
-            and isinstance(node.target, ast.Name)
-            and node.target.id == "__navmap__"
-            and node.value is not None
-        ):
-            names = {"__all__": list(exports)}
-            try:
-                navmap = _literal_eval(node.value, names)
-            except Exception:
-                navmap = None
-
-    anchors = {
-        match.group(1) for match in (ANCHOR_RE.match(line) for line in text.splitlines()) if match
-    }
-
-    if navmap is None:
+    try:
+        return py.read_text(encoding="utf-8").splitlines()
+    except Exception:
         return []
 
-    errors: list[str] = []
-    exports_list = list(exports)
-    nav_exports = navmap.get("exports", exports_list)
 
-    if set(nav_exports) != exports:
-        errors.append(
-            f"{py}: exports mismatch between __all__ and __navmap__ ({sorted(exports)} != {sorted(nav_exports)})"
-        )
+def _scan_inline(py: Path) -> tuple[dict[str, int], dict[str, int]]:
+    """Return (sections, anchors) mapping to 1-based line numbers."""
+    sections: dict[str, int] = {}
+    anchors: dict[str, int] = {}
+    for i, line in enumerate(_read_text(py), 1):
+        m = SECTION_RE.match(line)
+        if m:
+            sections[m.group(1)] = i
+        m = ANCHOR_RE.match(line)
+        if m:
+            anchors[m.group(1)] = i
+    return sections, anchors
 
-    sections = navmap.get("sections", [])
+
+def _parse_navmap_dict(py: Path) -> dict[str, Any]:
+    """Parse a module's __navmap__ by a quick-and-safe literal eval.
+
+    This checker only needs fields existence; deep evaluation is unnecessary.
+    """
+    import ast
+
+    try:
+        tree = ast.parse(py.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    result: dict[str, Any] = {}
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            if any(isinstance(t, ast.Name) and t.id == "__navmap__" for t in node.targets):
+                try:
+                    value = ast.literal_eval(node.value)
+                    if isinstance(value, dict):
+                        result = value
+                except Exception:
+                    pass
+    return result
+
+
+def _parse_all(py: Path) -> list[str]:
+    """Parse all.
+
+    Parameters
+    ----------
+    py : Path
+        Description.
+
+    Returns
+    -------
+    list[str]
+        Description.
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _parse_all(...)
+    """
+    import ast
+
+    try:
+        tree = ast.parse(py.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            if any(isinstance(t, ast.Name) and t.id == "__all__" for t in node.targets):
+                try:
+                    if isinstance(node.value, (ast.List, ast.Tuple)):
+                        vals: list[str] = []
+                        for elt in node.value.elts:
+                            if isinstance(elt, ast.Constant) and isinstance(elt.value, str):
+                                vals.append(elt.value)
+                            elif isinstance(elt, ast.Name) and IDENT_RE.match(elt.id):
+                                vals.append(elt.id)
+                            else:
+                                return []
+                        return vals
+                except Exception:
+                    return []
+    return []
+
+
+def _exports_for(py: Path, nav: dict[str, Any]) -> list[str]:
+    """Exports for.
+
+    Parameters
+    ----------
+    py : Path
+        Description.
+    nav : dict[str, Any]
+        Description.
+
+    Returns
+    -------
+    list[str]
+        Description.
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _exports_for(...)
+    """
+    nav_exports = nav.get("exports")
+    if isinstance(nav_exports, list) and all(isinstance(x, str) for x in nav_exports):
+        return list(dict.fromkeys(nav_exports))
+    all_list = _parse_all(py)
+    if all_list:
+        return list(dict.fromkeys(all_list))
+    return []
+
+
+def _module_path(py: Path) -> str | None:
+    """Module path.
+
+    Parameters
+    ----------
+    py : Path
+        Description.
+
+    Returns
+    -------
+    str | None
+        Description.
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _module_path(...)
+    """
+    try:
+        rel = py.relative_to(SRC)
+    except Exception:
+        return None
+    if rel.suffix != ".py":
+        return None
+    return ".".join(rel.with_suffix("").parts)
+
+
+def _validate_pep440(field_val: Any) -> str | None:
+    """Validate pep440.
+
+    Parameters
+    ----------
+    field_val : Any
+        Description.
+
+    Returns
+    -------
+    str | None
+        Description.
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _validate_pep440(...)
+    """
+    if field_val is None or field_val == "":
+        return None
+    if Version is None:
+        return "packaging not installed (cannot validate PEP 440)"
+    try:
+        Version(str(field_val))
+        return None
+    except InvalidVersion:
+        return f"non-PEP440 version: {field_val!r}"
+
+
+def _inspect(py: Path) -> list[str]:
+    """inspect.
+
+    Parameters
+    ----------
+    py : Path
+        Description.
+
+    Returns
+    -------
+    list[str]
+        Description.
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _inspect(...)
+    """
+    errs: list[str] = []
+    nav = _parse_navmap_dict(py)
+    sections_inline, anchors_inline = _scan_inline(py)
+    exports = _exports_for(py, nav)
+
+    # If module exports anything, __navmap__ must exist
+    if exports and not nav:
+        errs.append(f"{py}: module exports symbols but has no __navmap__")
+        return errs
+
+    # Sections: first must be public-api; kebab-case ids; anchors present for listed symbols
+    sections = nav.get("sections", [])
     if sections:
         first = sections[0].get("id")
         if first != "public-api":
-            errors.append(f"{py}: first navmap section must have id 'public-api'")
-        for section in sections:
-            sid = section.get("id", "")
+            errs.append(f"{py}: first navmap section must have id 'public-api'")
+        for sec in sections:
+            sid = sec.get("id", "")
             if sid and not SLUG_RE.match(sid):
-                errors.append(f"{py}: section id '{sid}' is not kebab-case")
-            for sym in section.get("symbols", []):
-                if not SYMBOL_RE.match(sym):
-                    errors.append(f"{py}: invalid symbol name '{sym}' in section '{sid}'")
-                elif sym not in anchors:
-                    errors.append(f"{py}: missing [nav:anchor] for section symbol '{sym}'")
+                errs.append(f"{py}: section id '{sid}' is not kebab-case")
+            for sym in sec.get("symbols", []):
+                if not IDENT_RE.match(sym):
+                    errs.append(f"{py}: invalid symbol name '{sym}' in section '{sid}'")
+                elif sym not in anchors_inline:
+                    errs.append(f"{py}: missing [nav:anchor] for section symbol '{sym}'")
 
-    return errors
+    # Exports: if nav declares, it must match the actual exports setwise
+    nav_exports = nav.get("exports", [])
+    if isinstance(nav_exports, list):
+        if set(x for x in nav_exports if isinstance(x, str)) != set(exports):
+            errs.append(f"{py}: __navmap__['exports'] does not match __all__/exports set")
+
+    # Per-export meta requirements (owner, stability, since/dep PEP 440)
+    meta: dict[str, Any] = nav.get("symbols", {}) or {}
+    for name in sorted(exports):
+        m = meta.get(name, {})
+        stab = m.get("stability")
+        owner = m.get("owner")
+        if stab not in STABILITY:
+            errs.append(f"{py}: symbol '{name}' missing/invalid stability (got {stab!r})")
+        if not owner:
+            errs.append(f"{py}: symbol '{name}' missing owner (e.g., '@team')")
+        # Versions
+        since = m.get("since")
+        deprec = m.get("deprecated_in")
+        e1 = _validate_pep440(since)
+        if e1:
+            errs.append(f"{py}: symbol '{name}' since invalid: {e1}")
+        e2 = _validate_pep440(deprec)
+        if e2:
+            errs.append(f"{py}: symbol '{name}' deprecated_in invalid: {e2}")
+        if Version and since and deprec:
+            try:
+                if Version(str(deprec)) < Version(str(since)):
+                    errs.append(f"{py}: symbol '{name}' deprecated_in ({deprec}) < since ({since})")
+            except InvalidVersion:
+                pass
+
+    return errs
 
 
 def main() -> int:
-    """Compute main.
-
-    Carry out the main operation.
+    """Main.
 
     Returns
     -------
     int
-        Description of return value.
+        Description.
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> main(...)
     """
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     errors: list[str] = []
-    for py in SRC.rglob("*.py"):
+    for py in sorted(SRC.rglob("*.py")):
         errors.extend(_inspect(py))
 
     if errors:
         print("\n".join(errors))
+        return 1
+
+    # Round-trip check: compare freshly built JSON to inline markers
+    try:
+        # Local import to avoid creating a hard dependency in module scope
+        from tools.navmap.build_navmap import build_index  # type: ignore
+    except Exception as e:  # pragma: no cover
+        print(f"navmap check: unable to import build_navmap for round-trip ({e})", file=sys.stderr)
+        return 1
+
+    index = build_index(json_path=INDEX)  # also refreshes file on disk
+    rt_errs: list[str] = []
+    for mod, entry in (index.get("modules") or {}).items():
+        p = REPO / entry.get("path", "")
+        lines = _read_text(p)
+        # Sections at recorded lines
+        for sid, lineno in (entry.get("section_lines") or {}).items():
+            if lineno < 1 or lineno > len(lines) or not SECTION_RE.match(lines[lineno - 1]):
+                rt_errs.append(f"{p}: round-trip mismatch for section '{sid}' at line {lineno}")
+        # Anchors at recorded lines
+        for sym, lineno in (entry.get("anchors") or {}).items():
+            if lineno < 1 or lineno > len(lines) or not ANCHOR_RE.match(lines[lineno - 1]):
+                rt_errs.append(f"{p}: round-trip mismatch for anchor '{sym}' at line {lineno}")
+
+    if rt_errs:
+        print("\n".join(rt_errs))
         return 1
 
     print("navmap check: OK")
@@ -247,4 +385,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())

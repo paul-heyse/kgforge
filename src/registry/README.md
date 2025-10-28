@@ -7,12 +7,12 @@ Registry utilities
 
 ## Modules
 
-- **`registry.api`** — Api utilities → [open](vscode://file//home/paul/kgfoundry/src/registry/api.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/registry/api.py#L1)
-- **`registry.duckdb_registry`** — Duckdb Registry utilities → [open](vscode://file//home/paul/kgfoundry/src/registry/duckdb_registry.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/registry/duckdb_registry.py#L1)
-- **`registry.helper`** — Helper utilities → [open](vscode://file//home/paul/kgfoundry/src/registry/helper.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/registry/helper.py#L1)
-- **`registry.migrate`** — Migrate utilities → [open](vscode://file//home/paul/kgfoundry/src/registry/migrate.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/registry/migrate.py#L1)
+- **`registry.api`** — Api utilities → [open](vscode://file//home/paul/kgfoundry/src/registry/api.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/0342b08deac5e1564b1fc9d5b196ccbeba265d41/src/registry/api.py#L1)
+- **`registry.duckdb_registry`** — Duckdb Registry utilities → [open](vscode://file//home/paul/kgfoundry/src/registry/duckdb_registry.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/0342b08deac5e1564b1fc9d5b196ccbeba265d41/src/registry/duckdb_registry.py#L1)
+- **`registry.helper`** — Helper utilities → [open](vscode://file//home/paul/kgfoundry/src/registry/helper.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/0342b08deac5e1564b1fc9d5b196ccbeba265d41/src/registry/helper.py#L1)
+- **`registry.migrate`** — Migrate utilities → [open](vscode://file//home/paul/kgfoundry/src/registry/migrate.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/0342b08deac5e1564b1fc9d5b196ccbeba265d41/src/registry/migrate.py#L1)
 
 ## Classes
 
-- **`registry.NavMap`** — Describe NavMap → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:32:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/kgfoundry_common/navmap_types.py#L32-L45)
-<!-- agent:readme v1 sha:5c4124270cb9aa2a3dec18bfa8776d4becf90d97 content:52ae7b3ce685 -->
+- **`registry.NavMap`** — Describe NavMap → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:32:1) | [view](https://github.com/github.com/paul-heyse/blob/0342b08deac5e1564b1fc9d5b196ccbeba265d41/src/kgfoundry_common/navmap_types.py#L32-L45)
+<!-- agent:readme v1 sha:0342b08deac5e1564b1fc9d5b196ccbeba265d41 content:7bc1806a0ec3 -->

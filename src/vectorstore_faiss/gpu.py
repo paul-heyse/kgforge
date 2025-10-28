@@ -58,39 +58,6 @@ class FaissGpuIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.factory = factory
         self.nprobe = nprobe
         self.gpu = gpu
@@ -132,39 +99,6 @@ class FaissGpuIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         if self._faiss is None:
             return
         train_mat = cast(FloatArray, np.asarray(train_vectors, dtype=np.float32, order="C"))
@@ -209,39 +143,6 @@ class FaissGpuIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         vec_array = cast(FloatArray, np.asarray(vectors, dtype=np.float32, order="C"))
         if self._faiss is None:
             self._xb = cast(FloatArray, np.array(vec_array, copy=True))
@@ -289,39 +190,6 @@ class FaissGpuIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         q = cast(FloatArray, np.asarray(query, dtype=np.float32, order="C"))
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12
         if self._faiss is None or self._index is None:
@@ -358,39 +226,6 @@ class FaissGpuIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         if self._faiss is None or self._index is None:
             if self._xb is not None and self._idmap is not None:
                 np.savez(index_uri, xb=self._xb, ids=self._idmap)
@@ -421,39 +256,6 @@ class FaissGpuIndex:
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         if self._faiss is None:
             if os.path.exists(index_uri + ".npz"):
                 data = np.load(index_uri + ".npz", allow_pickle=True)

@@ -47,37 +47,4 @@ class DenseEmbeddingModel(Protocol):
         """
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ...
