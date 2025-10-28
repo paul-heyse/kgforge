@@ -39,10 +39,12 @@ class MockKG:
     """Describe MockKG."""
 
     def __init__(self) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters.
         """
+        Compute init.
+        
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
+        """
+        
         self.chunk2concepts: dict[str, set[str]] = {}
         self.neighbors: dict[str, set[str]] = {}
 

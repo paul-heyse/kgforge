@@ -145,10 +145,11 @@ class KGFoundryClient:
         timeout: float = 30.0,
         http: _SupportsHttp | None = None,
     ) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters.
-
+        """
+        Compute init.
+        
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
+        
         Parameters
         ----------
         base_url : str | None
@@ -160,6 +161,7 @@ class KGFoundryClient:
         http : _SupportsHttp | None
             Description for ``http``.
         """
+        
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout

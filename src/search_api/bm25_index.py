@@ -89,10 +89,11 @@ class BM25Index:
     """Describe BM25Index."""
 
     def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters.
-
+        """
+        Compute init.
+        
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
+        
         Parameters
         ----------
         k1 : float | None
@@ -100,6 +101,7 @@ class BM25Index:
         b : float | None
             Description for ``b``.
         """
+        
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
