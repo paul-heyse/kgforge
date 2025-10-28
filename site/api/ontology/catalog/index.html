@@ -711,7 +711,10 @@
 <span class="normal">112</span>
 <span class="normal">113</span>
 <span class="normal">114</span>
-<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">OntologyCatalog</span><span class="p">:</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">OntologyCatalog</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Describe OntologyCatalog.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Concept</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -724,6 +727,7 @@
 <span class="sd">        concepts : List[Concept]</span>
 <span class="sd">            Description for ``concepts``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
 
 
 
@@ -755,6 +759,7 @@
 
 
 
+
         <span class="c1"># NOTE: return neighbor concept IDs up to depth when ontology data is wired</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
 
@@ -773,6 +778,7 @@
 <span class="sd">        Mapping[str, Any]</span>
 <span class="sd">            Description of return value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
 
 
 
@@ -832,7 +838,8 @@
 <span class="normal">63</span>
 <span class="normal">64</span>
 <span class="normal">65</span>
-<span class="normal">66</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Concept</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">66</span>
+<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Concept</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute init.</span>
 
 <span class="sd">    Initialise a new instance with validated parameters.</span>
@@ -842,6 +849,7 @@
 <span class="sd">    concepts : List[Concept]</span>
 <span class="sd">        Description for ``concepts``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
 
 
 
@@ -878,9 +886,7 @@
 
             <details class="quote">
               <summary>Source code in <code>src/ontology/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 96</span>
 <span class="normal"> 97</span>
 <span class="normal"> 98</span>
 <span class="normal"> 99</span>
@@ -899,7 +905,10 @@
 <span class="normal">112</span>
 <span class="normal">113</span>
 <span class="normal">114</span>
-<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hydrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hydrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute hydrate.</span>
 
 <span class="sd">    Carry out the hydrate operation.</span>
@@ -914,6 +923,7 @@
 <span class="sd">    Mapping[str, Any]</span>
 <span class="sd">        Description of return value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
 
 
 
@@ -952,8 +962,7 @@ depth : int | None
 
             <details class="quote">
               <summary>Source code in <code>src/ontology/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">68</span>
-<span class="normal">69</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">69</span>
 <span class="normal">70</span>
 <span class="normal">71</span>
 <span class="normal">72</span>
@@ -976,7 +985,9 @@ depth : int | None
 <span class="normal">89</span>
 <span class="normal">90</span>
 <span class="normal">91</span>
-<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute neighbors.</span>
 
 <span class="sd">    Carry out the neighbors operation.</span>
@@ -993,6 +1004,7 @@ depth : int | None
 <span class="sd">    Set[str]</span>
 <span class="sd">        Description of return value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
 
 
 
