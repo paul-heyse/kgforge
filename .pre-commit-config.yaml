@@ -76,6 +76,12 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+      # optional: enable when you want READMEs regenerated automatically
+      - id: readme-generator
+        name: "readme-generator (changed packages only)"
+        entry: bash tools/hooks/run_readme_generator.sh
+        language: system
+        pass_filenames: false
 
   - repo: https://github.com/PyCQA/pydocstyle
     rev: 6.3.0
