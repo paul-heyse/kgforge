@@ -54,6 +54,7 @@ def detect_packages() -> list[str]:
     
     
     
+    
     candidates = _candidate_names()
     lowers = [c for c in candidates if c.islower()]
     base = lowers or candidates
@@ -71,6 +72,7 @@ def detect_primary() -> str:
     str
         Description of return value.
     """
+    
     
     
     

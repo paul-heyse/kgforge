@@ -329,6 +329,7 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     
     
     
+    
     path = info.path
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
@@ -420,6 +421,7 @@ def repair_all(root: Path, apply: bool) -> list[str]:
     
     
     
+    
     messages: list[str] = []
     for info in _collect_modules(root):
         messages.extend(repair_module(info, apply=apply))
@@ -479,6 +481,7 @@ def main(argv: list[str] | None = None) -> int:
     int
         Description of return value.
     """
+    
     
     
     

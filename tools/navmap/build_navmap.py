@@ -448,6 +448,7 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
     
     
     
+    
     files = _discover_py_files()
     data: dict[str, Any] = {
         "commit": _git_sha(),
