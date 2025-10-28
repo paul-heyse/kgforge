@@ -16,6 +16,7 @@ import shutil
 import subprocess
 import sys
 import time
+from urllib.parse import urlparse
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -74,8 +75,10 @@ def detect_repo() -> tuple[str, str]:
     if remote.startswith("git@"):
         _, remainder = remote.split("@", 1)
         path = remainder.split(":", 1)[1]
-    elif remote.startswith("https://"):
-        path = remote.split("https://", 1)[1]
+    else:
+        parsed_remote = urlparse(remote)
+        if parsed_remote.path:
+            path = parsed_remote.path.lstrip("/")
 
     if path:
         parts = path.split("/")
