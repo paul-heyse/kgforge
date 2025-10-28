@@ -37,3 +37,34 @@ Submodules
    /autoapi/src/download/harvester/index
 
 
+
+
+Package Contents
+----------------
+
+.. py:function:: get_doc_model()
+
+   
+   Compute get doc model.
+
+   Carry out the get doc model operation.
+
+   :returns: *type[Doc]* -- Description of return value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

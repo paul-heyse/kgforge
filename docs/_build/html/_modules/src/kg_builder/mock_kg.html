@@ -511,100 +511,105 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos"> 34</span>        
 <span class="linenos"> 35</span>        
 <span class="linenos"> 36</span>        
+<span class="linenos"> 37</span>        
 <div class="viewcode-block" id="MockKG.chunk2concepts">
 <a class="viewcode-back" href="../../../autoapi/src/kg_builder/mock_kg/index.html#src.kg_builder.mock_kg.MockKG.chunk2concepts">[docs]</a>
-<span class="linenos"> 37</span>        <span class="bp">self</span><span class="o">.</span><span class="n">chunk2concepts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span></div>
+<span class="linenos"> 38</span>        <span class="bp">self</span><span class="o">.</span><span class="n">chunk2concepts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span></div>
 
 <div class="viewcode-block" id="MockKG.neighbors">
 <a class="viewcode-back" href="../../../autoapi/src/kg_builder/mock_kg/index.html#src.kg_builder.mock_kg.MockKG.neighbors">[docs]</a>
-<span class="linenos"> 38</span>        <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span></div>
+<span class="linenos"> 39</span>        <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span></div>
 
-<span class="linenos"> 39</span>
+<span class="linenos"> 40</span>
 <div class="viewcode-block" id="MockKG.add_mention">
 <a class="viewcode-back" href="../../../autoapi/src/kg_builder/mock_kg/index.html#src.kg_builder.mock_kg.MockKG.add_mention">[docs]</a>
-<span class="linenos"> 40</span>    <span class="k">def</span><span class="w"> </span><span class="nf">add_mention</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="linenos"> 41</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute add mention.</span>
-<span class="linenos"> 42</span>
-<span class="linenos"> 43</span><span class="sd">        Carry out the add mention operation.</span>
-<span class="linenos"> 44</span>
-<span class="linenos"> 45</span><span class="sd">        Parameters</span>
-<span class="linenos"> 46</span><span class="sd">        ----------</span>
-<span class="linenos"> 47</span><span class="sd">        chunk_id : str</span>
-<span class="linenos"> 48</span><span class="sd">            Description for ``chunk_id``.</span>
-<span class="linenos"> 49</span><span class="sd">        concept_id : str</span>
-<span class="linenos"> 50</span><span class="sd">            Description for ``concept_id``.</span>
-<span class="linenos"> 51</span><span class="sd">        &quot;&quot;&quot;</span>
-<span class="linenos"> 52</span>        
+<span class="linenos"> 41</span>    <span class="k">def</span><span class="w"> </span><span class="nf">add_mention</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos"> 42</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute add mention.</span>
+<span class="linenos"> 43</span>
+<span class="linenos"> 44</span><span class="sd">        Carry out the add mention operation.</span>
+<span class="linenos"> 45</span>
+<span class="linenos"> 46</span><span class="sd">        Parameters</span>
+<span class="linenos"> 47</span><span class="sd">        ----------</span>
+<span class="linenos"> 48</span><span class="sd">        chunk_id : str</span>
+<span class="linenos"> 49</span><span class="sd">            Description for ``chunk_id``.</span>
+<span class="linenos"> 50</span><span class="sd">        concept_id : str</span>
+<span class="linenos"> 51</span><span class="sd">            Description for ``concept_id``.</span>
+<span class="linenos"> 52</span><span class="sd">        &quot;&quot;&quot;</span>
 <span class="linenos"> 53</span>        
 <span class="linenos"> 54</span>        
-<span class="linenos"> 55</span>        <span class="bp">self</span><span class="o">.</span><span class="n">chunk2concepts</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">chunk_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">concept_id</span><span class="p">)</span></div>
+<span class="linenos"> 55</span>        
+<span class="linenos"> 56</span>        
+<span class="linenos"> 57</span>        <span class="bp">self</span><span class="o">.</span><span class="n">chunk2concepts</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">chunk_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">concept_id</span><span class="p">)</span></div>
 
-<span class="linenos"> 56</span>
+<span class="linenos"> 58</span>
 <div class="viewcode-block" id="MockKG.add_edge">
 <a class="viewcode-back" href="../../../autoapi/src/kg_builder/mock_kg/index.html#src.kg_builder.mock_kg.MockKG.add_edge">[docs]</a>
-<span class="linenos"> 57</span>    <span class="k">def</span><span class="w"> </span><span class="nf">add_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="linenos"> 58</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute add edge.</span>
-<span class="linenos"> 59</span>
-<span class="linenos"> 60</span><span class="sd">        Carry out the add edge operation.</span>
+<span class="linenos"> 59</span>    <span class="k">def</span><span class="w"> </span><span class="nf">add_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos"> 60</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute add edge.</span>
 <span class="linenos"> 61</span>
-<span class="linenos"> 62</span><span class="sd">        Parameters</span>
-<span class="linenos"> 63</span><span class="sd">        ----------</span>
-<span class="linenos"> 64</span><span class="sd">        a : str</span>
-<span class="linenos"> 65</span><span class="sd">            Description for ``a``.</span>
-<span class="linenos"> 66</span><span class="sd">        b : str</span>
-<span class="linenos"> 67</span><span class="sd">            Description for ``b``.</span>
-<span class="linenos"> 68</span><span class="sd">        &quot;&quot;&quot;</span>
-<span class="linenos"> 69</span>        
-<span class="linenos"> 70</span>        
+<span class="linenos"> 62</span><span class="sd">        Carry out the add edge operation.</span>
+<span class="linenos"> 63</span>
+<span class="linenos"> 64</span><span class="sd">        Parameters</span>
+<span class="linenos"> 65</span><span class="sd">        ----------</span>
+<span class="linenos"> 66</span><span class="sd">        a : str</span>
+<span class="linenos"> 67</span><span class="sd">            Description for ``a``.</span>
+<span class="linenos"> 68</span><span class="sd">        b : str</span>
+<span class="linenos"> 69</span><span class="sd">            Description for ``b``.</span>
+<span class="linenos"> 70</span><span class="sd">        &quot;&quot;&quot;</span>
 <span class="linenos"> 71</span>        
-<span class="linenos"> 72</span>        <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-<span class="linenos"> 73</span>        <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
+<span class="linenos"> 72</span>        
+<span class="linenos"> 73</span>        
+<span class="linenos"> 74</span>        
+<span class="linenos"> 75</span>        <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="linenos"> 76</span>        <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
 
-<span class="linenos"> 74</span>
+<span class="linenos"> 77</span>
 <div class="viewcode-block" id="MockKG.linked_concepts">
 <a class="viewcode-back" href="../../../autoapi/src/kg_builder/mock_kg/index.html#src.kg_builder.mock_kg.MockKG.linked_concepts">[docs]</a>
-<span class="linenos"> 75</span>    <span class="k">def</span><span class="w"> </span><span class="nf">linked_concepts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="linenos"> 76</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute linked concepts.</span>
-<span class="linenos"> 77</span>
-<span class="linenos"> 78</span><span class="sd">        Carry out the linked concepts operation.</span>
-<span class="linenos"> 79</span>
-<span class="linenos"> 80</span><span class="sd">        Parameters</span>
-<span class="linenos"> 81</span><span class="sd">        ----------</span>
-<span class="linenos"> 82</span><span class="sd">        chunk_id : str</span>
-<span class="linenos"> 83</span><span class="sd">            Description for ``chunk_id``.</span>
-<span class="linenos"> 84</span>
-<span class="linenos"> 85</span><span class="sd">        Returns</span>
-<span class="linenos"> 86</span><span class="sd">        -------</span>
-<span class="linenos"> 87</span><span class="sd">        List[str]</span>
-<span class="linenos"> 88</span><span class="sd">            Description of return value.</span>
-<span class="linenos"> 89</span><span class="sd">        &quot;&quot;&quot;</span>
-<span class="linenos"> 90</span>        
-<span class="linenos"> 91</span>        
-<span class="linenos"> 92</span>        
-<span class="linenos"> 93</span>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk2concepts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">chunk_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span></div>
+<span class="linenos"> 78</span>    <span class="k">def</span><span class="w"> </span><span class="nf">linked_concepts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="linenos"> 79</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute linked concepts.</span>
+<span class="linenos"> 80</span>
+<span class="linenos"> 81</span><span class="sd">        Carry out the linked concepts operation.</span>
+<span class="linenos"> 82</span>
+<span class="linenos"> 83</span><span class="sd">        Parameters</span>
+<span class="linenos"> 84</span><span class="sd">        ----------</span>
+<span class="linenos"> 85</span><span class="sd">        chunk_id : str</span>
+<span class="linenos"> 86</span><span class="sd">            Description for ``chunk_id``.</span>
+<span class="linenos"> 87</span>
+<span class="linenos"> 88</span><span class="sd">        Returns</span>
+<span class="linenos"> 89</span><span class="sd">        -------</span>
+<span class="linenos"> 90</span><span class="sd">        List[str]</span>
+<span class="linenos"> 91</span><span class="sd">            Description of return value.</span>
+<span class="linenos"> 92</span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos"> 93</span>        
+<span class="linenos"> 94</span>        
+<span class="linenos"> 95</span>        
+<span class="linenos"> 96</span>        
+<span class="linenos"> 97</span>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk2concepts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">chunk_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span></div>
 
-<span class="linenos"> 94</span>
+<span class="linenos"> 98</span>
 <div class="viewcode-block" id="MockKG.one_hop">
 <a class="viewcode-back" href="../../../autoapi/src/kg_builder/mock_kg/index.html#src.kg_builder.mock_kg.MockKG.one_hop">[docs]</a>
-<span class="linenos"> 95</span>    <span class="k">def</span><span class="w"> </span><span class="nf">one_hop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="linenos"> 96</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute one hop.</span>
-<span class="linenos"> 97</span>
-<span class="linenos"> 98</span><span class="sd">        Carry out the one hop operation.</span>
-<span class="linenos"> 99</span>
-<span class="linenos">100</span><span class="sd">        Parameters</span>
-<span class="linenos">101</span><span class="sd">        ----------</span>
-<span class="linenos">102</span><span class="sd">        concept_id : str</span>
-<span class="linenos">103</span><span class="sd">            Description for ``concept_id``.</span>
-<span class="linenos">104</span>
-<span class="linenos">105</span><span class="sd">        Returns</span>
-<span class="linenos">106</span><span class="sd">        -------</span>
-<span class="linenos">107</span><span class="sd">        List[str]</span>
-<span class="linenos">108</span><span class="sd">            Description of return value.</span>
-<span class="linenos">109</span><span class="sd">        &quot;&quot;&quot;</span>
-<span class="linenos">110</span>        
-<span class="linenos">111</span>        
-<span class="linenos">112</span>        
-<span class="linenos">113</span>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">concept_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span></div>
+<span class="linenos"> 99</span>    <span class="k">def</span><span class="w"> </span><span class="nf">one_hop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="linenos">100</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute one hop.</span>
+<span class="linenos">101</span>
+<span class="linenos">102</span><span class="sd">        Carry out the one hop operation.</span>
+<span class="linenos">103</span>
+<span class="linenos">104</span><span class="sd">        Parameters</span>
+<span class="linenos">105</span><span class="sd">        ----------</span>
+<span class="linenos">106</span><span class="sd">        concept_id : str</span>
+<span class="linenos">107</span><span class="sd">            Description for ``concept_id``.</span>
+<span class="linenos">108</span>
+<span class="linenos">109</span><span class="sd">        Returns</span>
+<span class="linenos">110</span><span class="sd">        -------</span>
+<span class="linenos">111</span><span class="sd">        List[str]</span>
+<span class="linenos">112</span><span class="sd">            Description of return value.</span>
+<span class="linenos">113</span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos">114</span>        
+<span class="linenos">115</span>        
+<span class="linenos">116</span>        
+<span class="linenos">117</span>        
+<span class="linenos">118</span>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">concept_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span></div>
 </div>
 
 </pre></div>

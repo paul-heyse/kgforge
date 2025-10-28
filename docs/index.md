@@ -30,6 +30,12 @@ reference/graphs/index
 ```
 
 ```{toctree}
+::hidden:
+::glob:
+autoapi/src/*/index
+```
+
+```{toctree}
 :maxdepth: 1
 :caption: Gallery
 gallery/index

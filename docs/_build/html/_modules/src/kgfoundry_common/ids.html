@@ -520,38 +520,40 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">43</span>    
 <span class="linenos">44</span>    
 <span class="linenos">45</span>    
-<span class="linenos">46</span>    <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">16</span><span class="p">]</span>
-<span class="linenos">47</span>    <span class="n">b32</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b32encode</span><span class="p">(</span><span class="n">h</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<span class="linenos">48</span>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;urn:doc:sha256:</span><span class="si">{</span><span class="n">b32</span><span class="si">}</span><span class="s2">&quot;</span></div>
+<span class="linenos">46</span>    
+<span class="linenos">47</span>    <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">16</span><span class="p">]</span>
+<span class="linenos">48</span>    <span class="n">b32</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b32encode</span><span class="p">(</span><span class="n">h</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="linenos">49</span>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;urn:doc:sha256:</span><span class="si">{</span><span class="n">b32</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
-<span class="linenos">49</span>
 <span class="linenos">50</span>
-<span class="linenos">51</span><span class="c1"># [nav:anchor urn_chunk]</span>
+<span class="linenos">51</span>
+<span class="linenos">52</span><span class="c1"># [nav:anchor urn_chunk]</span>
 <div class="viewcode-block" id="urn_chunk">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/ids/index.html#src.kgfoundry_common.ids.urn_chunk">[docs]</a>
-<span class="linenos">52</span><span class="k">def</span><span class="w"> </span><span class="nf">urn_chunk</span><span class="p">(</span><span class="n">doc_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="linenos">53</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute urn chunk.</span>
-<span class="linenos">54</span>
-<span class="linenos">55</span><span class="sd">    Carry out the urn chunk operation.</span>
-<span class="linenos">56</span>
-<span class="linenos">57</span><span class="sd">    Parameters</span>
-<span class="linenos">58</span><span class="sd">    ----------</span>
-<span class="linenos">59</span><span class="sd">    doc_hash : str</span>
-<span class="linenos">60</span><span class="sd">        Description for ``doc_hash``.</span>
-<span class="linenos">61</span><span class="sd">    start : int</span>
-<span class="linenos">62</span><span class="sd">        Description for ``start``.</span>
-<span class="linenos">63</span><span class="sd">    end : int</span>
-<span class="linenos">64</span><span class="sd">        Description for ``end``.</span>
-<span class="linenos">65</span>
-<span class="linenos">66</span><span class="sd">    Returns</span>
-<span class="linenos">67</span><span class="sd">    -------</span>
-<span class="linenos">68</span><span class="sd">    str</span>
-<span class="linenos">69</span><span class="sd">        Description of return value.</span>
-<span class="linenos">70</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">71</span>    
+<span class="linenos">53</span><span class="k">def</span><span class="w"> </span><span class="nf">urn_chunk</span><span class="p">(</span><span class="n">doc_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos">54</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute urn chunk.</span>
+<span class="linenos">55</span>
+<span class="linenos">56</span><span class="sd">    Carry out the urn chunk operation.</span>
+<span class="linenos">57</span>
+<span class="linenos">58</span><span class="sd">    Parameters</span>
+<span class="linenos">59</span><span class="sd">    ----------</span>
+<span class="linenos">60</span><span class="sd">    doc_hash : str</span>
+<span class="linenos">61</span><span class="sd">        Description for ``doc_hash``.</span>
+<span class="linenos">62</span><span class="sd">    start : int</span>
+<span class="linenos">63</span><span class="sd">        Description for ``start``.</span>
+<span class="linenos">64</span><span class="sd">    end : int</span>
+<span class="linenos">65</span><span class="sd">        Description for ``end``.</span>
+<span class="linenos">66</span>
+<span class="linenos">67</span><span class="sd">    Returns</span>
+<span class="linenos">68</span><span class="sd">    -------</span>
+<span class="linenos">69</span><span class="sd">    str</span>
+<span class="linenos">70</span><span class="sd">        Description of return value.</span>
+<span class="linenos">71</span><span class="sd">    &quot;&quot;&quot;</span>
 <span class="linenos">72</span>    
 <span class="linenos">73</span>    
-<span class="linenos">74</span>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;urn:chunk:</span><span class="si">{</span><span class="n">doc_hash</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span></div>
+<span class="linenos">74</span>    
+<span class="linenos">75</span>    
+<span class="linenos">76</span>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;urn:chunk:</span><span class="si">{</span><span class="n">doc_hash</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
 </pre></div>
 

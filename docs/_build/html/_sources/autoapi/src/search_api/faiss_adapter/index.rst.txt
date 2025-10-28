@@ -13,8 +13,14 @@ src.search_api.faiss_adapter
 
 
 
+
+
 Module Contents
 ---------------
+
+.. py:type:: VecArray
+   :canonical: NDArray[np.float32]
+
 
 .. py:class:: DenseVecs
 
