@@ -215,14 +215,16 @@ def module_name_for(path: Path) -> str:
         relative = path.relative_to(REPO_ROOT)
     except ValueError:
         relative = path
+
+    in_src = path.is_relative_to(SRC_ROOT)
     parts = list(relative.with_suffix("").parts)
-    if parts and parts[0] == "src":
+    if in_src and parts and parts[0] == "src":
         parts = parts[1:]
+
     module = ".".join(parts)
     if module.endswith(".__init__"):
         module = module[: -len(".__init__")]
-    if module and path.is_relative_to(SRC_ROOT):
-        module = f"src.{module}" if module else "src"
+
     return module
 
 
