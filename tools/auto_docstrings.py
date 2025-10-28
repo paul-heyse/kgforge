@@ -1469,6 +1469,7 @@ def _required_sections(
     parameters: list[tuple[str, str]],
     returns: str | None,
     raises: list[str],
+    include_examples: bool,
 ) -> set[str]:
     """Compute required sections.
 
@@ -1492,7 +1493,9 @@ def _required_sections(
     """
     if kind in {"module", "class"}:
         return set()
-    required: set[str] = {"Examples"}
+    required: set[str] = set()
+    if include_examples:
+        required.add("Examples")
     if parameters:
         required.add("Parameters")
     if returns:
@@ -1630,14 +1633,22 @@ def process_file(path: Path) -> bool:
         parameters: list[tuple[str, str]] = []
         returns: str | None = None
         raises: list[str] = []
+        include_examples = False
         if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             parameters = parameters_for(node)
             return_annotation: str = annotation_to_text(node.returns)
             if return_annotation not in {"None", "NoReturn"}:
                 returns = return_annotation
             raises = detect_raises(node)
+            include_examples = bool(node_name) and not node_name.startswith("_")
 
-        required_sections = _required_sections(kind, parameters, returns, raises)
+        required_sections = _required_sections(
+            kind,
+            parameters,
+            returns,
+            raises,
+            include_examples,
+        )
         needs_update = doc is None or "TODO" in (doc or "") or "NavMap:" in (doc or "")
         if not needs_update and required_sections:
             if doc is None:
