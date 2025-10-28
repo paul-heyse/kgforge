@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import os
 from pathlib import Path
 
@@ -28,6 +29,35 @@ def test_load_symbol_candidates_strips_init(tmp_path, monkeypatch):
 
     assert "kgfoundry" in candidates
     assert "kgfoundry.__init__" not in candidates
+
+
+def test_load_symbol_candidates_reads_navmap(tmp_path, monkeypatch):
+    root = tmp_path
+    navmap_dir = root / "site" / "_build" / "navmap"
+    navmap_dir.mkdir(parents=True, exist_ok=True)
+    navmap = navmap_dir / "navmap.json"
+    navmap.write_text(
+        json.dumps(
+            {
+                "modules": {
+                    "brand_new": {"exports": ["Alpha", "brand_new.beta"]},
+                    "legacy.__init__": {"exports": ["Gamma"]},
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(build_test_map, "ROOT", root)
+    monkeypatch.setattr(build_test_map, "SRC", root / "src")
+
+    candidates = build_test_map.load_symbol_candidates()
+
+    assert "brand_new" in candidates
+    assert "brand_new.Alpha" in candidates
+    assert "brand_new.beta" in candidates
+    assert "legacy" in candidates
+    assert "legacy.Gamma" in candidates
 
 
 def _normalize_repo_rel(path_like: str) -> str:
