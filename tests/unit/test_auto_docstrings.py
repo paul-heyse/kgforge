@@ -62,6 +62,8 @@ import importlib.util
 import sys
 from pathlib import Path
 
+import pytest
+
 MODULE_PATH = Path(__file__).resolve().parents[2] / "tools" / "auto_docstrings.py"
 spec = importlib.util.spec_from_file_location("auto_docstrings", MODULE_PATH)
 auto_docstrings = importlib.util.module_from_spec(spec)
@@ -74,6 +76,7 @@ annotation_to_text = auto_docstrings.annotation_to_text
 build_docstring = auto_docstrings.build_docstring
 build_examples = auto_docstrings.build_examples
 parameters_for = auto_docstrings.parameters_for
+extended_summary = auto_docstrings.extended_summary
 
 
 def _get_function(code: str) -> ast.FunctionDef:
@@ -81,6 +84,23 @@ def _get_function(code: str) -> ast.FunctionDef:
     node = module.body[0]
     assert isinstance(node, ast.FunctionDef)
     return node
+
+
+@pytest.mark.parametrize(
+    ("name", "expected_fragment"),
+    [
+        ("__iter__", "Yield each item"),
+        ("__eq__", "Determine whether"),
+        ("__pydantic_core_schema__", "schema object"),
+        ("model_dump", "Serialise the model instance"),
+    ],
+)
+def test_extended_summary_overrides(name: str, expected_fragment: str) -> None:
+    """Ensure special members receive tailored extended summaries."""
+
+    result = extended_summary("function", name, "pkg.module")
+
+    assert expected_fragment in result
 
 
 def test_build_docstring_appends_examples_for_public_function() -> None:
@@ -134,8 +154,6 @@ def process(item: str, limit: int | None = None) -> str:
 from importlib import util
 from pathlib import Path
 import sys
-
-import pytest
 
 AUTO_DOCSTRINGS_PATH = Path(__file__).resolve().parents[2] / "tools" / "auto_docstrings.py"
 _SPEC = util.spec_from_file_location("tools.auto_docstrings", AUTO_DOCSTRINGS_PATH)
