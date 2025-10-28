@@ -787,6 +787,11 @@ def build_one_package(
     except Exception:
         pyrev_ok = False
 
+    if not (pydeps_ok and pyrev_ok):
+        for partial in (imports_out, uml_out):
+            if partial.exists():
+                partial.unlink()
+
     # Save to cache if requested and successful
     if use_cache and pydeps_ok and pyrev_ok and tree_h:
         bucket.mkdir(parents=True, exist_ok=True)
@@ -883,6 +888,24 @@ def main() -> None:
                 print(
                     f"[graphs] {pkg}: {src}; pydeps={'ok' if ok1 else 'FAIL'}; pyreverse={'ok' if ok2 else 'FAIL'}"
                 )
+
+    failures: list[tuple[str, bool, bool]] = [
+        (pkg, ok1, ok2)
+        for pkg, _, ok1, ok2 in results
+        if not (ok1 and ok2)
+    ]
+    if failures:
+        lines = ["[graphs] build failures detected during per-package graph generation:"]
+        for pkg, ok1, ok2 in failures:
+            failed_parts: list[str] = []
+            if not ok1:
+                failed_parts.append("pydeps")
+            if not ok2:
+                failed_parts.append("pyreverse")
+            parts = ", ".join(failed_parts)
+            lines.append(f" - {pkg}: {parts} failed")
+        print("\n".join(lines), file=sys.stderr)
+        sys.exit(3)
 
     # 2) Global collapsed graph (subsystems)
     dot_all = OUT / "subsystems.dot"
