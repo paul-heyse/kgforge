@@ -7,11 +7,8 @@ __all__ = ["gpu"]
 
 __navmap__: NavMap = {
     "title": "vectorstore_faiss",
-    "synopsis": "FAISS-backed vector store abstractions",
+    "synopsis": "FAISS GPU vector store wrappers",
     "exports": __all__,
-    "owner": "@vectorstore",
-    "stability": "experimental",
-    "since": "0.1.0",
     "sections": [
         {
             "id": "public-api",
@@ -19,11 +16,16 @@ __navmap__: NavMap = {
             "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@search-api",
+        "stability": "experimental",
+        "since": "0.2.0",
+    },
     "symbols": {
         "gpu": {
             "stability": "experimental",
-            "owner": "@vectorstore",
-            "since": "0.1.0",
+            "owner": "@search-api",
+            "since": "0.2.0",
         },
     },
 }

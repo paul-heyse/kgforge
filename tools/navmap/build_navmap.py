@@ -50,6 +50,28 @@ PLACEHOLDER_ALL = object()
 
 
 def _literal_eval_navmap(node: ast.AST) -> Any:
+    """Literal eval navmap.
+
+    Parameters
+    ----------
+    node : ast.AST
+        Description.
+
+    Returns
+    -------
+    Any
+        Description.
+
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _literal_eval_navmap(...)
+    """
     if isinstance(node, ast.Constant):
         return node.value
     if isinstance(node, ast.Name):
@@ -72,6 +94,30 @@ def _literal_eval_navmap(node: ast.AST) -> Any:
 
 
 def _replace_placeholders(value: Any, exports: list[str]) -> Any:
+    """Replace placeholders.
+
+    Parameters
+    ----------
+    value : Any
+        Description.
+    exports : list[str]
+        Description.
+
+    Returns
+    -------
+    Any
+        Description.
+
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _replace_placeholders(...)
+    """
     if value is PLACEHOLDER_ALL:
         return list(dict.fromkeys(exports))
     if isinstance(value, list):
@@ -169,6 +215,7 @@ def _module_name(py: Path) -> str | None:
     -------
     str | None
         Description.
+
 
     Raises
     ------
@@ -338,6 +385,12 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     files = _discover_py_files()
     data: dict[str, Any] = {
         "commit": _git_sha(),
@@ -401,6 +454,7 @@ def main() -> int:
     -------
     int
         Description.
+
 
     Raises
     ------

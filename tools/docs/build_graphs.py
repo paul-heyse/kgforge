@@ -61,6 +61,11 @@ def parse_args() -> argparse.Namespace:
         Description of return value.
     """
     
+    
+    
+    
+    
+    
     p = argparse.ArgumentParser(
         description="Build per-package and cross-subsystem graphs with policy checks."
     )
@@ -153,6 +158,11 @@ def sh(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subproces
         Description of return value.
     """
     
+    
+    
+    
+    
+    
     return subprocess.run(
         cmd, check=check, cwd=str(cwd) if cwd else None, text=True, capture_output=False
     )
@@ -169,6 +179,11 @@ def ensure_bin(name: str) -> None:
         Description for ``name``.
     """
     
+    
+    
+    
+    
+    
     if not shutil.which(name):
         print(f"[graphs] Missing required executable on PATH: {name}", file=sys.stderr)
         sys.exit(2)
@@ -184,6 +199,11 @@ def find_top_packages() -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
     
     # Top-level packages are directories under src/ that contain __init__.py
     pkgs: list[str] = []
@@ -229,6 +249,11 @@ def build_pydeps_for_package(
         Description for ``fmt``.
     """
     
+    
+    
+    
+    
+    
     dot_tmp = out_svg.with_suffix(".dot")
     cmd = [
         sys.executable,
@@ -266,6 +291,11 @@ def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
         Description for ``fmt``.
     """
     
+    
+    
+    
+    
+    
     # classes_<project>.dot is named by -p <project>; use the package name to get unique names.
     sh(["pyreverse", f"src/{pkg}", "-o", "dot", "-p", pkg], cwd=ROOT)
     dot_file = ROOT / f"classes_{pkg}.dot"
@@ -298,6 +328,11 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
     max_bacon : int
         Description for ``max_bacon``.
     """
+    
+    
+    
+    
+    
     
     cmd = [
         sys.executable,
@@ -341,6 +376,11 @@ def collapse_to_packages(dot_path: Path):
         Description of return value.
     """
     
+    
+    
+    
+    
+    
     graphs = pydot.graph_from_dot_file(str(dot_path))
     pd = graphs[0] if isinstance(graphs, list) else graphs
     g = nx.drawing.nx_pydot.from_pydot(pd).to_directed()
@@ -370,6 +410,11 @@ def analyze_graph(g, layers: dict[str, Any]) -> dict[str, Any]:
     Mapping[str, Any]
         Description of return value.
     """
+    
+    
+    
+    
+    
     
     # cycles (Johnson’s algorithm) & degree centrality
     # 1) prune forbidden outward edges before cycle enumeration
@@ -454,6 +499,11 @@ def style_and_render(
         Description for ``fmt``.
     """
     
+    
+    
+    
+    
+    
     pkg2layer = layers.get("packages", {}) or {}
     palette = {
         "domain": "#2f855a",
@@ -509,6 +559,11 @@ def write_meta(meta: dict[str, Any], out_json: Path) -> None:
         Description for ``out_json``.
     """
     
+    
+    
+    
+    
+    
     out_json.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
 
@@ -530,6 +585,11 @@ def enforce_policy(
     fail_layers : bool
         Description for ``fail_layers``.
     """
+    
+    
+    
+    
+    
     
     allowed_cycles = set(tuple(c) for c in (allow.get("cycles") or []))
     allowed_edges = set(tuple(e) for e in (allow.get("edges") or []))
@@ -571,6 +631,11 @@ def last_tree_commit(pkg: str) -> str:
         Description of return value.
     """
     
+    
+    
+    
+    
+    
     try:
         sha = subprocess.check_output(
             ["git", "log", "-1", "--format=%H", "--", f"src/{pkg}"], cwd=str(ROOT), text=True
@@ -610,6 +675,11 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
         Description of return value.
     """
     
+    
+    
+    
+    
+    
     return cache_dir / pkg / tree_hash
 
 
@@ -648,6 +718,11 @@ def build_one_package(
     Tuple[str, bool, bool, bool]
         Description of return value.
     """
+    
+    
+    
+    
+    
     
     used_cache = False
     pydeps_ok = True

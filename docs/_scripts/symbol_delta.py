@@ -37,25 +37,19 @@ TRACKED_KEYS = {
 
 def _read_json(path: Path) -> Any:
     """Load JSON data from ``path``."""
-
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def _git_rev_parse(ref: str) -> str | None:
     """Return ``git rev-parse`` for ``ref`` if possible."""
-
     try:
-        return (
-            subprocess.check_output(["git", "rev-parse", ref], cwd=ROOT, text=True)
-            .strip()
-        )
+        return subprocess.check_output(["git", "rev-parse", ref], cwd=ROOT, text=True).strip()
     except Exception:  # pragma: no cover - detached or non-git environments
         return None
 
 
 def _load_base_snapshot(arg: str) -> tuple[list[dict[str, Any]], str | None]:
     """Return the base snapshot rows and resolved SHA from ``arg``."""
-
     candidate = Path(arg)
     if candidate.exists():
         data = _read_json(candidate)
@@ -84,7 +78,6 @@ def _load_base_snapshot(arg: str) -> tuple[list[dict[str, Any]], str | None]:
 
 def _index_rows(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     """Index rows by their ``path`` field."""
-
     indexed: dict[str, dict[str, Any]] = {}
     for row in rows:
         path = row.get("path")
@@ -97,7 +90,6 @@ def _diff_rows(
     base: dict[str, dict[str, Any]], head: dict[str, dict[str, Any]]
 ) -> tuple[list[str], list[str], list[dict[str, Any]]]:
     """Return (added, removed, changed) deltas between ``base`` and ``head`` maps."""
-
     base_paths = set(base)
     head_paths = set(head)
 
@@ -133,7 +125,6 @@ def _diff_rows(
 
 def _write_delta(delta: dict[str, Any]) -> None:
     """Write the delta file if it changed."""
-
     serialized = json.dumps(delta, indent=2, ensure_ascii=False) + "\n"
     if DELTA_PATH.exists():
         existing = DELTA_PATH.read_text(encoding="utf-8")
@@ -146,8 +137,31 @@ def _write_delta(delta: dict[str, Any]) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI entry point."""
+    """Compute main.
 
+    Carry out the main operation.
+
+    Parameters
+    ----------
+    argv : List[str] | None
+        Description for ``argv``.
+
+    Returns
+    -------
+    int
+        Description of return value.
+
+    Raises
+    ------
+    SystemExit
+        Raised when validation fails.
+    """
+    
+    
+    
+    
+    
+    
     global DELTA_PATH
 
     parser = argparse.ArgumentParser(description=__doc__)

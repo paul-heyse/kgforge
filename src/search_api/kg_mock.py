@@ -10,15 +10,28 @@ __all__ = ["detect_query_concepts", "kg_boost", "linked_concepts_for_text"]
 
 __navmap__: Final[NavMap] = {
     "title": "search_api.kg_mock",
-    "synopsis": "Mock KG helpers for search API demos",
+    "synopsis": "Mock knowledge graph helpers used by the search API",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["detect_query_concepts", "linked_concepts_for_text", "kg_boost"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@search-api",
+        "stability": "experimental",
+        "since": "0.2.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@search-api",
+            "stability": "experimental",
+            "since": "0.2.0",
+        }
+        for name in __all__
+    },
 }
 
 
@@ -58,6 +71,11 @@ def detect_query_concepts(query: str) -> set[str]:
         Description of return value.
     """
     
+    
+    
+    
+    
+    
     lowered = query.lower()
     hits: set[str] = set()
     for concept_id, meta in CONCEPTS.items():
@@ -82,6 +100,11 @@ def linked_concepts_for_text(text: str) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
     
     lowered = text.lower()
     hits = []
@@ -118,6 +141,11 @@ def kg_boost(
     float
         Description of return value.
     """
+    
+    
+    
+    
+    
     
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

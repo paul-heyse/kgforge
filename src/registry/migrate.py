@@ -14,15 +14,28 @@ __all__ = ["apply", "main"]
 
 __navmap__: Final[NavMap] = {
     "title": "registry.migrate",
-    "synopsis": "Module for registry.migrate",
+    "synopsis": "Migration helpers for DuckDB registry schemas",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["apply", "main"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@registry",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@registry",
+            "stability": "experimental",
+            "since": "0.1.0",
+        }
+        for name in __all__
+    },
 }
 
 
@@ -40,6 +53,11 @@ def apply(db: str, migrations_dir: str) -> None:
         Description for ``migrations_dir``.
     """
     
+    
+    
+    
+    
+    
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
         con.execute(p.read_text())
@@ -52,6 +70,11 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
     
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)

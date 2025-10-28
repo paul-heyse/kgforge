@@ -52,8 +52,21 @@ class NavLookup:
 
 
 def iter_packages() -> list[str]:
-    """Return packages to index based on auto-detection or ``DOCS_PKG`` override."""
+    """Compute iter packages.
 
+    Carry out the iter packages operation.
+
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    """
+    
+    
+    
+    
+    
+    
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     packages = detect_packages()
@@ -61,8 +74,30 @@ def iter_packages() -> list[str]:
 
 
 def safe_attr(node: Object, attr: str, default: object | None = None) -> object | None:
-    """Safely retrieve ``attr`` from ``node`` while swallowing Griffe edge cases."""
+    """Compute safe attr.
 
+    Carry out the safe attr operation.
+
+    Parameters
+    ----------
+    node : Object
+        Description for ``node``.
+    attr : str
+        Description for ``attr``.
+    default : object | None
+        Description for ``default``.
+
+    Returns
+    -------
+    object | None
+        Description of return value.
+    """
+    
+    
+    
+    
+    
+    
     try:
         return getattr(node, attr)
     except Exception:
@@ -71,7 +106,6 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
 
 def _module_for(path: str | None, kind: str) -> str | None:
     """Return the module path for ``path`` given the object ``kind``."""
-
     if not path:
         return None
     if kind in {"module", "package"}:
@@ -83,7 +117,6 @@ def _module_for(path: str | None, kind: str) -> str | None:
 
 def _package_for(module: str | None, path: str | None) -> str | None:
     """Return the top-level package for a module or object path."""
-
     target = module or path
     if not target:
         return None
@@ -92,7 +125,6 @@ def _package_for(module: str | None, path: str | None) -> str | None:
 
 def _canonical_path(node: Object) -> str | None:
     """Return the canonical path for ``node`` if available."""
-
     canonical = safe_attr(node, "canonical_path")
     if isinstance(canonical, Object):
         return canonical.path
@@ -103,7 +135,6 @@ def _canonical_path(node: Object) -> str | None:
 
 def _string_signature(node: Object) -> str | None:
     """Return a printable signature for callable ``node`` objects."""
-
     signature = safe_attr(node, "signature")
     if signature is None:
         return None
@@ -112,7 +143,6 @@ def _string_signature(node: Object) -> str | None:
 
 def _normalize_lineno(value: object | None) -> int | None:
     """Normalize a ``lineno``-like value into an ``int`` when possible."""
-
     if isinstance(value, int):
         return value
     if isinstance(value, float):
@@ -122,7 +152,6 @@ def _normalize_lineno(value: object | None) -> int | None:
 
 def _join_symbol(module: str, symbol: str) -> str:
     """Return a fully qualified symbol path from ``module`` and ``symbol``."""
-
     if not symbol:
         return module
     if symbol.startswith(module):
@@ -134,7 +163,6 @@ def _join_symbol(module: str, symbol: str) -> str:
 
 def _load_navmap() -> NavLookup:
     """Load the NavMap index if present and return lookup tables."""
-
     for candidate in NAVMAP_CANDIDATES:
         try:
             if candidate.exists():
@@ -147,7 +175,6 @@ def _load_navmap() -> NavLookup:
 
 def _index_navmap(data: dict[str, Any]) -> NavLookup:
     """Index NavMap metadata for symbol enrichment."""
-
     symbol_meta: dict[str, dict[str, Any]] = {}
     module_meta: dict[str, dict[str, Any]] = {}
     sections: dict[str, str] = {}
@@ -163,9 +190,7 @@ def _index_navmap(data: dict[str, Any]) -> NavLookup:
         module_defaults = payload.get("module_meta") or {}
         if isinstance(module_defaults, dict):
             module_meta[module_name] = {
-                key: value
-                for key, value in module_defaults.items()
-                if value is not None
+                key: value for key, value in module_defaults.items() if value is not None
             }
             if module_defaults:
                 symbol_meta.setdefault(module_name, dict(module_meta[module_name]))
@@ -197,7 +222,6 @@ def _index_navmap(data: dict[str, Any]) -> NavLookup:
 
 def _load_test_map() -> dict[str, Any]:
     """Return the optional test map produced earlier in the docs pipeline."""
-
     test_map_path = DOCS_BUILD / "test_map.json"
     if test_map_path.exists():
         try:
@@ -211,21 +235,16 @@ def _load_test_map() -> dict[str, Any]:
 
 def _current_sha() -> str:
     """Resolve the Git SHA used for GitHub permalinks."""
-
     if GITHUB_SHA:
         return GITHUB_SHA
     try:
-        return (
-            subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True)
-            .strip()
-        )
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     except Exception:  # pragma: no cover - fallback for detached states
         return "HEAD"
 
 
 def _github_link(file_rel: str, start: int | None, end: int | None) -> str | None:
     """Return a commit-stable GitHub permalink if GitHub metadata is configured."""
-
     if not (GITHUB_ORG and GITHUB_REPO):
         return None
     sha = _current_sha()
@@ -239,7 +258,6 @@ def _github_link(file_rel: str, start: int | None, end: int | None) -> str | Non
 
 def _source_links(file_rel: str | None, start: int | None, end: int | None) -> dict[str, str]:
     """Build the source link bundle (editor/github) for a symbol row."""
-
     if not file_rel:
         return {}
 
@@ -264,7 +282,6 @@ def _meta_value(
     key: str,
 ) -> Any:
     """Return the metadata value for ``key`` using symbol overrides then module defaults."""
-
     if symbol_meta and key in symbol_meta and symbol_meta[key] is not None:
         return symbol_meta[key]
     if module_defaults and key in module_defaults and module_defaults[key] is not None:
@@ -274,7 +291,6 @@ def _meta_value(
 
 def _doc_first_paragraph(node: Object) -> str:
     """Return the first paragraph of a node's docstring."""
-
     doc = safe_attr(node, "docstring")
     if doc and getattr(doc, "value", None):
         text = doc.value.strip()
@@ -287,10 +303,30 @@ def _doc_first_paragraph(node: Object) -> str:
 
 def _collect_rows(nav: NavLookup, test_map: dict[str, Any]) -> list[dict[str, Any]]:
     """Traverse packages and return enriched symbol rows."""
-
     rows: dict[str, dict[str, Any]] = {}
 
     def _walk(node: Object) -> None:
+        """walk.
+
+        Parameters
+        ----------
+        node : Object
+            Description.
+
+        Returns
+        -------
+        None
+            Description.
+
+        Raises
+        ------
+        Exception
+            Description.
+
+        Examples
+        --------
+        >>> _walk(...)
+        """
         path = getattr(node, "path", None)
         if not isinstance(path, str):
             return
@@ -362,9 +398,10 @@ def _collect_rows(nav: NavLookup, test_map: dict[str, Any]) -> list[dict[str, An
     return [rows[key] for key in sorted(rows)]
 
 
-def _build_reverse_maps(rows: list[dict[str, Any]]) -> tuple[dict[str, list[str]], dict[str, list[str]]]:
+def _build_reverse_maps(
+    rows: list[dict[str, Any]],
+) -> tuple[dict[str, list[str]], dict[str, list[str]]]:
     """Build reverse lookup tables keyed by file and module."""
-
     by_file: dict[str, set[str]] = defaultdict(set)
     by_module: dict[str, set[str]] = defaultdict(set)
 
@@ -389,7 +426,6 @@ def _build_reverse_maps(rows: list[dict[str, Any]]) -> tuple[dict[str, list[str]
 
 def _write_json_if_changed(path: Path, data: Any) -> bool:
     """Write ``data`` to ``path`` if the serialized content changed."""
-
     serialized = json.dumps(data, indent=2, ensure_ascii=False) + "\n"
     if path.exists():
         existing = path.read_text(encoding="utf-8")
@@ -401,8 +437,21 @@ def _write_json_if_changed(path: Path, data: Any) -> bool:
 
 
 def main() -> int:
-    """Entry point for the symbol index builder."""
+    """Compute main.
 
+    Carry out the main operation.
+
+    Returns
+    -------
+    int
+        Description of return value.
+    """
+    
+    
+    
+    
+    
+    
     nav_lookup = _load_navmap()
     test_map = _load_test_map()
 
@@ -421,12 +470,8 @@ def main() -> int:
     status.append(
         f"{'Updated' if wrote_symbols else 'Unchanged'} {symbols_path} ({len(rows)} entries)"
     )
-    status.append(
-        f"{'Updated' if wrote_by_file else 'Unchanged'} {by_file_path}"
-    )
-    status.append(
-        f"{'Updated' if wrote_by_module else 'Unchanged'} {by_module_path}"
-    )
+    status.append(f"{'Updated' if wrote_by_file else 'Unchanged'} {by_file_path}")
+    status.append(f"{'Updated' if wrote_by_module else 'Unchanged'} {by_module_path}")
 
     print("; ".join(status))
     return 0

@@ -25,6 +25,11 @@ def module_name(path: Path) -> str:
         Description of return value.
     """
     
+    
+    
+    
+    
+    
     rel = path.relative_to(SRC).with_suffix("")
     return str(rel).replace("/", ".")
 
@@ -44,6 +49,11 @@ def needs_docstring(text: str) -> bool:
     bool
         Description of return value.
     """
+    
+    
+    
+    
+    
     
     try:
         tree = ast.parse(text)
@@ -68,6 +78,11 @@ def insert_docstring(path: Path) -> bool:
         Description of return value.
     """
     
+    
+    
+    
+    
+    
     text = path.read_text()
     if not needs_docstring(text):
         return False
@@ -89,6 +104,11 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
+    
+    
+    
+    
     
     for path in SRC.rglob("*.py"):
         insert_docstring(path)
