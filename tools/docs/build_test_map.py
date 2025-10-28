@@ -338,9 +338,11 @@ def _normalize_repo_rel(path_like: str) -> str:
     except Exception:
         # coverage JSON often records absolute paths; make repo-relative if possible
         try:
-            idx = str(p).rfind(str(SRC))
+            raw = str(p)
+            root = str(ROOT)
+            idx = raw.find(root)
             if idx != -1:
-                return str(p)[idx - len(str(ROOT)) :].lstrip(os.sep)
+                return raw[idx + len(root) :].lstrip(os.sep)
         except Exception:
             pass
         return str(p)
