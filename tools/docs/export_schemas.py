@@ -89,6 +89,27 @@ def _module_iter() -> Iterable[str]:
 
 
 def is_pydantic_model(obj: object) -> bool:
+    """Is pydantic model.
+
+    Parameters
+    ----------
+    obj : object
+        Description.
+
+    Returns
+    -------
+    bool
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> is_pydantic_model(...)
+    """
     try:
         from pydantic import BaseModel
     except Exception:
@@ -97,6 +118,27 @@ def is_pydantic_model(obj: object) -> bool:
 
 
 def is_pandera_model(obj: object) -> bool:
+    """Is pandera model.
+
+    Parameters
+    ----------
+    obj : object
+        Description.
+
+    Returns
+    -------
+    bool
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> is_pandera_model(...)
+    """
     try:
         import pandera as pa
     except Exception:
@@ -106,6 +148,22 @@ def is_pandera_model(obj: object) -> bool:
 
 
 def _load_navmap() -> dict[str, Any]:
+    """Load navmap.
+
+    Returns
+    -------
+    dict[str, Any]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _load_navmap(...)
+    """
     if not NAVMAP.exists():
         return {}
     try:
@@ -190,11 +248,61 @@ def _example_for_pandera(model_cls) -> dict[str, Any]:
 
 
 def _apply_headers(schema: dict, module_name: str, class_name: str, base_url: str) -> None:
+    """Apply headers.
+
+    Parameters
+    ----------
+    schema : dict
+        Description.
+    module_name : str
+        Description.
+    class_name : str
+        Description.
+    base_url : str
+        Description.
+
+    Returns
+    -------
+    None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _apply_headers(...)
+    """
     schema["$schema"] = JSON_SCHEMA_DIALECT
     schema["$id"] = f"{base_url.rstrip('/')}/{module_name}.{class_name}.json#"
 
 
 def _inject_examples(schema: dict, example: dict | None) -> None:
+    """Inject examples.
+
+    Parameters
+    ----------
+    schema : dict
+        Description.
+    example : dict | None
+        Description.
+
+    Returns
+    -------
+    None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _inject_examples(...)
+    """
     if example:
         ex = schema.get("examples") or []
         if not isinstance(ex, list):
@@ -206,6 +314,29 @@ def _inject_examples(schema: dict, example: dict | None) -> None:
 
 
 def _inject_versions(schema: dict, versions: dict | None) -> None:
+    """Inject versions.
+
+    Parameters
+    ----------
+    schema : dict
+        Description.
+    versions : dict | None
+        Description.
+
+    Returns
+    -------
+    None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _inject_versions(...)
+    """
     if versions:
         # prefer root-level x- fields so they survive tools that merge properties
         for k, v in versions.items():
@@ -225,6 +356,21 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
     out["top_level_removed"] = del_keys
 
     def prop_keys(d: dict) -> set[str]:
+        """
+        Compute prop keys.
+        
+        Carry out the prop keys operation.
+        
+        Parameters
+        ----------
+        d : Mapping[str, Any]
+            Description for ``d``.
+        
+        Returns
+        -------
+        Set[str]
+            Description of return value.
+        """
         props = d.get("properties")
         return set(props.keys()) if isinstance(props, dict) else set()
 
@@ -241,6 +387,23 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
 
 @dataclass
 class Cfg:
+    """Represent Cfg.
+
+    Attributes
+    ----------
+    attribute : type
+        Description.
+
+    Methods
+    -------
+    method()
+        Description.
+
+    Examples
+    --------
+    >>> Cfg(...)
+    """
+
     ref_template: str
     base_url: str
     by_alias: bool
@@ -250,6 +413,35 @@ class Cfg:
 def _export_one_pydantic(
     module_name: str, name: str, model_cls, cfg: Cfg, nav: dict
 ) -> tuple[Path, dict]:
+    """Export one pydantic.
+
+    Parameters
+    ----------
+    module_name : str
+        Description.
+    name : str
+        Description.
+    model_cls
+        Description.
+    cfg : Cfg
+        Description.
+    nav : dict
+        Description.
+
+    Returns
+    -------
+    tuple[Path, dict]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _export_one_pydantic(...)
+    """
     # Generate schema dict (JSON schema 2020-12). Pydantic v2 exposes ref_template.
     # Docs: model_json_schema and ref_template customization.
     # https://docs.pydantic.dev/usage/schema/
@@ -269,6 +461,35 @@ def _export_one_pydantic(
 def _export_one_pandera(
     module_name: str, name: str, model_cls, cfg: Cfg, nav: dict
 ) -> tuple[Path, dict]:
+    """Export one pandera.
+
+    Parameters
+    ----------
+    module_name : str
+        Description.
+    name : str
+        Description.
+    model_cls
+        Description.
+    cfg : Cfg
+        Description.
+    nav : dict
+        Description.
+
+    Returns
+    -------
+    tuple[Path, dict]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _export_one_pandera(...)
+    """
     # Pandera emits JSON string; normalize to dict, enrich, and sort.
     try:
         schema = json.loads(model_cls.to_schema().to_json())
@@ -282,6 +503,17 @@ def _export_one_pandera(
 
 
 def _iter_models():
+    """Return  iter models.
+
+    Returns
+    -------
+    Any
+        Description.
+
+    Examples
+    --------
+    >>> _iter_models()
+    """
     for module_name in _module_iter():
         try:
             module = importlib.import_module(module_name)
@@ -293,6 +525,21 @@ def _iter_models():
 
 
 def main(argv: list[str] | None = None) -> int:
+    """
+    Compute main.
+    
+    Carry out the main operation.
+    
+    Parameters
+    ----------
+    argv : List[str] | None
+        Description for ``argv``.
+    
+    Returns
+    -------
+    int
+        Description of return value.
+    """
     import argparse
 
     p = argparse.ArgumentParser()

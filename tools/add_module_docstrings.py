@@ -10,51 +10,41 @@ SRC = ROOT / "src"
 
 
 def module_name(path: Path) -> str:
-    """Compute module name.
-
+    """
+    Compute module name.
+    
     Carry out the module name operation.
-
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     str
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     rel = path.relative_to(SRC).with_suffix("")
     return str(rel).replace("/", ".")
 
 
 def needs_docstring(text: str) -> bool:
-    """Compute needs docstring.
-
+    """
+    Compute needs docstring.
+    
     Carry out the needs docstring operation.
-
+    
     Parameters
     ----------
     text : str
         Description for ``text``.
-
+    
     Returns
     -------
     bool
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     try:
         tree = ast.parse(text)
     except SyntaxError:
@@ -63,26 +53,21 @@ def needs_docstring(text: str) -> bool:
 
 
 def insert_docstring(path: Path) -> bool:
-    """Compute insert docstring.
-
+    """
+    Compute insert docstring.
+    
     Carry out the insert docstring operation.
-
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     bool
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     text = path.read_text()
     if not needs_docstring(text):
         return False
@@ -100,16 +85,11 @@ def insert_docstring(path: Path) -> bool:
 
 
 def main() -> None:
-    """Compute main.
-
+    """
+    Compute main.
+    
     Carry out the main operation.
     """
-    
-    
-    
-    
-    
-    
     for path in SRC.rglob("*.py"):
         insert_docstring(path)
 

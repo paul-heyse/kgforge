@@ -22,7 +22,7 @@ __navmap__: NavMap = {
         "since": "0.2.0",
     },
     "symbols": {
-        "client": {
+        "KGFoundryClient": {
             "stability": "experimental",
             "owner": "@search-api",
             "since": "0.2.0",

@@ -19,45 +19,35 @@ LOG_FILE = LOG_DIR / "fallback.log"
 
 
 def has_python_files(path: Path) -> bool:
-    """Compute has python files.
-
+    """
+    Compute has python files.
+    
     Carry out the has python files operation.
-
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     bool
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     return any(path.rglob("*.py"))
 
 
 def run_doq(target: Path) -> None:
-    """Compute run doq.
-
+    """
+    Compute run doq.
+    
     Carry out the run doq operation.
-
+    
     Parameters
     ----------
     target : Path
         Description for ``target``.
     """
-    
-    
-    
-    
-    
-    
     cmd = [
         sys.executable,
         "-m",
@@ -75,21 +65,16 @@ def run_doq(target: Path) -> None:
 
 
 def run_fallback(target: Path) -> None:
-    """Compute run fallback.
-
+    """
+    Compute run fallback.
+    
     Carry out the run fallback operation.
-
+    
     Parameters
     ----------
     target : Path
         Description for ``target``.
     """
-    
-    
-    
-    
-    
-    
     cmd = [
         sys.executable,
         "tools/auto_docstrings.py",
@@ -102,16 +87,11 @@ def run_fallback(target: Path) -> None:
 
 
 def main() -> None:
-    """Compute main.
-
+    """
+    Compute main.
+    
     Carry out the main operation.
     """
-    
-    
-    
-    
-    
-    
     if LOG_FILE.exists():
         LOG_FILE.unlink()
     LOG_DIR.mkdir(parents=True, exist_ok=True)

@@ -28,35 +28,31 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
         """Describe NoopMetric."""
 
         def labels(self, *args: object, **kwargs: object) -> _NoopMetric:
-            """Compute labels.
-
+            """
+            Compute labels.
+            
             Carry out the labels operation.
-
+            
             Parameters
             ----------
             *args : Any
                 Description for ``*args``.
             **kwargs : Any
                 Description for ``**kwargs``.
-
+            
             Returns
             -------
             _NoopMetric
                 Description of return value.
             """
-            
-            
-            
-            
-            
-            
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
-            """Compute observe.
-
+            """
+            Compute observe.
+            
             Carry out the observe operation.
-
+            
             Parameters
             ----------
             *args : Any
@@ -64,19 +60,14 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
-            
-            
-            
-            
-            
-            
             return
 
         def inc(self, *args: object, **kwargs: object) -> None:
-            """Compute inc.
-
+            """
+            Compute inc.
+            
             Carry out the inc operation.
-
+            
             Parameters
             ----------
             *args : Any
@@ -84,19 +75,14 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
-            
-            
-            
-            
-            
-            
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
-            """Compute set.
-
+            """
+            Compute set.
+            
             Carry out the set operation.
-
+            
             Parameters
             ----------
             *args : Any
@@ -104,12 +90,6 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : Any
                 Description for ``**kwargs``.
             """
-            
-            
-            
-            
-            
-            
             return
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:

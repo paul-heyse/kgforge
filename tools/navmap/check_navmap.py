@@ -42,6 +42,27 @@ class _AllDictTemplate:
     __slots__ = ("template",)
 
     def __init__(self, template: Any) -> None:
+        """Init  .
+
+        Parameters
+        ----------
+        template : Any
+            Description.
+
+        Returns
+        -------
+        None
+            Description.
+
+        Raises
+        ------
+        Exception
+            Description.
+
+        Examples
+        --------
+        >>> __init__(...)
+        """
         self.template = template
 
 
@@ -359,15 +380,16 @@ def _inspect(py: Path) -> list[str]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Compute main.
-
+    """
+    Compute main.
+    
     Carry out the main operation.
-
+    
     Parameters
     ----------
     argv : List[str] | None
         Description for ``argv``.
-
+    
     Returns
     -------
     int

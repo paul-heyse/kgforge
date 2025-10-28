@@ -45,26 +45,21 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
 # [nav:anchor tokenize]
 def tokenize(text: str) -> list[str]:
-    """Compute tokenize.
-
+    """
+    Compute tokenize.
+    
     Carry out the tokenize operation.
-
+    
     Parameters
     ----------
     text : str
         Description for ``text``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
     """
-    
-    
-    
-    
-    
-    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -85,10 +80,11 @@ class FixtureIndex:
     """Describe FixtureIndex."""
 
     def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb") -> None:
-        """Compute init.
-
+        """
+        Compute init.
+        
         Initialise a new instance with validated parameters.
-
+        
         Parameters
         ----------
         root : str | None
@@ -96,12 +92,6 @@ class FixtureIndex:
         db_path : str | None
             Description for ``db_path``.
         """
-        
-        
-        
-        
-        
-        
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []
@@ -171,28 +161,23 @@ class FixtureIndex:
         self.N = len(self.docs)
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Compute search.
-
+        """
+        Compute search.
+        
         Carry out the search operation.
-
+        
         Parameters
         ----------
         query : str
             Description for ``query``.
         k : int | None
             Description for ``k``.
-
+        
         Returns
         -------
         List[Tuple[int, float]]
             Description of return value.
         """
-        
-        
-        
-        
-        
-        
         if getattr(self, "N", 0) == 0:
             return []
         qtoks = tokenize(query)
@@ -211,24 +196,19 @@ class FixtureIndex:
         return [(index, score) for index, score in ranked[:k] if score > 0.0]
 
     def doc(self, index: int) -> FixtureDoc:
-        """Compute doc.
-
+        """
+        Compute doc.
+        
         Carry out the doc operation.
-
+        
         Parameters
         ----------
         index : int
             Description for ``index``.
-
+        
         Returns
         -------
         src.search_api.fixture_index.FixtureDoc
             Description of return value.
         """
-        
-        
-        
-        
-        
-        
         return self.docs[index]

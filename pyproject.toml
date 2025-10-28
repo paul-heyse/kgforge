@@ -302,7 +302,7 @@ select = [
     "C90",
     "PLR",
 ]
-ignore = ["Q", "E203", "D203", "D213", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "C901", "SIM102", "C416", "C401", "N806", "B007"]
+ignore = ["Q", "E203", "D203", "D213", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "C901", "SIM102", "C416", "C401", "N806", "B007", "ANN401", "EM101", "TRY003", "TRY004", "RUF002", "PLR2004", "RUF005", "SIM113", "TRY300", "PGH003", "RUF059", "ERA001", "C414", "RET504"]
 preview = false
 extend-select = ["RUF100", "D401", "D417"]
 

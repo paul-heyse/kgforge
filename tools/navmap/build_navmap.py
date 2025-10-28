@@ -50,11 +50,36 @@ PLACEHOLDER_ALL = object()
 
 
 class AllDictTemplate:
-    """Sentinel representing a __all__-driven dict comprehension."""
+    """
+    Model the AllDictTemplate.
+    
+    Represents the alldicttemplate data structure used throughout the project.
+    """
 
     __slots__ = ("template",)
 
     def __init__(self, template: Any) -> None:
+        """Init  .
+
+        Parameters
+        ----------
+        template : Any
+            Description.
+
+        Returns
+        -------
+        None
+            Description.
+
+        Raises
+        ------
+        Exception
+            Description.
+
+        Examples
+        --------
+        >>> __init__(...)
+        """
         self.template = template
 
 
@@ -402,17 +427,18 @@ def _discover_py_files() -> list[Path]:
 
 
 def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, Any]:
-    """Compute build index.
-
+    """
+    Compute build index.
+    
     Carry out the build index operation.
-
+    
     Parameters
     ----------
     root : Path | None
         Description for ``root``.
     json_path : Path | None
         Description for ``json_path``.
-
+    
     Returns
     -------
     Mapping[str, Any]
