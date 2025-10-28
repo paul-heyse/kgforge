@@ -33,7 +33,9 @@ __navmap__: Final[NavMap] = {
 
 
 class ConceptMeta(TypedDict):
-    """Represent ConceptMeta."""
+    """Describe ConceptMeta."""
+    
+    
     
     
     

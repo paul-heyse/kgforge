@@ -38,7 +38,9 @@ Id = str
 
 # [nav:anchor Doc]
 class Doc(BaseModel):
-    """Represent Doc."""
+    """Describe Doc."""
+    
+    
     
     
     
@@ -70,7 +72,9 @@ class Doc(BaseModel):
 
 # [nav:anchor DoctagsAsset]
 class DoctagsAsset(BaseModel):
-    """Represent DoctagsAsset."""
+    """Describe DoctagsAsset."""
+    
+    
     
     
     
@@ -95,7 +99,9 @@ class DoctagsAsset(BaseModel):
 
 # [nav:anchor Chunk]
 class Chunk(BaseModel):
-    """Represent Chunk."""
+    """Describe Chunk."""
+    
+    
     
     
     
@@ -121,7 +127,9 @@ class Chunk(BaseModel):
 
 # [nav:anchor LinkAssertion]
 class LinkAssertion(BaseModel):
-    """Represent LinkAssertion."""
+    """Describe LinkAssertion."""
+    
+    
     
     
     

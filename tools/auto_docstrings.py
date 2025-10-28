@@ -56,7 +56,9 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
 
 @dataclass
 class DocstringChange:
-    """Represent DocstringChange."""
+    """Describe DocstringChange."""
+    
+    
     
 
     path: Path
@@ -152,11 +154,12 @@ def summarize(name: str, kind: str) -> str:
         Description of return value.
     """
     
+    
     base = " ".join(name.replace("_", " ").split()).strip()
     if kind == "class":
-        text = f"Represent {base or 'value'}."
+        text = f"Describe {base or 'object'}."
     elif kind == "module":
-        text = f"Module {base or 'summary'}."
+        text = f"{base.title() or 'Module'} utilities."
     else:
         text = f"Return {base or 'value'}."
     return text if text.endswith(".") else text + "."
@@ -179,6 +182,7 @@ def extended_summary(kind: str, name: str, module_name: str) -> str:
     str
         Description of return value.
     """
+    
     
     return ""
 

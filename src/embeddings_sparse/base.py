@@ -144,6 +144,8 @@ class SparseIndex(Protocol):
         
         
         
+        
+        
         ...
 
     def search(

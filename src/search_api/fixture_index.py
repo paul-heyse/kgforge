@@ -77,7 +77,9 @@ def tokenize(text: str) -> list[str]:
 # [nav:anchor FixtureDoc]
 @dataclass
 class FixtureDoc:
-    """Represent FixtureDoc."""
+    """Describe FixtureDoc."""
+    
+    
     
     
     

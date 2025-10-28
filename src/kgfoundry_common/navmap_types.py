@@ -16,7 +16,9 @@ from typing import Literal, NotRequired, TypedDict
 
 
 class NavSection(TypedDict):
-    """Represent NavSection."""
+    """Describe NavSection."""
+    
+    
     
     
     
@@ -37,7 +39,9 @@ class NavSection(TypedDict):
 
 
 class SymbolMeta(TypedDict, total=False):
-    """Represent SymbolMeta."""
+    """Describe SymbolMeta."""
+    
+    
     
     
     
@@ -66,7 +70,9 @@ class SymbolMeta(TypedDict, total=False):
 
 
 class NavMap(TypedDict, total=False):
-    """Represent NavMap."""
+    """Describe NavMap."""
+    
+    
     
     
     

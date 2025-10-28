@@ -34,7 +34,9 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor OntologyLoader]
 class OntologyLoader:
-    """Represent OntologyLoader."""
+    """Describe OntologyLoader."""
+    
+    
     
     
     

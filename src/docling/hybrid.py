@@ -36,7 +36,9 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor HybridChunker]
 class HybridChunker:
-    """Represent HybridChunker."""
+    """Describe HybridChunker."""
+    
+    
     
     
     

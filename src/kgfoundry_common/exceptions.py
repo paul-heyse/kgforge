@@ -34,7 +34,9 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DownloadError]
 class DownloadError(Exception):
-    """Represent DownloadError."""
+    """Describe DownloadError."""
+    
+    
     
     
     
@@ -54,7 +56,9 @@ class DownloadError(Exception):
 
 # [nav:anchor UnsupportedMIMEError]
 class UnsupportedMIMEError(Exception):
-    """Represent UnsupportedMIMEError."""
+    """Describe UnsupportedMIMEError."""
+    
+    
     
     
     
