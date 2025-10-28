@@ -1006,17 +1006,18 @@ def parse_args() -> argparse.Namespace:
     """Compute parse args.
 
     Carry out the parse args operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     argparse.Namespace
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import parse_args
     >>> result = parse_args()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", required=True, type=Path, help="Directory to process.")
@@ -1028,23 +1029,24 @@ def module_name_for(path: Path) -> str:
     """Compute module name for.
 
     Carry out the module name for operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     path : Path
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     str
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import module_name_for
     >>> result = module_name_for(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     try:
         relative = path.relative_to(REPO_ROOT)
@@ -1067,7 +1069,7 @@ def summarize(name: str, kind: str) -> str:
     """Compute summarize.
 
     Carry out the summarize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     name : str
@@ -1076,17 +1078,18 @@ def summarize(name: str, kind: str) -> str:
     kind : str
     kind : str
         Description for ``kind``.
-
+    
     Returns
     -------
     str
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import summarize
     >>> result = summarize(..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     base = _humanize_identifier(name) or "value"
     if kind == "module":
@@ -1104,7 +1107,7 @@ def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | Non
     """Compute extended summary.
 
     Carry out the extended summary operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     kind : str
@@ -1119,17 +1122,18 @@ def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | Non
     node : ast.AST | None
     node : ast.AST | None, optional, default=None
         Description for ``node``.
-
+    
     Returns
     -------
     str
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import extended_summary
     >>> result = extended_summary(..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     pretty = _humanize_identifier(name)
     if kind == "module":
@@ -1198,23 +1202,24 @@ def annotation_to_text(node: ast.AST | None) -> str:
     """Compute annotation to text.
 
     Carry out the annotation to text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     node : ast.AST | None
     node : ast.AST | None
         Description for ``node``.
-
+    
     Returns
     -------
     str
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import annotation_to_text
     >>> result = annotation_to_text(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     if node is None:
         return "Any"
@@ -1229,23 +1234,24 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     """Compute iter docstring nodes.
 
     Carry out the iter docstring nodes operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     tree : ast.Module
     tree : ast.Module
         Description for ``tree``.
-
+    
     Returns
     -------
     List[Tuple[int, ast.AST, str]]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import iter_docstring_nodes
     >>> result = iter_docstring_nodes(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     items: list[tuple[int, ast.AST, str]] = [(0, tree, "module")]
     for node in ast.walk(tree):
@@ -1277,23 +1283,24 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[Paramet
     """Compute parameters for.
 
     Carry out the parameters for operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     node : ast.FunctionDef | ast.AsyncFunctionDef
     node : ast.FunctionDef | ast.AsyncFunctionDef
         Description for ``node``.
-
+    
     Returns
     -------
     List[ParameterInfo]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import parameters_for
     >>> result = parameters_for(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     params: list[ParameterInfo] = []
     args = node.args
@@ -1369,23 +1376,24 @@ def detect_raises(node: ast.AST) -> list[str]:
     """Compute detect raises.
 
     Carry out the detect raises operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     node : ast.AST
     node : ast.AST
         Description for ``node``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import detect_raises
     >>> result = detect_raises(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     seen: OrderedDict[str, None] = OrderedDict()
 
@@ -1523,7 +1531,7 @@ def build_examples(
     """Compute build examples.
 
     Carry out the build examples operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     module_name : str
@@ -1538,17 +1546,18 @@ def build_examples(
     has_return : bool
     has_return : bool
         Description for ``has_return``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import build_examples
     >>> result = build_examples(..., ..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     lines: list[str] = ["Examples", "--------"]
     if module_name and not name.startswith("__"):
@@ -1574,7 +1583,7 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     """Compute build docstring.
 
     Carry out the build docstring operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     kind : str
@@ -1586,17 +1595,18 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     module_name : str
     module_name : str
         Description for ``module_name``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import build_docstring
     >>> result = build_docstring(..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     if kind == "module":
         module_display = module_name.split(".")[-1] if module_name else "module"
@@ -1722,23 +1732,24 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     """Compute docstring text.
 
     Carry out the docstring text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     node : ast.AST
     node : ast.AST
         Description for ``node``.
-
+    
     Returns
     -------
     Tuple[str | None, ast.Expr | None]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import docstring_text
     >>> result = docstring_text(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     body = getattr(node, "body", [])
     if not body:
@@ -1805,23 +1816,24 @@ def process_file(path: Path) -> bool:
     """Compute process file.
 
     Carry out the process file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     path : Path
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     bool
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import process_file
     >>> result = process_file(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     try:
         text = path.read_text(encoding="utf-8")

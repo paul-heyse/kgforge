@@ -36,7 +36,7 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             """Compute labels.
 
             Carry out the labels operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+            
             Parameters
             ----------
             *args : object
@@ -45,17 +45,18 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             **kwargs : object
             **kwargs : object
                 Description for ``**kwargs``.
-
+            
             Returns
             -------
             _NoopMetric
                 Description of return value.
-
+            
             Examples
             --------
             >>> from observability.metrics import labels
             >>> result = labels(*args, **kwargs)
             >>> result  # doctest: +ELLIPSIS
+            ...
             """
             return self
 

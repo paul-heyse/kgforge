@@ -60,23 +60,24 @@ class JsonFormatter(logging.Formatter):
         """Compute format.
 
         Carry out the format operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         record : logging.LogRecord
         record : logging.LogRecord
             Description for ``record``.
-
+        
         Returns
         -------
         str
             Description of return value.
-
+        
         Examples
         --------
         >>> from kgfoundry_common.logging import format
         >>> result = format(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         data = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),

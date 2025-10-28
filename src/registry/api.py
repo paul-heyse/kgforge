@@ -54,7 +54,7 @@ class Registry(Protocol):
         """Compute begin dataset.
 
         Carry out the begin dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         kind : str
@@ -63,17 +63,18 @@ class Registry(Protocol):
         run_id : str
         run_id : str
             Description for ``run_id``.
-
+        
         Returns
         -------
         str
             Description of return value.
-
+        
         Examples
         --------
         >>> from registry.api import begin_dataset
         >>> result = begin_dataset(..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         ...
 
@@ -129,7 +130,7 @@ class Registry(Protocol):
         """Compute insert run.
 
         Carry out the insert run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         purpose : str
@@ -144,17 +145,18 @@ class Registry(Protocol):
         config : collections.abc.Mapping
         config : collections.abc.Mapping
             Description for ``config``.
-
+        
         Returns
         -------
         str
             Description of return value.
-
+        
         Examples
         --------
         >>> from registry.api import insert_run
         >>> result = insert_run(..., ..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         ...
 

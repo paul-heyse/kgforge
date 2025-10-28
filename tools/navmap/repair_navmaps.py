@@ -327,7 +327,7 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     """Compute repair module.
 
     Carry out the repair module operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     info : ModuleInfo
@@ -336,17 +336,18 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     apply : bool | None
     apply : bool | None, optional, default=False
         Description for ``apply``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.navmap.repair_navmaps import repair_module
     >>> result = repair_module(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     path = info.path
     text = path.read_text(encoding="utf-8")
@@ -421,7 +422,7 @@ def repair_all(root: Path, apply: bool) -> list[str]:
     """Compute repair all.
 
     Carry out the repair all operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     root : Path
@@ -430,17 +431,18 @@ def repair_all(root: Path, apply: bool) -> list[str]:
     apply : bool
     apply : bool
         Description for ``apply``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.navmap.repair_navmaps import repair_all
     >>> result = repair_all(..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     messages: list[str] = []
     for info in _collect_modules(root):
@@ -490,23 +492,24 @@ def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     argv : List[str] | None
     argv : List[str] | None, optional, default=None
         Description for ``argv``.
-
+    
     Returns
     -------
     int
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.navmap.repair_navmaps import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     args = _parse_args(argv)
     root = args.root.resolve()

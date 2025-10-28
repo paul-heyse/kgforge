@@ -36,7 +36,7 @@ def main(
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     root_package : str | None
@@ -51,17 +51,18 @@ def main(
     detect : Callable[[], str] | None
     detect : Callable[[], str] | None, optional, default=None
         Description for ``detect``.
-
+    
     Returns
     -------
     Path
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.make_importlinter import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     detected_root = root_dir or Path(__file__).resolve().parents[1]
     if root_package is None:

@@ -18,23 +18,24 @@ def module_name(path: Path) -> str:
     """Compute module name.
 
     Carry out the module name operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     path : Path
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     str
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.add_module_docstrings import module_name
     >>> result = module_name(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     rel = path.relative_to(SRC).with_suffix("")
     parts = list(rel.parts)
@@ -47,23 +48,24 @@ def needs_docstring(text: str) -> bool:
     """Compute needs docstring.
 
     Carry out the needs docstring operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     text : str
     text : str
         Description for ``text``.
-
+    
     Returns
     -------
     bool
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.add_module_docstrings import needs_docstring
     >>> result = needs_docstring(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     try:
         tree = ast.parse(text)
@@ -76,23 +78,24 @@ def insert_docstring(path: Path) -> bool:
     """Compute insert docstring.
 
     Carry out the insert docstring operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     path : Path
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     bool
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.add_module_docstrings import insert_docstring
     >>> result = insert_docstring(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     text = path.read_text()
     if not needs_docstring(text):

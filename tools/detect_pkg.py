@@ -47,17 +47,18 @@ def detect_packages() -> list[str]:
     """Compute detect packages.
 
     Carry out the detect packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.detect_pkg import detect_packages
     >>> result = detect_packages()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     candidates = _candidate_names()
     lowers = [c for c in candidates if c.islower()]
@@ -70,17 +71,18 @@ def detect_primary() -> str:
     """Compute detect primary.
 
     Carry out the detect primary operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     str
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.detect_pkg import detect_primary
     >>> result = detect_primary()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     packages = detect_packages()
     return packages[0]

@@ -114,28 +114,29 @@ class SPLADEv3Encoder:
         """Compute encode.
 
         Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         texts : List[str]
         texts : List[str]
             Description for ``texts``.
-
+        
         Returns
         -------
         List[Tuple[List[int], List[float]]]
             Description of return value.
-
+        
         Raises
         ------
         NotImplementedError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.splade import encode
         >>> result = encode(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
@@ -253,7 +254,7 @@ class PureImpactIndex:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         query : str
@@ -262,17 +263,18 @@ class PureImpactIndex:
         k : int
         k : int
             Description for ``k``.
-
+        
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.splade import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -331,7 +333,7 @@ class LuceneImpactIndex:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         query : str
@@ -340,22 +342,23 @@ class LuceneImpactIndex:
         k : int
         k : int
             Description for ``k``.
-
+        
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
+        
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.splade import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         self._ensure()
         if self._searcher is None:
@@ -370,7 +373,7 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
     """Compute get splade.
 
     Carry out the get splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     backend : str
@@ -379,17 +382,18 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
     index_dir : str
     index_dir : str
         Description for ``index_dir``.
-
+    
     Returns
     -------
     PureImpactIndex | LuceneImpactIndex
         Description of return value.
-
+    
     Examples
     --------
     >>> from embeddings_sparse.splade import get_splade
     >>> result = get_splade(..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     if backend == "lucene":
         try:

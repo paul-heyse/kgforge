@@ -59,17 +59,18 @@ class _SupportsResponse(Protocol):
         """Compute json.
 
         Serialise the instance to JSON text. It respects include and exclude options so APIs can shape their payloads precisely. Pydantic populates this attribute during model construction, so applications should treat it as read-only metadata.
-
+        
         Returns
         -------
         collections.abc.Mapping
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_client.client import json
         >>> result = json()
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
 
 
@@ -80,7 +81,7 @@ class _SupportsHttp(Protocol):
         """Compute get.
 
         Carry out the get operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         url : str
@@ -89,17 +90,18 @@ class _SupportsHttp(Protocol):
         timeout : float
         timeout : float
             Description for ``timeout``.
-
+        
         Returns
         -------
         src.search_client.client._SupportsResponse
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_client.client import get
         >>> result = get(..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
 
     def post(
@@ -113,7 +115,7 @@ class _SupportsHttp(Protocol):
         """Compute post.
 
         Carry out the post operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         url : str
@@ -128,17 +130,18 @@ class _SupportsHttp(Protocol):
         timeout : float
         timeout : float
             Description for ``timeout``.
-
+        
         Returns
         -------
         src.search_client.client._SupportsResponse
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_client.client import post
         >>> result = post(..., ..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
 
 
@@ -201,17 +204,18 @@ class KGFoundryClient:
         """Compute healthz.
 
         Carry out the healthz operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Returns
         -------
         collections.abc.Mapping
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_client.client import healthz
         >>> result = healthz()
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
@@ -227,7 +231,7 @@ class KGFoundryClient:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         query : str
@@ -242,17 +246,18 @@ class KGFoundryClient:
         explain : bool | None
         explain : bool | None, optional, default=False
             Description for ``explain``.
-
+        
         Returns
         -------
         collections.abc.Mapping
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_client.client import search
         >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
@@ -265,7 +270,7 @@ class KGFoundryClient:
         """Compute concepts.
 
         Carry out the concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         q : str
@@ -274,17 +279,18 @@ class KGFoundryClient:
         limit : int | None
         limit : int | None, optional, default=50
             Description for ``limit``.
-
+        
         Returns
         -------
         collections.abc.Mapping
             Description of return value.
-
+        
         Examples
         --------
         >>> from search_client.client import concepts
         >>> result = concepts(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         r = self._http.post(
             f"{self.base_url}/graph/concepts",

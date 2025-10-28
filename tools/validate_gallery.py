@@ -79,17 +79,18 @@ class ValidationResult:
         """Compute ok.
 
         Carry out the ok operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Returns
         -------
         bool
             Description of return value.
-
+        
         Examples
         --------
         >>> from tools.validate_gallery import ok
         >>> result = ok()
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         return not self.errors
 
@@ -107,23 +108,24 @@ def validate_title_format(docstring: str) -> tuple[bool, str]:
     """Compute validate title format.
 
     Carry out the validate title format operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     docstring : str
     docstring : str
         Description for ``docstring``.
-
+    
     Returns
     -------
     Tuple[bool, str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.validate_gallery import validate_title_format
     >>> result = validate_title_format(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     lines = [line.rstrip() for line in inspect.cleandoc(docstring).splitlines()]
     while lines and not lines[0].strip():
@@ -155,23 +157,24 @@ def check_orphan_directive(docstring: str) -> bool:
     """Compute check orphan directive.
 
     Carry out the check orphan directive operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     docstring : str
     docstring : str
         Description for ``docstring``.
-
+    
     Returns
     -------
     bool
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.validate_gallery import check_orphan_directive
     >>> result = check_orphan_directive(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     return ":orphan:" in docstring
 
@@ -180,23 +183,24 @@ def check_custom_labels(docstring: str) -> list[str]:
     """Compute check custom labels.
 
     Carry out the check custom labels operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     docstring : str
     docstring : str
         Description for ``docstring``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.validate_gallery import check_custom_labels
     >>> result = check_custom_labels(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     return CUSTOM_LABEL_PATTERN.findall(docstring)
 
@@ -229,7 +233,7 @@ def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]
     """Compute validate example file.
 
     Carry out the validate example file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     file_path : Path
@@ -238,17 +242,18 @@ def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]
     strict : bool | None
     strict : bool | None, optional, default=False
         Description for ``strict``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.validate_gallery import validate_example_file
     >>> result = validate_example_file(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     errors: list[str] = []
     docstring = _load_docstring(file_path)
@@ -294,7 +299,7 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     examples_dir : Path
@@ -306,17 +311,18 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
     verbose : bool | None
     verbose : bool | None, optional, default=False
         Description for ``verbose``.
-
+    
     Returns
     -------
     int
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.validate_gallery import main
     >>> result = main(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     results: list[ValidationResult] = []
     exit_code = 0

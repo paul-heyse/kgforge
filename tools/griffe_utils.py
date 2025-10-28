@@ -11,11 +11,11 @@ from __future__ import annotations
 import importlib
 from functools import cache
 from types import ModuleType
-from typing import Any, TypeAlias
+from typing import Any
 
-GriffeModuleType: TypeAlias = ModuleType
-GriffeObjectType: TypeAlias = type[Any]
-GriffeLoaderType: TypeAlias = type[Any]
+GriffeModuleType = ModuleType
+GriffeObjectType = type[Any]
+GriffeLoaderType = type[Any]
 
 
 @cache

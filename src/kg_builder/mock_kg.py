@@ -103,23 +103,24 @@ class MockKG:
         """Compute linked concepts.
 
         Carry out the linked concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         chunk_id : str
         chunk_id : str
             Description for ``chunk_id``.
-
+        
         Returns
         -------
         List[str]
             Description of return value.
-
+        
         Examples
         --------
         >>> from kg_builder.mock_kg import linked_concepts
         >>> result = linked_concepts(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         return sorted(self.chunk2concepts.get(chunk_id, set()))
 
@@ -127,22 +128,23 @@ class MockKG:
         """Compute one hop.
 
         Carry out the one hop operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         concept_id : str
         concept_id : str
             Description for ``concept_id``.
-
+        
         Returns
         -------
         List[str]
             Description of return value.
-
+        
         Examples
         --------
         >>> from kg_builder.mock_kg import one_hop
         >>> result = one_hop(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         return sorted(self.neighbors.get(concept_id, set()))

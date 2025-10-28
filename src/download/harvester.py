@@ -104,7 +104,7 @@ class OpenAccessHarvester:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         topic : str
@@ -116,17 +116,18 @@ class OpenAccessHarvester:
         max_works : int
         max_works : int
             Description for ``max_works``.
-
+        
         Returns
         -------
         List[dict[str, typing.Any]]
             Description of return value.
-
+        
         Examples
         --------
         >>> from download.harvester import search
         >>> result = search(..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
@@ -145,23 +146,24 @@ class OpenAccessHarvester:
         """Compute resolve pdf.
 
         Carry out the resolve pdf operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         work : collections.abc.Mapping
         work : collections.abc.Mapping
             Description for ``work``.
-
+        
         Returns
         -------
         str | None
             Description of return value.
-
+        
         Examples
         --------
         >>> from download.harvester import resolve_pdf
         >>> result = resolve_pdf(...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         best = work.get("best_oa_location") or {}
         if best and best.get("pdf_url"):
@@ -187,7 +189,7 @@ class OpenAccessHarvester:
         """Compute download pdf.
 
         Carry out the download pdf operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         url : str
@@ -196,24 +198,25 @@ class OpenAccessHarvester:
         target_path : str
         target_path : str
             Description for ``target_path``.
-
+        
         Returns
         -------
         str
             Description of return value.
-
+        
         Raises
         ------
         DownloadError
             Raised when validation fails.
         UnsupportedMIMEError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from download.harvester import download_pdf
         >>> result = download_pdf(..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
@@ -231,7 +234,7 @@ class OpenAccessHarvester:
         """Compute run.
 
         Carry out the run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         topic : str
@@ -243,17 +246,18 @@ class OpenAccessHarvester:
         max_works : int
         max_works : int
             Description for ``max_works``.
-
+        
         Returns
         -------
         List[src.kgfoundry_common.models.Doc]
             Description of return value.
-
+        
         Examples
         --------
         >>> from download.harvester import run
         >>> result = run(..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
+        ...
         """
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)

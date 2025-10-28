@@ -422,7 +422,7 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
     """Compute build index.
 
     Carry out the build index operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     root : Path | None
@@ -431,17 +431,18 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
     json_path : Path | None
     json_path : Path | None, optional, default=None
         Description for ``json_path``.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.navmap.build_navmap import build_index
     >>> result = build_index()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     files = _discover_py_files()
     data: dict[str, Any] = {
@@ -515,17 +516,18 @@ def main() -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     int
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.navmap.build_navmap import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     build_index()
     print(f"navmap built → {INDEX_PATH}")

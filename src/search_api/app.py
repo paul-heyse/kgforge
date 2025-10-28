@@ -161,17 +161,18 @@ def healthz() -> dict[str, Any]:
     """Compute healthz.
 
     Carry out the healthz operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from search_api.app import healthz
     >>> result = healthz()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     return {
         "status": "ok",
@@ -190,7 +191,7 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
     """Compute rrf fuse.
 
     Carry out the rrf fuse operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     lists : List[List[Tuple[str, float]]]
@@ -199,17 +200,18 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
     k_rrf : int
     k_rrf : int
         Description for ``k_rrf``.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from search_api.app import rrf_fuse
     >>> result = rrf_fuse(..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     scores: dict[str, float] = {}
     for hits in lists:
@@ -228,7 +230,7 @@ def apply_kg_boosts(
     """Compute apply kg boosts.
 
     Carry out the apply kg boosts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     cands : collections.abc.Mapping
@@ -243,17 +245,18 @@ def apply_kg_boosts(
     one_hop : float | None
     one_hop : float | None, optional, default=0.04
         Description for ``one_hop``.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from search_api.app import apply_kg_boosts
     >>> result = apply_kg_boosts(..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     q_concepts = set()
     for w in query.lower().split():
@@ -280,7 +283,7 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     """Compute search.
 
     Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     req : src.search_api.schemas.SearchRequest
@@ -289,17 +292,18 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     _ : None | None
     _ : None | None, optional, default=Depends(auth)
         Description for ``_``.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from search_api.app import search
     >>> result = search(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
@@ -364,7 +368,7 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     """Compute graph concepts.
 
     Carry out the graph concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     body : collections.abc.Mapping
@@ -373,17 +377,18 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     _ : None | None
     _ : None | None, optional, default=Depends(auth)
         Description for ``_``.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from search_api.app import graph_concepts
     >>> result = graph_concepts(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring

@@ -97,17 +97,18 @@ def parse_args() -> argparse.Namespace:
     """Compute parse args.
 
     Carry out the parse args operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     argparse.Namespace
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import parse_args
     >>> result = parse_args()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     p = argparse.ArgumentParser(
         description="Build per-package and cross-subsystem graphs with policy checks."
@@ -187,7 +188,7 @@ def sh(
     """Compute sh.
 
     Carry out the sh operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     cmd : List[str]
@@ -199,17 +200,18 @@ def sh(
     check : bool | None
     check : bool | None, optional, default=True
         Description for ``check``.
-
+    
     Returns
     -------
     subprocess.CompletedProcess[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import sh
     >>> result = sh(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     return subprocess.run(
         cmd, check=check, cwd=str(cwd) if cwd else None, text=True, capture_output=False
@@ -245,17 +247,18 @@ def find_top_packages() -> list[str]:
     """Compute find top packages.
 
     Carry out the find top packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import find_top_packages
     >>> result = find_top_packages()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     # Top-level packages are directories under src/ that contain __init__.py
     pkgs: list[str] = []
@@ -476,28 +479,29 @@ def collapse_to_packages(dot_path: Path) -> Any:
     """Compute collapse to packages.
 
     Carry out the collapse to packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     dot_path : Path
     dot_path : Path
         Description for ``dot_path``.
-
+    
     Returns
     -------
     typing.Any
         Description of return value.
-
+    
     Raises
     ------
     RuntimeError
         Raised when validation fails.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import collapse_to_packages
     >>> result = collapse_to_packages(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     if nx is None or pydot is None:
         raise RuntimeError("networkx and pydot are required to collapse graphs")
@@ -555,7 +559,7 @@ def analyze_graph(g: Any, layers: dict[str, Any]) -> dict[str, Any]:
     """Compute analyze graph.
 
     Carry out the analyze graph operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     g : typing.Any
@@ -564,22 +568,23 @@ def analyze_graph(g: Any, layers: dict[str, Any]) -> dict[str, Any]:
     layers : collections.abc.Mapping
     layers : collections.abc.Mapping
         Description for ``layers``.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Raises
     ------
     RuntimeError
         Raised when validation fails.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import analyze_graph
     >>> result = analyze_graph(..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     if nx is None:
         raise RuntimeError("networkx is required for graph analysis")
@@ -868,7 +873,7 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
     """Compute cache bucket.
 
     Carry out the cache bucket operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     cache_dir : Path
@@ -880,17 +885,18 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
     tree_hash : str
     tree_hash : str
         Description for ``tree_hash``.
-
+    
     Returns
     -------
     Path
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import cache_bucket
     >>> result = cache_bucket(..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     return cache_dir / pkg / tree_hash
 
@@ -907,7 +913,7 @@ def build_one_package(
     """Compute build one package.
 
     Carry out the build one package operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     pkg : str
@@ -931,17 +937,18 @@ def build_one_package(
     verbose : bool
     verbose : bool
         Description for ``verbose``.
-
+    
     Returns
     -------
     Tuple[str, bool, bool, bool]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import build_one_package
     >>> result = build_one_package(..., ..., ..., ..., ..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     used_cache = False
     pydeps_ok = True

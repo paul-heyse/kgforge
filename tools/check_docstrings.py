@@ -27,17 +27,18 @@ def parse_args() -> argparse.Namespace:
     """Compute parse args.
 
     Carry out the parse args operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     argparse.Namespace
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.check_docstrings import parse_args
     >>> result = parse_args()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -52,23 +53,24 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
     """Compute iter docstrings.
 
     Carry out the iter docstrings operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     path : Path
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     collections.abc.Iterable
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.check_docstrings import iter_docstrings
     >>> result = iter_docstrings(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
@@ -86,17 +88,18 @@ def check_placeholders() -> int:
     """Compute check placeholders.
 
     Carry out the check placeholders operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Returns
     -------
     int
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.check_docstrings import check_placeholders
     >>> result = check_placeholders()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
     errors: list[str] = []
     keywords = {"TODO", "TBD", "FIXME"}
