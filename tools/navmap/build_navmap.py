@@ -273,6 +273,7 @@ def build_index() -> dict[str, Any]:
     
     
     
+    
     sha = _git_sha()
     data: dict[str, Any] = {"commit": sha, "modules": {}}
 
@@ -302,6 +303,7 @@ def main() -> None:
 
     Carry out the main operation.
     """
+    
     
     
     

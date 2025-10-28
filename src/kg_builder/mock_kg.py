@@ -34,6 +34,7 @@ class MockKG:
         
         
         
+        
         self.chunk2concepts: dict[str, set[str]] = {}
         self.neighbors: dict[str, set[str]] = {}
 
@@ -52,6 +53,7 @@ class MockKG:
         
         
         
+        
         self.chunk2concepts.setdefault(chunk_id, set()).add(concept_id)
 
     def add_edge(self, a: str, b: str) -> None:
@@ -66,6 +68,7 @@ class MockKG:
         b : str
             Description for ``b``.
         """
+        
         
         
         
@@ -90,6 +93,7 @@ class MockKG:
         
         
         
+        
         return sorted(self.chunk2concepts.get(chunk_id, set()))
 
     def one_hop(self, concept_id: str) -> list[str]:
@@ -107,6 +111,7 @@ class MockKG:
         List[str]
             Description of return value.
         """
+        
         
         
         

@@ -34,6 +34,7 @@ def detect_repo() -> tuple[str, str]:
     
     
     
+    
     try:
         remote = subprocess.check_output(
             ["git", "config", "--get", "remote.origin.url"], cwd=str(ROOT), text=True
@@ -77,6 +78,7 @@ def git_sha() -> str:
     
     
     
+    
     try:
         return subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=str(ROOT), text=True
@@ -111,6 +113,7 @@ def gh_url(rel: str, start: int, end: int | None) -> str:
     
     
     
+    
     rng = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel}{rng}"
 
@@ -125,6 +128,7 @@ def iter_packages() -> list[str]:
     List[str]
         Description of return value.
     """
+    
     
     
     
@@ -154,6 +158,7 @@ def summarize(node: Object) -> str:
     
     
     
+    
     doc = getattr(node, "docstring", None)
     if doc and getattr(doc, "value", None):
         summary = doc.value.strip().splitlines()[0].strip()
@@ -179,6 +184,7 @@ def is_public(node: Object) -> bool:
     
     
     
+    
     name = getattr(node, "name", "")
     return not name.startswith("_")
 
@@ -200,6 +206,7 @@ def get_open_link(node: Object, readme_dir: Path) -> str | None:
     str | None
         Description of return value.
     """
+    
     
     
     
@@ -237,6 +244,7 @@ def get_view_link(node: Object, readme_dir: Path) -> str | None:
     
     
     
+    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -269,6 +277,7 @@ def iter_public_members(node: Object) -> Iterable[Object]:
     
     
     
+    
     members = getattr(node, "members", {})
     return sorted([m for m in members.values() if is_public(m)], key=lambda child: child.name)
 
@@ -289,6 +298,7 @@ def render_member(node: Object, *, indent: int, lines: list[str], readme_dir: Pa
     readme_dir : Path
         Description for ``readme_dir``.
     """
+    
     
     
     
@@ -330,6 +340,7 @@ def write_readme(node: Object) -> None:
     node : Object
         Description for ``node``.
     """
+    
     
     
     

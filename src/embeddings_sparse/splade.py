@@ -66,6 +66,7 @@ class SPLADEv3Encoder:
         
         
         
+        
         self.model_id = model_id
         self.device = device
         self.topk = topk
@@ -94,6 +95,7 @@ class SPLADEv3Encoder:
         
         
         
+        
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
@@ -115,6 +117,7 @@ class PureImpactIndex:
         index_dir : str
             Description for ``index_dir``.
         """
+        
         
         
         
@@ -151,6 +154,7 @@ class PureImpactIndex:
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
+        
         
         
         
@@ -192,6 +196,7 @@ class PureImpactIndex:
         
         
         
+        
         with open(os.path.join(self.index_dir, "impact.pkl"), "rb") as handle:
             data = pickle.load(handle)
         self.df = data["df"]
@@ -215,6 +220,7 @@ class PureImpactIndex:
         List[Tuple[str, float]]
             Description of return value.
         """
+        
         
         
         
@@ -243,6 +249,7 @@ class LuceneImpactIndex:
         index_dir : str
             Description for ``index_dir``.
         """
+        
         
         
         
@@ -293,6 +300,7 @@ class LuceneImpactIndex:
         
         
         
+        
         self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
@@ -319,6 +327,7 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
     PureImpactIndex | LuceneImpactIndex
         Description of return value.
     """
+    
     
     
     

@@ -520,32 +520,34 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">43</span>    
 <span class="linenos">44</span>    
 <span class="linenos">45</span>    
-<span class="linenos">46</span>    <span class="k">def</span><span class="w"> </span><span class="nf">norm</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="linenos">47</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute norm.</span>
-<span class="linenos">48</span>
-<span class="linenos">49</span><span class="sd">        Carry out the norm operation.</span>
-<span class="linenos">50</span>
-<span class="linenos">51</span><span class="sd">        Parameters</span>
-<span class="linenos">52</span><span class="sd">        ----------</span>
-<span class="linenos">53</span><span class="sd">        s : str</span>
-<span class="linenos">54</span><span class="sd">            Description for ``s``.</span>
-<span class="linenos">55</span>
-<span class="linenos">56</span><span class="sd">        Returns</span>
-<span class="linenos">57</span><span class="sd">        -------</span>
-<span class="linenos">58</span><span class="sd">        str</span>
-<span class="linenos">59</span><span class="sd">            Description of return value.</span>
-<span class="linenos">60</span><span class="sd">        &quot;&quot;&quot;</span>
-<span class="linenos">61</span>        
+<span class="linenos">46</span>    
+<span class="linenos">47</span>    <span class="k">def</span><span class="w"> </span><span class="nf">norm</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos">48</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute norm.</span>
+<span class="linenos">49</span>
+<span class="linenos">50</span><span class="sd">        Carry out the norm operation.</span>
+<span class="linenos">51</span>
+<span class="linenos">52</span><span class="sd">        Parameters</span>
+<span class="linenos">53</span><span class="sd">        ----------</span>
+<span class="linenos">54</span><span class="sd">        s : str</span>
+<span class="linenos">55</span><span class="sd">            Description for ``s``.</span>
+<span class="linenos">56</span>
+<span class="linenos">57</span><span class="sd">        Returns</span>
+<span class="linenos">58</span><span class="sd">        -------</span>
+<span class="linenos">59</span><span class="sd">        str</span>
+<span class="linenos">60</span><span class="sd">            Description of return value.</span>
+<span class="linenos">61</span><span class="sd">        &quot;&quot;&quot;</span>
 <span class="linenos">62</span>        
 <span class="linenos">63</span>        
-<span class="linenos">64</span>        <span class="n">s</span> <span class="o">=</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">&quot;NFC&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
-<span class="linenos">65</span>        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="linenos">66</span>        <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\u2022\u25E6\u2013]&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>  <span class="c1"># bullets/dashes</span>
-<span class="linenos">67</span>        <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\x00-\x1F]&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
-<span class="linenos">68</span>        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<span class="linenos">69</span>
-<span class="linenos">70</span>    <span class="n">normed</span> <span class="o">=</span> <span class="p">[</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
-<span class="linenos">71</span>    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">normed</span><span class="p">)</span></div>
+<span class="linenos">64</span>        
+<span class="linenos">65</span>        
+<span class="linenos">66</span>        <span class="n">s</span> <span class="o">=</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">&quot;NFC&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+<span class="linenos">67</span>        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">68</span>        <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\u2022\u25E6\u2013]&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>  <span class="c1"># bullets/dashes</span>
+<span class="linenos">69</span>        <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\x00-\x1F]&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+<span class="linenos">70</span>        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<span class="linenos">71</span>
+<span class="linenos">72</span>    <span class="n">normed</span> <span class="o">=</span> <span class="p">[</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+<span class="linenos">73</span>    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">normed</span><span class="p">)</span></div>
 
 </pre></div>
 

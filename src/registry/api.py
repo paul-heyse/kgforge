@@ -5,8 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Final, Protocol
 
-from kgfoundry.kgfoundry_common.models import Doc, DoctagsAsset
-
+from kgfoundry_common.models import Doc, DoctagsAsset
 from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["Registry"]
@@ -46,9 +45,6 @@ class Registry(Protocol):
         str
             Description of return value.
         """
-        
-        
-        
         ...
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
@@ -65,9 +61,6 @@ class Registry(Protocol):
         rows : int
             Description for ``rows``.
         """
-        
-        
-        
         ...
 
     def rollback_dataset(self, dataset_id: str) -> None:
@@ -80,9 +73,6 @@ class Registry(Protocol):
         dataset_id : str
             Description for ``dataset_id``.
         """
-        
-        
-        
         ...
 
     def insert_run(
@@ -112,9 +102,6 @@ class Registry(Protocol):
         str
             Description of return value.
         """
-        
-        
-        
         ...
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
@@ -131,9 +118,6 @@ class Registry(Protocol):
         notes : str | None
             Description for ``notes``.
         """
-        
-        
-        
         ...
 
     def register_documents(self, docs: list[Doc]) -> None:
@@ -146,9 +130,6 @@ class Registry(Protocol):
         docs : List[Doc]
             Description for ``docs``.
         """
-        
-        
-        
         ...
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
@@ -161,9 +142,6 @@ class Registry(Protocol):
         assets : List[DoctagsAsset]
             Description for ``assets``.
         """
-        
-        
-        
         ...
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
@@ -180,9 +158,6 @@ class Registry(Protocol):
         payload : Mapping[str, object]
             Description for ``payload``.
         """
-        
-        
-        
         ...
 
     def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
@@ -201,7 +176,4 @@ class Registry(Protocol):
         message : str
             Description for ``message``.
         """
-        
-        
-        
         ...

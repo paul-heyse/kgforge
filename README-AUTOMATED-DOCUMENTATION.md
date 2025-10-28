@@ -38,12 +38,18 @@ generation pipeline, explaining every component, tool, and step in the process.
    - [Stage 0: Clean Slate](#stage-0-clean-slate)
    - [Stage 1: Docstring Generation](#stage-1-docstring-generation-make-docstrings)
    - [Stage 2: README Generation](#stage-2-readme-generation-make-readmes)
-   - [Stage 3: NavMap Index Build](#stage-3-navmap-index-build-python-toolsnavmapbuild_navmappy)
-   - [Stage 4: NavMap Validation](#stage-4-navmap-validation-python-toolsnavmapcheck_navmappy)
-   - [Stage 5: Sphinx HTML Build](#stage-5-sphinx-html-build-make-html)
-   - [Stage 6: Sphinx JSON Build](#stage-6-sphinx-json-build-make-json)
-   - [Stage 7: Symbol Index Build](#stage-7-symbol-index-build-make-symbols)
-   - [Stage 8: MkDocs Build](#stage-8-mkdocs-build-optional)
+   - [Stage 3: NavMap Update](#stage-3-navmap-update-python-toolsupdate_navmapspy)
+   - [Stage 4: NavMap Index Build](#stage-4-navmap-index-build-python-toolsnavmapbuild_navmappy)
+   - [Stage 5: NavMap Validation](#stage-5-navmap-validation-python-toolsnavmapcheck_navmappy)
+   - [Stage 6: Example Tests](#stage-6-example-tests-xdoctest)
+   - [Stage 7: Test Map Build](#stage-7-test-map-build-python-toolsdocsbuild_test_mappy)
+   - [Stage 8: Observability Scan](#stage-8-observability-scan-python-toolsdocsscan_observabilitypy)
+   - [Stage 9: Schema Export](#stage-9-schema-export-python-toolsdocsexport_schemaspy)
+   - [Stage 10: Graph Build](#stage-10-graph-build-python-toolsdocsbuild_graphspy)
+   - [Stage 11: Sphinx HTML Build](#stage-11-sphinx-html-build-make-html)
+   - [Stage 12: Sphinx JSON Build](#stage-12-sphinx-json-build-make-json)
+   - [Stage 13: Symbol Index Build](#stage-13-symbol-index-build-make-symbols)
+   - [Stage 14: MkDocs Build](#stage-14-mkdocs-build-optional)
 
 #### Troubleshooting & Operations
 3. **[Error Handling & Troubleshooting](#error-handling--troubleshooting)**
@@ -287,7 +293,32 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - Broken Griffe analysis
 - Permission issues writing READMEs
 
-#### Stage 3: Navigation Map Building (`python tools/navmap/build_navmap.py`)
+#### Stage 3: NavMap Update (`python tools/update_navmaps.py`)
+
+**Purpose:** Validate that module docstrings remain free of legacy `NavMap:` sections.
+
+**Tool:** `tools/update_navmaps.py`
+
+**What it does:**
+- Scans all Python files in `src/`
+- Checks for deprecated `NavMap:` sections in module docstrings
+- Exits with error if any legacy sections are found
+- Ensures clean migration to the new `__navmap__` dictionary approach
+
+**Exit condition:**
+- Success: No legacy `NavMap:` sections found, exit code 0
+- Failure: Legacy sections detected, exit code 1 with file paths
+
+**Failure reasons:**
+- Module docstrings containing `NavMap:` section markers
+- Incomplete migration from old format to new format
+
+**Impact of failure:**
+- Halts entire documentation build
+- Prevents commit via pre-commit hook
+- Forces removal of legacy sections before proceeding
+
+#### Stage 4: Navigation Map Building (`python tools/navmap/build_navmap.py`)
 
 **Purpose:** Extract and index module-level navigation metadata.
 
@@ -308,7 +339,7 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - Syntax errors in Python files
 - Permission issues creating output directory
 
-#### Stage 4: Navigation Map Validation (`python tools/navmap/check_navmap.py`)
+#### Stage 5: Navigation Map Validation (`python tools/navmap/check_navmap.py`)
 
 **Purpose:** Validate navmap metadata consistency and correctness.
 
@@ -334,7 +365,127 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - Prevents commit via pre-commit hook
 - Forces correction before proceeding
 
-#### Stage 5: Sphinx HTML Build (`make html`)
+#### Stage 6: Example Tests (`pytest --xdoctest`)
+
+**Purpose:** Validate doctest examples in example scripts.
+
+**Command:** `pytest -q --xdoctest --xdoctest-options=ELLIPSIS,IGNORE_WHITESPACE,NORMALIZE_WHITESPACE --xdoctest-modules --xdoctest-glob='examples/*.py' examples`
+
+**What it does:**
+- Runs xdoctest on all Python files in `examples/`
+- Validates docstring examples against actual execution
+- Checks that examples produce expected output
+- Allows whitespace normalization and ellipsis matching
+
+**Exit condition:**
+- Success: All doctest examples pass, exit code 0
+- Failure: Any doctest fails, exit code 1 with traceback
+
+**Failure reasons:**
+- Doctest examples produce incorrect output
+- Examples reference unavailable dependencies
+- Outdated examples that no longer match current API
+- Runtime errors in example code
+
+**Impact of failure:**
+- Halts entire documentation build
+- Ensures examples remain accurate and executable
+
+#### Stage 7: Test Map Build (`python tools/docs/build_test_map.py`)
+
+**Purpose:** Generate test coverage map for documentation.
+
+**Tool:** `tools/docs/build_test_map.py`
+
+**What it does:**
+- Analyzes test files and their coverage
+- Maps test functions to source code
+- Generates visual representation of test coverage
+- Creates documentation artifacts showing which code is tested
+
+**Generates:** Test coverage maps and reports (location TBD based on tool implementation)
+
+**Exit condition:**
+- Success: Test map generated successfully, exit code 0
+- Failure: Analysis errors, exit code 1
+
+**Failure reasons:**
+- Unable to parse test files
+- Coverage data unavailable
+- Permission issues writing output
+
+#### Stage 8: Observability Scan (`python tools/docs/scan_observability.py`)
+
+**Purpose:** Scan and document observability instrumentation.
+
+**Tool:** `tools/docs/scan_observability.py`
+
+**What it does:**
+- Scans codebase for logging, tracing, and metrics instrumentation
+- Documents observability patterns and practices
+- Identifies logging levels and structured logging usage
+- Maps telemetry spans and metrics definitions
+
+**Generates:** Observability documentation artifacts (location TBD based on tool implementation)
+
+**Exit condition:**
+- Success: Observability scan complete, exit code 0
+- Failure: Scan errors, exit code 1
+
+**Failure reasons:**
+- Unable to parse source files
+- Instrumentation pattern detection errors
+- Permission issues writing output
+
+#### Stage 9: Schema Export (`python tools/docs/export_schemas.py`)
+
+**Purpose:** Export data contract schemas for documentation.
+
+**Tool:** `tools/docs/export_schemas.py`
+
+**What it does:**
+- Extracts Pydantic models and data schemas from code
+- Exports JSON Schema definitions
+- Documents API contracts and data structures
+- Generates schema validation documentation
+
+**Generates:** Schema documentation files (location TBD based on tool implementation)
+
+**Exit condition:**
+- Success: Schemas exported successfully, exit code 0
+- Failure: Export errors, exit code 1
+
+**Failure reasons:**
+- Unable to parse schema definitions
+- Invalid Pydantic models
+- Schema serialization errors
+- Permission issues writing output
+
+#### Stage 10: Graph Build (`python tools/docs/build_graphs.py`)
+
+**Purpose:** Build dependency and architecture graphs.
+
+**Tool:** `tools/docs/build_graphs.py`
+
+**What it does:**
+- Analyzes code dependencies and relationships
+- Generates visual dependency graphs
+- Creates architecture diagrams
+- Maps module relationships and import hierarchies
+
+**Generates:** Graph visualizations and diagrams (location TBD based on tool implementation)
+
+**Exit condition:**
+- Success: Graphs generated successfully, exit code 0
+- Failure: Graph generation errors, exit code 1
+
+**Failure reasons:**
+- Unable to analyze dependencies
+- Graph rendering errors
+- GraphViz or visualization library unavailable
+- Permission issues writing output
+
+#### Stage 11: Sphinx HTML Build (`make html`)
 
 **Purpose:** Generate complete HTML documentation website.
 
@@ -365,7 +516,7 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - AutoAPI analysis errors
 - MyST-Parser Markdown errors
 
-#### Stage 6: Sphinx JSON Build (`make json`)
+#### Stage 12: Sphinx JSON Build (`make json`)
 
 **Purpose:** Generate machine-readable JSON documentation corpus.
 
@@ -392,7 +543,7 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - Search indexing systems
 - Documentation testing
 
-#### Stage 7: Symbol Index Build (`make symbols`)
+#### Stage 13: Symbol Index Build (`make symbols`)
 
 **Purpose:** Generate flat symbol index for fast agent lookup.
 
@@ -428,7 +579,7 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - Documentation validation
 - IDE integration
 
-#### Stage 8: MkDocs Build (Optional, Conditional)
+#### Stage 14: MkDocs Build (Optional, Conditional)
 
 **Purpose:** Generate alternative Markdown-first documentation site.
 
@@ -814,6 +965,10 @@ def func1():
 | [`tools/gen_readmes.py`](tools/gen_readmes.py) | Generates package-level `README.md` files that list public modules/classes/functions with summaries, editor deep links (`[open]`), and GitHub permalinks (`[view]`). |
 | [`tools/navmap/build_navmap.py`](tools/navmap/build_navmap.py) | Builds machine-readable navigation map index (`site/_build/navmap/navmap.json`). Extracts `__all__`, `__navmap__`, anchors, and sections from all Python modules. |
 | [`tools/navmap/check_navmap.py`](tools/navmap/check_navmap.py) | Validates navmap metadata: checks exports consistency, section naming conventions, kebab-case IDs, and anchor presence. Returns exit code 1 on errors. |
+| [`tools/docs/build_test_map.py`](tools/docs/build_test_map.py) | Builds test coverage map for documentation. Analyzes test files and maps them to source code. |
+| [`tools/docs/scan_observability.py`](tools/docs/scan_observability.py) | Scans codebase for observability instrumentation (logging, tracing, metrics). Documents observability patterns and practices. |
+| [`tools/docs/export_schemas.py`](tools/docs/export_schemas.py) | Exports Pydantic models and data schemas as JSON Schema definitions for API contract documentation. |
+| [`tools/docs/build_graphs.py`](tools/docs/build_graphs.py) | Builds dependency and architecture graphs. Analyzes code relationships and generates visual diagrams. |
 | [`tools/detect_pkg.py`](tools/detect_pkg.py) | Detects primary/all packages for doc generation (used by Sphinx/Makefile/tools). Prefers lowercase names and `kgfoundry`-prefixed packages in `src/`. |
 | [`docs/_scripts/build_symbol_index.py`](docs/_scripts/build_symbol_index.py) | Emits `docs/_build/symbols.json` flat array for agent consumption. Each entry contains fully qualified name, kind, file path, line range, and docstring summary. |
 | [`Makefile`](Makefile) | Defines developer tasks: `docstrings`, `readmes`, `html`, `json`, `symbols`, `navmap-build`, `navmap-check`, `watch`, `fmt`, `lint`, `bootstrap`. |
@@ -843,16 +998,21 @@ The single entry point for complete documentation regeneration.
 - Uses `.venv/bin/python` for all Python commands
 
 **Execution flow:**
-1. Clean slate: `rm -rf docs/_build/html docs/_build/json site`
+1. Clean slate: `rm -rf docs/_build site`
 2. `make docstrings` - Generate and validate docstrings
 3. `make readmes` - Generate package READMEs
-4. `python tools/update_navmaps.py` - Ensure docstrings remain free of `NavMap:` sections
+4. `python tools/update_navmaps.py` - Ensure docstrings remain free of legacy `NavMap:` sections
 5. `python tools/navmap/build_navmap.py` - Build navmap index
 6. `python tools/navmap/check_navmap.py` - Validate navmap
-7. `make html` - Build Sphinx HTML docs
-8. `make json` - Build Sphinx JSON corpus
-9. `make symbols` - Build symbol index
-10. `mkdocs build` (optional) - Build MkDocs site if available
+7. `pytest --xdoctest` - Run doctest examples in examples/
+8. `python tools/docs/build_test_map.py` - Build test coverage map
+9. `python tools/docs/scan_observability.py` - Scan observability instrumentation
+10. `python tools/docs/export_schemas.py` - Export data contract schemas
+11. `python tools/docs/build_graphs.py` - Build dependency and architecture graphs
+12. `make html` - Build Sphinx HTML docs
+13. `make json` - Build Sphinx JSON corpus
+14. `make symbols` - Build symbol index
+15. `mkdocs build` (optional) - Build MkDocs site if available
 
 **Exit behavior:**
 - Exits with error if virtual environment is missing
@@ -1887,34 +2047,51 @@ Stage 1: Docstrings (doq → auto_docstrings → format → lint → coverage)
     ↓
 Stage 2: READMEs (gen_readmes + doctoc)
     ↓
-Stage 3: NavMap Build (extract metadata)
+Stage 3: NavMap Update (validate no legacy sections) ⚠️ BLOCKING
     ↓
-Stage 4: NavMap Check (validate metadata) ⚠️ BLOCKING
+Stage 4: NavMap Build (extract metadata)
     ↓
-Stage 5: Sphinx HTML (build HTML site)
+Stage 5: NavMap Check (validate metadata) ⚠️ BLOCKING
     ↓
-Stage 6: Sphinx JSON (build JSON corpus)
+Stage 6: Example Tests (pytest --xdoctest) ⚠️ BLOCKING
     ↓
-Stage 7: Symbol Index (build flat symbol array)
+Stage 7: Test Map Build (build_test_map.py)
     ↓
-Stage 8: MkDocs (optional, non-blocking)
+Stage 8: Observability Scan (scan_observability.py)
+    ↓
+Stage 9: Schema Export (export_schemas.py)
+    ↓
+Stage 10: Graph Build (build_graphs.py)
+    ↓
+Stage 11: Sphinx HTML (build HTML site)
+    ↓
+Stage 12: Sphinx JSON (build JSON corpus)
+    ↓
+Stage 13: Symbol Index (build flat symbol array)
+    ↓
+Stage 14: MkDocs (optional, non-blocking)
     ↓
 ✓ Success
 ```
 
 **Key dependencies:**
 
-- **Stages 1-4 are sequential and critical:**
+- **Stages 1-6 are sequential and critical:**
   - If any fails, entire build stops
-  - Docstrings → READMEs → NavMap validation chain is strict
-  - NavMap validation (Stage 4) acts as a gate-keeper
+  - Docstrings → READMEs → NavMap validation → Example tests chain is strict
+  - NavMap validation (Stage 5) and example tests (Stage 6) act as gate-keepers
 
-- **Stages 5-7 depend on Stages 1-4:**
+- **Stages 7-10 are sequential but non-critical:**
+  - Generate additional documentation artifacts
+  - Build test maps, observability docs, schemas, and graphs
+  - Failures may be logged but don't halt the pipeline
+
+- **Stages 11-13 depend on Stages 1-10:**
   - Sphinx builds use docstrings and metadata
   - Symbol index uses complete symbol tree
   - Cannot proceed if earlier stages failed
 
-- **Stage 8 is optional:**
+- **Stage 14 is optional:**
   - MkDocs build can fail without stopping
   - Skipped if not installed
   - Non-blocking for overall pipeline success
@@ -2291,12 +2468,18 @@ This table shows all stages, their dependencies, and what they consume/produce:
 |---|-------|---------|-----------|----------|----------|-----------|
 | 1 | Docstrings | `make docstrings` | .venv, tools | Source code | Updated docstrings | YES |
 | 2 | READMEs | `make readmes` | Stage 1 | Docstrings | `README.md` files | NO |
-| 3 | NavMap Build | `build_navmap.py` | Stage 2 | Source code | `navmap.json` | YES |
-| 4 | NavMap Check | `check_navmap.py` | Stage 3 | `navmap.json` | Validation result | YES |
-| 5 | Sphinx HTML | `make html` | Stage 4 | Docstrings, Markdown | `docs/_build/html/` | NO |
-| 6 | Sphinx JSON | `make json` | Stage 4 | Docstrings, Markdown | `docs/_build/json/` | NO |
-| 7 | Symbol Index | `make symbols` | Stage 4 | Docstrings | `symbols.json` | NO |
-| 8 | MkDocs | `mkdocs build` | Stage 4 | Docstrings, Markdown | `site/` | NO |
+| 3 | NavMap Update | `update_navmaps.py` | Stage 2 | Source code | Validation result | YES |
+| 4 | NavMap Build | `build_navmap.py` | Stage 3 | Source code | `navmap.json` | YES |
+| 5 | NavMap Check | `check_navmap.py` | Stage 4 | `navmap.json` | Validation result | YES |
+| 6 | Example Tests | `pytest --xdoctest` | Stage 5 | Example scripts | Test results | YES |
+| 7 | Test Map Build | `build_test_map.py` | Stage 6 | Test files | Test coverage map | NO |
+| 8 | Observability Scan | `scan_observability.py` | Stage 7 | Source code | Observability docs | NO |
+| 9 | Schema Export | `export_schemas.py` | Stage 8 | Source code | Schema docs | NO |
+| 10 | Graph Build | `build_graphs.py` | Stage 9 | Source code | Dependency graphs | NO |
+| 11 | Sphinx HTML | `make html` | Stage 10 | Docstrings, Markdown | `docs/_build/html/` | NO |
+| 12 | Sphinx JSON | `make json` | Stage 10 | Docstrings, Markdown | `docs/_build/json/` | NO |
+| 13 | Symbol Index | `make symbols` | Stage 10 | Docstrings | `symbols.json` | NO |
+| 14 | MkDocs | `mkdocs build` | Stage 10 | Docstrings, Markdown | `site/` | NO |
 
 **Legend:**
 - **YES:** Failure halts pipeline

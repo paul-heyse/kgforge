@@ -526,40 +526,42 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">47</span>        
 <span class="linenos">48</span>        
 <span class="linenos">49</span>        
-<span class="linenos">50</span>        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-<span class="linenos">51</span>            <span class="s2">&quot;ts&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatTime</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">),</span>
-<span class="linenos">52</span>            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">levelname</span><span class="p">,</span>
-<span class="linenos">53</span>            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-<span class="linenos">54</span>            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">getMessage</span><span class="p">(),</span>
-<span class="linenos">55</span>        <span class="p">}</span>
-<span class="linenos">56</span>        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;run_id&quot;</span><span class="p">,</span> <span class="s2">&quot;doc_id&quot;</span><span class="p">,</span> <span class="s2">&quot;chunk_id&quot;</span><span class="p">):</span>
-<span class="linenos">57</span>            <span class="n">v</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="linenos">58</span>            <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
-<span class="linenos">59</span>                <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
-<span class="linenos">60</span>        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+<span class="linenos">50</span>        
+<span class="linenos">51</span>        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+<span class="linenos">52</span>            <span class="s2">&quot;ts&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatTime</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">),</span>
+<span class="linenos">53</span>            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">levelname</span><span class="p">,</span>
+<span class="linenos">54</span>            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+<span class="linenos">55</span>            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">getMessage</span><span class="p">(),</span>
+<span class="linenos">56</span>        <span class="p">}</span>
+<span class="linenos">57</span>        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;run_id&quot;</span><span class="p">,</span> <span class="s2">&quot;doc_id&quot;</span><span class="p">,</span> <span class="s2">&quot;chunk_id&quot;</span><span class="p">):</span>
+<span class="linenos">58</span>            <span class="n">v</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="linenos">59</span>            <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+<span class="linenos">60</span>                <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+<span class="linenos">61</span>        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 </div>
 
-<span class="linenos">61</span>
 <span class="linenos">62</span>
-<span class="linenos">63</span><span class="c1"># [nav:anchor setup_logging]</span>
+<span class="linenos">63</span>
+<span class="linenos">64</span><span class="c1"># [nav:anchor setup_logging]</span>
 <div class="viewcode-block" id="setup_logging">
 <a class="viewcode-back" href="../../../autoapi/src/kgfoundry_common/logging/index.html#src.kgfoundry_common.logging.setup_logging">[docs]</a>
-<span class="linenos">64</span><span class="k">def</span><span class="w"> </span><span class="nf">setup_logging</span><span class="p">(</span><span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="linenos">65</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute setup logging.</span>
-<span class="linenos">66</span>
-<span class="linenos">67</span><span class="sd">    Carry out the setup logging operation.</span>
-<span class="linenos">68</span>
-<span class="linenos">69</span><span class="sd">    Parameters</span>
-<span class="linenos">70</span><span class="sd">    ----------</span>
-<span class="linenos">71</span><span class="sd">    level : int | None</span>
-<span class="linenos">72</span><span class="sd">        Description for ``level``.</span>
-<span class="linenos">73</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">74</span>    
+<span class="linenos">65</span><span class="k">def</span><span class="w"> </span><span class="nf">setup_logging</span><span class="p">(</span><span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">66</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute setup logging.</span>
+<span class="linenos">67</span>
+<span class="linenos">68</span><span class="sd">    Carry out the setup logging operation.</span>
+<span class="linenos">69</span>
+<span class="linenos">70</span><span class="sd">    Parameters</span>
+<span class="linenos">71</span><span class="sd">    ----------</span>
+<span class="linenos">72</span><span class="sd">    level : int | None</span>
+<span class="linenos">73</span><span class="sd">        Description for ``level``.</span>
+<span class="linenos">74</span><span class="sd">    &quot;&quot;&quot;</span>
 <span class="linenos">75</span>    
 <span class="linenos">76</span>    
-<span class="linenos">77</span>    <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
-<span class="linenos">78</span>    <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">JsonFormatter</span><span class="p">())</span>
-<span class="linenos">79</span>    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">handler</span><span class="p">])</span></div>
+<span class="linenos">77</span>    
+<span class="linenos">78</span>    
+<span class="linenos">79</span>    <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+<span class="linenos">80</span>    <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">JsonFormatter</span><span class="p">())</span>
+<span class="linenos">81</span>    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">handler</span><span class="p">])</span></div>
 
 </pre></div>
 

@@ -41,5 +41,6 @@ def isotonic_calibrate(pairs: list[tuple[float, int]]) -> dict[str, object]:
     
     
     
+    
     # NOTE: fit isotonic regression parameters when calibrator is implemented
     return {"kind": "isotonic", "params": []}

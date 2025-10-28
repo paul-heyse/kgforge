@@ -60,6 +60,7 @@ def detect_query_concepts(query: str) -> set[str]:
     
     
     
+    
     lowered = query.lower()
     hits: set[str] = set()
     for concept_id, meta in CONCEPTS.items():
@@ -84,6 +85,7 @@ def linked_concepts_for_text(text: str) -> list[str]:
     List[str]
         Description of return value.
     """
+    
     
     
     
@@ -122,6 +124,7 @@ def kg_boost(
     float
         Description of return value.
     """
+    
     
     
     

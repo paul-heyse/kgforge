@@ -520,11 +520,12 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">43</span>    
 <span class="linenos">44</span>    
 <span class="linenos">45</span>    
-<span class="linenos">46</span>    <span class="n">agg</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="linenos">47</span>    <span class="k">for</span> <span class="n">ranked</span> <span class="ow">in</span> <span class="n">rankers</span><span class="p">:</span>
-<span class="linenos">48</span>        <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">_score</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ranked</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="linenos">49</span>            <span class="n">agg</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span>
-<span class="linenos">50</span>    <span class="k">return</span> <span class="n">agg</span></div>
+<span class="linenos">46</span>    
+<span class="linenos">47</span>    <span class="n">agg</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="linenos">48</span>    <span class="k">for</span> <span class="n">ranked</span> <span class="ow">in</span> <span class="n">rankers</span><span class="p">:</span>
+<span class="linenos">49</span>        <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">_score</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ranked</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="linenos">50</span>            <span class="n">agg</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span>
+<span class="linenos">51</span>    <span class="k">return</span> <span class="n">agg</span></div>
 
 </pre></div>
 
