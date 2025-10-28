@@ -5,12 +5,16 @@ src.search_client.client
 
 .. autoapi-nested-parse::
 
-   Module for search_client.client.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - KGFoundryClient: Minimal synchronous client for the kgfoundry search API.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`search_client.client`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -20,8 +24,62 @@ Module Contents
 
 .. py:class:: KGFoundryClient(base_url = 'http://localhost:8080', api_key = None, timeout = 30.0, http = None)
 
-   Minimal synchronous client for the kgfoundry search API.
+   
+   Represent KGFoundryClient.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: _headers()
+
+      Method description.
+
+   .. method:: healthz()
+
+      Method description.
+
+   .. method:: search()
+
+      Method description.
+
+   .. method:: concepts()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from search_client.client import KGFoundryClient
+   >>> result = KGFoundryClient()
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`search_client.client`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: base_url
       :value: ''
@@ -38,21 +96,173 @@ Module Contents
 
 
 
+   .. py:attribute:: _http
+      :type:  _SupportsHttp
+
+
+   .. py:method:: _headers()
+
+      
+      Return headers.
+
+      :returns: *Mapping[str, str]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from search_client.client import _headers
+      >>> result = _headers()
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`search_client.client`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
    .. py:method:: healthz()
 
-      Call the `/healthz` endpoint and return its JSON body.
+      
+      Return healthz.
 
+      :returns: *Mapping[str, Any]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from search_client.client import healthz
+      >>> result = healthz()
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`search_client.client`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: search(query, k = 10, filters = None, explain = False)
 
-      Execute a search query and return the API response body.
+      
+      Return search.
 
+      :param query: Description for ``query``.
+      :type query: str
+      :param k: Description for ``k``.
+      :type k: int, optional
+      :param filters: Description for ``filters``.
+      :type filters: Mapping[str, Any] | None, optional
+      :param explain: Description for ``explain``.
+      :type explain: bool, optional
+
+      :returns: *Mapping[str, Any]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from search_client.client import search
+      >>> result = search(..., ..., ..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`search_client.client`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: concepts(q, limit = 50)
 
-      Lookup related concepts via `/graph/concepts`.
+      
+      Return concepts.
 
+      :param q: Description for ``q``.
+      :type q: str
+      :param limit: Description for ``limit``.
+      :type limit: int, optional
+
+      :returns: *Mapping[str, Any]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from search_client.client import concepts
+      >>> result = concepts(..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`search_client.client`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 

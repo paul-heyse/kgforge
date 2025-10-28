@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -43,9 +42,8 @@ type StrArray = NDArray[np.str_]
 
 # [nav:anchor FaissGpuIndex]
 class FaissGpuIndex:
-    """
-    Represent FaissGpuIndex.
-    
+    """Represent FaissGpuIndex.
+
     Attributes
     ----------
     None
@@ -93,9 +91,8 @@ class FaissGpuIndex:
         gpu: bool = True,
         cuvs: bool = True,
     ) -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         factory : str, optional
@@ -138,9 +135,8 @@ class FaissGpuIndex:
             self._faiss = None
 
     def _ensure_resources(self) -> None:
-        """
-        Return ensure resources.
-        
+        """Return ensure resources.
+
         Examples
         --------
         >>> from vectorstore_faiss.gpu import _ensure_resources
@@ -162,9 +158,8 @@ class FaissGpuIndex:
             self._res = faiss.StandardGpuResources()
 
     def train(self, train_vectors: FloatArray, *, seed: int = 42) -> None:
-        """
-        Return train.
-        
+        """Return train.
+
         Parameters
         ----------
         train_vectors : FloatArray
@@ -212,9 +207,8 @@ class FaissGpuIndex:
             pass
 
     def add(self, keys: list[str], vectors: FloatArray) -> None:
-        """
-        Return add.
-        
+        """Return add.
+
         Parameters
         ----------
         keys : List[str]
@@ -266,9 +260,8 @@ class FaissGpuIndex:
             self._index.add(vec_array)
 
     def search(self, query: FloatArray, k: int) -> list[tuple[str, float]]:
-        """
-        Return search.
-        
+        """Return search.
+
         Parameters
         ----------
         query : FloatArray
@@ -321,9 +314,8 @@ class FaissGpuIndex:
         return [(str(ids[i]), float(scores[i])) for i in range(len(ids)) if ids[i] != -1]
 
     def save(self, index_uri: str, idmap_uri: str | None = None) -> None:
-        """
-        Return save.
-        
+        """Return save.
+
         Parameters
         ----------
         index_uri : str
@@ -362,9 +354,8 @@ class FaissGpuIndex:
         faiss.write_index(target_index, index_uri)
 
     def load(self, index_uri: str, idmap_uri: str | None = None) -> None:
-        """
-        Return load.
-        
+        """Return load.
+
         Parameters
         ----------
         index_uri : str

@@ -1,5 +1,6 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
+
+Auto-generated API documentation for the ``src.kg_builder.neo4j_store`` module.
 
 Notes
 -----
@@ -7,7 +8,7 @@ This module exposes the primary interfaces for the package.
 
 See Also
 --------
-kg_builder.neo4j_store
+src.kg_builder.neo4j_store
 """
 
 
@@ -35,29 +36,12 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Neo4jStore]
 class Neo4jStore:
-    """
-    Represent Neo4jStore.
+    """Represent Neo4jStore."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kg_builder.neo4j_store import Neo4jStore
-    >>> result = Neo4jStore()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kg_builder.neo4j_store
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
     
     
     

@@ -1,5 +1,6 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
+
+Auto-generated API documentation for the ``src.docling.vlm`` module.
 
 Notes
 -----
@@ -7,7 +8,7 @@ This module exposes the primary interfaces for the package.
 
 See Also
 --------
-docling.vlm
+src.docling.vlm
 """
 
 
@@ -35,29 +36,15 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor GraniteDoclingVLM]
 class GraniteDoclingVLM:
-    """
-    Represent GraniteDoclingVLM.
+    """Represent GraniteDoclingVLM."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from docling.vlm import GraniteDoclingVLM
-    >>> result = GraniteDoclingVLM()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    docling.vlm
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
     
     
     

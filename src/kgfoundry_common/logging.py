@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -38,9 +37,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor JsonFormatter]
 class JsonFormatter(logging.Formatter):
-    """
-    Represent JsonFormatter.
-    
+    """Represent JsonFormatter.
+
     Attributes
     ----------
     None
@@ -70,9 +68,8 @@ class JsonFormatter(logging.Formatter):
     
 
     def format(self, record: logging.LogRecord) -> str:
-        """
-        Return format.
-        
+        """Return format.
+
         Parameters
         ----------
         record : logging.LogRecord
@@ -114,9 +111,8 @@ class JsonFormatter(logging.Formatter):
 
 # [nav:anchor setup_logging]
 def setup_logging(level: int = logging.INFO) -> None:
-    """
-    Return setup logging.
-    
+    """Return setup logging.
+
     Parameters
     ----------
     level : int, optional

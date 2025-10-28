@@ -5,13 +5,16 @@ src.registry.migrate
 
 .. autoapi-nested-parse::
 
-   Module for registry.migrate.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - apply: Return apply.
-   - main: Run the CLI entry point for migration commands.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`registry.migrate`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -21,16 +24,72 @@ Module Contents
 
 .. py:function:: apply(db, migrations_dir)
 
+   
    Return apply.
 
-   :param db: Description.
+   :param db: Description for ``db``.
    :type db: str
-   :param migrations_dir: Description.
+   :param migrations_dir: Description for ``migrations_dir``.
    :type migrations_dir: str
 
+   .. rubric:: Examples
+
+   >>> from registry.migrate import apply
+   >>> apply(..., ...)  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`registry.migrate`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: main()
 
-   Run the CLI entry point for migration commands.
+   
+   Return main.
 
+   .. rubric:: Examples
+
+   >>> from registry.migrate import main
+   >>> main()  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`registry.migrate`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

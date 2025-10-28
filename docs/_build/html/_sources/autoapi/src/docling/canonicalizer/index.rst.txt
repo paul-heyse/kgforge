@@ -5,12 +5,18 @@ src.docling.canonicalizer
 
 .. autoapi-nested-parse::
 
-   Module for docling.canonicalizer.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - canonicalize_text: Apply NFC, normalize whitespace and bullets, preserve….
+   Auto-generated API documentation for the ``src.docling.canonicalizer`` module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.docling.canonicalizer`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -20,6 +26,40 @@ Module Contents
 
 .. py:function:: canonicalize_text(blocks)
 
-   Apply NFC, normalize whitespace and bullets, preserve single newlines between blocks.
+   
+   Return canonicalize text.
 
+   :param blocks: Description for ``blocks``.
+   :type blocks: List[str]
+
+   :returns: *str* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from docling.canonicalizer import canonicalize_text
+   >>> result = canonicalize_text(...)
+   >>> result  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`docling.canonicalizer`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

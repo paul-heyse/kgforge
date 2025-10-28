@@ -5,12 +5,16 @@ src.vectorstore_faiss.gpu
 
 .. autoapi-nested-parse::
 
-   Module for vectorstore_faiss.gpu.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - FaissGpuIndex: Wrap a FAISS vector index and provide numpy-based fallbacks.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`vectorstore_faiss.gpu`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -20,8 +24,70 @@ Module Contents
 
 .. py:class:: FaissGpuIndex(factory = 'OPQ64,IVF8192,PQ64', nprobe = 64, gpu = True, cuvs = True)
 
-   Wrap a FAISS vector index and provide numpy-based fallbacks.
+   
+   Represent FaissGpuIndex.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: _ensure_resources()
+
+      Method description.
+
+   .. method:: train()
+
+      Method description.
+
+   .. method:: add()
+
+      Method description.
+
+   .. method:: search()
+
+      Method description.
+
+   .. method:: save()
+
+      Method description.
+
+   .. method:: load()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from vectorstore_faiss.gpu import FaissGpuIndex
+   >>> result = FaissGpuIndex()
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`vectorstore_faiss.gpu`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: factory
       :value: 'OPQ64,IVF8192,PQ64'
@@ -43,33 +109,274 @@ Module Contents
 
 
 
+   .. py:attribute:: _faiss
+      :type:  Any | None
+      :value: None
+
+
+
+   .. py:attribute:: _res
+      :type:  Any | None
+      :value: None
+
+
+
+   .. py:attribute:: _index
+      :type:  Any | None
+      :value: None
+
+
+
+   .. py:attribute:: _idmap
+      :type:  StrArray | None
+      :value: None
+
+
+
+   .. py:attribute:: _xb
+      :type:  FloatArray | None
+      :value: None
+
+
+
+   .. py:method:: _ensure_resources()
+
+      
+      Return ensure resources.
+
+      .. rubric:: Examples
+
+      >>> from vectorstore_faiss.gpu import _ensure_resources
+      >>> _ensure_resources()  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`vectorstore_faiss.gpu`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
    .. py:method:: train(train_vectors, *, seed = 42)
 
-      Train the underlying FAISS index when FAISS is available.
+      
+      Return train.
 
+      :param train_vectors: Description for ``train_vectors``.
+      :type train_vectors: FloatArray
+      :param seed: Description for ``seed``.
+      :type seed: int, optional
+
+      .. rubric:: Examples
+
+      >>> from vectorstore_faiss.gpu import train
+      >>> train(..., ...)  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`vectorstore_faiss.gpu`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: add(keys, vectors)
 
-      Add ``vectors`` identified by ``keys`` to the index.
+      
+      Return add.
 
+      :param keys: Description for ``keys``.
+      :type keys: List[str]
+      :param vectors: Description for ``vectors``.
+      :type vectors: FloatArray
+
+      :raises RuntimeError: Raised when validation fails.
+
+      .. rubric:: Examples
+
+      >>> from vectorstore_faiss.gpu import add
+      >>> add(..., ...)  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`vectorstore_faiss.gpu`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: search(query, k)
 
-      Return the top ``k`` results for ``query`` using FAISS or brute force.
+      
+      Return search.
 
+      :param query: Description for ``query``.
+      :type query: FloatArray
+      :param k: Description for ``k``.
+      :type k: int
+
+      :returns: *List[Tuple[str, float]]* -- Description of return value.
+
+      :raises RuntimeError: Raised when validation fails.
+
+      .. rubric:: Examples
+
+      >>> from vectorstore_faiss.gpu import search
+      >>> result = search(..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`vectorstore_faiss.gpu`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: save(index_uri, idmap_uri = None)
 
-      Persist the index or numpy fallback arrays to disk.
+      
+      Return save.
 
+      :param index_uri: Description for ``index_uri``.
+      :type index_uri: str
+      :param idmap_uri: Description for ``idmap_uri``.
+      :type idmap_uri: str | None, optional
+
+      :raises RuntimeError: Raised when validation fails.
+
+      .. rubric:: Examples
+
+      >>> from vectorstore_faiss.gpu import save
+      >>> save(..., ...)  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`vectorstore_faiss.gpu`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: load(index_uri, idmap_uri = None)
 
-      Load an index from disk, supporting numpy fallbacks.
+      
+      Return load.
 
+      :param index_uri: Description for ``index_uri``.
+      :type index_uri: str
+      :param idmap_uri: Description for ``idmap_uri``.
+      :type idmap_uri: str | None, optional
+
+      :raises RuntimeError: Raised when validation fails.
+
+      .. rubric:: Examples
+
+      >>> from vectorstore_faiss.gpu import load
+      >>> load(..., ...)  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`vectorstore_faiss.gpu`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 

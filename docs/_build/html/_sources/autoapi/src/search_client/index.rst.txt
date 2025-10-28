@@ -5,11 +5,31 @@ src.search_client
 
 .. autoapi-nested-parse::
 
-   Module for search_client.
+   
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`search_client`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 Submodules

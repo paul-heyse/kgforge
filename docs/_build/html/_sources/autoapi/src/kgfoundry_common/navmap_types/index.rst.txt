@@ -5,13 +5,16 @@ src.kgfoundry_common.navmap_types
 
 .. autoapi-nested-parse::
 
-   Module for kgfoundry_common.navmap_types.
+   Provide utilities for module.
 
-   NavMap:
-   - NavSection: Section of a module navmap.
-   - SymbolMeta: Optional metadata describing a documented symbol.
-   - NavMap: Structure describing a module navmap.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`kgfoundry_common.navmap_types`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -24,8 +27,26 @@ Module Contents
    Bases: :py:obj:`TypedDict`
 
 
-   Section of a module navmap.
+   
+   Represent NavSection.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: id
       :type:  str
@@ -44,8 +65,26 @@ Module Contents
    Bases: :py:obj:`TypedDict`
 
 
-   Optional metadata describing a documented symbol.
+   
+   Represent SymbolMeta.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: since
       :type:  str
@@ -96,8 +135,26 @@ Module Contents
    Bases: :py:obj:`TypedDict`
 
 
-   Structure describing a module navmap.
+   
+   Represent NavMap.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: title
       :type:  str

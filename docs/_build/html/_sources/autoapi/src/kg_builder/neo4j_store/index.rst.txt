@@ -5,12 +5,18 @@ src.kg_builder.neo4j_store
 
 .. autoapi-nested-parse::
 
-   Module for kg_builder.neo4j_store.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - Neo4jStore: Placeholder interface for a Neo4j-backed store.
+   Auto-generated API documentation for the ``src.kg_builder.neo4j_store`` module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.kg_builder.neo4j_store`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -20,6 +26,24 @@ Module Contents
 
 .. py:class:: Neo4jStore
 
-   Placeholder interface for a Neo4j-backed store.
+   
+   Represent Neo4jStore.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

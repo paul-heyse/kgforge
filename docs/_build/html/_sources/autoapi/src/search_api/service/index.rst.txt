@@ -5,14 +5,16 @@ src.search_api.service
 
 .. autoapi-nested-parse::
 
-   Module for search_api.service.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - rrf_fuse: Fuse dense and sparse rankings via reciprocal rank fusion.
-   - apply_kg_boosts: Apply knowledge-graph based boosts to fused search results.
-   - mmr_deduplicate: De-duplicate search results using maximal marginal….
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`search_api.service`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -22,16 +24,129 @@ Module Contents
 
 .. py:function:: rrf_fuse(dense, sparse, k = 60)
 
-   Fuse dense and sparse rankings via reciprocal rank fusion.
+   
+   Return rrf fuse.
 
+   :param dense: Description for ``dense``.
+   :type dense: List[Tuple[str, float]]
+   :param sparse: Description for ``sparse``.
+   :type sparse: List[Tuple[str, float]]
+   :param k: Description for ``k``.
+   :type k: int, optional
+
+   :returns: *List[Tuple[str, float]]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.service import rrf_fuse
+   >>> result = rrf_fuse(..., ..., ...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`search_api.service`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: apply_kg_boosts(fused, query)
 
-   Apply knowledge-graph based boosts to fused search results.
+   
+   Return apply kg boosts.
 
+   :param fused: Description for ``fused``.
+   :type fused: List[Tuple[str, float]]
+   :param query: Description for ``query``.
+   :type query: str
+
+   :returns: *List[Tuple[str, float]]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.service import apply_kg_boosts
+   >>> result = apply_kg_boosts(..., ...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`search_api.service`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: mmr_deduplicate(results, lambda_ = 0.7)
 
-   De-duplicate search results using maximal marginal relevance heuristics.
+   
+   Return mmr deduplicate.
 
+   :param results: Description for ``results``.
+   :type results: List[Tuple[str, float]]
+   :param lambda_: Description for ``lambda_``.
+   :type lambda_: float, optional
+
+   :returns: *List[Tuple[str, float]]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.service import mmr_deduplicate
+   >>> result = mmr_deduplicate(..., ...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`search_api.service`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

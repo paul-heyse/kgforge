@@ -5,12 +5,16 @@ src.ontology.loader
 
 .. autoapi-nested-parse::
 
-   Module for ontology.loader.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - OntologyLoader: Placeholder loader for ontology metadata.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`ontology.loader`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -20,6 +24,24 @@ Module Contents
 
 .. py:class:: OntologyLoader
 
-   Placeholder loader for ontology metadata.
+   
+   Represent OntologyLoader.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

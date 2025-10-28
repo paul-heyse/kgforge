@@ -5,12 +5,16 @@ src.ontology.catalog
 
 .. autoapi-nested-parse::
 
-   Module for ontology.catalog.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - OntologyCatalog: In-memory view of ontology concepts and relationships.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`ontology.catalog`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -20,21 +24,139 @@ Module Contents
 
 .. py:class:: OntologyCatalog(concepts)
 
-   In-memory view of ontology concepts and relationships.
+   
+   Represent OntologyCatalog.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: neighbors()
+
+      Method description.
+
+   .. method:: hydrate()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from ontology.catalog import OntologyCatalog
+   >>> result = OntologyCatalog()
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`ontology.catalog`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: by_id
 
 
    .. py:method:: neighbors(concept_id, depth = 1)
 
-      Return neighbour concept identifiers up to ``depth`` hops.
+      
+      Return neighbors.
 
+      :param concept_id: Description for ``concept_id``.
+      :type concept_id: str
+      :param depth: Description for ``depth``.
+      :type depth: int, optional
+
+      :returns: *Set[str]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from ontology.catalog import neighbors
+      >>> result = neighbors(..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`ontology.catalog`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: hydrate(concept_id)
 
-      Load the full concept record for ``concept_id``.
+      
+      Return hydrate.
 
+      :param concept_id: Description for ``concept_id``.
+      :type concept_id: str
+
+      :returns: *Mapping[str, Any]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from ontology.catalog import hydrate
+      >>> result = hydrate(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`ontology.catalog`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 

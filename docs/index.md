@@ -20,4 +20,17 @@ explanations/index
 :caption: Reference
 autoapi/index
 architecture/index
+reference/test-matrix
+reference/observability/metrics
+reference/observability/logs
+reference/observability/traces
+reference/observability/config
+reference/schemas/index
+reference/graphs/index
+```
+
+```{toctree}
+:maxdepth: 1
+:caption: Gallery
+gallery/index
 ```

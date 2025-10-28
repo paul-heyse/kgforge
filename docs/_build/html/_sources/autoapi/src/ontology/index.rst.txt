@@ -5,8 +5,31 @@ src.ontology
 
 .. autoapi-nested-parse::
 
-   Module for ontology.
+   
+   Provide utilities for module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`ontology`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 Submodules

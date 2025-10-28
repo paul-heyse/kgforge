@@ -31,6 +31,10 @@
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
   <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -164,6 +168,72 @@ window.addEventListener("load", () => mermaid.run());
   </a>
 </li>
 
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/test-matrix.html">
+    Test Matrix (symbol → tests)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/observability/metrics.html">
+    Metrics (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/observability/logs.html">
+    Log events (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/observability/traces.html">
+    Traces (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/observability/config.html">
+    Configuration surfaces (Pydantic Settings & env usage)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/schemas/index.html">
+    Data Contract Schemas
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/graphs/index.html">
+    Package Graphs
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../gallery/index.html">
+    Welcome to the kgfoundry examples gallery
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -269,6 +339,62 @@ window.addEventListener("load", () => mermaid.run());
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/test-matrix.html">
+    Test Matrix (symbol → tests)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/observability/metrics.html">
+    Metrics (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/observability/logs.html">
+    Log events (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/observability/traces.html">
+    Traces (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/observability/config.html">
+    Configuration surfaces (Pydantic Settings & env usage)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/schemas/index.html">
+    Data Contract Schemas
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/graphs/index.html">
+    Package Graphs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../gallery/index.html">
+    Welcome to the kgfoundry examples gallery
+  </a>
+</li>
+
   </ul>
 </nav></div>
           
@@ -347,45 +473,80 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for src.search_api.fusion</h1><div class="highlight"><pre>
-<span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Module for search_api.fusion.</span>
+<span></span><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Provide utilities for module.</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="sd">NavMap:</span>
-<span class="linenos"> 4</span><span class="sd">- NavMap: Structure describing a module navmap.</span>
-<span class="linenos"> 5</span><span class="sd">- rrf_fuse: Fuse ranked lists using reciprocal rank fusion (RRF).</span>
-<span class="linenos"> 6</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-<span class="linenos"> 9</span>
-<span class="linenos">10</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span>
+<span class="linenos"> 3</span><span class="sd">Notes</span>
+<span class="linenos"> 4</span><span class="sd">-----</span>
+<span class="linenos"> 5</span><span class="sd">This module exposes the primary interfaces for the package.</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="sd">See Also</span>
+<span class="linenos"> 8</span><span class="sd">--------</span>
+<span class="linenos"> 9</span><span class="sd">search_api.fusion</span>
+<span class="linenos">10</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="linenos">11</span>
-<span class="linenos">12</span><span class="kn">from</span><span class="w"> </span><span class="nn">kgfoundry_common.navmap_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NavMap</span>
-<span class="linenos">13</span>
-<span class="linenos">14</span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rrf_fuse&quot;</span><span class="p">]</span>
-<span class="linenos">15</span>
-<span class="linenos">16</span><span class="n">__navmap__</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">NavMap</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-<span class="linenos">17</span>    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;search_api.fusion&quot;</span><span class="p">,</span>
-<span class="linenos">18</span>    <span class="s2">&quot;synopsis&quot;</span><span class="p">:</span> <span class="s2">&quot;Reciprocal rank fusion helpers used by the search API&quot;</span><span class="p">,</span>
-<span class="linenos">19</span>    <span class="s2">&quot;exports&quot;</span><span class="p">:</span> <span class="n">__all__</span><span class="p">,</span>
-<span class="linenos">20</span>    <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[</span>
-<span class="linenos">21</span>        <span class="p">{</span>
-<span class="linenos">22</span>            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;public-api&quot;</span><span class="p">,</span>
-<span class="linenos">23</span>            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Public API&quot;</span><span class="p">,</span>
-<span class="linenos">24</span>            <span class="s2">&quot;symbols&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;rrf_fuse&quot;</span><span class="p">],</span>
-<span class="linenos">25</span>        <span class="p">},</span>
-<span class="linenos">26</span>    <span class="p">],</span>
-<span class="linenos">27</span><span class="p">}</span>
-<span class="linenos">28</span>
-<span class="linenos">29</span>
-<span class="linenos">30</span><span class="c1"># [nav:anchor rrf_fuse]</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Final</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="kn">from</span><span class="w"> </span><span class="nn">kgfoundry_common.navmap_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NavMap</span>
+<span class="linenos">18</span>
+<span class="linenos">19</span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rrf_fuse&quot;</span><span class="p">]</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span><span class="n">__navmap__</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">NavMap</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+<span class="linenos">22</span>    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;search_api.fusion&quot;</span><span class="p">,</span>
+<span class="linenos">23</span>    <span class="s2">&quot;synopsis&quot;</span><span class="p">:</span> <span class="s2">&quot;Reciprocal rank fusion helpers used by the search API&quot;</span><span class="p">,</span>
+<span class="linenos">24</span>    <span class="s2">&quot;exports&quot;</span><span class="p">:</span> <span class="n">__all__</span><span class="p">,</span>
+<span class="linenos">25</span>    <span class="s2">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[</span>
+<span class="linenos">26</span>        <span class="p">{</span>
+<span class="linenos">27</span>            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;public-api&quot;</span><span class="p">,</span>
+<span class="linenos">28</span>            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Public API&quot;</span><span class="p">,</span>
+<span class="linenos">29</span>            <span class="s2">&quot;symbols&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;rrf_fuse&quot;</span><span class="p">],</span>
+<span class="linenos">30</span>        <span class="p">},</span>
+<span class="linenos">31</span>    <span class="p">],</span>
+<span class="linenos">32</span><span class="p">}</span>
+<span class="linenos">33</span>
+<span class="linenos">34</span>
+<span class="linenos">35</span><span class="c1"># [nav:anchor rrf_fuse]</span>
 <div class="viewcode-block" id="rrf_fuse">
 <a class="viewcode-back" href="../../../autoapi/src/search_api/fusion/index.html#src.search_api.fusion.rrf_fuse">[docs]</a>
-<span class="linenos">31</span><span class="k">def</span><span class="w"> </span><span class="nf">rrf_fuse</span><span class="p">(</span><span class="n">rankers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="linenos">32</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fuse ranked lists using reciprocal rank fusion (RRF).&quot;&quot;&quot;</span>
-<span class="linenos">33</span>    <span class="n">agg</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="linenos">34</span>    <span class="k">for</span> <span class="n">ranked</span> <span class="ow">in</span> <span class="n">rankers</span><span class="p">:</span>
-<span class="linenos">35</span>        <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">_score</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ranked</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="linenos">36</span>            <span class="n">agg</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span>
-<span class="linenos">37</span>    <span class="k">return</span> <span class="n">agg</span></div>
+<span class="linenos">36</span><span class="k">def</span><span class="w"> </span><span class="nf">rrf_fuse</span><span class="p">(</span><span class="n">rankers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="linenos">37</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return rrf fuse.</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span><span class="sd">    Parameters</span>
+<span class="linenos">40</span><span class="sd">    ----------</span>
+<span class="linenos">41</span><span class="sd">    rankers : List[List[Tuple[str, float]]]</span>
+<span class="linenos">42</span><span class="sd">        Description for ``rankers``.</span>
+<span class="linenos">43</span><span class="sd">    k : int, optional</span>
+<span class="linenos">44</span><span class="sd">        Description for ``k``.</span>
+<span class="linenos">45</span><span class="sd">    </span>
+<span class="linenos">46</span><span class="sd">    Returns</span>
+<span class="linenos">47</span><span class="sd">    -------</span>
+<span class="linenos">48</span><span class="sd">    Mapping[str, float]</span>
+<span class="linenos">49</span><span class="sd">        Description of return value.</span>
+<span class="linenos">50</span><span class="sd">    </span>
+<span class="linenos">51</span><span class="sd">    Examples</span>
+<span class="linenos">52</span><span class="sd">    --------</span>
+<span class="linenos">53</span><span class="sd">    &gt;&gt;&gt; from search_api.fusion import rrf_fuse</span>
+<span class="linenos">54</span><span class="sd">    &gt;&gt;&gt; result = rrf_fuse(..., ...)</span>
+<span class="linenos">55</span><span class="sd">    &gt;&gt;&gt; result  # doctest: +ELLIPSIS</span>
+<span class="linenos">56</span><span class="sd">    ...</span>
+<span class="linenos">57</span><span class="sd">    </span>
+<span class="linenos">58</span><span class="sd">    See Also</span>
+<span class="linenos">59</span><span class="sd">    --------</span>
+<span class="linenos">60</span><span class="sd">    search_api.fusion</span>
+<span class="linenos">61</span><span class="sd">    </span>
+<span class="linenos">62</span><span class="sd">    Notes</span>
+<span class="linenos">63</span><span class="sd">    -----</span>
+<span class="linenos">64</span><span class="sd">    Provide usage considerations, constraints, or complexity notes.</span>
+<span class="linenos">65</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">66</span>    
+<span class="linenos">67</span>    
+<span class="linenos">68</span>    <span class="n">agg</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="linenos">69</span>    <span class="k">for</span> <span class="n">ranked</span> <span class="ow">in</span> <span class="n">rankers</span><span class="p">:</span>
+<span class="linenos">70</span>        <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">_score</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ranked</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="linenos">71</span>            <span class="n">agg</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span>
+<span class="linenos">72</span>    <span class="k">return</span> <span class="n">agg</span></div>
 
 </pre></div>
 

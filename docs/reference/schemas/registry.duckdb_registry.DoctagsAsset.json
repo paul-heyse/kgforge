@@ -1,0 +1,46 @@
+{
+  "description": "Represent DoctagsAsset.\n\nAttributes\n----------\ndoc_id : Id\n    Attribute description.\ndoctags_uri : str\n    Attribute description.\npages : int\n    Attribute description.\nvlm_model : str\n    Attribute description.\nvlm_revision : str\n    Attribute description.\navg_logprob : float | None\n    Attribute description.\n\nExamples\n--------\n>>> from kgfoundry_common.models import DoctagsAsset\n>>> result = DoctagsAsset()\n>>> result  # doctest: +ELLIPSIS\n...\n\nSee Also\n--------\nkgfoundry_common.models\n\nNotes\n-----\nDocument class invariants and lifecycle details here.",
+  "properties": {
+    "doc_id": {
+      "title": "Doc Id",
+      "type": "string"
+    },
+    "doctags_uri": {
+      "title": "Doctags Uri",
+      "type": "string"
+    },
+    "pages": {
+      "title": "Pages",
+      "type": "integer"
+    },
+    "vlm_model": {
+      "title": "Vlm Model",
+      "type": "string"
+    },
+    "vlm_revision": {
+      "title": "Vlm Revision",
+      "type": "string"
+    },
+    "avg_logprob": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Avg Logprob"
+    }
+  },
+  "required": [
+    "doc_id",
+    "doctags_uri",
+    "pages",
+    "vlm_model",
+    "vlm_revision"
+  ],
+  "title": "DoctagsAsset",
+  "type": "object"
+}

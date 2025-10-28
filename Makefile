@@ -1,5 +1,5 @@
 
-.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings readmes html json symbols watch navmap-build navmap-check
+.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json
 
 VENV := .venv
 PY := $(VENV)/bin/python
@@ -82,3 +82,24 @@ navmap-check:
 
 watch:
 	PYTHONPATH=src $(PY) -m sphinx_autobuild --port $(WATCH_PORT) docs docs/_build/html
+
+doctest:
+	$(PYTEST) -q --xdoctest --xdoctest-options=ELLIPSIS,IGNORE_WHITESPACE,NORMALIZE_WHITESPACE --xdoctest-modules --xdoctest-glob='examples/*.py' examples
+
+test-map:
+	$(PY) tools/docs/build_test_map.py
+
+obs-catalog:
+	$(PY) tools/docs/scan_observability.py
+
+schemas:
+	$(PY) tools/docs/export_schemas.py
+
+graphs:
+	$(PY) tools/docs/build_graphs.py
+
+docs-html:
+	$(MAKE) html
+
+docs-json:
+	$(MAKE) json

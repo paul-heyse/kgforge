@@ -5,12 +5,18 @@ src.kg_builder.mock_kg
 
 .. autoapi-nested-parse::
 
-   Module for kg_builder.mock_kg.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - MockKG: A tiny in-memory KG for demo.
+   Auto-generated API documentation for the ``src.kg_builder.mock_kg`` module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.kg_builder.mock_kg`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -20,10 +26,61 @@ Module Contents
 
 .. py:class:: MockKG
 
-   A tiny in-memory KG for demo.
+   
+   Represent MockKG.
 
-   Maps chunk_id -> set(concept_id) and concept adjacency.
+   .. attribute:: None
 
+      No public attributes documented.
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: add_mention()
+
+      Method description.
+
+   .. method:: add_edge()
+
+      Method description.
+
+   .. method:: linked_concepts()
+
+      Method description.
+
+   .. method:: one_hop()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from kg_builder.mock_kg import MockKG
+   >>> result = MockKG()
+   >>> result  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`kg_builder.mock_kg`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: chunk2concepts
       :type:  dict[str, set[str]]
@@ -35,25 +92,159 @@ Module Contents
 
    .. py:method:: add_mention(chunk_id, concept_id)
 
-      Link a chunk identifier to the provided concept identifier.
+      
+      Return add mention.
 
+      :param chunk_id: Description for ``chunk_id``.
+      :type chunk_id: str
+      :param concept_id: Description for ``concept_id``.
+      :type concept_id: str
+
+      .. rubric:: Examples
+
+      >>> from kg_builder.mock_kg import add_mention
+      >>> add_mention(..., ...)  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`kg_builder.mock_kg`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: add_edge(a, b)
 
-      Connect two concept identifiers in both directions.
+      
+      Return add edge.
 
+      :param a: Description for ``a``.
+      :type a: str
+      :param b: Description for ``b``.
+      :type b: str
+
+      .. rubric:: Examples
+
+      >>> from kg_builder.mock_kg import add_edge
+      >>> add_edge(..., ...)  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`kg_builder.mock_kg`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: linked_concepts(chunk_id)
 
-      Return concepts associated with ``chunk_id`` in sorted order.
+      
+      Return linked concepts.
 
+      :param chunk_id: Description for ``chunk_id``.
+      :type chunk_id: str
+
+      :returns: *List[str]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from kg_builder.mock_kg import linked_concepts
+      >>> result = linked_concepts(...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`kg_builder.mock_kg`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: one_hop(concept_id)
 
-      Return sorted concept identifiers directly connected to ``concept_id``.
+      
+      Return one hop.
 
+      :param concept_id: Description for ``concept_id``.
+      :type concept_id: str
+
+      :returns: *List[str]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from kg_builder.mock_kg import one_hop
+      >>> result = one_hop(...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`kg_builder.mock_kg`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 

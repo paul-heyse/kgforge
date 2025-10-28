@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -39,53 +38,16 @@ Id = str
 
 # [nav:anchor Doc]
 class Doc(BaseModel):
-    """
-    Represent Doc.
+    """Represent Doc."""
     
-    Attributes
-    ----------
-    id : Id
-        Attribute description.
-    openalex_id : str | None
-        Attribute description.
-    doi : str | None
-        Attribute description.
-    arxiv_id : str | None
-        Attribute description.
-    pmcid : str | None
-        Attribute description.
-    title : str
-        Attribute description.
-    authors : List[str]
-        Attribute description.
-    pub_date : str | None
-        Attribute description.
-    license : str | None
-        Attribute description.
-    language : str | None
-        Attribute description.
-    pdf_uri : str
-        Attribute description.
-    source : str
-        Attribute description.
-    content_hash : str | None
-        Attribute description.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.models import Doc
-    >>> result = Doc()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.models
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -108,39 +70,16 @@ class Doc(BaseModel):
 
 # [nav:anchor DoctagsAsset]
 class DoctagsAsset(BaseModel):
-    """
-    Represent DoctagsAsset.
+    """Represent DoctagsAsset."""
     
-    Attributes
-    ----------
-    doc_id : Id
-        Attribute description.
-    doctags_uri : str
-        Attribute description.
-    pages : int
-        Attribute description.
-    vlm_model : str
-        Attribute description.
-    vlm_revision : str
-        Attribute description.
-    avg_logprob : float | None
-        Attribute description.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.models import DoctagsAsset
-    >>> result = DoctagsAsset()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.models
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -156,41 +95,16 @@ class DoctagsAsset(BaseModel):
 
 # [nav:anchor Chunk]
 class Chunk(BaseModel):
-    """
-    Represent Chunk.
+    """Represent Chunk."""
     
-    Attributes
-    ----------
-    id : Id
-        Attribute description.
-    doc_id : Id
-        Attribute description.
-    section : str | None
-        Attribute description.
-    start_char : int
-        Attribute description.
-    end_char : int
-        Attribute description.
-    tokens : int
-        Attribute description.
-    doctags_span : Mapping[str, int]
-        Attribute description.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.models import Chunk
-    >>> result = Chunk()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.models
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -207,43 +121,16 @@ class Chunk(BaseModel):
 
 # [nav:anchor LinkAssertion]
 class LinkAssertion(BaseModel):
-    """
-    Represent LinkAssertion.
+    """Represent LinkAssertion."""
     
-    Attributes
-    ----------
-    id : Id
-        Attribute description.
-    chunk_id : Id
-        Attribute description.
-    concept_id : Id
-        Attribute description.
-    score : float
-        Attribute description.
-    decision : Literal['link', 'reject', 'uncertain']
-        Attribute description.
-    evidence_span : str | None
-        Attribute description.
-    features : Mapping[str, float]
-        Attribute description.
-    run_id : str
-        Attribute description.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.models import LinkAssertion
-    >>> result = LinkAssertion()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.models
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     

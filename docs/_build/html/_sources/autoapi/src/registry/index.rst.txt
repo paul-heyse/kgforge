@@ -5,8 +5,31 @@ src.registry
 
 .. autoapi-nested-parse::
 
-   Module for registry.
+   
+   Provide utilities for module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`registry`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 Submodules

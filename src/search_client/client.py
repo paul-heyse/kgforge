@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -36,9 +35,8 @@ __navmap__: Final[NavMap] = {
 
 
 class _SupportsResponse(Protocol):
-    """
-    Represent SupportsResponse.
-    
+    """Represent SupportsResponse.
+
     Attributes
     ----------
     None
@@ -70,9 +68,8 @@ class _SupportsResponse(Protocol):
     
 
     def raise_for_status(self) -> None:
-        """
-        Return raise for status.
-        
+        """Return raise for status.
+
         Examples
         --------
         >>> from search_client.client import raise_for_status
@@ -89,9 +86,8 @@ class _SupportsResponse(Protocol):
         
 
     def json(self) -> dict[str, Any]:
-        """
-        Return json.
-        
+        """Return json.
+
         Returns
         -------
         Mapping[str, Any]
@@ -117,9 +113,8 @@ class _SupportsResponse(Protocol):
 
 
 class _SupportsHttp(Protocol):
-    """
-    Represent SupportsHttp.
-    
+    """Represent SupportsHttp.
+
     Attributes
     ----------
     None
@@ -151,9 +146,8 @@ class _SupportsHttp(Protocol):
     
 
     def get(self, url: str, *, timeout: float) -> _SupportsResponse:
-        """
-        Return get.
-        
+        """Return get.
+
         Parameters
         ----------
         url : str
@@ -191,9 +185,8 @@ class _SupportsHttp(Protocol):
         headers: dict[str, str],
         timeout: float,
     ) -> _SupportsResponse:
-        """
-        Return post.
-        
+        """Return post.
+
         Parameters
         ----------
         url : str
@@ -231,9 +224,8 @@ class _SupportsHttp(Protocol):
 
 # [nav:anchor KGFoundryClient]
 class KGFoundryClient:
-    """
-    Represent KGFoundryClient.
-    
+    """Represent KGFoundryClient.
+
     Attributes
     ----------
     None
@@ -277,9 +269,8 @@ class KGFoundryClient:
         timeout: float = 30.0,
         http: _SupportsHttp | None = None,
     ) -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         base_url : str, optional
@@ -311,9 +302,8 @@ class KGFoundryClient:
         self._http: _SupportsHttp = http or requests
 
     def _headers(self) -> dict[str, str]:
-        """
-        Return headers.
-        
+        """Return headers.
+
         Returns
         -------
         Mapping[str, str]
@@ -342,9 +332,8 @@ class KGFoundryClient:
         return h
 
     def healthz(self) -> dict[str, Any]:
-        """
-        Return healthz.
-        
+        """Return healthz.
+
         Returns
         -------
         Mapping[str, Any]
@@ -378,9 +367,8 @@ class KGFoundryClient:
         filters: dict[str, Any] | None = None,
         explain: bool = False,
     ) -> dict[str, Any]:
-        """
-        Return search.
-        
+        """Return search.
+
         Parameters
         ----------
         query : str
@@ -422,9 +410,8 @@ class KGFoundryClient:
         return r.json()
 
     def concepts(self, q: str, limit: int = 50) -> dict[str, Any]:
-        """
-        Return concepts.
-        
+        """Return concepts.
+
         Parameters
         ----------
         q : str

@@ -5,13 +5,16 @@ src.search_api.schemas
 
 .. autoapi-nested-parse::
 
-   Module for search_api.schemas.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - SearchRequest: Searchrequest.
-   - SearchResult: Searchresult.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`search_api.schemas`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -24,8 +27,26 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   Searchrequest.
+   
+   Represent SearchRequest.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: query
       :type:  str
@@ -56,8 +77,26 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   Searchresult.
+   
+   Represent SearchResult.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: doc_id
       :type:  str

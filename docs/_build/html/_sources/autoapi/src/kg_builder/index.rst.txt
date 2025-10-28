@@ -5,8 +5,33 @@ src.kg_builder
 
 .. autoapi-nested-parse::
 
-   Module for kg_builder.
+   
+   Provide utilities for module.
 
+   Auto-generated API documentation for the ``src.kg_builder`` module.
+
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.kg_builder`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 Submodules

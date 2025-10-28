@@ -1,0 +1,38 @@
+{
+  "description": "Represent SearchRequest.\n\nAttributes\n----------\nquery : str\n    Attribute description.\nk : int\n    Attribute description.\nfilters : Mapping[str, object] | None\n    Attribute description.\nexplain : bool\n    Attribute description.\n\nExamples\n--------\n>>> from search_api.schemas import SearchRequest\n>>> result = SearchRequest()\n>>> result  # doctest: +ELLIPSIS\n...\n\nSee Also\n--------\nsearch_api.schemas\n\nNotes\n-----\nDocument class invariants and lifecycle details here.",
+  "properties": {
+    "query": {
+      "minLength": 1,
+      "title": "Query",
+      "type": "string"
+    },
+    "k": {
+      "default": 10,
+      "title": "K",
+      "type": "integer"
+    },
+    "filters": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Filters"
+    },
+    "explain": {
+      "default": false,
+      "title": "Explain",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "query"
+  ],
+  "title": "SearchRequest",
+  "type": "object"
+}

@@ -5,4 +5,6 @@ Practical recipes for common workflows will live here. Add a page per topic and 
 ```{toctree}
 :maxdepth: 1
 :hidden:
+
+contributing
 ```

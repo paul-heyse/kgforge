@@ -52,6 +52,30 @@ repos:
         entry: python tools/navmap/build_navmap.py
         language: system
         pass_filenames: false
+      - id: docs-doctest
+        name: doctest (xdoctest via pytest)
+        entry: bash -lc 'pytest -q --xdoctest --xdoctest-options=ELLIPSIS,IGNORE_WHITESPACE,NORMALIZE_WHITESPACE --xdoctest-modules --xdoctest-glob="examples/*.py" examples'
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: docs-build-test-map
+        name: docs: build test map
+        entry: python tools/docs/build_test_map.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: docs-observability-scan
+        name: docs: observability scan
+        entry: python tools/docs/scan_observability.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: docs-export-schemas
+        name: docs: export schemas
+        entry: python tools/docs/export_schemas.py
+        language: system
+        pass_filenames: false
+        always_run: true
 
   - repo: https://github.com/PyCQA/pydocstyle
     rev: 6.3.0

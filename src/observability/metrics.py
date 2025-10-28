@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -36,9 +35,8 @@ try:
 except Exception:  # pragma: no cover - minimal no-op fallbacks
 
     class _NoopMetric:
-        """
-        Represent NoopMetric.
-        
+        """Represent NoopMetric.
+
         Attributes
         ----------
         None
@@ -74,9 +72,8 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
         
 
         def labels(self, *args: object, **kwargs: object) -> _NoopMetric:
-            """
-            Return labels.
-            
+            """Return labels.
+
             Parameters
             ----------
             *args : Any, optional
@@ -108,9 +105,8 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
-            """
-            Return observe.
-            
+            """Return observe.
+
             Parameters
             ----------
             *args : Any, optional
@@ -135,9 +131,8 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             return
 
         def inc(self, *args: object, **kwargs: object) -> None:
-            """
-            Return inc.
-            
+            """Return inc.
+
             Parameters
             ----------
             *args : Any, optional
@@ -162,9 +157,8 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
-            """
-            Return set.
-            
+            """Return set.
+
             Parameters
             ----------
             *args : Any, optional
@@ -189,9 +183,8 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             return
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:
-        """
-        Return make noop metric.
-        
+        """Return make noop metric.
+
         Parameters
         ----------
         *args : Any, optional

@@ -5,12 +5,18 @@ src.download.cli
 
 .. autoapi-nested-parse::
 
-   Module for download.cli.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - harvest: Harvest OA metadata and download PDFs (skeleton).
+   Auto-generated API documentation for the ``src.download.cli`` module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.download.cli`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -20,6 +26,41 @@ Module Contents
 
 .. py:function:: harvest(topic, years = '>=2018', max_works = 20000)
 
-   Harvest OA metadata and download PDFs (skeleton).
+   
+   Return harvest.
 
+   :param topic: Description for ``topic``.
+   :type topic: str
+   :param years: Description for ``years``.
+   :type years: str, optional
+   :param max_works: Description for ``max_works``.
+   :type max_works: int, optional
+
+   .. rubric:: Examples
+
+   >>> from download.cli import harvest
+   >>> harvest(..., ..., ...)  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`download.cli`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

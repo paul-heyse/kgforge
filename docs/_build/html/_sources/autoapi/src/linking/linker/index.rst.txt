@@ -5,12 +5,16 @@ src.linking.linker
 
 .. autoapi-nested-parse::
 
-   Module for linking.linker.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - Linker: Abstract linker contract implemented by production pipelines.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`linking.linker`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -20,6 +24,24 @@ Module Contents
 
 .. py:class:: Linker
 
-   Abstract linker contract implemented by production pipelines.
+   
+   Represent Linker.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

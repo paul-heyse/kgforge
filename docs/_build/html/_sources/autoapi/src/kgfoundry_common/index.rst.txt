@@ -5,8 +5,31 @@ src.kgfoundry_common
 
 .. autoapi-nested-parse::
 
-   Module for kgfoundry_common.
+   
+   Provide utilities for module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`kgfoundry_common`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 
 Submodules

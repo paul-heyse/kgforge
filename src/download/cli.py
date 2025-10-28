@@ -1,5 +1,6 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
+
+Auto-generated API documentation for the ``src.download.cli`` module.
 
 Notes
 -----
@@ -7,7 +8,7 @@ This module exposes the primary interfaces for the package.
 
 See Also
 --------
-download.cli
+src.download.cli
 """
 
 
@@ -40,9 +41,8 @@ app = typer.Typer(help="Downloader & harvester CLI (skeleton).")
 # [nav:anchor harvest]
 @app.command()
 def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
-    """
-    Return harvest.
-    
+    """Return harvest.
+
     Parameters
     ----------
     topic : str
@@ -51,21 +51,20 @@ def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
         Description for ``years``.
     max_works : int, optional
         Description for ``max_works``.
-    
+
     Examples
     --------
     >>> from download.cli import harvest
     >>> harvest(..., ..., ...)  # doctest: +ELLIPSIS
-    
+
     See Also
     --------
     download.cli
-    
+
     Notes
     -----
     Provide usage considerations, constraints, or complexity notes.
     """
-    
     typer.echo(f"[dry-run] would harvest topic={topic!r}, years={years}, max_works={max_works}")
 
 

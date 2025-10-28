@@ -5,22 +5,16 @@ src.kgfoundry_common.errors
 
 .. autoapi-nested-parse::
 
-   Module for kgfoundry_common.errors.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - DownloadError: Raised when an external download fails.
-   - UnsupportedMIMEError: Raised when an unsupported MIME type is encountered.
-   - DoclingError: Base Docling processing error.
-   - OCRTimeoutError: Raised when OCR operations exceed time limits.
-   - ChunkingError: Raised when chunk generation fails.
-   - EmbeddingError: Raised when embedding generation fails.
-   - SpladeOOMError: Raised when SPLADE runs out of memory.
-   - IndexBuildError: Raised when index construction fails.
-   - OntologyParseError: Raised when ontology parsing fails.
-   - LinkerCalibrationError: Raised when linker calibration cannot be performed.
-   - Neo4jError: Raised when Neo4j operations fail.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`kgfoundry_common.errors`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -33,86 +27,284 @@ Module Contents
    Bases: :py:obj:`Exception`
 
 
-   Raised when an external download fails.
+   
+   Represent DownloadError.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:exception:: UnsupportedMIMEError
 
    Bases: :py:obj:`Exception`
 
 
-   Raised when an unsupported MIME type is encountered.
+   
+   Represent UnsupportedMIMEError.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:exception:: DoclingError
 
    Bases: :py:obj:`Exception`
 
 
-   Base Docling processing error.
+   
+   Represent DoclingError.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:exception:: OCRTimeoutError
 
    Bases: :py:obj:`Exception`
 
 
-   Raised when OCR operations exceed time limits.
+   
+   Represent OCRTimeoutError.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:exception:: ChunkingError
 
    Bases: :py:obj:`Exception`
 
 
-   Raised when chunk generation fails.
+   
+   Represent ChunkingError.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:exception:: EmbeddingError
 
    Bases: :py:obj:`Exception`
 
 
-   Raised when embedding generation fails.
+   
+   Represent EmbeddingError.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:exception:: SpladeOOMError
 
    Bases: :py:obj:`Exception`
 
 
-   Raised when SPLADE runs out of memory.
+   
+   Represent SpladeOOMError.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:exception:: IndexBuildError
 
    Bases: :py:obj:`Exception`
 
 
-   Raised when index construction fails.
+   
+   Represent IndexBuildError.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:exception:: OntologyParseError
 
    Bases: :py:obj:`Exception`
 
 
-   Raised when ontology parsing fails.
+   
+   Represent OntologyParseError.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:exception:: LinkerCalibrationError
 
    Bases: :py:obj:`Exception`
 
 
-   Raised when linker calibration cannot be performed.
+   
+   Represent LinkerCalibrationError.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:exception:: Neo4jError
 
    Bases: :py:obj:`Exception`
 
 
-   Raised when Neo4j operations fail.
+   
+   Represent Neo4jError.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

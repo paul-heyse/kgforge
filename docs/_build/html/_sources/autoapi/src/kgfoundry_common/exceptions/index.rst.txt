@@ -5,13 +5,16 @@ src.kgfoundry_common.exceptions
 
 .. autoapi-nested-parse::
 
-   Module for kgfoundry_common.exceptions.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - DownloadError: Raised when an external download fails.
-   - UnsupportedMIMEError: Raised when a MIME type is unsupported.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`kgfoundry_common.exceptions`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -24,14 +27,50 @@ Module Contents
    Bases: :py:obj:`Exception`
 
 
-   Raised when an external download fails.
+   
+   Represent DownloadError.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:exception:: UnsupportedMIMEError
 
    Bases: :py:obj:`Exception`
 
 
-   Raised when a MIME type is unsupported.
+   
+   Represent UnsupportedMIMEError.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

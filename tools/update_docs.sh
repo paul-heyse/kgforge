@@ -13,7 +13,19 @@ if [[ ! -x "$BIN/python" ]]; then
   exit 1
 fi
 
-export PYTHONPATH="${PYTHONPATH:-src}"
+if [[ -z "${PYTHONPATH:-}" ]]; then
+  export PYTHONPATH="$ROOT/src:$ROOT"
+else
+  case ":$PYTHONPATH:" in
+    *":$ROOT/src:"*) ;;
+    *) PYTHONPATH="$PYTHONPATH:$ROOT/src" ;;
+  esac
+  case ":$PYTHONPATH:" in
+    *":$ROOT:"*) ;;
+    *) PYTHONPATH="$PYTHONPATH:$ROOT" ;;
+  esac
+  export PYTHONPATH
+fi
 export SPHINXOPTS="-W"
 PY="$BIN/python"
 
@@ -45,13 +57,18 @@ else
 fi
 
 # Ensure we rebuild from a clean slate.
-rm -rf docs/_build/html docs/_build/json site
+rm -rf docs/_build site
 
 run make docstrings
 run make readmes
 run "$PY" tools/update_navmaps.py
 run "$PY" tools/navmap/build_navmap.py
 run "$PY" tools/navmap/check_navmap.py
+run "$BIN"/pytest -q --xdoctest --xdoctest-options=ELLIPSIS,IGNORE_WHITESPACE,NORMALIZE_WHITESPACE --xdoctest-modules --xdoctest-glob='examples/*.py' examples
+run "$PY" tools/docs/build_test_map.py
+run "$PY" tools/docs/scan_observability.py
+run "$PY" tools/docs/export_schemas.py
+run "$PY" tools/docs/build_graphs.py
 run make html
 run make json
 run make symbols

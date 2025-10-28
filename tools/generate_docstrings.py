@@ -1,5 +1,17 @@
 #!/usr/bin/env python
-"""Generate NumPy-style docstrings across the repository."""
+"""Provide utilities for module.
+
+Auto-generated API documentation for the ``tools.generate_docstrings`` module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+tools.generate_docstrings
+"""
+
 
 from __future__ import annotations
 
@@ -19,12 +31,63 @@ LOG_FILE = LOG_DIR / "fallback.log"
 
 
 def has_python_files(path: Path) -> bool:
-    """Return True when the directory contains any Python sources."""
+    """Return has python files.
+
+    Auto-generated reference for the ``has_python_files`` callable defined in ``tools.generate_docstrings``.
+    
+    Parameters
+    ----------
+    path : Path
+        Description for ``path``.
+    
+    Returns
+    -------
+    bool
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.generate_docstrings import has_python_files
+    >>> result = has_python_files(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    tools.generate_docstrings
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     return any(path.rglob("*.py"))
 
 
 def run_doq(target: Path) -> None:
-    """Execute doq with the NumPy formatter for the supplied target directory."""
+    """Return run doq.
+
+    Auto-generated reference for the ``run_doq`` callable defined in ``tools.generate_docstrings``.
+    
+    Parameters
+    ----------
+    target : Path
+        Description for ``target``.
+    
+    Examples
+    --------
+    >>> from tools.generate_docstrings import run_doq
+    >>> run_doq(...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    tools.generate_docstrings
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     cmd = [
         sys.executable,
         "-m",
@@ -42,7 +105,29 @@ def run_doq(target: Path) -> None:
 
 
 def run_fallback(target: Path) -> None:
-    """Execute the AST-based helper for any remaining docstrings."""
+    """Return run fallback.
+
+    Auto-generated reference for the ``run_fallback`` callable defined in ``tools.generate_docstrings``.
+    
+    Parameters
+    ----------
+    target : Path
+        Description for ``target``.
+    
+    Examples
+    --------
+    >>> from tools.generate_docstrings import run_fallback
+    >>> run_fallback(...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    tools.generate_docstrings
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     cmd = [
         sys.executable,
         "tools/auto_docstrings.py",
@@ -55,7 +140,24 @@ def run_fallback(target: Path) -> None:
 
 
 def main() -> None:
-    """Generate docstrings for each configured directory."""
+    """Return main.
+
+    Auto-generated reference for the ``main`` callable defined in ``tools.generate_docstrings``.
+    
+    Examples
+    --------
+    >>> from tools.generate_docstrings import main
+    >>> main()  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    tools.generate_docstrings
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     if LOG_FILE.exists():
         LOG_FILE.unlink()
     LOG_DIR.mkdir(parents=True, exist_ok=True)

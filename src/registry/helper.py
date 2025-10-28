@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -41,9 +40,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DuckDBRegistryHelper]
 class DuckDBRegistryHelper:
-    """
-    Represent DuckDBRegistryHelper.
-    
+    """Represent DuckDBRegistryHelper.
+
     Attributes
     ----------
     None
@@ -91,9 +89,8 @@ class DuckDBRegistryHelper:
     
 
     def __init__(self, db_path: str) -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         db_path : str
@@ -116,9 +113,8 @@ class DuckDBRegistryHelper:
         self.db_path = db_path
 
     def _con(self) -> duckdb.DuckDBPyConnection:
-        """
-        Return con.
-        
+        """Return con.
+
         Returns
         -------
         duckdb.DuckDBPyConnection
@@ -149,9 +145,8 @@ class DuckDBRegistryHelper:
         revision: str | None,
         config: Mapping[str, object],
     ) -> str:
-        """
-        Return new run.
-        
+        """Return new run.
+
         Parameters
         ----------
         purpose : str
@@ -198,9 +193,8 @@ class DuckDBRegistryHelper:
         return run_id
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
-        """
-        Return close run.
-        
+        """Return close run.
+
         Parameters
         ----------
         run_id : str
@@ -238,9 +232,8 @@ class DuckDBRegistryHelper:
         con.close()
 
     def begin_dataset(self, kind: str, run_id: str) -> str:
-        """
-        Return begin dataset.
-        
+        """Return begin dataset.
+
         Parameters
         ----------
         kind : str
@@ -283,9 +276,8 @@ class DuckDBRegistryHelper:
         return dataset_id
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
-        """
-        Return commit dataset.
-        
+        """Return commit dataset.
+
         Parameters
         ----------
         dataset_id : str
@@ -325,9 +317,8 @@ class DuckDBRegistryHelper:
         con.close()
 
     def rollback_dataset(self, dataset_id: str) -> None:
-        """
-        Return rollback dataset.
-        
+        """Return rollback dataset.
+
         Parameters
         ----------
         dataset_id : str
@@ -356,9 +347,8 @@ class DuckDBRegistryHelper:
         con.close()
 
     def register_documents(self, docs: list[Doc]) -> None:
-        """
-        Return register documents.
-        
+        """Return register documents.
+
         Parameters
         ----------
         docs : List[Doc]
@@ -405,9 +395,8 @@ class DuckDBRegistryHelper:
         con.close()
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
-        """
-        Return register doctags.
-        
+        """Return register doctags.
+
         Parameters
         ----------
         assets : List[DoctagsAsset]
@@ -444,9 +433,8 @@ class DuckDBRegistryHelper:
         con.close()
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
-        """
-        Return emit event.
-        
+        """Return emit event.
+
         Parameters
         ----------
         event_name : str

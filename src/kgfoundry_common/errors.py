@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -59,29 +58,16 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DownloadError]
 class DownloadError(Exception):
-    """
-    Represent DownloadError.
+    """Represent DownloadError."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.errors import DownloadError
-    >>> result = DownloadError()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.errors
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -92,29 +78,16 @@ class DownloadError(Exception):
 
 # [nav:anchor UnsupportedMIMEError]
 class UnsupportedMIMEError(Exception):
-    """
-    Represent UnsupportedMIMEError.
+    """Represent UnsupportedMIMEError."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.errors import UnsupportedMIMEError
-    >>> result = UnsupportedMIMEError()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.errors
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -125,29 +98,16 @@ class UnsupportedMIMEError(Exception):
 
 # [nav:anchor DoclingError]
 class DoclingError(Exception):
-    """
-    Represent DoclingError.
+    """Represent DoclingError."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.errors import DoclingError
-    >>> result = DoclingError()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.errors
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -158,29 +118,16 @@ class DoclingError(Exception):
 
 # [nav:anchor OCRTimeoutError]
 class OCRTimeoutError(Exception):
-    """
-    Represent OCRTimeoutError.
+    """Represent OCRTimeoutError."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.errors import OCRTimeoutError
-    >>> result = OCRTimeoutError()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.errors
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -191,29 +138,16 @@ class OCRTimeoutError(Exception):
 
 # [nav:anchor ChunkingError]
 class ChunkingError(Exception):
-    """
-    Represent ChunkingError.
+    """Represent ChunkingError."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.errors import ChunkingError
-    >>> result = ChunkingError()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.errors
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -224,29 +158,16 @@ class ChunkingError(Exception):
 
 # [nav:anchor EmbeddingError]
 class EmbeddingError(Exception):
-    """
-    Represent EmbeddingError.
+    """Represent EmbeddingError."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.errors import EmbeddingError
-    >>> result = EmbeddingError()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.errors
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -257,29 +178,16 @@ class EmbeddingError(Exception):
 
 # [nav:anchor SpladeOOMError]
 class SpladeOOMError(Exception):
-    """
-    Represent SpladeOOMError.
+    """Represent SpladeOOMError."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.errors import SpladeOOMError
-    >>> result = SpladeOOMError()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.errors
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -290,29 +198,16 @@ class SpladeOOMError(Exception):
 
 # [nav:anchor IndexBuildError]
 class IndexBuildError(Exception):
-    """
-    Represent IndexBuildError.
+    """Represent IndexBuildError."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.errors import IndexBuildError
-    >>> result = IndexBuildError()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.errors
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -323,29 +218,16 @@ class IndexBuildError(Exception):
 
 # [nav:anchor OntologyParseError]
 class OntologyParseError(Exception):
-    """
-    Represent OntologyParseError.
+    """Represent OntologyParseError."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.errors import OntologyParseError
-    >>> result = OntologyParseError()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.errors
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -356,29 +238,16 @@ class OntologyParseError(Exception):
 
 # [nav:anchor LinkerCalibrationError]
 class LinkerCalibrationError(Exception):
-    """
-    Represent LinkerCalibrationError.
+    """Represent LinkerCalibrationError."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.errors import LinkerCalibrationError
-    >>> result = LinkerCalibrationError()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.errors
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -389,29 +258,16 @@ class LinkerCalibrationError(Exception):
 
 # [nav:anchor Neo4jError]
 class Neo4jError(Exception):
-    """
-    Represent Neo4jError.
+    """Represent Neo4jError."""
     
-    Attributes
-    ----------
-    None
-        No public attributes documented.
     
-    Examples
-    --------
-    >>> from kgfoundry_common.errors import Neo4jError
-    >>> result = Neo4jError()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    kgfoundry_common.errors
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     

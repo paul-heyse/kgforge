@@ -5,13 +5,16 @@ src.kgfoundry_common.logging
 
 .. autoapi-nested-parse::
 
-   Module for kgfoundry_common.logging.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - JsonFormatter: Format log records as compact JSON payloads.
-   - setup_logging: Configure the root logger with JSON formatting.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`kgfoundry_common.logging`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -26,20 +29,121 @@ Module Contents
    Bases: :py:obj:`logging.Formatter`
 
 
-   Format log records as compact JSON payloads.
+   
+   Represent JsonFormatter.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: format()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from kgfoundry_common.logging import JsonFormatter
+   >>> result = JsonFormatter()
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`kgfoundry_common.logging`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:method:: format(record)
 
-      Serialise a log record into a JSON string.
+      
+      Return format.
 
+      :param record: Description for ``record``.
+      :type record: logging.LogRecord
+
+      :returns: *str* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.logging import format
+      >>> result = format(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+      .. seealso:: :py:obj:`kgfoundry_common.logging`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
 .. py:function:: setup_logging(level = logging.INFO)
 
-   Configure the root logger with JSON formatting.
+   
+   Return setup logging.
 
-   :param level: Minimum log level to emit, defaults to :data:`logging.INFO`.
+   :param level: Description for ``level``.
    :type level: int, optional
 
+   .. rubric:: Examples
+
+   >>> from kgfoundry_common.logging import setup_logging
+   >>> setup_logging(...)  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`kgfoundry_common.logging`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

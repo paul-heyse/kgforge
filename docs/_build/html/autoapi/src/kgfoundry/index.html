@@ -32,6 +32,10 @@
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
   <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -45,8 +49,6 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/src/kgfoundry/index';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="src.kgfoundry_common" href="../kgfoundry_common/index.html" />
-    <link rel="prev" title="src.kg_builder.neo4j_store" href="../kg_builder/neo4j_store/index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -146,7 +148,7 @@
 </li>
 
 
-<li class="nav-item current active">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../index.html">
     API Reference
   </a>
@@ -159,6 +161,72 @@
   </a>
 </li>
 
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/test-matrix.html">
+    Test Matrix (symbol → tests)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/observability/metrics.html">
+    Metrics (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/observability/logs.html">
+    Log events (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/observability/traces.html">
+    Traces (static scan)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/observability/config.html">
+    Configuration surfaces (Pydantic Settings & env usage)
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/schemas/index.html">
+    Data Contract Schemas
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference/graphs/index.html">
+    Package Graphs
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../gallery/index.html">
+    Welcome to the kgfoundry examples gallery
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -216,8 +284,10 @@
       
       
       
+        
+      
       <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -253,7 +323,7 @@
 </li>
 
 
-<li class="nav-item current active">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../index.html">
     API Reference
   </a>
@@ -263,6 +333,62 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../architecture/index.html">
     Architecture
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/test-matrix.html">
+    Test Matrix (symbol → tests)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/observability/metrics.html">
+    Metrics (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/observability/logs.html">
+    Log events (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/observability/traces.html">
+    Traces (static scan)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/observability/config.html">
+    Configuration surfaces (Pydantic Settings & env usage)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/schemas/index.html">
+    Data Contract Schemas
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/graphs/index.html">
+    Package Graphs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../gallery/index.html">
+    Welcome to the kgfoundry examples gallery
   </a>
 </li>
 
@@ -287,106 +413,6 @@
       </div>
     
   </div>
-  
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">src</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 has-children"><a class="reference internal" href="../docling/index.html">src.docling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../docling/canonicalizer/index.html">src.docling.canonicalizer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../docling/hybrid/index.html">src.docling.hybrid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../docling/vlm/index.html">src.docling.vlm</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../download/index.html">src.download</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../download/cli/index.html">src.download.cli</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../download/harvester/index.html">src.download.harvester</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../embeddings_dense/index.html">src.embeddings_dense</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../embeddings_dense/base/index.html">src.embeddings_dense.base</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../embeddings_dense/qwen3/index.html">src.embeddings_dense.qwen3</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../embeddings_sparse/index.html">src.embeddings_sparse</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../embeddings_sparse/base/index.html">src.embeddings_sparse.base</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../embeddings_sparse/bm25/index.html">src.embeddings_sparse.bm25</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../embeddings_sparse/splade/index.html">src.embeddings_sparse.splade</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../kg_builder/index.html">src.kg_builder</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../kg_builder/mock_kg/index.html">src.kg_builder.mock_kg</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../kg_builder/neo4j_store/index.html">src.kg_builder.neo4j_store</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">src.kgfoundry</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../kgfoundry_common/index.html">src.kgfoundry_common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../kgfoundry_common/config/index.html">src.kgfoundry_common.config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../kgfoundry_common/errors/index.html">src.kgfoundry_common.errors</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../kgfoundry_common/exceptions/index.html">src.kgfoundry_common.exceptions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../kgfoundry_common/ids/index.html">src.kgfoundry_common.ids</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../kgfoundry_common/logging/index.html">src.kgfoundry_common.logging</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../kgfoundry_common/models/index.html">src.kgfoundry_common.models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../kgfoundry_common/navmap_types/index.html">src.kgfoundry_common.navmap_types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../kgfoundry_common/parquet_io/index.html">src.kgfoundry_common.parquet_io</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../linking/index.html">src.linking</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../linking/calibration/index.html">src.linking.calibration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../linking/linker/index.html">src.linking.linker</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../observability/index.html">src.observability</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../observability/metrics/index.html">src.observability.metrics</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../ontology/index.html">src.ontology</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../ontology/catalog/index.html">src.ontology.catalog</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ontology/loader/index.html">src.ontology.loader</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../orchestration/index.html">src.orchestration</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../orchestration/cli/index.html">src.orchestration.cli</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../orchestration/fixture_flow/index.html">src.orchestration.fixture_flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../orchestration/flows/index.html">src.orchestration.flows</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../registry/index.html">src.registry</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../registry/api/index.html">src.registry.api</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../registry/duckdb_registry/index.html">src.registry.duckdb_registry</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../registry/helper/index.html">src.registry.helper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../registry/migrate/index.html">src.registry.migrate</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../search_api/index.html">src.search_api</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../search_api/app/index.html">src.search_api.app</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../search_api/bm25_index/index.html">src.search_api.bm25_index</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../search_api/faiss_adapter/index.html">src.search_api.faiss_adapter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../search_api/fixture_index/index.html">src.search_api.fixture_index</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../search_api/fusion/index.html">src.search_api.fusion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../search_api/kg_mock/index.html">src.search_api.kg_mock</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../search_api/schemas/index.html">src.search_api.schemas</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../search_api/service/index.html">src.search_api.service</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../search_api/splade_index/index.html">src.search_api.splade_index</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../search_client/index.html">src.search_client</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../search_client/client/index.html">src.search_client.client</a></li>
-</ul>
-</details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../vectorstore_faiss/index.html">src.vectorstore_faiss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../vectorstore_faiss/gpu/index.html">src.vectorstore_faiss.gpu</a></li>
-</ul>
-</details></li>
-</ul>
-</details></li>
-</ul>
-</div>
-</nav></div>
-    </div>
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
@@ -423,12 +449,6 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    
-    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">API Reference</a></li>
-    
-    
-    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">src</a></li>
-    
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">src.kgfoundry</span></li>
   </ul>
 </nav>
@@ -448,37 +468,138 @@
                   
   <section id="module-src.kgfoundry">
 <span id="src-kgfoundry"></span><h1>src.kgfoundry<a class="headerlink" href="#module-src.kgfoundry" title="Link to this heading">#</a></h1>
-<p>Module for kgfoundry.</p>
+<p>Provide utilities for module.</p>
+<p class="rubric">Notes</p>
+<p>This module exposes the primary interfaces for the package.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kgfoundry</span></code></p>
+</div>
 <section id="package-contents">
 <h2>Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading">#</a></h2>
 <dl class="py data">
+<dt class="sig sig-object py" id="src.kgfoundry._ALIASES">
+<span class="sig-prename descclassname"><span class="pre">src.kgfoundry.</span></span><span class="sig-name descname"><span class="pre">_ALIASES</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../_modules/src/kgfoundry.html#_ALIASES"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry/__init__.py:13:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry._ALIASES" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="src.kgfoundry.__all__">
-<span class="sig-prename descclassname"><span class="pre">src.kgfoundry.</span></span><span class="sig-name descname"><span class="pre">__all__</span></span><a class="reference internal" href="../../../_modules/src/kgfoundry.html#__all__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry/__init__.py:20:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry.__all__" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.kgfoundry.</span></span><span class="sig-name descname"><span class="pre">__all__</span></span><a class="reference internal" href="../../../_modules/src/kgfoundry.html#__all__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry/__init__.py:30:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry.__all__" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="src.kgfoundry.__getattr__">
-<span class="sig-prename descclassname"><span class="pre">src.kgfoundry.</span></span><span class="sig-name descname"><span class="pre">__getattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/src/kgfoundry.html#__getattr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry/__init__.py:33:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry.__getattr__" title="Link to this definition">#</a></dt>
-<dd><p>Load a lazily requested submodule from the compatibility namespace.</p>
+<dt class="sig sig-object py" id="src.kgfoundry._load">
+<span class="sig-prename descclassname"><span class="pre">src.kgfoundry.</span></span><span class="sig-name descname"><span class="pre">_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/src/kgfoundry.html#_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry/__init__.py:33:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry._load" title="Link to this definition">#</a></dt>
+<dd><p>Return load.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Description for <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>object</em> – Description of return value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)">object</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">kgfoundry</span><span class="w"> </span><span class="kn">import</span> <span class="n">_load</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">_load</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kgfoundry</span></code></p>
+</div>
+<p class="rubric">Notes</p>
+<p>Provide usage considerations, constraints, or complexity notes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.kgfoundry.__getattr__">
+<span class="sig-prename descclassname"><span class="pre">src.kgfoundry.</span></span><span class="sig-name descname"><span class="pre">__getattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/src/kgfoundry.html#__getattr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry/__init__.py:70:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry.__getattr__" title="Link to this definition">#</a></dt>
+<dd><p>Return getattr.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Description for <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>object</em> – Description of return value.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.14)"><strong>AttributeError</strong></a> – Raised when validation fails.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)">object</a></p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">kgfoundry</span><span class="w"> </span><span class="kn">import</span> <span class="fm">__getattr__</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kgfoundry</span></code></p>
+</div>
+<p class="rubric">Notes</p>
+<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.kgfoundry.__dir__">
-<span class="sig-prename descclassname"><span class="pre">src.kgfoundry.</span></span><span class="sig-name descname"><span class="pre">__dir__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/src/kgfoundry.html#__dir__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry/__init__.py:41:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry.__dir__" title="Link to this definition">#</a></dt>
-<dd><p>Expose the known compatibility submodules for auto-complete.</p>
+<span class="sig-prename descclassname"><span class="pre">src.kgfoundry.</span></span><span class="sig-name descname"><span class="pre">__dir__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/src/kgfoundry.html#__dir__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry/__init__.py:110:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry.__dir__" title="Link to this definition">#</a></dt>
+<dd><p>Return dir.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>List[str]</em> – Description of return value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">kgfoundry</span><span class="w"> </span><span class="kn">import</span> <span class="fm">__dir__</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="fm">__dir__</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kgfoundry</span></code></p>
+</div>
+<p class="rubric">Notes</p>
+<p>Provide usage considerations, constraints, or complexity notes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.kgfoundry._ensure_namespace_alias">
+<span class="sig-prename descclassname"><span class="pre">src.kgfoundry.</span></span><span class="sig-name descname"><span class="pre">_ensure_namespace_alias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/src/kgfoundry.html#_ensure_namespace_alias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="vscode://file//home/paul/kgfoundry/src/src/kgfoundry/__init__.py:138:1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.kgfoundry._ensure_namespace_alias" title="Link to this definition">#</a></dt>
+<dd><p>Return ensure namespace alias.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Description for <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">kgfoundry</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ensure_namespace_alias</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_ensure_namespace_alias</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kgfoundry</span></code></p>
+</div>
+<p class="rubric">Notes</p>
+<p>Provide usage considerations, constraints, or complexity notes.</p>
 </dd></dl>
 
 </section>
@@ -494,24 +615,6 @@
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="../kg_builder/neo4j_store/index.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">src.kg_builder.neo4j_store</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="../kgfoundry_common/index.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">src.kgfoundry_common</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
@@ -532,9 +635,12 @@
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#package-contents">Package Contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgfoundry._ALIASES"><code class="docutils literal notranslate"><span class="pre">_ALIASES</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgfoundry.__all__"><code class="docutils literal notranslate"><span class="pre">__all__</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgfoundry._load"><code class="docutils literal notranslate"><span class="pre">_load()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgfoundry.__getattr__"><code class="docutils literal notranslate"><span class="pre">__getattr__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgfoundry.__dir__"><code class="docutils literal notranslate"><span class="pre">__dir__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#src.kgfoundry._ensure_namespace_alias"><code class="docutils literal notranslate"><span class="pre">_ensure_namespace_alias()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -38,9 +37,8 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor t_echo]
 @task
 def t_echo(msg: str) -> str:
-    """
-    Return t echo.
-    
+    """Return t echo.
+
     Parameters
     ----------
     msg : str
@@ -73,9 +71,8 @@ def t_echo(msg: str) -> str:
 # [nav:anchor e2e_flow]
 @flow(name="kgfoundry_e2e_skeleton")
 def e2e_flow() -> list[str]:
-    """
-    Return e2e flow.
-    
+    """Return e2e flow.
+
     Returns
     -------
     List[str]

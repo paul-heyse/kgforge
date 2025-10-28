@@ -1,0 +1,223 @@
+"""Provide utilities for module.
+
+Auto-generated API documentation for the ``tools.docs.build_graphs`` module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+tools.docs.build_graphs
+"""
+
+
+from __future__ import annotations
+
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+SRC = ROOT / "src"
+OUT = ROOT / "docs" / "_build" / "graphs"
+OUT.mkdir(parents=True, exist_ok=True)
+GRAPH_PACKAGES = {
+    "kgfoundry",
+    "kgfoundry_common",
+    "kg_builder",
+    "search_api",
+    "embeddings_dense",
+    "embeddings_sparse",
+    "orchestration",
+    "registry",
+}
+
+
+def run(cmd: list[str]) -> None:
+    """Return run.
+
+    Auto-generated reference for the ``run`` callable defined in ``tools.docs.build_graphs``.
+    
+    Parameters
+    ----------
+    cmd : List[str]
+        Description for ``cmd``.
+    
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import run
+    >>> run(...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    tools.docs.build_graphs
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    subprocess.run(cmd, check=True, cwd=ROOT)
+
+
+def top_level_packages() -> set[str]:
+    """Return top level packages.
+
+    Auto-generated reference for the ``top_level_packages`` callable defined in ``tools.docs.build_graphs``.
+    
+    Returns
+    -------
+    Set[str]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import top_level_packages
+    >>> result = top_level_packages()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    tools.docs.build_graphs
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    packages: set[str] = set()
+    if not SRC.exists():
+        return packages
+    for init_file in SRC.rglob("__init__.py"):
+        rel = init_file.relative_to(SRC)
+        if not rel.parts:
+            continue
+        top = rel.parts[0]
+        if top == "__init__.py":
+            continue
+        if GRAPH_PACKAGES and top not in GRAPH_PACKAGES:
+            continue
+        packages.add(top)
+    return packages
+
+
+def build_pydeps(pkg: str) -> None:
+    """Return build pydeps.
+
+    Auto-generated reference for the ``build_pydeps`` callable defined in ``tools.docs.build_graphs``.
+    
+    Parameters
+    ----------
+    pkg : str
+        Description for ``pkg``.
+    
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import build_pydeps
+    >>> build_pydeps(...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    tools.docs.build_graphs
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    dot_path = OUT / f"{pkg}.dot"
+    svg_path = OUT / f"{pkg}-imports.svg"
+    cmd = [
+        sys.executable,
+        "-m",
+        "pydeps",
+        f"src/{pkg}",
+        "--max-bacon=4",
+        "--noshow",
+        "-T",
+        "dot",
+        "-o",
+        str(dot_path),
+    ]
+    try:
+        subprocess.run(cmd, check=True, cwd=ROOT)
+        subprocess.run(["dot", "-Tsvg", str(dot_path), "-o", str(svg_path)], check=True, cwd=ROOT)
+    finally:
+        dot_path.unlink(missing_ok=True)
+
+
+def build_pyreverse(pkg: str) -> None:
+    """Return build pyreverse.
+
+    Auto-generated reference for the ``build_pyreverse`` callable defined in ``tools.docs.build_graphs``.
+    
+    Parameters
+    ----------
+    pkg : str
+        Description for ``pkg``.
+    
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import build_pyreverse
+    >>> build_pyreverse(...)  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    tools.docs.build_graphs
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    cmd = [
+        sys.executable,
+        "-m",
+        "pylint.pyreverse.main",
+        f"src/{pkg}",
+        "-o",
+        "svg",
+        "-d",
+        str(OUT),
+        "-p",
+        pkg,
+    ]
+    subprocess.run(cmd, check=True, cwd=ROOT)
+    for svg in OUT.glob("classes_*.svg"):
+        target = OUT / f"{pkg}-uml.svg"
+        svg.replace(target)
+    for svg in OUT.glob("packages_*.svg"):
+        svg.unlink()
+
+
+def main() -> None:
+    """Return main.
+
+    Auto-generated reference for the ``main`` callable defined in ``tools.docs.build_graphs``.
+    
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import main
+    >>> main()  # doctest: +ELLIPSIS
+    
+    See Also
+    --------
+    tools.docs.build_graphs
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
+    for pkg in sorted(top_level_packages()):
+        try:
+            build_pydeps(pkg)
+            build_pyreverse(pkg)
+        except subprocess.CalledProcessError as exc:  # pragma: no cover - diagnostic aid
+            print(f"[build_graphs] Skipping {pkg} due to error: {exc}")
+
+
+if __name__ == "__main__":
+    main()

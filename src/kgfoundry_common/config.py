@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -37,9 +36,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor load_config]
 def load_config(path: str) -> dict[str, Any]:
-    """
-    Return load config.
-    
+    """Return load config.
+
     Parameters
     ----------
     path : str

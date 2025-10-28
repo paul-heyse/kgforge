@@ -5,15 +5,18 @@ src.embeddings_sparse.bm25
 
 .. autoapi-nested-parse::
 
-   Module for embeddings_sparse.bm25.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - BM25Doc: Serialized representation of a BM25 indexed document.
-   - PurePythonBM25: Pure-Python BM25 builder and searcher for sparse retrieval.
-   - LuceneBM25: Pyserini-backed Lucene BM25 adapter lazily importing Lucene….
-   - get_bm25: Construct a BM25 implementation for the requested backend.
+   Auto-generated API documentation for the ``src.embeddings_sparse.bm25`` module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.embeddings_sparse.bm25`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -25,8 +28,26 @@ Module Contents
 
 .. py:class:: BM25Doc
 
-   Serialized representation of a BM25 indexed document.
+   
+   Represent BM25Doc.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: doc_id
       :type:  str
@@ -42,8 +63,65 @@ Module Contents
 
 .. py:class:: PurePythonBM25(index_dir, k1 = 0.9, b = 0.4, field_boosts = None)
 
-   Pure-Python BM25 builder and searcher for sparse retrieval.
+   
+   Represent PurePythonBM25.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: _tokenize()
+
+      Method description.
+
+   .. method:: build()
+
+      Method description.
+
+   .. method:: load()
+
+      Method description.
+
+   .. method:: _idf()
+
+      Method description.
+
+   .. method:: search()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from embeddings_sparse.bm25 import PurePythonBM25
+   >>> result = PurePythonBM25()
+   >>> result  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`embeddings_sparse.bm25`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: index_dir
 
@@ -83,28 +161,245 @@ Module Contents
 
 
 
+   .. py:method:: _tokenize(text)
+      :staticmethod:
+
+
+      
+      Return tokenize.
+
+      :param text: Description for ``text``.
+      :type text: str
+
+      :returns: *List[str]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.bm25 import _tokenize
+      >>> result = _tokenize(...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.bm25`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
    .. py:method:: build(docs_iterable)
 
-      Build the BM25 index from an iterable of document field mappings.
+      
+      Return build.
 
+      :param docs_iterable: Description for ``docs_iterable``.
+      :type docs_iterable: Iterable[Tuple[str, dict[str, str]]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: load()
 
-      Load a previously persisted BM25 index from disk.
+      
+      Return load.
 
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.bm25 import load
+      >>> load()  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.bm25`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: _idf(term)
+
+      
+      Return idf.
+
+      :param term: Description for ``term``.
+      :type term: str
+
+      :returns: *float* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.bm25 import _idf
+      >>> result = _idf(...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.bm25`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: search(query, k, fields = None)
 
-      Score documents using BM25 and return the top ``k`` hits.
+      
+      Return search.
 
+      :param query: Description for ``query``.
+      :type query: str
+      :param k: Description for ``k``.
+      :type k: int
+      :param fields: Description for ``fields``.
+      :type fields: Mapping[str, str] | None, optional
+
+      :returns: *List[Tuple[str, float]]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.bm25 import search
+      >>> result = search(..., ..., ...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.bm25`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
 .. py:class:: LuceneBM25(index_dir, k1 = 0.9, b = 0.4, field_boosts = None)
 
-   Pyserini-backed Lucene BM25 adapter lazily importing Lucene bindings.
+   
+   Represent LuceneBM25.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: build()
+
+      Method description.
+
+   .. method:: _ensure_searcher()
+
+      Method description.
+
+   .. method:: search()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from embeddings_sparse.bm25 import LuceneBM25
+   >>> result = LuceneBM25()
+   >>> result  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`embeddings_sparse.bm25`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: index_dir
 
@@ -122,20 +417,164 @@ Module Contents
    .. py:attribute:: field_boosts
 
 
+   .. py:attribute:: _searcher
+      :type:  Any | None
+      :value: None
+
+
+
    .. py:method:: build(docs_iterable)
 
-      Materialize a Lucene index from the provided document iterable.
+      
+      Return build.
 
+      :param docs_iterable: Description for ``docs_iterable``.
+      :type docs_iterable: Iterable[Tuple[str, dict[str, str]]]
+
+      :raises RuntimeError: Raised when validation fails.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: _ensure_searcher()
+
+      
+      Return ensure searcher.
+
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.bm25 import _ensure_searcher
+      >>> _ensure_searcher()  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.bm25`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: search(query, k, fields = None)
 
-      Execute a Lucene BM25 query and return the top ``k`` matches.
+      
+      Return search.
 
+      :param query: Description for ``query``.
+      :type query: str
+      :param k: Description for ``k``.
+      :type k: int
+      :param fields: Description for ``fields``.
+      :type fields: Mapping[str, str] | None, optional
+
+      :returns: *List[Tuple[str, float]]* -- Description of return value.
+
+      :raises RuntimeError: Raised when validation fails.
+
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.bm25 import search
+      >>> result = search(..., ..., ...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.bm25`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
 .. py:function:: get_bm25(backend, index_dir, *, k1 = 0.9, b = 0.4, field_boosts = None)
 
-   Construct a BM25 implementation for the requested backend.
+   
+   Return get bm25.
 
+   :param backend: Description for ``backend``.
+   :type backend: str
+   :param index_dir: Description for ``index_dir``.
+   :type index_dir: str
+   :param k1: Description for ``k1``.
+   :type k1: float, optional
+   :param b: Description for ``b``.
+   :type b: float, optional
+   :param field_boosts: Description for ``field_boosts``.
+   :type field_boosts: Mapping[str, float] | None, optional
+
+   :returns: *PurePythonBM25 | LuceneBM25* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from embeddings_sparse.bm25 import get_bm25
+   >>> result = get_bm25(..., ..., ..., ..., ...)
+   >>> result  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`embeddings_sparse.bm25`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

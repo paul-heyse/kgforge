@@ -5,12 +5,18 @@ src.embeddings_dense.base
 
 .. autoapi-nested-parse::
 
-   Module for embeddings_dense.base.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - DenseEmbeddingModel: Protocol describing dense embedding encoders used in….
+   Auto-generated API documentation for the ``src.embeddings_dense.base`` module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.embeddings_dense.base`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -23,12 +29,83 @@ Module Contents
    Bases: :py:obj:`Protocol`
 
 
-   Protocol describing dense embedding encoders used in kgfoundry.
+   
+   Represent DenseEmbeddingModel.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: encode()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from embeddings_dense.base import DenseEmbeddingModel
+   >>> result = DenseEmbeddingModel()
+   >>> result  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`embeddings_dense.base`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:method:: encode(texts)
 
-      Encode ``texts`` into a dense floating-point representation.
+      
+      Return encode.
 
+      :param texts: Description for ``texts``.
+      :type texts: Sequence[str]
+
+      :returns: *NDArray[np.float32]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from embeddings_dense.base import encode
+      >>> result = encode(...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_dense.base`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 

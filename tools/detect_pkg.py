@@ -1,4 +1,16 @@
-"""Utilities to detect package names for documentation generation."""
+"""Provide utilities for module.
+
+Auto-generated API documentation for the ``tools.detect_pkg`` module.
+
+Notes
+-----
+This module exposes the primary interfaces for the package.
+
+See Also
+--------
+tools.detect_pkg
+"""
+
 
 from __future__ import annotations
 
@@ -10,7 +22,36 @@ SRC = ROOT / "src"
 
 
 def _candidate_names() -> list[str]:
-    """Collect potential top-level package names."""
+    """Return candidate names.
+
+    Auto-generated reference for the ``_candidate_names`` callable defined in ``tools.detect_pkg``.
+    
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    
+    Raises
+    ------
+    SystemExit
+        Raised when validation fails.
+    
+    Examples
+    --------
+    >>> from tools.detect_pkg import _candidate_names
+    >>> result = _candidate_names()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    tools.detect_pkg
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     names: set[str] = set()
     if SRC.exists():
         names.update(p.parent.name for p in SRC.glob("*/__init__.py"))
@@ -26,7 +67,31 @@ def _candidate_names() -> list[str]:
 
 
 def detect_packages() -> list[str]:
-    """Return package names ordered with a kgfoundry-first preference."""
+    """Return detect packages.
+
+    Auto-generated reference for the ``detect_packages`` callable defined in ``tools.detect_pkg``.
+    
+    Returns
+    -------
+    List[str]
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.detect_pkg import detect_packages
+    >>> result = detect_packages()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    tools.detect_pkg
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     candidates = _candidate_names()
     lowers = [c for c in candidates if c.islower()]
     base = lowers or candidates
@@ -35,7 +100,31 @@ def detect_packages() -> list[str]:
 
 
 def detect_primary() -> str:
-    """Return the primary package name (first from detect_packages)."""
+    """Return detect primary.
+
+    Auto-generated reference for the ``detect_primary`` callable defined in ``tools.detect_pkg``.
+    
+    Returns
+    -------
+    str
+        Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.detect_pkg import detect_primary
+    >>> result = detect_primary()
+    >>> result  # doctest: +ELLIPSIS
+    ...
+    
+    See Also
+    --------
+    tools.detect_pkg
+    
+    Notes
+    -----
+    Provide usage considerations, constraints, or complexity notes.
+    """
+    
     packages = detect_packages()
     return packages[0]
 

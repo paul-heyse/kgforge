@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -38,9 +37,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Registry]
 class Registry(Protocol):
-    """
-    Represent Registry.
-    
+    """Represent Registry.
+
     Attributes
     ----------
     None
@@ -86,9 +84,8 @@ class Registry(Protocol):
     
 
     def begin_dataset(self, kind: str, run_id: str) -> str:
-        """
-        Return begin dataset.
-        
+        """Return begin dataset.
+
         Parameters
         ----------
         kind : str
@@ -120,9 +117,8 @@ class Registry(Protocol):
         ...
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
-        """
-        Return commit dataset.
-        
+        """Return commit dataset.
+
         Parameters
         ----------
         dataset_id : str
@@ -149,9 +145,8 @@ class Registry(Protocol):
         ...
 
     def rollback_dataset(self, dataset_id: str) -> None:
-        """
-        Return rollback dataset.
-        
+        """Return rollback dataset.
+
         Parameters
         ----------
         dataset_id : str
@@ -180,9 +175,8 @@ class Registry(Protocol):
         revision: str | None,
         config: Mapping[str, object],
     ) -> str:
-        """
-        Return insert run.
-        
+        """Return insert run.
+
         Parameters
         ----------
         purpose : str
@@ -218,9 +212,8 @@ class Registry(Protocol):
         ...
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
-        """
-        Return close run.
-        
+        """Return close run.
+
         Parameters
         ----------
         run_id : str
@@ -247,9 +240,8 @@ class Registry(Protocol):
         ...
 
     def register_documents(self, docs: list[Doc]) -> None:
-        """
-        Return register documents.
-        
+        """Return register documents.
+
         Parameters
         ----------
         docs : List[Doc]
@@ -273,9 +265,8 @@ class Registry(Protocol):
         ...
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
-        """
-        Return register doctags.
-        
+        """Return register doctags.
+
         Parameters
         ----------
         assets : List[DoctagsAsset]
@@ -299,9 +290,8 @@ class Registry(Protocol):
         ...
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
-        """
-        Return emit event.
-        
+        """Return emit event.
+
         Parameters
         ----------
         event_name : str
@@ -328,9 +318,8 @@ class Registry(Protocol):
         ...
 
     def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
-        """
-        Return incident.
-        
+        """Return incident.
+
         Parameters
         ----------
         event : str

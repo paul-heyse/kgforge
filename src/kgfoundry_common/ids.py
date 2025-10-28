@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -37,9 +36,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor urn_doc_from_text]
 def urn_doc_from_text(text: str) -> str:
-    """
-    Return urn doc from text.
-    
+    """Return urn doc from text.
+
     Parameters
     ----------
     text : str
@@ -73,9 +71,8 @@ def urn_doc_from_text(text: str) -> str:
 
 # [nav:anchor urn_chunk]
 def urn_chunk(doc_hash: str, start: int, end: int) -> str:
-    """
-    Return urn chunk.
-    
+    """Return urn chunk.
+
     Parameters
     ----------
     doc_hash : str

@@ -5,13 +5,16 @@ src.orchestration.flows
 
 .. autoapi-nested-parse::
 
-   Module for orchestration.flows.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - t_echo: Return ``msg`` unmodified; handy for flow scaffolding and….
-   - e2e_flow: Run the high-level kgfoundry demo flow and return step names.
+   .. rubric:: Notes
 
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`orchestration.flows`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -21,11 +24,78 @@ Module Contents
 
 .. py:function:: t_echo(msg)
 
-   Return ``msg`` unmodified; handy for flow scaffolding and tests.
+   
+   Return t echo.
 
+   :param msg: Description for ``msg``.
+   :type msg: str
+
+   :returns: *str* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from orchestration.flows import t_echo
+   >>> result = t_echo(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`orchestration.flows`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: e2e_flow()
 
-   Run the high-level kgfoundry demo flow and return step names.
+   
+   Return e2e flow.
 
+   :returns: *List[str]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from orchestration.flows import e2e_flow
+   >>> result = e2e_flow()
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+   .. seealso:: :py:obj:`orchestration.flows`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

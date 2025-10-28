@@ -1,5 +1,6 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
+
+Auto-generated API documentation for the ``src.embeddings_sparse.splade`` module.
 
 Notes
 -----
@@ -7,7 +8,7 @@ This module exposes the primary interfaces for the package.
 
 See Also
 --------
-embeddings_sparse.splade
+src.embeddings_sparse.splade
 """
 
 
@@ -48,37 +49,34 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 
 # [nav:anchor SPLADEv3Encoder]
 class SPLADEv3Encoder:
-    """
-    Represent SPLADEv3Encoder.
-    
+    """Represent SPLADEv3Encoder.
+
     Attributes
     ----------
     name : Any
         Attribute description.
-    
+
     Methods
     -------
     __init__()
         Method description.
     encode()
         Method description.
-    
+
     Examples
     --------
     >>> from embeddings_sparse.splade import SPLADEv3Encoder
     >>> result = SPLADEv3Encoder()
     >>> result  # doctest: +ELLIPSIS
-    ...
-    
+
     See Also
     --------
     embeddings_sparse.splade
-    
+
     Notes
     -----
     Document class invariants and lifecycle details here.
     """
-    
 
     name = "SPLADE-v3-distilbert"
 
@@ -89,9 +87,8 @@ class SPLADEv3Encoder:
         topk: int = 256,
         max_seq_len: int = 512,
     ) -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         model_id : str, optional
@@ -102,62 +99,57 @@ class SPLADEv3Encoder:
             Description for ``topk``.
         max_seq_len : int, optional
             Description for ``max_seq_len``.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.splade import __init__
         >>> __init__(..., ..., ..., ...)  # doctest: +ELLIPSIS
-        
+
         See Also
         --------
         embeddings_sparse.splade
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.model_id = model_id
         self.device = device
         self.topk = topk
         self.max_seq_len = max_seq_len
 
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
-        """
-        Return encode.
-        
+        """Return encode.
+
         Parameters
         ----------
         texts : List[str]
             Description for ``texts``.
-        
+
         Returns
         -------
         List[Tuple[List[int], List[float]]]
             Description of return value.
-        
+
         Raises
         ------
         NotImplementedError
             Raised when validation fails.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.splade import encode
         >>> result = encode(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
-        
+
         See Also
         --------
         embeddings_sparse.splade
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
@@ -167,14 +159,13 @@ class SPLADEv3Encoder:
 
 # [nav:anchor PureImpactIndex]
 class PureImpactIndex:
-    """
-    Represent PureImpactIndex.
-    
+    """Represent PureImpactIndex.
+
     Attributes
     ----------
     None
         No public attributes documented.
-    
+
     Methods
     -------
     __init__()
@@ -187,48 +178,43 @@ class PureImpactIndex:
         Method description.
     search()
         Method description.
-    
+
     Examples
     --------
     >>> from embeddings_sparse.splade import PureImpactIndex
     >>> result = PureImpactIndex()
     >>> result  # doctest: +ELLIPSIS
-    ...
-    
+
     See Also
     --------
     embeddings_sparse.splade
-    
+
     Notes
     -----
     Document class invariants and lifecycle details here.
     """
-    
-    
 
     def __init__(self, index_dir: str) -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         index_dir : str
             Description for ``index_dir``.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.splade import __init__
         >>> __init__(...)  # doctest: +ELLIPSIS
-        
+
         See Also
         --------
         embeddings_sparse.splade
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -236,60 +222,49 @@ class PureImpactIndex:
 
     @staticmethod
     def _tokenize(text: str) -> list[str]:
-        """
-        Return tokenize.
-        
+        """Return tokenize.
+
         Parameters
         ----------
         text : str
             Description for ``text``.
-        
+
         Returns
         -------
         List[str]
             Description of return value.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.splade import _tokenize
         >>> result = _tokenize(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
-        
+
         See Also
         --------
         embeddings_sparse.splade
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         return [token.lower() for token in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """
-        Return build.
-        
+        """Return build.
+
         Parameters
         ----------
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
-        
-        Examples
-        --------
-        >>> from embeddings_sparse.splade import build
-        >>> build(...)  # doctest: +ELLIPSIS
-        
-        See Also
-        --------
-        embeddings_sparse.splade
-        
-        Notes
-        -----
-        Provide usage considerations, constraints, or complexity notes.
         """
+        
+        
+        
+        
+        
+        
+        
         
         
         os.makedirs(self.index_dir, exist_ok=True)
@@ -323,23 +298,21 @@ class PureImpactIndex:
             )
 
     def load(self) -> None:
-        """
-        Return load.
-        
+        """Return load.
+
         Examples
         --------
         >>> from embeddings_sparse.splade import load
         >>> load()  # doctest: +ELLIPSIS
-        
+
         See Also
         --------
         embeddings_sparse.splade
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
         with open(os.path.join(self.index_dir, "impact.pkl"), "rb") as handle:
             data = pickle.load(handle)
         self.df = data["df"]
@@ -347,38 +320,34 @@ class PureImpactIndex:
         self.postings = data["postings"]
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
-        """
-        Return search.
-        
+        """Return search.
+
         Parameters
         ----------
         query : str
             Description for ``query``.
         k : int
             Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.splade import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
-        
+
         See Also
         --------
         embeddings_sparse.splade
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
         for token in tokens:
@@ -392,14 +361,13 @@ class PureImpactIndex:
 
 # [nav:anchor LuceneImpactIndex]
 class LuceneImpactIndex:
-    """
-    Represent LuceneImpactIndex.
-    
+    """Represent LuceneImpactIndex.
+
     Attributes
     ----------
     None
         No public attributes documented.
-    
+
     Methods
     -------
     __init__()
@@ -408,74 +376,67 @@ class LuceneImpactIndex:
         Method description.
     search()
         Method description.
-    
+
     Examples
     --------
     >>> from embeddings_sparse.splade import LuceneImpactIndex
     >>> result = LuceneImpactIndex()
     >>> result  # doctest: +ELLIPSIS
-    ...
-    
+
     See Also
     --------
     embeddings_sparse.splade
-    
+
     Notes
     -----
     Document class invariants and lifecycle details here.
     """
-    
-    
 
     def __init__(self, index_dir: str) -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         index_dir : str
             Description for ``index_dir``.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.splade import __init__
         >>> __init__(...)  # doctest: +ELLIPSIS
-        
+
         See Also
         --------
         embeddings_sparse.splade
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
         self.index_dir = index_dir
         self._searcher: Any | None = None
 
     def _ensure(self) -> None:
-        """
-        Return ensure.
-        
+        """Return ensure.
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.splade import _ensure
         >>> _ensure()  # doctest: +ELLIPSIS
-        
+
         See Also
         --------
         embeddings_sparse.splade
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
         if self._searcher is not None:
             return
         try:
@@ -486,43 +447,39 @@ class LuceneImpactIndex:
         self._searcher = LuceneImpactSearcher(self.index_dir)
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
-        """
-        Return search.
-        
+        """Return search.
+
         Parameters
         ----------
         query : str
             Description for ``query``.
         k : int
             Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.splade import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
-        
+
         See Also
         --------
         embeddings_sparse.splade
-        
+
         Notes
         -----
         Provide usage considerations, constraints, or complexity notes.
         """
-        
-        
         self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
@@ -533,37 +490,34 @@ class LuceneImpactIndex:
 
 # [nav:anchor get_splade]
 def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIndex:
-    """
-    Return get splade.
-    
+    """Return get splade.
+
     Parameters
     ----------
     backend : str
         Description for ``backend``.
     index_dir : str
         Description for ``index_dir``.
-    
+
     Returns
     -------
     PureImpactIndex | LuceneImpactIndex
         Description of return value.
-    
+
     Examples
     --------
     >>> from embeddings_sparse.splade import get_splade
     >>> result = get_splade(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
-    
+
     See Also
     --------
     embeddings_sparse.splade
-    
+
     Notes
     -----
     Provide usage considerations, constraints, or complexity notes.
     """
-    
     if backend == "lucene":
         try:
             return LuceneImpactIndex(index_dir)

@@ -5,15 +5,18 @@ src.embeddings_sparse.splade
 
 .. autoapi-nested-parse::
 
-   Module for embeddings_sparse.splade.
+   Provide utilities for module.
 
-   NavMap:
-   - NavMap: Structure describing a module navmap.
-   - SPLADEv3Encoder: Describe the SPLADE configuration used for neural encoding.
-   - PureImpactIndex: Approximate SPLADE indexing with TF/IDF-style impact….
-   - LuceneImpactIndex: Bridge to a Pyserini SPLADE impact index stored on disk.
-   - get_splade: Construct a SPLADE impact index for the requested backend.
+   Auto-generated API documentation for the ``src.embeddings_sparse.splade`` module.
 
+   .. rubric:: Notes
+
+   This module exposes the primary interfaces for the package.
+
+   .. seealso:: :py:obj:`src.embeddings_sparse.splade`
+
+   ..
+       !! processed by numpydoc !!
 
 
 
@@ -25,8 +28,51 @@ Module Contents
 
 .. py:class:: SPLADEv3Encoder(model_id = 'naver/splade-v3-distilbert', device = 'cuda', topk = 256, max_seq_len = 512)
 
-   Describe the SPLADE configuration used for neural encoding.
+   
+   Represent SPLADEv3Encoder.
 
+   .. attribute:: name
+
+      Attribute description.
+
+      :type: Any
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: encode()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from embeddings_sparse.splade import SPLADEv3Encoder
+   >>> result = SPLADEv3Encoder()
+   >>> result  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`embeddings_sparse.splade`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: name
       :value: 'SPLADE-v3-distilbert'
@@ -55,25 +101,103 @@ Module Contents
 
    .. py:method:: encode(texts)
 
-      Generate sparse impact vectors for each input text.
+      
+      Return encode.
 
-      :param texts: Raw text segments to encode.
-      :type texts: list[str]
+      :param texts: Description for ``texts``.
+      :type texts: List[str]
 
-      :returns: Pairs of token identifiers and weights describing the sparse vector.
-      :rtype: list[tuple[list[int], list[float]]]
+      :returns: *List[Tuple[List[int], List[float]]]* -- Description of return value.
 
-      :raises NotImplementedError: Always raised because the skeleton does not ship a neural encoder.
+      :raises NotImplementedError: Raised when validation fails.
 
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.splade import encode
+      >>> result = encode(...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.splade`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
 .. py:class:: PureImpactIndex(index_dir)
 
-   Approximate SPLADE indexing with TF/IDF-style impact weighting.
+   
+   Represent PureImpactIndex.
 
-   Keeps the retrieval path runnable without Pyserini or GPU resources by using a simple tokenizer
-   and log-scaled weights.
+   .. attribute:: None
 
+      No public attributes documented.
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: _tokenize()
+
+      Method description.
+
+   .. method:: build()
+
+      Method description.
+
+   .. method:: load()
+
+      Method description.
+
+   .. method:: search()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from embeddings_sparse.splade import PureImpactIndex
+   >>> result = PureImpactIndex()
+   >>> result  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`embeddings_sparse.splade`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: index_dir
 
@@ -91,40 +215,327 @@ Module Contents
       :type:  dict[str, dict[str, float]]
 
 
+   .. py:method:: _tokenize(text)
+      :staticmethod:
+
+
+      
+      Return tokenize.
+
+      :param text: Description for ``text``.
+      :type text: str
+
+      :returns: *List[str]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.splade import _tokenize
+      >>> result = _tokenize(...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.splade`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
    .. py:method:: build(docs_iterable)
 
-      Construct the impact index from an iterable of documents.
+      
+      Return build.
 
+      :param docs_iterable: Description for ``docs_iterable``.
+      :type docs_iterable: Iterable[Tuple[str, dict[str, str]]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: load()
 
-      Load an existing impact index from disk.
+      
+      Return load.
 
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.splade import load
+      >>> load()  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.splade`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
    .. py:method:: search(query, k)
 
-      Score documents with impact weights and return the top ``k`` hits.
+      
+      Return search.
 
+      :param query: Description for ``query``.
+      :type query: str
+      :param k: Description for ``k``.
+      :type k: int
+
+      :returns: *List[Tuple[str, float]]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.splade import search
+      >>> result = search(..., ...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.splade`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
 .. py:class:: LuceneImpactIndex(index_dir)
 
-   Bridge to a Pyserini SPLADE impact index stored on disk.
+   
+   Represent LuceneImpactIndex.
 
+   .. attribute:: None
+
+      No public attributes documented.
+
+   .. method:: __init__()
+
+      Method description.
+
+   .. method:: _ensure()
+
+      Method description.
+
+   .. method:: search()
+
+      Method description.
+
+   .. rubric:: Examples
+
+   >>> from embeddings_sparse.splade import LuceneImpactIndex
+   >>> result = LuceneImpactIndex()
+   >>> result  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`embeddings_sparse.splade`
+
+   .. rubric:: Notes
+
+   Document class invariants and lifecycle details here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
    .. py:attribute:: index_dir
 
 
+   .. py:attribute:: _searcher
+      :type:  Any | None
+      :value: None
+
+
+
+   .. py:method:: _ensure()
+
+      
+      Return ensure.
+
+      :raises RuntimeError: Raised when validation fails.
+
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.splade import _ensure
+      >>> _ensure()  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.splade`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
    .. py:method:: search(query, k)
 
-      Execute a SPLADE impact search against the Lucene index.
+      
+      Return search.
 
+      :param query: Description for ``query``.
+      :type query: str
+      :param k: Description for ``k``.
+      :type k: int
+
+      :returns: *List[Tuple[str, float]]* -- Description of return value.
+
+      :raises RuntimeError: Raised when validation fails.
+
+      .. rubric:: Examples
+
+      >>> from embeddings_sparse.splade import search
+      >>> result = search(..., ...)
+      >>> result  # doctest: +ELLIPSIS
+
+      .. seealso:: :py:obj:`embeddings_sparse.splade`
+
+      .. rubric:: Notes
+
+      Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
 
 .. py:function:: get_splade(backend, index_dir)
 
-   Construct a SPLADE impact index for the requested backend.
+   
+   Return get splade.
 
+   :param backend: Description for ``backend``.
+   :type backend: str
+   :param index_dir: Description for ``index_dir``.
+   :type index_dir: str
+
+   :returns: *PureImpactIndex | LuceneImpactIndex* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from embeddings_sparse.splade import get_splade
+   >>> result = get_splade(..., ...)
+   >>> result  # doctest: +ELLIPSIS
+
+   .. seealso:: :py:obj:`embeddings_sparse.splade`
+
+   .. rubric:: Notes
+
+   Provide usage considerations, constraints, or complexity notes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 

@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -35,9 +34,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor rrf_fuse]
 def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, float]:
-    """
-    Return rrf fuse.
-    
+    """Return rrf fuse.
+
     Parameters
     ----------
     rankers : List[List[Tuple[str, float]]]

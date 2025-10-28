@@ -1,5 +1,4 @@
-"""
-Provide utilities for module.
+"""Provide utilities for module.
 
 Notes
 -----
@@ -42,9 +41,8 @@ TOKEN = re.compile(r"[A-Za-z0-9]+")
 
 # [nav:anchor tok]
 def tok(text: str) -> list[str]:
-    """
-    Return tok.
-    
+    """Return tok.
+
     Parameters
     ----------
     text : str
@@ -78,35 +76,16 @@ def tok(text: str) -> list[str]:
 # [nav:anchor SpladeDoc]
 @dataclass
 class SpladeDoc:
-    """
-    Represent SpladeDoc.
+    """Represent SpladeDoc."""
     
-    Attributes
-    ----------
-    chunk_id : str
-        Attribute description.
-    doc_id : str
-        Attribute description.
-    section : str
-        Attribute description.
-    text : str
-        Attribute description.
     
-    Examples
-    --------
-    >>> from search_api.splade_index import SpladeDoc
-    >>> result = SpladeDoc()
-    >>> result  # doctest: +ELLIPSIS
-    ...
     
-    See Also
-    --------
-    search_api.splade_index
     
-    Notes
-    -----
-    Document class invariants and lifecycle details here.
-    """
+    
+    
+    
+    
+    
     
     
     
@@ -120,9 +99,8 @@ class SpladeDoc:
 
 # [nav:anchor SpladeIndex]
 class SpladeIndex:
-    """
-    Represent SpladeIndex.
-    
+    """Represent SpladeIndex.
+
     Attributes
     ----------
     None
@@ -163,9 +141,8 @@ class SpladeIndex:
         chunks_dataset_root: str | None = None,
         sparse_root: str | None = None,
     ) -> None:
-        """
-        Return init.
-        
+        """Return init.
+
         Parameters
         ----------
         db_path : str
@@ -197,9 +174,8 @@ class SpladeIndex:
         self._load(chunks_dataset_root)
 
     def _load(self, chunks_root: str | None) -> None:
-        """
-        Return load.
-        
+        """Return load.
+
         Parameters
         ----------
         chunks_root : str | None
@@ -250,9 +226,8 @@ class SpladeIndex:
                 self.df[term] = self.df.get(term, 0) + 1
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """
-        Return search.
-        
+        """Return search.
+
         Parameters
         ----------
         query : str
@@ -302,9 +277,8 @@ class SpladeIndex:
         return [(idx, value) for idx, value in ranked[:k] if value > 0.0]
 
     def doc(self, index: int) -> SpladeDoc:
-        """
-        Return doc.
-        
+        """Return doc.
+
         Parameters
         ----------
         index : int
