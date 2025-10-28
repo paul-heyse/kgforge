@@ -79,13 +79,13 @@ run "$PY" tools/update_navmaps.py
 run "$PY" tools/navmap/build_navmap.py
 run "$PY" tools/navmap/check_navmap.py
 run "$BIN"/pytest -q --xdoctest --xdoctest-options=ELLIPSIS,IGNORE_WHITESPACE,NORMALIZE_WHITESPACE --xdoctest-modules --xdoctest-glob='examples/*.py' examples
+run make symbols
 run "$PY" tools/docs/build_test_map.py
 run "$PY" tools/docs/scan_observability.py
 run "$PY" tools/docs/export_schemas.py
 run "$PY" tools/docs/build_graphs.py
 run make html
 run make json
-run make symbols
 if [[ $BUILD_MKDOCS -eq 1 ]]; then
   run "$BIN/mkdocs" build --config-file mkdocs.yml
 fi
