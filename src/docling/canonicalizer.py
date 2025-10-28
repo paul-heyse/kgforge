@@ -53,6 +53,8 @@ def canonicalize_text(blocks: list[str]) -> str:
     
     
     
+    
+    
 
 
 
@@ -88,6 +90,8 @@ def canonicalize_text(blocks: list[str]) -> str:
         str
             Description of return value.
         """
+        
+        
         
         
         

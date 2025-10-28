@@ -55,6 +55,8 @@ class DuckDBRegistryHelper:
         
         
         
+        
+        
 
 
 
@@ -125,6 +127,8 @@ class DuckDBRegistryHelper:
         
         
         
+        
+        
 
 
 
@@ -168,6 +172,8 @@ class DuckDBRegistryHelper:
         notes : str | None
             Description for ``notes``.
         """
+        
+        
         
         
         
@@ -240,6 +246,8 @@ class DuckDBRegistryHelper:
         
         
         
+        
+        
 
 
 
@@ -283,6 +291,8 @@ class DuckDBRegistryHelper:
         rows : int
             Description for ``rows``.
         """
+        
+        
         
         
         
@@ -350,6 +360,8 @@ class DuckDBRegistryHelper:
         
         
         
+        
+        
 
 
 
@@ -384,6 +396,8 @@ class DuckDBRegistryHelper:
         docs : List[Doc]
             Description for ``docs``.
         """
+        
+        
         
         
         
@@ -461,6 +475,8 @@ class DuckDBRegistryHelper:
         
         
         
+        
+        
 
 
 
@@ -506,6 +522,8 @@ class DuckDBRegistryHelper:
         payload : Mapping[str, object]
             Description for ``payload``.
         """
+        
+        
         
         
         

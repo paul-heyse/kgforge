@@ -7,16 +7,16 @@ Kgfoundry Common utilities
 
 ## Modules
 
-- **`kgfoundry_common.config`** — Config utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/config.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/7ec04ff0de15b4ab6cf0b39b512d4f4c3c97054d/src/kgfoundry_common/config.py#L1)
-- **`kgfoundry_common.errors`** — Errors utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/errors.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/7ec04ff0de15b4ab6cf0b39b512d4f4c3c97054d/src/kgfoundry_common/errors.py#L1)
-- **`kgfoundry_common.exceptions`** — Exceptions utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/exceptions.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/7ec04ff0de15b4ab6cf0b39b512d4f4c3c97054d/src/kgfoundry_common/exceptions.py#L1)
-- **`kgfoundry_common.ids`** — Ids utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/ids.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/7ec04ff0de15b4ab6cf0b39b512d4f4c3c97054d/src/kgfoundry_common/ids.py#L1)
-- **`kgfoundry_common.logging`** — Logging utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/logging.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/7ec04ff0de15b4ab6cf0b39b512d4f4c3c97054d/src/kgfoundry_common/logging.py#L1)
-- **`kgfoundry_common.models`** — Models utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/models.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/7ec04ff0de15b4ab6cf0b39b512d4f4c3c97054d/src/kgfoundry_common/models.py#L1)
-- **`kgfoundry_common.navmap_types`** — Navmap Types utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/7ec04ff0de15b4ab6cf0b39b512d4f4c3c97054d/src/kgfoundry_common/navmap_types.py#L1)
-- **`kgfoundry_common.parquet_io`** — Parquet Io utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/parquet_io.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/7ec04ff0de15b4ab6cf0b39b512d4f4c3c97054d/src/kgfoundry_common/parquet_io.py#L1)
+- **`kgfoundry_common.config`** — Config utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/config.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/kgfoundry_common/config.py#L1)
+- **`kgfoundry_common.errors`** — Errors utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/errors.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/kgfoundry_common/errors.py#L1)
+- **`kgfoundry_common.exceptions`** — Exceptions utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/exceptions.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/kgfoundry_common/exceptions.py#L1)
+- **`kgfoundry_common.ids`** — Ids utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/ids.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/kgfoundry_common/ids.py#L1)
+- **`kgfoundry_common.logging`** — Logging utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/logging.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/kgfoundry_common/logging.py#L1)
+- **`kgfoundry_common.models`** — Models utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/models.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/kgfoundry_common/models.py#L1)
+- **`kgfoundry_common.navmap_types`** — Navmap Types utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/kgfoundry_common/navmap_types.py#L1)
+- **`kgfoundry_common.parquet_io`** — Parquet Io utilities → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/parquet_io.py:1:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/kgfoundry_common/parquet_io.py#L1)
 
 ## Classes
 
-- **`kgfoundry_common.NavMap`** — Describe NavMap → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:32:1) | [view](https://github.com/github.com/paul-heyse/blob/7ec04ff0de15b4ab6cf0b39b512d4f4c3c97054d/src/kgfoundry_common/navmap_types.py#L32-L45)
-<!-- agent:readme v1 sha:7ec04ff0de15b4ab6cf0b39b512d4f4c3c97054d content:b4576a06ac42 -->
+- **`kgfoundry_common.NavMap`** — Describe NavMap → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:32:1) | [view](https://github.com/github.com/paul-heyse/blob/5c4124270cb9aa2a3dec18bfa8776d4becf90d97/src/kgfoundry_common/navmap_types.py#L32-L45)
+<!-- agent:readme v1 sha:5c4124270cb9aa2a3dec18bfa8776d4becf90d97 content:8eda0817ad79 -->
