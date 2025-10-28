@@ -1,10 +1,17 @@
-"""Data contracts smoke metadata.
+""".. _gallery_data_contracts_minimal:
 
-Title: Data contracts — schema export smoke
-Tags: schema, pydantic
-Time: <2s
-GPU: no
-Network: no
+Data contracts — schema export smoke
+====================================
+
+Demonstrate exporting a minimal :class:`pydantic.BaseModel` schema.
+
+.. tags:: schema, pydantic
+
+**Constraints**
+
+- **Time:** <2s
+- **GPU:** no
+- **Network:** no
 
 >>> from pydantic import BaseModel
 >>> class DemoPayload(BaseModel):
