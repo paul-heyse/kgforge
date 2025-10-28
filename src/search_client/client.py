@@ -167,13 +167,13 @@ class KGFoundryClient:
 
         Parameters
         ----------
-        base_url : str | None
+        base_url : str, optional, default='http://localhost:8080'
             Description for ``base_url``.
-        api_key : str | None
+        api_key : str | None, optional, default=None
             Description for ``api_key``.
-        timeout : float | None
+        timeout : float, optional, default=30.0
             Description for ``timeout``.
-        http : _SupportsHttp | None
+        http : _SupportsHttp | None, optional, default=None
             Description for ``http``.
         """
         

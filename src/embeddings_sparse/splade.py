@@ -94,13 +94,13 @@ class SPLADEv3Encoder:
 
         Parameters
         ----------
-        model_id : str | None
+        model_id : str, optional, default='naver/splade-v3-distilbert'
             Description for ``model_id``.
-        device : str | None
+        device : str, optional, default='cuda'
             Description for ``device``.
-        topk : int | None
+        topk : int, optional, default=256
             Description for ``topk``.
-        max_seq_len : int | None
+        max_seq_len : int, optional, default=512
             Description for ``max_seq_len``.
         """
         

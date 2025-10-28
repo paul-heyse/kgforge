@@ -116,9 +116,9 @@ class FaissAdapter:
         ----------
         db_path : str
             Description for ``db_path``.
-        factory : str | None
+        factory : str, optional, default='OPQ64,IVF8192,PQ64'
             Description for ``factory``.
-        metric : str | None
+        metric : str, optional, default='ip'
             Description for ``metric``.
         """
         
