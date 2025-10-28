@@ -1,19 +1,16 @@
-"""Quickstart — minimal import smoke test.
-
-.. _gallery_quickstart:
-
-Quickstart — minimal import smoke test
+"""Quickstart — minimal import smoke test
 ======================================
 
 Ensure the :mod:`kgfoundry` package can be imported without side effects.
 
 .. tags:: getting-started, smoke
 
-**Constraints**
+Constraints
+-----------
 
-- **Time:** <2s
-- **GPU:** no
-- **Network:** no
+- Time: <2s
+- GPU: no
+- Network: no
 
 >>> import importlib
 >>> module = importlib.import_module("kgfoundry")
