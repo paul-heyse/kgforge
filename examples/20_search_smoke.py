@@ -1,19 +1,16 @@
-"""Search — tiny corpus smoke (no GPU).
-
-.. _gallery_search_smoke:
-
-Search — tiny corpus smoke (no GPU)
+"""Search — tiny corpus smoke (no GPU)
 ===================================
 
 Exercise the bundled tiny corpus utilities without requiring accelerators.
 
 .. tags:: search, smoke
 
-**Constraints**
+Constraints
+-----------
 
-- **Time:** <2s
-- **GPU:** no
-- **Network:** no
+- Time: <2s
+- GPU: no
+- Network: no
 
 >>> from examples._utils import tiny_corpus
 >>> len(tiny_corpus())

@@ -190,6 +190,14 @@ sphinx_gallery_conf = {
     "run_stale_examples": False,
     "plot_gallery": False,
     "backreferences_dir": "gen_modules/backrefs",
+    "first_notebook_cell": None,  # Do not prepend setup cells to rendered notebooks.
+    "line_numbers": False,  # Produce cleaner code blocks in gallery pages.
+    "reference_url": {  # Keep cross-reference targets local to this project.
+        "sphinx_gallery": None,
+    },
+    "capture_repr": (),  # Avoid capturing repr output unless explicitly requested.
+    "expected_failing_examples": [],  # Fail the build if an example regresses unexpectedly.
+    "min_reported_time": 0,  # Always surface execution timing metadata in reports.
 }
 
 # Ensure JSON builder can serialize lru_cache wrappers
