@@ -54,13 +54,6 @@ class DuckDBRegistry:
         db_path : str
             Description for ``db_path``.
         """
-        
-        
-        
-        
-        
-        
-        
         self.db_path = db_path
         self.con = duckdb.connect(db_path, read_only=False)
         self.con.execute("PRAGMA threads=14")
@@ -81,14 +74,14 @@ class DuckDBRegistry:
         -------
         str
             Description of return value.
+
+        Examples
+        --------
+        >>> from registry.duckdb_registry import begin_dataset
+        >>> result = begin_dataset(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         dataset_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -113,14 +106,12 @@ class DuckDBRegistry:
             Description for ``parquet_root``.
         rows : int
             Description for ``rows``.
+
+        Examples
+        --------
+        >>> from registry.duckdb_registry import commit_dataset
+        >>> commit_dataset(..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         self.con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
         )
@@ -134,14 +125,12 @@ class DuckDBRegistry:
         ----------
         dataset_id : str
             Description for ``dataset_id``.
+
+        Examples
+        --------
+        >>> from registry.duckdb_registry import rollback_dataset
+        >>> rollback_dataset(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         self.con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
 
     def insert_run(
@@ -163,21 +152,21 @@ class DuckDBRegistry:
             Description for ``model_id``.
         revision : str | None
             Description for ``revision``.
-        config : Mapping[str, object]
+        config : collections.abc.Mapping
             Description for ``config``.
 
         Returns
         -------
         str
             Description of return value.
+
+        Examples
+        --------
+        >>> from registry.duckdb_registry import insert_run
+        >>> result = insert_run(..., ..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         run_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -202,14 +191,12 @@ class DuckDBRegistry:
             Description for ``success``.
         notes : str | None
             Description for ``notes``.
+
+        Examples
+        --------
+        >>> from registry.duckdb_registry import close_run
+        >>> close_run(..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         _ = success  # placeholder until success flag/notes are persisted
         _ = notes
         self.con.execute("UPDATE runs SET finished_at=now() WHERE run_id=?", [run_id])
@@ -221,16 +208,14 @@ class DuckDBRegistry:
 
         Parameters
         ----------
-        docs : List[Doc]
+        docs : List[src.kgfoundry_common.models.Doc]
             Description for ``docs``.
+
+        Examples
+        --------
+        >>> from registry.duckdb_registry import register_documents
+        >>> register_documents(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         for doc in docs:
             self.con.execute(
                 (
@@ -263,16 +248,14 @@ class DuckDBRegistry:
 
         Parameters
         ----------
-        assets : List[DoctagsAsset]
+        assets : List[src.kgfoundry_common.models.DoctagsAsset]
             Description for ``assets``.
+
+        Examples
+        --------
+        >>> from registry.duckdb_registry import register_doctags
+        >>> register_doctags(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         for asset in assets:
             self.con.execute(
                 (
@@ -301,16 +284,14 @@ class DuckDBRegistry:
             Description for ``event_name``.
         subject_id : str
             Description for ``subject_id``.
-        payload : Mapping[str, object]
+        payload : collections.abc.Mapping
             Description for ``payload``.
+
+        Examples
+        --------
+        >>> from registry.duckdb_registry import emit_event
+        >>> emit_event(..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         self.con.execute(
             (
                 "INSERT INTO pipeline_events("
@@ -335,14 +316,12 @@ class DuckDBRegistry:
             Description for ``error_class``.
         message : str
             Description for ``message``.
+
+        Examples
+        --------
+        >>> from registry.duckdb_registry import incident
+        >>> incident(..., ..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         self.con.execute(
             (
                 "INSERT INTO incidents("

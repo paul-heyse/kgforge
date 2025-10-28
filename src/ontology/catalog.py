@@ -15,6 +15,7 @@ class Concept:
     id: str
     label: str | None = None
 
+
 __all__ = ["OntologyCatalog"]
 
 __navmap__: Final[NavMap] = {
@@ -54,16 +55,9 @@ class OntologyCatalog:
 
         Parameters
         ----------
-        concepts : List[Concept]
+        concepts : List[src.ontology.catalog.Concept]
             Description for ``concepts``.
         """
-        
-        
-        
-        
-        
-        
-        
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
@@ -80,16 +74,16 @@ class OntologyCatalog:
 
         Returns
         -------
-        Set[str]
+        collections.abc.Set
             Description of return value.
+
+        Examples
+        --------
+        >>> from ontology.catalog import neighbors
+        >>> result = neighbors(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return set()
 
@@ -105,14 +99,14 @@ class OntologyCatalog:
 
         Returns
         -------
-        Mapping[str, Any]
+        collections.abc.Mapping
             Description of return value.
+
+        Examples
+        --------
+        >>> from ontology.catalog import hydrate
+        >>> result = hydrate(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         return {}

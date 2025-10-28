@@ -47,15 +47,15 @@ def isotonic_calibrate(pairs: list[tuple[float, int]]) -> dict[str, object]:
 
     Returns
     -------
-    Mapping[str, object]
+    collections.abc.Mapping
         Description of return value.
+
+    Examples
+    --------
+    >>> from linking.calibration import isotonic_calibrate
+    >>> result = isotonic_calibrate(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     # NOTE: fit isotonic regression parameters when calibrator is implemented
     return {"kind": "isotonic", "params": []}

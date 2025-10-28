@@ -91,16 +91,16 @@ def load_symbol_candidates() -> set[str]:
 
     Returns
     -------
-    Set[str]
+    collections.abc.Set
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_test_map import load_symbol_candidates
+    >>> result = load_symbol_candidates()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     candidates: set[str] = set()
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if symbols_json.exists():
@@ -134,16 +134,16 @@ def load_symbol_spans() -> dict[str, dict[str, Any]]:
 
     Returns
     -------
-    Mapping[str, Mapping[str, Any]]
+    collections.abc.Mapping
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_test_map import load_symbol_spans
+    >>> result = load_symbol_spans()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     out: dict[str, dict[str, Any]] = {}
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if not symbols_json.exists():
@@ -170,16 +170,16 @@ def load_public_symbols() -> set[str]:
 
     Returns
     -------
-    Set[str]
+    collections.abc.Set
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_test_map import load_public_symbols
+    >>> result = load_public_symbols()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     nav = ROOT / "site" / "_build" / "navmap" / "navmap.json"
     if not nav.exists():
         return set()
@@ -250,21 +250,21 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     ----------
     path : Path
         Description for ``path``.
-    symbols : Set[str]
+    symbols : collections.abc.Set
         Description for ``symbols``.
 
     Returns
     -------
-    Mapping[str, List[Mapping[str, object]]]
+    collections.abc.Mapping
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_test_map import scan_test_file
+    >>> result = scan_test_file(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -356,17 +356,19 @@ def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]
     """Compute load coverage.
 
     Carry out the load coverage operation.
-
+    
     Returns
     -------
-    Tuple[dict[str, Set[int]], dict[Tuple[str, int], Set[str]]]
+    Tuple[dict[str, collections.abc.Set], dict[Tuple[str, int], collections.abc.Set]]
         Description of return value.
+    
+    Examples
+    --------
+    >>> from tools.docs.build_test_map import load_coverage
+    >>> result = load_coverage()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
     
     
     if not COV_JSON.exists():
@@ -401,21 +403,21 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
 
     Parameters
     ----------
-    symbols : Set[str]
+    symbols : collections.abc.Set
         Description for ``symbols``.
 
     Returns
     -------
-    Mapping[str, List[Mapping[str, object]]]
+    collections.abc.Mapping
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_test_map import build_test_map
+    >>> result = build_test_map(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     table: dict[str, list[dict[str, object]]] = defaultdict(list)
     if not TESTS.exists():
         return {}
@@ -439,25 +441,25 @@ def attach_coverage(
 
     Parameters
     ----------
-    symbol_spans : Mapping[str, Mapping[str, Any]]
+    symbol_spans : collections.abc.Mapping
         Description for ``symbol_spans``.
-    executed : Mapping[str, Set[int]]
+    executed : collections.abc.Mapping
         Description for ``executed``.
-    ctx_by_line : Mapping[Tuple[str, int], Set[str]]
+    ctx_by_line : collections.abc.Mapping
         Description for ``ctx_by_line``.
 
     Returns
     -------
-    Mapping[str, Mapping[str, Any]]
+    collections.abc.Mapping
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_test_map import attach_coverage
+    >>> result = attach_coverage(..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     result: dict[str, dict[str, Any]] = {}
     for sym, meta in symbol_spans.items():
         f = meta.get("file")
@@ -499,27 +501,27 @@ def summarize(
 
     Parameters
     ----------
-    public_syms : Set[str]
+    public_syms : collections.abc.Set
         Description for ``public_syms``.
-    symbol_spans : Mapping[str, Mapping[str, Any]]
+    symbol_spans : collections.abc.Mapping
         Description for ``symbol_spans``.
-    coverage : Mapping[str, Mapping[str, Any]]
+    coverage : collections.abc.Mapping
         Description for ``coverage``.
     budget : int
         Description for ``budget``.
 
     Returns
     -------
-    Tuple[dict[str, Any], List[dict[str, Any]]]
+    Tuple[dict[str, typing.Any], List[dict[str, typing.Any]]]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_test_map import summarize
+    >>> result = summarize(..., ..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     # group by module
     by_mod: dict[str, list[str]] = defaultdict(list)
     for s in public_syms:

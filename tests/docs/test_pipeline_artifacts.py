@@ -44,9 +44,7 @@ def test_graph_build_outputs_are_clean() -> None:
     env = os.environ.copy()
     python_path = str(repo_root / "src")
     env["PYTHONPATH"] = (
-        f"{python_path}{os.pathsep}{env['PYTHONPATH']}"
-        if env.get("PYTHONPATH")
-        else python_path
+        f"{python_path}{os.pathsep}{env['PYTHONPATH']}" if env.get("PYTHONPATH") else python_path
     )
 
     def run_builder(fmt: str) -> None:

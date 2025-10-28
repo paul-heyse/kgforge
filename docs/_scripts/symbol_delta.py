@@ -157,14 +157,14 @@ def main(argv: list[str] | None = None) -> int:
     ------
     SystemExit
         Raised when validation fails.
+
+    Examples
+    --------
+    >>> from docs._scripts.symbol_delta import main
+    >>> result = main(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     global DELTA_PATH
 
     parser = argparse.ArgumentParser(description=__doc__)

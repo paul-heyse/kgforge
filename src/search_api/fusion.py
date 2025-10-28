@@ -49,16 +49,16 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, f
 
     Returns
     -------
-    Mapping[str, float]
+    collections.abc.Mapping
         Description of return value.
+
+    Examples
+    --------
+    >>> from search_api.fusion import rrf_fuse
+    >>> result = rrf_fuse(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     agg: dict[str, float] = {}
     for ranked in rankers:
         for r, (key, _score) in enumerate(ranked, start=1):

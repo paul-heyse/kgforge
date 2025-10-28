@@ -49,19 +49,19 @@ class DenseEmbeddingModel(Protocol):
 
         Parameters
         ----------
-        texts : Sequence[str]
+        texts : collections.abc.Sequence
             Description for ``texts``.
 
         Returns
         -------
-        NDArray[np.float32]
+        numpy.typing.NDArray
             Description of return value.
+
+        Examples
+        --------
+        >>> from embeddings_dense.base import encode
+        >>> result = encode(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         ...

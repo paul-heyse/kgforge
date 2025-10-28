@@ -393,14 +393,14 @@ def main(argv: list[str] | None = None) -> int:
     -------
     int
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.navmap.check_navmap import main
+    >>> result = main(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     errors: list[str] = []
     for py in sorted(SRC.rglob("*.py")):
         errors.extend(_inspect(py))

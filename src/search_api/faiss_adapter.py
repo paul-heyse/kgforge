@@ -103,13 +103,6 @@ class FaissAdapter:
         metric : str | None
             Description for ``metric``.
         """
-        
-        
-        
-        
-        
-        
-        
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
@@ -162,14 +155,12 @@ class FaissAdapter:
         """Compute build.
 
         Carry out the build operation.
+
+        Examples
+        --------
+        >>> from search_api.faiss_adapter import build
+        >>> build()  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         vectors = self._load_dense_parquet()
         self.vecs = vectors
         if not HAVE_FAISS:
@@ -202,14 +193,12 @@ class FaissAdapter:
         ----------
         cpu_index_path : str | None
             Description for ``cpu_index_path``.
+
+        Examples
+        --------
+        >>> from search_api.faiss_adapter import load_or_build
+        >>> load_or_build(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         try:
             if HAVE_FAISS and cpu_index_path and Path(cpu_index_path).exists():
                 cpu = faiss.read_index(cpu_index_path)
@@ -250,14 +239,14 @@ class FaissAdapter:
         ------
         RuntimeError
             Raised when validation fails.
+
+        Examples
+        --------
+        >>> from search_api.faiss_adapter import search
+        >>> result = search(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         if self.vecs is None and self.index is None:
             return []
         if HAVE_FAISS and self.index is not None:

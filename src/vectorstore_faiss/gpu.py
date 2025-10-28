@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Final, TypeAlias, cast
+from typing import Any, Final, cast
 
 import numpy as np
 from numpy.typing import NDArray
 
 from kgfoundry_common.navmap_types import NavMap
 
-__all__ = ["FloatArray", "IntArray", "StrArray", "FaissGpuIndex"]
+__all__ = ["FaissGpuIndex", "FloatArray", "IntArray", "StrArray"]
 
 __navmap__: Final[NavMap] = {
     "title": "vectorstore_faiss.gpu",
@@ -39,13 +39,13 @@ __navmap__: Final[NavMap] = {
 }
 
 # [nav:anchor FloatArray]
-FloatArray: TypeAlias = NDArray[np.float32]
+type FloatArray = NDArray[np.float32]
 
 # [nav:anchor IntArray]
-IntArray: TypeAlias = NDArray[np.int64]
+type IntArray = NDArray[np.int64]
 
 # [nav:anchor StrArray]
-StrArray: TypeAlias = NDArray[np.str_]
+type StrArray = NDArray[np.str_]
 
 
 # [nav:anchor FaissGpuIndex]
@@ -74,13 +74,6 @@ class FaissGpuIndex:
         cuvs : bool | None
             Description for ``cuvs``.
         """
-        
-        
-        
-        
-        
-        
-        
         self.factory = factory
         self.nprobe = nprobe
         self.gpu = gpu
@@ -119,14 +112,12 @@ class FaissGpuIndex:
             Description for ``train_vectors``.
         seed : int | None
             Description for ``seed``.
+
+        Examples
+        --------
+        >>> from vectorstore_faiss.gpu import train
+        >>> train(..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         if self._faiss is None:
             return
         train_mat = cast(FloatArray, np.asarray(train_vectors, dtype=np.float32, order="C"))
@@ -168,14 +159,12 @@ class FaissGpuIndex:
         ------
         RuntimeError
             Raised when validation fails.
+
+        Examples
+        --------
+        >>> from vectorstore_faiss.gpu import add
+        >>> add(..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         vec_array = cast(FloatArray, np.asarray(vectors, dtype=np.float32, order="C"))
         if self._faiss is None:
             self._xb = cast(FloatArray, np.array(vec_array, copy=True))
@@ -220,14 +209,14 @@ class FaissGpuIndex:
         ------
         RuntimeError
             Raised when validation fails.
+
+        Examples
+        --------
+        >>> from vectorstore_faiss.gpu import search
+        >>> result = search(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         q = cast(FloatArray, np.asarray(query, dtype=np.float32, order="C"))
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12
         if self._faiss is None or self._index is None:
@@ -261,14 +250,12 @@ class FaissGpuIndex:
         ------
         RuntimeError
             Raised when validation fails.
+
+        Examples
+        --------
+        >>> from vectorstore_faiss.gpu import save
+        >>> save(..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         if self._faiss is None or self._index is None:
             if self._xb is not None and self._idmap is not None:
                 np.savez(index_uri, xb=self._xb, ids=self._idmap)
@@ -296,14 +283,12 @@ class FaissGpuIndex:
         ------
         RuntimeError
             Raised when validation fails.
+
+        Examples
+        --------
+        >>> from vectorstore_faiss.gpu import load
+        >>> load(..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         if self._faiss is None:
             if os.path.exists(index_uri + ".npz"):
                 data = np.load(index_uri + ".npz", allow_pickle=True)

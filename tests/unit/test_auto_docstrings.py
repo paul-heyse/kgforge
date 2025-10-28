@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pytest
-
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-import tools.auto_docstrings as auto_docstrings
+from tools import auto_docstrings
 
 
 @pytest.fixture()
@@ -53,6 +52,8 @@ def test_module_name_for_non_src_files(repo_layout: Path) -> None:
     module = auto_docstrings.module_name_for(file_path)
 
     assert module == "docs._scripts.render"
+
+
 """Tests for ``tools.auto_docstrings`` helpers."""
 
 from __future__ import annotations
@@ -97,7 +98,6 @@ def _get_function(code: str) -> ast.FunctionDef:
 )
 def test_extended_summary_overrides(name: str, expected_fragment: str) -> None:
     """Ensure special members receive tailored extended summaries."""
-
     result = extended_summary("function", name, "pkg.module")
 
     assert expected_fragment in result
@@ -151,9 +151,11 @@ def process(item: str, limit: int | None = None) -> str:
 
     for section in required:
         assert section in docstring
+
+
+import sys
 from importlib import util
 from pathlib import Path
-import sys
 
 AUTO_DOCSTRINGS_PATH = Path(__file__).resolve().parents[2] / "tools" / "auto_docstrings.py"
 _SPEC = util.spec_from_file_location("tools.auto_docstrings", AUTO_DOCSTRINGS_PATH)
@@ -195,7 +197,6 @@ def test_build_docstring_appends_examples(
     source: str, module_name: str, expected_lines: list[str]
 ) -> None:
     """Ensure Examples block is appended for functions and async functions."""
-
     node = ast.parse(source).body[0]
     doc_lines = auto_docstrings.build_docstring("function", node, module_name)
 

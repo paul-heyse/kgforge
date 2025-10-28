@@ -60,14 +60,14 @@ class JsonFormatter(logging.Formatter):
         -------
         str
             Description of return value.
+
+        Examples
+        --------
+        >>> from kgfoundry_common.logging import format
+        >>> result = format(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         data = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
             "level": record.levelname,
@@ -91,14 +91,12 @@ def setup_logging(level: int = logging.INFO) -> None:
     ----------
     level : int | None
         Description for ``level``.
+
+    Examples
+    --------
+    >>> from kgfoundry_common.logging import setup_logging
+    >>> setup_logging(...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())
     logging.basicConfig(level=level, handlers=[handler])

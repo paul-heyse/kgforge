@@ -19,14 +19,14 @@ def iter_python_files() -> list[Path]:
     -------
     List[Path]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.update_navmaps import iter_python_files
+    >>> result = iter_python_files()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     search_root = SRC if SRC.exists() else ROOT
     return sorted(path for path in search_root.rglob("*.py") if path.is_file())
 
@@ -45,14 +45,14 @@ def module_docstring(path: Path) -> str | None:
     -------
     str | None
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.update_navmaps import module_docstring
+    >>> result = module_docstring(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     try:
         tree = ast.parse(path.read_text(encoding="utf-8"))
     except UnicodeDecodeError:
@@ -69,14 +69,12 @@ def main() -> None:
     ------
     SystemExit
         Raised when validation fails.
+
+    Examples
+    --------
+    >>> from tools.update_navmaps import main
+    >>> main()  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     offenders: list[Path] = []
     for file_path in iter_python_files():
         doc = module_docstring(file_path)

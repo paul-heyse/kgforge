@@ -53,14 +53,12 @@ def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
         Description for ``years``.
     max_works : int | None
         Description for ``max_works``.
+
+    Examples
+    --------
+    >>> from download.cli import harvest
+    >>> harvest(..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     typer.echo(f"[dry-run] would harvest topic={topic!r}, years={years}, max_works={max_works}")
 
 

@@ -29,16 +29,16 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str
 
     Returns
     -------
-    Mapping[str, Any]
+    collections.abc.Mapping
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.navmap.migrate_navmaps import migrate_navmaps
+    >>> result = migrate_navmaps(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     index = build_index()
     if output:
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -91,14 +91,14 @@ def main(argv: list[str] | None = None) -> int:
     -------
     int
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.navmap.migrate_navmaps import main
+    >>> result = main(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     args = _parse_args(argv)
     migrate_navmaps(args.output, pretty=not args.compact)
     print(f"Wrote navmap index to {args.output}")

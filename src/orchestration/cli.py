@@ -63,14 +63,12 @@ def index_bm25(
         Description for ``backend``.
     index_dir : str | None
         Description for ``index_dir``.
+
+    Examples
+    --------
+    >>> from orchestration.cli import index_bm25
+    >>> index_bm25(..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
@@ -127,14 +125,12 @@ def index_faiss(
         Description for ``dense_vectors``.
     index_path : str | None
         Description for ``index_path``.
+
+    Examples
+    --------
+    >>> from orchestration.cli import index_faiss
+    >>> index_faiss(..., ...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
         vecs = json.load(fh)
@@ -164,14 +160,12 @@ def api(port: int = 8080) -> None:
     ----------
     port : int | None
         Description for ``port``.
+
+    Examples
+    --------
+    >>> from orchestration.cli import api
+    >>> api(...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
@@ -188,14 +182,12 @@ def e2e() -> None:
     ------
     typer.Exit
         Raised when validation fails.
+
+    Examples
+    --------
+    >>> from orchestration.cli import e2e
+    >>> e2e()  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     try:
         from orchestration.flows import e2e_flow
     except ModuleNotFoundError as exc:  # pragma: no cover - defensive messaging

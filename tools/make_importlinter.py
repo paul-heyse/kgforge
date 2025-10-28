@@ -4,12 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from pathlib import Path
-from typing import Optional
 
 
 def _build_template(pkg: str) -> str:
     """Return the contents of the ``.importlinter`` file for ``pkg``."""
-
     return f"""[importlinter]
 root_package = {pkg}
 
@@ -25,17 +23,38 @@ layers =
 
 def main(
     *,
-    root_package: Optional[str] = None,
-    output_path: Optional[Path] = None,
-    root_dir: Optional[Path] = None,
-    detect: Optional[Callable[[], str]] = None,
+    root_package: str | None = None,
+    output_path: Path | None = None,
+    root_dir: Path | None = None,
+    detect: Callable[[], str] | None = None,
 ) -> Path:
-    """Generate the ``.importlinter`` configuration file.
+    """Compute main.
 
-    Parameters are optional so tests can call this function without touching the
-    project's real ``.importlinter`` file.
+    Carry out the main operation.
+
+    Parameters
+    ----------
+    root_package : Optional str | None
+        Description for ``root_package``.
+    output_path : Optional Path | None
+        Description for ``output_path``.
+    root_dir : Optional Path | None
+        Description for ``root_dir``.
+    detect : Optional collections.abc.Callable | None
+        Description for ``detect``.
+
+    Returns
+    -------
+    Path
+        Description of return value.
+
+    Examples
+    --------
+    >>> from tools.make_importlinter import main
+    >>> result = main(..., ..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-
     detected_root = root_dir or Path(__file__).resolve().parents[1]
     if root_package is None:
         detect_primary = detect or _import_detect_primary
@@ -48,6 +67,22 @@ def main(
 
 
 def _import_detect_primary() -> str:
+    """Import detect primary.
+
+    Returns
+    -------
+    str
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _import_detect_primary(...)
+    """
     from detect_pkg import detect_primary
 
     return detect_primary()

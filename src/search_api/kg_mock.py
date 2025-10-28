@@ -67,16 +67,16 @@ def detect_query_concepts(query: str) -> set[str]:
 
     Returns
     -------
-    Set[str]
+    collections.abc.Set
         Description of return value.
+
+    Examples
+    --------
+    >>> from search_api.kg_mock import detect_query_concepts
+    >>> result = detect_query_concepts(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     lowered = query.lower()
     hits: set[str] = set()
     for concept_id, meta in CONCEPTS.items():
@@ -100,14 +100,14 @@ def linked_concepts_for_text(text: str) -> list[str]:
     -------
     List[str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from search_api.kg_mock import linked_concepts_for_text
+    >>> result = linked_concepts_for_text(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     lowered = text.lower()
     hits = []
     for concept_id, meta in CONCEPTS.items():
@@ -142,13 +142,13 @@ def kg_boost(
     -------
     float
         Description of return value.
+
+    Examples
+    --------
+    >>> from search_api.kg_mock import kg_boost
+    >>> result = kg_boost(..., ..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

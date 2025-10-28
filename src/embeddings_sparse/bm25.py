@@ -110,13 +110,6 @@ class PurePythonBM25:
         field_boosts : Mapping[str, float] | None
             Description for ``field_boosts``.
         """
-        
-        
-        
-        
-        
-        
-        
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -152,16 +145,14 @@ class PurePythonBM25:
 
         Parameters
         ----------
-        docs_iterable : Iterable[Tuple[str, dict[str, str]]]
+        docs_iterable : collections.abc.Iterable
             Description for ``docs_iterable``.
+
+        Examples
+        --------
+        >>> from embeddings_sparse.bm25 import build
+        >>> build(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
@@ -212,14 +203,12 @@ class PurePythonBM25:
         """Compute load.
 
         Carry out the load operation.
+
+        Examples
+        --------
+        >>> from embeddings_sparse.bm25 import load
+        >>> load()  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         path = os.path.join(self.index_dir, "pure_bm25.pkl")
         with open(path, "rb") as f:
             data = pickle.load(f)
@@ -273,14 +262,14 @@ class PurePythonBM25:
         -------
         List[Tuple[str, float]]
             Description of return value.
+
+        Examples
+        --------
+        >>> from embeddings_sparse.bm25 import search
+        >>> result = search(..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -324,13 +313,6 @@ class LuceneBM25:
         field_boosts : Mapping[str, float] | None
             Description for ``field_boosts``.
         """
-        
-        
-        
-        
-        
-        
-        
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -344,21 +326,19 @@ class LuceneBM25:
 
         Parameters
         ----------
-        docs_iterable : Iterable[Tuple[str, dict[str, str]]]
+        docs_iterable : collections.abc.Iterable
             Description for ``docs_iterable``.
 
         Raises
         ------
         RuntimeError
             Raised when validation fails.
+
+        Examples
+        --------
+        >>> from embeddings_sparse.bm25 import build
+        >>> build(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         try:
             from pyserini.analysis import get_lucene_analyzer
             from pyserini.index import IndexWriter
@@ -420,14 +400,14 @@ class LuceneBM25:
         ------
         RuntimeError
             Raised when validation fails.
+
+        Examples
+        --------
+        >>> from embeddings_sparse.bm25 import search
+        >>> result = search(..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         self._ensure_searcher()
         if self._searcher is None:
             message = "Lucene searcher not initialized"
@@ -466,14 +446,14 @@ def get_bm25(
     -------
     PurePythonBM25 | LuceneBM25
         Description of return value.
+
+    Examples
+    --------
+    >>> from embeddings_sparse.bm25 import get_bm25
+    >>> result = get_bm25(..., ..., ..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     if backend == "lucene":
         try:
             return LuceneBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)

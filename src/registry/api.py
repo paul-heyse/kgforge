@@ -56,14 +56,14 @@ class Registry(Protocol):
         -------
         str
             Description of return value.
+
+        Examples
+        --------
+        >>> from registry.api import begin_dataset
+        >>> result = begin_dataset(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         ...
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
@@ -79,14 +79,12 @@ class Registry(Protocol):
             Description for ``parquet_root``.
         rows : int
             Description for ``rows``.
+
+        Examples
+        --------
+        >>> from registry.api import commit_dataset
+        >>> commit_dataset(..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         ...
 
     def rollback_dataset(self, dataset_id: str) -> None:
@@ -98,14 +96,12 @@ class Registry(Protocol):
         ----------
         dataset_id : str
             Description for ``dataset_id``.
+
+        Examples
+        --------
+        >>> from registry.api import rollback_dataset
+        >>> rollback_dataset(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         ...
 
     def insert_run(
@@ -127,21 +123,21 @@ class Registry(Protocol):
             Description for ``model_id``.
         revision : str | None
             Description for ``revision``.
-        config : Mapping[str, object]
+        config : collections.abc.Mapping
             Description for ``config``.
 
         Returns
         -------
         str
             Description of return value.
+
+        Examples
+        --------
+        >>> from registry.api import insert_run
+        >>> result = insert_run(..., ..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         ...
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
@@ -157,14 +153,12 @@ class Registry(Protocol):
             Description for ``success``.
         notes : str | None
             Description for ``notes``.
+
+        Examples
+        --------
+        >>> from registry.api import close_run
+        >>> close_run(..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         ...
 
     def register_documents(self, docs: list[Doc]) -> None:
@@ -174,16 +168,14 @@ class Registry(Protocol):
 
         Parameters
         ----------
-        docs : List[Doc]
+        docs : List[src.kgfoundry_common.models.Doc]
             Description for ``docs``.
+
+        Examples
+        --------
+        >>> from registry.api import register_documents
+        >>> register_documents(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         ...
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
@@ -193,16 +185,14 @@ class Registry(Protocol):
 
         Parameters
         ----------
-        assets : List[DoctagsAsset]
+        assets : List[src.kgfoundry_common.models.DoctagsAsset]
             Description for ``assets``.
+
+        Examples
+        --------
+        >>> from registry.api import register_doctags
+        >>> register_doctags(...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         ...
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
@@ -216,16 +206,14 @@ class Registry(Protocol):
             Description for ``event_name``.
         subject_id : str
             Description for ``subject_id``.
-        payload : Mapping[str, object]
+        payload : collections.abc.Mapping
             Description for ``payload``.
+
+        Examples
+        --------
+        >>> from registry.api import emit_event
+        >>> emit_event(..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         ...
 
     def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
@@ -243,12 +231,10 @@ class Registry(Protocol):
             Description for ``error_class``.
         message : str
             Description for ``message``.
+
+        Examples
+        --------
+        >>> from registry.api import incident
+        >>> incident(..., ..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         ...

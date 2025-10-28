@@ -43,14 +43,14 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             -------
             _NoopMetric
                 Description of return value.
+
+            Examples
+            --------
+            >>> from observability.metrics import labels
+            >>> result = labels()
+            >>> result  # doctest: +ELLIPSIS
+            ...
             """
-            
-            
-            
-            
-            
-            
-            
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
@@ -64,14 +64,12 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
                 Description for ``*args``.
             **kwargs : Any
                 Description for ``**kwargs``.
+
+            Examples
+            --------
+            >>> from observability.metrics import observe
+            >>> observe()  # doctest: +ELLIPSIS
             """
-            
-            
-            
-            
-            
-            
-            
             return
 
         def inc(self, *args: object, **kwargs: object) -> None:
@@ -85,14 +83,12 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
                 Description for ``*args``.
             **kwargs : Any
                 Description for ``**kwargs``.
+
+            Examples
+            --------
+            >>> from observability.metrics import inc
+            >>> inc()  # doctest: +ELLIPSIS
             """
-            
-            
-            
-            
-            
-            
-            
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
@@ -106,14 +102,12 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
                 Description for ``*args``.
             **kwargs : Any
                 Description for ``**kwargs``.
+
+            Examples
+            --------
+            >>> from observability.metrics import set
+            >>> set()  # doctest: +ELLIPSIS
             """
-            
-            
-            
-            
-            
-            
-            
             return
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:

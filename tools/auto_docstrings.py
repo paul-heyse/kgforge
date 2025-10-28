@@ -213,7 +213,6 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
 
 def _split_generic_arguments(text: str) -> list[str]:
     """Return a list of comma-separated generic arguments respecting nesting."""
-
     parts: list[str] = []
     current: list[str] = []
     depth = 0
@@ -237,7 +236,6 @@ def _split_generic_arguments(text: str) -> list[str]:
 
 def _normalize_qualified_name(text: str) -> str:
     """Map an annotation string to a fully qualified name when possible."""
-
     cleaned = text.strip()
     override = QUALIFIED_NAME_OVERRIDES.get(cleaned)
     if override:
@@ -248,9 +246,7 @@ def _normalize_qualified_name(text: str) -> str:
         normalized_base = QUALIFIED_NAME_OVERRIDES.get(base, base)
         inner = remainder[:-1]
         arguments = _split_generic_arguments(inner)
-        normalized_args = [
-            _normalize_qualified_name(argument) for argument in arguments
-        ]
+        normalized_args = [_normalize_qualified_name(argument) for argument in arguments]
         if QUALIFIED_NAME_OVERRIDES.get(base):
             # Sphinx cannot resolve cross-references that include generic
             # parameters, so we fall back to the canonical base name.
@@ -264,7 +260,6 @@ def _normalize_qualified_name(text: str) -> str:
 
 def _format_annotation_string(value: str) -> str:
     """Normalise an annotation string for consistent documentation output."""
-
     text = value.strip().replace("typing.", "")
     replacements = {"list": "List", "dict": "Mapping[str, Any]", "tuple": "Tuple", "set": "Set"}
     if text in replacements:
@@ -300,14 +295,13 @@ def parse_args() -> argparse.Namespace:
     -------
     argparse.Namespace
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import parse_args
+    >>> result = parse_args()
+    >>> result  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", required=True, type=Path, help="Directory to process.")
     parser.add_argument("--log", required=False, type=Path, help="Log file for changed paths.")
@@ -328,14 +322,13 @@ def module_name_for(path: Path) -> str:
     -------
     str
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import module_name_for
+    >>> result = module_name_for(...)
+    >>> result  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     try:
         relative = path.relative_to(REPO_ROOT)
     except ValueError:
@@ -369,14 +362,13 @@ def summarize(name: str, kind: str) -> str:
     -------
     str
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import summarize
+    >>> result = summarize(..., ...)
+    >>> result  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     base = _humanize_identifier(name) or "value"
     if kind == "module":
         text = f"Overview of {base}."
@@ -409,14 +401,13 @@ def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | Non
     -------
     str
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import extended_summary
+    >>> result = extended_summary(..., ..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     pretty = _humanize_identifier(name)
     if kind == "module":
         module_pretty = _humanize_identifier(module_name.split(".")[-1] if module_name else name)
@@ -467,14 +458,13 @@ def annotation_to_text(node: ast.AST | None) -> str:
     -------
     str
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import annotation_to_text
+    >>> result = annotation_to_text(...)
+    >>> result  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     if node is None:
         return "Any"
     try:
@@ -498,14 +488,13 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     -------
     List[Tuple[int, ast.AST, str]]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import iter_docstring_nodes
+    >>> result = iter_docstring_nodes(...)
+    >>> result  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     items: list[tuple[int, ast.AST, str]] = [(0, tree, "module")]
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
@@ -530,14 +519,13 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
     -------
     List[Tuple[str, str]]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import parameters_for
+    >>> result = parameters_for(...)
+    >>> result  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     params: list[tuple[str, str]] = []
     args = node.args
 
@@ -552,14 +540,12 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
             Description for ``arg``.
         default : ast.AST | None
             Description for ``default``.
+
+        Examples
+        --------
+        >>> from tools.auto_docstrings import add
+        >>> add(..., ...)  # doctest: +ELLIPSIS
         """
-        
-        
-        
-        
-        
-        
-        
         name = arg.arg
         if name in {"self", "cls"}:
             return
@@ -603,14 +589,13 @@ def detect_raises(node: ast.AST) -> list[str]:
     -------
     List[str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import detect_raises
+    >>> result = detect_raises(...)
+    >>> result  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     seen: OrderedDict[str, None] = OrderedDict()
     for child in ast.walk(node):
         if not isinstance(child, ast.Raise):
@@ -659,14 +644,13 @@ def build_examples(
     -------
     List[str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import build_examples
+    >>> result = build_examples(..., ..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     lines: list[str] = ["Examples", "--------"]
     if module_name and not name.startswith("__"):
         lines.append(f">>> from {module_name} import {name}")
@@ -700,14 +684,13 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     -------
     List[str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import build_docstring
+    >>> result = build_docstring(..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     if kind == "module":
         module_display = module_name.split(".")[-1] if module_name else "module"
         summary = summarize(module_display, kind)
@@ -756,7 +739,7 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
 
     if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         name = getattr(node, "name", "")
-        is_public = bool(name) and (not name.startswith("_") or name == "__init__")
+        is_public = bool(name) and not name.startswith("_")
         if is_public:
             example_lines = build_examples(module_name, name, parameters, bool(returns))
             if example_lines:
@@ -818,14 +801,13 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     -------
     Tuple[str | None, ast.Expr | None]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import docstring_text
+    >>> result = docstring_text(...)
+    >>> result  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     body = getattr(node, "body", [])
     if not body:
         return None, None
@@ -858,14 +840,12 @@ def replace(
         Description for ``indent``.
     insert_at : int
         Description for ``insert_at``.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import replace
+    >>> replace(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     formatted = [indent + line + "\n" for line in new_lines]
     if doc_expr is not None:
         start = doc_expr.lineno - 1
@@ -893,14 +873,13 @@ def process_file(path: Path) -> bool:
     -------
     bool
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import process_file
+    >>> result = process_file(...)
+    >>> result  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     try:
         text = path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
@@ -982,14 +961,12 @@ def main() -> None:
     """Compute main.
 
     Carry out the main operation.
+
+    Examples
+    --------
+    >>> from tools.auto_docstrings import main
+    >>> main()  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     args = parse_args()
     target = args.target.resolve()
     changed: list[DocstringChange] = []

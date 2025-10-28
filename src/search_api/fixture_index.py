@@ -58,14 +58,14 @@ def tokenize(text: str) -> list[str]:
     -------
     List[str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from search_api.fixture_index import tokenize
+    >>> result = tokenize(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -97,13 +97,6 @@ class FixtureIndex:
         db_path : str | None
             Description for ``db_path``.
         """
-        
-        
-        
-        
-        
-        
-        
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []
@@ -188,14 +181,14 @@ class FixtureIndex:
         -------
         List[Tuple[int, float]]
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_api.fixture_index import search
+        >>> result = search(..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         if getattr(self, "N", 0) == 0:
             return []
         qtoks = tokenize(query)
@@ -227,12 +220,12 @@ class FixtureIndex:
         -------
         src.search_api.fixture_index.FixtureDoc
             Description of return value.
+
+        Examples
+        --------
+        >>> from search_api.fixture_index import doc
+        >>> result = doc(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         return self.docs[index]

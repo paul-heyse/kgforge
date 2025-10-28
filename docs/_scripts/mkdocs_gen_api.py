@@ -35,14 +35,14 @@ def iter_packages() -> list[str]:
     -------
     List[str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from docs._scripts.mkdocs_gen_api import iter_packages
+    >>> result = iter_packages()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     packages = detect_packages()
     return packages or [detect_primary()]
 
@@ -59,14 +59,12 @@ def write_node(node: Object) -> None:
     ----------
     node : Object
         Description for ``node``.
+
+    Examples
+    --------
+    >>> from docs._scripts.mkdocs_gen_api import write_node
+    >>> write_node(...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     rel = node.path.replace(".", "/")
     page = out / rel / "index.md"
     with mkdocs_gen_files.open(page, "w") as f:

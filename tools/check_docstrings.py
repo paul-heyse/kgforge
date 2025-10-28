@@ -27,14 +27,14 @@ def parse_args() -> argparse.Namespace:
     -------
     argparse.Namespace
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.check_docstrings import parse_args
+    >>> result = parse_args()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--no-todo",
@@ -56,16 +56,16 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
 
     Returns
     -------
-    Iterable[Tuple[Path, int, str]]
+    collections.abc.Iterable
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.check_docstrings import iter_docstrings
+    >>> result = iter_docstrings(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if (doc := ast.get_docstring(tree, clean=False)) is not None:
@@ -87,14 +87,14 @@ def check_placeholders() -> int:
     -------
     int
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.check_docstrings import check_placeholders
+    >>> result = check_placeholders()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     errors: list[str] = []
     keywords = {"TODO", "TBD", "FIXME"}
 
@@ -123,14 +123,12 @@ def main() -> None:
     ------
     SystemExit
         Raised when validation fails.
+
+    Examples
+    --------
+    >>> from tools.check_docstrings import main
+    >>> main()  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     options = parse_args()
 
     cmd = [

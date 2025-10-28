@@ -14,16 +14,16 @@ def git_diff_names() -> set[str]:
 
     Returns
     -------
-    Set[str]
+    collections.abc.Set
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.hooks.docformatter import git_diff_names
+    >>> result = git_diff_names()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     result = subprocess.run(
         ["git", "diff", "--name-only"],
         check=True,
@@ -42,14 +42,14 @@ def main() -> int:
     -------
     int
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.hooks.docformatter import main
+    >>> result = main()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     repo = subprocess.run(
         ["git", "rev-parse", "--show-toplevel"],
         check=True,

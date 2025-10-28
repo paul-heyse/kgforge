@@ -67,14 +67,14 @@ class ParquetVectorWriter:
         -------
         pa.schema
             Description of return value.
+
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import dense_schema
+        >>> result = dense_schema(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -97,13 +97,6 @@ class ParquetVectorWriter:
         root : str
             Description for ``root``.
         """
-        
-        
-        
-        
-        
-        
-        
         self.root = Path(root)
 
     def write_dense(
@@ -126,7 +119,7 @@ class ParquetVectorWriter:
             Description for ``run_id``.
         dim : int
             Description for ``dim``.
-        records : Iterable[Tuple[str, List[float], float]]
+        records : collections.abc.Iterable
             Description for ``records``.
         shard : int | None
             Description for ``shard``.
@@ -135,14 +128,14 @@ class ParquetVectorWriter:
         -------
         str
             Description of return value.
+
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import write_dense
+        >>> result = write_dense(..., ..., ..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -178,14 +171,14 @@ class ParquetVectorWriter:
         -------
         pa.schema
             Description of return value.
+
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import splade_schema
+        >>> result = splade_schema()
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -215,7 +208,7 @@ class ParquetVectorWriter:
             Description for ``model``.
         run_id : str
             Description for ``run_id``.
-        records : Iterable[Tuple[str, List[int], List[float]]]
+        records : collections.abc.Iterable
             Description for ``records``.
         shard : int | None
             Description for ``shard``.
@@ -224,14 +217,14 @@ class ParquetVectorWriter:
         -------
         str
             Description of return value.
+
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import write_splade
+        >>> result = write_splade(..., ..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -272,14 +265,14 @@ class ParquetChunkWriter:
         -------
         pa.schema
             Description of return value.
+
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import chunk_schema
+        >>> result = chunk_schema()
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -317,13 +310,6 @@ class ParquetChunkWriter:
         run_id : str | None
             Description for ``run_id``.
         """
-        
-        
-        
-        
-        
-        
-        
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
@@ -334,21 +320,21 @@ class ParquetChunkWriter:
 
         Parameters
         ----------
-        rows : Iterable[dict[str, Any]]
+        rows : collections.abc.Iterable
             Description for ``rows``.
 
         Returns
         -------
         str
             Description of return value.
+
+        Examples
+        --------
+        >>> from kgfoundry_common.parquet_io import write
+        >>> result = write(...)
+        >>> result  # doctest: +ELLIPSIS
+        ...
         """
-        
-        
-        
-        
-        
-        
-        
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(
             table,

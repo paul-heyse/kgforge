@@ -59,14 +59,14 @@ def parse_args() -> argparse.Namespace:
     -------
     argparse.Namespace
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import parse_args
+    >>> result = parse_args()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     p = argparse.ArgumentParser(
         description="Build per-package and cross-subsystem graphs with policy checks."
     )
@@ -157,14 +157,14 @@ def sh(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subproces
     -------
     subprocess.CompletedProcess
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import sh
+    >>> result = sh(..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     return subprocess.run(
         cmd, check=check, cwd=str(cwd) if cwd else None, text=True, capture_output=False
     )
@@ -179,14 +179,12 @@ def ensure_bin(name: str) -> None:
     ----------
     name : str
         Description for ``name``.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import ensure_bin
+    >>> ensure_bin(...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     if not shutil.which(name):
         print(f"[graphs] Missing required executable on PATH: {name}", file=sys.stderr)
         sys.exit(2)
@@ -201,14 +199,14 @@ def find_top_packages() -> list[str]:
     -------
     List[str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import find_top_packages
+    >>> result = find_top_packages()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     # Top-level packages are directories under src/ that contain __init__.py
     pkgs: list[str] = []
     if not SRC.exists():
@@ -251,14 +249,12 @@ def build_pydeps_for_package(
         Description for ``max_bacon``.
     fmt : str
         Description for ``fmt``.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import build_pydeps_for_package
+    >>> build_pydeps_for_package(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     dot_tmp = out_svg.with_suffix(".dot")
     cmd = [
         sys.executable,
@@ -296,26 +292,27 @@ def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
         Description for ``out_dir``.
     fmt : str
         Description for ``fmt``.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import build_pyreverse_for_package
+    >>> build_pyreverse_for_package(..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     # classes_<project>.dot is named by -p <project>; use the package name to get unique names.
     out_dir.mkdir(parents=True, exist_ok=True)
-    sh([
-        "pyreverse",
-        f"src/{pkg}",
-        "-o",
-        "dot",
-        "-p",
-        pkg,
-        "-d",
-        str(out_dir),
-    ], cwd=ROOT)
+    sh(
+        [
+            "pyreverse",
+            f"src/{pkg}",
+            "-o",
+            "dot",
+            "-p",
+            pkg,
+            "-d",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+    )
 
     classes_dot = out_dir / f"classes_{pkg}.dot"
     packages_dot = out_dir / f"packages_{pkg}.dot"
@@ -359,14 +356,12 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
         Description for ``excludes``.
     max_bacon : int
         Description for ``max_bacon``.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import build_global_pydeps
+    >>> build_global_pydeps(..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     cmd = [
         sys.executable,
         "-m",
@@ -407,14 +402,14 @@ def collapse_to_packages(dot_path: Path) -> nx.DiGraph:
     -------
     nx.DiGraph
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import collapse_to_packages
+    >>> result = collapse_to_packages(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     graphs = pydot.graph_from_dot_file(str(dot_path))
     pd = graphs[0] if isinstance(graphs, list) else graphs
     g = nx.drawing.nx_pydot.from_pydot(pd).to_directed()
@@ -436,21 +431,21 @@ def analyze_graph(g: nx.DiGraph, layers: dict[str, Any]) -> dict[str, Any]:
     ----------
     g : nx.DiGraph
         Description for ``g``.
-    layers : Mapping[str, Any]
+    layers : collections.abc.Mapping
         Description for ``layers``.
 
     Returns
     -------
-    Mapping[str, Any]
+    collections.abc.Mapping
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import analyze_graph
+    >>> result = analyze_graph(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     # cycles (Johnson's algorithm) & degree centrality
     # 1) prune forbidden outward edges before cycle enumeration
     order = layers.get("order", [])
@@ -524,22 +519,20 @@ def style_and_render(
     ----------
     g : nx.DiGraph
         Description for ``g``.
-    layers : Mapping[str, Any]
+    layers : collections.abc.Mapping
         Description for ``layers``.
-    analysis : Mapping[str, Any]
+    analysis : collections.abc.Mapping
         Description for ``analysis``.
     out_svg : Path
         Description for ``out_svg``.
     fmt : str | None
         Description for ``fmt``.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import style_and_render
+    >>> style_and_render(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     pkg2layer = layers.get("packages", {}) or {}
     palette = {
         "domain": "#2f855a",
@@ -589,18 +582,16 @@ def write_meta(meta: dict[str, Any], out_json: Path) -> None:
 
     Parameters
     ----------
-    meta : Mapping[str, Any]
+    meta : collections.abc.Mapping
         Description for ``meta``.
     out_json : Path
         Description for ``out_json``.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import write_meta
+    >>> write_meta(..., ...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     out_json.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
 
@@ -613,22 +604,20 @@ def enforce_policy(
 
     Parameters
     ----------
-    analysis : Mapping[str, Any]
+    analysis : collections.abc.Mapping
         Description for ``analysis``.
-    allow : Mapping[str, Any]
+    allow : collections.abc.Mapping
         Description for ``allow``.
     fail_cycles : bool
         Description for ``fail_cycles``.
     fail_layers : bool
         Description for ``fail_layers``.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import enforce_policy
+    >>> enforce_policy(..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     allowed_cycles = set(tuple(c) for c in (allow.get("cycles") or []))
     allowed_edges = set(tuple(e) for e in (allow.get("edges") or []))
     new_cycles = [c for c in analysis["cycles"] if tuple(c) not in allowed_cycles]
@@ -667,14 +656,14 @@ def last_tree_commit(pkg: str) -> str:
     -------
     str
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import last_tree_commit
+    >>> result = last_tree_commit(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     try:
         sha = subprocess.check_output(
             ["git", "log", "-1", "--format=%H", "--", f"src/{pkg}"], cwd=str(ROOT), text=True
@@ -712,14 +701,14 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
     -------
     Path
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import cache_bucket
+    >>> result = cache_bucket(..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     return cache_dir / pkg / tree_hash
 
 
@@ -757,14 +746,14 @@ def build_one_package(
     -------
     Tuple[str, bool, bool, bool]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.docs.build_graphs import build_one_package
+    >>> result = build_one_package(..., ..., ..., ..., ..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     used_cache = False
     pydeps_ok = True
     pyrev_ok = True

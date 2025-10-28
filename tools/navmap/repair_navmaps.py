@@ -322,14 +322,14 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     -------
     List[str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.navmap.repair_navmaps import repair_module
+    >>> result = repair_module(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     path = info.path
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
@@ -414,14 +414,14 @@ def repair_all(root: Path, apply: bool) -> list[str]:
     -------
     List[str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.navmap.repair_navmaps import repair_all
+    >>> result = repair_all(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     messages: list[str] = []
     for info in _collect_modules(root):
         messages.extend(repair_module(info, apply=apply))
@@ -480,14 +480,14 @@ def main(argv: list[str] | None = None) -> int:
     -------
     int
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.navmap.repair_navmaps import main
+    >>> result = main(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     args = _parse_args(argv)
     root = args.root.resolve()
     messages = repair_all(root, apply=args.apply)

@@ -60,14 +60,14 @@ def detect_repo() -> tuple[str, str]:
     -------
     Tuple[str, str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import detect_repo
+    >>> result = detect_repo()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     try:
         remote = subprocess.check_output(
             ["git", "config", "--get", "remote.origin.url"], cwd=ROOT, text=True
@@ -106,14 +106,14 @@ def git_sha() -> str:
     -------
     str
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import git_sha
+    >>> result = git_sha()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     except Exception:
@@ -142,14 +142,14 @@ def gh_url(rel_path: str, start: int, end: int | None) -> str:
     -------
     str
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import gh_url
+    >>> result = gh_url(..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     fragment = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel_path}{fragment}"
 
@@ -163,14 +163,14 @@ def iter_packages() -> list[str]:
     -------
     List[str]
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import iter_packages
+    >>> result = iter_packages()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     env_pkgs = os.environ.get("DOCS_PKG")
     if env_pkgs:
         return [pkg.strip() for pkg in env_pkgs.split(",") if pkg.strip()]
@@ -191,14 +191,14 @@ def summarize(node: Object) -> str:
     -------
     str
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import summarize
+    >>> result = summarize(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     doc = getattr(node, "docstring", None)
     if not doc or not getattr(doc, "value", None):
         return ""
@@ -229,14 +229,14 @@ def is_public(node: Object) -> bool:
     -------
     bool
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import is_public
+    >>> result = is_public(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     return not getattr(node, "name", "").startswith("_")
 
 
@@ -256,14 +256,14 @@ def get_open_link(node: Object, readme_dir: Path) -> str | None:
     -------
     str | None
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import get_open_link
+    >>> result = get_open_link(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -291,14 +291,14 @@ def get_view_link(node: Object) -> str | None:
     -------
     str | None
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import get_view_link
+    >>> result = get_view_link(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -325,16 +325,16 @@ def iter_public_members(node: Object) -> Iterable[Object]:
 
     Returns
     -------
-    Iterable[Object]
+    collections.abc.Iterable
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import iter_public_members
+    >>> result = iter_public_members(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     members = getattr(node, "members", {})
     public = [m for m in members.values() if is_public(m)]
     return sorted(public, key=lambda child: getattr(child, "path", child.name))
@@ -408,14 +408,14 @@ def parse_config() -> Config:
     -------
     Config
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import parse_config
+    >>> result = parse_config()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     parser = argparse.ArgumentParser(description="Generate per-package README files.")
     parser.add_argument("--packages", default=os.getenv("DOCS_PKG", ""))
     parser.add_argument(
@@ -542,14 +542,14 @@ def badges_for(qname: str) -> Badges:
     -------
     Badges
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import badges_for
+    >>> result = badges_for(...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     symbol_meta, defaults = _lookup_nav(qname)
     merged = {**defaults, **symbol_meta}
     tests: list[dict[str, Any]] = []
@@ -622,14 +622,14 @@ def format_badges(qname: str, base_length: int = 0) -> str:
     -------
     str
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import format_badges
+    >>> result = format_badges(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     badge = badges_for(qname)
     parts: list[str] = []
     if badge.stability:
@@ -686,14 +686,14 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
     -------
     str | None
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import editor_link
+    >>> result = editor_link(..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     if editor_mode == "vscode":
         return f"vscode://file/{abs_path}:{lineno}:1"
     if editor_mode == "relative":
@@ -793,14 +793,14 @@ def render_line(node: Object, readme_dir: Path, cfg: Config) -> str | None:
     -------
     str | None
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import render_line
+    >>> result = render_line(..., ..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     qname = getattr(node, "path", "")
     summary = summarize(node)
 
@@ -885,14 +885,14 @@ def write_readme(node: Object, cfg: Config) -> bool:
     -------
     bool
         Description of return value.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import write_readme
+    >>> result = write_readme(..., ...)
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    
-    
-    
-    
-    
-    
-    
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"
 
@@ -1006,14 +1006,12 @@ def main() -> None:
     ------
     SystemExit
         Raised when validation fails.
+
+    Examples
+    --------
+    >>> from tools.gen_readmes import main
+    >>> main()  # doctest: +ELLIPSIS
     """
-    
-    
-    
-    
-    
-    
-    
     cfg = parse_config()
     if not cfg.packages:
         raise SystemExit("No packages detected; set DOCS_PKG or add packages under src/.")
