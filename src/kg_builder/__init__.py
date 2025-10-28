@@ -1,8 +1,6 @@
 """Kg Builder utilities."""
 
-import kg_builder.mock_kg as mock_kg
-import kg_builder.neo4j_store as neo4j_store
-
+from kg_builder import mock_kg, neo4j_store
 from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["mock_kg", "neo4j_store"]
@@ -22,7 +20,18 @@ __navmap__: NavMap = {
         },
     ],
     "symbols": {
-        "mock_kg": {},
-        "neo4j_store": {},
+        "mock_kg": {
+            "stability": "experimental",
+            "owner": "@kg-builder",
+            "since": "0.1.0",
+        },
+        "neo4j_store": {
+            "stability": "experimental",
+            "owner": "@kg-builder",
+            "since": "0.1.0",
+        },
     },
 }
+
+# [nav:anchor mock_kg]
+# [nav:anchor neo4j_store]
