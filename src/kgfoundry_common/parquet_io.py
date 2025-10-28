@@ -68,6 +68,12 @@ class ParquetVectorWriter:
         pa.schema
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -90,6 +96,12 @@ class ParquetVectorWriter:
         root : str
             Description for ``root``.
         """
+        
+        
+        
+        
+        
+        
         self.root = Path(root)
 
     def write_dense(
@@ -122,6 +134,12 @@ class ParquetVectorWriter:
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -158,6 +176,12 @@ class ParquetVectorWriter:
         pa.schema
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -197,6 +221,12 @@ class ParquetVectorWriter:
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -238,6 +268,12 @@ class ParquetChunkWriter:
         pa.schema
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -275,6 +311,12 @@ class ParquetChunkWriter:
         run_id : str | None
             Description for ``run_id``.
         """
+        
+        
+        
+        
+        
+        
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
@@ -293,6 +335,12 @@ class ParquetChunkWriter:
         str
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(
             table,

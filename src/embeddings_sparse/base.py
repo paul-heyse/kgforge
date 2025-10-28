@@ -61,6 +61,12 @@ class SparseEncoder(Protocol):
         List[Tuple[List[int], List[float]]]
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         ...
 
 
@@ -78,6 +84,12 @@ class SparseIndex(Protocol):
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
+        
+        
+        
+        
+        
+        
         ...
 
     def search(
@@ -101,4 +113,10 @@ class SparseIndex(Protocol):
         List[Tuple[str, float]]
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         ...

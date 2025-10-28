@@ -12,15 +12,28 @@ __all__ = ["SearchRequest", "SearchResult"]
 
 __navmap__: Final[NavMap] = {
     "title": "search_api.schemas",
-    "synopsis": "Module for search_api.schemas",
+    "synopsis": "Pydantic models used by the search API",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["SearchRequest", "SearchResult"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@search-api",
+        "stability": "experimental",
+        "since": "0.2.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@search-api",
+            "stability": "experimental",
+            "since": "0.2.0",
+        }
+        for name in __all__
+    },
 }
 
 

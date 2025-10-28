@@ -7,11 +7,8 @@ __all__ = ["api", "duckdb_registry", "helper", "migrate"]
 
 __navmap__: NavMap = {
     "title": "registry",
-    "synopsis": "Registry abstractions and DuckDB-backed implementations",
+    "synopsis": "DuckDB-backed registry APIs and helpers",
     "exports": __all__,
-    "owner": "@registry",
-    "stability": "experimental",
-    "since": "0.1.0",
     "sections": [
         {
             "id": "public-api",
@@ -19,6 +16,11 @@ __navmap__: NavMap = {
             "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@registry",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
     "symbols": {
         "api": {
             "stability": "beta",
@@ -26,19 +28,19 @@ __navmap__: NavMap = {
             "since": "0.1.0",
         },
         "duckdb_registry": {
-            "stability": "experimental",
+            "stability": "beta",
             "owner": "@registry",
-            "since": "0.2.0",
+            "since": "0.1.0",
         },
         "helper": {
-            "stability": "experimental",
+            "stability": "beta",
             "owner": "@registry",
             "since": "0.1.0",
         },
         "migrate": {
             "stability": "experimental",
             "owner": "@registry",
-            "since": "0.2.0",
+            "since": "0.1.0",
         },
     },
 }

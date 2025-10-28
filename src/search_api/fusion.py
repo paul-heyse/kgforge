@@ -10,15 +10,27 @@ __all__ = ["rrf_fuse"]
 
 __navmap__: Final[NavMap] = {
     "title": "search_api.fusion",
-    "synopsis": "Reciprocal rank fusion helpers used by the search API",
+    "synopsis": "Reciprocal rank fusion helpers for combining retrieval signals",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["rrf_fuse"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@search-api",
+        "stability": "experimental",
+        "since": "0.2.0",
+    },
+    "symbols": {
+        "rrf_fuse": {
+            "owner": "@search-api",
+            "stability": "experimental",
+            "since": "0.2.0",
+        },
+    },
 }
 
 
@@ -40,6 +52,11 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, f
     Mapping[str, float]
         Description of return value.
     """
+    
+    
+    
+    
+    
     
     agg: dict[str, float] = {}
     for ranked in rankers:

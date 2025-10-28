@@ -91,6 +91,12 @@ class SPLADEv3Encoder:
         max_seq_len : int | None
             Description for ``max_seq_len``.
         """
+        
+        
+        
+        
+        
+        
         self.model_id = model_id
         self.device = device
         self.topk = topk
@@ -116,6 +122,12 @@ class SPLADEv3Encoder:
         NotImplementedError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
+        
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
@@ -137,6 +149,12 @@ class PureImpactIndex:
         index_dir : str
             Description for ``index_dir``.
         """
+        
+        
+        
+        
+        
+        
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -170,6 +188,12 @@ class PureImpactIndex:
         docs_iterable : Iterable[Tuple[str, dict[str, str]]]
             Description for ``docs_iterable``.
         """
+        
+        
+        
+        
+        
+        
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -205,6 +229,12 @@ class PureImpactIndex:
 
         Carry out the load operation.
         """
+        
+        
+        
+        
+        
+        
         with open(os.path.join(self.index_dir, "impact.pkl"), "rb") as handle:
             data = pickle.load(handle)
         self.df = data["df"]
@@ -228,6 +258,12 @@ class PureImpactIndex:
         List[Tuple[str, float]]
             Description of return value.
         """
+        
+        
+        
+        
+        
+        
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
         for token in tokens:
@@ -253,6 +289,12 @@ class LuceneImpactIndex:
         index_dir : str
             Description for ``index_dir``.
         """
+        
+        
+        
+        
+        
+        
         self.index_dir = index_dir
         self._searcher: Any | None = None
 
@@ -297,6 +339,12 @@ class LuceneImpactIndex:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
+        
         self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
@@ -323,6 +371,12 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
     PureImpactIndex | LuceneImpactIndex
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     if backend == "lucene":
         try:
             return LuceneImpactIndex(index_dir)

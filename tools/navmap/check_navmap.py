@@ -79,6 +79,27 @@ def _parse_navmap_dict(py: Path) -> dict[str, Any]:
     result: dict[str, Any] = {}
 
     def _safe_eval(value: ast.AST) -> Any:
+        """Safe eval.
+
+        Parameters
+        ----------
+        value : ast.AST
+            Description.
+
+        Returns
+        -------
+        Any
+            Description.
+
+        Raises
+        ------
+        Exception
+            Description.
+
+        Examples
+        --------
+        >>> _safe_eval(...)
+        """
         if isinstance(value, ast.Constant):
             return value.value
         if isinstance(value, ast.Name) and value.id == "__all__":
@@ -123,6 +144,27 @@ def _parse_all(py: Path) -> list[str]:
         return []
 
     def _literal(node: ast.AST) -> list[str] | None:
+        """literal.
+
+        Parameters
+        ----------
+        node : ast.AST
+            Description.
+
+        Returns
+        -------
+        list[str] | None
+            Description.
+
+        Raises
+        ------
+        Exception
+            Description.
+
+        Examples
+        --------
+        >>> _literal(...)
+        """
         if isinstance(node, (ast.List, ast.Tuple)):
             vals: list[str] = []
             for elt in node.elts:
@@ -264,6 +306,12 @@ def main(argv: list[str] | None = None) -> int:
     int
         Description of return value.
     """
+    
+    
+    
+    
+    
+    
     errors: list[str] = []
     for py in sorted(SRC.rglob("*.py")):
         errors.extend(_inspect(py))

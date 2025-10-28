@@ -59,6 +59,11 @@ class OntologyCatalog:
             Description for ``concepts``.
         """
         
+        
+        
+        
+        
+        
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
@@ -79,6 +84,11 @@ class OntologyCatalog:
             Description of return value.
         """
         
+        
+        
+        
+        
+        
         # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return set()
 
@@ -97,5 +107,10 @@ class OntologyCatalog:
         Mapping[str, Any]
             Description of return value.
         """
+        
+        
+        
+        
+        
         
         return {}

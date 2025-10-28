@@ -14,15 +14,27 @@ __all__ = ["FaissGpuIndex"]
 
 __navmap__: Final[NavMap] = {
     "title": "vectorstore_faiss.gpu",
-    "synopsis": "FAISS index wrapper with optional cuVS acceleration and numpy fallback.",
+    "synopsis": "GPU-accelerated FAISS bindings and helper types",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["FaissGpuIndex"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@search-api",
+        "stability": "experimental",
+        "since": "0.2.0",
+    },
+    "symbols": {
+        "FaissGpuIndex": {
+            "owner": "@search-api",
+            "stability": "experimental",
+            "since": "0.2.0",
+        },
+    },
 }
 
 type FloatArray = NDArray[np.float32]
@@ -56,6 +68,11 @@ class FaissGpuIndex:
         cuvs : bool | None
             Description for ``cuvs``.
         """
+        
+        
+        
+        
+        
         
         self.factory = factory
         self.nprobe = nprobe
@@ -96,6 +113,11 @@ class FaissGpuIndex:
         seed : int | None
             Description for ``seed``.
         """
+        
+        
+        
+        
+        
         
         if self._faiss is None:
             return
@@ -139,6 +161,11 @@ class FaissGpuIndex:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
         
         vec_array = cast(FloatArray, np.asarray(vectors, dtype=np.float32, order="C"))
         if self._faiss is None:
@@ -186,6 +213,11 @@ class FaissGpuIndex:
             Raised when validation fails.
         """
         
+        
+        
+        
+        
+        
         q = cast(FloatArray, np.asarray(query, dtype=np.float32, order="C"))
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12
         if self._faiss is None or self._index is None:
@@ -221,6 +253,11 @@ class FaissGpuIndex:
             Raised when validation fails.
         """
         
+        
+        
+        
+        
+        
         if self._faiss is None or self._index is None:
             if self._xb is not None and self._idmap is not None:
                 np.savez(index_uri, xb=self._xb, ids=self._idmap)
@@ -249,6 +286,11 @@ class FaissGpuIndex:
         RuntimeError
             Raised when validation fails.
         """
+        
+        
+        
+        
+        
         
         if self._faiss is None:
             if os.path.exists(index_uri + ".npz"):

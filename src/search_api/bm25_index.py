@@ -24,9 +24,22 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["toks", "BM25Doc", "BM25Index"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@search-api",
+        "stability": "experimental",
+        "since": "0.2.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@search-api",
+            "stability": "experimental",
+            "since": "0.2.0",
+        }
+        for name in __all__
+    },
 }
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
@@ -48,6 +61,11 @@ def toks(text: str) -> list[str]:
     List[str]
         Description of return value.
     """
+    
+    
+    
+    
+    
     
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
@@ -82,6 +100,11 @@ class BM25Index:
             Description for ``b``.
         """
         
+        
+        
+        
+        
+        
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -105,6 +128,11 @@ class BM25Index:
         BM25Index
             Description of return value.
         """
+        
+        
+        
+        
+        
         
         index = cls()
         con = duckdb.connect(db_path)
@@ -177,6 +205,11 @@ class BM25Index:
             Description for ``path``.
         """
         
+        
+        
+        
+        
+        
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as handle:
             pickle.dump(
@@ -207,6 +240,11 @@ class BM25Index:
         BM25Index
             Description of return value.
         """
+        
+        
+        
+        
+        
         
         with open(path, "rb") as handle:
             payload = pickle.load(handle)
@@ -255,6 +293,11 @@ class BM25Index:
             Description of return value.
         """
         
+        
+        
+        
+        
+        
         if self.N == 0:
             return []
         terms = toks(query)
@@ -287,5 +330,10 @@ class BM25Index:
         BM25Doc
             Description of return value.
         """
+        
+        
+        
+        
+        
         
         return self.docs[index]
