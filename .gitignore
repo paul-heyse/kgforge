@@ -10,6 +10,7 @@ data/**/*
 *.parquet
 *.faiss
 *.ids
+/.wheelhouse
 
 # envs & build junk
 .venv/
