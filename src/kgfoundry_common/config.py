@@ -18,9 +18,21 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["load_config"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@kgfoundry-common",
+        "stability": "stable",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "load_config": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+    },
 }
 
 
@@ -40,6 +52,5 @@ def load_config(path: str) -> dict[str, Any]:
     Mapping[str, Any]
         Description of return value.
     """
-    
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f)

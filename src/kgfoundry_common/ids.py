@@ -18,9 +18,26 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["urn_doc_from_text", "urn_chunk"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@kgfoundry-common",
+        "stability": "stable",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "urn_doc_from_text": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+        "urn_chunk": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+    },
 }
 
 
@@ -40,7 +57,6 @@ def urn_doc_from_text(text: str) -> str:
     str
         Description of return value.
     """
-    
     h = hashlib.sha256(text.encode("utf-8")).digest()[:16]
     b32 = base64.b32encode(h).decode("ascii").strip("=").lower()
     return f"urn:doc:sha256:{b32}"
@@ -66,5 +82,4 @@ def urn_chunk(doc_hash: str, start: int, end: int) -> str:
     str
         Description of return value.
     """
-    
     return f"urn:chunk:{doc_hash.split(':')[-1]}:{start}-{end}"

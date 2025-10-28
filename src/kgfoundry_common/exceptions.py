@@ -18,9 +18,29 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["DownloadError", "UnsupportedMIMEError"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@kgfoundry-common",
+        "stability": "deprecated",
+        "since": "0.1.0",
+        "deprecated_in": "0.3.0",
+    },
+    "symbols": {
+        "DownloadError": {
+            "owner": "@kgfoundry-common",
+            "stability": "deprecated",
+            "since": "0.1.0",
+            "deprecated_in": "0.3.0",
+        },
+        "UnsupportedMIMEError": {
+            "owner": "@kgfoundry-common",
+            "stability": "deprecated",
+            "since": "0.1.0",
+            "deprecated_in": "0.3.0",
+        },
+    },
 }
 
 

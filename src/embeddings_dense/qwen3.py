@@ -16,9 +16,21 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["Qwen3Embedder"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@embeddings",
+        "stability": "experimental",
+        "since": "0.2.0",
+    },
+    "symbols": {
+        "Qwen3Embedder": {
+            "owner": "@embeddings",
+            "stability": "experimental",
+            "since": "0.2.0",
+        },
+    },
 }
 
 

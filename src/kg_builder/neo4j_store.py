@@ -16,9 +16,21 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["Neo4jStore"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@kg-builder",
+        "stability": "experimental",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "Neo4jStore": {
+            "owner": "@kg-builder",
+            "stability": "experimental",
+            "since": "0.1.0",
+        },
+    },
 }
 
 

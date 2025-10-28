@@ -20,9 +20,21 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["DenseEmbeddingModel"],
+            "symbols": __all__,
         },
     ],
+    "module_meta": {
+        "owner": "@embeddings",
+        "stability": "beta",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        "DenseEmbeddingModel": {
+            "owner": "@embeddings",
+            "stability": "beta",
+            "since": "0.1.0",
+        },
+    },
 }
 
 
@@ -45,5 +57,4 @@ class DenseEmbeddingModel(Protocol):
         NDArray[np.float32]
             Description of return value.
         """
-        
         ...
