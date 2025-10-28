@@ -525,6 +525,7 @@ The script executes stages sequentially in a strict order. Each stage must compl
 - Generates visual dependency graphs
 - Creates architecture diagrams
 - Maps module relationships and import hierarchies
+- Supports `--format` values `svg` (default) and `png`, with caching keyed per format
 
 **Generates:** Graph visualizations and diagrams (location TBD based on tool implementation)
 

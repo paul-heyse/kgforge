@@ -102,3 +102,77 @@ def test_main_exits_on_failure_and_cleans_outputs(
     captured = capsys.readouterr()
     assert "build failures detected" in captured.err
     assert "demo_pkg" in captured.err
+
+
+def test_build_one_package_supports_png_and_cache(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
+    """Non-default formats should render and populate the cache without rebuilding."""
+
+    out_dir = tmp_path / "graphs"
+    out_dir.mkdir()
+    cache_dir = tmp_path / "cache"
+    monkeypatch.setattr(build_graphs, "OUT", out_dir)
+    monkeypatch.setattr(build_graphs, "last_tree_commit", lambda _pkg: "deadbeefcafebabe")
+
+    fmt = "png"
+    pydeps_calls = 0
+    pyrev_calls = 0
+
+    def fake_pydeps(pkg: str, out_path: Path, excludes, max_bacon: int, requested_fmt: str) -> None:
+        nonlocal pydeps_calls
+        pydeps_calls += 1
+        assert requested_fmt == fmt
+        out_path.write_text("deps", encoding="utf-8")
+
+    def fake_pyreverse(pkg: str, out_dir_arg: Path, requested_fmt: str) -> None:
+        nonlocal pyrev_calls
+        pyrev_calls += 1
+        assert requested_fmt == fmt
+        (out_dir_arg / f"{pkg}-uml.{fmt}").write_text("uml", encoding="utf-8")
+
+    monkeypatch.setattr(build_graphs, "build_pydeps_for_package", fake_pydeps)
+    monkeypatch.setattr(build_graphs, "build_pyreverse_for_package", fake_pyreverse)
+
+    result = build_graphs.build_one_package(
+        pkg="demo_pkg",
+        fmt=fmt,
+        excludes=[],
+        max_bacon=4,
+        cache_dir=cache_dir,
+        use_cache=True,
+        verbose=False,
+    )
+
+    imports_path = out_dir / "demo_pkg-imports.png"
+    uml_path = out_dir / "demo_pkg-uml.png"
+    assert imports_path.exists()
+    assert uml_path.exists()
+    assert result == ("demo_pkg", False, True, True)
+    assert pydeps_calls == 1
+    assert pyrev_calls == 1
+
+    # Delete the freshly rendered files and ensure a cache hit restores them without rerunning builders.
+    imports_path.unlink()
+    uml_path.unlink()
+
+    def fail_pydeps(*_args, **_kwargs) -> None:  # pragma: no cover - defensive guard
+        raise AssertionError("pydeps should not run on cache hit")
+
+    def fail_pyreverse(*_args, **_kwargs) -> None:  # pragma: no cover - defensive guard
+        raise AssertionError("pyreverse should not run on cache hit")
+
+    monkeypatch.setattr(build_graphs, "build_pydeps_for_package", fail_pydeps)
+    monkeypatch.setattr(build_graphs, "build_pyreverse_for_package", fail_pyreverse)
+
+    cached_result = build_graphs.build_one_package(
+        pkg="demo_pkg",
+        fmt=fmt,
+        excludes=[],
+        max_bacon=4,
+        cache_dir=cache_dir,
+        use_cache=True,
+        verbose=False,
+    )
+
+    assert cached_result == ("demo_pkg", True, True, True)
+    assert imports_path.exists()
+    assert uml_path.exists()
