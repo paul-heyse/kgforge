@@ -1,4 +1,10 @@
-"""Splade utilities."""
+"""Overview of splade.
+
+This module bundles splade logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -65,7 +71,13 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 
 # [nav:anchor SPLADEv3Encoder]
 class SPLADEv3Encoder:
-    """Describe SPLADEv3Encoder."""
+    """Model the SPLADEv3Encoder.
+
+    Represent the spladev3encoder data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     name = "SPLADE-v3-distilbert"
 
@@ -93,6 +105,8 @@ class SPLADEv3Encoder:
         """
         
         
+        
+        
         self.model_id = model_id
         self.device = device
         self.topk = topk
@@ -101,23 +115,23 @@ class SPLADEv3Encoder:
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
         """Compute encode.
 
-        Carry out the encode operation.
-
+        Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         texts : List[str]
             Description for ``texts``.
-
+        
         Returns
         -------
         List[Tuple[List[int], List[float]]]
             Description of return value.
-
+        
         Raises
         ------
         NotImplementedError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.splade import encode
@@ -125,6 +139,7 @@ class SPLADEv3Encoder:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
@@ -134,7 +149,13 @@ class SPLADEv3Encoder:
 
 # [nav:anchor PureImpactIndex]
 class PureImpactIndex:
-    """Describe PureImpactIndex."""
+    """Model the PureImpactIndex.
+
+    Represent the pureimpactindex data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     def __init__(self, index_dir: str) -> None:
         """Compute init.
@@ -146,6 +167,8 @@ class PureImpactIndex:
         index_dir : str
             Description for ``index_dir``.
         """
+        
+        
         
         
         self.index_dir = index_dir
@@ -174,18 +197,19 @@ class PureImpactIndex:
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Compute build.
 
-        Carry out the build operation.
-
+        Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         docs_iterable : collections.abc.Iterable
             Description for ``docs_iterable``.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.splade import build
         >>> build(...)  # doctest: +ELLIPSIS
         """
+        
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -219,13 +243,14 @@ class PureImpactIndex:
     def load(self) -> None:
         """Compute load.
 
-        Carry out the load operation.
-
+        Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Examples
         --------
         >>> from embeddings_sparse.splade import load
         >>> load()  # doctest: +ELLIPSIS
         """
+        
         with open(os.path.join(self.index_dir, "impact.pkl"), "rb") as handle:
             data = pickle.load(handle)
         self.df = data["df"]
@@ -235,20 +260,20 @@ class PureImpactIndex:
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
         """Compute search.
 
-        Carry out the search operation.
-
+        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         query : str
             Description for ``query``.
         k : int
             Description for ``k``.
-
+        
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.splade import search
@@ -256,6 +281,7 @@ class PureImpactIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
         for token in tokens:
@@ -269,7 +295,13 @@ class PureImpactIndex:
 
 # [nav:anchor LuceneImpactIndex]
 class LuceneImpactIndex:
-    """Describe LuceneImpactIndex."""
+    """Model the LuceneImpactIndex.
+
+    Represent the luceneimpactindex data structure used throughout the project. The class
+    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+    are typically created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     def __init__(self, index_dir: str) -> None:
         """Compute init.
@@ -281,6 +313,8 @@ class LuceneImpactIndex:
         index_dir : str
             Description for ``index_dir``.
         """
+        
+        
         
         
         self.index_dir = index_dir
@@ -308,25 +342,25 @@ class LuceneImpactIndex:
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
         """Compute search.
 
-        Carry out the search operation.
-
+        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         query : str
             Description for ``query``.
         k : int
             Description for ``k``.
-
+        
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
+        
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.splade import search
@@ -334,6 +368,7 @@ class LuceneImpactIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
@@ -346,20 +381,20 @@ class LuceneImpactIndex:
 def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIndex:
     """Compute get splade.
 
-    Carry out the get splade operation.
-
+    Carry out the get splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     backend : str
         Description for ``backend``.
     index_dir : str
         Description for ``index_dir``.
-
+    
     Returns
     -------
     PureImpactIndex | LuceneImpactIndex
         Description of return value.
-
+    
     Examples
     --------
     >>> from embeddings_sparse.splade import get_splade
@@ -367,6 +402,7 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     if backend == "lucene":
         try:
             return LuceneImpactIndex(index_dir)

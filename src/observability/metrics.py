@@ -1,4 +1,10 @@
-"""Metrics utilities."""
+"""Overview of metrics.
+
+This module bundles metrics logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -30,84 +36,88 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
         def labels(self, *args: object, **kwargs: object) -> _NoopMetric:
             """Compute labels.
 
-            Carry out the labels operation.
-
+            Carry out the labels operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+            
             Parameters
             ----------
             *args : Any
                 Description for ``*args``.
             **kwargs : Any
                 Description for ``**kwargs``.
-
+            
             Returns
             -------
             _NoopMetric
                 Description of return value.
-
+            
             Examples
             --------
             >>> from observability.metrics import labels
-            >>> result = labels()
+            >>> result = labels(*args, **kwargs)
             >>> result  # doctest: +ELLIPSIS
             ...
             """
+            
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
             """Compute observe.
 
-            Carry out the observe operation.
-
+            Carry out the observe operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+            
             Parameters
             ----------
             *args : Any
                 Description for ``*args``.
             **kwargs : Any
                 Description for ``**kwargs``.
-
+            
             Examples
             --------
             >>> from observability.metrics import observe
-            >>> observe()  # doctest: +ELLIPSIS
+            >>> observe(*args, **kwargs)  # doctest: +ELLIPSIS
             """
+            
             return
 
         def inc(self, *args: object, **kwargs: object) -> None:
             """Compute inc.
 
-            Carry out the inc operation.
-
+            Carry out the inc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+            
             Parameters
             ----------
             *args : Any
                 Description for ``*args``.
             **kwargs : Any
                 Description for ``**kwargs``.
-
+            
             Examples
             --------
             >>> from observability.metrics import inc
-            >>> inc()  # doctest: +ELLIPSIS
+            >>> inc(*args, **kwargs)  # doctest: +ELLIPSIS
             """
+            
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
             """Compute set.
 
-            Carry out the set operation.
-
+            Carry out the set operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+            
             Parameters
             ----------
             *args : Any
                 Description for ``*args``.
             **kwargs : Any
                 Description for ``**kwargs``.
-
+            
             Examples
             --------
             >>> from observability.metrics import set
-            >>> set()  # doctest: +ELLIPSIS
+            >>> set(*args, **kwargs)  # doctest: +ELLIPSIS
             """
+            
             return
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:

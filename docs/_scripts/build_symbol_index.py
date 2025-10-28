@@ -1,4 +1,10 @@
-"""Build Symbol Index utilities."""
+"""Overview of build symbol index.
+
+This module bundles build symbol index logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -44,7 +50,13 @@ loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
 
 @dataclass(slots=True)
 class NavLookup:
-    """Indexed NavMap metadata used when enriching symbol rows."""
+    """Model the NavLookup.
+
+    Represent the navlookup data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     symbol_meta: dict[str, dict[str, Any]]
     module_meta: dict[str, dict[str, Any]]
@@ -54,13 +66,13 @@ class NavLookup:
 def iter_packages() -> list[str]:
     """Compute iter packages.
 
-    Carry out the iter packages operation.
-
+    Carry out the iter packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from docs._scripts.build_symbol_index import iter_packages
@@ -68,6 +80,7 @@ def iter_packages() -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
     packages = detect_packages()
@@ -77,8 +90,8 @@ def iter_packages() -> list[str]:
 def safe_attr(node: Object, attr: str, default: object | None = None) -> object | None:
     """Compute safe attr.
 
-    Carry out the safe attr operation.
-
+    Carry out the safe attr operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     node : Object
@@ -87,19 +100,20 @@ def safe_attr(node: Object, attr: str, default: object | None = None) -> object 
         Description for ``attr``.
     default : object | None
         Description for ``default``.
-
+    
     Returns
     -------
     object | None
         Description of return value.
-
+    
     Examples
     --------
     >>> from docs._scripts.build_symbol_index import safe_attr
-    >>> result = safe_attr(..., ..., ...)
+    >>> result = safe_attr(..., ...)
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     try:
         return getattr(node, attr)
     except Exception:
@@ -441,13 +455,13 @@ def _write_json_if_changed(path: Path, data: Any) -> bool:
 def main() -> int:
     """Compute main.
 
-    Carry out the main operation.
-
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Returns
     -------
     int
         Description of return value.
-
+    
     Examples
     --------
     >>> from docs._scripts.build_symbol_index import main
@@ -455,6 +469,7 @@ def main() -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     nav_lookup = _load_navmap()
     test_map = _load_test_map()
 

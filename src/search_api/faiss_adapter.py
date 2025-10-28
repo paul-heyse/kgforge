@@ -1,4 +1,10 @@
-"""Faiss Adapter utilities."""
+"""Overview of faiss adapter.
+
+This module bundles faiss adapter logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -74,7 +80,13 @@ type IndexArray = NDArray[np.int64]
 # [nav:anchor DenseVecs]
 @dataclass
 class DenseVecs:
-    """Describe DenseVecs."""
+    """Model the DenseVecs.
+
+    Represent the densevecs data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     ids: list[str]
     mat: VecArray
@@ -82,7 +94,13 @@ class DenseVecs:
 
 # [nav:anchor FaissAdapter]
 class FaissAdapter:
-    """Describe FaissAdapter."""
+    """Model the FaissAdapter.
+
+    Represent the faissadapter data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     def __init__(
         self,
@@ -103,6 +121,8 @@ class FaissAdapter:
         metric : str | None
             Description for ``metric``.
         """
+        
+        
         
         
         self.db_path = db_path
@@ -156,13 +176,14 @@ class FaissAdapter:
     def build(self) -> None:
         """Compute build.
 
-        Carry out the build operation.
-
+        Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Examples
         --------
         >>> from search_api.faiss_adapter import build
         >>> build()  # doctest: +ELLIPSIS
         """
+        
         vectors = self._load_dense_parquet()
         self.vecs = vectors
         if not HAVE_FAISS:
@@ -189,18 +210,19 @@ class FaissAdapter:
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
         """Compute load or build.
 
-        Carry out the load or build operation.
-
+        Carry out the load or build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         cpu_index_path : str | None
             Description for ``cpu_index_path``.
-
+        
         Examples
         --------
         >>> from search_api.faiss_adapter import load_or_build
-        >>> load_or_build(...)  # doctest: +ELLIPSIS
+        >>> load_or_build()  # doctest: +ELLIPSIS
         """
+        
         try:
             if HAVE_FAISS and cpu_index_path and Path(cpu_index_path).exists():
                 cpu = faiss.read_index(cpu_index_path)
@@ -223,32 +245,33 @@ class FaissAdapter:
     def search(self, qvec: VecArray, k: int = 10) -> list[tuple[str, float]]:
         """Compute search.
 
-        Carry out the search operation.
-
+        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         qvec : src.search_api.faiss_adapter.VecArray
             Description for ``qvec``.
         k : int | None
             Description for ``k``.
-
+        
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-
+        
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-
+        
         Examples
         --------
         >>> from search_api.faiss_adapter import search
-        >>> result = search(..., ...)
+        >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         if self.vecs is None and self.index is None:
             return []
         if HAVE_FAISS and self.index is not None:

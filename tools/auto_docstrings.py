@@ -1,5 +1,11 @@
 #!/usr/bin/env python
-"""Generate consistent NumPy-style docstrings across the kgfoundry codebase."""
+"""Overview of auto docstrings.
+
+This module bundles auto docstrings logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -947,7 +953,13 @@ def _format_annotation_string(value: str) -> str:
 
 @dataclass
 class DocstringChange:
-    """Describe DocstringChange."""
+    """Model the DocstringChange.
+
+    Represent the docstringchange data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
 
     path: Path
 
@@ -955,19 +967,21 @@ class DocstringChange:
 def parse_args() -> argparse.Namespace:
     """Compute parse args.
 
-    Carry out the parse args operation.
-
+    Carry out the parse args operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Returns
     -------
     argparse.Namespace
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import parse_args
     >>> result = parse_args()
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", required=True, type=Path, help="Directory to process.")
     parser.add_argument("--log", required=False, type=Path, help="Log file for changed paths.")
@@ -977,24 +991,26 @@ def parse_args() -> argparse.Namespace:
 def module_name_for(path: Path) -> str:
     """Compute module name for.
 
-    Carry out the module name for operation.
-
+    Carry out the module name for operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     str
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import module_name_for
     >>> result = module_name_for(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     try:
         relative = path.relative_to(REPO_ROOT)
     except ValueError:
@@ -1015,26 +1031,28 @@ def module_name_for(path: Path) -> str:
 def summarize(name: str, kind: str) -> str:
     """Compute summarize.
 
-    Carry out the summarize operation.
-
+    Carry out the summarize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     name : str
         Description for ``name``.
     kind : str
         Description for ``kind``.
-
+    
     Returns
     -------
     str
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import summarize
     >>> result = summarize(..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     base = _humanize_identifier(name) or "value"
     if kind == "module":
         text = f"Overview of {base}."
@@ -1050,8 +1068,8 @@ def summarize(name: str, kind: str) -> str:
 def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | None = None) -> str:
     """Compute extended summary.
 
-    Carry out the extended summary operation.
-
+    Carry out the extended summary operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     kind : str
@@ -1062,18 +1080,20 @@ def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | Non
         Description for ``module_name``.
     node : ast.AST | None
         Description for ``node``.
-
+    
     Returns
     -------
     str
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import extended_summary
-    >>> result = extended_summary(..., ..., ..., ...)
+    >>> result = extended_summary(..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     pretty = _humanize_identifier(name)
     if kind == "module":
         module_pretty = _humanize_identifier(module_name.split(".")[-1] if module_name else name)
@@ -1140,24 +1160,26 @@ def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | Non
 def annotation_to_text(node: ast.AST | None) -> str:
     """Compute annotation to text.
 
-    Carry out the annotation to text operation.
-
+    Carry out the annotation to text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     node : ast.AST | None
         Description for ``node``.
-
+    
     Returns
     -------
     str
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import annotation_to_text
     >>> result = annotation_to_text(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     if node is None:
         return "Any"
     try:
@@ -1170,24 +1192,26 @@ def annotation_to_text(node: ast.AST | None) -> str:
 def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     """Compute iter docstring nodes.
 
-    Carry out the iter docstring nodes operation.
-
+    Carry out the iter docstring nodes operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     tree : ast.Module
         Description for ``tree``.
-
+    
     Returns
     -------
     List[Tuple[int, ast.AST, str]]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import iter_docstring_nodes
     >>> result = iter_docstring_nodes(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     items: list[tuple[int, ast.AST, str]] = [(0, tree, "module")]
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
@@ -1198,47 +1222,65 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     return items
 
 
-def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[str, str]]:
+@dataclass(frozen=True)
+class ParameterInfo:
+    """Model the ParameterInfo.
+
+    Represent the parameterinfo data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
+    """
+    
+
+    name: str
+    annotation: str
+    required: bool
+
+
+def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[ParameterInfo]:
     """Compute parameters for.
 
-    Carry out the parameters for operation.
-
+    Carry out the parameters for operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     node : ast.FunctionDef | ast.AsyncFunctionDef
         Description for ``node``.
-
+    
     Returns
     -------
-    List[Tuple[str, str]]
+    List[ParameterInfo]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import parameters_for
     >>> result = parameters_for(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
-    params: list[tuple[str, str]] = []
+    
+    params: list[ParameterInfo] = []
     args = node.args
 
     def add(arg: ast.arg, default: ast.AST | None) -> None:
         """Compute add.
 
-        Carry out the add operation.
-
+        Carry out the add operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        
         Parameters
         ----------
         arg : ast.arg
             Description for ``arg``.
         default : ast.AST | None
             Description for ``default``.
-
+        
         Examples
         --------
         >>> from tools.auto_docstrings import add
         >>> add(..., ...)  # doctest: +ELLIPSIS
         """
+        
         name = arg.arg
         if name in {"self", "cls"}:
             return
@@ -1249,7 +1291,7 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
         if is_optional:
             cleaned = annotation or "Any"
             annotation = f"{cleaned} | None"
-        params.append((name, annotation or "Any"))
+        params.append(ParameterInfo(name, annotation or "Any", not is_optional))
 
     positional = args.posonlyargs + args.args
     defaults = [None] * (len(positional) - len(args.defaults)) + list(args.defaults)
@@ -1257,13 +1299,13 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
         add(arg, default)
 
     if args.vararg:
-        params.append((f"*{args.vararg.arg}", "Any"))
+        params.append(ParameterInfo(f"*{args.vararg.arg}", "Any", False))
 
     for arg, default in zip(args.kwonlyargs, args.kw_defaults, strict=True):
         add(arg, default)
 
     if args.kwarg:
-        params.append((f"**{args.kwarg.arg}", "Any"))
+        params.append(ParameterInfo(f"**{args.kwarg.arg}", "Any", False))
 
     return params
 
@@ -1271,24 +1313,26 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[s
 def detect_raises(node: ast.AST) -> list[str]:
     """Compute detect raises.
 
-    Carry out the detect raises operation.
-
+    Carry out the detect raises operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     node : ast.AST
         Description for ``node``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import detect_raises
     >>> result = detect_raises(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     seen: OrderedDict[str, None] = OrderedDict()
     for child in ast.walk(node):
         if not isinstance(child, ast.Raise):
@@ -1316,39 +1360,44 @@ def detect_raises(node: ast.AST) -> list[str]:
 
 
 def build_examples(
-    module_name: str, name: str, parameters: list[tuple[str, str]], has_return: bool
+    module_name: str, name: str, parameters: list[ParameterInfo], has_return: bool
 ) -> list[str]:
     """Compute build examples.
 
-    Carry out the build examples operation.
-
+    Carry out the build examples operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     module_name : str
         Description for ``module_name``.
     name : str
         Description for ``name``.
-    parameters : List[Tuple[str, str]]
+    parameters : List[ParameterInfo]
         Description for ``parameters``.
     has_return : bool
         Description for ``has_return``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import build_examples
     >>> result = build_examples(..., ..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     lines: list[str] = ["Examples", "--------"]
     if module_name and not name.startswith("__"):
         lines.append(f">>> from {module_name} import {name}")
-    call_args = ["..."] * sum(1 for param, _ in parameters if not param.startswith("*"))
-    invocation = f"{name}({', '.join(call_args)})" if call_args else f"{name}()"
+    required_args = ["..."] * sum(1 for param in parameters if param.required and not param.name.startswith("*"))
+    variadic_args = [param.name for param in parameters if param.name.startswith("*")]
+
+    call_parts = [*required_args, *variadic_args]
+    invocation = f"{name}({', '.join(call_parts)})" if call_parts else f"{name}()"
     if not name.startswith("__"):
         if has_return:
             lines.append(f">>> result = {invocation}")
@@ -1362,8 +1411,8 @@ def build_examples(
 def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     """Compute build docstring.
 
-    Carry out the build docstring operation.
-
+    Carry out the build docstring operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     kind : str
@@ -1372,18 +1421,20 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
         Description for ``node``.
     module_name : str
         Description for ``module_name``.
-
+    
     Returns
     -------
     List[str]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import build_docstring
     >>> result = build_docstring(..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     if kind == "module":
         module_display = module_name.split(".")[-1] if module_name else "module"
         summary = summarize(module_display, kind)
@@ -1393,7 +1444,7 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
         summary = summarize(object_name, kind)
         extended = extended_summary(kind, object_name, module_name, node)
 
-    parameters: list[tuple[str, str]] = []
+    parameters: list[ParameterInfo] = []
     returns: str | None = None
     raises: list[str] = []
     if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -1417,9 +1468,9 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
 
     if parameters:
         lines.extend(["", "Parameters", "----------"])
-        for param_name, annotation in parameters:
-            lines.append(f"{param_name} : {annotation}")
-            lines.append(f"    Description for ``{param_name}``.")
+        for parameter in parameters:
+            lines.append(f"{parameter.name} : {parameter.annotation}")
+            lines.append(f"    Description for ``{parameter.name}``.")
 
     if returns:
         lines.extend(["", "Returns", "-------", returns, "    Description of return value."])
@@ -1444,7 +1495,7 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
 
 def _required_sections(
     kind: str,
-    parameters: list[tuple[str, str]],
+    parameters: list[ParameterInfo],
     returns: str | None,
     raises: list[str],
 ) -> set[str]:
@@ -1456,7 +1507,7 @@ def _required_sections(
     ----------
     kind : str
         Description for ``kind``.
-    parameters : List[Tuple[str, str]]
+    parameters : List[ParameterInfo]
         Description for ``parameters``.
     returns : str | None
         Description for ``returns``.
@@ -1483,24 +1534,26 @@ def _required_sections(
 def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     """Compute docstring text.
 
-    Carry out the docstring text operation.
-
+    Carry out the docstring text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     node : ast.AST
         Description for ``node``.
-
+    
     Returns
     -------
     Tuple[str | None, ast.Expr | None]
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import docstring_text
     >>> result = docstring_text(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     body = getattr(node, "body", [])
     if not body:
         return None, None
@@ -1519,8 +1572,8 @@ def replace(
 ) -> None:
     """Compute replace.
 
-    Carry out the replace operation.
-
+    Carry out the replace operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     doc_expr : ast.Expr | None
@@ -1533,12 +1586,13 @@ def replace(
         Description for ``indent``.
     insert_at : int
         Description for ``insert_at``.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import replace
     >>> replace(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
+    
     formatted = [indent + line + "\n" for line in new_lines]
     if doc_expr is not None:
         start = doc_expr.lineno - 1
@@ -1555,24 +1609,26 @@ def replace(
 def process_file(path: Path) -> bool:
     """Compute process file.
 
-    Carry out the process file operation.
-
+    Carry out the process file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     path : Path
         Description for ``path``.
-
+    
     Returns
     -------
     bool
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import process_file
     >>> result = process_file(...)
     >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     try:
         text = path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
@@ -1600,7 +1656,7 @@ def process_file(path: Path) -> bool:
                 continue
 
         doc, expr = docstring_text(node)
-        parameters: list[tuple[str, str]] = []
+        parameters: list[ParameterInfo] = []
         returns: str | None = None
         raises: list[str] = []
         if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -1632,12 +1688,21 @@ def process_file(path: Path) -> bool:
             )
             if any(token in doc for token in boilerplate_tokens):
                 needs_update = True
+        new_lines: list[str] | None = None
+        if not needs_update:
+            new_lines = build_docstring(kind, node, module_name)
+            generated_body = "\n".join(new_lines[1:-1]) if len(new_lines) >= 2 else ""
+            if (doc or "") != generated_body:
+                needs_update = True
+
         if not needs_update:
             continue
 
+        if new_lines is None:
+            new_lines = build_docstring(kind, node, module_name)
+
         if kind == "module":
             indent = ""
-            new_lines = build_docstring(kind, node, module_name)
             insert_at = 1 if lines and lines[0].startswith("#!") else 0
             replace(expr, lines, new_lines, indent, insert_at)
         else:
@@ -1651,7 +1716,6 @@ def process_file(path: Path) -> bool:
             ):
                 continue
             indent = " " * (node.col_offset + 4)
-            new_lines = build_docstring(kind, node, module_name)
             body: list[ast.stmt] = node.body
             insert_at = body[0].lineno - 1 if body else node.lineno
             replace(expr, lines, new_lines, indent, insert_at)
@@ -1665,13 +1729,14 @@ def process_file(path: Path) -> bool:
 def main() -> None:
     """Compute main.
 
-    Carry out the main operation.
-
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Examples
     --------
     >>> from tools.auto_docstrings import main
     >>> main()  # doctest: +ELLIPSIS
     """
+    
     args = parse_args()
     target = args.target.resolve()
     changed: list[DocstringChange] = []

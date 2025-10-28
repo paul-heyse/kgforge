@@ -1,21 +1,11 @@
 #!/usr/bin/env python3
-"""Build the repository NavMap index.
+"""Overview of build navmap.
 
-Outputs:
-  site/_build/navmap/navmap.json
-
-Additions in this version:
-- policy_version + link_mode at top-level
-- commit-stable GitHub permalinks in entry["links"]["github"] when DOCS_LINK_MODE includes 'github'
-- module_meta defaults (owner, stability, since, deprecated_in) inherited by per-symbol meta
-- normalized (kebab-case) section IDs and stable, deduped exports
-
-Environment:
-  DOCS_LINK_MODE=editor|github|both   (default: editor)
-  DOCS_GITHUB_ORG=<org>
-  DOCS_GITHUB_REPO=<repo>
-  DOCS_GITHUB_SHA=<sha>               (fallback to `git rev-parse HEAD`)
+This module bundles build navmap logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
+
 
 from __future__ import annotations
 
@@ -52,33 +42,25 @@ PLACEHOLDER_ALL = object()
 class AllDictTemplate:
     """Model the AllDictTemplate.
 
-    Represents the alldicttemplate data structure used throughout the project.
+    Represent the alldicttemplate data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
     """
+    
 
     __slots__ = ("template",)
 
     def __init__(self, template: Any) -> None:
-        """Init  .
+        """Compute init.
+
+        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
 
         Parameters
         ----------
-        template : Any
-            Description.
-
-        Returns
-        -------
-        None
-            Description.
-
-        Raises
-        ------
-        Exception
-            Description.
-
-        Examples
-        --------
-        >>> __init__(...)
+        template : typing.Any
+            Description for ``template``.
         """
+        
         self.template = template
 
 
@@ -202,22 +184,13 @@ def _replace_placeholders(value: Any, exports: list[str]) -> Any:
 
 @dataclass
 class ModuleInfo:
-    """Represent ModuleInfo.
+    """Model the ModuleInfo.
 
-    Attributes
-    ----------
-    attribute : type
-        Description.
-
-    Methods
-    -------
-    method()
-        Description.
-
-    Examples
-    --------
-    >>> ModuleInfo(...)
+    Represent the moduleinfo data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
     """
+    
 
     module: str
     path: Path
@@ -428,27 +401,28 @@ def _discover_py_files() -> list[Path]:
 def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, Any]:
     """Compute build index.
 
-    Carry out the build index operation.
-
+    Carry out the build index operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     root : Path | None
         Description for ``root``.
     json_path : Path | None
         Description for ``json_path``.
-
+    
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-
+    
     Examples
     --------
     >>> from tools.navmap.build_navmap import build_index
-    >>> result = build_index(..., ...)
+    >>> result = build_index()
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     files = _discover_py_files()
     data: dict[str, Any] = {
         "commit": _git_sha(),
@@ -512,23 +486,23 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
 
 
 def main() -> int:
-    """Run the navmap build CLI.
+    """Compute main.
 
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Returns
     -------
     int
-        Description.
-
-
-    Raises
-    ------
-    Exception
-        Description.
-
+        Description of return value.
+    
     Examples
     --------
-    >>> main(...)
+    >>> from tools.navmap.build_navmap import main
+    >>> result = main()
+    >>> result  # doctest: +ELLIPSIS
+    ...
     """
+    
     build_index()
     print(f"navmap built → {INDEX_PATH}")
     return 0

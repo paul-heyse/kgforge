@@ -79,8 +79,8 @@ def _get_function(code: str) -> ast.FunctionDef:
 @pytest.mark.parametrize(
     ("name", "expected_fragment"),
     [
-        ("__iter__", "Yield each item"),
-        ("__eq__", "Determine whether"),
+        ("__iter__", "Yield each element"),
+        ("__eq__", "Compare the instance for equality"),
         ("__pydantic_core_schema__", "schema object"),
         ("model_dump", "Serialise the model instance"),
     ],
@@ -185,3 +185,27 @@ def test_build_docstring_appends_examples(
     emitted_examples = doc_lines[examples_index + 2 : closing_index]
     for line in expected_lines:
         assert line in emitted_examples
+
+
+def test_build_examples_skip_optional_parameters_while_showing_variadics() -> None:
+    node = _get_function(
+        """
+def sample(
+    required: int,
+    optional: int | None = None,
+    *values: int,
+    kw_required: str,
+    kw_optional: str | None = None,
+    **extras: str,
+) -> int:
+    return required
+"""
+    )
+
+    params = parameters_for(node)
+    examples = build_examples("pkg.module", "sample", params, True)
+
+    invocation_line = next(line for line in examples if line.startswith(">>> result = sample"))
+
+    assert ">>> result = sample(..., ..., *values, **extras)" == invocation_line
+    assert any(not param.required for param in params if not param.name.startswith("*"))

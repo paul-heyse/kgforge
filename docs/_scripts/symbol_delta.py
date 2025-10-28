@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Compute the delta between symbol index snapshots."""
+"""Overview of symbol delta.
+
+This module bundles symbol delta logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
+"""
+
 
 from __future__ import annotations
 
@@ -141,30 +147,31 @@ def _write_delta(delta: dict[str, Any]) -> None:
 def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
-    Carry out the main operation.
-
+    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    
     Parameters
     ----------
     argv : List[str] | None
         Description for ``argv``.
-
+    
     Returns
     -------
     int
         Description of return value.
-
+    
     Raises
     ------
     SystemExit
         Raised when validation fails.
-
+    
     Examples
     --------
     >>> from docs._scripts.symbol_delta import main
-    >>> result = main(...)
+    >>> result = main()
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     global DELTA_PATH
 
     parser = argparse.ArgumentParser(description=__doc__)

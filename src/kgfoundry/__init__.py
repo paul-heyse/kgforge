@@ -1,4 +1,10 @@
-"""Kgfoundry utilities."""
+"""Overview of kgfoundry.
+
+This module bundles kgfoundry logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
+"""
+
 
 _ALIASES: dict[str, str] = {
     "docling": "docling",
