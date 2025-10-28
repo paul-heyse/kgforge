@@ -203,6 +203,11 @@ def main() -> int:
     
     
     
+    
+    
+    
+    
+    
     errors: list[str] = []
     for py in SRC.rglob("*.py"):
         errors.extend(_inspect(py))

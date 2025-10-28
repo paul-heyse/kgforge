@@ -1,1 +1,30 @@
 """Ontology utilities."""
+
+from typing import Final
+
+import ontology.catalog as catalog
+import ontology.loader as loader
+
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = ["catalog", "loader"]
+
+__navmap__: Final[NavMap] = {
+    "title": "ontology",
+    "synopsis": "Ontology loading and lookup helpers",
+    "exports": __all__,
+    "owner": "@ontology",
+    "stability": "experimental",
+    "since": "0.1.0",
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": __all__,
+        },
+    ],
+    "symbols": {
+        "catalog": {},
+        "loader": {},
+    },
+}
