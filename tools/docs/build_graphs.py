@@ -274,6 +274,8 @@ def build_pydeps_for_package(
     sh(cmd, cwd=ROOT)
     # Render to final image via graphviz (dot)
     sh(["dot", f"-T{fmt}", str(dot_tmp), "-o", str(out_svg)], cwd=ROOT)
+    if dot_tmp.exists():
+        dot_tmp.unlink()
 
 
 def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
@@ -297,11 +299,35 @@ def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
     
     
     # classes_<project>.dot is named by -p <project>; use the package name to get unique names.
-    sh(["pyreverse", f"src/{pkg}", "-o", "dot", "-p", pkg], cwd=ROOT)
-    dot_file = ROOT / f"classes_{pkg}.dot"
-    if dot_file.exists():
-        sh(["dot", "-Tsvg", str(dot_file), "-o", str(out_dir / f"{pkg}-uml.svg")], cwd=ROOT)
-        # (optional) cleanup: dot_file.unlink(missing_ok=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    sh([
+        "pyreverse",
+        f"src/{pkg}",
+        "-o",
+        "dot",
+        "-p",
+        pkg,
+        "-d",
+        str(out_dir),
+    ], cwd=ROOT)
+
+    classes_dot = out_dir / f"classes_{pkg}.dot"
+    packages_dot = out_dir / f"packages_{pkg}.dot"
+    output_path = out_dir / f"{pkg}-uml.{fmt}"
+    if classes_dot.exists():
+        sh(["dot", f"-T{fmt}", str(classes_dot), "-o", str(output_path)], cwd=ROOT)
+
+    # Cleanup intermediate dot files from both the build directory and repo root
+    for dot_path in (classes_dot, packages_dot):
+        if dot_path.exists():
+            dot_path.unlink()
+
+    for root_dot in (
+        ROOT / f"classes_{pkg}.dot",
+        ROOT / f"packages_{pkg}.dot",
+    ):
+        if root_dot.exists():
+            root_dot.unlink()
 
 
 # --------------------------------------------------------------------------------------
