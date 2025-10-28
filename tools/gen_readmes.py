@@ -1,14 +1,11 @@
-"""Generate per-package README files with metadata badges and deep links."""
+"""Generate per-package README files with metadata badges and deep links.
 
-from __future__ import annotations
+Generate deterministic, metadata-rich package README files.
 
-"""Generate deterministic, metadata-rich package README files.
-
-The README generator walks the object tree discovered by Griffe, enriches
-each public symbol with metadata from the NavMap/TestMap JSON artifacts,
-and writes per-package ``README.md`` files.  The generated documents follow a
-strict structure so downstream automation (agents, tooling, DocToc) can reason
-about the content reliably.
+The README generator walks the object tree discovered by Griffe, enriches each public
+symbol with metadata from the NavMap/TestMap JSON artifacts, and writes per-package
+``README.md`` files. The generated documents follow a strict structure so downstream
+automation (agents, tooling, DocToc) can reason about the content reliably.
 
 High level workflow:
 
@@ -20,6 +17,8 @@ High level workflow:
 The module also exposes helpers that the unit tests exercise directly so we can
 guarantee determinism, badge ordering, and link formatting behaviour.
 """
+
+from __future__ import annotations
 
 import argparse
 import hashlib

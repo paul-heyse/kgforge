@@ -218,10 +218,7 @@ def _navmap_assignment_span(tree: ast.Module) -> tuple[int, int] | None:
     for node in tree.body:
         if isinstance(node, (ast.Assign, ast.AnnAssign)):
             targets: Iterable[ast.expr]
-            if isinstance(node, ast.Assign):
-                targets = node.targets
-            else:
-                targets = (node.target,)
+            targets = node.targets if isinstance(node, ast.Assign) else (node.target,)
             for target in targets:
                 if isinstance(target, ast.Name) and target.id == "__navmap__":
                     start = node.lineno
@@ -334,8 +331,6 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
 
     exports = list(dict.fromkeys(info.navmap.get("exports", info.exports)))
     anchors = set(info.anchors)
-    sections = info.navmap.get("sections", []) if info.navmap else []
-
     definition_lines = _definition_lines(tree)
     messages: list[str] = []
     insertions: list[tuple[int, str]] = []

@@ -54,7 +54,8 @@ def _load_base_snapshot(arg: str) -> tuple[list[dict[str, Any]], str | None]:
     if candidate.exists():
         data = _read_json(candidate)
         if not isinstance(data, list):
-            raise SystemExit(f"Base snapshot at {candidate} is not a JSON array")
+            message = f"Base snapshot at {candidate} is not a JSON array"
+            raise SystemExit(message)
         return data, _git_rev_parse("HEAD")
 
     try:
@@ -72,7 +73,8 @@ def _load_base_snapshot(arg: str) -> tuple[list[dict[str, Any]], str | None]:
 
     data = json.loads(blob)
     if not isinstance(data, list):
-        raise SystemExit(f"Git ref '{arg}' does not contain a JSON array for symbols.json")
+        message = f"Git ref '{arg}' does not contain a JSON array for symbols.json"
+        raise SystemExit(message)
     return data, _git_rev_parse(arg)
 
 
@@ -175,11 +177,13 @@ def main(argv: list[str] | None = None) -> int:
     DELTA_PATH = Path(args.output)
 
     if not SYMBOLS_PATH.exists():
-        raise SystemExit(f"Missing current snapshot: {SYMBOLS_PATH}")
+        message = f"Missing current snapshot: {SYMBOLS_PATH}"
+        raise SystemExit(message)
 
     head_rows = _read_json(SYMBOLS_PATH)
     if not isinstance(head_rows, list):
-        raise SystemExit(f"{SYMBOLS_PATH} is not a JSON array")
+        message = f"{SYMBOLS_PATH} is not a JSON array"
+        raise SystemExit(message)
 
     base_rows, base_sha = _load_base_snapshot(args.base)
     head_sha = _git_rev_parse("HEAD")

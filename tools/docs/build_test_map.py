@@ -506,7 +506,7 @@ def summarize(
 
 
 def main() -> None:
-    """Main.
+    """Run the build-test-map command-line entry point.
 
     Returns
     -------

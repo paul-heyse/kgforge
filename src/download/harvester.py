@@ -44,9 +44,7 @@ HTTP_OK = 200
 
 # [nav:anchor OpenAccessHarvester]
 class OpenAccessHarvester:
-    """Download documents via OpenAlex and raise :class:`kgfoundry_common.errors.DownloadError` when
-    retrieval fails.
-    """
+    """Download documents via OpenAlex and raise :class:`kgfoundry_common.errors.DownloadError` when retrieval fails."""
 
     def __init__(
         self,
