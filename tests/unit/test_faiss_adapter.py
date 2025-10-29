@@ -76,6 +76,6 @@ def test_dense_search_top1_is_self(tmp_path: pathlib.Path) -> None:
         idx.train(X)  # no-op in fallback
         idx.add(ids, X)
         res = idx.search(vec.reshape(1, -1), k=5)
-        top_ids = [ids[i] for i, _ in res]
+        top_ids = [ids[i] if isinstance(i, int) else i for i, _ in res]
         assert cid in top_ids
         assert top_ids[0] == cid

@@ -1,5 +1,12 @@
-include = ["src/**/*.py", "tools/**/*.py"]
-exclude = ["tests/**", "docs/_build/**", "site/**"]
+include = ["src/**/*.py"]
+exclude = ["tests/**", "docs/_build/**", "site/**", "tools/**"]
+ignore = [
+    "tests/e2e/**",
+    "tests/mock_servers/**",
+    "docs/_scripts/**",
+    "docs/conf.py",
+    "src/__init__.py",
+]
 ownership_marker = "<!-- auto:docstring-builder v1 -->"
 dynamic_probes = false
 normalize_sections = true

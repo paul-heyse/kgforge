@@ -101,7 +101,19 @@ Parameters
     Describe ``kwargs``.
 """
 
-    def get(self, url: str, *, timeout: float) -> SupportsResponse:
+    def get(
+        self,
+        url: Any,
+        *,
+        params: Any | None = ...,
+        headers: Any | None = ...,
+        cookies: Any | None = ...,
+        auth: Any | None = ...,
+        follow_redirects: Any | None = ...,
+        timeout: Any | None = ...,
+        extensions: Any | None = ...,
+        **kwargs: Any,
+    ) -> Any:
         """Compute get.
 <!-- auto:docstring-builder v1 -->
 
@@ -134,12 +146,20 @@ Examples
 
     def post(
         self,
-        url: str,
+        url: Any,
         *,
-        json: dict[str, Any],
-        headers: dict[str, str],
-        timeout: float,
-    ) -> SupportsResponse:
+        content: Any | None = ...,
+        data: Any | None = ...,
+        files: Any | None = ...,
+        json: Any | None = ...,
+        headers: Any | None = ...,
+        cookies: Any | None = ...,
+        auth: Any | None = ...,
+        follow_redirects: Any | None = ...,
+        timeout: Any | None = ...,
+        extensions: Any | None = ...,
+        **kwargs: Any,
+    ) -> Any:
         """Compute post.
 <!-- auto:docstring-builder v1 -->
 
@@ -174,6 +194,32 @@ Examples
 >>> result  # doctest: +ELLIPSIS
 """
 
+        Carry out the post operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+        Parameters
+        ----------
+        url : str
+            Description for ``url``.
+        json : collections.abc.Mapping
+            Description for ``json``.
+        headers : collections.abc.Mapping
+            Description for ``headers``.
+        timeout : float
+            Description for ``timeout``.
+
+        Returns
+        -------
+        src.search_client.client.SupportsResponse
+            Description of return value.
+
+        Examples
+        --------
+        >>> from search_client.client import post
+        >>> result = post(..., ..., ..., ...)
+        >>> result  # doctest: +ELLIPSIS
+        """
+        ...
+
 
 class RequestsHttp(SupportsHttp):
     """Adapter that fulfils :class:`SupportsHttp` using ``requests``.
@@ -199,11 +245,38 @@ SupportsResponse
     Describe return value.
 """
         response = requests.get(url, timeout=timeout)
+    def get(
+        self,
+        url: Any,
+        *,
+        params: Any | None = None,
+        headers: Any | None = None,
+        cookies: Any | None = None,
+        auth: Any | None = None,
+        follow_redirects: Any | None = None,
+        timeout: Any | None = None,
+        extensions: Any | None = None,
+        **kwargs: Any,
+    ) -> Any:
+        """Issue a GET request via :mod:`requests`."""
+        if extensions is not None:
+            kwargs.setdefault("extensions", extensions)
+        if follow_redirects is not None:
+            kwargs.setdefault("allow_redirects", follow_redirects)
+        response = requests.get(
+            url,
+            params=params,
+            headers=headers,
+            cookies=cookies,
+            auth=auth,
+            timeout=timeout,
+            **kwargs,
+        )
         return cast(SupportsResponse, response)
 
     def post(
         self,
-        url: str,
+        url: Any,
         *,
         json: dict[str, Any],
         headers: dict[str, str],
@@ -231,6 +304,36 @@ SupportsResponse
     Describe return value.
 """
         response = requests.post(url, json=json, headers=headers, timeout=timeout)
+        content: Any | None = None,
+        data: Any | None = None,
+        files: Any | None = None,
+        json: Any | None = None,
+        headers: Any | None = None,
+        cookies: Any | None = None,
+        auth: Any | None = None,
+        follow_redirects: Any | None = None,
+        timeout: Any | None = None,
+        extensions: Any | None = None,
+        **kwargs: Any,
+    ) -> Any:
+        """Issue a POST request via :mod:`requests`."""
+        if content is not None and data is None:
+            data = content
+        if extensions is not None:
+            kwargs.setdefault("extensions", extensions)
+        if follow_redirects is not None:
+            kwargs.setdefault("allow_redirects", follow_redirects)
+        response = requests.post(
+            url,
+            data=data,
+            json=json,
+            files=files,
+            headers=headers,
+            cookies=cookies,
+            auth=auth,
+            timeout=timeout,
+            **kwargs,
+        )
         return cast(SupportsResponse, response)
 
 
@@ -304,7 +407,7 @@ Examples
 """
         r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
-        return r.json()
+        return cast(dict[str, Any], r.json())
 
     def search(
         self,
@@ -354,10 +457,13 @@ Examples
 """
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
-            f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout
+            f"{self.base_url}/search",
+            json=payload,
+            headers=self._headers(),
+            timeout=self.timeout,
         )
         r.raise_for_status()
-        return r.json()
+        return cast(dict[str, Any], r.json())
 
     def concepts(self, q: str, limit: int = 50) -> dict[str, Any]:
         """Compute concepts.
@@ -398,4 +504,4 @@ Examples
             timeout=self.timeout,
         )
         r.raise_for_status()
-        return r.json()
+        return cast(dict[str, Any], r.json())

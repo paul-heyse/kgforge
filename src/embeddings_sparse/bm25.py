@@ -380,14 +380,12 @@ Examples
 >>> build(...)  # doctest: +ELLIPSIS
 """
         try:
-            from pyserini.analysis import get_lucene_analyzer
-            from pyserini.index import IndexWriter
+            from pyserini.index.lucene import LuceneIndexer
         except Exception as exc:
             message = "Pyserini/Lucene not available"
             raise RuntimeError(message) from exc
         os.makedirs(self.index_dir, exist_ok=True)
-        analyzer = get_lucene_analyzer(stemmer="english", stopwords=True)
-        writer = IndexWriter(self.index_dir, analyzer=analyzer, keep_stopwords=False)
+        indexer = LuceneIndexer(self.index_dir)
         for doc_id, fields in docs_iterable:
             # combine fields with boosts in a "contents" field for simplicity
             title = fields.get("title", "")
@@ -400,8 +398,8 @@ Examples
                     body,
                 ]
             )
-            writer.add_document(docid=doc_id, contents=contents)
-        writer.close()
+            indexer.add_doc_dict({"id": doc_id, "contents": contents})
+        indexer.close()
 
     def _ensure_searcher(self) -> None:
         """Compute ensure searcher.

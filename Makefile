@@ -1,5 +1,5 @@
 
-.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json
+.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings docfacts-diff readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json
 
 VENV := .venv
 PY := $(VENV)/bin/python
@@ -44,6 +44,16 @@ lint:
 	$(VENV)/bin/ruff format --check $(FMT_TARGETS)
 	$(VENV)/bin/mypy src
 
+lint-docs:
+	uvx pydoclint --style numpy src
+	uv run python -m tools.docstring_builder.cli check --diff
+	uvx mypy --strict src
+	@if [ "$(RUN_DOCS_TESTS)" = "1" ]; then \
+		uv run pytest tests/docs; \
+	else \
+		echo "Skipping tests/docs (set RUN_DOCS_TESTS=1 to enable)"; \
+	fi
+
 clean:
 	rm -rf .venv .mypy_cache .ruff_cache .pytest_cache dist build
 
@@ -59,6 +69,9 @@ docstrings:
 	$(VENV)/bin/docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i $(DOCSTRING_DIRS) || true
 	$(VENV)/bin/pydocstyle $(DOCSTRING_DIRS)
 	$(VENV)/bin/interrogate -i src --fail-under 90
+
+docfacts-diff:
+	uv run --no-project --with libcst --with griffe python -m tools.docstring_builder.cli --diff-only --all
 
 readmes:
 	$(PY) tools/gen_readmes.py

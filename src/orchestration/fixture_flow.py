@@ -8,7 +8,7 @@ for implementation specifics.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Final
+from typing import Final, cast
 
 from prefect import flow, task
 
@@ -351,7 +351,7 @@ Examples
     chunks_info = t_write_fixture_chunks(f"{root}/parquet/chunks")
     dense_info = t_write_fixture_dense(f"{root}/parquet/dense")
     sparse_info = t_write_fixture_splade(f"{root}/parquet/sparse")
-    return t_register_in_duckdb(db_path, chunks_info, dense_info, sparse_info)
+    return _t_register_in_duckdb_impl(db_path, chunks_info, dense_info, sparse_info)
 
 
 # [nav:anchor fixture_pipeline]
