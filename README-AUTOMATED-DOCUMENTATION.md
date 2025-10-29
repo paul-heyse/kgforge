@@ -1018,9 +1018,9 @@ def func1():
 | [`tools/docs/build_graphs.py`](tools/docs/build_graphs.py) | Builds dependency and architecture graphs. Analyzes code relationships and generates visual diagrams. |
 | [`tools/detect_pkg.py`](tools/detect_pkg.py) | Detects primary/all packages for doc generation (used by Sphinx/Makefile/tools). Prefers lowercase names and `kgfoundry`-prefixed packages in `src/`. |
 | [`docs/_scripts/build_symbol_index.py`](docs/_scripts/build_symbol_index.py) | Emits `docs/_build/symbols.json` flat array for agent consumption. Each entry contains fully qualified name, kind, file path, line range, and docstring summary. |
-| [`Makefile`](Makefile) | Defines developer tasks: `docstrings`, `readmes`, `html`, `json`, `symbols`, `navmap-build`, `navmap-check`, `watch`, `fmt`, `lint`, `bootstrap`. |
+| [`Makefile`](Makefile) | Defines developer tasks: `docstrings`, `readmes`, `html`, `json`, `symbols`, `navmap-build`, `navmap-check`, `watch`, `fmt`, `lint`, `lint-docs`, `bootstrap`. |
 | [`mkdocs.yml`](mkdocs.yml) | MkDocs configuration for Material theme with plugins: search, gen-files (dynamic API pages), mkdocstrings (Python docs), literate-nav, section-index. |
-| [`.pre-commit-config.yaml`](.pre-commit-config.yaml) | Pre-commit hooks: Ruff (imports/lint/format), Black, Mypy, docformatter, **pydoclint**, navmap-build, navmap-check, validate-gallery, pydocstyle, interrogate. |
+| [`.pre-commit-config.yaml`](.pre-commit-config.yaml) | Pre-commit hooks: Ruff (imports/lint/format), Black, Mypy, docformatter, **pydoclint**, navmap-build, navmap-check, validate-gallery, pydocstyle, interrogate, optional docstring diff. |
 | [`tools/validate_gallery.py`](tools/validate_gallery.py) | Parses `examples/*.py` to ensure docstrings follow the Sphinx-Gallery title, tag, and constraints conventions. Fails early when examples drift. |
 | [`.numpydoc`](.numpydoc) | Global numpydoc validation settings (`GL01`, `SS01`, `ES01`, `RT01`, `PR01`) used by Sphinx during HTML/JSON builds. |
 | [`pyproject.toml`](pyproject.toml) | Configures Ruff (lint/format), Black, pytest, mypy, pydocstyle, and documentation tooling (bundled with project dependencies). |
@@ -2966,6 +2966,45 @@ Removes all previously generated documentation artifacts to ensure a clean rebui
 - Module-level NavMap sections listing public API entry points
 - Properly formatted and wrapped docstring text validated against PEP 257
 
+### Stage 1b: Documentation lint fast path (`make lint-docs`)
+
+**Purpose:** Provide a quick pre-flight that mirrors the CI docstring checks
+without rebuilding the entire documentation site.
+
+**Makefile target:** `lint-docs`
+
+**Execution sequence:**
+
+1. **`uvx pydoclint --style numpy src`**
+   - Validates NumPy docstring sections match the function signatures.
+   - Runs in a disposable `uv` environment so local installs stay untouched.
+
+2. **`uv run python -m tools.docstring_builder.cli check --diff`**
+   - Reuses the docstring builder cache to detect drift and regenerate
+     `docs/_build/docfacts.json` previews on failure.
+   - Prints inline diffs when drift is detected to speed up fixes.
+
+3. **`uvx mypy --strict src`**
+   - Executes strict type checking using the `uv.lock` environment for parity
+     with CI and pre-commit.
+
+4. **`uv run pytest tests/docs`** *(optional)*
+   - Guarded by `RUN_DOCS_TESTS=1` so developers can opt into the
+     documentation-specific pytest subset during deeper reviews.
+
+**Environment variables:**
+- `RUN_DOCS_TESTS=1` &rarr; enables the optional `pytest tests/docs` invocation.
+- `SKIP_DOC_BUILDER_DIFF=1` &rarr; bypasses the optional pre-commit hook when
+  you only need the main builder check.
+- `DOC_BUILDER_SINCE=<rev>` &rarr; narrows the docstring diff hook to files
+  changed since the provided revision (defaults to `origin/main`).
+
+**Integration points:**
+- Called directly by CI after the Ruff lint step to fail fast on docstring or
+  DocFacts drift.
+- Available as an optional pre-commit hook (`docstring-builder (diff, optional)`)
+  for contributors who want immediate feedback on edited files.
+
 ### Stage 2: README Generation (`make readmes`)
 
 **Purpose:** Generate package-level README.md files with API listings and deep links.
@@ -3242,7 +3281,7 @@ def func1():
 | [`tools/navmap/check_navmap.py`](tools/navmap/check_navmap.py) | Validates navmap metadata: checks exports consistency, section naming conventions, kebab-case IDs, and anchor presence. Returns exit code 1 on errors. |
 | [`tools/detect_pkg.py`](tools/detect_pkg.py) | Detects primary/all packages for doc generation (used by Sphinx/Makefile/tools). Prefers lowercase names and `kgfoundry`-prefixed packages in `src/`. |
 | [`docs/_scripts/build_symbol_index.py`](docs/_scripts/build_symbol_index.py) | Emits `docs/_build/symbols.json` flat array for agent consumption. Each entry contains fully qualified name, kind, file path, line range, and docstring summary. |
-| [`Makefile`](Makefile) | Defines developer tasks: `docstrings`, `readmes`, `html`, `json`, `symbols`, `navmap-build`, `navmap-check`, `watch`, `fmt`, `lint`, `bootstrap`. |
+| [`Makefile`](Makefile) | Defines developer tasks: `docstrings`, `readmes`, `html`, `json`, `symbols`, `navmap-build`, `navmap-check`, `watch`, `fmt`, `lint`, `lint-docs`, `bootstrap`. |
 | [`mkdocs.yml`](mkdocs.yml) | MkDocs configuration for Material theme with plugins: search, gen-files (dynamic API pages), mkdocstrings (Python docs), literate-nav, section-index. |
 | [`.pre-commit-config.yaml`](.pre-commit-config.yaml) | Pre-commit hooks: Ruff (imports/lint/format), Black, Mypy, docformatter, pydocstyle, interrogate, navmap-build, navmap-check. |
 | [`pyproject.toml`](pyproject.toml) | Configures Ruff (lint/format), Black, pytest, mypy, pydocstyle, and documentation tooling (bundled with project dependencies). |
