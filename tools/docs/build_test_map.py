@@ -606,8 +606,8 @@ def summarize(
     lints: list[dict[str, Any]] = []
     untested_total = 0
     for mod, syms in by_mod.items():
-        ratios = []
-        untested = []
+        ratios: list[float] = []
+        untested: list[str] = []
         for s in syms:
             cov = coverage.get(s, {})
             ratios.append(float(cov.get("ratio") or 0.0))

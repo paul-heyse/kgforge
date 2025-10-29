@@ -11,7 +11,7 @@ from __future__ import annotations
 import importlib
 from functools import cache
 from types import ModuleType
-from typing import Any
+from typing import Any, cast
 
 GriffeModuleType = ModuleType
 GriffeObjectType = type[Any]
@@ -33,6 +33,9 @@ def resolve_griffe() -> tuple[GriffeModuleType, GriffeObjectType, GriffeLoaderTy
     except ModuleNotFoundError:
         loader_module = None
 
-    loader_cls = getattr(loader_module, "GriffeLoader", griffe_module.GriffeLoader)
-    object_cls = griffe_module.Object
+    loader_cls = cast(
+        GriffeLoaderType,
+        getattr(loader_module, "GriffeLoader", griffe_module.GriffeLoader),
+    )
+    object_cls = cast(GriffeObjectType, griffe_module.Object)
     return griffe_module, object_cls, loader_cls

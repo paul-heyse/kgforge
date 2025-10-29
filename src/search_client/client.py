@@ -7,7 +7,7 @@ implementation specifics.
 
 from __future__ import annotations
 
-from typing import Any, Final, Protocol
+from typing import Any, Final, Protocol, cast
 
 import requests
 
@@ -71,7 +71,6 @@ class SupportsResponse(Protocol):
         >>> from search_client.client import json
         >>> result = json()
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
 
 
@@ -101,7 +100,6 @@ class SupportsHttp(Protocol):
         >>> from search_client.client import get
         >>> result = get(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
 
     def post(
@@ -137,8 +135,31 @@ class SupportsHttp(Protocol):
         >>> from search_client.client import post
         >>> result = post(..., ..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
+
+
+class RequestsHttp(SupportsHttp):
+    """Adapter that fulfils :class:`SupportsHttp` using ``requests``."""
+
+    def get(self, url: str, *, timeout: float) -> SupportsResponse:
+        """Issue a GET request via :mod:`requests`."""
+        response = requests.get(url, timeout=timeout)
+        return cast(SupportsResponse, response)
+
+    def post(
+        self,
+        url: str,
+        *,
+        json: dict[str, Any],
+        headers: dict[str, str],
+        timeout: float,
+    ) -> SupportsResponse:
+        """Issue a POST request via :mod:`requests`."""
+        response = requests.post(url, json=json, headers=headers, timeout=timeout)
+        return cast(SupportsResponse, response)
+
+
+_DEFAULT_HTTP: Final[SupportsHttp] = RequestsHttp()
 
 
 # [nav:anchor KGFoundryClient]
@@ -175,7 +196,7 @@ class KGFoundryClient:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
-        self._http: SupportsHttp = http or requests
+        self._http: SupportsHttp = http or _DEFAULT_HTTP
 
     def _headers(self) -> dict[str, str]:
         """Compute headers.
@@ -207,7 +228,6 @@ class KGFoundryClient:
         >>> from search_client.client import healthz
         >>> result = healthz()
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
@@ -245,7 +265,6 @@ class KGFoundryClient:
         >>> from search_client.client import search
         >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
@@ -276,7 +295,6 @@ class KGFoundryClient:
         >>> from search_client.client import concepts
         >>> result = concepts(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         r = self._http.post(
             f"{self.base_url}/graph/concepts",

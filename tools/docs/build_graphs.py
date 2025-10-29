@@ -24,7 +24,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from tempfile import NamedTemporaryFile, mkdtemp
 from types import ModuleType
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     import networkx as nx_mod
@@ -168,7 +168,6 @@ def parse_args() -> argparse.Namespace:
     >>> from tools.docs.build_graphs import parse_args
     >>> result = parse_args()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     p = argparse.ArgumentParser(
         description="Build per-package and cross-subsystem graphs with policy checks."
@@ -268,7 +267,6 @@ def sh(
     >>> from tools.docs.build_graphs import sh
     >>> result = sh(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return subprocess.run(
         cmd, check=check, cwd=str(cwd) if cwd else None, text=True, capture_output=False
@@ -314,7 +312,6 @@ def find_top_packages() -> list[str]:
     >>> from tools.docs.build_graphs import find_top_packages
     >>> result = find_top_packages()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     # Top-level packages are directories under src/ that contain __init__.py
     pkgs: list[str] = []
@@ -568,6 +565,19 @@ def _enumerate_cycles(
         return cycles, False, []
 
     if pruned_graph.number_of_edges() > edge_budget:
+        if nx is None:
+            return (
+                [],
+                True,
+                [
+                    {
+                        "members": [],
+                        "size": 0,
+                        "truncated": False,
+                        "has_cycle": False,
+                    }
+                ],
+            )
         components = sorted(
             (sorted(component) for component in nx.strongly_connected_components(scc_graph)),
             key=len,
@@ -718,10 +728,7 @@ def collapse_to_packages(dot_path: Path) -> DiGraph:
     directed = cast("DiGraph", nx.drawing.nx_pydot.from_pydot(pd_graph).to_directed())
     collapsed = nx.DiGraph()
 
-    module_names = {
-        node: _module_label(node, data)
-        for node, data in directed.nodes(data=True)
-    }
+    module_names = {node: _module_label(node, data) for node, data in directed.nodes(data=True)}
 
     package_nodes = {_pkg_of(name) for name in module_names.values()}
     collapsed.add_nodes_from(sorted(package_nodes))
@@ -851,7 +858,8 @@ def style_and_render(
             pydot.Edge(src, dst, color=edge_color, penwidth=penw, fontsize="8", label=label)
         )
 
-    payload = dot_graph.create_svg() if fmt == "svg" else dot_graph.create_png()
+    dot_any = cast(Any, dot_graph)
+    payload = dot_any.create_svg() if fmt == "svg" else dot_any.create_png()
     out_svg.write_bytes(payload)
 
 
@@ -1008,7 +1016,6 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
     >>> from tools.docs.build_graphs import cache_bucket
     >>> result = cache_bucket(..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return cache_dir / pkg / tree_hash
 
@@ -1288,7 +1295,9 @@ def _load_allowlist(path: str) -> dict[str, object]:
 def _render_summary_markdown(meta: Mapping[str, object]) -> str:
     lines = ["# Subsystem Graph Metadata", ""]
     skipped = bool(meta.get("cycle_enumeration_skipped"))
-    lines.append("*Cycle enumeration skipped:* Yes" if skipped else "*Cycle enumeration skipped:* No")
+    lines.append(
+        "*Cycle enumeration skipped:* Yes" if skipped else "*Cycle enumeration skipped:* No"
+    )
     scc_summary = meta.get("scc_summary")
     if isinstance(scc_summary, Sequence) and scc_summary:
         lines.append("")
