@@ -6,6 +6,7 @@ from typing import cast
 import duckdb
 import yaml
 from fastapi.testclient import TestClient
+
 from kgfoundry.embeddings_sparse.bm25 import PurePythonBM25
 from kgfoundry.orchestration.fixture_flow import fixture_pipeline
 from kgfoundry.search_client import KGFoundryClient

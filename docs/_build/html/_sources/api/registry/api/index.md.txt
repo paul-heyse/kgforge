@@ -1,0 +1,3 @@
+# `registry.api`
+
+::: registry.api

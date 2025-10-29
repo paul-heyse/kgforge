@@ -1,8 +1,9 @@
 """Overview of migrate.
 
-This module bundles migrate logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles migrate logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -46,22 +47,19 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor apply]
 def apply(db: str, migrations_dir: str) -> None:
-    """Apply every SQL migration file in ``migrations_dir`` to the DuckDB database.
+    """Describe apply.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    db : str
-        Path to the DuckDB database file.
-    migrations_dir : str
-        Directory containing ``.sql`` migration scripts.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-    Raises
-    ------
-    duckdb.Error
-        Raised when a migration statement fails to execute. ``READ_PARQUET`` view
-        migrations are skipped if DuckDB requires constant arguments.
-    """
+Parameters
+----------
+db : str
+    Describe ``db``.
+migrations_dir : str
+    Describe ``migrations_dir``.
+"""
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
         sql = p.read_text()
@@ -83,15 +81,13 @@ def apply(db: str, migrations_dir: str) -> None:
 
 # [nav:anchor main]
 def main() -> None:
-    """Compute main.
+    """Describe main.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-Examples
---------
->>> from registry.migrate import main
->>> main()  # doctest: +ELLIPSIS
+Python's object protocol for this class. Use it to integrate with
+built-in operators, protocols, or runtime behaviours that expect
+instances to participate in the language's data model.
 """
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)

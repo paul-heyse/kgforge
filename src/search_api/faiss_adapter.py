@@ -1,8 +1,9 @@
 """Overview of faiss adapter.
 
-This module bundles faiss adapter logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This module bundles faiss adapter logic for the kgfoundry stack. It
+groups related helpers so downstream packages can import a single
+cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -80,16 +81,21 @@ type FloatArrayLike = NDArray[np.floating[Any]]
 # [nav:anchor DenseVecs]
 @dataclass
 class DenseVecs:
-    """Dense vector matrix and identifiers loaded from storage.
+    """Describe DenseVecs.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    ids : list[str]
-        Chunk identifiers aligned with ``mat`` rows.
-    mat : VecArray
-        Normalised dense vectors suitable for cosine similarity.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+ids : list[str]
+    Describe ``ids``.
+mat : VecArray
+    Describe ``mat``.
+"""
 
     ids: list[str]
     mat: VecArray
@@ -97,20 +103,28 @@ class DenseVecs:
 
 # [nav:anchor FaissAdapter]
 class FaissAdapter:
-    """Dense retrieval adapter that couples DuckDB storage with FAISS.
+    """Describe FaissAdapter.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    db_path : str
-        Path to the DuckDB database or parquet directory containing vectors.
-    factory : str, optional
-        FAISS index factory string used when building GPU/CPU indices.
-        Defaults to ``"OPQ64,IVF8192,PQ64"``.
-    metric : str, optional
-        Similarity metric used for search, e.g. ``"ip"`` or ``"l2"``. Defaults
-        to ``"ip"``.
-    """
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+
+Parameters
+----------
+db_path : str
+    Describe ``db_path``.
+factory : str, optional
+    Describe ``factory``.
+    Defaults to ``'OPQ64,IVF8192,PQ64'``.
+metric : str, optional
+    Describe ``metric``.
+    Defaults to ``'ip'``.
+
+Raises
+------
+RuntimeError
+    Raised when TODO for RuntimeError.
+"""
 
     def __init__(
         self,
@@ -118,6 +132,23 @@ class FaissAdapter:
         factory: str = "OPQ64,IVF8192,PQ64",
         metric: str = "ip",
     ) -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+db_path : str
+    Describe ``db_path``.
+factory : str, optional
+    Describe ``factory``.
+    Defaults to ``'OPQ64,IVF8192,PQ64'``.
+metric : str, optional
+    Describe ``metric``.
+    Defaults to ``'ip'``.
+"""
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
@@ -126,26 +157,27 @@ class FaissAdapter:
         self.vecs: DenseVecs | None = None
 
     def _load_dense_from_parquet(self, source: Path) -> DenseVecs:
-        """Load and normalise dense vectors from a parquet dataset.
+        """Describe  load dense from parquet.
+
 <!-- auto:docstring-builder v1 -->
 
-        Parameters
-        ----------
-        source : Path
-            Path to a parquet file or directory readable by DuckDB.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-        Returns
-        -------
-        DenseVecs
-            Identifiers and normalised vectors backed by ``float32`` arrays.
+Parameters
+----------
+source : Path
+    Describe ``source``.
 
-        Raises
-        ------
-        duckdb.Error
-            If DuckDB fails to read the parquet source.
-        RuntimeError
-            If no vectors are discovered in ``source``.
-        """
+Returns
+-------
+DenseVecs
+    Describe return value.
+
+Raises
+------
+RuntimeError
+Raised when TODO for RuntimeError.
+"""
         con = duckdb.connect(database=":memory:")
         try:
             rows = con.execute(
@@ -169,23 +201,21 @@ class FaissAdapter:
         return DenseVecs(ids=ids, mat=normalized)
 
     def _load_dense_parquet(self) -> DenseVecs:
-        """Compute load dense parquet.
+        """Describe  load dense parquet.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the load dense parquet operation.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Returns
 -------
 DenseVecs
-    Description of return value.
-    
-    
-    
+    Describe return value.
 
 Raises
 ------
 RuntimeError
-    Raised when validation fails.
+Raised when TODO for RuntimeError.
 """
         candidate = Path(self.db_path)
         if candidate.is_dir() or candidate.suffix == ".parquet":
@@ -223,15 +253,13 @@ RuntimeError
         return DenseVecs(ids=ids, mat=normalized)
 
     def build(self) -> None:
-        """Compute build.
+        """Describe build.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-Examples
---------
->>> from search_api.faiss_adapter import build
->>> build()  # doctest: +ELLIPSIS
+Python's object protocol for this class. Use it to integrate
+with built-in operators, protocols, or runtime behaviours that
+expect instances to participate in the language's data model.
 """
         vectors = self._load_dense_parquet()
         self.vecs = vectors
@@ -256,25 +284,17 @@ Examples
         self.index = self._clone_to_gpu(cpu)
 
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
-        """Compute load or build.
+        """Describe load or build.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the load or build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 cpu_index_path : str | None, optional
+    Describe ``cpu_index_path``.
     Defaults to ``None``.
-    Description for ``cpu_index_path``.
-    
-    
-    
-    Defaults to ``None``.
-
-Examples
---------
->>> from search_api.faiss_adapter import load_or_build
->>> load_or_build()  # doctest: +ELLIPSIS
 """
         faiss_module = faiss
         if faiss_module is None:
@@ -293,15 +313,16 @@ Examples
         self.build()
 
     def _clone_to_gpu(self, cpu_index: object) -> object:
-        """Return a GPU-backed index when FAISS provides the necessary bindings.
+        """Describe  clone to gpu.
+
 <!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 cpu_index : object
     Describe ``cpu_index``.
-    
-    
 
 Returns
 -------
@@ -326,36 +347,24 @@ object
             return index_cpu_to_gpu(resources, 0, cpu_index, options)
 
     def search(self, qvec: FloatArrayLike, k: int = 10) -> list[list[tuple[str, float]]]:
-        """Compute search.
+        """Describe search.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
-qvec : VecArray
-    Description for ``qvec``.
+qvec : FloatArrayLike
+    Describe ``qvec``.
 k : int, optional
-    Defaults to ``10``.
-    Description for ``k``.
-    
-    
-    
+    Describe ``k``.
     Defaults to ``10``.
 
 Returns
 -------
 list[list[tuple[str, float]]]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.faiss_adapter import search
->>> result = search(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         if self.vecs is None and self.index is None:
             return []
@@ -365,15 +374,16 @@ Examples
         return self._search_with_cpu(queries, k)
 
     def _prepare_queries(self, qvec: VecArray) -> VecArray:
-        """Normalise query input into a 2D float32 array.
+        """Describe  prepare queries.
+
 <!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 qvec : VecArray
     Describe ``qvec``.
-    
-    
 
 Returns
 -------
@@ -386,26 +396,29 @@ VecArray
         return query_arr
 
     def _search_with_faiss(self, queries: VecArray, k: int) -> list[list[tuple[str, float]]]:
-        """Execute a FAISS search using the configured index.
+        """Describe  search with faiss.
+
 <!-- auto:docstring-builder v1 -->
 
-        Parameters
-        ----------
-        queries : VecArray
-            2-D array of query vectors.
-        k : int
-            Number of nearest neighbours to return for each query.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-        Returns
-        -------
-        list[list[tuple[str, float]]]
-            Ranked chunk identifiers paired with similarity scores.
+Parameters
+----------
+queries : VecArray
+    Describe ``queries``.
+k : int
+    Describe ``k``.
 
-        Raises
-        ------
-        RuntimeError
-            If the FAISS index or identifier map has not been loaded.
-        """
+Returns
+-------
+list[list[tuple[str, float]]]
+    Describe return value.
+
+Raises
+------
+RuntimeError
+Raised when TODO for RuntimeError.
+"""
         if self.index is None or self.idmap is None:
             message = "FAISS index or ID mapping not loaded"
             raise RuntimeError(message)
@@ -421,26 +434,29 @@ VecArray
         return batches
 
     def _search_with_cpu(self, queries: VecArray, k: int) -> list[list[tuple[str, float]]]:
-        """Perform cosine similarity search using the in-memory matrix.
+        """Describe  search with cpu.
+
 <!-- auto:docstring-builder v1 -->
 
-        Parameters
-        ----------
-        queries : VecArray
-            2-D array of query vectors.
-        k : int
-            Number of nearest neighbours to return for each query.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-        Returns
-        -------
-        list[list[tuple[str, float]]]
-            Ranked chunk identifiers paired with similarity scores.
+Parameters
+----------
+queries : VecArray
+    Describe ``queries``.
+k : int
+    Describe ``k``.
 
-        Raises
-        ------
-        RuntimeError
-            If dense vectors have not been loaded into memory.
-        """
+Returns
+-------
+list[list[tuple[str, float]]]
+    Describe return value.
+
+Raises
+------
+RuntimeError
+Raised when TODO for RuntimeError.
+"""
         if self.vecs is None:
             message = "Dense vectors not loaded"
             raise RuntimeError(message)

@@ -1,0 +1,3 @@
+# `docling.canonicalizer`
+
+::: docling.canonicalizer

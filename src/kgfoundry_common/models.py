@@ -1,8 +1,9 @@
 """Overview of models.
 
-This module bundles models logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles models logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -67,38 +68,54 @@ type Id = str
 
 # [nav:anchor Doc]
 class Doc(BaseModel):
-    """Document metadata captured by the registry services.
+    """Describe Doc.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    id : Id
-        Internal identifier for the document record.
-    openalex_id : str | None
-        Optional OpenAlex identifier associated with the document.
-    doi : str | None
-        Digital Object Identifier string, if available.
-    arxiv_id : str | None
-        Optional arXiv identifier for preprint content.
-    pmcid : str | None
-        Optional PubMed Central identifier.
-    title : str
-        Human-readable title for the document.
-    authors : list[str]
-        Ordered list of author names.
-    pub_date : str | None
-        Publication date formatted as an ISO string when supplied.
-    license : str | None
-        License or usage rights flag associated with the document.
-    language : str | None
-        ISO language code representing the document language. Defaults to ``"en"``.
-    pdf_uri : str
-        URI pointing to the primary PDF asset.
-    source : str
-        Source system or ingestion pipeline that produced the record.
-    content_hash : str | None
-        Optional checksum for deduplication and change detection.
-    """
+the behaviour it provides to callers. Callers interact with
+validated data through this model.
+
+Parameters
+----------
+id : Id
+    Describe ``id``.
+openalex_id : str | None, optional
+    Describe ``openalex_id``.
+    Defaults to ``None``.
+doi : str | None, optional
+    Describe ``doi``.
+    Defaults to ``None``.
+arxiv_id : str | None, optional
+    Describe ``arxiv_id``.
+    Defaults to ``None``.
+pmcid : str | None, optional
+    Describe ``pmcid``.
+    Defaults to ``None``.
+title : str, optional
+    Describe ``title``.
+    Defaults to ``''``.
+authors : list[str], optional
+    Describe ``authors``.
+    Defaults to ``<factory>``.
+pub_date : str | None, optional
+    Describe ``pub_date``.
+    Defaults to ``None``.
+license : str | None, optional
+    Describe ``license``.
+    Defaults to ``None``.
+language : str | None, optional
+    Describe ``language``.
+    Defaults to ``'en'``.
+pdf_uri : str, optional
+    Describe ``pdf_uri``.
+    Defaults to ``''``.
+source : str, optional
+    Describe ``source``.
+    Defaults to ``'unknown'``.
+content_hash : str | None, optional
+    Describe ``content_hash``.
+    Defaults to ``None``.
+"""
 
     id: Id
     openalex_id: str | None = None
@@ -117,24 +134,29 @@ class Doc(BaseModel):
 
 # [nav:anchor DoctagsAsset]
 class DoctagsAsset(BaseModel):
-    """Metadata describing generated doctags artefacts.
+    """Describe DoctagsAsset.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    doc_id : Id
-        Document identifier tied to the doctags asset.
-    doctags_uri : str
-        URI where the doctags artefact is stored.
-    pages : int
-        Number of pages covered by the doctags generation process.
-    vlm_model : str
-        Name of the vision-language model that produced the tags.
-    vlm_revision : str
-        Revision of the VLM model used during inference.
-    avg_logprob : float | None
-        Optional average log probability reported by the VLM.
-    """
+the behaviour it provides to callers. Callers interact with
+validated data through this model.
+
+Parameters
+----------
+doc_id : Id
+    Describe ``doc_id``.
+doctags_uri : str
+    Describe ``doctags_uri``.
+pages : int
+    Describe ``pages``.
+vlm_model : str
+    Describe ``vlm_model``.
+vlm_revision : str
+    Describe ``vlm_revision``.
+avg_logprob : float | None, optional
+    Describe ``avg_logprob``.
+    Defaults to ``None``.
+"""
 
     doc_id: Id
     doctags_uri: str
@@ -146,26 +168,30 @@ class DoctagsAsset(BaseModel):
 
 # [nav:anchor Chunk]
 class Chunk(BaseModel):
-    """Chunk metadata describing a passage extracted from a document.
+    """Describe Chunk.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    id : Id
-        Identifier for the chunk record.
-    doc_id : Id
-        Identifier of the document that produced the chunk.
-    section : str | None
-        Optional section label associated with the chunk.
-    start_char : int
-        Inclusive start character offset within the source document.
-    end_char : int
-        Exclusive end character offset within the source document.
-    tokens : int
-        Token count used for downstream budgeting.
-    doctags_span : dict[str, int]
-        Mapping describing the span within doctags artefacts.
-    """
+the behaviour it provides to callers. Callers interact with
+validated data through this model.
+
+Parameters
+----------
+id : Id
+    Describe ``id``.
+doc_id : Id
+    Describe ``doc_id``.
+section : str | None
+    Describe ``section``.
+start_char : int
+    Describe ``start_char``.
+end_char : int
+    Describe ``end_char``.
+tokens : int
+    Describe ``tokens``.
+doctags_span : dict[str, int]
+    Describe ``doctags_span``.
+"""
 
     id: Id
     doc_id: Id
@@ -178,28 +204,34 @@ class Chunk(BaseModel):
 
 # [nav:anchor LinkAssertion]
 class LinkAssertion(BaseModel):
-    """Assertion linking a chunk to a knowledge-graph concept.
+    """Describe LinkAssertion.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    id : Id
-        Identifier for the assertion event.
-    chunk_id : Id
-        Chunk that the assertion refers to.
-    concept_id : Id
-        Target concept identifier referenced by the link.
-    score : float
-        Confidence score produced by the linker.
-    decision : Literal['link', 'reject', 'uncertain']
-        Decision outcome assigned to the assertion.
-    evidence_span : str | None
-        Optional textual span used as supporting evidence.
-    features : dict[str, float]
-        Per-feature scores contributing to the decision.
-    run_id : str
-        Pipeline run identifier that produced the assertion.
-    """
+the behaviour it provides to callers. Callers interact with
+validated data through this model.
+
+Parameters
+----------
+id : Id
+    Describe ``id``.
+chunk_id : Id
+    Describe ``chunk_id``.
+concept_id : Id
+    Describe ``concept_id``.
+score : float
+    Describe ``score``.
+decision : Literal['link', 'reject', 'uncertain']
+    Describe ``decision``.
+evidence_span : str | None, optional
+    Describe ``evidence_span``.
+    Defaults to ``None``.
+features : dict[str, float], optional
+    Describe ``features``.
+    Defaults to ``<factory>``.
+run_id : str
+    Describe ``run_id``.
+"""
 
     id: Id
     chunk_id: Id

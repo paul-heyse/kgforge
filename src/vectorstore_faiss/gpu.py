@@ -1,8 +1,8 @@
 """Overview of gpu.
 
-This module bundles gpu logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles gpu logic for the kgfoundry stack. It groups related
+helpers so downstream packages can import a single cohesive namespace.
+Refer to the functions and classes below for implementation specifics.
 """
 
 from __future__ import annotations
@@ -56,21 +56,32 @@ type StrArray = NDArray[np.str_]
 
 # [nav:anchor FaissGpuIndex]
 class FaissGpuIndex:
-    """Utility for building FAISS indexes with optional GPU acceleration.
+    """Describe FaissGpuIndex.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    factory : str, optional
-        FAISS factory string used to construct the index. Defaults to
-        ``"OPQ64,IVF8192,PQ64"``.
-    nprobe : int, optional
-        Number of IVF clusters probed during search. Defaults to ``64``.
-    gpu : bool, optional
-        Whether to build the index on GPU hardware when available. Defaults to ``True``.
-    cuvs : bool, optional
-        Toggle for using cuVS accelerated routines when present. Defaults to ``True``.
-    """
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+
+Parameters
+----------
+factory : str, optional
+    Describe ``factory``.
+    Defaults to ``'OPQ64,IVF8192,PQ64'``.
+nprobe : int, optional
+    Describe ``nprobe``.
+    Defaults to ``64``.
+gpu : bool, optional
+    Describe ``gpu``.
+    Defaults to ``True``.
+cuvs : bool, optional
+    Describe ``cuvs``.
+    Defaults to ``True``.
+
+Raises
+------
+RuntimeError
+    Raised when TODO for RuntimeError.
+"""
 
     def __init__(
         self,
@@ -79,6 +90,27 @@ class FaissGpuIndex:
         gpu: bool = True,
         cuvs: bool = True,
     ) -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+factory : str, optional
+    Describe ``factory``.
+    Defaults to ``'OPQ64,IVF8192,PQ64'``.
+nprobe : int, optional
+    Describe ``nprobe``.
+    Defaults to ``64``.
+gpu : bool, optional
+    Describe ``gpu``.
+    Defaults to ``True``.
+cuvs : bool, optional
+    Describe ``cuvs``.
+    Defaults to ``True``.
+"""
         self.factory = factory
         self.nprobe = nprobe
         self.gpu = gpu
@@ -96,10 +128,13 @@ class FaissGpuIndex:
             self._faiss = None
 
     def _ensure_resources(self) -> None:
-        """Compute ensure resources.
+        """Describe  ensure resources.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the ensure resources operation.
+Python's object protocol for this class. Use it to integrate
+with built-in operators, protocols, or runtime behaviours that
+expect instances to participate in the language's data model.
 """
         if not self._faiss or not self.gpu:
             return
@@ -108,27 +143,19 @@ Carry out the ensure resources operation.
             self._res = faiss.StandardGpuResources()
 
     def train(self, train_vectors: FloatArray | FloatArrayLike, *, seed: int = 42) -> None:
-        """Compute train.
+        """Describe train.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the train operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
-train_vectors : FloatArray
-    Description for ``train_vectors``.
+train_vectors : FloatArray | FloatArrayLike
+    Describe ``train_vectors``.
 seed : int, optional
+    Describe ``seed``.
     Defaults to ``42``.
-    Description for ``seed``.
-    
-    
-    
-    Defaults to ``42``.
-
-Examples
---------
->>> from vectorstore_faiss.gpu import train
->>> train(...)  # doctest: +ELLIPSIS
 """
         if self._faiss is None:
             return
@@ -156,30 +183,23 @@ Examples
             pass
 
     def add(self, keys: list[str], vectors: FloatArray | FloatArrayLike) -> None:
-        """Compute add.
+        """Describe add.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the add operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 keys : list[str]
-    Description for ``keys``.
-vectors : FloatArray
-    Description for ``vectors``.
-    
-    
-    
+    Describe ``keys``.
+vectors : FloatArray | FloatArrayLike
+    Describe ``vectors``.
 
 Raises
 ------
 RuntimeError
-    Raised when validation fails.
-
-Examples
---------
->>> from vectorstore_faiss.gpu import add
->>> add(..., ...)  # doctest: +ELLIPSIS
+Raised when TODO for RuntimeError.
 """
         vec_array: FloatArray = np.asarray(vectors, dtype=np.float32, order="C")
         if self._faiss is None:
@@ -206,39 +226,28 @@ Examples
             self._index.add(vec_array)
 
     def search(self, query: FloatArray | FloatArrayLike, k: int) -> list[tuple[str, float]]:
-        """Compute search.
+        """Describe search.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
-query : FloatArray
-    Description for ``query``.
+query : FloatArray | FloatArrayLike
+    Describe ``query``.
 k : int
-    Description for ``k``.
-    
-    
-    
+    Describe ``k``.
 
 Returns
 -------
 list[tuple[str, float]]
-    Description of return value.
-    
-    
-    
+    Describe return value.
 
 Raises
 ------
 RuntimeError
-    Raised when validation fails.
-
-Examples
---------
->>> from vectorstore_faiss.gpu import search
->>> result = search(..., ...)
->>> result  # doctest: +ELLIPSIS
+Raised when TODO for RuntimeError.
 """
         q: FloatArray = np.asarray(query, dtype=np.float32, order="C")
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12
@@ -258,32 +267,24 @@ Examples
         return [(str(ids[i]), float(scores[i])) for i in range(len(ids)) if ids[i] != -1]
 
     def save(self, index_uri: str, idmap_uri: str | None = None) -> None:
-        """Compute save.
+        """Describe save.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the save operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 index_uri : str
-    Description for ``index_uri``.
+    Describe ``index_uri``.
 idmap_uri : str | None, optional
-    Defaults to ``None``.
-    Description for ``idmap_uri``.
-    
-    
-    
+    Describe ``idmap_uri``.
     Defaults to ``None``.
 
 Raises
 ------
 RuntimeError
-    Raised when validation fails.
-
-Examples
---------
->>> from vectorstore_faiss.gpu import save
->>> save(...)  # doctest: +ELLIPSIS
+Raised when TODO for RuntimeError.
 """
         if self._faiss is None or self._index is None:
             if self._xb is not None and self._idmap is not None:
@@ -297,32 +298,24 @@ Examples
         faiss.write_index(target_index, index_uri)
 
     def load(self, index_uri: str, idmap_uri: str | None = None) -> None:
-        """Compute load.
+        """Describe load.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 index_uri : str
-    Description for ``index_uri``.
+    Describe ``index_uri``.
 idmap_uri : str | None, optional
-    Defaults to ``None``.
-    Description for ``idmap_uri``.
-    
-    
-    
+    Describe ``idmap_uri``.
     Defaults to ``None``.
 
 Raises
 ------
 RuntimeError
-    Raised when validation fails.
-
-Examples
---------
->>> from vectorstore_faiss.gpu import load
->>> load(...)  # doctest: +ELLIPSIS
+Raised when TODO for RuntimeError.
 """
         if self._faiss is None:
             if os.path.exists(index_uri + ".npz"):

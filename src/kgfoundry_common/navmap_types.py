@@ -1,8 +1,9 @@
 """Overview of navmap types.
 
-This module bundles navmap types logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This module bundles navmap types logic for the kgfoundry stack. It
+groups related helpers so downstream packages can import a single
+cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -24,11 +25,10 @@ type Stability = Literal[
 
 # [nav:anchor NavSection]
 class NavSection(TypedDict):
-    """Model the NavSection.
+    """Describe NavSection.
 
-Represent the navsection data structure used throughout the project. The class encapsulates
-behaviour behind a well-defined interface for collaborating components. Instances are typically
-created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     id: str
@@ -38,11 +38,10 @@ created by factories or runtime orchestrators documented nearby.
 
 # [nav:anchor SymbolMeta]
 class SymbolMeta(TypedDict, total=False):
-    """Model the SymbolMeta.
+    """Describe SymbolMeta.
 
-Represent the symbolmeta data structure used throughout the project. The class encapsulates
-behaviour behind a well-defined interface for collaborating components. Instances are typically
-created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     since: str
@@ -62,7 +61,10 @@ created by factories or runtime orchestrators documented nearby.
 
 # [nav:anchor ModuleMeta]
 class ModuleMeta(TypedDict, total=False):
-    """Describe module-level metadata surfaced in navigation structures.
+    """Describe ModuleMeta.
+
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     owner: str
@@ -73,11 +75,10 @@ class ModuleMeta(TypedDict, total=False):
 
 # [nav:anchor NavMap]
 class NavMap(TypedDict, total=False):
-    """Model the NavMap.
+    """Describe NavMap.
 
-Represent the navmap data structure used throughout the project. The class encapsulates
-behaviour behind a well-defined interface for collaborating components. Instances are typically
-created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     title: str

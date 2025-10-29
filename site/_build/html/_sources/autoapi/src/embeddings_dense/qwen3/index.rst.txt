@@ -1,0 +1,48 @@
+src.embeddings_dense.qwen3
+==========================
+
+.. py:module:: src.embeddings_dense.qwen3
+
+.. autoapi-nested-parse::
+
+   Overview of qwen3.
+
+   This module bundles qwen3 logic for the kgfoundry stack. It groups related helpers so downstream
+   packages can import a single cohesive namespace. Refer to the functions and classes below for
+   implementation specifics.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: Qwen3Embedder
+
+   
+   Model the Qwen3Embedder.
+
+   Represent the qwen3embedder data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

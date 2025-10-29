@@ -1,0 +1,58 @@
+src.kgfoundry_common.config
+===========================
+
+.. py:module:: src.kgfoundry_common.config
+
+.. autoapi-nested-parse::
+
+   Overview of config.
+
+   This module bundles config logic for the kgfoundry stack. It groups related helpers so downstream
+   packages can import a single cohesive namespace. Refer to the functions and classes below for
+   implementation specifics.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: load_config(path)
+
+   
+   Compute load config.
+
+   Carry out the load config operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param path: Description for ``path``.
+   :type path: str
+
+   :returns: *collections.abc.Mapping* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from kgfoundry_common.config import load_config
+   >>> result = load_config(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

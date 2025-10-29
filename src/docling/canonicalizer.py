@@ -1,8 +1,9 @@
 """Overview of canonicalizer.
 
-This module bundles canonicalizer logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This module bundles canonicalizer logic for the kgfoundry stack. It
+groups related helpers so downstream packages can import a single
+cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -43,32 +44,22 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor canonicalize_text]
 def canonicalize_text(blocks: list[str]) -> str:
-    """Compute canonicalize text.
+    """Describe canonicalize text.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the canonicalize text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
-blocks : list[str]
-    Description for ``blocks``.
-    
-    
-    
+blocks : list
+    TODO: describe ``blocks``.
+
 
 Returns
 -------
 str
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from docling.canonicalizer import canonicalize_text
->>> result = canonicalize_text(...)
->>> result  # doctest: +ELLIPSIS
+    TODO: describe return value.
 """
 
     def norm(s: str) -> str:

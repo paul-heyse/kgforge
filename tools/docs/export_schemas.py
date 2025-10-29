@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Overview of export schemas.
 
-This module bundles export schemas logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This module bundles export schemas logic for the kgfoundry stack. It
+groups related helpers so downstream packages can import a single
+cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -46,7 +47,9 @@ DEFAULT_BASE_URL = os.getenv("SCHEMA_BASE_URL", "https://kgfoundry/schemas")
 
 
 def _load_pandera_module() -> ModuleType | None:
-    """Load ``pandera`` using ``importlib`` to avoid strict import-time failures."""
+    """Load ``pandera`` using ``importlib`` to avoid strict import-time
+    failures.
+    """
     try:
         module = importlib.import_module("pandera")
     except ModuleNotFoundError:
@@ -186,7 +189,8 @@ def _load_navmap() -> dict[str, Any]:
 def _nav_versions(module_name: str, class_name: str, nav: dict[str, Any]) -> dict[str, Any] | None:
     """Find navmap version metadata.
 
-    Return {x-version-introduced, x-deprecated-in} when module and symbol names match.
+    Return {x-version-introduced, x-deprecated-in} when module and
+    symbol names match.
     """
     mods = nav.get("modules") or {}
     entry = mods.get(module_name)
@@ -242,7 +246,9 @@ def _example_for_pydantic(model_cls: type[object]) -> dict[str, object]:
 
 
 def _example_for_pandera(model_cls: type[object]) -> dict[str, object]:
-    """Produce a minimal 'row' example based on class attributes / schema JSON."""
+    """Produce a minimal 'row' example based on class attributes / schema
+    JSON.
+    """
     attr_name = "to_schema"
     try:
         to_schema = getattr(model_cls, attr_name)
@@ -417,8 +423,9 @@ def _diff_summary(old: Mapping[str, object], new: Mapping[str, object]) -> dict[
 class Cfg:
     """Model the Cfg.
 
-    Represent the cfg data structure used throughout the project. The class encapsulates behaviour
-    behind a well-defined interface for collaborating components. Instances are typically created by
+    Represent the cfg data structure used throughout the project. The
+    class encapsulates behaviour behind a well-defined interface for
+    collaborating components. Instances are typically created by
     factories or runtime orchestrators documented nearby.
     """
 

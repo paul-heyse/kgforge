@@ -1,8 +1,8 @@
 """Overview of ids.
 
-This module bundles ids logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles ids logic for the kgfoundry stack. It groups related
+helpers so downstream packages can import a single cohesive namespace.
+Refer to the functions and classes below for implementation specifics.
 """
 
 from __future__ import annotations
@@ -48,32 +48,22 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor urn_doc_from_text]
 def urn_doc_from_text(text: str) -> str:
-    """Compute urn doc from text.
+    """Describe urn doc from text.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the urn doc from text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 text : str
-    Description for ``text``.
-    
-    
+    Describe ``text``.
     
 
 Returns
 -------
 str
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from kgfoundry_common.ids import urn_doc_from_text
->>> result = urn_doc_from_text(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     h = hashlib.sha256(text.encode("utf-8")).digest()[:16]
     b32 = base64.b32encode(h).decode("ascii").strip("=").lower()
@@ -82,35 +72,25 @@ Examples
 
 # [nav:anchor urn_chunk]
 def urn_chunk(doc_hash: str, start: int, end: int) -> str:
-    """Compute urn chunk.
+    """Describe urn chunk.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the urn chunk operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 doc_hash : str
-    Description for ``doc_hash``.
+    Describe ``doc_hash``.
 start : int
-    Description for ``start``.
+    Describe ``start``.
 end : int
-    Description for ``end``.
-    
-    
+    Describe ``end``.
     
 
 Returns
 -------
 str
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from kgfoundry_common.ids import urn_chunk
->>> result = urn_chunk(..., ..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     return f"urn:chunk:{doc_hash.split(':')[-1]}:{start}-{end}"

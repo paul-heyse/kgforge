@@ -1,8 +1,9 @@
 """Overview of splade index.
 
-This module bundles splade index logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This module bundles splade index logic for the kgfoundry stack. It
+groups related helpers so downstream packages can import a single
+cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -49,32 +50,21 @@ TOKEN = re.compile(r"[A-Za-z0-9]+")
 
 # [nav:anchor tok]
 def tok(text: str) -> list[str]:
-    """Compute tok.
+    """Describe tok.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the tok operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 text : str
-    Description for ``text``.
-    
-    
-    
+    Describe ``text``.
 
 Returns
 -------
 list[str]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.splade_index import tok
->>> result = tok(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     return [token.lower() for token in TOKEN.findall(text or "")]
 
@@ -82,20 +72,25 @@ Examples
 # [nav:anchor SpladeDoc]
 @dataclass
 class SpladeDoc:
-    """Fixture SPLADE document loaded from the DuckDB catalog.
+    """Describe SpladeDoc.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    chunk_id : str
-        Unique chunk identifier.
-    doc_id : str
-        Parent document identifier.
-    section : str
-        Section heading captured with the chunk.
-    text : str
-        Raw text body of the chunk.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+chunk_id : str
+    Describe ``chunk_id``.
+doc_id : str
+    Describe ``doc_id``.
+section : str
+    Describe ``section``.
+text : str
+    Describe ``text``.
+"""
 
     chunk_id: str
     doc_id: str
@@ -105,19 +100,25 @@ class SpladeDoc:
 
 # [nav:anchor SpladeIndex]
 class SpladeIndex:
-    """Simplified SPLADE index for fixtures and tutorials.
+    """Describe SpladeIndex.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    db_path : str
-        DuckDB database containing the fixture datasets.
-    chunks_dataset_root : str | None, optional
-        Optional explicit path to the chunks dataset. Defaults to ``None`` to
-        auto-discover via DuckDB metadata.
-    sparse_root : str | None, optional
-        Reserved parameter for compatibility with production code paths.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+db_path : str
+    Describe ``db_path``.
+chunks_dataset_root : str | None, optional
+    Describe ``chunks_dataset_root``.
+    Defaults to ``None``.
+sparse_root : str | None, optional
+    Describe ``sparse_root``.
+    Defaults to ``None``.
+"""
 
     def __init__(
         self,
@@ -125,6 +126,23 @@ class SpladeIndex:
         chunks_dataset_root: str | None = None,
         sparse_root: str | None = None,
     ) -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+db_path : str
+    Describe ``db_path``.
+chunks_dataset_root : str | None, optional
+    Describe ``chunks_dataset_root``.
+    Defaults to ``None``.
+sparse_root : str | None, optional
+    Describe ``sparse_root``.
+    Defaults to ``None``.
+"""
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -133,15 +151,16 @@ class SpladeIndex:
         self._load(chunks_dataset_root)
 
     def _load(self, chunks_root: str | None) -> None:
-        """Compute load.
+        """Describe  load.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the load operation.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 chunks_root : str | None
-    Description for ``chunks_root``.
+    Describe ``chunks_root``.
 """
         _ = chunks_root  # optional override currently unused
         if not Path(self.db_path).exists():
@@ -174,36 +193,24 @@ chunks_root : str | None
                 self.df[term] = self.df.get(term, 0) + 1
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Compute search.
+        """Describe search.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 query : str
-    Description for ``query``.
+    Describe ``query``.
 k : int, optional
-    Defaults to ``10``.
-    Description for ``k``.
-    
-    
-    
+    Describe ``k``.
     Defaults to ``10``.
 
 Returns
 -------
 list[tuple[int, float]]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.splade_index import search
->>> result = search(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         if self.N == 0:
             return []
@@ -225,31 +232,20 @@ Examples
         return [(idx, value) for idx, value in ranked[:k] if value > 0.0]
 
     def doc(self, index: int) -> SpladeDoc:
-        """Compute doc.
+        """Describe doc.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 index : int
-    Description for ``index``.
-    
-    
-    
+    Describe ``index``.
 
 Returns
 -------
 SpladeDoc
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.splade_index import doc
->>> result = doc(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         return self.docs[index]

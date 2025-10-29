@@ -1,8 +1,8 @@
 """Overview of cli.
 
-This module bundles cli logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles cli logic for the kgfoundry stack. It groups related
+helpers so downstream packages can import a single cohesive namespace.
+Refer to the functions and classes below for implementation specifics.
 """
 
 from __future__ import annotations
@@ -13,8 +13,8 @@ from typing import Final
 
 import numpy as np
 import typer
-from kgfoundry.embeddings_sparse.bm25 import get_bm25
 
+from kgfoundry.embeddings_sparse.bm25 import get_bm25
 from kgfoundry_common.navmap_types import NavMap
 from vectorstore_faiss import gpu as faiss_gpu
 
@@ -55,33 +55,23 @@ def index_bm25(
     backend: str = typer.Option("lucene", help="lucene|pure"),
     index_dir: str = typer.Option("./_indices/bm25", help="Output index directory"),
 ) -> None:
-    """Compute index bm25.
+    """Describe index bm25.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the index bm25 operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 chunks_parquet : str, optional
-    Optional parameter default ``typer.Argument(..., help='Path to Parquet/JSONL with chunks')``. Description for ``chunks_parquet``.
-    Defaults to ``<typer.models.ArgumentInfo object at 0x7f00c53956a0>``.
-    Defaults to ``<typer.models.ArgumentInfo object at 0x7f4eb85a56a0>``.
+    Describe ``chunks_parquet``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7350d51b3e00>``.
 backend : str, optional
-    Optional parameter default ``typer.Option('lucene', help='lucene|pure')``. Description for ``backend``.
-    Defaults to ``<typer.models.OptionInfo object at 0x7f00c5332ad0>``.
-    Defaults to ``<typer.models.OptionInfo object at 0x7f4eb853ead0>``.
+    Describe ``backend``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7350d502ae90>``.
 index_dir : str, optional
-    Optional parameter default ``typer.Option('./_indices/bm25', help='Output index directory')``. Description for ``index_dir``.
-    
-    
-    Defaults to ``<typer.models.OptionInfo object at 0x7f00c5332c10>``.
-    
-    Defaults to ``<typer.models.OptionInfo object at 0x7f4eb853ec10>``.
-
-Examples
---------
->>> from orchestration.cli import index_bm25
->>> index_bm25()  # doctest: +ELLIPSIS
+    Describe ``index_dir``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7350d502b4d0>``.
 """
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
@@ -128,29 +118,20 @@ def index_faiss(
         "./_indices/faiss/shard_000.idx", help="Output index (CPU .idx)"
     ),
 ) -> None:
-    """Compute index faiss.
+    """Describe index faiss.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the index faiss operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 dense_vectors : str, optional
-    Optional parameter default ``typer.Argument(..., help='Path to dense vectors JSON (skeleton)')``. Description for ``dense_vectors``.
-    Defaults to ``<typer.models.ArgumentInfo object at 0x7f00c5332d50>``.
-    Defaults to ``<typer.models.ArgumentInfo object at 0x7f4eb853ed50>``.
+    Describe ``dense_vectors``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7350d502b750>``.
 index_path : str, optional
-    Optional parameter default ``typer.Option('./_indices/faiss/shard_000.idx', help='Output index (CPU .idx)')``. Description for ``index_path``.
-    
-    
-    Defaults to ``<typer.models.OptionInfo object at 0x7f00c5332e90>``.
-    
-    Defaults to ``<typer.models.OptionInfo object at 0x7f4eb853ee90>``.
-
-Examples
---------
->>> from orchestration.cli import index_faiss
->>> index_faiss()  # doctest: +ELLIPSIS
+    Describe ``index_path``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7350d502b890>``.
 """
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
@@ -172,25 +153,17 @@ Examples
 
 # [nav:anchor api]
 def api(port: int = 8080) -> None:
-    """Compute api.
+    """Describe api.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the api operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 port : int, optional
+    Describe ``port``.
     Defaults to ``8080``.
-    Description for ``port``.
-    
-    
-    
-    Defaults to ``8080``.
-
-Examples
---------
->>> from orchestration.cli import api
->>> api()  # doctest: +ELLIPSIS
 """
     import uvicorn
 
@@ -199,20 +172,16 @@ Examples
 
 # [nav:anchor e2e]
 def e2e() -> None:
-    """Compute e2e.
+    """Describe e2e.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the e2e operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Raises
 ------
-typer.Exit
-    Raised when validation fails.
-
-Examples
---------
->>> from orchestration.cli import e2e
->>> e2e()  # doctest: +ELLIPSIS
+Exit
+    Raised when TODO for Exit.
 """
     try:
         from orchestration.flows import e2e_flow

@@ -1,0 +1,372 @@
+{
+  "/home/paul/kgfoundry/docs/reference/schemas/kgfoundry_common.models.Chunk.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$defs",
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type",
+      "x-version-introduced"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "doc_id",
+      "doctags_span",
+      "end_char",
+      "id",
+      "section",
+      "start_char",
+      "tokens"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/kgfoundry_common.models.Doc.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$defs",
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type",
+      "x-version-introduced"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "arxiv_id",
+      "authors",
+      "content_hash",
+      "doi",
+      "id",
+      "language",
+      "license",
+      "openalex_id",
+      "pdf_uri",
+      "pmcid"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/kgfoundry_common.models.DoctagsAsset.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$defs",
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type",
+      "x-version-introduced"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "avg_logprob",
+      "doc_id",
+      "doctags_uri",
+      "pages",
+      "vlm_model",
+      "vlm_revision"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/kgfoundry_common.models.LinkAssertion.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$defs",
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type",
+      "x-version-introduced"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "chunk_id",
+      "concept_id",
+      "decision",
+      "evidence_span",
+      "features",
+      "id",
+      "run_id",
+      "score"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/orchestration.fixture_flow.Doc.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$defs",
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "arxiv_id",
+      "authors",
+      "content_hash",
+      "doi",
+      "id",
+      "language",
+      "license",
+      "openalex_id",
+      "pdf_uri",
+      "pmcid"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/registry.api.Doc.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$defs",
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "arxiv_id",
+      "authors",
+      "content_hash",
+      "doi",
+      "id",
+      "language",
+      "license",
+      "openalex_id",
+      "pdf_uri",
+      "pmcid"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/registry.api.DoctagsAsset.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$defs",
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "avg_logprob",
+      "doc_id",
+      "doctags_uri",
+      "pages",
+      "vlm_model",
+      "vlm_revision"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/registry.duckdb_registry.Doc.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$defs",
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "arxiv_id",
+      "authors",
+      "content_hash",
+      "doi",
+      "id",
+      "language",
+      "license",
+      "openalex_id",
+      "pdf_uri",
+      "pmcid"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/registry.duckdb_registry.DoctagsAsset.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$defs",
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "avg_logprob",
+      "doc_id",
+      "doctags_uri",
+      "pages",
+      "vlm_model",
+      "vlm_revision"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/registry.helper.Doc.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$defs",
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "arxiv_id",
+      "authors",
+      "content_hash",
+      "doi",
+      "id",
+      "language",
+      "license",
+      "openalex_id",
+      "pdf_uri",
+      "pmcid"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/registry.helper.DoctagsAsset.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$defs",
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "avg_logprob",
+      "doc_id",
+      "doctags_uri",
+      "pages",
+      "vlm_model",
+      "vlm_revision"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/search_api.app.SearchRequest.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "explain",
+      "filters",
+      "k",
+      "query"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/search_api.app.SearchResult.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "chunk_id",
+      "concepts",
+      "doc_id",
+      "score",
+      "section",
+      "signals",
+      "spans",
+      "title"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/search_api.schemas.SearchRequest.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type",
+      "x-version-introduced"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "explain",
+      "filters",
+      "k",
+      "query"
+    ]
+  },
+  "/home/paul/kgfoundry/docs/reference/schemas/search_api.schemas.SearchResult.json": {
+    "top_level_added": [],
+    "top_level_removed": [
+      "$id",
+      "$schema",
+      "description",
+      "examples",
+      "properties",
+      "required",
+      "title",
+      "type",
+      "x-version-introduced"
+    ],
+    "properties_added_top10": [],
+    "properties_removed_top10": [
+      "chunk_id",
+      "concepts",
+      "doc_id",
+      "score",
+      "section",
+      "signals",
+      "spans",
+      "title"
+    ]
+  }
+}

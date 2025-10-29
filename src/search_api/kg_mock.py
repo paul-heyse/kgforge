@@ -1,8 +1,9 @@
 """Overview of kg mock.
 
-This module bundles kg mock logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles kg mock logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -41,11 +42,10 @@ __navmap__: Final[NavMap] = {
 
 
 class ConceptMeta(TypedDict):
-    """Model the ConceptMeta.
+    """Describe ConceptMeta.
 
-Represent the conceptmeta data structure used throughout the project. The class encapsulates
-behaviour behind a well-defined interface for collaborating components. Instances are typically
-created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     label: str
@@ -66,32 +66,21 @@ CONCEPTS: Final[dict[str, ConceptMeta]] = {
 
 # [nav:anchor detect_query_concepts]
 def detect_query_concepts(query: str) -> set[str]:
-    """Compute detect query concepts.
+    """Describe detect query concepts.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the detect query concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 query : str
-    Description for ``query``.
-    
-    
-    
+    Describe ``query``.
 
 Returns
 -------
 set[str]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.kg_mock import detect_query_concepts
->>> result = detect_query_concepts(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     lowered = query.lower()
     hits: set[str] = set()
@@ -103,32 +92,21 @@ Examples
 
 # [nav:anchor linked_concepts_for_text]
 def linked_concepts_for_text(text: str) -> list[str]:
-    """Compute linked concepts for text.
+    """Describe linked concepts for text.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the linked concepts for text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 text : str
-    Description for ``text``.
-    
-    
-    
+    Describe ``text``.
 
 Returns
 -------
 list[str]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.kg_mock import linked_concepts_for_text
->>> result = linked_concepts_for_text(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     lowered = text.lower()
     hits = []
@@ -145,42 +123,29 @@ def kg_boost(
     direct: float = 0.08,
     one_hop: float = 0.04,
 ) -> float:
-    """Compute kg boost.
+    """Describe kg boost.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the kg boost operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 query_concepts : list[str]
-    Description for ``query_concepts``.
+    Describe ``query_concepts``.
 chunk_concepts : list[str]
-    Description for ``chunk_concepts``.
+    Describe ``chunk_concepts``.
 direct : float, optional
-    Defaults to ``0.08``.
-    Description for ``direct``.
+    Describe ``direct``.
     Defaults to ``0.08``.
 one_hop : float, optional
-    Defaults to ``0.04``.
-    Description for ``one_hop``.
-    
-    
-    
+    Describe ``one_hop``.
     Defaults to ``0.04``.
 
 Returns
 -------
 float
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.kg_mock import kg_boost
->>> result = kg_boost(..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

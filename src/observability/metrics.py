@@ -1,8 +1,9 @@
 """Overview of metrics.
 
-This module bundles metrics logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles metrics logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -30,106 +31,103 @@ try:
 except Exception:  # pragma: no cover - minimal no-op fallbacks
 
     class _NoopMetric:
-        """Describe NoopMetric.
+        """Describe  NoopMetric.
+
+<!-- auto:docstring-builder v1 -->
+
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
         def labels(self, *args: object, **kwargs: object) -> _NoopMetric:
-            """Compute labels.
+            """Describe labels.
 
-Carry out the labels operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
-*args : object
-    Description for ``*args``.
-**kwargs : object
-    Description for ``**kwargs``.
+args : object, optional, by default ()
+    TODO: describe ``args``.
+kwargs : object, optional, by default {}
+    TODO: describe ``kwargs``.
+
 
 Returns
 -------
 _NoopMetric
-    Description of return value.
-
-Examples
---------
->>> from observability.metrics import labels
->>> result = labels(*args, **kwargs)
->>> result  # doctest: +ELLIPSIS
+    TODO: describe return value.
 """
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
-            """Compute observe.
+            """Describe observe.
 
-Carry out the observe operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
-*args : object
-    Description for ``*args``.
-**kwargs : object
-    Description for ``**kwargs``.
-
-Examples
---------
->>> from observability.metrics import observe
->>> observe(*args, **kwargs)  # doctest: +ELLIPSIS
+args : object, optional, by default ()
+    TODO: describe ``args``.
+kwargs : object, optional, by default {}
+    TODO: describe ``kwargs``.
 """
             return
 
         def inc(self, *args: object, **kwargs: object) -> None:
-            """Compute inc.
+            """Describe inc.
 
-Carry out the inc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
-*args : object
-    Description for ``*args``.
-**kwargs : object
-    Description for ``**kwargs``.
-
-Examples
---------
->>> from observability.metrics import inc
->>> inc(*args, **kwargs)  # doctest: +ELLIPSIS
+args : object, optional, by default ()
+    TODO: describe ``args``.
+kwargs : object, optional, by default {}
+    TODO: describe ``kwargs``.
 """
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
-            """Compute set.
+            """Describe set.
 
-Carry out the set operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
-*args : object
-    Description for ``*args``.
-**kwargs : object
-    Description for ``**kwargs``.
-
-Examples
---------
->>> from observability.metrics import set
->>> set(*args, **kwargs)  # doctest: +ELLIPSIS
+args : object, optional, by default ()
+    TODO: describe ``args``.
+kwargs : object, optional, by default {}
+    TODO: describe ``kwargs``.
 """
             return
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:
-        """Return a metric stub that ignores all inputs.
+        """Describe  make noop metric.
 
-        Parameters
-        ----------
-        *args : object
-            Positional arguments accepted for API compatibility and ignored.
-        **kwargs : object
-            Keyword arguments accepted for API compatibility and ignored.
+<!-- auto:docstring-builder v1 -->
 
-        Returns
-        -------
-        _NoopMetric
-            Object implementing the ``set`` and ``observe`` methods as no-ops.
-        """
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+args : object, optional, by default ()
+    TODO: describe ``args``.
+kwargs : object, optional, by default {}
+    TODO: describe ``kwargs``.
+
+
+Returns
+-------
+_NoopMetric
+    TODO: describe return value.
+"""
         return _NoopMetric()
 
     Counter = cast(CounterFactory, _make_noop_metric)

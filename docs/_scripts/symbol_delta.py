@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Overview of symbol delta.
 
-This module bundles symbol delta logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This module bundles symbol delta logic for the kgfoundry stack. It
+groups related helpers so downstream packages can import a single
+cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -101,7 +102,9 @@ def _index_rows(rows: list[JSONRow]) -> JSONMap:
 
 
 def _diff_rows(base: JSONMap, head: JSONMap) -> tuple[list[str], list[str], list[JSONRow]]:
-    """Return (added, removed, changed) deltas between ``base`` and ``head`` maps."""
+    """Return (added, removed, changed) deltas between ``base`` and ``head``
+    maps.
+    """
     base_paths = set(base)
     head_paths = set(head)
 

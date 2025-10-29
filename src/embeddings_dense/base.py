@@ -1,8 +1,9 @@
 """Overview of base.
 
-This module bundles base logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles base logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -45,47 +46,42 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DenseEmbeddingModel]
 class DenseEmbeddingModel(Protocol):
-    """Model the DenseEmbeddingModel.
+    """Describe DenseEmbeddingModel.
+
 <!-- auto:docstring-builder v1 -->
 
-Represent the denseembeddingmodel data structure used throughout the project. The class
-encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-are typically created by factories or runtime orchestrators documented nearby.
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
 
 Parameters
 ----------
-*args : Any
+*args : inspect._empty
     Describe ``args``.
-**kwargs : Any
+**kwargs : inspect._empty
     Describe ``kwargs``.
+
+Returns
+-------
+inspect._empty
+    Describe return value.
 """
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]:
-        """Compute encode.
+        """Describe encode.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 texts : Sequence[str]
-    Description for ``texts``.
-    
-    
-    
+    Describe ``texts``.
 
 Returns
 -------
 NDArray[np.float32]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from embeddings_dense.base import encode
->>> result = encode(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         ...

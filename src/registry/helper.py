@@ -1,8 +1,9 @@
 """Overview of helper.
 
-This module bundles helper logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles helper logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -47,27 +48,46 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DuckDBRegistryHelper]
 class DuckDBRegistryHelper:
-    """Helper for writing registry artefacts into DuckDB tables.
+    """Describe DuckDBRegistryHelper.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    db_path : str
-        File path pointing at the DuckDB registry database.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+db_path : str
+    Describe ``db_path``.
+"""
 
     def __init__(self, db_path: str) -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+db_path : str
+    Describe ``db_path``.
+"""
         self.db_path = db_path
 
     def _con(self) -> duckdb.DuckDBPyConnection:
-        """Open a DuckDB connection to the configured database file.
+        """Describe  con.
+
 <!-- auto:docstring-builder v1 -->
 
-        Returns
-        -------
-        duckdb.DuckDBPyConnection
-            Mutable connection handle bound to ``self.db_path``.
-        """
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Returns
+-------
+_duckdb.DuckDBPyConnection
+    Describe return value.
+"""
         return duckdb.connect(self.db_path)
 
     def new_run(
@@ -77,38 +97,27 @@ class DuckDBRegistryHelper:
         revision: str | None,
         config: Mapping[str, object],
     ) -> str:
-        """Compute new run.
+        """Describe new run.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the new run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 purpose : str
-    Description for ``purpose``.
+    Describe ``purpose``.
 model_id : str | None
-    Description for ``model_id``.
+    Describe ``model_id``.
 revision : str | None
-    Description for ``revision``.
+    Describe ``revision``.
 config : Mapping[str, object]
-    Description for ``config``.
-    
-    
-    
+    Describe ``config``.
 
 Returns
 -------
 str
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from registry.helper import new_run
->>> result = new_run(..., ..., ..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         run_id = str(uuid.uuid4())
         con = self._con()
@@ -124,29 +133,21 @@ Examples
         return run_id
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
-        """Compute close run.
+        """Describe close run.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the close run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 run_id : str
-    Description for ``run_id``.
+    Describe ``run_id``.
 success : bool
-    Description for ``success``.
+    Describe ``success``.
 notes : str | None, optional
+    Describe ``notes``.
     Defaults to ``None``.
-    Description for ``notes``.
-    
-    
-    
-    Defaults to ``None``.
-
-Examples
---------
->>> from registry.helper import close_run
->>> close_run(..., ...)  # doctest: +ELLIPSIS
 """
         con = self._con()
         con.execute("UPDATE runs SET finished_at=CURRENT_TIMESTAMP WHERE run_id=?", [run_id])
@@ -162,34 +163,23 @@ Examples
         con.close()
 
     def begin_dataset(self, kind: str, run_id: str) -> str:
-        """Compute begin dataset.
+        """Describe begin dataset.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the begin dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 kind : str
-    Description for ``kind``.
+    Describe ``kind``.
 run_id : str
-    Description for ``run_id``.
-    
-    
-    
+    Describe ``run_id``.
 
 Returns
 -------
 str
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from registry.helper import begin_dataset
->>> result = begin_dataset(..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         dataset_id = str(uuid.uuid4())
         con = self._con()
@@ -205,27 +195,20 @@ Examples
         return dataset_id
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
-        """Compute commit dataset.
+        """Describe commit dataset.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the commit dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 dataset_id : str
-    Description for ``dataset_id``.
+    Describe ``dataset_id``.
 parquet_root : str
-    Description for ``parquet_root``.
+    Describe ``parquet_root``.
 rows : int
-    Description for ``rows``.
-    
-    
-    
-
-Examples
---------
->>> from registry.helper import commit_dataset
->>> commit_dataset(..., ..., ...)  # doctest: +ELLIPSIS
+    Describe ``rows``.
 """
         con = self._con()
         con.execute(
@@ -243,23 +226,16 @@ Examples
         con.close()
 
     def rollback_dataset(self, dataset_id: str) -> None:
-        """Compute rollback dataset.
+        """Describe rollback dataset.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the rollback dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 dataset_id : str
-    Description for ``dataset_id``.
-    
-    
-    
-
-Examples
---------
->>> from registry.helper import rollback_dataset
->>> rollback_dataset(...)  # doctest: +ELLIPSIS
+    Describe ``dataset_id``.
 """
         con = self._con()
         con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
@@ -270,23 +246,16 @@ Examples
         con.close()
 
     def register_documents(self, docs: list[Doc]) -> None:
-        """Compute register documents.
+        """Describe register documents.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the register documents operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 docs : list[Doc]
-    Description for ``docs``.
-    
-    
-    
-
-Examples
---------
->>> from registry.helper import register_documents
->>> register_documents(...)  # doctest: +ELLIPSIS
+    Describe ``docs``.
 """
         con = self._con()
         for doc in docs:
@@ -314,23 +283,16 @@ Examples
         con.close()
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
-        """Compute register doctags.
+        """Describe register doctags.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the register doctags operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 assets : list[DoctagsAsset]
-    Description for ``assets``.
-    
-    
-    
-
-Examples
---------
->>> from registry.helper import register_doctags
->>> register_doctags(...)  # doctest: +ELLIPSIS
+    Describe ``assets``.
 """
         con = self._con()
         for asset in assets:
@@ -348,27 +310,20 @@ Examples
         con.close()
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
-        """Compute emit event.
+        """Describe emit event.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the emit event operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 event_name : str
-    Description for ``event_name``.
+    Describe ``event_name``.
 subject_id : str
-    Description for ``subject_id``.
+    Describe ``subject_id``.
 payload : Mapping[str, object]
-    Description for ``payload``.
-    
-    
-    
-
-Examples
---------
->>> from registry.helper import emit_event
->>> emit_event(..., ..., ...)  # doctest: +ELLIPSIS
+    Describe ``payload``.
 """
         con = self._con()
         con.execute(

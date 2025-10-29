@@ -1,8 +1,8 @@
 """Overview of app.
 
-This module bundles app logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles app logic for the kgfoundry stack. It groups related
+helpers so downstream packages can import a single cohesive namespace.
+Refer to the functions and classes below for implementation specifics.
 """
 
 from __future__ import annotations
@@ -14,10 +14,10 @@ from typing import Any, Final
 
 import yaml
 from fastapi import Depends, FastAPI, Header, HTTPException
+
 from kgfoundry.embeddings_sparse.bm25 import PurePythonBM25, get_bm25
 from kgfoundry.embeddings_sparse.splade import get_splade
 from kgfoundry.kg_builder.mock_kg import MockKG
-
 from kgfoundry_common.navmap_types import NavMap
 from search_api.schemas import SearchRequest, SearchResult
 from vectorstore_faiss import gpu as faiss_gpu
@@ -131,30 +131,22 @@ kg.add_edge("C:42", "C:99")
 
 # [nav:anchor auth]
 def auth(authorization: str | None = Header(default=None)) -> None:
-    """Compute auth.
+    """Describe auth.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the auth operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 authorization : str | None, optional
-    Optional parameter default ``Header(default=None)``. Description for ``authorization``.
-    
-    
-    Defaults to ``Header(None)``.
-    
+    Describe ``authorization``.
     Defaults to ``Header(None)``.
 
 Raises
 ------
 HTTPException
-    Raised when validation fails.
-
-Examples
---------
->>> from search_api.app import auth
->>> auth()  # doctest: +ELLIPSIS
+    Raised when TODO for HTTPException.
 """
     if not API_KEYS:
         return  # disabled in skeleton
@@ -167,24 +159,16 @@ Examples
 
 # [nav:anchor healthz]
 def healthz() -> dict[str, Any]:
-    """Compute healthz.
+    """Describe healthz.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the healthz operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Returns
 -------
 dict[str, Any]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.app import healthz
->>> result = healthz()
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     return {
         "status": "ok",
@@ -200,34 +184,23 @@ Examples
 
 # [nav:anchor rrf_fuse]
 def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, float]:
-    """Compute rrf fuse.
+    """Describe rrf fuse.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the rrf fuse operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 lists : list[list[tuple[str, float]]]
-    Description for ``lists``.
+    Describe ``lists``.
 k_rrf : int
-    Description for ``k_rrf``.
-    
-    
-    
+    Describe ``k_rrf``.
 
 Returns
 -------
 dict[str, float]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.app import rrf_fuse
->>> result = rrf_fuse(..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     scores: dict[str, float] = {}
     for hits in lists:
@@ -243,42 +216,29 @@ def apply_kg_boosts(
     direct: float = 0.08,
     one_hop: float = 0.04,
 ) -> dict[str, float]:
-    """Compute apply kg boosts.
+    """Describe apply kg boosts.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the apply kg boosts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 cands : dict[str, float]
-    Description for ``cands``.
+    Describe ``cands``.
 query : str
-    Description for ``query``.
+    Describe ``query``.
 direct : float, optional
-    Defaults to ``0.08``.
-    Description for ``direct``.
+    Describe ``direct``.
     Defaults to ``0.08``.
 one_hop : float, optional
-    Defaults to ``0.04``.
-    Description for ``one_hop``.
-    
-    
-    
+    Describe ``one_hop``.
     Defaults to ``0.04``.
 
 Returns
 -------
 dict[str, float]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.app import apply_kg_boosts
->>> result = apply_kg_boosts(..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     q_concepts = set()
     for w in query.lower().split():
@@ -301,21 +261,25 @@ Examples
 
 # [nav:anchor search]
 def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
-    """Execute a blended dense + sparse search over the configured indices.
+    """Describe search.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    req : SearchRequest
-        Validated search request containing the query and filters.
-    _ : None, optional
-        Dependency injection hook that enforces authentication.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-    Returns
-    -------
-    dict[str, Any]
-        Search results keyed by channel, including fused rankings.
-    """
+Parameters
+----------
+req : SearchRequest
+    Describe ``req``.
+_ : None, optional
+    Describe ``_``.
+    Defaults to ``Depends(auth)``.
+
+Returns
+-------
+dict[str, Any]
+    Describe return value.
+"""
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
     dense_hits: list[tuple[str, float]] = []
@@ -375,21 +339,25 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
 
 # [nav:anchor graph_concepts]
 def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str, Any]:
-    """Return concept suggestions seeded from the mock knowledge graph.
+    """Describe graph concepts.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    body : Mapping[str, Any]
-        JSON payload containing the ``"q"`` query string.
-    _ : None, optional
-        Dependency injection hook that enforces authentication.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-    Returns
-    -------
-    dict[str, Any]
-        Matching concepts grouped under the ``"concepts"`` key.
-    """
+Parameters
+----------
+body : Mapping[str, Any]
+    Describe ``body``.
+_ : None, optional
+    Describe ``_``.
+    Defaults to ``Depends(auth)``.
+
+Returns
+-------
+dict[str, Any]
+    Describe return value.
+"""
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring
     concepts = [

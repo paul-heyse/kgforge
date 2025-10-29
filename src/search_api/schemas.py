@@ -1,8 +1,9 @@
 """Overview of schemas.
 
-This module bundles schemas logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles schemas logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -45,20 +46,27 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor SearchRequest]
 class SearchRequest(BaseModel):
-    """Request model describing an incoming search query.
+    """Describe SearchRequest.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    query : str
-        Full-text query string supplied by the caller.
-    k : int
-        Maximum number of results to return. Defaults to ``10``.
-    filters : dict[str, object] | None
-        Optional filter expression forwarded to the backend.
-    explain : bool
-        Flag indicating whether to return scoring breakdowns. Defaults to ``False``.
-    """
+the behaviour it provides to callers. Callers interact with
+validated data through this model.
+
+Parameters
+----------
+query : str
+    Describe ``query``.
+k : int, optional
+    Describe ``k``.
+    Defaults to ``10``.
+filters : dict[str, object] | None, optional
+    Describe ``filters``.
+    Defaults to ``None``.
+explain : bool, optional
+    Describe ``explain``.
+    Defaults to ``False``.
+"""
 
     query: str = Field(min_length=1)
     k: int = 10
@@ -68,28 +76,35 @@ class SearchRequest(BaseModel):
 
 # [nav:anchor SearchResult]
 class SearchResult(BaseModel):
-    """Result model produced by the search API.
+    """Describe SearchResult.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    doc_id : str
-        Identifier for the matched document.
-    chunk_id : str
-        Identifier for the specific chunk within the document.
-    title : str
-        Title of the source document.
-    section : str
-        Section heading captured for the chunk.
-    score : float
-        Score assigned by the retrieval backend.
-    signals : dict[str, float]
-        Optional per-feature contribution breakdown.
-    spans : dict[str, int]
-        Mapping of matched spans to offsets.
-    concepts : list[dict[str, str]]
-        Optional knowledge graph annotations returned with the result.
-    """
+the behaviour it provides to callers. Callers interact with
+validated data through this model.
+
+Parameters
+----------
+doc_id : str
+    Describe ``doc_id``.
+chunk_id : str
+    Describe ``chunk_id``.
+title : str
+    Describe ``title``.
+section : str
+    Describe ``section``.
+score : float
+    Describe ``score``.
+signals : dict[str, float], optional
+    Describe ``signals``.
+    Defaults to ``<factory>``.
+spans : dict[str, int], optional
+    Describe ``spans``.
+    Defaults to ``<factory>``.
+concepts : list[dict[str, str]], optional
+    Describe ``concepts``.
+    Defaults to ``<factory>``.
+"""
 
     doc_id: str
     chunk_id: str

@@ -1,0 +1,10 @@
+[
+  {
+    "severity": "error",
+    "symbol": "*",
+    "rule": "untested_public_budget",
+    "message": "Untested public symbols 145 exceed budget 5",
+    "module": "*",
+    "file": "*"
+  }
+]

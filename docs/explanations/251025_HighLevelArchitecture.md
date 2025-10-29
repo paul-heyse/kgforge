@@ -93,7 +93,7 @@ ontology.loader = "ontology.loader:OntologyLoader"
 > Keep models lean. Payloads (large text, vectors) live in Parquet files; rows refer to them via IDs.
 
 ```python
-# kgfoundry_common/models.py (Python 3.13, Pydantic v2)
+# kgfoundry_common/models.py (Python 3.13.9, Pydantic v2)
 from pydantic import BaseModel, Field, AwareDatetime
 from typing import Optional, List, Dict, Literal
 from dataclasses import dataclass
@@ -457,7 +457,7 @@ system:
   duckdb_path: /data/catalog/catalog.duckdb
 
 runtime:
-  python: "3.13"
+  python: "3.13.9"
   cuda: "13.0"
   torch: "2.9"
   duckdb_min: "1.4.1"
@@ -1676,7 +1676,7 @@ system:
   duckdb_path: /data/catalog/catalog.duckdb
 
 runtime:
-  python: "3.13"
+  python: "3.13.9"
   cuda: "13.0"
   torch: "2.9"
   duckdb_min: "1.4.1"

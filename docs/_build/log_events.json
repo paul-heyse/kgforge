@@ -1,0 +1,14 @@
+[
+  {
+    "logger": "logger",
+    "level": "warning",
+    "message_template": "\"BM25 search failed, falling back to empty results: %s\"",
+    "structured_keys": [],
+    "file": "src/search_api/app.py",
+    "lineno": 324,
+    "source_link": {
+      "editor": "vscode://file/src/search_api/app.py:324:1"
+    },
+    "runbook": null
+  }
+]

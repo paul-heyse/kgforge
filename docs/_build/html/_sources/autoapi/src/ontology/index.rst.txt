@@ -1,0 +1,42 @@
+src.ontology
+============
+
+.. py:module:: src.ontology
+
+.. autoapi-nested-parse::
+
+   
+   Overview of ontology.
+
+   This module bundles ontology logic for the kgfoundry stack. It groups related helpers so downstream
+   packages can import a single cohesive namespace. Refer to the functions and classes below for
+   implementation specifics.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/src/ontology/catalog/index
+   /autoapi/src/ontology/loader/index
+
+

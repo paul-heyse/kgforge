@@ -5,7 +5,7 @@ project-excludes = [
     "site/**",
 ]
 search-path = ["src", "."]
-python-version = "3.13.3"
+python-version = "3.13.9"
 
 # Type-check behavior
 infer-with-first-use = true

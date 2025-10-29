@@ -1,8 +1,9 @@
 """Overview of service.
 
-This module bundles service logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles service logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -47,38 +48,26 @@ __navmap__: Final[NavMap] = {
 def rrf_fuse(
     dense: list[tuple[str, float]], sparse: list[tuple[str, float]], k: int = 60
 ) -> list[tuple[str, float]]:
-    """Compute rrf fuse.
+    """Describe rrf fuse.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the rrf fuse operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 dense : list[tuple[str, float]]
-    Description for ``dense``.
+    Describe ``dense``.
 sparse : list[tuple[str, float]]
-    Description for ``sparse``.
+    Describe ``sparse``.
 k : int, optional
-    Defaults to ``60``.
-    Description for ``k``.
-    
-    
-    
+    Describe ``k``.
     Defaults to ``60``.
 
 Returns
 -------
 list[tuple[str, float]]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.service import rrf_fuse
->>> result = rrf_fuse(..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     # NOTE: implement stable RRF across rankers when ranker outputs are wired
     return []
@@ -86,34 +75,23 @@ Examples
 
 # [nav:anchor apply_kg_boosts]
 def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[str, float]]:
-    """Compute apply kg boosts.
+    """Describe apply kg boosts.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the apply kg boosts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 fused : list[tuple[str, float]]
-    Description for ``fused``.
+    Describe ``fused``.
 query : str
-    Description for ``query``.
-    
-    
-    
+    Describe ``query``.
 
 Returns
 -------
 list[tuple[str, float]]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.service import apply_kg_boosts
->>> result = apply_kg_boosts(..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     # NOTE: apply boosts for direct & one-hop concept matches once KG signals exist
     return fused
@@ -123,36 +101,24 @@ Examples
 def mmr_deduplicate(
     results: list[tuple[str, float]], lambda_: float = 0.7
 ) -> list[tuple[str, float]]:
-    """Compute mmr deduplicate.
+    """Describe mmr deduplicate.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the mmr deduplicate operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 results : list[tuple[str, float]]
-    Description for ``results``.
+    Describe ``results``.
 lambda_ : float, optional
-    Defaults to ``0.7``.
-    Description for ``lambda_``.
-    
-    
-    
+    Describe ``lambda_``.
     Defaults to ``0.7``.
 
 Returns
 -------
 list[tuple[str, float]]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.service import mmr_deduplicate
->>> result = mmr_deduplicate(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     # NOTE: add doc-level diversity via MMR when result scoring is available
     return results

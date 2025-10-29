@@ -1,8 +1,9 @@
 """Overview of fixture index.
 
-This module bundles fixture index logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This module bundles fixture index logic for the kgfoundry stack. It
+groups related helpers so downstream packages can import a single
+cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -50,32 +51,21 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
 # [nav:anchor tokenize]
 def tokenize(text: str) -> list[str]:
-    """Compute tokenize.
+    """Describe tokenize.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the tokenize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 text : str
-    Description for ``text``.
-    
-    
-    
+    Describe ``text``.
 
 Returns
 -------
 list[str]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.fixture_index import tokenize
->>> result = tokenize(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
@@ -83,22 +73,27 @@ Examples
 # [nav:anchor FixtureDoc]
 @dataclass
 class FixtureDoc:
-    """Fixture document loaded from the DuckDB tutorial dataset.
+    """Describe FixtureDoc.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    chunk_id : str
-        Unique chunk identifier.
-    doc_id : str
-        Document identifier associated with the chunk.
-    title : str
-        Document title used for display.
-    section : str
-        Optional section heading captured for the chunk.
-    text : str
-        Raw text body of the chunk.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+chunk_id : str
+    Describe ``chunk_id``.
+doc_id : str
+    Describe ``doc_id``.
+title : str
+    Describe ``title``.
+section : str
+    Describe ``section``.
+text : str
+    Describe ``text``.
+"""
 
     chunk_id: str
     doc_id: str
@@ -109,19 +104,40 @@ class FixtureDoc:
 
 # [nav:anchor FixtureIndex]
 class FixtureIndex:
-    """BM25-style fixture index used for demos and regression tests.
+    """Describe FixtureIndex.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    root : str, optional
-        Root directory containing fixture assets. Defaults to ``"/data"``.
-    db_path : str, optional
-        DuckDB catalog path used to discover parquet datasets. Defaults to
-        ``"/data/catalog/catalog.duckdb"``.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+root : str, optional
+    Describe ``root``.
+    Defaults to ``'/data'``.
+db_path : str, optional
+    Describe ``db_path``.
+    Defaults to ``'/data/catalog/catalog.duckdb'``.
+"""
 
     def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb") -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+root : str, optional
+    Describe ``root``.
+    Defaults to ``'/data'``.
+db_path : str, optional
+    Describe ``db_path``.
+    Defaults to ``'/data/catalog/catalog.duckdb'``.
+"""
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []
@@ -130,10 +146,13 @@ class FixtureIndex:
         self._load_from_duckdb()
 
     def _load_from_duckdb(self) -> None:
-        """Compute load from duckdb.
+        """Describe  load from duckdb.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the load from duckdb operation.
+Python's object protocol for this class. Use it to integrate
+with built-in operators, protocols, or runtime behaviours that
+expect instances to participate in the language's data model.
 """
         if not Path(self.db_path).exists():
             return
@@ -175,10 +194,13 @@ Carry out the load from duckdb operation.
         self._build_lex()
 
     def _build_lex(self) -> None:
-        """Compute build lex.
+        """Describe  build lex.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the build lex operation.
+Python's object protocol for this class. Use it to integrate
+with built-in operators, protocols, or runtime behaviours that
+expect instances to participate in the language's data model.
 """
         self.tf.clear()
         self.df.clear()
@@ -193,36 +215,24 @@ Carry out the build lex operation.
         self.N = len(self.docs)
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Compute search.
+        """Describe search.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 query : str
-    Description for ``query``.
+    Describe ``query``.
 k : int, optional
-    Defaults to ``10``.
-    Description for ``k``.
-    
-    
-    
+    Describe ``k``.
     Defaults to ``10``.
 
 Returns
 -------
 list[tuple[int, float]]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.fixture_index import search
->>> result = search(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         if getattr(self, "N", 0) == 0:
             return []
@@ -242,31 +252,20 @@ Examples
         return [(index, score) for index, score in ranked[:k] if score > 0.0]
 
     def doc(self, index: int) -> FixtureDoc:
-        """Compute doc.
+        """Describe doc.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 index : int
-    Description for ``index``.
-    
-    
-    
+    Describe ``index``.
 
 Returns
 -------
 FixtureDoc
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.fixture_index import doc
->>> result = doc(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         return self.docs[index]

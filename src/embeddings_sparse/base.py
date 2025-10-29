@@ -1,8 +1,9 @@
 """Overview of base.
 
-This module bundles base logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles base logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -47,120 +48,108 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor SparseEncoder]
 class SparseEncoder(Protocol):
-    """Protocol describing sparse encoders exposed by the package.
+    """Describe SparseEncoder.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    name : str
-        Canonical identifier advertised by the encoder implementation.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+*args : inspect._empty
+    Describe ``args``.
+**kwargs : inspect._empty
+    Describe ``kwargs``.
+
+Returns
+-------
+inspect._empty
+    Describe return value.
+"""
 
     name: str
 
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
-        """Compute encode.
+        """Describe encode.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 texts : list[str]
-    Description for ``texts``.
-    
-    
-    
+    Describe ``texts``.
 
 Returns
 -------
 list[tuple[list[int], list[float]]]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from embeddings_sparse.base import encode
->>> result = encode(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         ...
 
 
 # [nav:anchor SparseIndex]
 class SparseIndex(Protocol):
-    """Model the SparseIndex.
+    """Describe SparseIndex.
+
 <!-- auto:docstring-builder v1 -->
 
-Represent the sparseindex data structure used throughout the project. The class encapsulates
-behaviour behind a well-defined interface for collaborating components. Instances are typically
-created by factories or runtime orchestrators documented nearby.
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
 
 Parameters
 ----------
-*args : Any
+*args : inspect._empty
     Describe ``args``.
-**kwargs : Any
+**kwargs : inspect._empty
     Describe ``kwargs``.
+
+Returns
+-------
+inspect._empty
+    Describe return value.
 """
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """Compute build.
+        """Describe build.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 docs_iterable : Iterable[tuple[str, dict[str, str]]]
-    Description for ``docs_iterable``.
-    
-    
-    
-
-Examples
---------
->>> from embeddings_sparse.base import build
->>> build(...)  # doctest: +ELLIPSIS
+    Describe ``docs_iterable``.
 """
         ...
 
     def search(
         self, query: str, k: int, fields: Mapping[str, str] | None = None
     ) -> list[tuple[str, float]]:
-        """Compute search.
+        """Describe search.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 query : str
-    Description for ``query``.
+    Describe ``query``.
 k : int
-    Description for ``k``.
+    Describe ``k``.
 fields : Mapping[str, str] | None, optional
-    Defaults to ``None``.
-    Description for ``fields``.
-    
-    
-    
+    Describe ``fields``.
     Defaults to ``None``.
 
 Returns
 -------
 list[tuple[str, float]]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from embeddings_sparse.base import search
->>> result = search(..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         ...

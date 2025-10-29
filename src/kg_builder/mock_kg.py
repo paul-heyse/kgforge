@@ -1,8 +1,9 @@
 """Overview of mock kg.
 
-This module bundles mock kg logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles mock kg logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -41,120 +42,94 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor MockKG]
 class MockKG:
-    """Lightweight in-memory knowledge graph used in tests and demos.
+    """Describe MockKG.
+
 <!-- auto:docstring-builder v1 -->
 
-    The mock graph keeps adjacency and mention mappings in dictionaries so unit tests can
-    exercise higher-level logic without hitting a real backend.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+"""
 
     def __init__(self) -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Python's object protocol for this class. Use it to integrate
+with built-in operators, protocols, or runtime behaviours that
+expect instances to participate in the language's data model.
+"""
         self.chunk2concepts: dict[str, set[str]] = {}
         self.neighbors: dict[str, set[str]] = {}
 
     def add_mention(self, chunk_id: str, concept_id: str) -> None:
-        """Compute add mention.
+        """Describe add mention.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the add mention operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 chunk_id : str
-    Description for ``chunk_id``.
+    Describe ``chunk_id``.
 concept_id : str
-    Description for ``concept_id``.
-    
-    
-    
-
-Examples
---------
->>> from kg_builder.mock_kg import add_mention
->>> add_mention(..., ...)  # doctest: +ELLIPSIS
+    Describe ``concept_id``.
 """
         self.chunk2concepts.setdefault(chunk_id, set()).add(concept_id)
 
     def add_edge(self, a: str, b: str) -> None:
-        """Compute add edge.
+        """Describe add edge.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the add edge operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 a : str
-    Description for ``a``.
+    Describe ``a``.
 b : str
-    Description for ``b``.
-    
-    
-    
-
-Examples
---------
->>> from kg_builder.mock_kg import add_edge
->>> add_edge(..., ...)  # doctest: +ELLIPSIS
+    Describe ``b``.
 """
         self.neighbors.setdefault(a, set()).add(b)
         self.neighbors.setdefault(b, set()).add(a)
 
     def linked_concepts(self, chunk_id: str) -> list[str]:
-        """Compute linked concepts.
+        """Describe linked concepts.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the linked concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 chunk_id : str
-    Description for ``chunk_id``.
-    
-    
-    
+    Describe ``chunk_id``.
 
 Returns
 -------
 list[str]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from kg_builder.mock_kg import linked_concepts
->>> result = linked_concepts(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         return sorted(self.chunk2concepts.get(chunk_id, set()))
 
     def one_hop(self, concept_id: str) -> list[str]:
-        """Compute one hop.
+        """Describe one hop.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the one hop operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 concept_id : str
-    Description for ``concept_id``.
-    
-    
-    
+    Describe ``concept_id``.
 
 Returns
 -------
 list[str]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from kg_builder.mock_kg import one_hop
->>> result = one_hop(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         return sorted(self.neighbors.get(concept_id, set()))

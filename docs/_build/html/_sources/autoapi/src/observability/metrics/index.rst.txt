@@ -1,0 +1,205 @@
+src.observability.metrics
+=========================
+
+.. py:module:: src.observability.metrics
+
+.. autoapi-nested-parse::
+
+   Overview of metrics.
+
+   This module bundles metrics logic for the kgfoundry stack. It groups related helpers so downstream
+   packages can import a single cohesive namespace. Refer to the functions and classes below for
+   implementation specifics.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: CounterFactory
+
+.. py:class:: _NoopMetric
+
+   
+   Describe NoopMetric.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:method:: labels(*args, **kwargs)
+
+      
+      Compute labels.
+
+      Carry out the labels operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param \*args: Description for ``*args``.
+      :type \*args: object
+      :param \*\*kwargs: Description for ``**kwargs``.
+      :type \*\*kwargs: object
+
+      :returns: *_NoopMetric* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from observability.metrics import labels
+      >>> result = labels(*args, **kwargs)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: observe(*args, **kwargs)
+
+      
+      Compute observe.
+
+      Carry out the observe operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param \*args: Description for ``*args``.
+      :type \*args: object
+      :param \*\*kwargs: Description for ``**kwargs``.
+      :type \*\*kwargs: object
+
+      .. rubric:: Examples
+
+      >>> from observability.metrics import observe
+      >>> observe(*args, **kwargs)  # doctest: +ELLIPSIS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: inc(*args, **kwargs)
+
+      
+      Compute inc.
+
+      Carry out the inc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param \*args: Description for ``*args``.
+      :type \*args: object
+      :param \*\*kwargs: Description for ``**kwargs``.
+      :type \*\*kwargs: object
+
+      .. rubric:: Examples
+
+      >>> from observability.metrics import inc
+      >>> inc(*args, **kwargs)  # doctest: +ELLIPSIS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: set(*args, **kwargs)
+
+      
+      Compute set.
+
+      Carry out the set operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param \*args: Description for ``*args``.
+      :type \*args: object
+      :param \*\*kwargs: Description for ``**kwargs``.
+      :type \*\*kwargs: object
+
+      .. rubric:: Examples
+
+      >>> from observability.metrics import set
+      >>> set(*args, **kwargs)  # doctest: +ELLIPSIS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:data:: pdf_download_success_total
+
+.. py:data:: pdf_download_failure_total
+
+.. py:data:: search_total_latency_ms
+
+.. py:data:: faiss_search_latency_ms
+
+.. py:data:: bm25_queries_total
+
+.. py:data:: splade_queries_total
+

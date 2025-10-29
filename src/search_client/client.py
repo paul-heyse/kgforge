@@ -1,9 +1,4 @@
-"""Overview of client.
-
-This module bundles client logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
-"""
+"""Thin HTTP client for interacting with the kgfoundry Search API."""
 
 from __future__ import annotations
 
@@ -13,11 +8,16 @@ import requests
 
 from kgfoundry_common.navmap_types import NavMap
 
-__all__ = ["KGFoundryClient"]
+__all__ = [
+    "KGFoundryClient",
+    "RequestsHttp",
+    "SupportsHttp",
+    "SupportsResponse",
+]
 
 __navmap__: Final[NavMap] = {
     "title": "search_client.client",
-    "synopsis": "Lightweight HTTP client for the kgfoundry Search API",
+    "synopsis": "Lightweight client wrapper around the kgfoundry Search API",
     "exports": __all__,
     "sections": [
         {
@@ -32,330 +32,229 @@ __navmap__: Final[NavMap] = {
         "since": "0.2.0",
     },
     "symbols": {
-        "KGFoundryClient": {
+        name: {
             "owner": "@search-api",
             "stability": "experimental",
             "since": "0.2.0",
-        },
+        }
+        for name in __all__
     },
 }
 
 
-# [nav:anchor SupportsResponse]
 class SupportsResponse(Protocol):
     """Describe SupportsResponse.
+
 <!-- auto:docstring-builder v1 -->
+
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
 
 Parameters
 ----------
-*args : Any
+*args : inspect._empty
     Describe ``args``.
-**kwargs : Any
+**kwargs : inspect._empty
     Describe ``kwargs``.
+
+Returns
+-------
+inspect._empty
+    Describe return value.
 """
 
     def raise_for_status(self) -> None:
-        """Compute raise for status.
+        """Describe raise for status.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the raise for status operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-Examples
---------
->>> from search_client.client import raise_for_status
->>> raise_for_status()  # doctest: +ELLIPSIS
+Python's object protocol for this class. Use it to integrate
+with built-in operators, protocols, or runtime behaviours that
+expect instances to participate in the language's data model.
 """
 
     def json(self) -> dict[str, Any]:
-        """Compute json.
+        """Describe json.
+
 <!-- auto:docstring-builder v1 -->
 
-Serialise the instance to JSON text. It respects include and exclude options so APIs can shape their payloads precisely. Pydantic populates this attribute during model construction, so applications should treat it as read-only metadata.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Returns
 -------
 dict[str, Any]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_client.client import json
->>> result = json()
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
+        ...
 
 
-# [nav:anchor SupportsHttp]
 class SupportsHttp(Protocol):
     """Describe SupportsHttp.
+
 <!-- auto:docstring-builder v1 -->
+
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
 
 Parameters
 ----------
-*args : Any
+*args : inspect._empty
     Describe ``args``.
-**kwargs : Any
+**kwargs : inspect._empty
     Describe ``kwargs``.
+
+Returns
+-------
+inspect._empty
+    Describe return value.
 """
 
-    def get(
-        self,
-        url: Any,
-        *,
-        params: Any | None = ...,
-        headers: Any | None = ...,
-        cookies: Any | None = ...,
-        auth: Any | None = ...,
-        follow_redirects: Any | None = ...,
-        timeout: Any | None = ...,
-        extensions: Any | None = ...,
-        **kwargs: Any,
-    ) -> Any:
-        """Compute get.
+    def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
+        """Describe get.
+
 <!-- auto:docstring-builder v1 -->
 
-Retrieve a value for ``key`` while falling back to a default when absent. The convenience wrapper mirrors ``dict.get`` so configuration objects remain ergonomic. Use it to express optional access without raising ``KeyError``.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 url : str
-    Description for ``url``.
-timeout : float
-    Description for ``timeout``.
-    
-    
-    
+    Describe ``url``.
+*args : object
+    Describe ``args``.
+**kwargs : object
+    Describe ``kwargs``.
 
 Returns
 -------
 SupportsResponse
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_client.client import get
->>> result = get(..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
+        ...
 
-    def post(
-        self,
-        url: Any,
-        *,
-        content: Any | None = ...,
-        data: Any | None = ...,
-        files: Any | None = ...,
-        json: Any | None = ...,
-        headers: Any | None = ...,
-        cookies: Any | None = ...,
-        auth: Any | None = ...,
-        follow_redirects: Any | None = ...,
-        timeout: Any | None = ...,
-        extensions: Any | None = ...,
-        **kwargs: Any,
-    ) -> Any:
-        """Compute post.
+    def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
+        """Describe post.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the post operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 url : str
-    Description for ``url``.
-json : dict[str, Any]
-    Description for ``json``.
-headers : dict[str, str]
-    Description for ``headers``.
-timeout : float
-    Description for ``timeout``.
-    
-    
-    
+    Describe ``url``.
+*args : object
+    Describe ``args``.
+**kwargs : object
+    Describe ``kwargs``.
 
 Returns
 -------
 SupportsResponse
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_client.client import post
->>> result = post(..., ..., ..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
-
-        Carry out the post operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-        Parameters
-        ----------
-        url : str
-            Description for ``url``.
-        json : collections.abc.Mapping
-            Description for ``json``.
-        headers : collections.abc.Mapping
-            Description for ``headers``.
-        timeout : float
-            Description for ``timeout``.
-
-        Returns
-        -------
-        src.search_client.client.SupportsResponse
-            Description of return value.
-
-        Examples
-        --------
-        >>> from search_client.client import post
-        >>> result = post(..., ..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
         ...
 
 
 class RequestsHttp(SupportsHttp):
-    """Adapter that fulfils :class:`SupportsHttp` using ``requests``.
+    """Describe RequestsHttp.
+
 <!-- auto:docstring-builder v1 -->
+
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Returns
+-------
+inspect._empty
+    Describe return value.
 """
 
-    def get(self, url: str, *, timeout: float) -> SupportsResponse:
-        """Issue a GET request via :mod:`requests`.
+    def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
+        """Describe get.
+
 <!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 url : str
     Describe ``url``.
-timeout : float
-    Describe ``timeout``.
-    
-    
+*args : object
+    Describe ``args``.
+**kwargs : object
+    Describe ``kwargs``.
 
 Returns
 -------
 SupportsResponse
     Describe return value.
 """
-        response = requests.get(url, timeout=timeout)
-    def get(
-        self,
-        url: Any,
-        *,
-        params: Any | None = None,
-        headers: Any | None = None,
-        cookies: Any | None = None,
-        auth: Any | None = None,
-        follow_redirects: Any | None = None,
-        timeout: Any | None = None,
-        extensions: Any | None = None,
-        **kwargs: Any,
-    ) -> Any:
-        """Issue a GET request via :mod:`requests`."""
-        if extensions is not None:
-            kwargs.setdefault("extensions", extensions)
-        if follow_redirects is not None:
-            kwargs.setdefault("allow_redirects", follow_redirects)
-        response = requests.get(
+        return requests.get(
             url,
-            params=params,
-            headers=headers,
-            cookies=cookies,
-            auth=auth,
-            timeout=timeout,
-            **kwargs,
+            *cast(tuple[Any, ...], args),
+            **cast(dict[str, Any], kwargs),
         )
-        return cast(SupportsResponse, response)
 
-    def post(
-        self,
-        url: Any,
-        *,
-        json: dict[str, Any],
-        headers: dict[str, str],
-        timeout: float,
-    ) -> SupportsResponse:
-        """Issue a POST request via :mod:`requests`.
+    def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
+        """Describe post.
+
 <!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 url : str
     Describe ``url``.
-json : dict[str, Any]
-    Describe ``json``.
-headers : dict[str, str]
-    Describe ``headers``.
-timeout : float
-    Describe ``timeout``.
-    
-    
+*args : object
+    Describe ``args``.
+**kwargs : object
+    Describe ``kwargs``.
 
 Returns
 -------
 SupportsResponse
     Describe return value.
 """
-        response = requests.post(url, json=json, headers=headers, timeout=timeout)
-        content: Any | None = None,
-        data: Any | None = None,
-        files: Any | None = None,
-        json: Any | None = None,
-        headers: Any | None = None,
-        cookies: Any | None = None,
-        auth: Any | None = None,
-        follow_redirects: Any | None = None,
-        timeout: Any | None = None,
-        extensions: Any | None = None,
-        **kwargs: Any,
-    ) -> Any:
-        """Issue a POST request via :mod:`requests`."""
-        if content is not None and data is None:
-            data = content
-        if extensions is not None:
-            kwargs.setdefault("extensions", extensions)
-        if follow_redirects is not None:
-            kwargs.setdefault("allow_redirects", follow_redirects)
-        response = requests.post(
+        return requests.post(
             url,
-            data=data,
-            json=json,
-            files=files,
-            headers=headers,
-            cookies=cookies,
-            auth=auth,
-            timeout=timeout,
-            **kwargs,
+            *cast(tuple[Any, ...], args),
+            **cast(dict[str, Any], kwargs),
         )
-        return cast(SupportsResponse, response)
 
 
 _DEFAULT_HTTP: Final[SupportsHttp] = RequestsHttp()
 
 
-# [nav:anchor KGFoundryClient]
 class KGFoundryClient:
-    """HTTP client for interacting with the KGFoundry search service.
+    """Describe KGFoundryClient.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    base_url : str, optional
-        Base URL for the API. Defaults to ``"http://localhost:8080"``.
-    api_key : str | None, optional
-        Optional bearer token used for authentication.
-    timeout : float, optional
-        Request timeout applied to every call. Defaults to ``30.0`` seconds.
-    http : SupportsHttp | None, optional
-        Custom HTTP transport implementation, primarily for testing.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+base_url : str, optional
+    Describe ``base_url``.
+    Defaults to ``'http://localhost:8080'``.
+api_key : str | None, optional
+    Describe ``api_key``.
+    Defaults to ``None``.
+timeout : float, optional
+    Describe ``timeout``.
+    Defaults to ``30.0``.
+http : SupportsHttp | None, optional
+    Describe ``http``.
+    Defaults to ``None``.
+"""
 
     def __init__(
         self,
@@ -364,50 +263,64 @@ class KGFoundryClient:
         timeout: float = 30.0,
         http: SupportsHttp | None = None,
     ) -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+base_url : str, optional
+    Describe ``base_url``.
+    Defaults to ``'http://localhost:8080'``.
+api_key : str | None, optional
+    Describe ``api_key``.
+    Defaults to ``None``.
+timeout : float, optional
+    Describe ``timeout``.
+    Defaults to ``30.0``.
+http : SupportsHttp | None, optional
+    Describe ``http``.
+    Defaults to ``None``.
+"""
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
         self._http: SupportsHttp = http or _DEFAULT_HTTP
 
     def _headers(self) -> dict[str, str]:
-        """Compute headers.
+        """Describe  headers.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the headers operation.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Returns
 -------
 dict[str, str]
-    Description of return value.
+    Describe return value.
 """
-        h = {"Content-Type": "application/json"}
+        headers = {"Content-Type": "application/json"}
         if self.api_key:
-            h["Authorization"] = f"Bearer {self.api_key}"
-        return h
+            headers["Authorization"] = f"Bearer {self.api_key}"
+        return headers
 
     def healthz(self) -> dict[str, Any]:
-        """Compute healthz.
+        """Describe healthz.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the healthz operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Returns
 -------
 dict[str, Any]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_client.client import healthz
->>> result = healthz()
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
-        r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
-        r.raise_for_status()
-        return cast(dict[str, Any], r.json())
+        response = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
 
     def search(
         self,
@@ -416,92 +329,66 @@ Examples
         filters: dict[str, Any] | None = None,
         explain: bool = False,
     ) -> dict[str, Any]:
-        """Compute search.
+        """Describe search.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 query : str
-    Description for ``query``.
+    Describe ``query``.
 k : int, optional
-    Defaults to ``10``.
-    Description for ``k``.
+    Describe ``k``.
     Defaults to ``10``.
 filters : dict[str, Any] | None, optional
-    Defaults to ``None``.
-    Description for ``filters``.
+    Describe ``filters``.
     Defaults to ``None``.
 explain : bool, optional
-    Defaults to ``False``.
-    Description for ``explain``.
-    
-    
-    
+    Describe ``explain``.
     Defaults to ``False``.
 
 Returns
 -------
 dict[str, Any]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_client.client import search
->>> result = search(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
-        r = self._http.post(
+        response = self._http.post(
             f"{self.base_url}/search",
             json=payload,
             headers=self._headers(),
             timeout=self.timeout,
         )
-        r.raise_for_status()
-        return cast(dict[str, Any], r.json())
+        response.raise_for_status()
+        return response.json()
 
     def concepts(self, q: str, limit: int = 50) -> dict[str, Any]:
-        """Compute concepts.
+        """Describe concepts.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 q : str
-    Description for ``q``.
+    Describe ``q``.
 limit : int, optional
-    Defaults to ``50``.
-    Description for ``limit``.
-    
-    
-    
+    Describe ``limit``.
     Defaults to ``50``.
 
 Returns
 -------
 dict[str, Any]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_client.client import concepts
->>> result = concepts(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
-        r = self._http.post(
+        response = self._http.post(
             f"{self.base_url}/graph/concepts",
             json={"q": q, "limit": limit},
             headers=self._headers(),
             timeout=self.timeout,
         )
-        r.raise_for_status()
-        return cast(dict[str, Any], r.json())
+        response.raise_for_status()
+        return response.json()

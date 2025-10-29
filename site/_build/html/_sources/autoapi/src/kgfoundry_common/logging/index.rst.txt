@@ -1,0 +1,122 @@
+src.kgfoundry_common.logging
+============================
+
+.. py:module:: src.kgfoundry_common.logging
+
+.. autoapi-nested-parse::
+
+   Overview of logging.
+
+   This module bundles logging logic for the kgfoundry stack. It groups related helpers so downstream
+   packages can import a single cohesive namespace. Refer to the functions and classes below for
+   implementation specifics.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: JsonFormatter(fmt=None, datefmt=None, style='%', validate=True, *, defaults=None)
+
+   Bases: :py:obj:`logging.Formatter`
+
+
+   
+   Model the JsonFormatter.
+
+   Represent the jsonformatter data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:method:: format(record)
+
+      
+      Compute format.
+
+      Carry out the format operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param record: Description for ``record``.
+      :type record: logging.LogRecord
+
+      :returns: *str* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.logging import format
+      >>> result = format(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:function:: setup_logging(level = logging.INFO)
+
+   
+   Compute setup logging.
+
+   Carry out the setup logging operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param level: Optional parameter default ``logging.INFO``. Description for ``level``.
+   :type level: int | None
+
+   .. rubric:: Examples
+
+   >>> from kgfoundry_common.logging import setup_logging
+   >>> setup_logging()  # doctest: +ELLIPSIS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

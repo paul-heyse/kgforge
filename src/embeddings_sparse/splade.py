@@ -1,8 +1,9 @@
 """Overview of splade.
 
-This module bundles splade logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles splade logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -70,29 +71,32 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 
 # [nav:anchor SPLADEv3Encoder]
 class SPLADEv3Encoder:
-    """Encode text into SPLADE v3 sparse embeddings.
+    """Describe SPLADEv3Encoder.
+
 <!-- auto:docstring-builder v1 -->
 
-    The encoder keeps track of model metadata so sparse indices can reference a
-    consistent identifier when materialising impact weights.
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 
-    Parameters
-    ----------
-    model_id : str, optional
-        Hugging Face model identifier used to load the encoder. Defaults to
-        ``"naver/splade-v3-distilbert"``.
-    device : str, optional
-        Device identifier passed to the underlying transformer. Defaults to ``"cuda"``.
-    topk : int, optional
-        Number of highest-weight terms to retain per document. Defaults to ``256``.
-    max_seq_len : int, optional
-        Maximum sequence length fed to the encoder. Defaults to ``512``.
+Parameters
+----------
+model_id : str, optional
+    Describe ``model_id``.
+    Defaults to ``'naver/splade-v3-distilbert'``.
+device : str, optional
+    Describe ``device``.
+    Defaults to ``'cuda'``.
+topk : int, optional
+    Describe ``topk``.
+    Defaults to ``256``.
+max_seq_len : int, optional
+    Describe ``max_seq_len``.
+    Defaults to ``512``.
 
-    Attributes
-    ----------
-    name : str
-        Canonical encoder label surfaced in index metadata.
-    """
+Raises
+------
+NotImplementedError
+    Raised when TODO for NotImplementedError.
+"""
 
     name = "SPLADE-v3-distilbert"
 
@@ -103,43 +107,53 @@ class SPLADEv3Encoder:
         topk: int = 256,
         max_seq_len: int = 512,
     ) -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+model_id : str, optional
+    Describe ``model_id``.
+    Defaults to ``'naver/splade-v3-distilbert'``.
+device : str, optional
+    Describe ``device``.
+    Defaults to ``'cuda'``.
+topk : int, optional
+    Describe ``topk``.
+    Defaults to ``256``.
+max_seq_len : int, optional
+    Describe ``max_seq_len``.
+    Defaults to ``512``.
+"""
         self.model_id = model_id
         self.device = device
         self.topk = topk
         self.max_seq_len = max_seq_len
 
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
-        """Compute encode.
+        """Describe encode.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 texts : list[str]
-    Description for ``texts``.
-    
-    
-    
+    Describe ``texts``.
 
 Returns
 -------
 list[tuple[list[int], list[float]]]
-    Description of return value.
-    
-    
-    
+    Describe return value.
 
 Raises
 ------
 NotImplementedError
-    Raised when validation fails.
-
-Examples
---------
->>> from embeddings_sparse.splade import encode
->>> result = encode(...)
->>> result  # doctest: +ELLIPSIS
+Raised when TODO for NotImplementedError.
 """
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
@@ -150,16 +164,32 @@ Examples
 
 # [nav:anchor PureImpactIndex]
 class PureImpactIndex:
-    """In-memory SPLADE impact scorer backed by pickled postings.
+    """Describe PureImpactIndex.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    index_dir : str
-        Directory that stores the pickled impact weights.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+index_dir : str
+    Describe ``index_dir``.
+"""
 
     def __init__(self, index_dir: str) -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+index_dir : str
+    Describe ``index_dir``.
+"""
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -167,44 +197,35 @@ class PureImpactIndex:
 
     @staticmethod
     def _tokenize(text: str) -> list[str]:
-        """Compute tokenize.
+        """Describe  tokenize.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the tokenize operation.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 text : str
-    Description for ``text``.
-    
-    
-    
+    Describe ``text``.
 
 Returns
 -------
 list[str]
-    Description of return value.
+    Describe return value.
 """
         return [token.lower() for token in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """Compute build.
+        """Describe build.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 docs_iterable : Iterable[tuple[str, dict[str, str]]]
-    Description for ``docs_iterable``.
-    
-    
-    
-
-Examples
---------
->>> from embeddings_sparse.splade import build
->>> build(...)  # doctest: +ELLIPSIS
+    Describe ``docs_iterable``.
 """
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
@@ -237,15 +258,13 @@ Examples
             )
 
     def load(self) -> None:
-        """Compute load.
+        """Describe load.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-Examples
---------
->>> from embeddings_sparse.splade import load
->>> load()  # doctest: +ELLIPSIS
+Python's object protocol for this class. Use it to integrate
+with built-in operators, protocols, or runtime behaviours that
+expect instances to participate in the language's data model.
 """
         with open(os.path.join(self.index_dir, "impact.pkl"), "rb") as handle:
             data = pickle.load(handle)
@@ -254,34 +273,23 @@ Examples
         self.postings = data["postings"]
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
-        """Compute search.
+        """Describe search.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 query : str
-    Description for ``query``.
+    Describe ``query``.
 k : int
-    Description for ``k``.
-    
-    
-    
+    Describe ``k``.
 
 Returns
 -------
 list[tuple[str, float]]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from embeddings_sparse.splade import search
->>> result = search(..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -296,33 +304,56 @@ Examples
 
 # [nav:anchor LuceneImpactIndex]
 class LuceneImpactIndex:
-    """Lucene-backed SPLADE impact scorer exposed through Pyserini.
+    """Describe LuceneImpactIndex.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    index_dir : str
-        Directory containing the Lucene impact index.
-    query_encoder : str, optional
-        SPLADE encoder identifier used for token expansion. Defaults to
-        ``"naver/splade-v3-distilbert"``.
-    """
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+
+Parameters
+----------
+index_dir : str
+    Describe ``index_dir``.
+query_encoder : str, optional
+    Describe ``query_encoder``.
+    Defaults to ``'naver/splade-v3-distilbert'``.
+
+Raises
+------
+RuntimeError
+    Raised when TODO for RuntimeError.
+"""
 
     def __init__(self, index_dir: str, query_encoder: str = "naver/splade-v3-distilbert") -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+index_dir : str
+    Describe ``index_dir``.
+query_encoder : str, optional
+    Describe ``query_encoder``.
+    Defaults to ``'naver/splade-v3-distilbert'``.
+"""
         self.index_dir = index_dir
         self.query_encoder = query_encoder
         self._searcher: Any | None = None
 
     def _ensure(self) -> None:
-        """Compute ensure.
+        """Describe  ensure.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the ensure operation.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Raises
 ------
 RuntimeError
-    Raised when validation fails.
+Raised when TODO for RuntimeError.
 """
         if self._searcher is not None:
             return
@@ -334,39 +365,28 @@ RuntimeError
         self._searcher = LuceneImpactSearcher(self.index_dir, query_encoder=self.query_encoder)
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
-        """Compute search.
+        """Describe search.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 query : str
-    Description for ``query``.
+    Describe ``query``.
 k : int
-    Description for ``k``.
-    
-    
-    
+    Describe ``k``.
 
 Returns
 -------
 list[tuple[str, float]]
-    Description of return value.
-    
-    
-    
+    Describe return value.
 
 Raises
 ------
 RuntimeError
-    Raised when validation fails.
-
-Examples
---------
->>> from embeddings_sparse.splade import search
->>> result = search(..., ...)
->>> result  # doctest: +ELLIPSIS
+Raised when TODO for RuntimeError.
 """
         self._ensure()
         if self._searcher is None:
@@ -382,38 +402,26 @@ def get_splade(
     index_dir: str,
     query_encoder: str = "naver/splade-v3-distilbert",
 ) -> PureImpactIndex | LuceneImpactIndex:
-    """Compute get splade.
+    """Describe get splade.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the get splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 backend : str
-    Description for ``backend``.
+    Describe ``backend``.
 index_dir : str
-    Description for ``index_dir``.
+    Describe ``index_dir``.
 query_encoder : str, optional
-    Defaults to ``'naver/splade-v3-distilbert'``.
-    Description for ``query_encoder``.
-    
-    
-    
+    Describe ``query_encoder``.
     Defaults to ``'naver/splade-v3-distilbert'``.
 
 Returns
 -------
 PureImpactIndex | LuceneImpactIndex
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from embeddings_sparse.splade import get_splade
->>> result = get_splade(..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     if backend == "lucene":
         try:

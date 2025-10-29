@@ -1,0 +1,341 @@
+src.kgfoundry_common.errors
+===========================
+
+.. py:module:: src.kgfoundry_common.errors
+
+.. autoapi-nested-parse::
+
+   Overview of errors.
+
+   This module bundles errors logic for the kgfoundry stack. It groups related helpers so downstream
+   packages can import a single cohesive namespace. Refer to the functions and classes below for
+   implementation specifics.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+Module Contents
+---------------
+
+.. py:exception:: DownloadError
+
+   Bases: :py:obj:`Exception`
+
+
+   
+   Model the DownloadError.
+
+   Represent the downloaderror data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:exception:: UnsupportedMIMEError
+
+   Bases: :py:obj:`Exception`
+
+
+   
+   Model the UnsupportedMIMEError.
+
+   Represent the unsupportedmimeerror data structure used throughout the project. The class
+   encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+   are typically created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:exception:: DoclingError
+
+   Bases: :py:obj:`Exception`
+
+
+   
+   Model the DoclingError.
+
+   Represent the doclingerror data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:exception:: OCRTimeoutError
+
+   Bases: :py:obj:`Exception`
+
+
+   
+   Model the OCRTimeoutError.
+
+   Represent the ocrtimeouterror data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:exception:: ChunkingError
+
+   Bases: :py:obj:`Exception`
+
+
+   
+   Model the ChunkingError.
+
+   Represent the chunkingerror data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:exception:: EmbeddingError
+
+   Bases: :py:obj:`Exception`
+
+
+   
+   Model the EmbeddingError.
+
+   Represent the embeddingerror data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:exception:: SpladeOOMError
+
+   Bases: :py:obj:`Exception`
+
+
+   
+   Model the SpladeOOMError.
+
+   Represent the spladeoomerror data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:exception:: IndexBuildError
+
+   Bases: :py:obj:`Exception`
+
+
+   
+   Model the IndexBuildError.
+
+   Represent the indexbuilderror data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:exception:: OntologyParseError
+
+   Bases: :py:obj:`Exception`
+
+
+   
+   Model the OntologyParseError.
+
+   Represent the ontologyparseerror data structure used throughout the project. The class
+   encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+   are typically created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:exception:: LinkerCalibrationError
+
+   Bases: :py:obj:`Exception`
+
+
+   
+   Model the LinkerCalibrationError.
+
+   Represent the linkercalibrationerror data structure used throughout the project. The class
+   encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+   are typically created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:exception:: Neo4jError
+
+   Bases: :py:obj:`Exception`
+
+
+   
+   Model the Neo4jError.
+
+   Represent the neo4jerror data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

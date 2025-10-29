@@ -74,9 +74,7 @@ def _select_files(config: BuilderConfig, args: argparse.Namespace) -> Iterable[P
         return selected
 
     files = [
-        path
-        for path in iter_target_files(config, REPO_ROOT)
-        if not _should_ignore(path, config)
+        path for path in iter_target_files(config, REPO_ROOT) if not _should_ignore(path, config)
     ]
     if args.module:
         filtered: list[Path] = []
@@ -179,6 +177,41 @@ def _load_docfacts_from_disk() -> dict[str, DocFact]:
     return entries
 
 
+def _load_docfact_state(config: BuilderConfig) -> tuple[dict[str, DocFact], dict[str, Path]]:
+    """Load docfact entries along with best-effort source mapping."""
+    entries = _load_docfacts_from_disk()
+    sources: dict[str, Path] = {}
+    for qname, fact in entries.items():
+        source = _module_to_path(fact.module)
+        if source is not None:
+            sources[qname] = source
+    return entries, sources
+
+
+def _record_docfacts(
+    facts: Iterable[DocFact],
+    file_path: Path,
+    entries: dict[str, DocFact],
+    sources: dict[str, Path],
+) -> None:
+    for fact in facts:
+        entries[fact.qname] = fact
+        sources[fact.qname] = file_path
+
+
+def _filter_docfacts_for_output(
+    entries: dict[str, DocFact], sources: dict[str, Path], config: BuilderConfig
+) -> list[DocFact]:
+    filtered: list[DocFact] = []
+    for qname, fact in entries.items():
+        source = sources.get(qname) or _module_to_path(fact.module)
+        if source is not None and _should_ignore(source, config):
+            LOGGER.debug("Dropping docfact %s due to ignore rules", qname)
+            continue
+        filtered.append(fact)
+    return filtered
+
+
 def _process_file(
     file_path: Path,
     config: BuilderConfig,
@@ -219,12 +252,7 @@ def _process_file(
 
 def _run(files: Iterable[Path], args: argparse.Namespace, config: BuilderConfig) -> int:
     cache = BuilderCache(CACHE_PATH)
-    docfact_entries = _load_docfacts_from_disk()
-    docfact_sources: dict[str, Path] = {}
-    for qname, fact in docfact_entries.items():
-        source = _module_to_path(fact.module)
-        if source is not None:
-            docfact_sources[qname] = source
+    docfact_entries, docfact_sources = _load_docfact_state(config)
     is_update = args.command == "update"
     is_check = args.command == "check"
     exit_code = 0
@@ -239,17 +267,9 @@ def _run(files: Iterable[Path], args: argparse.Namespace, config: BuilderConfig)
         exit_code = max(exit_code, file_exit)
         if is_check and changed and args.diff:
             sys.stdout.write(preview or "")
-        for fact in docfacts:
-            docfact_entries[fact.qname] = fact
-            docfact_sources[fact.qname] = file_path
+        _record_docfacts(docfacts, file_path, docfact_entries, docfact_sources)
     if args.command in {"update", "check"}:
-        filtered: list[DocFact] = []
-        for qname, fact in docfact_entries.items():
-            source = docfact_sources.get(qname) or _module_to_path(fact.module)
-            if source is not None and _should_ignore(source, config):
-                LOGGER.debug("Dropping docfact %s due to ignore rules", qname)
-                continue
-            filtered.append(fact)
+        filtered = _filter_docfacts_for_output(docfact_entries, docfact_sources, config)
         drift = _handle_docfacts(filtered, check_mode=is_check)
         if drift:
             exit_code = 1
@@ -304,7 +324,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--since", help="Only consider files changed since revision", default="")
     parser.add_argument("--force", action="store_true", help="Ignore cache entries")
     parser.add_argument("--diff", action="store_true", help="Show diffs in check mode")
-    parser.add_argument("--all", action="store_true", help="Process all files, ignoring cache entries")
+    parser.add_argument(
+        "--all", action="store_true", help="Process all files, ignoring cache entries"
+    )
     parser.add_argument(
         "--update",
         dest="flag_update",

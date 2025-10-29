@@ -1,4 +1,6 @@
-"""Extended summary and type-override helpers for legacy docstring generation."""
+"""Extended summary and type-override helpers for legacy docstring
+generation.
+"""
 
 from __future__ import annotations
 
@@ -25,8 +27,7 @@ def _format_magic_summary(lead: str) -> str:
 
 def _format_standard_summary(lead: str) -> str:
     return (
-        f"{lead}. "
-        "Callers rely on this helper when working with the standard collection protocols."
+        f"{lead}. Callers rely on this helper when working with the standard collection protocols."
     )
 
 

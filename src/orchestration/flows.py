@@ -1,8 +1,9 @@
 """Overview of flows.
 
-This module bundles flows logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles flows logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -43,32 +44,21 @@ __navmap__: Final[NavMap] = {
 
 
 def _t_echo_impl(msg: str) -> str:
-    """Compute t echo.
+    """Describe  t echo impl.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the t echo operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 msg : str
-    Description for ``msg``.
-    
-    
-    
+    Describe ``msg``.
 
 Returns
 -------
 str
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from orchestration.flows import t_echo
->>> result = t_echo(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     return msg
 
@@ -78,24 +68,16 @@ t_echo = task(_t_echo_impl)
 
 
 def _e2e_flow_impl() -> list[str]:
-    """Compute e2e flow.
+    """Describe  e2e flow impl.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the e2e flow operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Returns
 -------
 list[str]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from orchestration.flows import e2e_flow
->>> result = e2e_flow()
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     return [
         t_echo.submit(x).result()

@@ -1,8 +1,9 @@
 """Overview of harvester.
 
-This module bundles harvester logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles harvester logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -51,20 +52,29 @@ HTTP_OK = 200
 
 @dataclass(frozen=True)
 class HarvesterConfig:
-    """Immutable configuration bundle for harvester endpoints.
+    """Describe HarvesterConfig.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    openalex_base : str
-        Base URL for the OpenAlex API.
-    unpaywall_base : str
-        Base URL for Unpaywall requests.
-    pdf_host_base : str | None
-        Optional override for the PDF hosting service.
-    out_dir : str
-        Directory used to persist downloaded PDFs.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+openalex_base : str, optional
+    Describe ``openalex_base``.
+    Defaults to ``'https://api.openalex.org'``.
+unpaywall_base : str, optional
+    Describe ``unpaywall_base``.
+    Defaults to ``'https://api.unpaywall.org'``.
+pdf_host_base : str | None, optional
+    Describe ``pdf_host_base``.
+    Defaults to ``None``.
+out_dir : str, optional
+    Describe ``out_dir``.
+    Defaults to ``'/data/pdfs'``.
+"""
 
     openalex_base: str = "https://api.openalex.org"
     unpaywall_base: str = "https://api.unpaywall.org"
@@ -74,21 +84,31 @@ class HarvesterConfig:
 
 # [nav:anchor OpenAccessHarvester]
 class OpenAccessHarvester:
-    """Harvest open-access works using OpenAlex and Unpaywall APIs.
+    """Describe OpenAccessHarvester.
+
 <!-- auto:docstring-builder v1 -->
 
-    The harvester owns the HTTP session and normalises URL construction so download
-    logic can be reused across pipelines.
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 
-    Parameters
-    ----------
-    user_agent : str
-        User agent string sent with outbound requests.
-    contact_email : str
-        Contact email appended to the ``User-Agent`` header.
-    config : HarvesterConfig | None, optional
-        Optional configuration overrides. Defaults to ``HarvesterConfig()``.
-    """
+Parameters
+----------
+user_agent : str
+    Describe ``user_agent``.
+contact_email : str
+    Describe ``contact_email``.
+config : HarvesterConfig | None, optional
+    Describe ``config``.
+    Defaults to ``None``.
+
+Raises
+------
+TypeError
+    Raised when TODO for TypeError.
+DownloadError
+    Raised when TODO for DownloadError.
+UnsupportedMIMEError
+    Raised when TODO for UnsupportedMIMEError.
+"""
 
     def __init__(
         self,
@@ -96,6 +116,22 @@ class OpenAccessHarvester:
         contact_email: str,
         config: HarvesterConfig | None = None,
     ) -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+user_agent : str
+    Describe ``user_agent``.
+contact_email : str
+    Describe ``contact_email``.
+config : HarvesterConfig | None, optional
+    Describe ``config``.
+    Defaults to ``None``.
+"""
         cfg = config or HarvesterConfig()
         self.ua = user_agent
         self.email = contact_email
@@ -108,41 +144,30 @@ class OpenAccessHarvester:
         self.session.headers.update({"User-Agent": f"{self.ua} ({self.email})"})
 
     def search(self, topic: str, years: str, max_works: int) -> list[dict[str, object]]:
-        """Compute search.
+        """Describe search.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 topic : str
-    Description for ``topic``.
+    Describe ``topic``.
 years : str
-    Description for ``years``.
+    Describe ``years``.
 max_works : int
-    Description for ``max_works``.
-    
-    
-    
+    Describe ``max_works``.
 
 Returns
 -------
 list[dict[str, object]]
-    Description of return value.
-    
-    
-    
+    Describe return value.
 
 Raises
 ------
 TypeError
-    Raised when validation fails.
-
-Examples
---------
->>> from download.harvester import search
->>> result = search(..., ..., ...)
->>> result  # doctest: +ELLIPSIS
+Raised when TODO for TypeError.
 """
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
@@ -169,32 +194,21 @@ Examples
         return typed_results[:max_works]
 
     def resolve_pdf(self, work: Mapping[str, object]) -> str | None:
-        """Compute resolve pdf.
+        """Describe resolve pdf.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the resolve pdf operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 work : Mapping[str, object]
-    Description for ``work``.
-    
-    
-    
+    Describe ``work``.
 
 Returns
 -------
 str | None
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from download.harvester import resolve_pdf
->>> result = resolve_pdf(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         direct = self._lookup_direct_pdf(work)
         if direct:
@@ -215,15 +229,16 @@ Examples
         return None
 
     def _lookup_direct_pdf(self, work: Mapping[str, object]) -> str | None:
-        """Return the primary PDF URL if embedded directly in the payload.
+        """Describe  lookup direct pdf.
+
 <!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 work : Mapping[str, object]
     Describe ``work``.
-    
-    
 
 Returns
 -------
@@ -238,15 +253,16 @@ str | None
         return None
 
     def _lookup_locations_pdf(self, locations: object) -> str | None:
-        """Scan secondary locations for a resolvable PDF link.
+        """Describe  lookup locations pdf.
+
 <!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 locations : object
     Describe ``locations``.
-    
-    
 
 Returns
 -------
@@ -265,15 +281,16 @@ str | None
         return None
 
     def _resolve_unpaywall_pdf(self, doi: str) -> str | None:
-        """Resolve a DOI via Unpaywall when available.
+        """Describe  resolve unpaywall pdf.
+
 <!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 doi : str
     Describe ``doi``.
-    
-    
 
 Returns
 -------
@@ -295,15 +312,16 @@ str | None
         return None
 
     def _host_pdf_url(self, doi: str) -> str | None:
-        """Return a hosted PDF URL when a distribution host is configured.
+        """Describe  host pdf url.
+
 <!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 doi : str
     Describe ``doi``.
-    
-    
 
 Returns
 -------
@@ -315,41 +333,30 @@ str | None
         return f"{self.pdf_host}/pdf/{doi.replace('/', '_')}.pdf"
 
     def download_pdf(self, url: str, target_path: str) -> str:
-        """Compute download pdf.
+        """Describe download pdf.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the download pdf operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 url : str
-    Description for ``url``.
+    Describe ``url``.
 target_path : str
-    Description for ``target_path``.
-    
-    
-    
+    Describe ``target_path``.
 
 Returns
 -------
 str
-    Description of return value.
-    
-    
-    
+    Describe return value.
 
 Raises
 ------
 DownloadError
-    Raised when validation fails.
+Raised when TODO for DownloadError.
 UnsupportedMIMEError
-    Raised when validation fails.
-
-Examples
---------
->>> from download.harvester import download_pdf
->>> result = download_pdf(..., ...)
->>> result  # doctest: +ELLIPSIS
+Raised when TODO for UnsupportedMIMEError.
 """
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
@@ -364,36 +371,25 @@ Examples
         return target_path
 
     def run(self, topic: str, years: str, max_works: int) -> list[Doc]:
-        """Compute run.
+        """Describe run.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 topic : str
-    Description for ``topic``.
+    Describe ``topic``.
 years : str
-    Description for ``years``.
+    Describe ``years``.
 max_works : int
-    Description for ``max_works``.
-    
-    
-    
+    Describe ``max_works``.
 
 Returns
 -------
 list[Doc]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from download.harvester import run
->>> result = run(..., ..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)

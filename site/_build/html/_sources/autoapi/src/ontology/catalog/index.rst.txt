@@ -1,0 +1,127 @@
+src.ontology.catalog
+====================
+
+.. py:module:: src.ontology.catalog
+
+.. autoapi-nested-parse::
+
+   Overview of catalog.
+
+   This module bundles catalog logic for the kgfoundry stack. It groups related helpers so downstream
+   packages can import a single cohesive namespace. Refer to the functions and classes below for
+   implementation specifics.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: OntologyCatalog(concepts)
+
+   
+   Model the OntologyCatalog.
+
+   Represent the ontologycatalog data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:attribute:: by_id
+
+
+   .. py:method:: neighbors(concept_id, depth = 1)
+
+      
+      Compute neighbors.
+
+      Carry out the neighbors operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param concept_id: Description for ``concept_id``.
+      :type concept_id: str
+      :param depth: Optional parameter default ``1``. Description for ``depth``.
+      :type depth: int | None
+
+      :returns: *collections.abc.Set* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from ontology.catalog import neighbors
+      >>> result = neighbors(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: hydrate(concept_id)
+
+      
+      Compute hydrate.
+
+      Carry out the hydrate operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param concept_id: Description for ``concept_id``.
+      :type concept_id: str
+
+      :returns: *collections.abc.Mapping* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from ontology.catalog import hydrate
+      >>> result = hydrate(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

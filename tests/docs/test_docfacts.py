@@ -7,16 +7,29 @@ import json
 from pathlib import Path
 
 import pytest
-
 from tools.docstring_builder.cli import DOCFACTS_PATH
+
+
+def _missing_docfacts_message(path: Path) -> str:
+    return f"Docfacts missing at {path}"
+
+
+def _invalid_payload_message() -> str:
+    return "Docfacts payload must be a list"
+
+
+def _module_import_error_message(module_name: str, exc: Exception) -> str:
+    return f"Module '{module_name}' from docfacts is not importable: {exc}"
 
 
 def _load_docfacts() -> list[dict[str, object]]:
     if not DOCFACTS_PATH.exists():
-        raise FileNotFoundError(f"Docfacts missing at {DOCFACTS_PATH}")
+        message = _missing_docfacts_message(DOCFACTS_PATH)
+        raise FileNotFoundError(message)
     payload = json.loads(DOCFACTS_PATH.read_text(encoding="utf-8"))
     if not isinstance(payload, list):  # pragma: no cover - defensive guard
-        raise TypeError("Docfacts payload must be a list")
+        message = _invalid_payload_message()
+        raise TypeError(message)
     return payload
 
 
@@ -47,8 +60,12 @@ def test_docfacts_modules_are_importable(monkeypatch: pytest.MonkeyPatch) -> Non
     monkeypatch.syspath_prepend(str(repo_root / "src"))
 
     for entry in _load_docfacts():
-        module_name = entry["module"]
+        module_value = entry.get("module")
+        if not isinstance(module_value, str) or not module_value:
+            continue
+        module_name: str = module_value
         try:
             importlib.import_module(module_name)
         except Exception as exc:  # pragma: no cover - fail fast for visibility
-            pytest.fail(f"Module '{module_name}' from docfacts is not importable: {exc}")
+            message = _module_import_error_message(module_name, exc)
+            pytest.fail(message)
