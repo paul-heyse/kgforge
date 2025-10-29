@@ -17,7 +17,8 @@ if TYPE_CHECKING:
         Parameters
         ----------
         **data : Any
-            Describe ``data``.
+        Describe ``data``.
+
 
 
 
@@ -42,7 +43,8 @@ if TYPE_CHECKING:
             Parameters
             ----------
             **data : Any
-                Describe ``data``.
+            Describe ``data``.
+
 
 
 
@@ -67,25 +69,26 @@ if TYPE_CHECKING:
             Parameters
             ----------
             obj : Any
-                Describe ``obj``.
+            Describe ``obj``.
             strict : bool | None, optional
-                Describe ``strict``.
-                Defaults to ``None``.
+            Describe ``strict``.
+            Defaults to ``None``.
             extra : ExtraValues | None, optional
-                Describe ``extra``.
-                Defaults to ``None``.
+            Describe ``extra``.
+            Defaults to ``None``.
             from_attributes : bool | None, optional
-                Describe ``from_attributes``.
-                Defaults to ``None``.
+            Describe ``from_attributes``.
+            Defaults to ``None``.
             context : Any | None, optional
-                Describe ``context``.
-                Defaults to ``None``.
+            Describe ``context``.
+            Defaults to ``None``.
             by_alias : bool | None, optional
-                Describe ``by_alias``.
-                Defaults to ``None``.
+            Describe ``by_alias``.
+            Defaults to ``None``.
             by_name : bool | None, optional
-                Describe ``by_name``.
-                Defaults to ``None``.
+            Describe ``by_name``.
+            Defaults to ``None``.
+
 
 
 
@@ -95,7 +98,8 @@ if TYPE_CHECKING:
             Returns
             -------
             Self
-                Describe return value.
+            Describe return value.
+
 
 
 
@@ -137,44 +141,45 @@ if TYPE_CHECKING:
             Parameters
             ----------
             mode : Literal['json', 'python'] | str, optional
-                Describe ``mode``.
-                Defaults to ``'python'``.
+            Describe ``mode``.
+            Defaults to ``'python'``.
             include : IncEx | None, optional
-                Describe ``include``.
-                Defaults to ``None``.
+            Describe ``include``.
+            Defaults to ``None``.
             exclude : IncEx | None, optional
-                Describe ``exclude``.
-                Defaults to ``None``.
+            Describe ``exclude``.
+            Defaults to ``None``.
             context : Any | None, optional
-                Describe ``context``.
-                Defaults to ``None``.
+            Describe ``context``.
+            Defaults to ``None``.
             by_alias : bool | None, optional
-                Describe ``by_alias``.
-                Defaults to ``None``.
+            Describe ``by_alias``.
+            Defaults to ``None``.
             exclude_unset : bool, optional
-                Describe ``exclude_unset``.
-                Defaults to ``False``.
+            Describe ``exclude_unset``.
+            Defaults to ``False``.
             exclude_defaults : bool, optional
-                Describe ``exclude_defaults``.
-                Defaults to ``False``.
+            Describe ``exclude_defaults``.
+            Defaults to ``False``.
             exclude_none : bool, optional
-                Describe ``exclude_none``.
-                Defaults to ``False``.
+            Describe ``exclude_none``.
+            Defaults to ``False``.
             exclude_computed_fields : bool, optional
-                Describe ``exclude_computed_fields``.
-                Defaults to ``False``.
+            Describe ``exclude_computed_fields``.
+            Defaults to ``False``.
             round_trip : bool, optional
-                Describe ``round_trip``.
-                Defaults to ``False``.
+            Describe ``round_trip``.
+            Defaults to ``False``.
             warnings : bool | Literal['none', 'warn', 'error'], optional
-                Describe ``warnings``.
-                Defaults to ``True``.
+            Describe ``warnings``.
+            Defaults to ``True``.
             fallback : Callable[[Any], Any] | None, optional
-                Describe ``fallback``.
-                Defaults to ``None``.
+            Describe ``fallback``.
+            Defaults to ``None``.
             serialize_as_any : bool, optional
-                Describe ``serialize_as_any``.
-                Defaults to ``False``.
+            Describe ``serialize_as_any``.
+            Defaults to ``False``.
+
 
 
 
@@ -184,7 +189,7 @@ if TYPE_CHECKING:
             Returns
             -------
             dict[str, Any]
-                Dictionary representation emitted by Pydantic.
+            Dictionary representation emitted by Pydantic.
             """
             raise NotImplementedError
 
@@ -213,47 +218,48 @@ if TYPE_CHECKING:
             Parameters
             ----------
             indent : int | None, optional
-                Describe ``indent``.
-                Defaults to ``None``.
+            Describe ``indent``.
+            Defaults to ``None``.
             ensure_ascii : bool, optional
-                Describe ``ensure_ascii``.
-                Defaults to ``False``.
+            Describe ``ensure_ascii``.
+            Defaults to ``False``.
             include : IncEx | None, optional
-                Describe ``include``.
-                Defaults to ``None``.
+            Describe ``include``.
+            Defaults to ``None``.
             exclude : IncEx | None, optional
-                Describe ``exclude``.
-                Defaults to ``None``.
+            Describe ``exclude``.
+            Defaults to ``None``.
             context : Any | None, optional
-                Describe ``context``.
-                Defaults to ``None``.
+            Describe ``context``.
+            Defaults to ``None``.
             by_alias : bool | None, optional
-                Describe ``by_alias``.
-                Defaults to ``None``.
+            Describe ``by_alias``.
+            Defaults to ``None``.
             exclude_unset : bool, optional
-                Describe ``exclude_unset``.
-                Defaults to ``False``.
+            Describe ``exclude_unset``.
+            Defaults to ``False``.
             exclude_defaults : bool, optional
-                Describe ``exclude_defaults``.
-                Defaults to ``False``.
+            Describe ``exclude_defaults``.
+            Defaults to ``False``.
             exclude_none : bool, optional
-                Describe ``exclude_none``.
-                Defaults to ``False``.
+            Describe ``exclude_none``.
+            Defaults to ``False``.
             exclude_computed_fields : bool, optional
-                Describe ``exclude_computed_fields``.
-                Defaults to ``False``.
+            Describe ``exclude_computed_fields``.
+            Defaults to ``False``.
             round_trip : bool, optional
-                Describe ``round_trip``.
-                Defaults to ``False``.
+            Describe ``round_trip``.
+            Defaults to ``False``.
             warnings : bool | Literal['none', 'warn', 'error'], optional
-                Describe ``warnings``.
-                Defaults to ``True``.
+            Describe ``warnings``.
+            Defaults to ``True``.
             fallback : Callable[[Any], Any] | None, optional
-                Describe ``fallback``.
-                Defaults to ``None``.
+            Describe ``fallback``.
+            Defaults to ``None``.
             serialize_as_any : bool, optional
-                Describe ``serialize_as_any``.
-                Defaults to ``False``.
+            Describe ``serialize_as_any``.
+            Defaults to ``False``.
+
 
 
 
@@ -263,7 +269,7 @@ if TYPE_CHECKING:
             Returns
             -------
             str
-                JSON string emitted by Pydantic.
+            JSON string emitted by Pydantic.
             """
             raise NotImplementedError
 

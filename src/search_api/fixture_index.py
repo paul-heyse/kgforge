@@ -59,7 +59,8 @@ def tokenize(text: str) -> list[str]:
     Parameters
     ----------
     text : str
-        Describe ``text``.
+    Describe ``text``.
+
 
 
 
@@ -69,7 +70,7 @@ def tokenize(text: str) -> list[str]:
     Returns
     -------
     list[str]
-        Describe return value.
+    Describe return value.
     """
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
@@ -88,15 +89,15 @@ class FixtureDoc:
     Parameters
     ----------
     chunk_id : str
-        Describe ``chunk_id``.
+    Describe ``chunk_id``.
     doc_id : str
-        Describe ``doc_id``.
+    Describe ``doc_id``.
     title : str
-        Describe ``title``.
+    Describe ``title``.
     section : str
-        Describe ``section``.
+    Describe ``section``.
     text : str
-        Describe ``text``.
+    Describe ``text``.
     """
 
     chunk_id: str
@@ -119,11 +120,11 @@ class FixtureIndex:
     Parameters
     ----------
     root : str, optional
-        Describe ``root``.
-        Defaults to ``'/data'``.
+    Describe ``root``.
+    Defaults to ``'/data'``.
     db_path : str, optional
-        Describe ``db_path``.
-        Defaults to ``'/data/catalog/catalog.duckdb'``.
+    Describe ``db_path``.
+    Defaults to ``'/data/catalog/catalog.duckdb'``.
     """
 
     def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb") -> None:
@@ -136,11 +137,11 @@ class FixtureIndex:
         Parameters
         ----------
         root : str, optional
-            Describe ``root``.
-            Defaults to ``'/data'``.
+        Describe ``root``.
+        Defaults to ``'/data'``.
         db_path : str, optional
-            Describe ``db_path``.
-            Defaults to ``'/data/catalog/catalog.duckdb'``.
+        Describe ``db_path``.
+        Defaults to ``'/data/catalog/catalog.duckdb'``.
         """
         self.root = Path(root)
         self.db_path = db_path
@@ -228,10 +229,11 @@ class FixtureIndex:
         Parameters
         ----------
         query : str
-            Describe ``query``.
+        Describe ``query``.
         k : int, optional
-            Describe ``k``.
-            Defaults to ``10``.
+        Describe ``k``.
+        Defaults to ``10``.
+
 
 
 
@@ -241,7 +243,7 @@ class FixtureIndex:
         Returns
         -------
         list[tuple[int, float]]
-            Describe return value.
+        Describe return value.
         """
         if getattr(self, "N", 0) == 0:
             return []
@@ -270,7 +272,8 @@ class FixtureIndex:
         Parameters
         ----------
         index : int
-            Describe ``index``.
+        Describe ``index``.
+
 
 
 
@@ -280,6 +283,6 @@ class FixtureIndex:
         Returns
         -------
         FixtureDoc
-            Describe return value.
+        Describe return value.
         """
         return self.docs[index]

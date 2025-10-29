@@ -8,7 +8,7 @@ import json
 import logging
 import subprocess
 import sys
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from pathlib import Path
 
 from tools.docstring_builder.apply import apply_edits
@@ -33,6 +33,17 @@ DEFAULT_IGNORE_PATTERNS = [
     "docs/conf.py",
     "src/__init__.py",
 ]
+MISSING_MODULE_PATTERNS = ["docs/_build/**"]
+
+
+@dataclasses.dataclass(slots=True)
+class ProcessingOptions:
+    """Runtime options controlling how a file is processed."""
+
+    command: str
+    force: bool
+    ignore_missing: bool
+    missing_patterns: tuple[str, ...]
 
 
 def _module_to_path(module: str) -> Path | None:
@@ -92,6 +103,14 @@ def _select_files(config: BuilderConfig, args: argparse.Namespace) -> Iterable[P
     return [file_path for file_path in files if not _should_ignore(file_path, config)]
 
 
+def _matches_patterns(path: Path, patterns: Iterable[str]) -> bool:
+    try:
+        rel = path.relative_to(REPO_ROOT)
+    except ValueError:  # pragma: no cover - defensive guard
+        rel = path
+    return any(rel.match(pattern) for pattern in patterns)
+
+
 def _should_ignore(path: Path, config: BuilderConfig) -> bool:
     rel = path.relative_to(REPO_ROOT)
     patterns = _resolve_ignore_patterns(config)
@@ -109,6 +128,46 @@ def _changed_files_since(revision: str) -> set[str]:
         LOGGER.warning("git diff failed: %s", result.stderr.strip())
         return set()
     return {line.strip() for line in result.stdout.splitlines() if line.strip()}
+
+
+def _legacy_command_from_flags(args: argparse.Namespace) -> str | None:
+    for attr, command in (
+        ("diff", "check"),
+        ("flag_check", "check"),
+        ("flag_update", "update"),
+        ("flag_harvest", "harvest"),
+    ):
+        if getattr(args, attr, False):
+            return command
+    if getattr(args, "since", "") or getattr(args, "module", ""):
+        return "update"
+    if getattr(args, "all", False) or getattr(args, "force", False):
+        return "update"
+    return None
+
+
+def _assign_command(args: argparse.Namespace) -> None:
+    """Normalise legacy flags and attach the appropriate handler."""
+    if getattr(args, "all", False):
+        args.force = True
+    if getattr(args, "flag_diff", False):
+        args.diff = True
+        args.flag_check = True
+    if hasattr(args, "func"):
+        return
+
+    for attr, handler in (
+        ("flag_harvest", _command_harvest),
+        ("flag_update", _command_update),
+        ("flag_check", _command_check),
+    ):
+        if getattr(args, attr, False):
+            args.func = handler
+            return
+
+    legacy_command = _legacy_command_from_flags(args)
+    if legacy_command is not None:
+        args.func = LEGACY_COMMAND_HANDLERS[legacy_command]
 
 
 def _collect_edits(
@@ -216,37 +275,51 @@ def _process_file(
     file_path: Path,
     config: BuilderConfig,
     cache: BuilderCache,
-    *,
-    command: str,
-    force: bool,
+    options: ProcessingOptions,
 ) -> tuple[int, list[DocFact], str | None, bool]:
     """Harvest, render, and apply docstrings for a single file."""
+    command = options.command
     is_update = command == "update"
     is_check = command == "check"
-    if command != "harvest" and not force and not cache.needs_update(file_path, config.config_hash):
+    exit_code = 0
+    docfacts: list[DocFact] = []
+    preview: str | None = None
+    changed = False
+    if (
+        command != "harvest"
+        and not options.force
+        and not cache.needs_update(file_path, config.config_hash)
+    ):
         LOGGER.debug("Skipping %s; cache is fresh", file_path)
-        return 0, [], None, False
+        return exit_code, docfacts, preview, changed
     try:
         result = harvest_file(file_path, config, REPO_ROOT)
+    except ModuleNotFoundError as exc:
+        relative = file_path.relative_to(REPO_ROOT)
+        if options.ignore_missing and _matches_patterns(file_path, options.missing_patterns):
+            LOGGER.info("Skipping %s due to missing dependency: %s", relative, exc)
+            return exit_code, docfacts, preview, changed
+        LOGGER.exception("Failed to harvest %s", relative)
+        return 1, docfacts, preview, changed
     except Exception:  # pragma: no cover - runtime defensive handling
         LOGGER.exception("Failed to harvest %s", file_path)
-        return 1, [], None, False
+        return 1, docfacts, preview, changed
     edits, semantics = _collect_edits(result, config)
     if command == "harvest":
         docfacts = build_docfacts(semantics)
-        return 0, docfacts, None, False
-    if not semantics:
+    else:
+        if not semantics:
+            if is_update:
+                cache.update(file_path, config.config_hash)
+            return exit_code, docfacts, preview, changed
+        changed, preview = apply_edits(result, edits, write=is_update)
+        if is_check and changed:
+            relative = file_path.relative_to(REPO_ROOT)
+            LOGGER.error("Docstrings out of date in %s", relative)
         if is_update:
             cache.update(file_path, config.config_hash)
-        return 0, [], None, False
-    changed, preview = apply_edits(result, edits, write=is_update)
-    if is_check and changed:
-        relative = file_path.relative_to(REPO_ROOT)
-        LOGGER.error("Docstrings out of date in %s", relative)
-    if is_update:
-        cache.update(file_path, config.config_hash)
-    docfacts = build_docfacts(semantics)
-    exit_code = 1 if is_check and changed else 0
+        docfacts = build_docfacts(semantics)
+        exit_code = 1 if is_check and changed else 0
     return exit_code, docfacts, preview, changed
 
 
@@ -256,13 +329,18 @@ def _run(files: Iterable[Path], args: argparse.Namespace, config: BuilderConfig)
     is_update = args.command == "update"
     is_check = args.command == "check"
     exit_code = 0
+    options = ProcessingOptions(
+        command=args.command or "",
+        force=args.force,
+        ignore_missing=getattr(args, "ignore_missing", False),
+        missing_patterns=tuple(MISSING_MODULE_PATTERNS),
+    )
     for file_path in files:
         file_exit, docfacts, preview, changed = _process_file(
             file_path,
             config,
             cache,
-            command=args.command or "",
-            force=args.force,
+            options,
         )
         exit_code = max(exit_code, file_exit)
         if is_check and changed and args.diff:
@@ -317,6 +395,13 @@ def _command_clear_cache(_: argparse.Namespace) -> int:
     return 0
 
 
+LEGACY_COMMAND_HANDLERS: dict[str, Callable[[argparse.Namespace], int]] = {
+    "update": _command_update,
+    "check": _command_check,
+    "harvest": _command_harvest,
+}
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the top-level argument parser for the docstring builder CLI."""
     parser = argparse.ArgumentParser(prog="docstring-builder")
@@ -324,6 +409,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--since", help="Only consider files changed since revision", default="")
     parser.add_argument("--force", action="store_true", help="Ignore cache entries")
     parser.add_argument("--diff", action="store_true", help="Show diffs in check mode")
+    parser.add_argument(
+        "--ignore-missing",
+        action="store_true",
+        help="Skip modules that raise ModuleNotFoundError (e.g., docs/_build artefacts)",
+    )
     parser.add_argument(
         "--all", action="store_true", help="Process all files, ignoring cache entries"
     )
@@ -378,17 +468,7 @@ def main(argv: list[str] | None = None) -> int:
     """Execute the docstring builder CLI."""
     parser = build_parser()
     args = parser.parse_args(argv)
-    if getattr(args, "all", False):
-        args.force = True
-    if getattr(args, "flag_diff", False):
-        args.diff = True
-        args.flag_check = True
-    if getattr(args, "flag_harvest", False):
-        args.func = _command_harvest
-    elif getattr(args, "flag_update", False):
-        args.func = _command_update
-    elif getattr(args, "flag_check", False):
-        args.func = _command_check
+    _assign_command(args)
     logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
     if not hasattr(args, "func"):
         parser.print_help()

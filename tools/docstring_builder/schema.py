@@ -16,6 +16,7 @@ class ParameterDoc:
     optional: bool = False
     default: str | None = None
     display_name: str | None = None
+    kind: str = "positional_or_keyword"
 
 
 @dataclass(slots=True)

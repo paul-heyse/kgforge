@@ -215,10 +215,36 @@ class MyClass:
 #### Automated Docstring Generation
 
 When adding new code without docstrings:
-1. Run `make docstrings` - generates NumPy-style skeletons
+1. Run `make artifacts` - scaffolds docstrings and dependent artefacts
 2. Fill in descriptions manually
-3. Run `make docstrings` again - formats and validates
+3. Run `make artifacts` again - formats and validates
 4. Pre-commit hooks enforce coverage and style
+
+### Documentation artefact workflow
+
+- `make artifacts` is the canonical way to regenerate docstrings, DocFacts, navmaps,
+  observability reports, and exported schemas. It invokes
+  `tools/docs/build_artifacts.py`, which prints a status line for each stage.
+- The underlying docstring builder now understands legacy flags such as
+  `--diff` and `--since` and exposes an `--ignore-missing` option to skip
+  transient imports from `docs/_build/**`.
+
+| Triggered by…                               | What `make artifacts` updates                 |
+| ------------------------------------------- | --------------------------------------------- |
+| API signature or docstring changes          | Managed docstrings + `docs/_build/docfacts.json` |
+| Navigation policy updates                   | `site/_build/navmap/navmap.json` and test maps |
+| Observability rules or coverage annotations | `docs/_build/observability*.json`             |
+| Schema / model tweaks                       | `docs/_build/schema_*.json` plus drift report |
+
+**FAQ**
+
+- _DocFacts still drift after running the target?_ Make sure your working tree is
+  clean and re-run `make artifacts`; the JSON output is deterministic.
+- _Builder raises `ModuleNotFoundError: docs._build...`?_ Use
+  `python -m tools.docstring_builder.cli update --all --ignore-missing` (the
+  command used inside `make artifacts`).
+- _Schema export keeps reporting drift?_ Open `docs/_build/schema_drift.json`
+  to inspect the generated changes and commit the desired snapshot.
 
 ### Import Organization
 
@@ -318,7 +344,7 @@ When you commit, these hooks run automatically in order:
 7. **pydoclint** - Validates parameter/return parity
 8. **pydocstyle** - Lints docstrings for NumPy convention
 9. **interrogate** - Enforces 90% docstring coverage
-10. **navmap-build** - Regenerates navigation index
+10. **docs-artifacts** - Runs `make artifacts` to regenerate docstrings, navmaps, schemas
 11. **navmap-check** - Validates navigation metadata
 12. **readme-generator** (optional) - Updates package READMEs
 
@@ -335,8 +361,8 @@ uvx ruff check --fix && uvx ruff format && black .
 # Type check
 uvx mypy --strict src
 
-# Generate/validate docstrings
-make docstrings
+# Regenerate documentation artefacts
+make artifacts
 
 # Run tests
 uv run pytest -q

@@ -64,29 +64,32 @@ def index_bm25(
     Parameters
     ----------
     chunks_parquet : str, optional
-        Describe ``chunks_parquet``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x7f7991b89a90>``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x7de3249197f0>``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x7c42a2e49940>``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x7549f5e817f0>``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x7f491ce7d7f0>``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x7af9d40d97f0>``.
+    Describe ``chunks_parquet``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7f7991b89a90>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7de3249197f0>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7c42a2e49940>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7549f5e817f0>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7f491ce7d7f0>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7af9d40d97f0>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7f5ae26a41a0>``.
     backend : str, optional
-        Describe ``backend``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7f7991bad450>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7de3781b0a50>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7c42a2e8c7d0>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7549f5ea4910>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7f491cea0910>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7af9d40f8910>``.
+    Describe ``backend``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7f7991bad450>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7de3781b0a50>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7c42a2e8c7d0>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7549f5ea4910>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7f491cea0910>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7af9d40f8910>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7f5ae26b4050>``.
     index_dir : str, optional
-        Describe ``index_dir``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7f7991bad590>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7de3781b0b90>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7c42a2e8c910>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7549f5ea4a50>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7f491cea0a50>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7af9d40f8a50>``.
+    Describe ``index_dir``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7f7991bad590>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7de3781b0b90>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7c42a2e8c910>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7549f5ea4a50>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7f491cea0a50>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7af9d40f8a50>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7f5ae26b4190>``.
     """
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
@@ -142,21 +145,23 @@ def index_faiss(
     Parameters
     ----------
     dense_vectors : str, optional
-        Describe ``dense_vectors``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x7f7991bad6d0>``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x7de3781b0cd0>``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x7c42a2e8ca50>``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x7549f5ea4b90>``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x7f491cea0b90>``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x7af9d40f8b90>``.
+    Describe ``dense_vectors``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7f7991bad6d0>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7de3781b0cd0>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7c42a2e8ca50>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7549f5ea4b90>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7f491cea0b90>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7af9d40f8b90>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7f5ae26b42d0>``.
     index_path : str, optional
-        Describe ``index_path``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7f7991bad810>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7de3781b0e10>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7c42a2e8cb90>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7549f5ea4cd0>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7f491cea0cd0>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x7af9d40f8cd0>``.
+    Describe ``index_path``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7f7991bad810>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7de3781b0e10>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7c42a2e8cb90>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7549f5ea4cd0>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7f491cea0cd0>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7af9d40f8cd0>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7f5ae26b4410>``.
     """
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
@@ -187,8 +192,8 @@ def api(port: int = 8080) -> None:
     Parameters
     ----------
     port : int, optional
-        Describe ``port``.
-        Defaults to ``8080``.
+    Describe ``port``.
+    Defaults to ``8080``.
     """
     import uvicorn
 

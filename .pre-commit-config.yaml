@@ -52,11 +52,12 @@ repos:
         entry: python -m tools.docstring_builder.cli check
         language: system
         always_run: true
-      - id: navmap-build
-        name: navmap-build
-        entry: python tools/navmap/build_navmap.py
+      - id: docs-artifacts
+        name: "docs: regenerate artifacts"
+        entry: make artifacts
         language: system
         pass_filenames: false
+        always_run: true
       - id: validate-gallery
         name: Validate gallery examples
         entry: python tools/validate_gallery.py
@@ -66,24 +67,6 @@ repos:
       - id: docs-doctest
         name: doctest (xdoctest via pytest)
         entry: bash -lc 'pytest -q --xdoctest --xdoctest-options=ELLIPSIS,IGNORE_WHITESPACE,NORMALIZE_WHITESPACE --xdoctest-modules --xdoctest-glob="examples/*.py" examples'
-        language: system
-        pass_filenames: false
-        always_run: true
-      - id: docs-build-test-map
-        name: "docs: build test map"
-        entry: python tools/docs/build_test_map.py
-        language: system
-        pass_filenames: false
-        always_run: true
-      - id: docs-observability-scan
-        name: "docs: observability scan"
-        entry: python tools/docs/scan_observability.py
-        language: system
-        pass_filenames: false
-        always_run: true
-      - id: docs-export-schemas
-        name: "docs: export schemas"
-        entry: python tools/docs/export_schemas.py
         language: system
         pass_filenames: false
         always_run: true
