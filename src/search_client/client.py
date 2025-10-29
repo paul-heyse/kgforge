@@ -55,6 +55,7 @@ class SupportsResponse(Protocol):
         >>> from search_client.client import raise_for_status
         >>> raise_for_status()  # doctest: +ELLIPSIS
         """
+        ...
 
     def json(self) -> dict[str, Any]:
         """Compute json.
@@ -72,13 +73,26 @@ class SupportsResponse(Protocol):
         >>> result = json()
         >>> result  # doctest: +ELLIPSIS
         """
+        ...
 
 
 # [nav:anchor SupportsHttp]
 class SupportsHttp(Protocol):
     """Describe SupportsHttp."""
 
-    def get(self, url: str, *, timeout: float) -> SupportsResponse:
+    def get(
+        self,
+        url: Any,
+        *,
+        params: Any | None = ...,
+        headers: Any | None = ...,
+        cookies: Any | None = ...,
+        auth: Any | None = ...,
+        follow_redirects: Any | None = ...,
+        timeout: Any | None = ...,
+        extensions: Any | None = ...,
+        **kwargs: Any,
+    ) -> Any:
         """Compute get.
 
         Retrieve a value for ``key`` while falling back to a default when absent. The convenience wrapper mirrors ``dict.get`` so configuration objects remain ergonomic. Use it to express optional access without raising ``KeyError``.
@@ -101,15 +115,24 @@ class SupportsHttp(Protocol):
         >>> result = get(..., ...)
         >>> result  # doctest: +ELLIPSIS
         """
+        ...
 
     def post(
         self,
-        url: str,
+        url: Any,
         *,
-        json: dict[str, Any],
-        headers: dict[str, str],
-        timeout: float,
-    ) -> SupportsResponse:
+        content: Any | None = ...,
+        data: Any | None = ...,
+        files: Any | None = ...,
+        json: Any | None = ...,
+        headers: Any | None = ...,
+        cookies: Any | None = ...,
+        auth: Any | None = ...,
+        follow_redirects: Any | None = ...,
+        timeout: Any | None = ...,
+        extensions: Any | None = ...,
+        **kwargs: Any,
+    ) -> Any:
         """Compute post.
 
         Carry out the post operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -136,26 +159,75 @@ class SupportsHttp(Protocol):
         >>> result = post(..., ..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
         """
+        ...
 
 
 class RequestsHttp(SupportsHttp):
     """Adapter that fulfils :class:`SupportsHttp` using ``requests``."""
 
-    def get(self, url: str, *, timeout: float) -> SupportsResponse:
+    def get(
+        self,
+        url: Any,
+        *,
+        params: Any | None = None,
+        headers: Any | None = None,
+        cookies: Any | None = None,
+        auth: Any | None = None,
+        follow_redirects: Any | None = None,
+        timeout: Any | None = None,
+        extensions: Any | None = None,
+        **kwargs: Any,
+    ) -> Any:
         """Issue a GET request via :mod:`requests`."""
-        response = requests.get(url, timeout=timeout)
+        if extensions is not None:
+            kwargs.setdefault("extensions", extensions)
+        if follow_redirects is not None:
+            kwargs.setdefault("allow_redirects", follow_redirects)
+        response = requests.get(
+            url,
+            params=params,
+            headers=headers,
+            cookies=cookies,
+            auth=auth,
+            timeout=timeout,
+            **kwargs,
+        )
         return cast(SupportsResponse, response)
 
     def post(
         self,
-        url: str,
+        url: Any,
         *,
-        json: dict[str, Any],
-        headers: dict[str, str],
-        timeout: float,
-    ) -> SupportsResponse:
+        content: Any | None = None,
+        data: Any | None = None,
+        files: Any | None = None,
+        json: Any | None = None,
+        headers: Any | None = None,
+        cookies: Any | None = None,
+        auth: Any | None = None,
+        follow_redirects: Any | None = None,
+        timeout: Any | None = None,
+        extensions: Any | None = None,
+        **kwargs: Any,
+    ) -> Any:
         """Issue a POST request via :mod:`requests`."""
-        response = requests.post(url, json=json, headers=headers, timeout=timeout)
+        if content is not None and data is None:
+            data = content
+        if extensions is not None:
+            kwargs.setdefault("extensions", extensions)
+        if follow_redirects is not None:
+            kwargs.setdefault("allow_redirects", follow_redirects)
+        response = requests.post(
+            url,
+            data=data,
+            json=json,
+            files=files,
+            headers=headers,
+            cookies=cookies,
+            auth=auth,
+            timeout=timeout,
+            **kwargs,
+        )
         return cast(SupportsResponse, response)
 
 
@@ -231,7 +303,7 @@ class KGFoundryClient:
         """
         r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
-        return r.json()
+        return cast(dict[str, Any], r.json())
 
     def search(
         self,
@@ -268,10 +340,13 @@ class KGFoundryClient:
         """
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
-            f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout
+            f"{self.base_url}/search",
+            json=payload,
+            headers=self._headers(),
+            timeout=self.timeout,
         )
         r.raise_for_status()
-        return r.json()
+        return cast(dict[str, Any], r.json())
 
     def concepts(self, q: str, limit: int = 50) -> dict[str, Any]:
         """Compute concepts.
@@ -303,4 +378,4 @@ class KGFoundryClient:
             timeout=self.timeout,
         )
         r.raise_for_status()
-        return r.json()
+        return cast(dict[str, Any], r.json())
