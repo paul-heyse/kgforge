@@ -92,7 +92,6 @@ class ValidationResult:
         >>> from tools.validate_gallery import ok
         >>> result = ok()
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         return not self.errors
 
@@ -126,31 +125,31 @@ def validate_title_format(docstring: str) -> tuple[bool, str]:
     >>> from tools.validate_gallery import validate_title_format
     >>> result = validate_title_format(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     lines = [line.rstrip() for line in inspect.cleandoc(docstring).splitlines()]
     while lines and not lines[0].strip():
         lines.pop(0)
+
+    failure: str | None = None
     if not lines:
-        return False, "docstring is empty"
+        failure = "docstring is empty"
+    else:
+        title = lines[0]
+        if len(title) > TITLE_MAX_LENGTH:
+            failure = f"title exceeds {TITLE_MAX_LENGTH} characters"
+        elif len(lines) < MIN_LINES_WITH_UNDERLINE:
+            failure = "missing underline under the title"
+        else:
+            underline = lines[1]
+            if not TITLE_UNDERLINE_PATTERN.fullmatch(underline):
+                failure = "title underline must be composed of '=' characters"
+            elif abs(len(underline) - len(title)) > UNDERLINE_TOLERANCE:
+                failure = "title underline length must match the title (±1 character)"
+            elif len(lines) <= BLANK_LINE_INDEX or lines[BLANK_LINE_INDEX].strip():
+                failure = "expected a blank line after the title underline"
 
-    title = lines[0]
-    if len(title) > TITLE_MAX_LENGTH:
-        return False, f"title exceeds {TITLE_MAX_LENGTH} characters"
-
-    if len(lines) < MIN_LINES_WITH_UNDERLINE:
-        return False, "missing underline under the title"
-
-    underline = lines[1]
-    if not TITLE_UNDERLINE_PATTERN.fullmatch(underline):
-        return False, "title underline must be composed of '=' characters"
-
-    if abs(len(underline) - len(title)) > UNDERLINE_TOLERANCE:
-        return False, "title underline length must match the title (±1 character)"
-
-    if len(lines) <= BLANK_LINE_INDEX or lines[BLANK_LINE_INDEX].strip():
-        return False, "expected a blank line after the title underline"
-
+    if failure is not None:
+        return False, failure
     return True, ""
 
 
@@ -174,7 +173,6 @@ def check_orphan_directive(docstring: str) -> bool:
     >>> from tools.validate_gallery import check_orphan_directive
     >>> result = check_orphan_directive(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return ":orphan:" in docstring
 
@@ -199,7 +197,6 @@ def check_custom_labels(docstring: str) -> list[str]:
     >>> from tools.validate_gallery import check_custom_labels
     >>> result = check_custom_labels(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return CUSTOM_LABEL_PATTERN.findall(docstring)
 
@@ -250,7 +247,6 @@ def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]
     >>> from tools.validate_gallery import validate_example_file
     >>> result = validate_example_file(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     errors: list[str] = []
     docstring = _load_docstring(file_path)
@@ -316,7 +312,6 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
     >>> from tools.validate_gallery import main
     >>> result = main(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     results: list[ValidationResult] = []
     exit_code = 0

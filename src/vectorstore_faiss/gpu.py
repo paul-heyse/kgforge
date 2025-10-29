@@ -8,7 +8,7 @@ implementation specifics.
 from __future__ import annotations
 
 import os
-from typing import Any, Final, cast
+from typing import Any, Final
 
 import numpy as np
 from numpy.typing import NDArray
@@ -130,7 +130,7 @@ class FaissGpuIndex:
         """
         if self._faiss is None:
             return
-        train_mat = cast(FloatArray, np.asarray(train_vectors, dtype=np.float32, order="C"))
+        train_mat: FloatArray = np.asarray(train_vectors, dtype=np.float32, order="C")
         faiss = self._faiss
         dimension = train_mat.shape[1]
         cpu_index = faiss.index_factory(dimension, self.factory, faiss.METRIC_INNER_PRODUCT)
@@ -175,10 +175,12 @@ class FaissGpuIndex:
         >>> from vectorstore_faiss.gpu import add
         >>> add(..., ...)  # doctest: +ELLIPSIS
         """
-        vec_array = cast(FloatArray, np.asarray(vectors, dtype=np.float32, order="C"))
+        vec_array: FloatArray = np.asarray(vectors, dtype=np.float32, order="C")
         if self._faiss is None:
-            self._xb = cast(FloatArray, np.array(vec_array, copy=True))
-            self._idmap = cast(StrArray, np.asarray(keys, dtype=str))
+            xb: FloatArray = np.array(vec_array, dtype=np.float32, copy=True)
+            self._xb = xb
+            idmap: StrArray = np.asarray(keys, dtype=np.str_)
+            self._idmap = idmap
             norms = np.linalg.norm(self._xb, axis=1, keepdims=True) + 1e-12
             self._xb /= norms
             return
@@ -187,12 +189,11 @@ class FaissGpuIndex:
             message = "FAISS index not initialized; call train() before add()."
             raise RuntimeError(message)
         faiss.normalize_L2(vec_array)
+        idmap_array: IntArray = np.asarray(keys, dtype=np.int64)
         if isinstance(self._index, faiss.IndexIDMap2):
-            idmap_array = cast(IntArray, np.asarray(keys, dtype="int64"))
             self._index.add_with_ids(vec_array, idmap_array)
         elif hasattr(faiss, "IndexIDMap2"):
             idmap = faiss.IndexIDMap2(self._index)
-            idmap_array = cast(IntArray, np.asarray(keys, dtype="int64"))
             idmap.add_with_ids(vec_array, idmap_array)
             self._index = idmap
         else:
@@ -225,9 +226,8 @@ class FaissGpuIndex:
         >>> from vectorstore_faiss.gpu import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
-        q = cast(FloatArray, np.asarray(query, dtype=np.float32, order="C"))
+        q: FloatArray = np.asarray(query, dtype=np.float32, order="C")
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12
         if self._faiss is None or self._index is None:
             if self._xb is None or self._idmap is None:

@@ -6,7 +6,7 @@ import ast
 import fnmatch
 import ssl
 from pathlib import Path
-from typing import Any
+from typing import TypeVar, cast
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
@@ -16,21 +16,24 @@ from tools.auto_docstrings import QUALIFIED_NAME_OVERRIDES, _normalize_qualified
 CONF_PATH = Path(__file__).resolve().parents[2] / "docs" / "conf.py"
 
 
-def _load_conf_symbol(name: str) -> Any:
+T = TypeVar("T")
+
+
+def _load_conf_symbol(name: str) -> T:
     """Return the literal value assigned to ``name`` inside ``docs/conf.py``."""
     module = ast.parse(CONF_PATH.read_text())
     for node in module.body:
         if isinstance(node, ast.Assign):
             for target in node.targets:
                 if isinstance(target, ast.Name) and target.id == name:
-                    return ast.literal_eval(node.value)
-        if isinstance(node, ast.AnnAssign):
-            if (
-                isinstance(node.target, ast.Name)
-                and node.target.id == name
-                and node.value is not None
-            ):
-                return ast.literal_eval(node.value)
+                    return cast(T, ast.literal_eval(node.value))
+        if (
+            isinstance(node, ast.AnnAssign)
+            and isinstance(node.target, ast.Name)
+            and node.target.id == name
+            and node.value is not None
+        ):
+            return cast(T, ast.literal_eval(node.value))
     raise KeyError(name)
 
 
@@ -257,7 +260,7 @@ def test_intersphinx_inventory_report_covers_all_projects() -> None:
             project, status = line[2:].split(":", 1)
             statuses[project.strip()] = status.strip()
     assert set(statuses) == set(mapping)
-    for project, status in statuses.items():
+    for status in statuses.values():
         assert status
 
 
