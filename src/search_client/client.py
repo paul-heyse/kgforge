@@ -54,9 +54,10 @@ class SupportsResponse(Protocol):
     Parameters
     ----------
     *args : inspect._empty
-        Describe ``args``.
+    Describe ``args``.
     **kwargs : inspect._empty
-        Describe ``kwargs``.
+    Describe ``kwargs``.
+
 
 
 
@@ -66,7 +67,7 @@ class SupportsResponse(Protocol):
     Returns
     -------
     inspect._empty
-        Describe return value.
+    Describe return value.
     """
 
     def raise_for_status(self) -> None:
@@ -89,7 +90,7 @@ class SupportsResponse(Protocol):
         Returns
         -------
         dict[str, Any]
-            Describe return value.
+        Describe return value.
         """
         ...
 
@@ -106,9 +107,10 @@ class SupportsHttp(Protocol):
     Parameters
     ----------
     *args : inspect._empty
-        Describe ``args``.
+    Describe ``args``.
     **kwargs : inspect._empty
-        Describe ``kwargs``.
+    Describe ``kwargs``.
+
 
 
 
@@ -118,7 +120,7 @@ class SupportsHttp(Protocol):
     Returns
     -------
     inspect._empty
-        Describe return value.
+    Describe return value.
     """
 
     def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
@@ -131,11 +133,12 @@ class SupportsHttp(Protocol):
         Parameters
         ----------
         url : str
-            Describe ``url``.
+        Describe ``url``.
         *args : object
-            Describe ``args``.
+        Describe ``args``.
         **kwargs : object
-            Describe ``kwargs``.
+        Describe ``kwargs``.
+
 
 
 
@@ -145,7 +148,7 @@ class SupportsHttp(Protocol):
         Returns
         -------
         SupportsResponse
-            Describe return value.
+        Describe return value.
         """
         ...
 
@@ -159,11 +162,12 @@ class SupportsHttp(Protocol):
         Parameters
         ----------
         url : str
-            Describe ``url``.
+        Describe ``url``.
         *args : object
-            Describe ``args``.
+        Describe ``args``.
         **kwargs : object
-            Describe ``kwargs``.
+        Describe ``kwargs``.
+
 
 
 
@@ -173,7 +177,7 @@ class SupportsHttp(Protocol):
         Returns
         -------
         SupportsResponse
-            Describe return value.
+        Describe return value.
         """
         ...
 
@@ -190,7 +194,7 @@ class RequestsHttp(SupportsHttp):
     Returns
     -------
     inspect._empty
-        Describe return value.
+    Describe return value.
     """
 
     def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
@@ -203,11 +207,12 @@ class RequestsHttp(SupportsHttp):
         Parameters
         ----------
         url : str
-            Describe ``url``.
+        Describe ``url``.
         *args : object
-            Describe ``args``.
+        Describe ``args``.
         **kwargs : object
-            Describe ``kwargs``.
+        Describe ``kwargs``.
+
 
 
 
@@ -217,7 +222,7 @@ class RequestsHttp(SupportsHttp):
         Returns
         -------
         SupportsResponse
-            Describe return value.
+        Describe return value.
         """
         return requests.get(
             url,
@@ -235,11 +240,12 @@ class RequestsHttp(SupportsHttp):
         Parameters
         ----------
         url : str
-            Describe ``url``.
+        Describe ``url``.
         *args : object
-            Describe ``args``.
+        Describe ``args``.
         **kwargs : object
-            Describe ``kwargs``.
+        Describe ``kwargs``.
+
 
 
 
@@ -249,7 +255,7 @@ class RequestsHttp(SupportsHttp):
         Returns
         -------
         SupportsResponse
-            Describe return value.
+        Describe return value.
         """
         return requests.post(
             url,
@@ -273,17 +279,17 @@ class KGFoundryClient:
     Parameters
     ----------
     base_url : str, optional
-        Describe ``base_url``.
-        Defaults to ``'http://localhost:8080'``.
+    Describe ``base_url``.
+    Defaults to ``'http://localhost:8080'``.
     api_key : str | None, optional
-        Describe ``api_key``.
-        Defaults to ``None``.
+    Describe ``api_key``.
+    Defaults to ``None``.
     timeout : float, optional
-        Describe ``timeout``.
-        Defaults to ``30.0``.
+    Describe ``timeout``.
+    Defaults to ``30.0``.
     http : SupportsHttp | None, optional
-        Describe ``http``.
-        Defaults to ``None``.
+    Describe ``http``.
+    Defaults to ``None``.
     """
 
     def __init__(
@@ -302,17 +308,17 @@ class KGFoundryClient:
         Parameters
         ----------
         base_url : str, optional
-            Describe ``base_url``.
-            Defaults to ``'http://localhost:8080'``.
+        Describe ``base_url``.
+        Defaults to ``'http://localhost:8080'``.
         api_key : str | None, optional
-            Describe ``api_key``.
-            Defaults to ``None``.
+        Describe ``api_key``.
+        Defaults to ``None``.
         timeout : float, optional
-            Describe ``timeout``.
-            Defaults to ``30.0``.
+        Describe ``timeout``.
+        Defaults to ``30.0``.
         http : SupportsHttp | None, optional
-            Describe ``http``.
-            Defaults to ``None``.
+        Describe ``http``.
+        Defaults to ``None``.
         """
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
@@ -329,7 +335,7 @@ class KGFoundryClient:
         Returns
         -------
         dict[str, str]
-            Describe return value.
+        Describe return value.
         """
         headers = {"Content-Type": "application/json"}
         if self.api_key:
@@ -346,7 +352,7 @@ class KGFoundryClient:
         Returns
         -------
         dict[str, Any]
-            Describe return value.
+        Describe return value.
         """
         response = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         response.raise_for_status()
@@ -368,16 +374,17 @@ class KGFoundryClient:
         Parameters
         ----------
         query : str
-            Describe ``query``.
+        Describe ``query``.
         k : int, optional
-            Describe ``k``.
-            Defaults to ``10``.
+        Describe ``k``.
+        Defaults to ``10``.
         filters : dict[str, Any] | None, optional
-            Describe ``filters``.
-            Defaults to ``None``.
+        Describe ``filters``.
+        Defaults to ``None``.
         explain : bool, optional
-            Describe ``explain``.
-            Defaults to ``False``.
+        Describe ``explain``.
+        Defaults to ``False``.
+
 
 
 
@@ -387,7 +394,7 @@ class KGFoundryClient:
         Returns
         -------
         dict[str, Any]
-            Describe return value.
+        Describe return value.
         """
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         response = self._http.post(
@@ -409,10 +416,11 @@ class KGFoundryClient:
         Parameters
         ----------
         q : str
-            Describe ``q``.
+        Describe ``q``.
         limit : int, optional
-            Describe ``limit``.
-            Defaults to ``50``.
+        Describe ``limit``.
+        Defaults to ``50``.
+
 
 
 
@@ -422,7 +430,7 @@ class KGFoundryClient:
         Returns
         -------
         dict[str, Any]
-            Describe return value.
+        Describe return value.
         """
         response = self._http.post(
             f"{self.base_url}/graph/concepts",

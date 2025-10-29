@@ -55,16 +55,16 @@ class SearchRequest(BaseModel):
     Parameters
     ----------
     query : str
-        Describe ``query``.
+    Describe ``query``.
     k : int, optional
-        Describe ``k``.
-        Defaults to ``10``.
+    Describe ``k``.
+    Defaults to ``10``.
     filters : dict[str, object] | None, optional
-        Describe ``filters``.
-        Defaults to ``None``.
+    Describe ``filters``.
+    Defaults to ``None``.
     explain : bool, optional
-        Describe ``explain``.
-        Defaults to ``False``.
+    Describe ``explain``.
+    Defaults to ``False``.
     """
 
     query: str = Field(min_length=1)
@@ -85,24 +85,24 @@ class SearchResult(BaseModel):
     Parameters
     ----------
     doc_id : str
-        Describe ``doc_id``.
+    Describe ``doc_id``.
     chunk_id : str
-        Describe ``chunk_id``.
+    Describe ``chunk_id``.
     title : str
-        Describe ``title``.
+    Describe ``title``.
     section : str
-        Describe ``section``.
+    Describe ``section``.
     score : float
-        Describe ``score``.
+    Describe ``score``.
     signals : dict[str, float], optional
-        Describe ``signals``.
-        Defaults to ``<factory>``.
+    Describe ``signals``.
+    Defaults to ``<factory>``.
     spans : dict[str, int], optional
-        Describe ``spans``.
-        Defaults to ``<factory>``.
+    Describe ``spans``.
+    Defaults to ``<factory>``.
     concepts : list[dict[str, str]], optional
-        Describe ``concepts``.
-        Defaults to ``<factory>``.
+    Describe ``concepts``.
+    Defaults to ``<factory>``.
     """
 
     doc_id: str

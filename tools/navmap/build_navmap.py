@@ -8,6 +8,7 @@ for implementation specifics.
 
 from __future__ import annotations
 
+import argparse
 import ast
 import json
 import os
@@ -962,24 +963,22 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> NavIndexDict
     return data
 
 
-def main() -> int:
-    """Compute main.
+def main(argv: Sequence[str] | None = None) -> int:
+    """Generate the navmap index and optionally override the output path."""
+    parser = argparse.ArgumentParser(description="Build the navigation index JSON")
+    parser.add_argument(
+        "--write",
+        type=Path,
+        metavar="PATH",
+        help="Destination for the generated navmap JSON",
+        default=None,
+    )
+    args = parser.parse_args(argv)
 
-    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Returns
-    -------
-    int
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.navmap.build_navmap import main
-    >>> result = main()
-    >>> result  # doctest: +ELLIPSIS
-    """
-    build_index()
-    print(f"navmap built → {INDEX_PATH}")
+    target = args.write if args.write is not None else None
+    build_index(json_path=target)
+    destination = target or INDEX_PATH
+    print(f"[navmap] regenerated {destination}")
     return 0
 
 

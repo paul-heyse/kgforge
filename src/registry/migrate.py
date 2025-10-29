@@ -55,9 +55,9 @@ def apply(db: str, migrations_dir: str) -> None:
     Parameters
     ----------
     db : str
-        Describe ``db``.
+    Describe ``db``.
     migrations_dir : str
-        Describe ``migrations_dir``.
+    Describe ``migrations_dir``.
     """
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):

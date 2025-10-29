@@ -7,7 +7,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 
 from tools.docstring_builder.config import BuilderConfig
-from tools.docstring_builder.harvest import HarvestResult, SymbolHarvest
+from tools.docstring_builder.harvest import HarvestResult, SymbolHarvest, parameter_display_name
 from tools.docstring_builder.overrides import extended_summary as overrides_extended_summary
 from tools.docstring_builder.schema import DocstringSchema, ParameterDoc, RaiseDoc, ReturnDoc
 
@@ -47,12 +47,7 @@ def _build_parameters(symbol: SymbolHarvest) -> list[ParameterDoc]:
         if parameter.name == "self":
             continue
         annotation = parameter.annotation
-        display = parameter.name
-        kind_lower = parameter.kind.lower()
-        if "variadic positional" in kind_lower or "var positional" in kind_lower:
-            display = f"*{display}"
-        elif "variadic keyword" in kind_lower or "var keyword" in kind_lower:
-            display = f"**{display}"
+        display = parameter_display_name(parameter)
         doc = ParameterDoc(
             name=parameter.name,
             annotation=annotation,
@@ -60,6 +55,7 @@ def _build_parameters(symbol: SymbolHarvest) -> list[ParameterDoc]:
             optional=False,
             default=parameter.default,
             display_name=display,
+            kind=parameter.kind.name.lower(),
         )
         doc.optional = _infer_optional(doc, annotation, parameter.default)
         docs.append(doc)

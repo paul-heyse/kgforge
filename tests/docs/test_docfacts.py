@@ -46,6 +46,17 @@ def test_docfacts_required_fields_present(field: str) -> None:
         assert field in entry, f"Missing {field} field in docfact for {entry.get('qname')}"
 
 
+def test_docfacts_parameter_metadata_complete() -> None:
+    for entry in _load_docfacts():
+        parameters = entry.get("parameters", [])
+        assert isinstance(parameters, list)
+        for parameter in parameters:
+            assert "display_name" in parameter, "parameter display name missing"
+            assert "kind" in parameter, "parameter kind missing"
+            assert parameter["display_name"], "parameter display name must be truthy"
+            assert parameter["kind"], "parameter kind must be truthy"
+
+
 def test_docfacts_kind_values_are_valid() -> None:
     allowed = {"class", "function", "method"}
     docfacts = _load_docfacts()

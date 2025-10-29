@@ -159,3 +159,27 @@ jobs:
 
       - name: Run docfacts diff
         run: make docfacts-diff
+
+  docs_artifacts:
+    name: Docs Artifacts
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Regenerate documentation artifacts
+        run: uv run python tools/docs/build_artifacts.py
+
+      - name: Verify clean tree
+        run: |
+          git status --short
+          git diff --exit-code
+          if [ -n "$(git ls-files --others --exclude-standard)" ]; then
+            echo "Unexpected untracked files:" \
+            && git ls-files --others --exclude-standard \
+            && exit 1
+          fi

@@ -91,9 +91,9 @@ class DenseVecs:
     Parameters
     ----------
     ids : list[str]
-        Describe ``ids``.
+    Describe ``ids``.
     mat : VecArray
-        Describe ``mat``.
+    Describe ``mat``.
     """
 
     ids: list[str]
@@ -111,13 +111,14 @@ class FaissAdapter:
     Parameters
     ----------
     db_path : str
-        Describe ``db_path``.
+    Describe ``db_path``.
     factory : str, optional
-        Describe ``factory``.
-        Defaults to ``'OPQ64,IVF8192,PQ64'``.
+    Describe ``factory``.
+    Defaults to ``'OPQ64,IVF8192,PQ64'``.
     metric : str, optional
-        Describe ``metric``.
-        Defaults to ``'ip'``.
+    Describe ``metric``.
+    Defaults to ``'ip'``.
+
 
 
 
@@ -145,13 +146,13 @@ class FaissAdapter:
         Parameters
         ----------
         db_path : str
-            Describe ``db_path``.
+        Describe ``db_path``.
         factory : str, optional
-            Describe ``factory``.
-            Defaults to ``'OPQ64,IVF8192,PQ64'``.
+        Describe ``factory``.
+        Defaults to ``'OPQ64,IVF8192,PQ64'``.
         metric : str, optional
-            Describe ``metric``.
-            Defaults to ``'ip'``.
+        Describe ``metric``.
+        Defaults to ``'ip'``.
         """
         self.db_path = db_path
         self.factory = factory
@@ -170,7 +171,8 @@ class FaissAdapter:
         Parameters
         ----------
         source : Path
-            Describe ``source``.
+        Describe ``source``.
+
 
 
 
@@ -180,7 +182,8 @@ class FaissAdapter:
         Returns
         -------
         DenseVecs
-            Describe return value.
+        Describe return value.
+
 
 
 
@@ -225,7 +228,8 @@ class FaissAdapter:
         Returns
         -------
         DenseVecs
-            Describe return value.
+        Describe return value.
+
 
 
 
@@ -314,8 +318,8 @@ class FaissAdapter:
         Parameters
         ----------
         cpu_index_path : str | None, optional
-            Describe ``cpu_index_path``.
-            Defaults to ``None``.
+        Describe ``cpu_index_path``.
+        Defaults to ``None``.
         """
         faiss_module = faiss
         if faiss_module is None:
@@ -343,7 +347,8 @@ class FaissAdapter:
         Parameters
         ----------
         cpu_index : object
-            Describe ``cpu_index``.
+        Describe ``cpu_index``.
+
 
 
 
@@ -353,7 +358,7 @@ class FaissAdapter:
         Returns
         -------
         object
-            Describe return value.
+        Describe return value.
         """
         faiss_module = faiss
         if faiss_module is None:
@@ -382,10 +387,11 @@ class FaissAdapter:
         Parameters
         ----------
         qvec : FloatArrayLike
-            Describe ``qvec``.
+        Describe ``qvec``.
         k : int, optional
-            Describe ``k``.
-            Defaults to ``10``.
+        Describe ``k``.
+        Defaults to ``10``.
+
 
 
 
@@ -395,7 +401,7 @@ class FaissAdapter:
         Returns
         -------
         list[list[tuple[str, float]]]
-            Describe return value.
+        Describe return value.
         """
         if self.vecs is None and self.index is None:
             return []
@@ -414,7 +420,8 @@ class FaissAdapter:
         Parameters
         ----------
         qvec : VecArray
-            Describe ``qvec``.
+        Describe ``qvec``.
+
 
 
 
@@ -424,7 +431,7 @@ class FaissAdapter:
         Returns
         -------
         VecArray
-            Describe return value.
+        Describe return value.
         """
         query_arr: VecArray = np.asarray(qvec, dtype=np.float32, order="C")
         if query_arr.ndim == 1:
@@ -441,9 +448,10 @@ class FaissAdapter:
         Parameters
         ----------
         queries : VecArray
-            Describe ``queries``.
+        Describe ``queries``.
         k : int
-            Describe ``k``.
+        Describe ``k``.
+
 
 
 
@@ -453,7 +461,8 @@ class FaissAdapter:
         Returns
         -------
         list[list[tuple[str, float]]]
-            Describe return value.
+        Describe return value.
+
 
 
 
@@ -490,9 +499,10 @@ class FaissAdapter:
         Parameters
         ----------
         queries : VecArray
-            Describe ``queries``.
+        Describe ``queries``.
         k : int
-            Describe ``k``.
+        Describe ``k``.
+
 
 
 
@@ -502,7 +512,8 @@ class FaissAdapter:
         Returns
         -------
         list[list[tuple[str, float]]]
-            Describe return value.
+        Describe return value.
+
 
 
 

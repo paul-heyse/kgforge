@@ -93,11 +93,11 @@ class BM25Doc:
     Parameters
     ----------
     doc_id : str
-        Describe ``doc_id``.
+    Describe ``doc_id``.
     length : int
-        Describe ``length``.
+    Describe ``length``.
     fields : dict[str, str]
-        Describe ``fields``.
+    Describe ``fields``.
     """
 
     doc_id: str
@@ -118,16 +118,16 @@ class PurePythonBM25:
     Parameters
     ----------
     index_dir : str
-        Describe ``index_dir``.
+    Describe ``index_dir``.
     k1 : float, optional
-        Describe ``k1``.
-        Defaults to ``0.9``.
+    Describe ``k1``.
+    Defaults to ``0.9``.
     b : float, optional
-        Describe ``b``.
-        Defaults to ``0.4``.
+    Describe ``b``.
+    Defaults to ``0.4``.
     field_boosts : dict[str, float] | None, optional
-        Describe ``field_boosts``.
-        Defaults to ``None``.
+    Describe ``field_boosts``.
+    Defaults to ``None``.
     """
 
     def __init__(
@@ -146,16 +146,16 @@ class PurePythonBM25:
         Parameters
         ----------
         index_dir : str
-            Describe ``index_dir``.
+        Describe ``index_dir``.
         k1 : float, optional
-            Describe ``k1``.
-            Defaults to ``0.9``.
+        Describe ``k1``.
+        Defaults to ``0.9``.
         b : float, optional
-            Describe ``b``.
-            Defaults to ``0.4``.
+        Describe ``b``.
+        Defaults to ``0.4``.
         field_boosts : dict[str, float] | None, optional
-            Describe ``field_boosts``.
-            Defaults to ``None``.
+        Describe ``field_boosts``.
+        Defaults to ``None``.
         """
         self.index_dir = index_dir
         self.k1 = k1
@@ -178,7 +178,8 @@ class PurePythonBM25:
         Parameters
         ----------
         text : str
-            Describe ``text``.
+        Describe ``text``.
+
 
 
 
@@ -188,7 +189,7 @@ class PurePythonBM25:
         Returns
         -------
         list[str]
-            Describe return value.
+        Describe return value.
         """
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
@@ -202,7 +203,7 @@ class PurePythonBM25:
         Parameters
         ----------
         docs_iterable : Iterable[tuple[str, dict[str, str]]]
-            Describe ``docs_iterable``.
+        Describe ``docs_iterable``.
         """
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
@@ -281,7 +282,8 @@ class PurePythonBM25:
         Parameters
         ----------
         term : str
-            Describe ``term``.
+        Describe ``term``.
+
 
 
 
@@ -291,7 +293,7 @@ class PurePythonBM25:
         Returns
         -------
         float
-            Describe return value.
+        Describe return value.
         """
         n_t = self.df.get(term, 0)
         if n_t == 0:
@@ -311,12 +313,13 @@ class PurePythonBM25:
         Parameters
         ----------
         query : str
-            Describe ``query``.
+        Describe ``query``.
         k : int
-            Describe ``k``.
+        Describe ``k``.
         fields : Mapping[str, str] | None, optional
-            Describe ``fields``.
-            Defaults to ``None``.
+        Describe ``fields``.
+        Defaults to ``None``.
+
 
 
 
@@ -326,7 +329,7 @@ class PurePythonBM25:
         Returns
         -------
         list[tuple[str, float]]
-            Describe return value.
+        Describe return value.
         """
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
@@ -356,16 +359,17 @@ class LuceneBM25:
     Parameters
     ----------
     index_dir : str
-        Describe ``index_dir``.
+    Describe ``index_dir``.
     k1 : float, optional
-        Describe ``k1``.
-        Defaults to ``0.9``.
+    Describe ``k1``.
+    Defaults to ``0.9``.
     b : float, optional
-        Describe ``b``.
-        Defaults to ``0.4``.
+    Describe ``b``.
+    Defaults to ``0.4``.
     field_boosts : dict[str, float] | None, optional
-        Describe ``field_boosts``.
-        Defaults to ``None``.
+    Describe ``field_boosts``.
+    Defaults to ``None``.
+
 
 
 
@@ -394,16 +398,16 @@ class LuceneBM25:
         Parameters
         ----------
         index_dir : str
-            Describe ``index_dir``.
+        Describe ``index_dir``.
         k1 : float, optional
-            Describe ``k1``.
-            Defaults to ``0.9``.
+        Describe ``k1``.
+        Defaults to ``0.9``.
         b : float, optional
-            Describe ``b``.
-            Defaults to ``0.4``.
+        Describe ``b``.
+        Defaults to ``0.4``.
         field_boosts : dict[str, float] | None, optional
-            Describe ``field_boosts``.
-            Defaults to ``None``.
+        Describe ``field_boosts``.
+        Defaults to ``None``.
         """
         self.index_dir = index_dir
         self.k1 = k1
@@ -421,7 +425,8 @@ class LuceneBM25:
         Parameters
         ----------
         docs_iterable : Iterable[tuple[str, dict[str, str]]]
-            Describe ``docs_iterable``.
+        Describe ``docs_iterable``.
+
 
 
 
@@ -483,12 +488,13 @@ class LuceneBM25:
         Parameters
         ----------
         query : str
-            Describe ``query``.
+        Describe ``query``.
         k : int
-            Describe ``k``.
+        Describe ``k``.
         fields : dict[str, str] | None, optional
-            Describe ``fields``.
-            Defaults to ``None``.
+        Describe ``fields``.
+        Defaults to ``None``.
+
 
 
 
@@ -498,7 +504,8 @@ class LuceneBM25:
         Returns
         -------
         list[tuple[str, float]]
-            Describe return value.
+        Describe return value.
+
 
 
 
@@ -537,18 +544,19 @@ def get_bm25(
     Parameters
     ----------
     backend : str
-        Describe ``backend``.
+    Describe ``backend``.
     index_dir : str
-        Describe ``index_dir``.
+    Describe ``index_dir``.
     k1 : float, optional
-        Describe ``k1``.
-        Defaults to ``0.9``.
+    Describe ``k1``.
+    Defaults to ``0.9``.
     b : float, optional
-        Describe ``b``.
-        Defaults to ``0.4``.
+    Describe ``b``.
+    Defaults to ``0.4``.
     field_boosts : dict[str, float] | None, optional
-        Describe ``field_boosts``.
-        Defaults to ``None``.
+    Describe ``field_boosts``.
+    Defaults to ``None``.
+
 
 
 
@@ -558,7 +566,7 @@ def get_bm25(
     Returns
     -------
     PurePythonBM25 | LuceneBM25
-        Describe return value.
+    Describe return value.
     """
     if backend == "lucene":
         try:

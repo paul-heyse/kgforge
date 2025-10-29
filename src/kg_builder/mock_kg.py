@@ -71,9 +71,9 @@ class MockKG:
         Parameters
         ----------
         chunk_id : str
-            Describe ``chunk_id``.
+        Describe ``chunk_id``.
         concept_id : str
-            Describe ``concept_id``.
+        Describe ``concept_id``.
         """
         self.chunk2concepts.setdefault(chunk_id, set()).add(concept_id)
 
@@ -87,9 +87,9 @@ class MockKG:
         Parameters
         ----------
         a : str
-            Describe ``a``.
+        Describe ``a``.
         b : str
-            Describe ``b``.
+        Describe ``b``.
         """
         self.neighbors.setdefault(a, set()).add(b)
         self.neighbors.setdefault(b, set()).add(a)
@@ -104,7 +104,8 @@ class MockKG:
         Parameters
         ----------
         chunk_id : str
-            Describe ``chunk_id``.
+        Describe ``chunk_id``.
+
 
 
 
@@ -114,7 +115,7 @@ class MockKG:
         Returns
         -------
         list[str]
-            Describe return value.
+        Describe return value.
         """
         return sorted(self.chunk2concepts.get(chunk_id, set()))
 
@@ -128,7 +129,8 @@ class MockKG:
         Parameters
         ----------
         concept_id : str
-            Describe ``concept_id``.
+        Describe ``concept_id``.
+
 
 
 
@@ -138,6 +140,6 @@ class MockKG:
         Returns
         -------
         list[str]
-            Describe return value.
+        Describe return value.
         """
         return sorted(self.neighbors.get(concept_id, set()))

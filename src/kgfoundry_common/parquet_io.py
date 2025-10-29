@@ -66,7 +66,7 @@ class ParquetVectorWriter:
     Parameters
     ----------
     root : str
-        Describe ``root``.
+    Describe ``root``.
     """
 
     @staticmethod
@@ -80,7 +80,8 @@ class ParquetVectorWriter:
         Parameters
         ----------
         dim : int
-            Describe ``dim``.
+        Describe ``dim``.
+
 
 
 
@@ -90,7 +91,7 @@ class ParquetVectorWriter:
         Returns
         -------
         pyarrow.lib.schema
-            Describe return value.
+        Describe return value.
         """
         return pa.schema(
             [
@@ -114,7 +115,7 @@ class ParquetVectorWriter:
         Parameters
         ----------
         root : str
-            Describe ``root``.
+        Describe ``root``.
         """
         self.root = Path(root)
 
@@ -135,16 +136,17 @@ class ParquetVectorWriter:
         Parameters
         ----------
         model : str
-            Describe ``model``.
+        Describe ``model``.
         run_id : str
-            Describe ``run_id``.
+        Describe ``run_id``.
         dim : int
-            Describe ``dim``.
+        Describe ``dim``.
         records : Iterable[tuple[str, list[float], float]]
-            Describe ``records``.
+        Describe ``records``.
         shard : int, optional
-            Describe ``shard``.
-            Defaults to ``0``.
+        Describe ``shard``.
+        Defaults to ``0``.
+
 
 
 
@@ -154,7 +156,7 @@ class ParquetVectorWriter:
         Returns
         -------
         str
-            Describe return value.
+        Describe return value.
         """
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
@@ -192,7 +194,7 @@ class ParquetVectorWriter:
         Returns
         -------
         pyarrow.lib.schema
-            Describe return value.
+        Describe return value.
         """
         return pa.schema(
             [
@@ -222,14 +224,15 @@ class ParquetVectorWriter:
         Parameters
         ----------
         model : str
-            Describe ``model``.
+        Describe ``model``.
         run_id : str
-            Describe ``run_id``.
+        Describe ``run_id``.
         records : Iterable[tuple[str, list[int], list[float]]]
-            Describe ``records``.
+        Describe ``records``.
         shard : int, optional
-            Describe ``shard``.
-            Defaults to ``0``.
+        Describe ``shard``.
+        Defaults to ``0``.
+
 
 
 
@@ -239,7 +242,7 @@ class ParquetVectorWriter:
         Returns
         -------
         str
-            Describe return value.
+        Describe return value.
         """
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
@@ -280,13 +283,13 @@ class ParquetChunkWriter:
     Parameters
     ----------
     root : str
-        Describe ``root``.
+    Describe ``root``.
     model : str, optional
-        Describe ``model``.
-        Defaults to ``'docling_hybrid'``.
+    Describe ``model``.
+    Defaults to ``'docling_hybrid'``.
     run_id : str, optional
-        Describe ``run_id``.
-        Defaults to ``'dev'``.
+    Describe ``run_id``.
+    Defaults to ``'dev'``.
     """
 
     @staticmethod
@@ -300,7 +303,7 @@ class ParquetChunkWriter:
         Returns
         -------
         pyarrow.lib.schema
-            Describe return value.
+        Describe return value.
         """
         return pa.schema(
             [
@@ -336,13 +339,13 @@ class ParquetChunkWriter:
         Parameters
         ----------
         root : str
-            Describe ``root``.
+        Describe ``root``.
         model : str, optional
-            Describe ``model``.
-            Defaults to ``'docling_hybrid'``.
+        Describe ``model``.
+        Defaults to ``'docling_hybrid'``.
         run_id : str, optional
-            Describe ``run_id``.
-            Defaults to ``'dev'``.
+        Describe ``run_id``.
+        Defaults to ``'dev'``.
         """
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
@@ -357,7 +360,8 @@ class ParquetChunkWriter:
         Parameters
         ----------
         rows : Iterable[dict[str, Any]]
-            Describe ``rows``.
+        Describe ``rows``.
+
 
 
 
@@ -367,7 +371,7 @@ class ParquetChunkWriter:
         Returns
         -------
         str
-            Describe return value.
+        Describe return value.
         """
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(
