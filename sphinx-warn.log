@@ -1,348 +1,1652 @@
-Running Sphinx v8.2.3
-loading translations [en]... done
-loading pickled environment... The configuration has changed (4 options: 'html_permalinks_icon', 'html_theme_options', 'linkcode_resolve', 'templates_path')
-done
-myst v4.0.1: MdParserConfig(commonmark_only=False, gfm_only=False, enable_extensions={'colon_fence', 'deflist', 'linkify'}, disable_syntax=[], all_links_external=False, links_external_new_tab=False, url_schemes=('http', 'https', 'mailto', 'ftp'), ref_domains=None, fence_as_directive=set(), number_code_blocks=[], title_to_header=False, heading_anchors=0, heading_slug_func=None, html_meta={}, footnote_sort=True, footnote_transition=True, words_per_minute=200, substitutions={}, linkify_fuzzy_links=True, dmath_allow_labels=True, dmath_allow_space=True, dmath_allow_digits=True, dmath_double_inline=False, update_mathjax=True, mathjax_classes='tex2jax_process|mathjax_process|math|output_area', enable_checkboxes=False, suppress_warnings=[], highlight_code_blocks=True)
-[autosummary] generating autosummary for: architecture/adr/0001-record-architecture-decisions.md, architecture/adr/0002-hexagonal-architecture.md, architecture/index.md, explanations/251025_FAISS_whl_overview.md, explanations/251025_HighLevelArchitecture.md, explanations/index.md, getting-started.md, how-to/index.md, index.md
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/kg_builder/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/linking/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/embeddings_dense/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/orchestration/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/docling/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/search_api/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/ontology/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/observability/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/embeddings_sparse/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/vectorstore_faiss/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/kgfoundry_common/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/registry/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/search_client/__init__.py
-[AutoAPI] Ignoring /home/paul/kgfoundry/src/download/__init__.py
-[AutoAPI] Reading files... [  2%] /home/paul/kgfoundry/src/kg_builder/mock_kg.py
-[AutoAPI] Reading files... [  5%] /home/paul/kgfoundry/src/kg_builder/neo4j_store.py
-[AutoAPI] Reading files... [  7%] /home/paul/kgfoundry/src/linking/linker.py
-[AutoAPI] Reading files... [ 10%] /home/paul/kgfoundry/src/linking/calibration.py
-[AutoAPI] Reading files... [ 12%] /home/paul/kgfoundry/src/embeddings_dense/base.py
-[AutoAPI] Reading files... [ 14%] /home/paul/kgfoundry/src/embeddings_dense/qwen3.py
-[AutoAPI] Reading files... [ 17%] /home/paul/kgfoundry/src/orchestration/fixture_flow.py
-[AutoAPI] Reading files... [ 19%] /home/paul/kgfoundry/src/orchestration/cli.py
-[AutoAPI] Reading files... [ 21%] /home/paul/kgfoundry/src/orchestration/flows.py
-[AutoAPI] Reading files... [ 24%] /home/paul/kgfoundry/src/docling/vlm.py
-[AutoAPI] Reading files... [ 26%] /home/paul/kgfoundry/src/docling/hybrid.py
-[AutoAPI] Reading files... [ 29%] /home/paul/kgfoundry/src/docling/canonicalizer.py
-[AutoAPI] Reading files... [ 31%] /home/paul/kgfoundry/src/search_api/bm25_index.py
-[AutoAPI] Reading files... [ 33%] /home/paul/kgfoundry/src/search_api/app.py
-[AutoAPI] Reading files... [ 36%] /home/paul/kgfoundry/src/search_api/schemas.py
-[AutoAPI] Reading files... [ 38%] /home/paul/kgfoundry/src/search_api/splade_index.py
-[AutoAPI] Reading files... [ 40%] /home/paul/kgfoundry/src/search_api/service.py
-[AutoAPI] Reading files... [ 43%] /home/paul/kgfoundry/src/search_api/kg_mock.py
-[AutoAPI] Reading files... [ 45%] /home/paul/kgfoundry/src/search_api/fusion.py
-[AutoAPI] Reading files... [ 48%] /home/paul/kgfoundry/src/search_api/faiss_adapter.py
-[AutoAPI] Reading files... [ 50%] /home/paul/kgfoundry/src/search_api/fixture_index.py
-[AutoAPI] Reading files... [ 52%] /home/paul/kgfoundry/src/ontology/loader.py
-[AutoAPI] Reading files... [ 55%] /home/paul/kgfoundry/src/ontology/catalog.py
-[AutoAPI] Reading files... [ 57%] /home/paul/kgfoundry/src/observability/metrics.py
-[AutoAPI] Reading files... [ 60%] /home/paul/kgfoundry/src/embeddings_sparse/base.py
-[AutoAPI] Reading files... [ 62%] /home/paul/kgfoundry/src/embeddings_sparse/splade.py
-[AutoAPI] Reading files... [ 64%] /home/paul/kgfoundry/src/embeddings_sparse/bm25.py
-[AutoAPI] Reading files... [ 67%] /home/paul/kgfoundry/src/vectorstore_faiss/gpu.py
-[AutoAPI] Reading files... [ 69%] /home/paul/kgfoundry/src/kgfoundry_common/parquet_io.py
-[AutoAPI] Reading files... [ 71%] /home/paul/kgfoundry/src/kgfoundry_common/models.py
-[AutoAPI] Reading files... [ 74%] /home/paul/kgfoundry/src/kgfoundry_common/config.py
-[AutoAPI] Reading files... [ 76%] /home/paul/kgfoundry/src/kgfoundry_common/ids.py
-[AutoAPI] Reading files... [ 79%] /home/paul/kgfoundry/src/kgfoundry_common/logging.py
-[AutoAPI] Reading files... [ 81%] /home/paul/kgfoundry/src/kgfoundry_common/errors.py
-[AutoAPI] Reading files... [ 83%] /home/paul/kgfoundry/src/kgfoundry_common/exceptions.py
-[AutoAPI] Reading files... [ 86%] /home/paul/kgfoundry/src/registry/duckdb_registry.py
-[AutoAPI] Reading files... [ 88%] /home/paul/kgfoundry/src/registry/api.py
-[AutoAPI] Reading files... [ 90%] /home/paul/kgfoundry/src/registry/helper.py
-[AutoAPI] Reading files... [ 93%] /home/paul/kgfoundry/src/registry/migrate.py
-[AutoAPI] Reading files... [ 95%] /home/paul/kgfoundry/src/search_client/client.py
-[AutoAPI] Reading files... [ 98%] /home/paul/kgfoundry/src/download/cli.py
-[AutoAPI] Reading files... [100%] /home/paul/kgfoundry/src/download/harvester.py
+WARNING: while setting up extension numpydoc_validation: extension 'numpydoc_validation' has no setup() function; is it really a Sphinx extension module?
+WARNING: failed to reach any of the inventories with the following issues:
+intersphinx inventory 'https://duckdb.org/docs/api/python/objects.inv' not fetchable due to <class 'requests.exceptions.HTTPError'>: 404 Client Error: Not Found for url: https://duckdb.org/docs/api/python/objects.inv
+WARNING: failed to reach any of the inventories with the following issues:
+intersphinx inventory 'https://typer.tiangolo.com/objects.inv' not fetchable due to <class 'requests.exceptions.HTTPError'>: 404 Client Error: Not Found for url: https://typer.tiangolo.com/objects.inv
+WARNING: [numpydoc] Validation warnings while processing docstring for '__contains__':
+  ES01: No extended summary found
 
-[AutoAPI] Mapping Data... [  2%] /home/paul/kgfoundry/src/kg_builder/mock_kg.py
-[AutoAPI] Mapping Data... [  5%] /home/paul/kgfoundry/src/kg_builder/neo4j_store.py
-[AutoAPI] Mapping Data... [  7%] /home/paul/kgfoundry/src/linking/linker.py
-[AutoAPI] Mapping Data... [ 10%] /home/paul/kgfoundry/src/linking/calibration.py
-[AutoAPI] Mapping Data... [ 12%] /home/paul/kgfoundry/src/embeddings_dense/base.py
-[AutoAPI] Mapping Data... [ 14%] /home/paul/kgfoundry/src/embeddings_dense/qwen3.py
-[AutoAPI] Mapping Data... [ 17%] /home/paul/kgfoundry/src/orchestration/fixture_flow.py
-[AutoAPI] Mapping Data... [ 19%] /home/paul/kgfoundry/src/orchestration/cli.py
-[AutoAPI] Mapping Data... [ 21%] /home/paul/kgfoundry/src/orchestration/flows.py
-[AutoAPI] Mapping Data... [ 24%] /home/paul/kgfoundry/src/docling/vlm.py
-[AutoAPI] Mapping Data... [ 26%] /home/paul/kgfoundry/src/docling/hybrid.py
-[AutoAPI] Mapping Data... [ 29%] /home/paul/kgfoundry/src/docling/canonicalizer.py
-[AutoAPI] Mapping Data... [ 31%] /home/paul/kgfoundry/src/search_api/bm25_index.py
-[AutoAPI] Mapping Data... [ 33%] /home/paul/kgfoundry/src/search_api/app.py
-[AutoAPI] Mapping Data... [ 36%] /home/paul/kgfoundry/src/search_api/schemas.py
-[AutoAPI] Mapping Data... [ 38%] /home/paul/kgfoundry/src/search_api/splade_index.py
-[AutoAPI] Mapping Data... [ 40%] /home/paul/kgfoundry/src/search_api/service.py
-[AutoAPI] Mapping Data... [ 43%] /home/paul/kgfoundry/src/search_api/kg_mock.py
-[AutoAPI] Mapping Data... [ 45%] /home/paul/kgfoundry/src/search_api/fusion.py
-[AutoAPI] Mapping Data... [ 48%] /home/paul/kgfoundry/src/search_api/faiss_adapter.py
-[AutoAPI] Mapping Data... [ 50%] /home/paul/kgfoundry/src/search_api/fixture_index.py
-[AutoAPI] Mapping Data... [ 52%] /home/paul/kgfoundry/src/ontology/loader.py
-[AutoAPI] Mapping Data... [ 55%] /home/paul/kgfoundry/src/ontology/catalog.py
-[AutoAPI] Mapping Data... [ 57%] /home/paul/kgfoundry/src/observability/metrics.py
-[AutoAPI] Mapping Data... [ 60%] /home/paul/kgfoundry/src/embeddings_sparse/base.py
-[AutoAPI] Mapping Data... [ 62%] /home/paul/kgfoundry/src/embeddings_sparse/splade.py
-[AutoAPI] Mapping Data... [ 64%] /home/paul/kgfoundry/src/embeddings_sparse/bm25.py
-[AutoAPI] Mapping Data... [ 67%] /home/paul/kgfoundry/src/vectorstore_faiss/gpu.py
-[AutoAPI] Mapping Data... [ 69%] /home/paul/kgfoundry/src/kgfoundry_common/parquet_io.py
-[AutoAPI] Mapping Data... [ 71%] /home/paul/kgfoundry/src/kgfoundry_common/models.py
-[AutoAPI] Mapping Data... [ 74%] /home/paul/kgfoundry/src/kgfoundry_common/config.py
-[AutoAPI] Mapping Data... [ 76%] /home/paul/kgfoundry/src/kgfoundry_common/ids.py
-[AutoAPI] Mapping Data... [ 79%] /home/paul/kgfoundry/src/kgfoundry_common/logging.py
-[AutoAPI] Mapping Data... [ 81%] /home/paul/kgfoundry/src/kgfoundry_common/errors.py
-[AutoAPI] Mapping Data... [ 83%] /home/paul/kgfoundry/src/kgfoundry_common/exceptions.py
-[AutoAPI] Mapping Data... [ 86%] /home/paul/kgfoundry/src/registry/duckdb_registry.py
-[AutoAPI] Mapping Data... [ 88%] /home/paul/kgfoundry/src/registry/api.py
-[AutoAPI] Mapping Data... [ 90%] /home/paul/kgfoundry/src/registry/helper.py
-[AutoAPI] Mapping Data... [ 93%] /home/paul/kgfoundry/src/registry/migrate.py
-[AutoAPI] Mapping Data... [ 95%] /home/paul/kgfoundry/src/search_client/client.py
-[AutoAPI] Mapping Data... [ 98%] /home/paul/kgfoundry/src/download/cli.py
-[AutoAPI] Mapping Data... [100%] /home/paul/kgfoundry/src/download/harvester.py
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
 
-[AutoAPI] Rendering Data... [  2%] src.docling.vlm
-[AutoAPI] Rendering Data... [  5%] src.registry.api
-[AutoAPI] Rendering Data... [  7%] src.download.cli
-[AutoAPI] Rendering Data... [ 10%] src.linking.linker
-[AutoAPI] Rendering Data... [ 12%] src.docling.hybrid
-[AutoAPI] Rendering Data... [ 14%] src.search_api.app
-[AutoAPI] Rendering Data... [ 17%] src.ontology.loader
-[AutoAPI] Rendering Data... [ 19%] src.registry.helper
-[AutoAPI] Rendering Data... [ 21%] src.ontology.catalog
-[AutoAPI] Rendering Data... [ 24%] src.registry.migrate
-[AutoAPI] Rendering Data... [ 26%] src.orchestration.cli
-[AutoAPI] Rendering Data... [ 29%] src.search_api.fusion
-[AutoAPI] Rendering Data... [ 31%] src.kg_builder.mock_kg
-[AutoAPI] Rendering Data... [ 33%] src.search_api.schemas
-[AutoAPI] Rendering Data... [ 36%] src.search_api.service
-[AutoAPI] Rendering Data... [ 38%] src.search_api.kg_mock
-[AutoAPI] Rendering Data... [ 40%] src.kgfoundry_common.ids
-[AutoAPI] Rendering Data... [ 43%] src.download.harvester
-[AutoAPI] Rendering Data... [ 45%] src.linking.calibration
-[AutoAPI] Rendering Data... [ 48%] src.orchestration.flows
-[AutoAPI] Rendering Data... [ 50%] src.search_client.client
-[AutoAPI] Rendering Data... [ 52%] src.embeddings_dense.base
-[AutoAPI] Rendering Data... [ 55%] src.docling.canonicalizer
-[AutoAPI] Rendering Data... [ 57%] src.search_api.bm25_index
-[AutoAPI] Rendering Data... [ 60%] src.observability.metrics
-[AutoAPI] Rendering Data... [ 62%] src.vectorstore_faiss.gpu
-[AutoAPI] Rendering Data... [ 64%] src.kgfoundry_common.models
-[AutoAPI] Rendering Data... [ 67%] src.kgfoundry_common.config
-[AutoAPI] Rendering Data... [ 69%] src.kgfoundry_common.errors
-[AutoAPI] Rendering Data... [ 71%] src.kg_builder.neo4j_store
-[AutoAPI] Rendering Data... [ 74%] src.embeddings_dense.qwen3
-[AutoAPI] Rendering Data... [ 76%] src.embeddings_sparse.base
-[AutoAPI] Rendering Data... [ 79%] src.embeddings_sparse.bm25
-[AutoAPI] Rendering Data... [ 81%] src.kgfoundry_common.logging
-[AutoAPI] Rendering Data... [ 83%] src.search_api.splade_index
-[AutoAPI] Rendering Data... [ 86%] src.search_api.faiss_adapter
-[AutoAPI] Rendering Data... [ 88%] src.search_api.fixture_index
-[AutoAPI] Rendering Data... [ 90%] src.embeddings_sparse.splade
-[AutoAPI] Rendering Data... [ 93%] src.registry.duckdb_registry
-[AutoAPI] Rendering Data... [ 95%] src.kgfoundry_common.parquet_io
-[AutoAPI] Rendering Data... [ 98%] src.kgfoundry_common.exceptions
-[AutoAPI] Rendering Data... [100%] src.orchestration.fixture_flow
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delitem__':
+  ES01: No extended summary found
 
-building [mo]: targets for 0 po files that are out of date
-writing output... 
-building [html]: targets for 43 source files that are out of date
-updating environment: 0 added, 43 changed, 0 removed
-reading sources... [  2%] autoapi/index
-reading sources... [  5%] autoapi/src/docling/canonicalizer/index
-reading sources... [  7%] autoapi/src/docling/hybrid/index
-reading sources... [  9%] autoapi/src/docling/vlm/index
-reading sources... [ 12%] autoapi/src/download/cli/index
-reading sources... [ 14%] autoapi/src/download/harvester/index
-reading sources... [ 16%] autoapi/src/embeddings_dense/base/index
-reading sources... [ 19%] autoapi/src/embeddings_dense/qwen3/index
-reading sources... [ 21%] autoapi/src/embeddings_sparse/base/index
-reading sources... [ 23%] autoapi/src/embeddings_sparse/bm25/index
-reading sources... [ 26%] autoapi/src/embeddings_sparse/splade/index
-reading sources... [ 28%] autoapi/src/kg_builder/mock_kg/index
-reading sources... [ 30%] autoapi/src/kg_builder/neo4j_store/index
-reading sources... [ 33%] autoapi/src/kgfoundry_common/config/index
-reading sources... [ 35%] autoapi/src/kgfoundry_common/errors/index
-reading sources... [ 37%] autoapi/src/kgfoundry_common/exceptions/index
-reading sources... [ 40%] autoapi/src/kgfoundry_common/ids/index
-reading sources... [ 42%] autoapi/src/kgfoundry_common/logging/index
-reading sources... [ 44%] autoapi/src/kgfoundry_common/models/index
-reading sources... [ 47%] autoapi/src/kgfoundry_common/parquet_io/index
-reading sources... [ 49%] autoapi/src/linking/calibration/index
-reading sources... [ 51%] autoapi/src/linking/linker/index
-reading sources... [ 53%] autoapi/src/observability/metrics/index
-reading sources... [ 56%] autoapi/src/ontology/catalog/index
-reading sources... [ 58%] autoapi/src/ontology/loader/index
-reading sources... [ 60%] autoapi/src/orchestration/cli/index
-reading sources... [ 63%] autoapi/src/orchestration/fixture_flow/index
-reading sources... [ 65%] autoapi/src/orchestration/flows/index
-reading sources... [ 67%] autoapi/src/registry/api/index
-reading sources... [ 70%] autoapi/src/registry/duckdb_registry/index
-reading sources... [ 72%] autoapi/src/registry/helper/index
-reading sources... [ 74%] autoapi/src/registry/migrate/index
-reading sources... [ 77%] autoapi/src/search_api/app/index
-reading sources... [ 79%] autoapi/src/search_api/bm25_index/index
-reading sources... [ 81%] autoapi/src/search_api/faiss_adapter/index
-reading sources... [ 84%] autoapi/src/search_api/fixture_index/index
-reading sources... [ 86%] autoapi/src/search_api/fusion/index
-reading sources... [ 88%] autoapi/src/search_api/kg_mock/index
-reading sources... [ 91%] autoapi/src/search_api/schemas/index
-reading sources... [ 93%] autoapi/src/search_api/service/index
-reading sources... [ 95%] autoapi/src/search_api/splade_index/index
-reading sources... [ 98%] autoapi/src/search_client/client/index
-reading sources... [100%] autoapi/src/vectorstore_faiss/gpu/index
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
 
-looking for now-outdated files... none found
-pickling environment... done
-checking consistency... /home/paul/kgfoundry/docs/autoapi/src/docling/canonicalizer/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/docling/hybrid/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/docling/vlm/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/download/cli/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/download/harvester/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/embeddings_dense/base/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/embeddings_dense/qwen3/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/embeddings_sparse/base/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/embeddings_sparse/bm25/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/embeddings_sparse/splade/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/kg_builder/mock_kg/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/kg_builder/neo4j_store/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/kgfoundry_common/config/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/kgfoundry_common/errors/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/kgfoundry_common/exceptions/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/kgfoundry_common/ids/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/kgfoundry_common/logging/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/kgfoundry_common/models/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/kgfoundry_common/parquet_io/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/linking/calibration/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/linking/linker/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/observability/metrics/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/ontology/catalog/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/ontology/loader/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/orchestration/cli/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/orchestration/fixture_flow/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/orchestration/flows/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/registry/api/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/registry/duckdb_registry/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/registry/helper/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/registry/migrate/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/search_api/app/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/search_api/bm25_index/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/search_api/faiss_adapter/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/search_api/fixture_index/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/search_api/fusion/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/search_api/kg_mock/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/search_api/schemas/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/search_api/service/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/search_api/splade_index/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/search_client/client/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-/home/paul/kgfoundry/docs/autoapi/src/vectorstore_faiss/gpu/index.rst: WARNING: document isn't included in any toctree [toc.not_included]
-done
-preparing documents... done
-copying assets... 
-copying static files... 
-Writing evaluated template result to /home/paul/kgfoundry/docs/_build/html/_static/language_data.js
-Writing evaluated template result to /home/paul/kgfoundry/docs/_build/html/_static/documentation_options.js
-Writing evaluated template result to /home/paul/kgfoundry/docs/_build/html/_static/basic.css
-copying static files: done
-copying extra files... 
-copying extra files: done
-copying assets: done
-writing output... [  2%] autoapi/index
-writing output... [  5%] autoapi/src/docling/canonicalizer/index
-writing output... [  7%] autoapi/src/docling/hybrid/index
-writing output... [  9%] autoapi/src/docling/vlm/index
-writing output... [ 11%] autoapi/src/download/cli/index
-writing output... [ 14%] autoapi/src/download/harvester/index
-writing output... [ 16%] autoapi/src/embeddings_dense/base/index
-writing output... [ 18%] autoapi/src/embeddings_dense/qwen3/index
-writing output... [ 20%] autoapi/src/embeddings_sparse/base/index
-writing output... [ 23%] autoapi/src/embeddings_sparse/bm25/index
-writing output... [ 25%] autoapi/src/embeddings_sparse/splade/index
-writing output... [ 27%] autoapi/src/kg_builder/mock_kg/index
-writing output... [ 30%] autoapi/src/kg_builder/neo4j_store/index
-writing output... [ 32%] autoapi/src/kgfoundry_common/config/index
-writing output... [ 34%] autoapi/src/kgfoundry_common/errors/index
-writing output... [ 36%] autoapi/src/kgfoundry_common/exceptions/index
-writing output... [ 39%] autoapi/src/kgfoundry_common/ids/index
-writing output... [ 41%] autoapi/src/kgfoundry_common/logging/index
-writing output... [ 43%] autoapi/src/kgfoundry_common/models/index
-writing output... [ 45%] autoapi/src/kgfoundry_common/parquet_io/index
-writing output... [ 48%] autoapi/src/linking/calibration/index
-writing output... [ 50%] autoapi/src/linking/linker/index
-writing output... [ 52%] autoapi/src/observability/metrics/index
-writing output... [ 55%] autoapi/src/ontology/catalog/index
-writing output... [ 57%] autoapi/src/ontology/loader/index
-writing output... [ 59%] autoapi/src/orchestration/cli/index
-writing output... [ 61%] autoapi/src/orchestration/fixture_flow/index
-writing output... [ 64%] autoapi/src/orchestration/flows/index
-writing output... [ 66%] autoapi/src/registry/api/index
-writing output... [ 68%] autoapi/src/registry/duckdb_registry/index
-writing output... [ 70%] autoapi/src/registry/helper/index
-writing output... [ 73%] autoapi/src/registry/migrate/index
-writing output... [ 75%] autoapi/src/search_api/app/index
-writing output... [ 77%] autoapi/src/search_api/bm25_index/index
-writing output... [ 80%] autoapi/src/search_api/faiss_adapter/index
-writing output... [ 82%] autoapi/src/search_api/fixture_index/index
-writing output... [ 84%] autoapi/src/search_api/fusion/index
-writing output... [ 86%] autoapi/src/search_api/kg_mock/index
-writing output... [ 89%] autoapi/src/search_api/schemas/index
-writing output... [ 91%] autoapi/src/search_api/service/index
-writing output... [ 93%] autoapi/src/search_api/splade_index/index
-writing output... [ 95%] autoapi/src/search_client/client/index
-writing output... [ 98%] autoapi/src/vectorstore_faiss/gpu/index
-writing output... [100%] index
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
 
-generating indices... genindex py-modindex done
-highlighting module code... [  2%] src.docling.canonicalizer
-highlighting module code... [  5%] src.docling.hybrid
-highlighting module code... [  7%] src.docling.vlm
-highlighting module code... [ 10%] src.download.cli
-highlighting module code... [ 12%] src.download.harvester
-highlighting module code... [ 14%] src.embeddings_dense.base
-highlighting module code... [ 17%] src.embeddings_dense.qwen3
-highlighting module code... [ 19%] src.embeddings_sparse.base
-highlighting module code... [ 21%] src.embeddings_sparse.bm25
-highlighting module code... [ 24%] src.embeddings_sparse.splade
-highlighting module code... [ 26%] src.kg_builder.mock_kg
-highlighting module code... [ 29%] src.kg_builder.neo4j_store
-highlighting module code... [ 31%] src.kgfoundry_common.config
-highlighting module code... [ 33%] src.kgfoundry_common.errors
-highlighting module code... [ 36%] src.kgfoundry_common.exceptions
-highlighting module code... [ 38%] src.kgfoundry_common.ids
-highlighting module code... [ 40%] src.kgfoundry_common.logging
-highlighting module code... [ 43%] src.kgfoundry_common.models
-highlighting module code... [ 45%] src.kgfoundry_common.parquet_io
-highlighting module code... [ 48%] src.linking.calibration
-highlighting module code... [ 50%] src.linking.linker
-highlighting module code... [ 52%] src.observability.metrics
-highlighting module code... [ 55%] src.ontology.catalog
-highlighting module code... [ 57%] src.ontology.loader
-highlighting module code... [ 60%] src.orchestration.cli
-highlighting module code... [ 62%] src.orchestration.fixture_flow
-highlighting module code... [ 64%] src.orchestration.flows
-highlighting module code... [ 67%] src.registry.api
-highlighting module code... [ 69%] src.registry.duckdb_registry
-highlighting module code... [ 71%] src.registry.helper
-highlighting module code... [ 74%] src.registry.migrate
-highlighting module code... [ 76%] src.search_api.app
-highlighting module code... [ 79%] src.search_api.bm25_index
-highlighting module code... [ 81%] src.search_api.faiss_adapter
-highlighting module code... [ 83%] src.search_api.fixture_index
-highlighting module code... [ 86%] src.search_api.fusion
-highlighting module code... [ 88%] src.search_api.kg_mock
-highlighting module code... [ 90%] src.search_api.schemas
-highlighting module code... [ 93%] src.search_api.service
-highlighting module code... [ 95%] src.search_api.splade_index
-highlighting module code... [ 98%] src.search_client.client
-highlighting module code... [100%] src.vectorstore_faiss.gpu
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
 
-writing additional pages... search done
-dumping search index in English (code: en)... done
-dumping object inventory... done
-build succeeded, 42 warnings.
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
 
-The HTML pages are in docs/_build/html.
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ior__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__iter__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__len__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__or__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reversed__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ror__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'clear':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'copy':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'get':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'items':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'keys':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'values':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__contains__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ior__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__iter__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__len__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__or__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reversed__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ror__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'clear':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'copy':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'get':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'items':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'keys':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'values':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__contains__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ior__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__iter__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__len__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__or__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reversed__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ror__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'clear':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'copy':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'get':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'items':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'keys':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'values':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'ModuleMeta':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__contains__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ior__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__iter__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__len__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__or__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reversed__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ror__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'clear':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'copy':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'get':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'items':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'keys':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'values':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'model_config':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__class_vars__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__private_attributes__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__signature__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_complete__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_core_schema__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_custom_init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_parent_namespace__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_post_init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_root_model__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_serializer__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_validator__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_setattr_handlers__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_computed_fields__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_extra__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_fields_set__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_private__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__copy__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__deepcopy__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__iter__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'model_config':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__class_vars__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__private_attributes__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__signature__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_complete__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_core_schema__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_custom_init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_parent_namespace__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_post_init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_root_model__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_serializer__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_validator__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_setattr_handlers__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_computed_fields__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_extra__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_fields_set__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_private__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__copy__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__deepcopy__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__iter__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'model_config':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__class_vars__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__private_attributes__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__signature__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_complete__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_core_schema__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_custom_init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_parent_namespace__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_post_init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_root_model__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_serializer__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_validator__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_setattr_handlers__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_computed_fields__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_extra__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_fields_set__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_private__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__copy__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__deepcopy__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__iter__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'model_config':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__class_vars__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__private_attributes__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__signature__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_complete__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_core_schema__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_custom_init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_parent_namespace__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_post_init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_root_model__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_serializer__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_validator__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_setattr_handlers__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_computed_fields__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_extra__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_fields_set__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_private__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__copy__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__deepcopy__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__iter__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__cause__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__context__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__hash__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__cause__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__context__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__hash__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__cause__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__context__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__hash__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__cause__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__context__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__hash__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__cause__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__context__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__hash__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__cause__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__context__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__hash__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__cause__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__context__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__hash__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__cause__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__context__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__hash__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__cause__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__context__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__hash__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__cause__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__context__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__hash__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__cause__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__context__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__hash__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'usesTime':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '_NoopMetric':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '_load_dense_from_parquet':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__contains__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__delitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__dir__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__eq__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ge__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getattribute__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__getstate__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__gt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ior__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__iter__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__le__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__len__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__lt__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ne__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__new__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__or__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reduce_ex__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__repr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__reversed__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__ror__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setattr__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__setitem__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__sizeof__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__str__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'clear':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'copy':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'get':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'items':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'keys':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'values':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'model_config':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__class_vars__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__private_attributes__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__signature__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_complete__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_core_schema__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_custom_init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_parent_namespace__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_post_init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_root_model__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_serializer__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_validator__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_setattr_handlers__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_computed_fields__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_extra__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_fields_set__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_private__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__copy__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__deepcopy__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__iter__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'model_config':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__class_vars__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__private_attributes__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__signature__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_complete__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_core_schema__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_custom_init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_parent_namespace__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_post_init__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_root_model__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_serializer__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_validator__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_setattr_handlers__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_computed_fields__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_extra__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_fields_set__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__pydantic_private__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__copy__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__deepcopy__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for '__iter__':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'from_parquet':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'SupportsResponse':
+  ES01: No extended summary found
+
+WARNING: [numpydoc] Validation warnings while processing docstring for 'SupportsHttp':
+  ES01: No extended summary found
+
+/workspace/kgfoundry/docs/autoapi/src/search_api/faiss_adapter/index.rst:25: WARNING: duplicate object description of NDArray[np.float32], other instance in autoapi/src/vectorstore_faiss/gpu/index, use :no-index: for one of them
+/workspace/kgfoundry/docs/autoapi/src/vectorstore_faiss/gpu/index.rst:25: WARNING: duplicate object description of NDArray[np.float32], other instance in autoapi/src/search_api/faiss_adapter/index, use :no-index: for one of them
+/workspace/kgfoundry/docs/reference/graphs/index.md:22: CRITICAL: Directive "include": file not found: '/workspace/kgfoundry/docs/_build/graphs/subsystems_meta.md' [docutils]
+/workspace/kgfoundry/docs/reference/graphs/index.md:5: WARNING: image file not readable: _build/graphs/kgfoundry-imports.svg [image.not_readable]
+/workspace/kgfoundry/docs/reference/graphs/index.md:10: WARNING: image file not readable: _build/graphs/kgfoundry-uml.svg [image.not_readable]
+/workspace/kgfoundry/docs/reference/graphs/index.md:17: WARNING: image file not readable: _build/graphs/subsystems.svg [image.not_readable]
+/workspace/kgfoundry/docs/reference/schemas/index.md:4: WARNING: toctree glob pattern '*.json' didn't match any documents
+/workspace/kgfoundry/docs/api/docling/canonicalizer/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/docling/hybrid/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/docling/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/docling/vlm/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/download/cli/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/download/harvester/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/download/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/embeddings_dense/base/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/embeddings_dense/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/embeddings_dense/qwen3/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/embeddings_sparse/base/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/embeddings_sparse/bm25/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/embeddings_sparse/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/embeddings_sparse/splade/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kf_common/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kg_builder/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kg_builder/mock_kg/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kg_builder/neo4j_store/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kgfoundry/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kgfoundry_common/config/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kgfoundry_common/errors/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kgfoundry_common/exceptions/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kgfoundry_common/ids/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kgfoundry_common/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kgfoundry_common/logging/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kgfoundry_common/models/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kgfoundry_common/navmap_types/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/kgfoundry_common/parquet_io/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/linking/calibration/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/linking/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/linking/linker/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/observability/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/observability/metrics/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/ontology/catalog/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/ontology/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/ontology/loader/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/orchestration/cli/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/orchestration/fixture_flow/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/orchestration/flows/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/orchestration/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/registry/api/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/registry/duckdb_registry/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/registry/helper/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/registry/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/registry/migrate/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/search_api/app/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/search_api/bm25_index/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/search_api/faiss_adapter/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/search_api/fixture_index/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/search_api/fusion/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/search_api/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/search_api/kg_mock/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/search_api/schemas/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/search_api/service/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/search_api/splade_index/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/search_client/client/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/search_client/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/tests/conftest/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/tests/docs/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/tests/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/tests/mock_servers/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/tests/test_e2e_smoke/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/tests/test_imports/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/tests/tools/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/tests/unit/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/vectorstore_faiss/gpu/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/api/vectorstore_faiss/index.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/how-to/read-package-readmes.md: WARNING: document isn't included in any toctree [toc.not_included]
+/workspace/kgfoundry/docs/autoapi/src/kgfoundry_common/models/index.rst:58: WARNING: py:class reference target not found: Id [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/kgfoundry_common/models/index.rst:163: WARNING: py:class reference target not found: Id [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/kgfoundry_common/models/index.rst:218: WARNING: py:class reference target not found: Id [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/kgfoundry_common/models/index.rst:222: WARNING: py:class reference target not found: Id [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/kgfoundry_common/models/index.rst:275: WARNING: py:class reference target not found: Id [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/kgfoundry_common/models/index.rst:279: WARNING: py:class reference target not found: Id [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/kgfoundry_common/models/index.rst:283: WARNING: py:class reference target not found: Id [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/kgfoundry_common/navmap_types/index.rst:103: WARNING: py:class reference target not found: Stability [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/kgfoundry_common/navmap_types/index.rst:181: WARNING: py:class reference target not found: Stability [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/ontology/catalog/index.rst:21: WARNING: py:class reference target not found: Concept [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/search_api/app/index.rst:21: WARNING: py:exc reference target not found: HTTPException [ref.exc]
+/workspace/kgfoundry/docs/autoapi/src/search_api/faiss_adapter/index.rst:59: WARNING: py:class reference target not found: VecArray [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/search_api/faiss_adapter/index.rst:23: WARNING: py:class reference target not found: src.search_api.faiss_adapter.VecArray [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/search_client/client/index.rst:21: WARNING: py:class reference target not found: SupportsHttp [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/search_client/client/index.rst:64: WARNING: py:class reference target not found: SupportsHttp [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/vectorstore_faiss/gpu/index.rst:101: WARNING: py:class reference target not found: StrArray [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/vectorstore_faiss/gpu/index.rst:107: WARNING: py:class reference target not found: FloatArray [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/vectorstore_faiss/gpu/index.rst:23: WARNING: py:class reference target not found: src.vectorstore_faiss.gpu.FloatArray [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/vectorstore_faiss/gpu/index.rst:23: WARNING: py:class reference target not found: src.vectorstore_faiss.gpu.FloatArray [ref.class]
+/workspace/kgfoundry/docs/autoapi/src/vectorstore_faiss/gpu/index.rst:23: WARNING: py:class reference target not found: src.vectorstore_faiss.gpu.FloatArray [ref.class]

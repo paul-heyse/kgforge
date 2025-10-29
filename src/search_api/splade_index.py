@@ -56,7 +56,6 @@ def tok(text: str) -> list[str]:
     Parameters
     ----------
     text : str
-    text : str
         Description for ``text``.
     
     Returns
@@ -71,6 +70,7 @@ def tok(text: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return [token.lower() for token in TOKEN.findall(text or "")]
 
 
@@ -112,15 +112,13 @@ class SpladeIndex:
         Parameters
         ----------
         db_path : str
-        db_path : str
             Description for ``db_path``.
         chunks_dataset_root : str | None
-        chunks_dataset_root : str | None, optional, default=None
-            Description for ``chunks_dataset_root``.
+            Optional parameter default ``None``. Description for ``chunks_dataset_root``.
         sparse_root : str | None
-        sparse_root : str | None, optional, default=None
-            Description for ``sparse_root``.
+            Optional parameter default ``None``. Description for ``sparse_root``.
         """
+        
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -176,11 +174,9 @@ class SpladeIndex:
         Parameters
         ----------
         query : str
-        query : str
             Description for ``query``.
         k : int | None
-        k : int | None, optional, default=10
-            Description for ``k``.
+            Optional parameter default ``10``. Description for ``k``.
         
         Returns
         -------
@@ -194,6 +190,7 @@ class SpladeIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         if self.N == 0:
             return []
         terms = tok(query)
@@ -221,7 +218,6 @@ class SpladeIndex:
         Parameters
         ----------
         index : int
-        index : int
             Description for ``index``.
         
         Returns
@@ -236,4 +232,5 @@ class SpladeIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         return self.docs[index]

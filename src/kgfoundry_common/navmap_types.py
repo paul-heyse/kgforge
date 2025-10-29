@@ -7,11 +7,22 @@ for implementation specifics.
 
 from __future__ import annotations
 
-from typing import Literal, NotRequired, TypedDict
+from typing import Final, Literal, NotRequired, TypeAlias, TypedDict
 
-Stability = Literal["frozen", "stable", "experimental", "internal", "beta", "deprecated"]
+__all__ = ["Stability", "NavSection", "SymbolMeta", "ModuleMeta", "NavMap"]
+
+# [nav:anchor Stability]
+Stability: TypeAlias = Literal[
+    "frozen",
+    "stable",
+    "experimental",
+    "internal",
+    "beta",
+    "deprecated",
+]
 
 
+# [nav:anchor NavSection]
 class NavSection(TypedDict):
     """Model the NavSection.
 
@@ -25,6 +36,7 @@ class NavSection(TypedDict):
     symbols: list[str]
 
 
+# [nav:anchor SymbolMeta]
 class SymbolMeta(TypedDict, total=False):
     """Model the SymbolMeta.
 
@@ -48,6 +60,7 @@ class SymbolMeta(TypedDict, total=False):
     coverage_target: NotRequired[float]
 
 
+# [nav:anchor ModuleMeta]
 class ModuleMeta(TypedDict, total=False):
     """Describe module-level metadata surfaced in navigation structures."""
 
@@ -57,6 +70,7 @@ class ModuleMeta(TypedDict, total=False):
     deprecated_in: str
 
 
+# [nav:anchor NavMap]
 class NavMap(TypedDict, total=False):
     """Model the NavMap.
 
@@ -77,3 +91,30 @@ class NavMap(TypedDict, total=False):
     edit_scopes: dict[str, list[str]]
     deps: list[str]
     module_meta: ModuleMeta
+
+
+__navmap__: Final[NavMap] = {
+    "title": "kgfoundry_common.navmap_types",
+    "synopsis": "Shared navigation metadata structures used across kgfoundry.",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": __all__,
+        },
+    ],
+    "module_meta": {
+        "owner": "@kgfoundry-common",
+        "stability": "stable",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        }
+        for name in __all__
+    },
+}

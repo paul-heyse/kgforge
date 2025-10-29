@@ -52,7 +52,6 @@ def t_echo(msg: str) -> str:
     Parameters
     ----------
     msg : str
-    msg : str
         Description for ``msg``.
     
     Returns
@@ -67,6 +66,7 @@ def t_echo(msg: str) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return msg
 
 

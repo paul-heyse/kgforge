@@ -93,18 +93,15 @@ class SPLADEv3Encoder:
         Parameters
         ----------
         model_id : str | None
-        model_id : str | None, optional, default='naver/splade-v3-distilbert'
-            Description for ``model_id``.
+            Optional parameter default ``'naver/splade-v3-distilbert'``. Description for ``model_id``.
         device : str | None
-        device : str | None, optional, default='cuda'
-            Description for ``device``.
+            Optional parameter default ``'cuda'``. Description for ``device``.
         topk : int | None
-        topk : int | None, optional, default=256
-            Description for ``topk``.
+            Optional parameter default ``256``. Description for ``topk``.
         max_seq_len : int | None
-        max_seq_len : int | None, optional, default=512
-            Description for ``max_seq_len``.
+            Optional parameter default ``512``. Description for ``max_seq_len``.
         """
+        
         self.model_id = model_id
         self.device = device
         self.topk = topk
@@ -117,7 +114,6 @@ class SPLADEv3Encoder:
         
         Parameters
         ----------
-        texts : List[str]
         texts : List[str]
             Description for ``texts``.
         
@@ -138,6 +134,7 @@ class SPLADEv3Encoder:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
@@ -162,9 +159,9 @@ class PureImpactIndex:
         Parameters
         ----------
         index_dir : str
-        index_dir : str
             Description for ``index_dir``.
         """
+        
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -192,18 +189,18 @@ class PureImpactIndex:
         """Compute build.
 
         Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         docs_iterable : collections.abc.Iterable
-        docs_iterable : collections.abc.Iterable
             Description for ``docs_iterable``.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.splade import build
         >>> build(...)  # doctest: +ELLIPSIS
         """
+        
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -258,9 +255,7 @@ class PureImpactIndex:
         Parameters
         ----------
         query : str
-        query : str
             Description for ``query``.
-        k : int
         k : int
             Description for ``k``.
         
@@ -276,6 +271,7 @@ class PureImpactIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
         for token in tokens:
@@ -304,9 +300,9 @@ class LuceneImpactIndex:
         Parameters
         ----------
         index_dir : str
-        index_dir : str
             Description for ``index_dir``.
         """
+        
         self.index_dir = index_dir
         self._searcher: Any | None = None
 
@@ -337,9 +333,7 @@ class LuceneImpactIndex:
         Parameters
         ----------
         query : str
-        query : str
             Description for ``query``.
-        k : int
         k : int
             Description for ``k``.
         
@@ -360,6 +354,7 @@ class LuceneImpactIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
@@ -377,9 +372,7 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
     Parameters
     ----------
     backend : str
-    backend : str
         Description for ``backend``.
-    index_dir : str
     index_dir : str
         Description for ``index_dir``.
     
@@ -395,6 +388,7 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     if backend == "lucene":
         try:
             return LuceneImpactIndex(index_dir)

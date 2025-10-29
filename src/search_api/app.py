@@ -129,23 +129,23 @@ def auth(authorization: str | None = Header(default=None)) -> None:
     """Compute auth.
 
     Carry out the auth operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     authorization : str | None
-    authorization : str | None, optional, default=Header(default=None)
-        Description for ``authorization``.
-
+        Optional parameter default ``Header(default=None)``. Description for ``authorization``.
+    
     Raises
     ------
     HTTPException
         Raised when validation fails.
-
+    
     Examples
     --------
     >>> from search_api.app import auth
     >>> auth()  # doctest: +ELLIPSIS
     """
+    
     if not API_KEYS:
         return  # disabled in skeleton
     if not authorization or not authorization.startswith("Bearer "):
@@ -195,9 +195,7 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
     Parameters
     ----------
     lists : List[List[Tuple[str, float]]]
-    lists : List[List[Tuple[str, float]]]
         Description for ``lists``.
-    k_rrf : int
     k_rrf : int
         Description for ``k_rrf``.
     
@@ -213,6 +211,7 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     scores: dict[str, float] = {}
     for hits in lists:
         for rank, (doc_id, _score) in enumerate(hits, start=1):
@@ -234,17 +233,13 @@ def apply_kg_boosts(
     Parameters
     ----------
     cands : collections.abc.Mapping
-    cands : collections.abc.Mapping
         Description for ``cands``.
-    query : str
     query : str
         Description for ``query``.
     direct : float | None
-    direct : float | None, optional, default=0.08
-        Description for ``direct``.
+        Optional parameter default ``0.08``. Description for ``direct``.
     one_hop : float | None
-    one_hop : float | None, optional, default=0.04
-        Description for ``one_hop``.
+        Optional parameter default ``0.04``. Description for ``one_hop``.
     
     Returns
     -------
@@ -258,6 +253,7 @@ def apply_kg_boosts(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     q_concepts = set()
     for w in query.lower().split():
         if w.startswith("concept"):
@@ -287,11 +283,9 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     Parameters
     ----------
     req : src.search_api.schemas.SearchRequest
-    req : src.search_api.schemas.SearchRequest
         Description for ``req``.
     _ : None | None
-    _ : None | None, optional, default=Depends(auth)
-        Description for ``_``.
+        Optional parameter default ``Depends(auth)``. Description for ``_``.
     
     Returns
     -------
@@ -305,6 +299,7 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
     dense_hits: list[tuple[str, float]] = []
@@ -372,11 +367,9 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     Parameters
     ----------
     body : collections.abc.Mapping
-    body : collections.abc.Mapping
         Description for ``body``.
     _ : None | None
-    _ : None | None, optional, default=Depends(auth)
-        Description for ``_``.
+        Optional parameter default ``Depends(auth)``. Description for ``_``.
     
     Returns
     -------
@@ -390,6 +383,7 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring
     concepts = [

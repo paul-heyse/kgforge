@@ -60,18 +60,18 @@ class ValidationResult:
         """Compute extend.
 
         Carry out the extend operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         messages : collections.abc.Iterable
-        messages : collections.abc.Iterable
             Description for ``messages``.
-
+        
         Examples
         --------
         >>> from tools.validate_gallery import extend
         >>> extend(...)  # doctest: +ELLIPSIS
         """
+        
         self.errors.extend(messages)
 
     @property
@@ -112,7 +112,6 @@ def validate_title_format(docstring: str) -> tuple[bool, str]:
     Parameters
     ----------
     docstring : str
-    docstring : str
         Description for ``docstring``.
     
     Returns
@@ -127,6 +126,7 @@ def validate_title_format(docstring: str) -> tuple[bool, str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     lines = [line.rstrip() for line in inspect.cleandoc(docstring).splitlines()]
     while lines and not lines[0].strip():
         lines.pop(0)
@@ -161,7 +161,6 @@ def check_orphan_directive(docstring: str) -> bool:
     Parameters
     ----------
     docstring : str
-    docstring : str
         Description for ``docstring``.
     
     Returns
@@ -176,6 +175,7 @@ def check_orphan_directive(docstring: str) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return ":orphan:" in docstring
 
 
@@ -186,7 +186,6 @@ def check_custom_labels(docstring: str) -> list[str]:
     
     Parameters
     ----------
-    docstring : str
     docstring : str
         Description for ``docstring``.
     
@@ -202,6 +201,7 @@ def check_custom_labels(docstring: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return CUSTOM_LABEL_PATTERN.findall(docstring)
 
 
@@ -237,11 +237,9 @@ def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]
     Parameters
     ----------
     file_path : Path
-    file_path : Path
         Description for ``file_path``.
     strict : bool | None
-    strict : bool | None, optional, default=False
-        Description for ``strict``.
+        Optional parameter default ``False``. Description for ``strict``.
     
     Returns
     -------
@@ -255,6 +253,7 @@ def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     errors: list[str] = []
     docstring = _load_docstring(file_path)
     if docstring is None:
@@ -303,14 +302,11 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
     Parameters
     ----------
     examples_dir : Path
-    examples_dir : Path
         Description for ``examples_dir``.
     strict : bool | None
-    strict : bool | None, optional, default=False
-        Description for ``strict``.
+        Optional parameter default ``False``. Description for ``strict``.
     verbose : bool | None
-    verbose : bool | None, optional, default=False
-        Description for ``verbose``.
+        Optional parameter default ``False``. Description for ``verbose``.
     
     Returns
     -------
@@ -324,6 +320,7 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     results: list[ValidationResult] = []
     exit_code = 0
     for path in _iter_example_files(examples_dir):

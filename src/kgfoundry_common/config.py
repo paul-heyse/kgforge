@@ -50,7 +50,6 @@ def load_config(path: str) -> dict[str, Any]:
     Parameters
     ----------
     path : str
-    path : str
         Description for ``path``.
     
     Returns
@@ -65,5 +64,6 @@ def load_config(path: str) -> dict[str, Any]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f)

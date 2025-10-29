@@ -124,6 +124,30 @@ numpydoc_validation_checks = {
     "RT01",
     "PR01",
 }
+numpydoc_xref_param_type = True
+numpydoc_xref_ignore = {"default", "optional"}
+numpydoc_xref_aliases = {
+    # Internal models and aliases (TypeAlias entries resolve as ``py:data``).
+    "Concept": ("py:class", "src.ontology.catalog.Concept"),
+    "FloatArray": ("py:data", "src.vectorstore_faiss.gpu.FloatArray"),
+    "Id": ("py:data", "src.kgfoundry_common.models.Id"),
+    "NavMap": ("py:class", "src.kgfoundry_common.navmap_types.NavMap"),
+    "Stability": ("py:data", "src.kgfoundry_common.navmap_types.Stability"),
+    "StrArray": ("py:data", "src.vectorstore_faiss.gpu.StrArray"),
+    "VecArray": ("py:data", "src.search_api.faiss_adapter.VecArray"),
+    "SupportsHttp": ("py:class", "src.search_client.client.SupportsHttp"),
+    "SupportsResponse": ("py:class", "src.search_client.client.SupportsResponse"),
+    # Third-party helpers that numpydoc otherwise classifies incorrectly.
+    "NDArray": ("py:data", "numpy.typing.NDArray"),
+    "numpy.typing.NDArray": ("py:data", "numpy.typing.NDArray"),
+    "pyarrow.schema": ("py:function", "pyarrow.schema"),
+    "HTTPException": ("py:class", "fastapi.HTTPException"),
+    "Depends": ("py:function", "fastapi.Depends"),
+    "Header": ("py:function", "fastapi.Header"),
+    "typer.Argument": ("py:class", "typer.Argument"),
+    "typer.Option": ("py:class", "typer.Option"),
+    "typer.Exit": ("py:exc", "typer.Exit"),
+}
 
 # Use whatever theme you prefer; pydata_sphinx_theme is widely used.
 html_theme = os.environ.get("SPHINX_THEME", "pydata_sphinx_theme")
@@ -198,17 +222,21 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "pyarrow": ("https://arrow.apache.org/docs/", None),
-    "duckdb": ("https://duckdb.org/docs/", None),
     "pydantic": ("https://docs.pydantic.dev/latest/", None),
     "fastapi": ("https://fastapi.tiangolo.com/", None),
-    "typer": ("https://typer.tiangolo.com/", None),
     "requests": ("https://requests.readthedocs.io/en/latest/", None),
     # Scientific computing stack used throughout vector operations.
     "scipy": ("https://docs.scipy.org/doc/scipy/", None),
     "pandas": ("https://pandas.pydata.org/docs/", None),
     # HTTP and testing stacks referenced in API docs.
-    "httpx": ("https://www.python-httpx.org/", None),
+    "httpx": (
+        "https://httpx.readthedocs.io/en/stable/",
+        "https://httpx.readthedocs.io/en/stable/objects.inv",
+    ),
     "pytest": ("https://docs.pytest.org/en/stable/", None),
+    # Best-effort mappings for CLI/database integrations.
+    "typer": ("https://typer.tiangolo.com/", None),
+    "duckdb": ("https://duckdb.org/docs/api/python/", None),
 }
 
 # Fallback external links for types missing from upstream inventories.
@@ -350,25 +378,38 @@ def linkcode_resolve(domain: str, info: Mapping[str, str | None]) -> str | None:
     return None
 
 
-nitpick_ignore = set()
+nitpick_ignore = {
+    # NumPy scalar aliases do not expose inventory targets.
+    ("py:class", "numpy.float32"),
+    ("py:class", "np.float32"),
+    ("py:class", "np.int64"),
+    ("py:class", "np.str_"),
+    ("py:class", "NDArray"),
+    ("py:class", "numpy.typing.NDArray"),
+    ("py:class", "pyarrow.schema"),
+    ("py:class", "Id"),
+    ("py:class", "src.kgfoundry_common.models.Id"),
+    ("py:class", "Stability"),
+    ("py:class", "src.kgfoundry_common.navmap_types.Stability"),
+    ("py:class", "VecArray"),
+    ("py:class", "src.search_api.faiss_adapter.VecArray"),
+    ("py:class", "FloatArray"),
+    ("py:class", "StrArray"),
+    ("py:class", "src.vectorstore_faiss.gpu.FloatArray"),
+    ("py:class", "src.vectorstore_faiss.gpu.StrArray"),
+    ("py:class", "SupportsHttp"),
+    ("py:class", "src.search_client.client.SupportsHttp"),
+    ("py:exc", "HTTPException"),
+    ("py:class", "Concept"),
+    ("py:class", "src.ontology.catalog.Concept"),
+    # Third-party projects without accessible inventories.
+    ("py:class", "duckdb.DuckDBPyConnection"),
+    ("py:class", "typer.Argument"),
+    ("py:class", "typer.Option"),
+    ("py:exc", "typer.Exit"),
+}
 
-nitpick_ignore.update(
-    {
-        ("py:class", "optional"),
-        ("py:class", "Optional"),
-        ("py:class", "duckdb.DuckDBPyConnection"),
-        ("py:class", "pyarrow.schema"),
-        ("py:class", "pyarrow.Schema"),
-        ("py:class", "pyarrow.Table"),
-    }
-)
-
-nitpick_ignore_regex = [
-    ("py:obj", r"pydantic\\.BaseModel"),
-    ("py:class", r"pydantic\\.BaseModel"),
-    ("py:class", r"kgfoundry\\.kgfoundry_common\\..*"),
-    ("py:class", r"kgfoundry\\.kgfoundry_common\\.models\\.Id"),
-]
+nitpick_ignore_regex: list[tuple[str, str]] = []
 
 
 class GalleryTagsDirective(Directive):
