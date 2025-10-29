@@ -5,6 +5,7 @@
    - Mirrors the `.envrc` workflow; supports overrides (`OFFLINE=1`, `USE_WHEELHOUSE=1`, `EXTRAS="gpu"`, `ALLOW_GPU=1`).
 
 2. **direnv (auto-activation)**
+   - **Critial note**: if you do not run `bash scripts/bootstrap.sh`, ensure uv > 0.93 is installed, run "uv python install 3.13.9", and then run "uv python pin 3.13.9"
    - Install `direnv` (`sudo apt install direnv` or `brew install direnv`) and add the hook for your shell (`eval "$(direnv hook bash)"` or `eval "$(direnv hook zsh)"`).
    - Ensure `uv` is installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`).
    - From the repo root run `direnv allow` once. The committed `.envrc` will:
@@ -13,8 +14,8 @@
      - install pre-commit hooks on first load.
 
 3. **Manual uv commands (CI/manual fallback)**
-   - `uv python pin 3.13.9`
-   - `uv venv`
+   - **Critial note**: if you do not run `bash scripts/bootstrap.sh`, ensure uv > 0.93 is installed, run "uv python install 3.13.9", and then run "uv python pin 3.13.9"
+   - `uv venv .venv`
    - `uv sync --frozen`
    - `uvx pre-commit install -t pre-commit -t pre-push`
    - Activate with `. .venv/bin/activate` or run tools via `uv run` / `uvx`.

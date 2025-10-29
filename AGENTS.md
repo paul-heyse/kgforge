@@ -6,6 +6,7 @@
    - Supports overrides such as `OFFLINE=1`, `USE_WHEELHOUSE=1`, or additional extras (GPU installs require `ALLOW_GPU=1`).
 
 2. **direnv (auto-activation)**
+   - **Critial note**: if you do not run `bash scripts/bootstrap.sh`, ensure uv > 0.93 is installed, run "uv python install 3.13.9", and then run "uv python pin 3.13.9"
    - Install `direnv` for your shell (`sudo apt install direnv` or `brew install direnv`) and hook it via `eval "$(direnv hook bash)"` / `eval "$(direnv hook zsh)"` in your shell rc.
    - Ensure `uv` is installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`).
    - From the repo root run `direnv allow` once. The committed `.envrc` will:
@@ -15,7 +16,7 @@
    - Future shell entries auto-refresh whenever `pyproject.toml`, `uv.lock`, or `.env` change.
 
 3. **Manual uv flow (last resort / CI snippets)**
-   - `uv python pin 3.13.9`
+   - **Critial note**: if you do not run `bash scripts/bootstrap.sh`, ensure uv > 0.93 is installed, run "uv python install 3.13.9", and then run "uv python pin 3.13.9"
    - `uv venv`
    - `uv sync --frozen`
    - `uvx pre-commit install -t pre-commit -t pre-push`
