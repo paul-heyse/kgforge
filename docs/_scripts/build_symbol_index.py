@@ -20,7 +20,7 @@ from types import ModuleType
 from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
-    from griffe.dataclasses import Object as GriffeObject
+    from griffe import Object as GriffeObject
 else:
     GriffeObject = object  # type: ignore[misc, assignment]
 
@@ -70,8 +70,8 @@ class NavLookup:
     created by factories or runtime orchestrators documented nearby.
     """
 
-    symbol_meta: dict[str, dict[str, object]]
-    module_meta: dict[str, dict[str, object]]
+    symbol_meta: dict[str, dict[str, Any]]
+    module_meta: dict[str, dict[str, Any]]
     sections: dict[str, str]
 
 
@@ -90,7 +90,6 @@ def iter_packages() -> list[str]:
     >>> from docs._scripts.build_symbol_index import iter_packages
     >>> result = iter_packages()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     if ENV_PKGS:
         return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
@@ -122,7 +121,6 @@ def safe_attr(node: object, attr: str, default: object | None = None) -> object 
     >>> from docs._scripts.build_symbol_index import safe_attr
     >>> result = safe_attr(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         return getattr(node, attr)
@@ -199,7 +197,7 @@ def _load_navmap() -> NavLookup:
     return NavLookup(symbol_meta={}, module_meta={}, sections={})
 
 
-def _clean_meta(meta: Mapping[str, object] | None) -> dict[str, object]:
+def _clean_meta(meta: Mapping[str, Any] | None) -> dict[str, Any]:
     """Return a copy of ``meta`` with ``None`` entries removed."""
     if not isinstance(meta, Mapping):
         return {}
@@ -209,9 +207,9 @@ def _clean_meta(meta: Mapping[str, object] | None) -> dict[str, object]:
 def _record_module_defaults(
     module_name: str,
     payload: Mapping[str, object],
-    module_meta: MutableMapping[str, dict[str, object]],
-    symbol_meta: MutableMapping[str, dict[str, object]],
-) -> dict[str, object]:
+    module_meta: MutableMapping[str, dict[str, Any]],
+    symbol_meta: MutableMapping[str, dict[str, Any]],
+) -> dict[str, Any]:
     """Extract module-level defaults and prime symbol metadata with them."""
     defaults = _clean_meta(cast(Mapping[str, object] | None, payload.get("module_meta")))
     module_meta[module_name] = defaults
@@ -223,7 +221,7 @@ def _record_module_defaults(
 def _record_symbol_meta(
     module_name: str,
     per_symbol_meta: Mapping[str, object] | None,
-    symbol_meta: MutableMapping[str, dict[str, object]],
+    symbol_meta: MutableMapping[str, dict[str, Any]],
 ) -> None:
     """Merge per-symbol metadata into the index."""
     if not isinstance(per_symbol_meta, Mapping):
@@ -261,8 +259,8 @@ def _record_sections(
 
 def _index_navmap(data: Mapping[str, object]) -> NavLookup:
     """Index NavMap metadata for symbol enrichment."""
-    symbol_meta: dict[str, dict[str, object]] = {}
-    module_meta: dict[str, dict[str, object]] = {}
+    symbol_meta: dict[str, dict[str, Any]] = {}
+    module_meta: dict[str, dict[str, Any]] = {}
     sections: dict[str, str] = {}
 
     modules = data.get("modules")
@@ -286,7 +284,7 @@ def _index_navmap(data: Mapping[str, object]) -> NavLookup:
     return NavLookup(symbol_meta=symbol_meta, module_meta=module_meta, sections=sections)
 
 
-def _load_test_map() -> dict[str, object]:
+def _load_test_map() -> dict[str, Any]:
     """Return the optional test map produced earlier in the docs pipeline."""
     test_map_path = DOCS_BUILD / "test_map.json"
     if test_map_path.exists():
@@ -438,7 +436,7 @@ def _row_from_node(
     node: GriffeObject,
     nav: NavLookup,
     test_map: Mapping[str, object],
-) -> dict[str, object] | None:
+) -> dict[str, Any] | None:
     """Construct a row describing ``node`` if it has a valid path."""
     path = getattr(node, "path", None)
     if not isinstance(path, str):
@@ -465,7 +463,7 @@ def _row_from_node(
     if not tested_by and canonical:
         tested_by = _normalize_tests(test_map.get(canonical))
 
-    row: dict[str, object] = {
+    row: dict[str, Any] = {
         "path": path,
         "canonical_path": canonical,
         "kind": kind,
@@ -489,14 +487,16 @@ def _row_from_node(
     return row
 
 
-def _collect_rows(nav: NavLookup, test_map: Mapping[str, object]) -> list[dict[str, object]]:
+def _collect_rows(nav: NavLookup, test_map: Mapping[str, Any]) -> list[dict[str, Any]]:
     """Traverse packages and return enriched symbol rows."""
-    rows: dict[str, dict[str, object]] = {}
+    rows: dict[str, dict[str, Any]] = {}
 
     def _walk(node: GriffeObject) -> None:
         row = _row_from_node(node, nav, test_map)
         if row is not None:
-            rows[row["path"]] = row
+            path_value = row.get("path")
+            if isinstance(path_value, str):
+                rows[path_value] = row
         for member in _iter_members(node):
             _walk(member)
 
@@ -508,7 +508,7 @@ def _collect_rows(nav: NavLookup, test_map: Mapping[str, object]) -> list[dict[s
 
 
 def _build_reverse_maps(
-    rows: list[dict[str, object]],
+    rows: list[dict[str, Any]],
 ) -> tuple[dict[str, list[str]], dict[str, list[str]]]:
     """Build reverse lookup tables keyed by file and module."""
     by_file: dict[str, set[str]] = defaultdict(set)
@@ -560,7 +560,6 @@ def main() -> int:
     >>> from docs._scripts.build_symbol_index import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     nav_lookup = _load_navmap()
     test_map = _load_test_map()
