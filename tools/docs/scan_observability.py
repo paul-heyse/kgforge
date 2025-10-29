@@ -711,7 +711,6 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     Parameters
     ----------
     path : Path
-    path : Path
         Description for ``path``.
     
     Returns
@@ -726,6 +725,7 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     try:
         text = path.read_text(encoding="utf-8")
     except OSError:
@@ -747,9 +747,7 @@ def scan_file(
     Parameters
     ----------
     path : Path
-    path : Path
         Description for ``path``.
-    policy : collections.abc.Mapping
     policy : collections.abc.Mapping
         Description for ``policy``.
     
@@ -765,6 +763,7 @@ def scan_file(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     text, tree = read_ast(path)
     if not text or tree is None:
         return ([], [], [])

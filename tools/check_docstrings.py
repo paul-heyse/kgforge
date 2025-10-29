@@ -57,7 +57,6 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
     Parameters
     ----------
     path : Path
-    path : Path
         Description for ``path``.
     
     Returns
@@ -72,6 +71,7 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if (doc := ast.get_docstring(tree, clean=False)) is not None:

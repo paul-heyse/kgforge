@@ -50,7 +50,6 @@ def canonicalize_text(blocks: list[str]) -> str:
     Parameters
     ----------
     blocks : List[str]
-    blocks : List[str]
         Description for ``blocks``.
     
     Returns
@@ -74,7 +73,6 @@ def canonicalize_text(blocks: list[str]) -> str:
         Parameters
         ----------
         s : str
-        s : str
             Description for ``s``.
         
         Returns
@@ -89,6 +87,7 @@ def canonicalize_text(blocks: list[str]) -> str:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         s = unicodedata.normalize("NFC", s)
         s = s.replace("\r\n", "\n").replace("\r", "\n")
         s = re.sub(r"[\u2022\u25E6\u2013]", "-", s)  # bullets/dashes

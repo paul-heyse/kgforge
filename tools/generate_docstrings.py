@@ -32,7 +32,6 @@ def has_python_files(path: Path) -> bool:
     Parameters
     ----------
     path : Path
-    path : Path
         Description for ``path``.
     
     Returns
@@ -47,6 +46,7 @@ def has_python_files(path: Path) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return any(path.rglob("*.py"))
 
 
@@ -81,7 +81,6 @@ def run_doq(target: Path) -> bool:
     Parameters
     ----------
     target : Path
-    target : Path
         Description for ``target``.
     
     Returns
@@ -96,6 +95,7 @@ def run_doq(target: Path) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     cmd = [
         sys.executable,
         "-m",
@@ -120,18 +120,18 @@ def run_fallback(target: Path) -> None:
     """Compute run fallback.
 
     Carry out the run fallback operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     target : Path
-    target : Path
         Description for ``target``.
-
+    
     Examples
     --------
     >>> from tools.generate_docstrings import run_fallback
     >>> run_fallback(...)  # doctest: +ELLIPSIS
     """
+    
     cmd = [
         sys.executable,
         "tools/auto_docstrings.py",

@@ -59,24 +59,22 @@ def index_bm25(
     """Compute index bm25.
 
     Carry out the index bm25 operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     chunks_parquet : str | None
-    chunks_parquet : str | None, optional, default=typer.Argument(..., help='Path to Parquet/JSONL with chunks')
-        Description for ``chunks_parquet``.
+        Optional parameter default ``typer.Argument(..., help='Path to Parquet/JSONL with chunks')``. Description for ``chunks_parquet``.
     backend : str | None
-    backend : str | None, optional, default=typer.Option('lucene', help='lucene|pure')
-        Description for ``backend``.
+        Optional parameter default ``typer.Option('lucene', help='lucene|pure')``. Description for ``backend``.
     index_dir : str | None
-    index_dir : str | None, optional, default=typer.Option('./_indices/bm25', help='Output index directory')
-        Description for ``index_dir``.
-
+        Optional parameter default ``typer.Option('./_indices/bm25', help='Output index directory')``. Description for ``index_dir``.
+    
     Examples
     --------
     >>> from orchestration.cli import index_bm25
     >>> index_bm25()  # doctest: +ELLIPSIS
     """
+    
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
@@ -126,21 +124,20 @@ def index_faiss(
     """Compute index faiss.
 
     Carry out the index faiss operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     dense_vectors : str | None
-    dense_vectors : str | None, optional, default=typer.Argument(..., help='Path to dense vectors JSON (skeleton)')
-        Description for ``dense_vectors``.
+        Optional parameter default ``typer.Argument(..., help='Path to dense vectors JSON (skeleton)')``. Description for ``dense_vectors``.
     index_path : str | None
-    index_path : str | None, optional, default=typer.Option('./_indices/faiss/shard_000.idx', help='Output index (CPU .idx)')
-        Description for ``index_path``.
-
+        Optional parameter default ``typer.Option('./_indices/faiss/shard_000.idx', help='Output index (CPU .idx)')``. Description for ``index_path``.
+    
     Examples
     --------
     >>> from orchestration.cli import index_faiss
     >>> index_faiss()  # doctest: +ELLIPSIS
     """
+    
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
         vecs = json.load(fh)
@@ -165,18 +162,18 @@ def api(port: int = 8080) -> None:
     """Compute api.
 
     Carry out the api operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     port : int | None
-    port : int | None, optional, default=8080
-        Description for ``port``.
-
+        Optional parameter default ``8080``. Description for ``port``.
+    
     Examples
     --------
     >>> from orchestration.cli import api
     >>> api()  # doctest: +ELLIPSIS
     """
+    
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)

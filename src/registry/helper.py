@@ -62,9 +62,9 @@ class DuckDBRegistryHelper:
         Parameters
         ----------
         db_path : str
-        db_path : str
             Description for ``db_path``.
         """
+        
         self.db_path = db_path
 
     def _con(self) -> duckdb.DuckDBPyConnection:
@@ -93,15 +93,11 @@ class DuckDBRegistryHelper:
         Parameters
         ----------
         purpose : str
-        purpose : str
             Description for ``purpose``.
-        model_id : str | None
         model_id : str | None
             Description for ``model_id``.
         revision : str | None
-        revision : str | None
             Description for ``revision``.
-        config : collections.abc.Mapping
         config : collections.abc.Mapping
             Description for ``config``.
         
@@ -117,6 +113,7 @@ class DuckDBRegistryHelper:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         run_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -134,24 +131,22 @@ class DuckDBRegistryHelper:
         """Compute close run.
 
         Carry out the close run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         run_id : str
-        run_id : str
             Description for ``run_id``.
-        success : bool
         success : bool
             Description for ``success``.
         notes : str | None
-        notes : str | None, optional, default=None
-            Description for ``notes``.
-
+            Optional parameter default ``None``. Description for ``notes``.
+        
         Examples
         --------
         >>> from registry.helper import close_run
         >>> close_run(..., ...)  # doctest: +ELLIPSIS
         """
+        
         con = self._con()
         con.execute("UPDATE runs SET finished_at=CURRENT_TIMESTAMP WHERE run_id=?", [run_id])
         con.execute(
@@ -173,9 +168,7 @@ class DuckDBRegistryHelper:
         Parameters
         ----------
         kind : str
-        kind : str
             Description for ``kind``.
-        run_id : str
         run_id : str
             Description for ``run_id``.
         
@@ -191,6 +184,7 @@ class DuckDBRegistryHelper:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         dataset_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -208,24 +202,22 @@ class DuckDBRegistryHelper:
         """Compute commit dataset.
 
         Carry out the commit dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         dataset_id : str
-        dataset_id : str
             Description for ``dataset_id``.
-        parquet_root : str
         parquet_root : str
             Description for ``parquet_root``.
         rows : int
-        rows : int
             Description for ``rows``.
-
+        
         Examples
         --------
         >>> from registry.helper import commit_dataset
         >>> commit_dataset(..., ..., ...)  # doctest: +ELLIPSIS
         """
+        
         con = self._con()
         con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
@@ -245,18 +237,18 @@ class DuckDBRegistryHelper:
         """Compute rollback dataset.
 
         Carry out the rollback dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         dataset_id : str
-        dataset_id : str
             Description for ``dataset_id``.
-
+        
         Examples
         --------
         >>> from registry.helper import rollback_dataset
         >>> rollback_dataset(...)  # doctest: +ELLIPSIS
         """
+        
         con = self._con()
         con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
         con.execute(
@@ -269,18 +261,18 @@ class DuckDBRegistryHelper:
         """Compute register documents.
 
         Carry out the register documents operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         docs : List[src.kgfoundry_common.models.Doc]
-        docs : List[src.kgfoundry_common.models.Doc]
             Description for ``docs``.
-
+        
         Examples
         --------
         >>> from registry.helper import register_documents
         >>> register_documents(...)  # doctest: +ELLIPSIS
         """
+        
         con = self._con()
         for doc in docs:
             con.execute(
@@ -310,18 +302,18 @@ class DuckDBRegistryHelper:
         """Compute register doctags.
 
         Carry out the register doctags operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         assets : List[src.kgfoundry_common.models.DoctagsAsset]
-        assets : List[src.kgfoundry_common.models.DoctagsAsset]
             Description for ``assets``.
-
+        
         Examples
         --------
         >>> from registry.helper import register_doctags
         >>> register_doctags(...)  # doctest: +ELLIPSIS
         """
+        
         con = self._con()
         for asset in assets:
             con.execute(
@@ -341,24 +333,22 @@ class DuckDBRegistryHelper:
         """Compute emit event.
 
         Carry out the emit event operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         event_name : str
-        event_name : str
             Description for ``event_name``.
-        subject_id : str
         subject_id : str
             Description for ``subject_id``.
         payload : collections.abc.Mapping
-        payload : collections.abc.Mapping
             Description for ``payload``.
-
+        
         Examples
         --------
         >>> from registry.helper import emit_event
         >>> emit_event(..., ..., ...)  # doctest: +ELLIPSIS
         """
+        
         con = self._con()
         con.execute(
             "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",

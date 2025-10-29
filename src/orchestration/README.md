@@ -7,11 +7,11 @@ Overview of orchestration.
 
 ## Modules
 
-- **`orchestration.cli`** — Overview of cli. → [open](vscode://file//home/paul/kgfoundry/src/orchestration/cli.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/003c82161377a9d2105e9ca618e8679ba2a602ff/src/orchestration/cli.py#L1)
-- **`orchestration.fixture_flow`** — Overview of fixture flow. → [open](vscode://file//home/paul/kgfoundry/src/orchestration/fixture_flow.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/003c82161377a9d2105e9ca618e8679ba2a602ff/src/orchestration/fixture_flow.py#L1)
-- **`orchestration.flows`** — Overview of flows. → [open](vscode://file//home/paul/kgfoundry/src/orchestration/flows.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/003c82161377a9d2105e9ca618e8679ba2a602ff/src/orchestration/flows.py#L1)
+- **`orchestration.cli`** — Overview of cli. → [open](vscode://file//workspace/kgfoundry/src/orchestration/cli.py:1:1) | [view](https://github.com/your-org/your-repo/blob/46a51f319338d544a6cfb6b7491a80695ba1dfde/src/orchestration/cli.py#L1)
+- **`orchestration.fixture_flow`** — Overview of fixture flow. → [open](vscode://file//workspace/kgfoundry/src/orchestration/fixture_flow.py:1:1) | [view](https://github.com/your-org/your-repo/blob/46a51f319338d544a6cfb6b7491a80695ba1dfde/src/orchestration/fixture_flow.py#L1)
+- **`orchestration.flows`** — Overview of flows. → [open](vscode://file//workspace/kgfoundry/src/orchestration/flows.py:1:1) | [view](https://github.com/your-org/your-repo/blob/46a51f319338d544a6cfb6b7491a80695ba1dfde/src/orchestration/flows.py#L1)
 
 ## Classes
 
-- **`orchestration.NavMap`** — Model the NavMap. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:60:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/003c82161377a9d2105e9ca618e8679ba2a602ff/src/kgfoundry_common/navmap_types.py#L60-L79)
-<!-- agent:readme v1 sha:003c82161377a9d2105e9ca618e8679ba2a602ff content:f5169200e2b7 -->
+- **`orchestration.NavMap`** — Model the NavMap. → [open](vscode://file//workspace/kgfoundry/src/kgfoundry_common/navmap_types.py:74:1) | [view](https://github.com/your-org/your-repo/blob/46a51f319338d544a6cfb6b7491a80695ba1dfde/src/kgfoundry_common/navmap_types.py#L74-L93)
+<!-- agent:readme v1 sha:46a51f319338d544a6cfb6b7491a80695ba1dfde content:c86f3d84ac35 -->

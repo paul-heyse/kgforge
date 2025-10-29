@@ -73,7 +73,6 @@ def detect_query_concepts(query: str) -> set[str]:
     Parameters
     ----------
     query : str
-    query : str
         Description for ``query``.
     
     Returns
@@ -88,6 +87,7 @@ def detect_query_concepts(query: str) -> set[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     lowered = query.lower()
     hits: set[str] = set()
     for concept_id, meta in CONCEPTS.items():
@@ -105,7 +105,6 @@ def linked_concepts_for_text(text: str) -> list[str]:
     Parameters
     ----------
     text : str
-    text : str
         Description for ``text``.
     
     Returns
@@ -120,6 +119,7 @@ def linked_concepts_for_text(text: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     lowered = text.lower()
     hits = []
     for concept_id, meta in CONCEPTS.items():
@@ -142,17 +142,13 @@ def kg_boost(
     Parameters
     ----------
     query_concepts : List[str]
-    query_concepts : List[str]
         Description for ``query_concepts``.
-    chunk_concepts : List[str]
     chunk_concepts : List[str]
         Description for ``chunk_concepts``.
     direct : float | None
-    direct : float | None, optional, default=0.08
-        Description for ``direct``.
+        Optional parameter default ``0.08``. Description for ``direct``.
     one_hop : float | None
-    one_hop : float | None, optional, default=0.04
-        Description for ``one_hop``.
+        Optional parameter default ``0.04``. Description for ``one_hop``.
     
     Returns
     -------
@@ -166,5 +162,6 @@ def kg_boost(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

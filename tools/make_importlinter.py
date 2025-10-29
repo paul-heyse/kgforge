@@ -40,17 +40,13 @@ def main(
     Parameters
     ----------
     root_package : str | None
-    root_package : str | None, optional, default=None
-        Description for ``root_package``.
+        Optional parameter default ``None``. Description for ``root_package``.
     output_path : Path | None
-    output_path : Path | None, optional, default=None
-        Description for ``output_path``.
+        Optional parameter default ``None``. Description for ``output_path``.
     root_dir : Path | None
-    root_dir : Path | None, optional, default=None
-        Description for ``root_dir``.
+        Optional parameter default ``None``. Description for ``root_dir``.
     detect : Callable[[], str] | None
-    detect : Callable[[], str] | None, optional, default=None
-        Description for ``detect``.
+        Optional parameter default ``None``. Description for ``detect``.
     
     Returns
     -------
@@ -64,6 +60,7 @@ def main(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     detected_root = root_dir or Path(__file__).resolve().parents[1]
     if root_package is None:
         detect_primary = detect or _import_detect_primary

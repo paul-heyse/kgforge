@@ -71,7 +71,6 @@ class ParquetVectorWriter:
         Parameters
         ----------
         dim : int
-        dim : int
             Description for ``dim``.
         
         Returns
@@ -86,6 +85,7 @@ class ParquetVectorWriter:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -106,9 +106,9 @@ class ParquetVectorWriter:
         Parameters
         ----------
         root : str
-        root : str
             Description for ``root``.
         """
+        
         self.root = Path(root)
 
     def write_dense(
@@ -126,20 +126,15 @@ class ParquetVectorWriter:
         Parameters
         ----------
         model : str
-        model : str
             Description for ``model``.
-        run_id : str
         run_id : str
             Description for ``run_id``.
         dim : int
-        dim : int
             Description for ``dim``.
-        records : collections.abc.Iterable
         records : collections.abc.Iterable
             Description for ``records``.
         shard : int | None
-        shard : int | None, optional, default=0
-            Description for ``shard``.
+            Optional parameter default ``0``. Description for ``shard``.
         
         Returns
         -------
@@ -153,6 +148,7 @@ class ParquetVectorWriter:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -222,17 +218,13 @@ class ParquetVectorWriter:
         Parameters
         ----------
         model : str
-        model : str
             Description for ``model``.
-        run_id : str
         run_id : str
             Description for ``run_id``.
         records : collections.abc.Iterable
-        records : collections.abc.Iterable
             Description for ``records``.
         shard : int | None
-        shard : int | None, optional, default=0
-            Description for ``shard``.
+            Optional parameter default ``0``. Description for ``shard``.
         
         Returns
         -------
@@ -246,6 +238,7 @@ class ParquetVectorWriter:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -331,15 +324,13 @@ class ParquetChunkWriter:
         Parameters
         ----------
         root : str
-        root : str
             Description for ``root``.
         model : str | None
-        model : str | None, optional, default='docling_hybrid'
-            Description for ``model``.
+            Optional parameter default ``'docling_hybrid'``. Description for ``model``.
         run_id : str | None
-        run_id : str | None, optional, default='dev'
-            Description for ``run_id``.
+            Optional parameter default ``'dev'``. Description for ``run_id``.
         """
+        
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
@@ -350,7 +341,6 @@ class ParquetChunkWriter:
         
         Parameters
         ----------
-        rows : collections.abc.Iterable
         rows : collections.abc.Iterable
             Description for ``rows``.
         
@@ -366,6 +356,7 @@ class ParquetChunkWriter:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(
             table,
