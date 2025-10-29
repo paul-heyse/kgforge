@@ -44,6 +44,16 @@ lint:
 	$(VENV)/bin/ruff format --check $(FMT_TARGETS)
 	$(VENV)/bin/mypy src
 
+lint-docs:
+	uvx pydoclint --style numpy src
+	uv run python -m tools.docstring_builder.cli check --diff
+	uvx mypy --strict src
+	@if [ "$(RUN_DOCS_TESTS)" = "1" ]; then \
+		uv run pytest tests/docs; \
+	else \
+		echo "Skipping tests/docs (set RUN_DOCS_TESTS=1 to enable)"; \
+	fi
+
 clean:
 	rm -rf .venv .mypy_cache .ruff_cache .pytest_cache dist build
 
