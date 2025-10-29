@@ -8,7 +8,7 @@ from collections.abc import Callable
 from concurrent.futures import Future
 from pathlib import Path
 from types import SimpleNamespace, TracebackType
-from typing import Any, Literal
+from typing import Literal
 
 import pytest
 
@@ -22,7 +22,7 @@ build_graphs = importlib.import_module("tools.docs.build_graphs")
 class _DummyExecutor:
     """Synchronous stand-in for :class:`ProcessPoolExecutor` used in tests."""
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, *args: object, **kwargs: object) -> None:
         pass
 
     def __enter__(self) -> _DummyExecutor:
@@ -39,8 +39,8 @@ class _DummyExecutor:
     def submit(
         self,
         fn: Callable[..., tuple[str, bool, bool, bool]],
-        *args: Any,
-        **kwargs: Any,
+        *args: object,
+        **kwargs: object,
     ) -> Future[tuple[str, bool, bool, bool]]:
         fut: Future[tuple[str, bool, bool, bool]] = Future()
         try:
@@ -91,7 +91,8 @@ def test_main_exits_on_failure_and_cleans_outputs(
         pkg: str, out_svg: Path, excludes: list[str] | None, max_bacon: int, fmt: str
     ) -> None:
         out_svg.write_text("partial", encoding="utf-8")
-        raise RuntimeError("boom")
+        message = "boom"
+        raise RuntimeError(message)
 
     def fake_pyreverse(pkg: str, out_dir_arg: Path, fmt: str) -> None:
         out_dir_arg.mkdir(parents=True, exist_ok=True)
@@ -173,11 +174,17 @@ def test_build_one_package_supports_png_and_cache(
     imports_path.unlink()
     uml_path.unlink()
 
-    def fail_pydeps(*_args: Any, **_kwargs: Any) -> None:  # pragma: no cover - defensive guard
-        raise AssertionError("pydeps should not run on cache hit")
+    def fail_pydeps(
+        *_args: object, **_kwargs: object
+    ) -> None:  # pragma: no cover - defensive guard
+        message = "pydeps should not run on cache hit"
+        raise AssertionError(message)
 
-    def fail_pyreverse(*_args: Any, **_kwargs: Any) -> None:  # pragma: no cover - defensive guard
-        raise AssertionError("pyreverse should not run on cache hit")
+    def fail_pyreverse(
+        *_args: object, **_kwargs: object
+    ) -> None:  # pragma: no cover - defensive guard
+        message = "pyreverse should not run on cache hit"
+        raise AssertionError(message)
 
     monkeypatch.setattr(build_graphs, "build_pydeps_for_package", fail_pydeps)
     monkeypatch.setattr(build_graphs, "build_pyreverse_for_package", fail_pyreverse)
