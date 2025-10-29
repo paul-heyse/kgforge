@@ -14,5 +14,5 @@ Overview of registry.
 
 ## Classes
 
-- **`registry.NavMap`** — Model the NavMap. → [open](vscode://file//workspace/kgfoundry/src/kgfoundry_common/navmap_types.py:74:1) | [view](https://github.com/your-org/your-repo/blob/46a51f319338d544a6cfb6b7491a80695ba1dfde/src/kgfoundry_common/navmap_types.py#L74-L93)
-<!-- agent:readme v1 sha:46a51f319338d544a6cfb6b7491a80695ba1dfde content:df0df67f1033 -->
+- **`registry.NavMap`** — Model the NavMap. → [open](vscode://file//workspace/kgfoundry/src/kgfoundry_common/navmap_types.py:60:1) | [view](https://github.com/your-org/your-repo/blob/46a51f319338d544a6cfb6b7491a80695ba1dfde/src/kgfoundry_common/navmap_types.py#L60-L79)
+<!-- agent:readme v1 sha:46a51f319338d544a6cfb6b7491a80695ba1dfde content:3fdde9754324 -->
