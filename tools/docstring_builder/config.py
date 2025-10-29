@@ -38,6 +38,7 @@ class BuilderConfig:
     exclude: list[str] = field(default_factory=list)
     ownership_marker: str = DEFAULT_MARKER
     dynamic_probes: bool = False
+    normalize_sections: bool = False
     package_settings: PackageSettings = field(default_factory=PackageSettings)
     navmap_metadata: bool = True
 
@@ -49,6 +50,7 @@ class BuilderConfig:
             "exclude": self.exclude,
             "ownership_marker": self.ownership_marker,
             "dynamic_probes": self.dynamic_probes,
+            "normalize_sections": self.normalize_sections,
             "summary_verbs": self.package_settings.summary_verbs,
             "opt_out": sorted(self.package_settings.opt_out),
             "navmap_metadata": self.navmap_metadata,
@@ -85,6 +87,7 @@ def load_config(path: Path | None = None) -> BuilderConfig:
     exclude = _as_list(data.get("exclude")) or ["tests/**", "site/**", "docs/_build/**"]
     ownership_marker = data.get("ownership_marker", DEFAULT_MARKER)
     dynamic_probes = bool(data.get("dynamic_probes", False))
+    normalize_sections = bool(data.get("normalize_sections", False))
     navmap_metadata = bool(data.get("navmap_metadata", True))
 
     package_section = data.get("packages", {}) or {}
@@ -100,6 +103,7 @@ def load_config(path: Path | None = None) -> BuilderConfig:
         exclude=[str(pattern) for pattern in exclude],
         ownership_marker=str(ownership_marker),
         dynamic_probes=dynamic_probes,
+        normalize_sections=normalize_sections,
         package_settings=package_settings,
         navmap_metadata=navmap_metadata,
     )

@@ -25,7 +25,19 @@ else:
     ):
 
         class DocstringYields(_doc_common.DocstringReturns):
-            """Compatibility stub for missing ``DocstringYields``."""
+            """Compatibility stub for missing ``DocstringYields``.
+
+            Parameters
+            ----------
+            args : list[str]
+                Names associated with the yielded values.
+            description : str | None
+                Optional description rendered in the docstring.
+            type_name : str | None
+                Type annotation captured for the yield expression.
+            return_name : str | None, optional
+                Explicit name attached to the yield block.
+            """
 
             def __init__(
                 self,
@@ -34,33 +46,6 @@ else:
                 type_name: str | None,
                 return_name: str | None = None,
             ) -> None:
-                """Init  .
-
-                Parameters
-                ----------
-                args : list[str]
-                    Description.
-                description : Optional[str]
-                    Description.
-                type_name : Optional[str]
-                    Description.
-                return_name : Optional[str]
-                    Description.
-
-                Returns
-                -------
-                None
-                    Description.
-
-                Raises
-                ------
-                Exception
-                    Description.
-
-                Examples
-                --------
-                >>> __init__(...)
-                """
                 super().__init__(
                     args=args,
                     description=description,
@@ -81,7 +66,8 @@ else:
         if not hasattr(_doc_cls, "attrs"):
 
             def _docstring_attrs(self: DocstringType) -> list[object]:
-                """Return documented attributes if parsing supports them."""
+                """Return documented attributes if parsing supports them.
+"""
                 return [meta for meta in self.meta if getattr(meta, "args", None) == ["attr"]]
 
             _doc_cls.attrs = property(_docstring_attrs)  # type: ignore[attr-defined]
@@ -93,7 +79,8 @@ else:
         if _yield_cls is not None and not hasattr(_doc_cls, "yields"):
 
             def _docstring_yields(self: DocstringType) -> object | None:
-                """Return the first yields section if available."""
+                """Return the first yields section if available.
+"""
                 if _yield_cls is None:  # pragma: no cover - defensive guard
                     return None
                 for meta in self.meta:
@@ -106,7 +93,8 @@ else:
         if _yield_cls is not None and not hasattr(_doc_cls, "many_yields"):
 
             def _docstring_many_yields(self: DocstringType) -> list[object]:
-                """Return all yields sections."""
+                """Return all yields sections.
+"""
                 if _yield_cls is None:  # pragma: no cover - defensive guard
                     return []
                 return [meta for meta in self.meta if isinstance(meta, _yield_cls)]
@@ -116,7 +104,8 @@ else:
         if not hasattr(_doc_cls, "size"):
 
             def _docstring_size(self: DocstringType) -> int:
-                """Estimate docstring size for style heuristics."""
+                """Estimate docstring size for style heuristics.
+"""
                 parts: list[str] = []
                 if self.short_description:
                     parts.append(self.short_description)

@@ -55,34 +55,27 @@ ROW_GROUP_SIZE = 4096
 
 # [nav:anchor ParquetVectorWriter]
 class ParquetVectorWriter:
-    """Model the ParquetVectorWriter.
+    """Write dense and SPLADE vectors to partitioned Parquet layouts.
 
-    Represent the parquetvectorwriter data structure used throughout the project. The class
-    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-    are typically created by factories or runtime orchestrators documented nearby.
+    Parameters
+    ----------
+    root : str
+        Root directory that receives partitioned parquet outputs.
     """
 
     @staticmethod
     def dense_schema(dim: int) -> pa.schema:
-        """Compute dense schema.
-
-        Carry out the dense schema operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        """Build the schema for dense embedding parquet files.
 
         Parameters
         ----------
         dim : int
-            Description for ``dim``.
+            Dimension of the dense vector column.
 
         Returns
         -------
         pa.schema
-            Description of return value.
-
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import dense_schema
-        >>> result = dense_schema(...)
-        >>> result  # doctest: +ELLIPSIS
+            Schema describing the dense vector table layout.
         """
         return pa.schema(
             [
@@ -97,15 +90,6 @@ class ParquetVectorWriter:
         )
 
     def __init__(self, root: str) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-
-        Parameters
-        ----------
-        root : str
-            Description for ``root``.
-        """
         self.root = Path(root)
 
     def write_dense(
@@ -116,7 +100,7 @@ class ParquetVectorWriter:
         records: Iterable[tuple[str, list[float], float]],
         shard: int = 0,
     ) -> str:
-        """Compute write dense.
+        """Write dense embedding vectors to a partitioned Parquet shard.
 
         Carry out the write dense operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
@@ -128,9 +112,9 @@ class ParquetVectorWriter:
             Description for ``run_id``.
         dim : int
             Description for ``dim``.
-        records : collections.abc.Iterable
+        records : Iterable[tuple[str, list[float], float]]
             Description for ``records``.
-        shard : int | None
+        shard : int, optional
             Optional parameter default ``0``. Description for ``shard``.
 
         Returns
@@ -171,20 +155,12 @@ class ParquetVectorWriter:
 
     @staticmethod
     def splade_schema() -> pa.schema:
-        """Compute splade schema.
-
-        Carry out the splade schema operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        """Build the schema for SPLADE impact parquet files.
 
         Returns
         -------
         pa.schema
-            Description of return value.
-
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import splade_schema
-        >>> result = splade_schema()
-        >>> result  # doctest: +ELLIPSIS
+            Schema describing impact weights stored in parquet.
         """
         return pa.schema(
             [
@@ -205,7 +181,7 @@ class ParquetVectorWriter:
         records: Iterable[tuple[str, list[int], list[float]]],
         shard: int = 0,
     ) -> str:
-        """Compute write splade.
+        """Write SPLADE impact vectors to a partitioned Parquet shard.
 
         Carry out the write splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
@@ -215,9 +191,9 @@ class ParquetVectorWriter:
             Description for ``model``.
         run_id : str
             Description for ``run_id``.
-        records : collections.abc.Iterable
+        records : Iterable[tuple[str, list[int], list[float]]]
             Description for ``records``.
-        shard : int | None
+        shard : int, optional
             Optional parameter default ``0``. Description for ``shard``.
 
         Returns
@@ -259,29 +235,26 @@ class ParquetVectorWriter:
 
 # [nav:anchor ParquetChunkWriter]
 class ParquetChunkWriter:
-    """Model the ParquetChunkWriter.
+    """Write chunk records and metadata to partitioned Parquet files.
 
-    Represent the parquetchunkwriter data structure used throughout the project. The class
-    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-    are typically created by factories or runtime orchestrators documented nearby.
+    Parameters
+    ----------
+    root : str
+        Root directory for chunk parquet outputs.
+    model : str, optional
+        Model identifier stored alongside the chunk data. Defaults to ``"docling_hybrid"``.
+    run_id : str, optional
+        Run identifier used to scope partitions. Defaults to ``"dev"``.
     """
 
     @staticmethod
     def chunk_schema() -> pa.schema:
-        """Compute chunk schema.
-
-        Carry out the chunk schema operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+        """Build the schema describing chunk parquet files.
 
         Returns
         -------
         pa.schema
-            Description of return value.
-
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import chunk_schema
-        >>> result = chunk_schema()
-        >>> result  # doctest: +ELLIPSIS
+            Schema capturing chunk identifiers and doctags spans.
         """
         return pa.schema(
             [
@@ -308,30 +281,17 @@ class ParquetChunkWriter:
         )
 
     def __init__(self, root: str, model: str = "docling_hybrid", run_id: str = "dev") -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-
-        Parameters
-        ----------
-        root : str
-            Description for ``root``.
-        model : str | None
-            Optional parameter default ``'docling_hybrid'``. Description for ``model``.
-        run_id : str | None
-            Optional parameter default ``'dev'``. Description for ``run_id``.
-        """
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
     def write(self, rows: Iterable[dict[str, Any]]) -> str:
-        """Compute write.
+        """Write chunk records to the configured Parquet layout.
 
         Carry out the write operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
         Parameters
         ----------
-        rows : collections.abc.Iterable
+        rows : Iterable[dict[str, Any]]
             Description for ``rows``.
 
         Returns

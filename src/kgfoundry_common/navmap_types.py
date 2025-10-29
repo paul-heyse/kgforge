@@ -26,10 +26,10 @@ type Stability = Literal[
 class NavSection(TypedDict):
     """Model the NavSection.
 
-    Represent the navsection data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the navsection data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     id: str
     title: str
@@ -40,10 +40,10 @@ class NavSection(TypedDict):
 class SymbolMeta(TypedDict, total=False):
     """Model the SymbolMeta.
 
-    Represent the symbolmeta data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the symbolmeta data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     since: str
     stability: Stability
@@ -62,7 +62,8 @@ class SymbolMeta(TypedDict, total=False):
 
 # [nav:anchor ModuleMeta]
 class ModuleMeta(TypedDict, total=False):
-    """Describe module-level metadata surfaced in navigation structures."""
+    """Describe module-level metadata surfaced in navigation structures.
+"""
 
     owner: str
     stability: Stability
@@ -74,10 +75,10 @@ class ModuleMeta(TypedDict, total=False):
 class NavMap(TypedDict, total=False):
     """Model the NavMap.
 
-    Represent the navmap data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the navmap data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     title: str
     synopsis: str

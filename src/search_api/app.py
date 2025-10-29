@@ -132,24 +132,30 @@ kg.add_edge("C:42", "C:99")
 # [nav:anchor auth]
 def auth(authorization: str | None = Header(default=None)) -> None:
     """Compute auth.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the auth operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the auth operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    authorization : str | None
-        Optional parameter default ``Header(default=None)``. Description for ``authorization``.
+Parameters
+----------
+authorization : str | None, optional
+    Optional parameter default ``Header(default=None)``. Description for ``authorization``.
+    
+    
+    Defaults to ``Header(None)``.
+    
+    Defaults to ``Header(None)``.
 
-    Raises
-    ------
-    HTTPException
-        Raised when validation fails.
+Raises
+------
+HTTPException
+    Raised when validation fails.
 
-    Examples
-    --------
-    >>> from search_api.app import auth
-    >>> auth()  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from search_api.app import auth
+>>> auth()  # doctest: +ELLIPSIS
+"""
     if not API_KEYS:
         return  # disabled in skeleton
     if not authorization or not authorization.startswith("Bearer "):
@@ -162,20 +168,24 @@ def auth(authorization: str | None = Header(default=None)) -> None:
 # [nav:anchor healthz]
 def healthz() -> dict[str, Any]:
     """Compute healthz.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the healthz operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the healthz operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Returns
-    -------
-    collections.abc.Mapping
-        Description of return value.
+Returns
+-------
+dict[str, Any]
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from search_api.app import healthz
-    >>> result = healthz()
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from search_api.app import healthz
+>>> result = healthz()
+>>> result  # doctest: +ELLIPSIS
+"""
     return {
         "status": "ok",
         "components": {
@@ -191,27 +201,34 @@ def healthz() -> dict[str, Any]:
 # [nav:anchor rrf_fuse]
 def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, float]:
     """Compute rrf fuse.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the rrf fuse operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the rrf fuse operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    lists : List[List[Tuple[str, float]]]
-        Description for ``lists``.
-    k_rrf : int
-        Description for ``k_rrf``.
+Parameters
+----------
+lists : list[list[tuple[str, float]]]
+    Description for ``lists``.
+k_rrf : int
+    Description for ``k_rrf``.
+    
+    
+    
 
-    Returns
-    -------
-    collections.abc.Mapping
-        Description of return value.
+Returns
+-------
+dict[str, float]
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from search_api.app import rrf_fuse
-    >>> result = rrf_fuse(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from search_api.app import rrf_fuse
+>>> result = rrf_fuse(..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
     scores: dict[str, float] = {}
     for hits in lists:
         for rank, (doc_id, _score) in enumerate(hits, start=1):
@@ -227,31 +244,42 @@ def apply_kg_boosts(
     one_hop: float = 0.04,
 ) -> dict[str, float]:
     """Compute apply kg boosts.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the apply kg boosts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the apply kg boosts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    cands : collections.abc.Mapping
-        Description for ``cands``.
-    query : str
-        Description for ``query``.
-    direct : float | None
-        Optional parameter default ``0.08``. Description for ``direct``.
-    one_hop : float | None
-        Optional parameter default ``0.04``. Description for ``one_hop``.
+Parameters
+----------
+cands : dict[str, float]
+    Description for ``cands``.
+query : str
+    Description for ``query``.
+direct : float, optional
+    Defaults to ``0.08``.
+    Description for ``direct``.
+    Defaults to ``0.08``.
+one_hop : float, optional
+    Defaults to ``0.04``.
+    Description for ``one_hop``.
+    
+    
+    
+    Defaults to ``0.04``.
 
-    Returns
-    -------
-    collections.abc.Mapping
-        Description of return value.
+Returns
+-------
+dict[str, float]
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from search_api.app import apply_kg_boosts
-    >>> result = apply_kg_boosts(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from search_api.app import apply_kg_boosts
+>>> result = apply_kg_boosts(..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
     q_concepts = set()
     for w in query.lower().split():
         if w.startswith("concept"):
@@ -273,27 +301,20 @@ def apply_kg_boosts(
 
 # [nav:anchor search]
 def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
-    """Compute search.
-
-    Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Execute a blended dense + sparse search over the configured indices.
+<!-- auto:docstring-builder v1 -->
 
     Parameters
     ----------
-    req : src.search_api.schemas.SearchRequest
-        Description for ``req``.
-    _ : None | None
-        Optional parameter default ``Depends(auth)``. Description for ``_``.
+    req : SearchRequest
+        Validated search request containing the query and filters.
+    _ : None, optional
+        Dependency injection hook that enforces authentication.
 
     Returns
     -------
-    collections.abc.Mapping
-        Description of return value.
-
-    Examples
-    --------
-    >>> from search_api.app import search
-    >>> result = search(...)
-    >>> result  # doctest: +ELLIPSIS
+    dict[str, Any]
+        Search results keyed by channel, including fused rankings.
     """
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
@@ -354,27 +375,20 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
 
 # [nav:anchor graph_concepts]
 def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str, Any]:
-    """Compute graph concepts.
-
-    Carry out the graph concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Return concept suggestions seeded from the mock knowledge graph.
+<!-- auto:docstring-builder v1 -->
 
     Parameters
     ----------
-    body : collections.abc.Mapping
-        Description for ``body``.
-    _ : None | None
-        Optional parameter default ``Depends(auth)``. Description for ``_``.
+    body : Mapping[str, Any]
+        JSON payload containing the ``"q"`` query string.
+    _ : None, optional
+        Dependency injection hook that enforces authentication.
 
     Returns
     -------
-    collections.abc.Mapping
-        Description of return value.
-
-    Examples
-    --------
-    >>> from search_api.app import graph_concepts
-    >>> result = graph_concepts(...)
-    >>> result  # doctest: +ELLIPSIS
+    dict[str, Any]
+        Matching concepts grouped under the ``"concepts"`` key.
     """
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring

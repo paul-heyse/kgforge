@@ -136,7 +136,7 @@ def build_semantic_schemas(result: HarvestResult, config: BuilderConfig) -> list
     ast_nodes = _ast_index(result)
     entries: list[SemanticResult] = []
     for symbol in result.symbols:
-        if not symbol.owned:
+        if not symbol.owned and not config.normalize_sections:
             continue
         parameters = _build_parameters(symbol)
         returns = _build_returns(symbol)

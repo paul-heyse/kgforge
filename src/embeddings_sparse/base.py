@@ -47,90 +47,120 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor SparseEncoder]
 class SparseEncoder(Protocol):
-    """Model the SparseEncoder.
+    """Protocol describing sparse encoders exposed by the package.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the sparseencoder data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Attributes
+    ----------
+    name : str
+        Canonical identifier advertised by the encoder implementation.
     """
 
     name: str
 
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
         """Compute encode.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        texts : List[str]
-            Description for ``texts``.
+Parameters
+----------
+texts : list[str]
+    Description for ``texts``.
+    
+    
+    
 
-        Returns
-        -------
-        List[Tuple[List[int], List[float]]]
-            Description of return value.
+Returns
+-------
+list[tuple[list[int], list[float]]]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from embeddings_sparse.base import encode
-        >>> result = encode(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_sparse.base import encode
+>>> result = encode(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         ...
 
 
 # [nav:anchor SparseIndex]
 class SparseIndex(Protocol):
     """Model the SparseIndex.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the sparseindex data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the sparseindex data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+
+Parameters
+----------
+*args : Any
+    Describe ``args``.
+**kwargs : Any
+    Describe ``kwargs``.
+"""
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Compute build.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        docs_iterable : collections.abc.Iterable
-            Description for ``docs_iterable``.
+Parameters
+----------
+docs_iterable : Iterable[tuple[str, dict[str, str]]]
+    Description for ``docs_iterable``.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from embeddings_sparse.base import build
-        >>> build(...)  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_sparse.base import build
+>>> build(...)  # doctest: +ELLIPSIS
+"""
         ...
 
     def search(
         self, query: str, k: int, fields: Mapping[str, str] | None = None
     ) -> list[tuple[str, float]]:
         """Compute search.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        query : str
-            Description for ``query``.
-        k : int
-            Description for ``k``.
-        fields : Mapping[str, str] | None
-            Optional parameter default ``None``. Description for ``fields``.
+Parameters
+----------
+query : str
+    Description for ``query``.
+k : int
+    Description for ``k``.
+fields : Mapping[str, str] | None, optional
+    Defaults to ``None``.
+    Description for ``fields``.
+    
+    
+    
+    Defaults to ``None``.
 
-        Returns
-        -------
-        List[Tuple[str, float]]
-            Description of return value.
+Returns
+-------
+list[tuple[str, float]]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from embeddings_sparse.base import search
-        >>> result = search(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_sparse.base import search
+>>> result = search(..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
         ...

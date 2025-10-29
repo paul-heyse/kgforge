@@ -44,30 +44,37 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor load_config]
 def load_config(path: str) -> dict[str, Any]:
     """Compute load config.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the load config operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the load config operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    path : str
-        Description for ``path``.
+Parameters
+----------
+path : str
+    Description for ``path``.
+    
+    
+    
 
-    Returns
-    -------
-    collections.abc.Mapping
-        Description of return value.
+Returns
+-------
+dict[str, Any]
+    Description of return value.
+    
+    
+    
 
-    Raises
-    ------
-    TypeError
-        Raised when validation fails.
+Raises
+------
+TypeError
+    Raised when validation fails.
 
-    Examples
-    --------
-    >>> from kgfoundry_common.config import load_config
-    >>> result = load_config(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from kgfoundry_common.config import load_config
+>>> result = load_config(...)
+>>> result  # doctest: +ELLIPSIS
+"""
     with open(path, encoding="utf-8") as f:
         loaded = yaml.safe_load(f)
     if not isinstance(loaded, dict):

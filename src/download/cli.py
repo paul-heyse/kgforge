@@ -46,23 +46,31 @@ app = typer.Typer(help="Downloader & harvester CLI (skeleton).")
 # [nav:anchor harvest]
 def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
     """Compute harvest.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the harvest operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the harvest operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    topic : str
-        Description for ``topic``.
-    years : str | None
-        Optional parameter default ``'>=2018'``. Description for ``years``.
-    max_works : int | None
-        Optional parameter default ``20000``. Description for ``max_works``.
+Parameters
+----------
+topic : str
+    Description for ``topic``.
+years : str, optional
+    Defaults to ``'>=2018'``.
+    Description for ``years``.
+    Defaults to ``'>=2018'``.
+max_works : int, optional
+    Defaults to ``20000``.
+    Description for ``max_works``.
+    
+    
+    
+    Defaults to ``20000``.
 
-    Examples
-    --------
-    >>> from download.cli import harvest
-    >>> harvest(...)  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from download.cli import harvest
+>>> harvest(...)  # doctest: +ELLIPSIS
+"""
     typer.echo(f"[dry-run] would harvest topic={topic!r}, years={years}, max_works={max_works}")
 
 

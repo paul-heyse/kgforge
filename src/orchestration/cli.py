@@ -56,23 +56,33 @@ def index_bm25(
     index_dir: str = typer.Option("./_indices/bm25", help="Output index directory"),
 ) -> None:
     """Compute index bm25.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the index bm25 operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the index bm25 operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    chunks_parquet : str | None
-        Optional parameter default ``typer.Argument(..., help='Path to Parquet/JSONL with chunks')``. Description for ``chunks_parquet``.
-    backend : str | None
-        Optional parameter default ``typer.Option('lucene', help='lucene|pure')``. Description for ``backend``.
-    index_dir : str | None
-        Optional parameter default ``typer.Option('./_indices/bm25', help='Output index directory')``. Description for ``index_dir``.
+Parameters
+----------
+chunks_parquet : str, optional
+    Optional parameter default ``typer.Argument(..., help='Path to Parquet/JSONL with chunks')``. Description for ``chunks_parquet``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7f00c53956a0>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7f4eb85a56a0>``.
+backend : str, optional
+    Optional parameter default ``typer.Option('lucene', help='lucene|pure')``. Description for ``backend``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7f00c5332ad0>``.
+    Defaults to ``<typer.models.OptionInfo object at 0x7f4eb853ead0>``.
+index_dir : str, optional
+    Optional parameter default ``typer.Option('./_indices/bm25', help='Output index directory')``. Description for ``index_dir``.
+    
+    
+    Defaults to ``<typer.models.OptionInfo object at 0x7f00c5332c10>``.
+    
+    Defaults to ``<typer.models.OptionInfo object at 0x7f4eb853ec10>``.
 
-    Examples
-    --------
-    >>> from orchestration.cli import index_bm25
-    >>> index_bm25()  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from orchestration.cli import index_bm25
+>>> index_bm25()  # doctest: +ELLIPSIS
+"""
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
@@ -119,21 +129,29 @@ def index_faiss(
     ),
 ) -> None:
     """Compute index faiss.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the index faiss operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the index faiss operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    dense_vectors : str | None
-        Optional parameter default ``typer.Argument(..., help='Path to dense vectors JSON (skeleton)')``. Description for ``dense_vectors``.
-    index_path : str | None
-        Optional parameter default ``typer.Option('./_indices/faiss/shard_000.idx', help='Output index (CPU .idx)')``. Description for ``index_path``.
+Parameters
+----------
+dense_vectors : str, optional
+    Optional parameter default ``typer.Argument(..., help='Path to dense vectors JSON (skeleton)')``. Description for ``dense_vectors``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7f00c5332d50>``.
+    Defaults to ``<typer.models.ArgumentInfo object at 0x7f4eb853ed50>``.
+index_path : str, optional
+    Optional parameter default ``typer.Option('./_indices/faiss/shard_000.idx', help='Output index (CPU .idx)')``. Description for ``index_path``.
+    
+    
+    Defaults to ``<typer.models.OptionInfo object at 0x7f00c5332e90>``.
+    
+    Defaults to ``<typer.models.OptionInfo object at 0x7f4eb853ee90>``.
 
-    Examples
-    --------
-    >>> from orchestration.cli import index_faiss
-    >>> index_faiss()  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from orchestration.cli import index_faiss
+>>> index_faiss()  # doctest: +ELLIPSIS
+"""
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
         vecs = json.load(fh)
@@ -155,19 +173,25 @@ def index_faiss(
 # [nav:anchor api]
 def api(port: int = 8080) -> None:
     """Compute api.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the api operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the api operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    port : int | None
-        Optional parameter default ``8080``. Description for ``port``.
+Parameters
+----------
+port : int, optional
+    Defaults to ``8080``.
+    Description for ``port``.
+    
+    
+    
+    Defaults to ``8080``.
 
-    Examples
-    --------
-    >>> from orchestration.cli import api
-    >>> api()  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from orchestration.cli import api
+>>> api()  # doctest: +ELLIPSIS
+"""
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
@@ -176,19 +200,20 @@ def api(port: int = 8080) -> None:
 # [nav:anchor e2e]
 def e2e() -> None:
     """Compute e2e.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the e2e operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the e2e operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Raises
-    ------
-    typer.Exit
-        Raised when validation fails.
+Raises
+------
+typer.Exit
+    Raised when validation fails.
 
-    Examples
-    --------
-    >>> from orchestration.cli import e2e
-    >>> e2e()  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from orchestration.cli import e2e
+>>> e2e()  # doctest: +ELLIPSIS
+"""
     try:
         from orchestration.flows import e2e_flow
     except ModuleNotFoundError as exc:  # pragma: no cover - defensive messaging
