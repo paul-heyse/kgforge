@@ -38,6 +38,15 @@ jobs:
           . .venv/bin/activate
           python tools/check_docstrings.py --no-todo
 
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Run documentation linting
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          make lint-docs
+
   tests:
     name: Pytest
     runs-on: ubuntu-latest

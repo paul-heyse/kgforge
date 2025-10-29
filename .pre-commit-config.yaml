@@ -93,6 +93,23 @@ repos:
         entry: bash tools/hooks/run_readme_generator.sh
         language: system
         pass_filenames: false
+      # optional: fast docstring drift detection with skip flag support
+      - id: docstring-builder-diff
+        name: "docstring-builder (diff, optional)"
+        entry: >-
+          bash -lc '
+          if [ "${SKIP_DOC_BUILDER_DIFF:-0}" = "1" ]; then
+            echo "Skipping docstring diff (SKIP_DOC_BUILDER_DIFF=1)";
+            exit 0;
+          fi;
+          SINCE=${DOC_BUILDER_SINCE:-origin/main};
+          if ! git rev-parse "$SINCE" >/dev/null 2>&1; then
+            SINCE=HEAD~1;
+          fi;
+          python -m tools.docstring_builder.cli check --diff --since "$SINCE";
+          '
+        language: system
+        pass_filenames: false
 
   - repo: https://github.com/PyCQA/pydocstyle
     rev: 6.3.0
