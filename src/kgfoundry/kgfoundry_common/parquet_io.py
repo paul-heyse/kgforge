@@ -1,6 +1,4 @@
-"""Expose ``kgfoundry_common.parquet_io`` inside the ``kgfoundry``
-namespace.
-"""
+"""Expose ``kgfoundry_common.parquet_io`` inside the ``kgfoundry`` namespace."""
 
 from __future__ import annotations
 

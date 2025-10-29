@@ -1,8 +1,8 @@
 """Overview of gpu.
 
-This module bundles gpu logic for the kgfoundry stack. It groups related
-helpers so downstream packages can import a single cohesive namespace.
-Refer to the functions and classes below for implementation specifics.
+This module bundles gpu logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -58,30 +58,35 @@ type StrArray = NDArray[np.str_]
 class FaissGpuIndex:
     """Describe FaissGpuIndex.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 
-Parameters
-----------
-factory : str, optional
-    Describe ``factory``.
-    Defaults to ``'OPQ64,IVF8192,PQ64'``.
-nprobe : int, optional
-    Describe ``nprobe``.
-    Defaults to ``64``.
-gpu : bool, optional
-    Describe ``gpu``.
-    Defaults to ``True``.
-cuvs : bool, optional
-    Describe ``cuvs``.
-    Defaults to ``True``.
+    Parameters
+    ----------
+    factory : str, optional
+        Describe ``factory``.
+        Defaults to ``'OPQ64,IVF8192,PQ64'``.
+    nprobe : int, optional
+        Describe ``nprobe``.
+        Defaults to ``64``.
+    gpu : bool, optional
+        Describe ``gpu``.
+        Defaults to ``True``.
+    cuvs : bool, optional
+        Describe ``cuvs``.
+        Defaults to ``True``.
 
-Raises
-------
-RuntimeError
+
+
+
+
+
+    Raises
+    ------
+    RuntimeError
     Raised when TODO for RuntimeError.
-"""
+    """
 
     def __init__(
         self,
@@ -92,25 +97,25 @@ RuntimeError
     ) -> None:
         """Describe   init  .
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-factory : str, optional
-    Describe ``factory``.
-    Defaults to ``'OPQ64,IVF8192,PQ64'``.
-nprobe : int, optional
-    Describe ``nprobe``.
-    Defaults to ``64``.
-gpu : bool, optional
-    Describe ``gpu``.
-    Defaults to ``True``.
-cuvs : bool, optional
-    Describe ``cuvs``.
-    Defaults to ``True``.
-"""
+        Parameters
+        ----------
+        factory : str, optional
+            Describe ``factory``.
+            Defaults to ``'OPQ64,IVF8192,PQ64'``.
+        nprobe : int, optional
+            Describe ``nprobe``.
+            Defaults to ``64``.
+        gpu : bool, optional
+            Describe ``gpu``.
+            Defaults to ``True``.
+        cuvs : bool, optional
+            Describe ``cuvs``.
+            Defaults to ``True``.
+        """
         self.factory = factory
         self.nprobe = nprobe
         self.gpu = gpu
@@ -130,12 +135,12 @@ cuvs : bool, optional
     def _ensure_resources(self) -> None:
         """Describe  ensure resources.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Python's object protocol for this class. Use it to integrate
-with built-in operators, protocols, or runtime behaviours that
-expect instances to participate in the language's data model.
-"""
+        Python's object protocol for this class. Use it to integrate with built-in operators,
+        protocols, or runtime behaviours that expect instances to participate in the language's data
+        model.
+        """
         if not self._faiss or not self.gpu:
             return
         if self._res is None:
@@ -145,18 +150,18 @@ expect instances to participate in the language's data model.
     def train(self, train_vectors: FloatArray | FloatArrayLike, *, seed: int = 42) -> None:
         """Describe train.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-train_vectors : FloatArray | FloatArrayLike
-    Describe ``train_vectors``.
-seed : int, optional
-    Describe ``seed``.
-    Defaults to ``42``.
-"""
+        Parameters
+        ----------
+        train_vectors : FloatArray | FloatArrayLike
+            Describe ``train_vectors``.
+        seed : int, optional
+            Describe ``seed``.
+            Defaults to ``42``.
+        """
         if self._faiss is None:
             return
         train_mat: FloatArray = np.asarray(train_vectors, dtype=np.float32, order="C")
@@ -185,22 +190,27 @@ seed : int, optional
     def add(self, keys: list[str], vectors: FloatArray | FloatArrayLike) -> None:
         """Describe add.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-keys : list[str]
-    Describe ``keys``.
-vectors : FloatArray | FloatArrayLike
-    Describe ``vectors``.
+        Parameters
+        ----------
+        keys : list[str]
+            Describe ``keys``.
+        vectors : FloatArray | FloatArrayLike
+            Describe ``vectors``.
 
-Raises
-------
-RuntimeError
-Raised when TODO for RuntimeError.
-"""
+
+
+
+
+
+        Raises
+        ------
+        RuntimeError
+        Raised when TODO for RuntimeError.
+        """
         vec_array: FloatArray = np.asarray(vectors, dtype=np.float32, order="C")
         if self._faiss is None:
             xb: FloatArray = np.array(vec_array, dtype=np.float32, copy=True)
@@ -228,27 +238,38 @@ Raised when TODO for RuntimeError.
     def search(self, query: FloatArray | FloatArrayLike, k: int) -> list[tuple[str, float]]:
         """Describe search.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-query : FloatArray | FloatArrayLike
-    Describe ``query``.
-k : int
-    Describe ``k``.
+        Parameters
+        ----------
+        query : FloatArray | FloatArrayLike
+            Describe ``query``.
+        k : int
+            Describe ``k``.
 
-Returns
--------
-list[tuple[str, float]]
-    Describe return value.
 
-Raises
-------
-RuntimeError
-Raised when TODO for RuntimeError.
-"""
+
+
+
+
+        Returns
+        -------
+        list[tuple[str, float]]
+            Describe return value.
+
+
+
+
+
+
+
+        Raises
+        ------
+        RuntimeError
+        Raised when TODO for RuntimeError.
+        """
         q: FloatArray = np.asarray(query, dtype=np.float32, order="C")
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12
         if self._faiss is None or self._index is None:
@@ -269,23 +290,28 @@ Raised when TODO for RuntimeError.
     def save(self, index_uri: str, idmap_uri: str | None = None) -> None:
         """Describe save.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-index_uri : str
-    Describe ``index_uri``.
-idmap_uri : str | None, optional
-    Describe ``idmap_uri``.
-    Defaults to ``None``.
+        Parameters
+        ----------
+        index_uri : str
+            Describe ``index_uri``.
+        idmap_uri : str | None, optional
+            Describe ``idmap_uri``.
+            Defaults to ``None``.
 
-Raises
-------
-RuntimeError
-Raised when TODO for RuntimeError.
-"""
+
+
+
+
+
+        Raises
+        ------
+        RuntimeError
+        Raised when TODO for RuntimeError.
+        """
         if self._faiss is None or self._index is None:
             if self._xb is not None and self._idmap is not None:
                 np.savez(index_uri, xb=self._xb, ids=self._idmap)
@@ -300,23 +326,28 @@ Raised when TODO for RuntimeError.
     def load(self, index_uri: str, idmap_uri: str | None = None) -> None:
         """Describe load.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-index_uri : str
-    Describe ``index_uri``.
-idmap_uri : str | None, optional
-    Describe ``idmap_uri``.
-    Defaults to ``None``.
+        Parameters
+        ----------
+        index_uri : str
+            Describe ``index_uri``.
+        idmap_uri : str | None, optional
+            Describe ``idmap_uri``.
+            Defaults to ``None``.
 
-Raises
-------
-RuntimeError
-Raised when TODO for RuntimeError.
-"""
+
+
+
+
+
+        Raises
+        ------
+        RuntimeError
+        Raised when TODO for RuntimeError.
+        """
         if self._faiss is None:
             if os.path.exists(index_uri + ".npz"):
                 data = np.load(index_uri + ".npz", allow_pickle=True)

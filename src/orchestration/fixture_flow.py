@@ -1,9 +1,8 @@
 """Overview of fixture flow.
 
-This module bundles fixture flow logic for the kgfoundry stack. It
-groups related helpers so downstream packages can import a single
-cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles fixture flow logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from __future__ import annotations
@@ -58,20 +57,25 @@ __navmap__: Final[NavMap] = {
 def _t_prepare_dirs_impl(root: str) -> dict[str, bool]:
     """Describe  t prepare dirs impl.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-root : str
-    Describe ``root``.
+    Parameters
+    ----------
+    root : str
+        Describe ``root``.
 
-Returns
--------
-dict[str, bool]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    dict[str, bool]
+        Describe return value.
+    """
     path = Path(root)
     (path / "parquet" / "dense").mkdir(parents=True, exist_ok=True)
     (path / "parquet" / "sparse").mkdir(parents=True, exist_ok=True)
@@ -88,20 +92,25 @@ t_prepare_dirs = task(_t_prepare_dirs_impl)
 def _t_write_fixture_chunks_impl(chunks_root: str) -> tuple[str, int]:
     """Describe  t write fixture chunks impl.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-chunks_root : str
-    Describe ``chunks_root``.
+    Parameters
+    ----------
+    chunks_root : str
+        Describe ``chunks_root``.
 
-Returns
--------
-tuple[str, int]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    tuple[str, int]
+        Describe return value.
+    """
     writer = ParquetChunkWriter(chunks_root, model="docling_hybrid", run_id="fixture")
     rows = [
         {
@@ -128,20 +137,25 @@ t_write_fixture_chunks = task(_t_write_fixture_chunks_impl)
 def _t_write_fixture_dense_impl(dense_root: str) -> tuple[str, int]:
     """Describe  t write fixture dense impl.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-dense_root : str
-    Describe ``dense_root``.
+    Parameters
+    ----------
+    dense_root : str
+        Describe ``dense_root``.
 
-Returns
--------
-tuple[str, int]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    tuple[str, int]
+        Describe return value.
+    """
     writer = ParquetVectorWriter(dense_root)
     vector = [0.0] * 2560
     out_root = writer.write_dense(
@@ -158,20 +172,25 @@ t_write_fixture_dense = task(_t_write_fixture_dense_impl)
 def _t_write_fixture_splade_impl(sparse_root: str) -> tuple[str, int]:
     """Describe  t write fixture splade impl.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-sparse_root : str
-    Describe ``sparse_root``.
+    Parameters
+    ----------
+    sparse_root : str
+        Describe ``sparse_root``.
 
-Returns
--------
-tuple[str, int]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    tuple[str, int]
+        Describe return value.
+    """
     writer = ParquetVectorWriter(sparse_root)
     out_root = writer.write_splade(
         "SPLADE-v3-distilbert",
@@ -195,26 +214,31 @@ def _t_register_in_duckdb_impl(
 ) -> dict[str, list[str]]:
     """Describe  t register in duckdb impl.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-db_path : str
-    Describe ``db_path``.
-chunks_info : tuple[str, int]
-    Describe ``chunks_info``.
-dense_info : tuple[str, int]
-    Describe ``dense_info``.
-sparse_info : tuple[str, int]
-    Describe ``sparse_info``.
+    Parameters
+    ----------
+    db_path : str
+        Describe ``db_path``.
+    chunks_info : tuple[str, int]
+        Describe ``chunks_info``.
+    dense_info : tuple[str, int]
+        Describe ``dense_info``.
+    sparse_info : tuple[str, int]
+        Describe ``sparse_info``.
 
-Returns
--------
-dict[str, list[str]]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    dict[str, list[str]]
+        Describe return value.
+    """
     registry = DuckDBRegistryHelper(db_path)
     dense_run = registry.new_run("dense_embed", "Qwen3-Embedding-4B", "main", {"dim": 2560})
     sparse_run = registry.new_run("splade_encode", "SPLADE-v3-distilbert", "main", {"topk": 256})
@@ -262,24 +286,29 @@ def _fixture_pipeline_impl(
 ) -> dict[str, list[str]]:
     """Describe  fixture pipeline impl.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-root : str, optional
-    Describe ``root``.
-    Defaults to ``'/data'``.
-db_path : str, optional
-    Describe ``db_path``.
-    Defaults to ``'/data/catalog/catalog.duckdb'``.
+    Parameters
+    ----------
+    root : str, optional
+        Describe ``root``.
+        Defaults to ``'/data'``.
+    db_path : str, optional
+        Describe ``db_path``.
+        Defaults to ``'/data/catalog/catalog.duckdb'``.
 
-Returns
--------
-dict[str, list[str]]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    dict[str, list[str]]
+        Describe return value.
+    """
     t_prepare_dirs(root)
     chunks_info = t_write_fixture_chunks(f"{root}/parquet/chunks")
     dense_info = t_write_fixture_dense(f"{root}/parquet/dense")

@@ -1,9 +1,8 @@
 """Overview of flows.
 
-This module bundles flows logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles flows logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -46,20 +45,25 @@ __navmap__: Final[NavMap] = {
 def _t_echo_impl(msg: str) -> str:
     """Describe  t echo impl.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-msg : str
-    Describe ``msg``.
+    Parameters
+    ----------
+    msg : str
+        Describe ``msg``.
 
-Returns
--------
-str
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    str
+        Describe return value.
+    """
     return msg
 
 
@@ -70,15 +74,15 @@ t_echo = task(_t_echo_impl)
 def _e2e_flow_impl() -> list[str]:
     """Describe  e2e flow impl.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Returns
--------
-list[str]
-    Describe return value.
-"""
+    Returns
+    -------
+    list[str]
+        Describe return value.
+    """
     return [
         t_echo.submit(x).result()
         for x in [

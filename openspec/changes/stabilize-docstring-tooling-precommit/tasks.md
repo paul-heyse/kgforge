@@ -1,0 +1,33 @@
+## 1. Implementation
+- [ ] 1.1 Create strongly typed shims for docstring-parser
+    - [ ] 1.1.1 Define Protocols (`DocstringProto`, `DocstringAttrProto`, `DocstringYieldsProto`) that list the exact attributes we depend on (e.g., `meta`, `args`, `description`).
+    - [ ] 1.1.2 Implement helper functions `ensure_docstring_attrs` and `ensure_docstring_yields` that perform the `setattr` with runtime guards and return booleans for logging.
+    - [ ] 1.1.3 Replace the direct property assignments in `sitecustomize.py` with calls to those helpers and add defensive logging when upstream already exposes the attribute.
+- [ ] 1.2 Harden docstring-builder metadata pipeline
+    - [ ] 1.2.1 Extend `tools/docstring_builder/harvest.py` so `ParameterHarvest` stores the original `inspect.Parameter.kind` value and expose a `display_name` helper.
+    - [ ] 1.2.2 Persist the enriched metadata into DocFacts JSON; update the schema if new fields are required and regenerate fixtures under `tests/docs/test_docfacts.py`.
+    - [ ] 1.2.3 Update `render.py` to consume `display_name`, add regression tests covering idempotent output for functions with `*args/**kwargs`.
+- [ ] 1.3 Restore CLI backwards compatibility
+    - [ ] 1.3.1 Teach `tools/docstring_builder/cli.py` to parse legacy top-level flags (`--diff`, `--since`, `--module`) and translate them into the new subcommand arguments.
+    - [ ] 1.3.2 Add an `--ignore-missing` option that suppresses ModuleNotFoundError for known build artefact paths (e.g., `docs/_build/**`).
+    - [ ] 1.3.3 Write unit tests that mimic the pre-commit invocation to avoid regressions.
+- [ ] 1.4 Consolidate documentation artefact regeneration
+    - [ ] 1.4.1 Create a new make target (tentatively `make artifacts`) that sequentially runs navmap build, docstring builder update, schema export, observability scan, and test-map generation.
+    - [ ] 1.4.2 Ensure each sub-command writes a short status line and exits early on failure; wire the target into `tools/update_navmaps.py` or sibling scripts where appropriate.
+    - [ ] 1.4.3 Update `.pre-commit-config.yaml` so hooks with side effects either call the consolidated target or are marked as `pass_filenames: false` to avoid repeated regeneration.
+- [ ] 1.5 Documentation and CI updates
+    - [ ] 1.5.1 Document the new workflow in CONTRIBUTING.md and AGENTS.md with a step-by-step guide aimed at junior contributors.
+    - [ ] 1.5.2 Add FAQ entries describing common failure modes (e.g., missing DocFacts, navmap drift) and the commands that fix them.
+    - [ ] 1.5.3 Introduce a CI job that runs `make artifacts` and fails if any tracked artefact changes after regeneration.
+
+## 2. Validation
+- [ ] 2.1 Perform local verification
+    - [ ] 2.1.1 Run `uv run mypy` to confirm the shim is type-safe without ignores.
+    - [ ] 2.1.2 Execute `uv run pyrefly check` to ensure docstring semantics remain correct.
+    - [ ] 2.1.3 Run `make artifacts` followed by `git status` to confirm idempotence.
+- [ ] 2.2 Pre-commit shakedown
+    - [ ] 2.2.1 Execute `uv run pre-commit run --all-files` and verify that no hook rewrites files after regeneration.
+    - [ ] 2.2.2 Add automated tests (pytest) covering the new CLI flag translation and docstring-builder metadata cases.
+- [ ] 2.3 Documentation review
+    - [ ] 2.3.1 Have a peer review the updated CONTRIBUTING/AGENTS sections for clarity.
+    - [ ] 2.3.2 Record a short walkthrough (screenshot or asciinema) demonstrating the new workflow for onboarding.

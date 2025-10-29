@@ -1,9 +1,8 @@
 """Overview of fusion.
 
-This module bundles fusion logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles fusion logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -44,24 +43,28 @@ __navmap__: Final[NavMap] = {
 def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, float]:
     """Describe rrf fuse.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-rankers : list[list[tuple[str, float]]]
-    Describe ``rankers``.
-k : int, optional
-    Describe ``k``.
-    Defaults to ``60``.
-    
+    Parameters
+    ----------
+    rankers : list[list[tuple[str, float]]]
+        Describe ``rankers``.
+    k : int, optional
+        Describe ``k``.
+        Defaults to ``60``.
 
-Returns
--------
-dict[str, float]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    dict[str, float]
+        Describe return value.
+    """
     agg: dict[str, float] = {}
     for ranked in rankers:
         for r, (key, _score) in enumerate(ranked, start=1):

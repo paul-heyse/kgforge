@@ -1,6 +1,4 @@
-"""Extended summary and type-override helpers for legacy docstring
-generation.
-"""
+"""Extended summary and type-override helpers for legacy docstring generation."""
 
 from __future__ import annotations
 
@@ -432,10 +430,12 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
 
 
 def _is_magic(name: str) -> bool:
+    """Return True when ``name`` matches a known Python magic method."""
     return name in MAGIC_METHOD_EXTENDED_SUMMARIES
 
 
 def _is_pydantic_artifact(name: str) -> bool:
+    """Return True when ``name`` refers to a Pydantic-specific helper."""
     return name in PYDANTIC_ARTIFACT_SUMMARIES or name.startswith("__pydantic")
 
 

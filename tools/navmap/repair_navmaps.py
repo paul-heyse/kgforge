@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 """Overview of repair navmaps.
 
-This module bundles repair navmaps logic for the kgfoundry stack. It
-groups related helpers so downstream packages can import a single
-cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles repair navmaps logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from __future__ import annotations
@@ -478,9 +477,7 @@ def _collect_section_dicts(raw: object) -> list[dict[str, Any]]:
 
 
 def _build_sections(sections: Iterable[dict[str, Any]], exports: list[str]) -> list[dict[str, Any]]:
-    """Return the canonical ``sections`` payload with the public API section
-    first.
-    """
+    """Return the canonical ``sections`` payload with the public API section first."""
     remaining = [section for section in sections if section.get("id") != "public-api"]
     return [{"id": "public-api", "symbols": exports}, *remaining]
 
@@ -537,9 +534,7 @@ def _apply_symbol_defaults(
 
 
 def _normalize_exports(value: object, fallback: Iterable[str]) -> list[str]:
-    """Return a deduplicated list of exports derived from ``value`` or
-    ``fallback``.
-    """
+    """Return a deduplicated list of exports derived from ``value`` or ``fallback``."""
     if isinstance(value, Iterable) and not isinstance(value, (str, bytes)):
         candidates = value
     else:

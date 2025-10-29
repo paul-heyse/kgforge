@@ -1,9 +1,8 @@
 """Overview of splade.
 
-This module bundles splade logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles splade logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -73,30 +72,35 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 class SPLADEv3Encoder:
     """Describe SPLADEv3Encoder.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 
-Parameters
-----------
-model_id : str, optional
-    Describe ``model_id``.
-    Defaults to ``'naver/splade-v3-distilbert'``.
-device : str, optional
-    Describe ``device``.
-    Defaults to ``'cuda'``.
-topk : int, optional
-    Describe ``topk``.
-    Defaults to ``256``.
-max_seq_len : int, optional
-    Describe ``max_seq_len``.
-    Defaults to ``512``.
+    Parameters
+    ----------
+    model_id : str, optional
+        Describe ``model_id``.
+        Defaults to ``'naver/splade-v3-distilbert'``.
+    device : str, optional
+        Describe ``device``.
+        Defaults to ``'cuda'``.
+    topk : int, optional
+        Describe ``topk``.
+        Defaults to ``256``.
+    max_seq_len : int, optional
+        Describe ``max_seq_len``.
+        Defaults to ``512``.
 
-Raises
-------
-NotImplementedError
+
+
+
+
+
+    Raises
+    ------
+    NotImplementedError
     Raised when TODO for NotImplementedError.
-"""
+    """
 
     name = "SPLADE-v3-distilbert"
 
@@ -109,25 +113,25 @@ NotImplementedError
     ) -> None:
         """Describe   init  .
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-model_id : str, optional
-    Describe ``model_id``.
-    Defaults to ``'naver/splade-v3-distilbert'``.
-device : str, optional
-    Describe ``device``.
-    Defaults to ``'cuda'``.
-topk : int, optional
-    Describe ``topk``.
-    Defaults to ``256``.
-max_seq_len : int, optional
-    Describe ``max_seq_len``.
-    Defaults to ``512``.
-"""
+        Parameters
+        ----------
+        model_id : str, optional
+            Describe ``model_id``.
+            Defaults to ``'naver/splade-v3-distilbert'``.
+        device : str, optional
+            Describe ``device``.
+            Defaults to ``'cuda'``.
+        topk : int, optional
+            Describe ``topk``.
+            Defaults to ``256``.
+        max_seq_len : int, optional
+            Describe ``max_seq_len``.
+            Defaults to ``512``.
+        """
         self.model_id = model_id
         self.device = device
         self.topk = topk
@@ -136,25 +140,36 @@ max_seq_len : int, optional
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
         """Describe encode.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-texts : list[str]
-    Describe ``texts``.
+        Parameters
+        ----------
+        texts : list[str]
+            Describe ``texts``.
 
-Returns
--------
-list[tuple[list[int], list[float]]]
-    Describe return value.
 
-Raises
-------
-NotImplementedError
-Raised when TODO for NotImplementedError.
-"""
+
+
+
+
+        Returns
+        -------
+        list[tuple[list[int], list[float]]]
+            Describe return value.
+
+
+
+
+
+
+
+        Raises
+        ------
+        NotImplementedError
+        Raised when TODO for NotImplementedError.
+        """
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
@@ -166,30 +181,30 @@ Raised when TODO for NotImplementedError.
 class PureImpactIndex:
     """Describe PureImpactIndex.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-index_dir : str
-    Describe ``index_dir``.
-"""
+    Parameters
+    ----------
+    index_dir : str
+        Describe ``index_dir``.
+    """
 
     def __init__(self, index_dir: str) -> None:
         """Describe   init  .
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-index_dir : str
-    Describe ``index_dir``.
-"""
+        Parameters
+        ----------
+        index_dir : str
+            Describe ``index_dir``.
+        """
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -199,34 +214,39 @@ index_dir : str
     def _tokenize(text: str) -> list[str]:
         """Describe  tokenize.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-text : str
-    Describe ``text``.
+        Parameters
+        ----------
+        text : str
+            Describe ``text``.
 
-Returns
--------
-list[str]
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        list[str]
+            Describe return value.
+        """
         return [token.lower() for token in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Describe build.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-docs_iterable : Iterable[tuple[str, dict[str, str]]]
-    Describe ``docs_iterable``.
-"""
+        Parameters
+        ----------
+        docs_iterable : Iterable[tuple[str, dict[str, str]]]
+            Describe ``docs_iterable``.
+        """
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -260,12 +280,12 @@ docs_iterable : Iterable[tuple[str, dict[str, str]]]
     def load(self) -> None:
         """Describe load.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Python's object protocol for this class. Use it to integrate
-with built-in operators, protocols, or runtime behaviours that
-expect instances to participate in the language's data model.
-"""
+        Python's object protocol for this class. Use it to integrate with built-in operators,
+        protocols, or runtime behaviours that expect instances to participate in the language's data
+        model.
+        """
         with open(os.path.join(self.index_dir, "impact.pkl"), "rb") as handle:
             data = pickle.load(handle)
         self.df = data["df"]
@@ -275,22 +295,27 @@ expect instances to participate in the language's data model.
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
         """Describe search.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-query : str
-    Describe ``query``.
-k : int
-    Describe ``k``.
+        Parameters
+        ----------
+        query : str
+            Describe ``query``.
+        k : int
+            Describe ``k``.
 
-Returns
--------
-list[tuple[str, float]]
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        list[tuple[str, float]]
+            Describe return value.
+        """
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
         for token in tokens:
@@ -306,39 +331,44 @@ list[tuple[str, float]]
 class LuceneImpactIndex:
     """Describe LuceneImpactIndex.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 
-Parameters
-----------
-index_dir : str
-    Describe ``index_dir``.
-query_encoder : str, optional
-    Describe ``query_encoder``.
-    Defaults to ``'naver/splade-v3-distilbert'``.
+    Parameters
+    ----------
+    index_dir : str
+        Describe ``index_dir``.
+    query_encoder : str, optional
+        Describe ``query_encoder``.
+        Defaults to ``'naver/splade-v3-distilbert'``.
 
-Raises
-------
-RuntimeError
+
+
+
+
+
+    Raises
+    ------
+    RuntimeError
     Raised when TODO for RuntimeError.
-"""
+    """
 
     def __init__(self, index_dir: str, query_encoder: str = "naver/splade-v3-distilbert") -> None:
         """Describe   init  .
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-index_dir : str
-    Describe ``index_dir``.
-query_encoder : str, optional
-    Describe ``query_encoder``.
-    Defaults to ``'naver/splade-v3-distilbert'``.
-"""
+        Parameters
+        ----------
+        index_dir : str
+            Describe ``index_dir``.
+        query_encoder : str, optional
+            Describe ``query_encoder``.
+            Defaults to ``'naver/splade-v3-distilbert'``.
+        """
         self.index_dir = index_dir
         self.query_encoder = query_encoder
         self._searcher: Any | None = None
@@ -346,15 +376,15 @@ query_encoder : str, optional
     def _ensure(self) -> None:
         """Describe  ensure.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Raises
-------
-RuntimeError
-Raised when TODO for RuntimeError.
-"""
+        Raises
+        ------
+        RuntimeError
+        Raised when TODO for RuntimeError.
+        """
         if self._searcher is not None:
             return
         try:
@@ -367,27 +397,38 @@ Raised when TODO for RuntimeError.
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
         """Describe search.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-query : str
-    Describe ``query``.
-k : int
-    Describe ``k``.
+        Parameters
+        ----------
+        query : str
+            Describe ``query``.
+        k : int
+            Describe ``k``.
 
-Returns
--------
-list[tuple[str, float]]
-    Describe return value.
 
-Raises
-------
-RuntimeError
-Raised when TODO for RuntimeError.
-"""
+
+
+
+
+        Returns
+        -------
+        list[tuple[str, float]]
+            Describe return value.
+
+
+
+
+
+
+
+        Raises
+        ------
+        RuntimeError
+        Raised when TODO for RuntimeError.
+        """
         self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
@@ -404,25 +445,30 @@ def get_splade(
 ) -> PureImpactIndex | LuceneImpactIndex:
     """Describe get splade.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-backend : str
-    Describe ``backend``.
-index_dir : str
-    Describe ``index_dir``.
-query_encoder : str, optional
-    Describe ``query_encoder``.
-    Defaults to ``'naver/splade-v3-distilbert'``.
+    Parameters
+    ----------
+    backend : str
+        Describe ``backend``.
+    index_dir : str
+        Describe ``index_dir``.
+    query_encoder : str, optional
+        Describe ``query_encoder``.
+        Defaults to ``'naver/splade-v3-distilbert'``.
 
-Returns
--------
-PureImpactIndex | LuceneImpactIndex
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    PureImpactIndex | LuceneImpactIndex
+        Describe return value.
+    """
     if backend == "lucene":
         try:
             return LuceneImpactIndex(index_dir=index_dir, query_encoder=query_encoder)

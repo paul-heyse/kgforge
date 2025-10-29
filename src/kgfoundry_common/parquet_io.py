@@ -1,9 +1,8 @@
 """Overview of parquet io.
 
-This module bundles parquet io logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles parquet io logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from __future__ import annotations
@@ -58,37 +57,41 @@ ROW_GROUP_SIZE = 4096
 class ParquetVectorWriter:
     """Describe ParquetVectorWriter.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-root : str
-    Describe ``root``.
-"""
+    Parameters
+    ----------
+    root : str
+        Describe ``root``.
+    """
 
     @staticmethod
     def dense_schema(dim: int) -> pa.schema:
         """Describe dense schema.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-dim : int
-    Describe ``dim``.
-    
+        Parameters
+        ----------
+        dim : int
+            Describe ``dim``.
 
-Returns
--------
-pyarrow.lib.schema
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        pyarrow.lib.schema
+            Describe return value.
+        """
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -104,15 +107,15 @@ pyarrow.lib.schema
     def __init__(self, root: str) -> None:
         """Describe   init  .
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-root : str
-    Describe ``root``.
-"""
+        Parameters
+        ----------
+        root : str
+            Describe ``root``.
+        """
         self.root = Path(root)
 
     def write_dense(
@@ -125,30 +128,34 @@ root : str
     ) -> str:
         """Describe write dense.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-model : str
-    Describe ``model``.
-run_id : str
-    Describe ``run_id``.
-dim : int
-    Describe ``dim``.
-records : Iterable[tuple[str, list[float], float]]
-    Describe ``records``.
-shard : int, optional
-    Describe ``shard``.
-    Defaults to ``0``.
-    
+        Parameters
+        ----------
+        model : str
+            Describe ``model``.
+        run_id : str
+            Describe ``run_id``.
+        dim : int
+            Describe ``dim``.
+        records : Iterable[tuple[str, list[float], float]]
+            Describe ``records``.
+        shard : int, optional
+            Describe ``shard``.
+            Defaults to ``0``.
 
-Returns
--------
-str
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        str
+            Describe return value.
+        """
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -178,15 +185,15 @@ str
     def splade_schema() -> pa.schema:
         """Describe splade schema.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Returns
--------
-pyarrow.lib.schema
-    Describe return value.
-"""
+        Returns
+        -------
+        pyarrow.lib.schema
+            Describe return value.
+        """
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -208,28 +215,32 @@ pyarrow.lib.schema
     ) -> str:
         """Describe write splade.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-model : str
-    Describe ``model``.
-run_id : str
-    Describe ``run_id``.
-records : Iterable[tuple[str, list[int], list[float]]]
-    Describe ``records``.
-shard : int, optional
-    Describe ``shard``.
-    Defaults to ``0``.
-    
+        Parameters
+        ----------
+        model : str
+            Describe ``model``.
+        run_id : str
+            Describe ``run_id``.
+        records : Iterable[tuple[str, list[int], list[float]]]
+            Describe ``records``.
+        shard : int, optional
+            Describe ``shard``.
+            Defaults to ``0``.
 
-Returns
--------
-str
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        str
+            Describe return value.
+        """
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -260,37 +271,37 @@ str
 class ParquetChunkWriter:
     """Describe ParquetChunkWriter.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-root : str
-    Describe ``root``.
-model : str, optional
-    Describe ``model``.
-    Defaults to ``'docling_hybrid'``.
-run_id : str, optional
-    Describe ``run_id``.
-    Defaults to ``'dev'``.
-"""
+    Parameters
+    ----------
+    root : str
+        Describe ``root``.
+    model : str, optional
+        Describe ``model``.
+        Defaults to ``'docling_hybrid'``.
+    run_id : str, optional
+        Describe ``run_id``.
+        Defaults to ``'dev'``.
+    """
 
     @staticmethod
     def chunk_schema() -> pa.schema:
         """Describe chunk schema.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Returns
--------
-pyarrow.lib.schema
-    Describe return value.
-"""
+        Returns
+        -------
+        pyarrow.lib.schema
+            Describe return value.
+        """
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -318,42 +329,46 @@ pyarrow.lib.schema
     def __init__(self, root: str, model: str = "docling_hybrid", run_id: str = "dev") -> None:
         """Describe   init  .
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-root : str
-    Describe ``root``.
-model : str, optional
-    Describe ``model``.
-    Defaults to ``'docling_hybrid'``.
-run_id : str, optional
-    Describe ``run_id``.
-    Defaults to ``'dev'``.
-"""
+        Parameters
+        ----------
+        root : str
+            Describe ``root``.
+        model : str, optional
+            Describe ``model``.
+            Defaults to ``'docling_hybrid'``.
+        run_id : str, optional
+            Describe ``run_id``.
+            Defaults to ``'dev'``.
+        """
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
     def write(self, rows: Iterable[dict[str, Any]]) -> str:
         """Describe write.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-rows : Iterable[dict[str, Any]]
-    Describe ``rows``.
-    
+        Parameters
+        ----------
+        rows : Iterable[dict[str, Any]]
+            Describe ``rows``.
 
-Returns
--------
-str
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        str
+            Describe return value.
+        """
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(
             table,

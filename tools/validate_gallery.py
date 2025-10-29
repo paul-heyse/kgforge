@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Overview of validate gallery.
 
-This module bundles validate gallery logic for the kgfoundry stack. It
-groups related helpers so downstream packages can import a single
-cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles validate gallery logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from __future__ import annotations
@@ -52,10 +51,9 @@ __all__ = [
 class ValidationResult:
     """Model the ValidationResult.
 
-    Represent the validationresult data structure used throughout the
-    project. The class encapsulates behaviour behind a well-defined
-    interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Represent the validationresult data structure used throughout the project. The class
+    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+    are typically created by factories or runtime orchestrators documented nearby.
     """
 
     path: Path
@@ -101,10 +99,9 @@ class ValidationResult:
 class GalleryValidationError(RuntimeError):
     """Model the GalleryValidationError.
 
-    Represent the galleryvalidationerror data structure used throughout
-    the project. The class encapsulates behaviour behind a well-defined
-    interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Represent the galleryvalidationerror data structure used throughout the project. The class
+    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+    are typically created by factories or runtime orchestrators documented nearby.
     """
 
 

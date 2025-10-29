@@ -5,9 +5,9 @@
     "message_template": "\"BM25 search failed, falling back to empty results: %s\"",
     "structured_keys": [],
     "file": "src/search_api/app.py",
-    "lineno": 324,
+    "lineno": 312,
     "source_link": {
-      "editor": "vscode://file/src/search_api/app.py:324:1"
+      "editor": "vscode://file/src/search_api/app.py:312:1"
     },
     "runbook": null
   }

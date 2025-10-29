@@ -1,8 +1,8 @@
 """Overview of ids.
 
-This module bundles ids logic for the kgfoundry stack. It groups related
-helpers so downstream packages can import a single cohesive namespace.
-Refer to the functions and classes below for implementation specifics.
+This module bundles ids logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -50,21 +50,25 @@ __navmap__: Final[NavMap] = {
 def urn_doc_from_text(text: str) -> str:
     """Describe urn doc from text.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-text : str
-    Describe ``text``.
-    
+    Parameters
+    ----------
+    text : str
+        Describe ``text``.
 
-Returns
--------
-str
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    str
+        Describe return value.
+    """
     h = hashlib.sha256(text.encode("utf-8")).digest()[:16]
     b32 = base64.b32encode(h).decode("ascii").strip("=").lower()
     return f"urn:doc:sha256:{b32}"
@@ -74,23 +78,27 @@ str
 def urn_chunk(doc_hash: str, start: int, end: int) -> str:
     """Describe urn chunk.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-doc_hash : str
-    Describe ``doc_hash``.
-start : int
-    Describe ``start``.
-end : int
-    Describe ``end``.
-    
+    Parameters
+    ----------
+    doc_hash : str
+        Describe ``doc_hash``.
+    start : int
+        Describe ``start``.
+    end : int
+        Describe ``end``.
 
-Returns
--------
-str
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    str
+        Describe return value.
+    """
     return f"urn:chunk:{doc_hash.split(':')[-1]}:{start}-{end}"

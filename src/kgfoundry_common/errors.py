@@ -1,9 +1,8 @@
 """Overview of errors.
 
-This module bundles errors logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles errors logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -57,9 +56,11 @@ __navmap__: Final[NavMap] = {
 class DownloadError(Exception):
     """Describe DownloadError.
 
-<!-- auto:docstring-builder v1 -->
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    <!-- auto:docstring-builder v1 -->
+
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
+    """
 
     ...
 
@@ -68,9 +69,11 @@ Describe the data structure and how instances collaborate with the surrounding p
 class UnsupportedMIMEError(Exception):
     """Describe UnsupportedMIMEError.
 
-<!-- auto:docstring-builder v1 -->
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    <!-- auto:docstring-builder v1 -->
+
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
+    """
 
     ...
 
@@ -79,9 +82,11 @@ Describe the data structure and how instances collaborate with the surrounding p
 class DoclingError(Exception):
     """Describe DoclingError.
 
-<!-- auto:docstring-builder v1 -->
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    <!-- auto:docstring-builder v1 -->
+
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
+    """
 
     ...
 
@@ -90,9 +95,11 @@ Describe the data structure and how instances collaborate with the surrounding p
 class OCRTimeoutError(Exception):
     """Describe OCRTimeoutError.
 
-<!-- auto:docstring-builder v1 -->
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    <!-- auto:docstring-builder v1 -->
+
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
+    """
 
     ...
 
@@ -101,9 +108,11 @@ Describe the data structure and how instances collaborate with the surrounding p
 class ChunkingError(Exception):
     """Describe ChunkingError.
 
-<!-- auto:docstring-builder v1 -->
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    <!-- auto:docstring-builder v1 -->
+
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
+    """
 
     ...
 
@@ -112,9 +121,11 @@ Describe the data structure and how instances collaborate with the surrounding p
 class EmbeddingError(Exception):
     """Describe EmbeddingError.
 
-<!-- auto:docstring-builder v1 -->
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    <!-- auto:docstring-builder v1 -->
+
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
+    """
 
     ...
 
@@ -123,9 +134,11 @@ Describe the data structure and how instances collaborate with the surrounding p
 class SpladeOOMError(Exception):
     """Describe SpladeOOMError.
 
-<!-- auto:docstring-builder v1 -->
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    <!-- auto:docstring-builder v1 -->
+
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
+    """
 
     ...
 
@@ -134,9 +147,11 @@ Describe the data structure and how instances collaborate with the surrounding p
 class IndexBuildError(Exception):
     """Describe IndexBuildError.
 
-<!-- auto:docstring-builder v1 -->
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    <!-- auto:docstring-builder v1 -->
+
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
+    """
 
     ...
 
@@ -145,9 +160,11 @@ Describe the data structure and how instances collaborate with the surrounding p
 class OntologyParseError(Exception):
     """Describe OntologyParseError.
 
-<!-- auto:docstring-builder v1 -->
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    <!-- auto:docstring-builder v1 -->
+
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
+    """
 
     ...
 
@@ -156,9 +173,11 @@ Describe the data structure and how instances collaborate with the surrounding p
 class LinkerCalibrationError(Exception):
     """Describe LinkerCalibrationError.
 
-<!-- auto:docstring-builder v1 -->
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    <!-- auto:docstring-builder v1 -->
+
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
+    """
 
     ...
 
@@ -167,8 +186,10 @@ Describe the data structure and how instances collaborate with the surrounding p
 class Neo4jError(Exception):
     """Describe Neo4jError.
 
-<!-- auto:docstring-builder v1 -->
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    <!-- auto:docstring-builder v1 -->
+
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
+    """
 
     ...

@@ -6,6 +6,6 @@
     "rule": "structured_logging",
     "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
     "file": "src/search_api/app.py",
-    "lineno": 324
+    "lineno": 312
   }
 ]

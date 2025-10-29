@@ -1,9 +1,8 @@
 """Overview of gen readmes.
 
-This module bundles gen readmes logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles gen readmes logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from __future__ import annotations
@@ -430,10 +429,9 @@ TEST_MAP = _load_json(TESTMAP_PATH)
 class Config:
     """Model the Config.
 
-    Represent the config data structure used throughout the project. The
-    class encapsulates behaviour behind a well-defined interface for
-    collaborating components. Instances are typically created by
-    factories or runtime orchestrators documented nearby.
+    Represent the config data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
     """
 
     packages: list[str]
@@ -449,10 +447,9 @@ class Config:
 class Badges:
     """Model the Badges.
 
-    Represent the badges data structure used throughout the project. The
-    class encapsulates behaviour behind a well-defined interface for
-    collaborating components. Instances are typically created by
-    factories or runtime orchestrators documented nearby.
+    Represent the badges data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
     """
 
     stability: str | None = None

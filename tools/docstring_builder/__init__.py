@@ -1,6 +1,4 @@
-"""Docstring builder package coordinating harvesting, synthesis, and
-application.
-"""
+"""Docstring builder package coordinating harvesting, synthesis, and application."""
 
 from __future__ import annotations
 

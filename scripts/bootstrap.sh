@@ -100,7 +100,7 @@ OFFLINE="${OFFLINE:-0}"             # 1 = no network (uses cache / local wheelho
 USE_WHEELHOUSE="${USE_WHEELHOUSE:-0}" # 1 = add ./.wheelhouse to candidate wheels
 
 # Hard safety: block gpu extra unless explicitly allowed
-ALLOW_GPU="${ALLOW_GPU:-1}"
+ALLOW_GPU="${ALLOW_GPU:-0}"
 case ",${EXTRAS}," in
   *,gpu,*) if [ "${ALLOW_GPU}" != "1" ]; then
               err "The 'gpu' extra is disallowed by default. Set ALLOW_GPU=1 to proceed (not recommended for bootstrap)."

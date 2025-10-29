@@ -1,9 +1,8 @@
 """Overview of service.
 
-This module bundles service logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles service logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -50,25 +49,30 @@ def rrf_fuse(
 ) -> list[tuple[str, float]]:
     """Describe rrf fuse.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-dense : list[tuple[str, float]]
-    Describe ``dense``.
-sparse : list[tuple[str, float]]
-    Describe ``sparse``.
-k : int, optional
-    Describe ``k``.
-    Defaults to ``60``.
+    Parameters
+    ----------
+    dense : list[tuple[str, float]]
+        Describe ``dense``.
+    sparse : list[tuple[str, float]]
+        Describe ``sparse``.
+    k : int, optional
+        Describe ``k``.
+        Defaults to ``60``.
 
-Returns
--------
-list[tuple[str, float]]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    list[tuple[str, float]]
+        Describe return value.
+    """
     # NOTE: implement stable RRF across rankers when ranker outputs are wired
     return []
 
@@ -77,22 +81,27 @@ list[tuple[str, float]]
 def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[str, float]]:
     """Describe apply kg boosts.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-fused : list[tuple[str, float]]
-    Describe ``fused``.
-query : str
-    Describe ``query``.
+    Parameters
+    ----------
+    fused : list[tuple[str, float]]
+        Describe ``fused``.
+    query : str
+        Describe ``query``.
 
-Returns
--------
-list[tuple[str, float]]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    list[tuple[str, float]]
+        Describe return value.
+    """
     # NOTE: apply boosts for direct & one-hop concept matches once KG signals exist
     return fused
 
@@ -103,22 +112,27 @@ def mmr_deduplicate(
 ) -> list[tuple[str, float]]:
     """Describe mmr deduplicate.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-results : list[tuple[str, float]]
-    Describe ``results``.
-lambda_ : float, optional
-    Describe ``lambda_``.
-    Defaults to ``0.7``.
+    Parameters
+    ----------
+    results : list[tuple[str, float]]
+        Describe ``results``.
+    lambda_ : float, optional
+        Describe ``lambda_``.
+        Defaults to ``0.7``.
 
-Returns
--------
-list[tuple[str, float]]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    list[tuple[str, float]]
+        Describe return value.
+    """
     # NOTE: add doc-level diversity via MMR when result scoring is available
     return results

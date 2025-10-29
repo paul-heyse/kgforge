@@ -1,9 +1,8 @@
 """Overview of metrics.
 
-This module bundles metrics logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles metrics logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -33,101 +32,102 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
     class _NoopMetric:
         """Describe  NoopMetric.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+        Describe the data structure and how instances collaborate with the surrounding package.
+        Highlight how the class supports nearby modules to guide readers through the codebase.
+        """
 
         def labels(self, *args: object, **kwargs: object) -> _NoopMetric:
             """Describe labels.
 
-<!-- auto:docstring-builder v1 -->
+            <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+            Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-args : object, optional, by default ()
-    TODO: describe ``args``.
-kwargs : object, optional, by default {}
-    TODO: describe ``kwargs``.
+            Parameters
+            ----------
+            *args : object, optional, by default ()
+                TODO: describe ``args``.
+            **kwargs : object, optional, by default {}
+                TODO: describe ``kwargs``.
 
 
-Returns
--------
-_NoopMetric
-    TODO: describe return value.
-"""
+            Returns
+            -------
+            _NoopMetric
+                TODO: describe return value.
+            """
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
             """Describe observe.
 
-<!-- auto:docstring-builder v1 -->
+            <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+            Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-args : object, optional, by default ()
-    TODO: describe ``args``.
-kwargs : object, optional, by default {}
-    TODO: describe ``kwargs``.
-"""
+            Parameters
+            ----------
+            *args : object, optional, by default ()
+                TODO: describe ``args``.
+            **kwargs : object, optional, by default {}
+                TODO: describe ``kwargs``.
+            """
             return
 
         def inc(self, *args: object, **kwargs: object) -> None:
             """Describe inc.
 
-<!-- auto:docstring-builder v1 -->
+            <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+            Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-args : object, optional, by default ()
-    TODO: describe ``args``.
-kwargs : object, optional, by default {}
-    TODO: describe ``kwargs``.
-"""
+            Parameters
+            ----------
+            *args : object, optional, by default ()
+                TODO: describe ``args``.
+            **kwargs : object, optional, by default {}
+                TODO: describe ``kwargs``.
+            """
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
             """Describe set.
 
-<!-- auto:docstring-builder v1 -->
+            <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+            Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-args : object, optional, by default ()
-    TODO: describe ``args``.
-kwargs : object, optional, by default {}
-    TODO: describe ``kwargs``.
-"""
+            Parameters
+            ----------
+            *args : object, optional, by default ()
+                TODO: describe ``args``.
+            **kwargs : object, optional, by default {}
+                TODO: describe ``kwargs``.
+            """
             return
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:
         """Describe  make noop metric.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-args : object, optional, by default ()
-    TODO: describe ``args``.
-kwargs : object, optional, by default {}
-    TODO: describe ``kwargs``.
+        Parameters
+        ----------
+        *args : object, optional, by default ()
+            TODO: describe ``args``.
+        **kwargs : object, optional, by default {}
+            TODO: describe ``kwargs``.
 
 
-Returns
--------
-_NoopMetric
-    TODO: describe return value.
-"""
+        Returns
+        -------
+        _NoopMetric
+            TODO: describe return value.
+        """
         return _NoopMetric()
 
     Counter = cast(CounterFactory, _make_noop_metric)

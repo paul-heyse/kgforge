@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Overview of build test map.
 
-This module bundles build test map logic for the kgfoundry stack. It
-groups related helpers so downstream packages can import a single
-cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles build test map logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from __future__ import annotations
@@ -44,9 +43,8 @@ NAVMAP_MISSING_MESSAGE = (
 class NavMapLoadError(RuntimeError):
     """Model the NavMapLoadError.
 
-    Represent the navmaploaderror data structure used throughout the
-    project. The class encapsulates behaviour behind a well-defined
-    interface for collaborating components. Instances are typically
+    Represent the navmaploaderror data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
 
@@ -93,9 +91,7 @@ def _add_exports(
 
 
 def _candidates_from_symbols_json(symbols_json: Path) -> set[str]:
-    """Load module paths from the symbol index produced during docs
-    generation.
-    """
+    """Load module paths from the symbol index produced during docs generation."""
     payload = _load_json(symbols_json)
     if not isinstance(payload, list):
         return set()
@@ -147,9 +143,7 @@ def _candidates_from_source_tree() -> set[str]:
 
 
 def load_symbol_candidates() -> set[str]:
-    """Return potential module and attribute targets for documentation
-    lookup.
-    """
+    """Return potential module and attribute targets for documentation lookup."""
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if symbols_json.exists():
         candidates = _candidates_from_symbols_json(symbols_json)

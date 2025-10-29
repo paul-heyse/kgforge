@@ -1,9 +1,8 @@
 """Overview of faiss adapter.
 
-This module bundles faiss adapter logic for the kgfoundry stack. It
-groups related helpers so downstream packages can import a single
-cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles faiss adapter logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from __future__ import annotations
@@ -83,19 +82,19 @@ type FloatArrayLike = NDArray[np.floating[Any]]
 class DenseVecs:
     """Describe DenseVecs.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-ids : list[str]
-    Describe ``ids``.
-mat : VecArray
-    Describe ``mat``.
-"""
+    Parameters
+    ----------
+    ids : list[str]
+        Describe ``ids``.
+    mat : VecArray
+        Describe ``mat``.
+    """
 
     ids: list[str]
     mat: VecArray
@@ -105,26 +104,31 @@ mat : VecArray
 class FaissAdapter:
     """Describe FaissAdapter.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 
-Parameters
-----------
-db_path : str
-    Describe ``db_path``.
-factory : str, optional
-    Describe ``factory``.
-    Defaults to ``'OPQ64,IVF8192,PQ64'``.
-metric : str, optional
-    Describe ``metric``.
-    Defaults to ``'ip'``.
+    Parameters
+    ----------
+    db_path : str
+        Describe ``db_path``.
+    factory : str, optional
+        Describe ``factory``.
+        Defaults to ``'OPQ64,IVF8192,PQ64'``.
+    metric : str, optional
+        Describe ``metric``.
+        Defaults to ``'ip'``.
 
-Raises
-------
-RuntimeError
+
+
+
+
+
+    Raises
+    ------
+    RuntimeError
     Raised when TODO for RuntimeError.
-"""
+    """
 
     def __init__(
         self,
@@ -134,21 +138,21 @@ RuntimeError
     ) -> None:
         """Describe   init  .
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-db_path : str
-    Describe ``db_path``.
-factory : str, optional
-    Describe ``factory``.
-    Defaults to ``'OPQ64,IVF8192,PQ64'``.
-metric : str, optional
-    Describe ``metric``.
-    Defaults to ``'ip'``.
-"""
+        Parameters
+        ----------
+        db_path : str
+            Describe ``db_path``.
+        factory : str, optional
+            Describe ``factory``.
+            Defaults to ``'OPQ64,IVF8192,PQ64'``.
+        metric : str, optional
+            Describe ``metric``.
+            Defaults to ``'ip'``.
+        """
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
@@ -159,25 +163,36 @@ metric : str, optional
     def _load_dense_from_parquet(self, source: Path) -> DenseVecs:
         """Describe  load dense from parquet.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-source : Path
-    Describe ``source``.
+        Parameters
+        ----------
+        source : Path
+            Describe ``source``.
 
-Returns
--------
-DenseVecs
-    Describe return value.
 
-Raises
-------
-RuntimeError
-Raised when TODO for RuntimeError.
-"""
+
+
+
+
+        Returns
+        -------
+        DenseVecs
+            Describe return value.
+
+
+
+
+
+
+
+        Raises
+        ------
+        RuntimeError
+        Raised when TODO for RuntimeError.
+        """
         con = duckdb.connect(database=":memory:")
         try:
             rows = con.execute(
@@ -203,20 +218,26 @@ Raised when TODO for RuntimeError.
     def _load_dense_parquet(self) -> DenseVecs:
         """Describe  load dense parquet.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Returns
--------
-DenseVecs
-    Describe return value.
+        Returns
+        -------
+        DenseVecs
+            Describe return value.
 
-Raises
-------
-RuntimeError
-Raised when TODO for RuntimeError.
-"""
+
+
+
+
+
+
+        Raises
+        ------
+        RuntimeError
+        Raised when TODO for RuntimeError.
+        """
         candidate = Path(self.db_path)
         if candidate.is_dir() or candidate.suffix == ".parquet":
             return self._load_dense_from_parquet(candidate)
@@ -255,12 +276,12 @@ Raised when TODO for RuntimeError.
     def build(self) -> None:
         """Describe build.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Python's object protocol for this class. Use it to integrate
-with built-in operators, protocols, or runtime behaviours that
-expect instances to participate in the language's data model.
-"""
+        Python's object protocol for this class. Use it to integrate with built-in operators,
+        protocols, or runtime behaviours that expect instances to participate in the language's data
+        model.
+        """
         vectors = self._load_dense_parquet()
         self.vecs = vectors
         self.idmap = vectors.ids
@@ -286,16 +307,16 @@ expect instances to participate in the language's data model.
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
         """Describe load or build.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-cpu_index_path : str | None, optional
-    Describe ``cpu_index_path``.
-    Defaults to ``None``.
-"""
+        Parameters
+        ----------
+        cpu_index_path : str | None, optional
+            Describe ``cpu_index_path``.
+            Defaults to ``None``.
+        """
         faiss_module = faiss
         if faiss_module is None:
             self.build()
@@ -315,20 +336,25 @@ cpu_index_path : str | None, optional
     def _clone_to_gpu(self, cpu_index: object) -> object:
         """Describe  clone to gpu.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-cpu_index : object
-    Describe ``cpu_index``.
+        Parameters
+        ----------
+        cpu_index : object
+            Describe ``cpu_index``.
 
-Returns
--------
-object
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        object
+            Describe return value.
+        """
         faiss_module = faiss
         if faiss_module is None:
             return cpu_index
@@ -349,23 +375,28 @@ object
     def search(self, qvec: FloatArrayLike, k: int = 10) -> list[list[tuple[str, float]]]:
         """Describe search.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-qvec : FloatArrayLike
-    Describe ``qvec``.
-k : int, optional
-    Describe ``k``.
-    Defaults to ``10``.
+        Parameters
+        ----------
+        qvec : FloatArrayLike
+            Describe ``qvec``.
+        k : int, optional
+            Describe ``k``.
+            Defaults to ``10``.
 
-Returns
--------
-list[list[tuple[str, float]]]
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        list[list[tuple[str, float]]]
+            Describe return value.
+        """
         if self.vecs is None and self.index is None:
             return []
         queries = self._prepare_queries(qvec)
@@ -376,20 +407,25 @@ list[list[tuple[str, float]]]
     def _prepare_queries(self, qvec: VecArray) -> VecArray:
         """Describe  prepare queries.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-qvec : VecArray
-    Describe ``qvec``.
+        Parameters
+        ----------
+        qvec : VecArray
+            Describe ``qvec``.
 
-Returns
--------
-VecArray
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        VecArray
+            Describe return value.
+        """
         query_arr: VecArray = np.asarray(qvec, dtype=np.float32, order="C")
         if query_arr.ndim == 1:
             query_arr = query_arr[None, :]
@@ -398,27 +434,38 @@ VecArray
     def _search_with_faiss(self, queries: VecArray, k: int) -> list[list[tuple[str, float]]]:
         """Describe  search with faiss.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-queries : VecArray
-    Describe ``queries``.
-k : int
-    Describe ``k``.
+        Parameters
+        ----------
+        queries : VecArray
+            Describe ``queries``.
+        k : int
+            Describe ``k``.
 
-Returns
--------
-list[list[tuple[str, float]]]
-    Describe return value.
 
-Raises
-------
-RuntimeError
-Raised when TODO for RuntimeError.
-"""
+
+
+
+
+        Returns
+        -------
+        list[list[tuple[str, float]]]
+            Describe return value.
+
+
+
+
+
+
+
+        Raises
+        ------
+        RuntimeError
+        Raised when TODO for RuntimeError.
+        """
         if self.index is None or self.idmap is None:
             message = "FAISS index or ID mapping not loaded"
             raise RuntimeError(message)
@@ -436,27 +483,38 @@ Raised when TODO for RuntimeError.
     def _search_with_cpu(self, queries: VecArray, k: int) -> list[list[tuple[str, float]]]:
         """Describe  search with cpu.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-queries : VecArray
-    Describe ``queries``.
-k : int
-    Describe ``k``.
+        Parameters
+        ----------
+        queries : VecArray
+            Describe ``queries``.
+        k : int
+            Describe ``k``.
 
-Returns
--------
-list[list[tuple[str, float]]]
-    Describe return value.
 
-Raises
-------
-RuntimeError
-Raised when TODO for RuntimeError.
-"""
+
+
+
+
+        Returns
+        -------
+        list[list[tuple[str, float]]]
+            Describe return value.
+
+
+
+
+
+
+
+        Raises
+        ------
+        RuntimeError
+        Raised when TODO for RuntimeError.
+        """
         if self.vecs is None:
             message = "Dense vectors not loaded"
             raise RuntimeError(message)

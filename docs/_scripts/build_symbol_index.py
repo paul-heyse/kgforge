@@ -1,9 +1,8 @@
 """Overview of build symbol index.
 
-This module bundles build symbol index logic for the kgfoundry stack. It
-groups related helpers so downstream packages can import a single
-cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles build symbol index logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from __future__ import annotations
@@ -66,10 +65,9 @@ loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
 class NavLookup:
     """Model the NavLookup.
 
-    Represent the navlookup data structure used throughout the project.
-    The class encapsulates behaviour behind a well-defined interface for
-    collaborating components. Instances are typically created by
-    factories or runtime orchestrators documented nearby.
+    Represent the navlookup data structure used throughout the project. The class encapsulates
+    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    created by factories or runtime orchestrators documented nearby.
     """
 
     symbol_meta: dict[str, dict[str, Any]]
@@ -310,9 +308,7 @@ def _current_sha() -> str:
 
 
 def _github_link(file_rel: str, start: int | None, end: int | None) -> str | None:
-    """Return a commit-stable GitHub permalink if GitHub metadata is
-    configured.
-    """
+    """Return a commit-stable GitHub permalink if GitHub metadata is configured."""
     if not (GITHUB_ORG and GITHUB_REPO):
         return None
     sha = _current_sha()
@@ -349,9 +345,7 @@ def _meta_value(
     module_defaults: Mapping[str, object] | None,
     key: str,
 ) -> object | None:
-    """Return the metadata value for ``key`` using symbol overrides then module
-    defaults.
-    """
+    """Return the metadata value for ``key`` using symbol overrides then module defaults."""
     if symbol_meta and key in symbol_meta and symbol_meta[key] is not None:
         return symbol_meta[key]
     if module_defaults and key in module_defaults and module_defaults[key] is not None:

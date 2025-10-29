@@ -1,0 +1,155 @@
+{
+  "$defs": {
+    "Id": {
+      "type": "string"
+    }
+  },
+  "$id": "https://kgfoundry/schemas/kgfoundry.registry.duckdb_registry.Doc.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Describe Doc.\n\n<!-- auto:docstring-builder v1 -->\n\nthe behaviour it provides to callers. Callers interact with\nvalidated data through this model.\n\nParameters\n----------\nid : Id\n    Describe ``id``.\nopenalex_id : str | None, optional\n    Describe ``openalex_id``.\n    Defaults to ``None``.\ndoi : str | None, optional\n    Describe ``doi``.\n    Defaults to ``None``.\narxiv_id : str | None, optional\n    Describe ``arxiv_id``.\n    Defaults to ``None``.\npmcid : str | None, optional\n    Describe ``pmcid``.\n    Defaults to ``None``.\ntitle : str, optional\n    Describe ``title``.\n    Defaults to ``''``.\nauthors : list[str], optional\n    Describe ``authors``.\n    Defaults to ``<factory>``.\npub_date : str | None, optional\n    Describe ``pub_date``.\n    Defaults to ``None``.\nlicense : str | None, optional\n    Describe ``license``.\n    Defaults to ``None``.\nlanguage : str | None, optional\n    Describe ``language``.\n    Defaults to ``'en'``.\npdf_uri : str, optional\n    Describe ``pdf_uri``.\n    Defaults to ``''``.\nsource : str, optional\n    Describe ``source``.\n    Defaults to ``'unknown'``.\ncontent_hash : str | None, optional\n    Describe ``content_hash``.\n    Defaults to ``None``.",
+  "examples": [
+    {
+      "arxiv_id": {},
+      "authors": null,
+      "content_hash": {},
+      "doi": {},
+      "id": null,
+      "language": "en",
+      "license": {},
+      "openalex_id": {},
+      "pdf_uri": "",
+      "pmcid": {},
+      "pub_date": {},
+      "source": "unknown",
+      "title": ""
+    }
+  ],
+  "properties": {
+    "arxiv_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Arxiv Id"
+    },
+    "authors": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Authors",
+      "type": "array"
+    },
+    "content_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Content Hash"
+    },
+    "doi": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Doi"
+    },
+    "id": {
+      "$ref": "#/$defs/Id"
+    },
+    "language": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "en",
+      "title": "Language"
+    },
+    "license": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "License"
+    },
+    "openalex_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Openalex Id"
+    },
+    "pdf_uri": {
+      "default": "",
+      "title": "Pdf Uri",
+      "type": "string"
+    },
+    "pmcid": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pmcid"
+    },
+    "pub_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pub Date"
+    },
+    "source": {
+      "default": "unknown",
+      "title": "Source",
+      "type": "string"
+    },
+    "title": {
+      "default": "",
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "title": "Doc",
+  "type": "object"
+}

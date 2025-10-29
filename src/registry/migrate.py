@@ -1,9 +1,8 @@
 """Overview of migrate.
 
-This module bundles migrate logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles migrate logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -49,17 +48,17 @@ __navmap__: Final[NavMap] = {
 def apply(db: str, migrations_dir: str) -> None:
     """Describe apply.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-db : str
-    Describe ``db``.
-migrations_dir : str
-    Describe ``migrations_dir``.
-"""
+    Parameters
+    ----------
+    db : str
+        Describe ``db``.
+    migrations_dir : str
+        Describe ``migrations_dir``.
+    """
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
         sql = p.read_text()
@@ -83,12 +82,11 @@ migrations_dir : str
 def main() -> None:
     """Describe main.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Python's object protocol for this class. Use it to integrate with
-built-in operators, protocols, or runtime behaviours that expect
-instances to participate in the language's data model.
-"""
+    Python's object protocol for this class. Use it to integrate with built-in operators, protocols,
+    or runtime behaviours that expect instances to participate in the language's data model.
+    """
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
     a = sp.add_parser("apply")

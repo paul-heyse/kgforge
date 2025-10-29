@@ -1,9 +1,8 @@
 """Overview of bm25.
 
-This module bundles bm25 logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles bm25 logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -85,21 +84,21 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 class BM25Doc:
     """Describe BM25Doc.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-doc_id : str
-    Describe ``doc_id``.
-length : int
-    Describe ``length``.
-fields : dict[str, str]
-    Describe ``fields``.
-"""
+    Parameters
+    ----------
+    doc_id : str
+        Describe ``doc_id``.
+    length : int
+        Describe ``length``.
+    fields : dict[str, str]
+        Describe ``fields``.
+    """
 
     doc_id: str
     length: int
@@ -110,26 +109,26 @@ fields : dict[str, str]
 class PurePythonBM25:
     """Describe PurePythonBM25.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-index_dir : str
-    Describe ``index_dir``.
-k1 : float, optional
-    Describe ``k1``.
-    Defaults to ``0.9``.
-b : float, optional
-    Describe ``b``.
-    Defaults to ``0.4``.
-field_boosts : dict[str, float] | None, optional
-    Describe ``field_boosts``.
-    Defaults to ``None``.
-"""
+    Parameters
+    ----------
+    index_dir : str
+        Describe ``index_dir``.
+    k1 : float, optional
+        Describe ``k1``.
+        Defaults to ``0.9``.
+    b : float, optional
+        Describe ``b``.
+        Defaults to ``0.4``.
+    field_boosts : dict[str, float] | None, optional
+        Describe ``field_boosts``.
+        Defaults to ``None``.
+    """
 
     def __init__(
         self,
@@ -140,24 +139,24 @@ field_boosts : dict[str, float] | None, optional
     ) -> None:
         """Describe   init  .
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-index_dir : str
-    Describe ``index_dir``.
-k1 : float, optional
-    Describe ``k1``.
-    Defaults to ``0.9``.
-b : float, optional
-    Describe ``b``.
-    Defaults to ``0.4``.
-field_boosts : dict[str, float] | None, optional
-    Describe ``field_boosts``.
-    Defaults to ``None``.
-"""
+        Parameters
+        ----------
+        index_dir : str
+            Describe ``index_dir``.
+        k1 : float, optional
+            Describe ``k1``.
+            Defaults to ``0.9``.
+        b : float, optional
+            Describe ``b``.
+            Defaults to ``0.4``.
+        field_boosts : dict[str, float] | None, optional
+            Describe ``field_boosts``.
+            Defaults to ``None``.
+        """
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -172,34 +171,39 @@ field_boosts : dict[str, float] | None, optional
     def _tokenize(text: str) -> list[str]:
         """Describe  tokenize.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-text : str
-    Describe ``text``.
+        Parameters
+        ----------
+        text : str
+            Describe ``text``.
 
-Returns
--------
-list[str]
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        list[str]
+            Describe return value.
+        """
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Describe build.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-docs_iterable : Iterable[tuple[str, dict[str, str]]]
-    Describe ``docs_iterable``.
-"""
+        Parameters
+        ----------
+        docs_iterable : Iterable[tuple[str, dict[str, str]]]
+            Describe ``docs_iterable``.
+        """
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
@@ -249,12 +253,12 @@ docs_iterable : Iterable[tuple[str, dict[str, str]]]
     def load(self) -> None:
         """Describe load.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Python's object protocol for this class. Use it to integrate
-with built-in operators, protocols, or runtime behaviours that
-expect instances to participate in the language's data model.
-"""
+        Python's object protocol for this class. Use it to integrate with built-in operators,
+        protocols, or runtime behaviours that expect instances to participate in the language's data
+        model.
+        """
         path = os.path.join(self.index_dir, "pure_bm25.pkl")
         with open(path, "rb") as f:
             data = pickle.load(f)
@@ -270,20 +274,25 @@ expect instances to participate in the language's data model.
     def _idf(self, term: str) -> float:
         """Describe  idf.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-term : str
-    Describe ``term``.
+        Parameters
+        ----------
+        term : str
+            Describe ``term``.
 
-Returns
--------
-float
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        float
+            Describe return value.
+        """
         n_t = self.df.get(term, 0)
         if n_t == 0:
             return 0.0
@@ -295,25 +304,30 @@ float
     ) -> list[tuple[str, float]]:
         """Describe search.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-query : str
-    Describe ``query``.
-k : int
-    Describe ``k``.
-fields : Mapping[str, str] | None, optional
-    Describe ``fields``.
-    Defaults to ``None``.
+        Parameters
+        ----------
+        query : str
+            Describe ``query``.
+        k : int
+            Describe ``k``.
+        fields : Mapping[str, str] | None, optional
+            Describe ``fields``.
+            Defaults to ``None``.
 
-Returns
--------
-list[tuple[str, float]]
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        list[tuple[str, float]]
+            Describe return value.
+        """
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -335,29 +349,34 @@ list[tuple[str, float]]
 class LuceneBM25:
     """Describe LuceneBM25.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 
-Parameters
-----------
-index_dir : str
-    Describe ``index_dir``.
-k1 : float, optional
-    Describe ``k1``.
-    Defaults to ``0.9``.
-b : float, optional
-    Describe ``b``.
-    Defaults to ``0.4``.
-field_boosts : dict[str, float] | None, optional
-    Describe ``field_boosts``.
-    Defaults to ``None``.
+    Parameters
+    ----------
+    index_dir : str
+        Describe ``index_dir``.
+    k1 : float, optional
+        Describe ``k1``.
+        Defaults to ``0.9``.
+    b : float, optional
+        Describe ``b``.
+        Defaults to ``0.4``.
+    field_boosts : dict[str, float] | None, optional
+        Describe ``field_boosts``.
+        Defaults to ``None``.
 
-Raises
-------
-RuntimeError
+
+
+
+
+
+    Raises
+    ------
+    RuntimeError
     Raised when TODO for RuntimeError.
-"""
+    """
 
     def __init__(
         self,
@@ -368,24 +387,24 @@ RuntimeError
     ) -> None:
         """Describe   init  .
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-index_dir : str
-    Describe ``index_dir``.
-k1 : float, optional
-    Describe ``k1``.
-    Defaults to ``0.9``.
-b : float, optional
-    Describe ``b``.
-    Defaults to ``0.4``.
-field_boosts : dict[str, float] | None, optional
-    Describe ``field_boosts``.
-    Defaults to ``None``.
-"""
+        Parameters
+        ----------
+        index_dir : str
+            Describe ``index_dir``.
+        k1 : float, optional
+            Describe ``k1``.
+            Defaults to ``0.9``.
+        b : float, optional
+            Describe ``b``.
+            Defaults to ``0.4``.
+        field_boosts : dict[str, float] | None, optional
+            Describe ``field_boosts``.
+            Defaults to ``None``.
+        """
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -395,20 +414,25 @@ field_boosts : dict[str, float] | None, optional
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Describe build.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-docs_iterable : Iterable[tuple[str, dict[str, str]]]
-    Describe ``docs_iterable``.
+        Parameters
+        ----------
+        docs_iterable : Iterable[tuple[str, dict[str, str]]]
+            Describe ``docs_iterable``.
 
-Raises
-------
-RuntimeError
-Raised when TODO for RuntimeError.
-"""
+
+
+
+
+
+        Raises
+        ------
+        RuntimeError
+        Raised when TODO for RuntimeError.
+        """
         try:
             from pyserini.index.lucene import LuceneIndexer
         except Exception as exc:
@@ -434,12 +458,12 @@ Raised when TODO for RuntimeError.
     def _ensure_searcher(self) -> None:
         """Describe  ensure searcher.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Python's object protocol for this class. Use it to integrate
-with built-in operators, protocols, or runtime behaviours that
-expect instances to participate in the language's data model.
-"""
+        Python's object protocol for this class. Use it to integrate with built-in operators,
+        protocols, or runtime behaviours that expect instances to participate in the language's data
+        model.
+        """
         if self._searcher is not None:
             return
         from pyserini.search.lucene import LuceneSearcher
@@ -452,30 +476,41 @@ expect instances to participate in the language's data model.
     ) -> list[tuple[str, float]]:
         """Describe search.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-query : str
-    Describe ``query``.
-k : int
-    Describe ``k``.
-fields : dict[str, str] | None, optional
-    Describe ``fields``.
-    Defaults to ``None``.
+        Parameters
+        ----------
+        query : str
+            Describe ``query``.
+        k : int
+            Describe ``k``.
+        fields : dict[str, str] | None, optional
+            Describe ``fields``.
+            Defaults to ``None``.
 
-Returns
--------
-list[tuple[str, float]]
-    Describe return value.
 
-Raises
-------
-RuntimeError
-Raised when TODO for RuntimeError.
-"""
+
+
+
+
+        Returns
+        -------
+        list[tuple[str, float]]
+            Describe return value.
+
+
+
+
+
+
+
+        Raises
+        ------
+        RuntimeError
+        Raised when TODO for RuntimeError.
+        """
         self._ensure_searcher()
         if self._searcher is None:
             message = "Lucene searcher not initialized"
@@ -495,31 +530,36 @@ def get_bm25(
 ) -> PurePythonBM25 | LuceneBM25:
     """Describe get bm25.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-backend : str
-    Describe ``backend``.
-index_dir : str
-    Describe ``index_dir``.
-k1 : float, optional
-    Describe ``k1``.
-    Defaults to ``0.9``.
-b : float, optional
-    Describe ``b``.
-    Defaults to ``0.4``.
-field_boosts : dict[str, float] | None, optional
-    Describe ``field_boosts``.
-    Defaults to ``None``.
+    Parameters
+    ----------
+    backend : str
+        Describe ``backend``.
+    index_dir : str
+        Describe ``index_dir``.
+    k1 : float, optional
+        Describe ``k1``.
+        Defaults to ``0.9``.
+    b : float, optional
+        Describe ``b``.
+        Defaults to ``0.4``.
+    field_boosts : dict[str, float] | None, optional
+        Describe ``field_boosts``.
+        Defaults to ``None``.
 
-Returns
--------
-PurePythonBM25 | LuceneBM25
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    PurePythonBM25 | LuceneBM25
+        Describe return value.
+    """
     if backend == "lucene":
         try:
             return LuceneBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)

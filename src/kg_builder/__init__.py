@@ -1,9 +1,8 @@
 """Overview of kg builder.
 
-This module bundles kg builder logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles kg builder logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from kg_builder import mock_kg, neo4j_store
