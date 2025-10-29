@@ -272,7 +272,7 @@ The script executes stages sequentially in a strict order. Each stage must compl
 **Purpose:** Generate, update, format, and validate all docstrings.
 
 **Executes:**
-1. `python tools/generate_docstrings.py` - Regenerate docstrings using NumPy templates (doq + fallback)
+1. `python -m tools.docstring_builder update` - Harvest with Griffe, render via Jinja templates, and emit DocFacts JSON.
 2. `python tools/update_navmaps.py` - Assert module docstrings contain no legacy `NavMap:` blocks
 3. `docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i` - Format to PEP 257
 4. `pydocstyle` - Lint docstrings for PEP 257 compliance
@@ -281,8 +281,8 @@ The script executes stages sequentially in a strict order. Each stage must compl
 **Targets:** `src/`, `tools/`, `docs/_scripts/`
 
 **NumPy compliance guarantees:**
-- Custom doq templates in `tools/doq_templates/numpy/` now emit `Parameters`, `Returns`, `Raises`, and `Examples` skeletons using NumPy formatting (`name : type, optional`).
-- The fallback generator (`tools/auto_docstrings.py`) normalises missing docstrings to include `Examples`, `See Also`, and `Notes` sections, detects `raise` statements to populate `Raises`, and rewrites summaries in the imperative mood.
+- The builder relies on Griffe metadata, NumPy-aware Jinja templates, and semantic enrichment to emit `Summary`, `Parameters`, `Returns/Yields`, `Raises`, `Notes`, `See Also`, and `Examples` blocks with canonical wording.
+- Ownership markers (`<!-- auto:docstring-builder v1 -->`) ensure idempotent rewrites and protect curated prose that falls outside managed blocks.
 - `.numpydoc` plus `numpydoc_validation_checks` (GL01/SS01/ES01/RT01/PR01) ensure every regenerated docstring passes strict numpydoc validation during Sphinx builds.
 
 **Exit condition:**
@@ -699,13 +699,12 @@ Removes all previously generated documentation artifacts to ensure a clean rebui
 
 **Execution sequence:**
 
-1. **`python tools/generate_docstrings.py`**
-   - Runs `doq` (docstring skeleton generator) with NumPy-style templates from `tools/doq_templates/numpy/`
-   - Processes directories: `src/`, `tools/`, `docs/_scripts/`
-   - Generates complete function signatures with Parameters/Returns sections
-   - Then runs `tools/auto_docstrings.py` as a fallback for remaining items
-   - The fallback uses AST parsing to create docstrings for modules, classes, and functions
-   - Logs changes to `site/_build/docstrings/fallback.log`
+1. **`python -m tools.docstring_builder update`**
+   - Loads configuration from `docstring_builder.toml` (include/exclude globs, ownership markers).
+   - Uses Griffe to harvest modules, classes, and callables with signature metadata and docstrings.
+   - Applies semantic synthesis (raises detection, optionality inference, async/generator notes).
+   - Renders NumPy-style docstrings through Jinja templates while preserving curated sections.
+   - Writes DocFacts to `docs/_build/docfacts.json` for downstream agent consumption.
 
 2. **`python tools/update_navmaps.py`**
    - Uses Griffe to statically analyze each module
@@ -735,10 +734,10 @@ Removes all previously generated documentation artifacts to ensure a clean rebui
    - Fails the build if coverage drops below 90%
 
 **What gets generated:**
-- Complete NumPy-style docstrings for functions, classes, and modules
+- Complete, deterministic NumPy-style docstrings for functions, classes, and modules
+- Machine-readable DocFacts covering parameters, returns, raises, and notes per symbol
 - Module-level NavMap sections listing public API entry points
-- Properly formatted and wrapped docstring text
-- Validated compliance with PEP 257
+- Properly formatted and wrapped docstring text validated against NumPy/PEP 257
 
 ### Stage 2: README Generation (`make readmes`)
 
@@ -1008,8 +1007,8 @@ def func1():
 | ---- | ------- |
 | [`docs/conf.py`](docs/conf.py) | Sphinx configuration. Performs static parsing with AutoAPI, adds editor/GitHub deep links, builds HTML/JSON outputs, configures extensions, and defines symbol lookup via Griffe. |
 | [`tools/update_docs.sh`](tools/update_docs.sh) | **Master orchestration script.** One-touch wrapper that runs the complete documentation pipeline: docstring generation, nav-map build/check, README generation, and Sphinx/MkDocs builds. |
-| [`tools/generate_docstrings.py`](tools/generate_docstrings.py) | Docstring skeleton generator. Runs `doq` with NumPy templates on `src/`, `tools/`, and `docs/_scripts/`, then runs `auto_docstrings.py` fallback for remaining items. |
-| [`tools/auto_docstrings.py`](tools/auto_docstrings.py) | AST-based fallback docstring generator. Creates NumPy-style docstrings for modules, classes, and functions that don't already have them or have TODO placeholders. |
+| [`tools/generate_docstrings.py`](tools/generate_docstrings.py) | Thin wrapper that invokes `python -m tools.docstring_builder update` so Makefile targets continue to work. |
+| [`tools/docstring_builder/`](tools/docstring_builder/) | Harvests symbols with Griffe, synthesizes NumPy docstrings, applies changes via LibCST, and emits DocFacts JSON alongside updates. |
 | [`tools/update_navmaps.py`](tools/update_navmaps.py) | Validates that module docstrings remain free of legacy `NavMap:` sections; exits non-zero if any violations are detected. |
 | [`tools/gen_readmes.py`](tools/gen_readmes.py) | Generates package-level `README.md` files that list public modules/classes/functions with summaries, editor deep links (`[open]`), and GitHub permalinks (`[view]`). |
 | [`tools/navmap/build_navmap.py`](tools/navmap/build_navmap.py) | Builds machine-readable navigation map index (`site/_build/navmap/navmap.json`). Extracts `__all__`, `__navmap__`, anchors, and sections from all Python modules. |
@@ -1027,7 +1026,7 @@ def func1():
 | [`.numpydoc`](.numpydoc) | Global numpydoc validation settings (`GL01`, `SS01`, `ES01`, `RT01`, `PR01`) used by Sphinx during HTML/JSON builds. |
 | [`pyproject.toml`](pyproject.toml) | Configures Ruff (lint/format), Black, pytest, mypy, pydocstyle, and docs extras (`[project.optional-dependencies.docs]`). |
 | [`mypy.ini`](mypy.ini) | Strict type-check configuration (Python 3.13, `mypy_path=src`, third-party ignores for packages lacking stubs). |
-| [`tools/doq_templates/numpy/`](tools/doq_templates/numpy/) | NumPy-style docstring templates used by `doq` during docstring generation (def, class, module templates). |
+| [`tools/doq_templates/numpy/`](tools/doq_templates/numpy/) | Legacy NumPy-style templates kept for one-off skeleton seeding with `doq` when bootstrapping new modules. |
 
 ---
 
@@ -1142,47 +1141,30 @@ Comprehensive Sphinx configuration with agent-friendly features.
 - `SPHINX_THEME`: Override default theme
 - `PROJECT_NAME` / `PROJECT_AUTHOR`: Project metadata
 
-### Docstring Generation: `tools/generate_docstrings.py`
+### Docstring Generation: `tools/docstring_builder/`
 
-Two-stage docstring generation for comprehensive coverage.
+The builder coordinates harvesting, synthesis, rendering, and application steps to keep
+docstrings and DocFacts in sync with code.
 
-**Stage 1: doq (primary generator)**
-- Command: `doq --formatter numpy -t tools/doq_templates/numpy/ -w -r -d <target>`
-- Uses custom NumPy templates from `tools/doq_templates/numpy/`:
-  - `def.txt`: Function/method template
-  - `class.txt`: Class template
-  - Other templates for different contexts
-- Generates skeleton docstrings with:
-  - Summary line
-  - Parameters section with types from annotations
-  - Returns section with return type
-  - Placeholder descriptions
-- Writes in-place (`-w` flag)
-- Recursive (`-r` flag)
-- Processes: `src/`, `tools/`, `docs/_scripts/`
+**Pipeline overview**
 
-**Stage 2: auto_docstrings.py (fallback)**
-- AST-based parsing for remaining items
-- Targets:
-  - Modules without docstrings
-  - Classes/functions with missing or TODO docstrings
-- Uses introspection to generate:
-  - Imperative-style summaries (e.g., "Return user configuration.")
-  - Parameter lists with types from annotations
-  - Optional parameter markers for defaults
-  - Return type documentation
-- Logs touched files to `site/_build/docstrings/fallback.log`
-- Preservation rules: the fallback now only overwrites docstrings that still
-  contain its placeholder phrases (for example the "Carry out the …
-  operation." extended summary or "Description for ``param``." entries).
-  Custom narratives—even those without an ``Examples`` block or that discuss
-  ``list``/``dict`` types—remain untouched as long as those boilerplate lines
-  are replaced with hand-written content.
+1. **Harvest (`harvest.py`)**
+   - Loads modules with Griffe using search paths from `docstring_builder.toml`.
+   - Records qualified names, signatures, annotations, decorators, and existing docstrings.
+   - Builds a LibCST index for precise edits and ownership detection.
+2. **Semantic analysis (`semantics.py`)**
+   - Resolves annotations, optional/default semantics, async/generator behaviour, and `raise` statements.
+   - Produces structured `DocstringSchema` objects with placeholder descriptions when human detail is missing.
+3. **Rendering (`render.py`)**
+   - Feeds schemas into NumPy-aware Jinja templates that enforce ordering, punctuation, and marker placement.
+   - Ensures rendered docstrings include owned sections only, preserving curated prose elsewhere.
+4. **Application (`apply.py`)**
+   - Rewrites docstrings through LibCST to maintain formatting, indentation, and quoting style.
+   - Marks generated blocks with `<!-- auto:docstring-builder v1 -->` so re-runs remain idempotent.
+5. **DocFacts (`docfacts.py`)**
+   - Emits `docs/_build/docfacts.json` capturing parameters, defaults, optionality, raises, and notes for AI agents.
 
-**Why two stages?**
-- doq is faster and more comprehensive for standard functions
-- auto_docstrings catches edge cases doq misses
-- Together they ensure 100% initial coverage
+`tools/generate_docstrings.py` simply shells out to `python -m tools.docstring_builder update` so legacy targets keep working.
 
 ### NavMap System: `tools/navmap/`
 
@@ -1928,10 +1910,10 @@ Complete list of files and directories generated by the documentation system:
   - VSCode deep links
   - Symbol metadata (tags, categories, stability)
 
-- **`site/_build/docstrings/fallback.log`**: Docstring generation log
-  - Lists files touched by `auto_docstrings.py`
-  - One file path per line
-  - Useful for tracking changes
+- **`docs/_build/docfacts.json`**: Docstring builder sidecar facts
+  - Array of machine-readable symbol metadata (parameters, defaults, raises, notes)
+  - Consumed by README/navmap tooling and external AI agents
+  - Rebuilt whenever `python -m tools.docstring_builder update` runs
 
 ### Package Documentation
 
@@ -1967,7 +1949,7 @@ Complete reference for all Make targets:
 ### Documentation Generation
 
 - **`make docstrings`**: Generate and validate docstrings
-  - Runs `generate_docstrings.py` (doq + auto_docstrings)
+  - Runs `generate_docstrings.py` (wrapper around `python -m tools.docstring_builder update`)
   - Runs `update_navmaps.py` (refresh NavMap sections)
   - Runs `docformatter` (format docstrings)
   - Runs `pydocstyle` (lint docstrings)
@@ -2392,7 +2374,7 @@ tools/update_docs.sh
 The stages in `update_docs.sh` have strict dependencies and must execute in order:
 
 ```
-Stage 1: Docstrings (doq → auto_docstrings → format → lint → coverage)
+Stage 1: Docstrings (builder → format → lint → coverage)
     ↓
 Stage 2: READMEs (gen_readmes + doctoc)
     ↓
@@ -2820,25 +2802,15 @@ Advantages:
 - Extensible metadata system
 ```
 
-### Why Two-Stage Docstring Generation?
+### Why Docstring Builder Automation?
 
-**Stage 1: doq (template-based)**
-- Fast, predictable output
-- Works for standard function signatures
-- Generates parameter/return sections
-- NumPy-style consistency
-
-**Stage 2: auto_docstrings (AST-based fallback)**
-- Catches edge cases doq misses
-- Module-level docstrings
-- Custom logic for special cases
-- Ensures 100% coverage
-
-**Why both?**
-- `doq` alone: ~85% coverage
-- `doq` + `auto_docstrings`: 100% coverage
-- Two-pass ensures comprehensive coverage
-- Fallback handles special cases
+- **Deterministic harvesting:** Griffe inspects annotations, decorators, async/generator semantics, and docstrings
+  without executing code, eliminating import-order flakiness.
+- **Semantic synthesis:** The builder infers optional parameters, collects `raise` statements, and adds coroutine/generator notes.
+- **Template-driven rendering:** Jinja templates enforce NumPy ordering and punctuation while still allowing curated prose
+  outside owned blocks.
+- **Idempotent application:** LibCST rewrites preserve formatting and whitespace so re-running the builder yields no diff.
+- **DocFacts export:** Machine-readable JSON keeps README/navmap automation and AI agents aligned with code-level truth.
 
 ### Why NavMap Validation?
 
@@ -2955,13 +2927,12 @@ Removes all previously generated documentation artifacts to ensure a clean rebui
 
 **Execution sequence:**
 
-1. **`python tools/generate_docstrings.py`**
-   - Runs `doq` (docstring skeleton generator) with NumPy-style templates from `tools/doq_templates/numpy/`
-   - Processes directories: `src/`, `tools/`, `docs/_scripts/`
-   - Generates complete function signatures with Parameters/Returns sections
-   - Then runs `tools/auto_docstrings.py` as a fallback for remaining items
-   - The fallback uses AST parsing to create docstrings for modules, classes, and functions
-   - Logs changes to `site/_build/docstrings/fallback.log`
+1. **`python -m tools.docstring_builder update`**
+   - Reads configuration from `docstring_builder.toml` to determine include/exclude globs and ownership markers.
+   - Harvests modules with Griffe to capture signatures, annotations, existing docstrings, and decorators.
+   - Synthesizes schema objects with optionality, raises, coroutine/generator notes, and TODO placeholders for missing detail.
+   - Renders NumPy-style docstrings through Jinja templates and applies them via LibCST to preserve formatting.
+   - Writes/updates `docs/_build/docfacts.json` alongside source edits for downstream automation.
 
 2. **`python tools/update_navmaps.py`**
    - Uses Griffe to statically analyze each module
@@ -2991,10 +2962,10 @@ Removes all previously generated documentation artifacts to ensure a clean rebui
    - Fails the build if coverage drops below 90%
 
 **What gets generated:**
-- Complete NumPy-style docstrings for functions, classes, and modules
+- Deterministic NumPy-style docstrings for functions, classes, and modules
+- Machine-readable DocFacts for every managed symbol
 - Module-level NavMap sections listing public API entry points
-- Properly formatted and wrapped docstring text
-- Validated compliance with PEP 257
+- Properly formatted and wrapped docstring text validated against PEP 257
 
 ### Stage 2: README Generation (`make readmes`)
 
@@ -3264,8 +3235,8 @@ def func1():
 | ---- | ------- |
 | [`docs/conf.py`](docs/conf.py) | Sphinx configuration. Performs static parsing with AutoAPI, adds editor/GitHub deep links, builds HTML/JSON outputs, configures extensions, and defines symbol lookup via Griffe. |
 | [`tools/update_docs.sh`](tools/update_docs.sh) | **Master orchestration script.** One-touch wrapper that runs the complete documentation pipeline: docstring generation, nav-map build/check, README generation, and Sphinx/MkDocs builds. |
-| [`tools/generate_docstrings.py`](tools/generate_docstrings.py) | Docstring skeleton generator. Runs `doq` with NumPy templates on `src/`, `tools/`, and `docs/_scripts/`, then runs `auto_docstrings.py` fallback for remaining items. |
-| [`tools/auto_docstrings.py`](tools/auto_docstrings.py) | AST-based fallback docstring generator. Creates NumPy-style docstrings for modules, classes, and functions that don't already have them or have TODO placeholders. |
+| [`tools/generate_docstrings.py`](tools/generate_docstrings.py) | Wrapper that invokes the docstring builder CLI (`python -m tools.docstring_builder update`). |
+| [`tools/docstring_builder/`](tools/docstring_builder/) | Package orchestrating Griffe harvesting, semantic synthesis, Jinja rendering, LibCST application, and DocFacts export. |
 | [`tools/update_navmaps.py`](tools/update_navmaps.py) | Refreshes module-level docstrings with a `NavMap:` section summarizing public API entry points (classes/functions with truncated summaries). |
 | [`tools/gen_readmes.py`](tools/gen_readmes.py) | Generates package-level `README.md` files that list public modules/classes/functions with summaries, editor deep links (`[open]`), and GitHub permalinks (`[view]`). |
 | [`tools/navmap/build_navmap.py`](tools/navmap/build_navmap.py) | Builds machine-readable navigation map index (`site/_build/navmap/navmap.json`). Extracts `__all__`, `__navmap__`, anchors, and sections from all Python modules. |
@@ -3277,7 +3248,7 @@ def func1():
 | [`.pre-commit-config.yaml`](.pre-commit-config.yaml) | Pre-commit hooks: Ruff (imports/lint/format), Black, Mypy, docformatter, pydocstyle, interrogate, navmap-build, navmap-check. |
 | [`pyproject.toml`](pyproject.toml) | Configures Ruff (lint/format), Black, pytest, mypy, pydocstyle, and docs extras (`[project.optional-dependencies.docs]`). |
 | [`mypy.ini`](mypy.ini) | Strict type-check configuration (Python 3.13, `mypy_path=src`, third-party ignores for packages lacking stubs). |
-| [`tools/doq_templates/numpy/`](tools/doq_templates/numpy/) | NumPy-style docstring templates used by `doq` during docstring generation (def, class, module templates). |
+| [`tools/doq_templates/numpy/`](tools/doq_templates/numpy/) | Legacy NumPy-style templates kept for one-off skeleton seeding with `doq` when bootstrapping new modules. |
 
 ---
 
@@ -3366,39 +3337,23 @@ Comprehensive Sphinx configuration with agent-friendly features.
 
 ### Docstring Generation: `tools/generate_docstrings.py`
 
-Two-stage docstring generation for comprehensive coverage.
+Docstring builder automation keeps coverage high while protecting curated prose.
 
-**Stage 1: doq (primary generator)**
-- Command: `doq --formatter numpy -t tools/doq_templates/numpy/ -w -r -d <target>`
-- Uses custom NumPy templates from `tools/doq_templates/numpy/`:
-  - `def.txt`: Function/method template
-  - `class.txt`: Class template
-  - Other templates for different contexts
-- Generates skeleton docstrings with:
-  - Summary line
-  - Parameters section with types from annotations
-  - Returns section with return type
-  - Placeholder descriptions
-- Writes in-place (`-w` flag)
-- Recursive (`-r` flag)
-- Processes: `src/`, `tools/`, `docs/_scripts/`
+**Harvest**
+- Griffe loads modules without executing them, capturing signatures, annotations, decorators, and docstrings.
+- LibCST indexes allow us to patch docstrings precisely.
 
-**Stage 2: auto_docstrings.py (fallback)**
-- AST-based parsing for remaining items
-- Targets:
-  - Modules without docstrings
-  - Classes/functions with missing or TODO docstrings
-- Uses introspection to generate:
-  - Imperative-style summaries (e.g., "Return user configuration.")
-  - Parameter lists with types from annotations
-  - Optional parameter markers for defaults
-  - Return type documentation
-- Logs touched files to `site/_build/docstrings/fallback.log`
+**Semantic Synthesis**
+- AST analysis identifies `raise` statements, coroutine/generator semantics, and optional parameters.
+- Schemas carry summary placeholders, Parameters/Returns/Raises metadata, and TODO markers.
 
-**Why two stages?**
-- doq is faster and more comprehensive for standard functions
-- auto_docstrings catches edge cases doq misses
-- Together they ensure 100% initial coverage
+**Rendering & Application**
+- Jinja templates render canonical NumPy sections with ownership markers.
+- LibCST rewrites insert or replace docstrings while preserving indentation, ensuring idempotence.
+
+**DocFacts**
+- `docs/_build/docfacts.json` lists parameters, defaults, optionality, raises, and notes for each managed symbol.
+- Downstream automation (README generation, navmap checks, AI agents) can consume the structured feed.
 
 ### NavMap System: `tools/navmap/`
 
@@ -3731,7 +3686,7 @@ Because these run on every commit, local commands like `tools/update_docs.sh` ma
 5. **Type Checking**
    - `mypy.ini` is configured with `mypy_path = src` and ignores for third-party packages lacking stubs (duckdb, faiss, etc.).
 6. **Docstring Templates**
-   - Located under `tools/doq_templates/numpy/` and used by `doq` during `make docstrings` to emit NumPy-style docstrings.
+  - Optional legacy templates under `tools/doq_templates/numpy/` remain available for manual seeding via `doq`.
 7. **Environment Variables**
    - `DOCS_EDITOR` for editor scheme (`vscode`, `pycharm`).
    - `SPHINX_AUTOBUILD_PORT` to change the live server port.

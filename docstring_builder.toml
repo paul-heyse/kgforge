@@ -1,0 +1,13 @@
+include = ["src/**/*.py", "tools/**/*.py"]
+exclude = ["tests/**", "docs/_build/**", "site/**"]
+ownership_marker = "<!-- auto:docstring-builder v1 -->"
+dynamic_probes = false
+navmap_metadata = true
+
+[packages]
+summary_verbs = {
+  kgfoundry = "Document",
+  kgfoundry_common = "Describe",
+  tools = "Automate",
+}
+opt_out = []
