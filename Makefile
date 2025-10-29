@@ -1,5 +1,5 @@
 
-.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json
+.PHONY: bootstrap run api e2e test fmt lint lint-docs clean migrations mock fixture docstrings readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json
 
 VENV := .venv
 PY := $(VENV)/bin/python
@@ -43,6 +43,16 @@ lint:
 	$(VENV)/bin/ruff check $(LINT_TARGETS)
 	$(VENV)/bin/ruff format --check $(FMT_TARGETS)
 	$(VENV)/bin/mypy src
+
+lint-docs:
+	uvx pydoclint --style numpy src
+	uv run python -m tools.docstring_builder.cli check --diff
+	uvx mypy --strict src
+	@if [ "$(RUN_DOCS_TESTS)" = "1" ]; then \
+		uv run pytest tests/docs; \
+	else \
+		echo "Skipping tests/docs (set RUN_DOCS_TESTS=1 to enable)"; \
+	fi
 
 clean:
 	rm -rf .venv .mypy_cache .ruff_cache .pytest_cache dist build
