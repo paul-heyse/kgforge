@@ -1,8 +1,8 @@
 ## 0. Near-term Adherence Milestone (next 1–2 weeks)
-- [ ] 0.1 Typed stubs + drift checker in CI
-    - [ ] 0.1.1 Finalize `.pyi` for `griffe`, `libcst`, `mkdocs_gen_files`.
-    - [ ] 0.1.2 Implement a runtime vs. stubs drift checker with actionable diff output.
-    - [ ] 0.1.3 Add CI job: run drift checker then `uv run mypy --strict src tools/docstring_builder`.
+- [x] 0.1 Typed stubs + drift checker in CI
+    - [x] 0.1.1 Finalize `.pyi` for `griffe`, `libcst`, `mkdocs_gen_files`.
+    - [x] 0.1.2 Implement a runtime vs. stubs drift checker with actionable diff output.
+    - [x] 0.1.3 Add CI job: run drift checker then `uv run mypy --strict src tools/docstring_builder`.
     - Details:
         - Create stubs:
             - `stubs/griffe/__init__.pyi`: expose `Object`, `Module`, `Function`, and `GriffeLoader` with minimal attributes used in `tools/docstring_builder/harvest.py` and `docs/_scripts/mkdocs_gen_api.py`.
@@ -19,9 +19,9 @@
         - CI fails on stub mismatches with clear missing/extra members listed.
         - No `Any` leaks reported by mypy strict.
 
-- [ ] 0.2 Docstring builder lint/check in pre-commit
-    - [ ] 0.2.1 Implement `docstring-builder lint` and `docstring-builder check` with exit codes: `0` ok, `1` policy violations, `2` config errors, `3` internal errors.
-    - [ ] 0.2.2 Add pre-commit hooks to run `lint`/`check` before artifact generation.
+- [x] 0.2 Docstring builder lint/check in pre-commit
+    - [x] 0.2.1 Implement `docstring-builder lint` and `docstring-builder check` with exit codes: `0` ok, `1` policy violations, `2` config errors, `3` internal errors.
+    - [x] 0.2.2 Add pre-commit hooks to run `lint`/`check` before artifact generation.
     - Details:
         - Update `tools/docstring_builder/cli.py`:
             - Add a `lint` subcommand that delegates to `check` (fast path) and may skip DocFacts drift comparison when `--no-docfacts` is provided.
@@ -31,9 +31,9 @@
     - AC:
         - Commits with doc violations are blocked; no full rebuild is required.
 
-- [ ] 0.3 Minimal policy gates
-    - [ ] 0.3.1 Add `[tool.kgfoundry.docstrings.policy]` with coverage ≥90% and params/returns parity.
-    - [ ] 0.3.2 Wire policy evaluation into `docstring-builder lint`.
+- [x] 0.3 Minimal policy gates
+    - [x] 0.3.1 Add `[tool.kgfoundry.docstrings.policy]` with coverage ≥90% and params/returns parity.
+    - [x] 0.3.2 Wire policy evaluation into `docstring-builder lint`.
     - Details:
         - Rely on existing hooks in `.pre-commit-config.yaml`:
             - `pydoclint --style numpy src` (parameter/returns parity)
@@ -43,9 +43,9 @@
     - AC:
         - Violations show symbol/file and cause; hook exits with code `1`.
 
-- [ ] 0.4 Manifest + incremental rebuilds
-    - [ ] 0.4.1 Write `docs/_build/docstrings_manifest.json` with input hashes, tool/plugin versions, and config fingerprint.
-    - [ ] 0.4.2 Add `--changed-only` to process only touched files and dependents.
+- [x] 0.4 Manifest + incremental rebuilds
+    - [x] 0.4.1 Write `docs/_build/docstrings_manifest.json` with input hashes, tool/plugin versions, and config fingerprint.
+    - [x] 0.4.2 Add `--changed-only` to process only touched files and dependents.
     - Details:
         - Implement manifest writer in `tools/docstring_builder/cli.py` after `_run()` completes:
             - Include: list of processed files, `config.config_hash`, CLI args (`since/module/force`), builder cache path and mtime, and counts of symbols/docfacts.
@@ -55,9 +55,9 @@
     - AC:
         - Touching one file triggers <1s rebuild on warm cache for that scope.
 
-- [ ] 0.5 Pre-commit consolidation (ruff/mypy/doc tools/pyrefly)
-    - [ ] 0.5.1 Order hooks: ruff imports → ruff fix → ruff format → mypy strict → docformatter/pydoclint/interrogate → docstring-builder lint/check → make artifacts → navmap-check → pyrefly validate.
-    - [ ] 0.5.2 Ensure pyrefly treats optional deps as extras and passes without them.
+- [x] 0.5 Pre-commit consolidation (ruff/mypy/doc tools/pyrefly)
+    - [x] 0.5.1 Order hooks: ruff imports → ruff fix → ruff format → mypy strict → docformatter/pydoclint/interrogate → docstring-builder lint/check → make artifacts → navmap-check → pyrefly validate.
+    - [x] 0.5.2 Ensure pyrefly treats optional deps as extras and passes without them.
     - Details:
         - Update `.pre-commit-config.yaml`:
             - Move `docstring-builder (check)` above `docs: regenerate artifacts`.
@@ -66,9 +66,9 @@
     - AC:
         - `pre-commit run --all-files` surfaces all violations deterministically.
 
-- [ ] 0.6 Golden tests for the builder
-    - [ ] 0.6.1 Add 3–5 representative modules with golden renders.
-    - [ ] 0.6.2 Implement `--update` to refresh goldens intentionally.
+- [x] 0.6 Golden tests for the builder
+    - [x] 0.6.1 Add 3–5 representative modules with golden renders.
+    - [x] 0.6.2 Implement `--update` to refresh goldens intentionally.
     - Details:
         - Create `tests/docs/test_docstring_golden.py` to call `python -m tools.docstring_builder.cli check --diff` and capture expected diffs for selected files under `src/`.
         - Store golden snapshots under `tests/docs/goldens/` (JSON or text) and compare with normalized whitespace.
@@ -76,17 +76,17 @@
     - AC:
         - CI fails with readable diff on unintended doc output changes.
 
-- [ ] 0.7 Minimal observability for failures
-    - [ ] 0.7.1 Emit `docs/_build/observability_docstrings.json` with counts, timings, and first 20 errors.
-    - [ ] 0.7.2 Print a console SUMMARY on failures (top errors, slowest stages).
+- [x] 0.7 Minimal observability for failures
+    - [x] 0.7.1 Emit `docs/_build/observability_docstrings.json` with counts, timings, and first 20 errors.
+    - [x] 0.7.2 Print a console SUMMARY on failures (top errors, slowest stages).
     - Details:
         - In `tools/docstring_builder/cli.py`, collect simple metrics: total files considered, processed, skipped by cache, changed vs unchanged, and elapsed seconds per major step (harvest/apply/write).
         - On non-zero exit, write a JSON summary under `docs/_build/observability_docstrings.json` and print a short console summary (max 10 lines).
     - AC:
         - On failure, developers see where/why without inspecting logs deeply.
 
-- [ ] 0.8 Doctor command
-    - [ ] 0.8.1 Implement `docstring-builder doctor` for Python version, config alignment, stubs discoverable, optional deps status, and manifest writeability.
+- [x] 0.8 Doctor command
+    - [x] 0.8.1 Implement `docstring-builder doctor` for Python version, config alignment, stubs discoverable, optional deps status, and manifest writeability.
     - Details:
         - Add a `doctor` subcommand in `tools/docstring_builder/cli.py` that checks:
             - Python ≥ 3.13, `mypy.ini` includes `mypy_path = src:stubs`.

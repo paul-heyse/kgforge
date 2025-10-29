@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 from collections.abc import Iterable
 from dataclasses import dataclass
+from typing import Literal
 
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import HarvestResult, SymbolHarvest, parameter_display_name
@@ -65,7 +66,7 @@ def _build_parameters(symbol: SymbolHarvest) -> list[ParameterDoc]:
 def _build_returns(symbol: SymbolHarvest) -> list[ReturnDoc]:
     if symbol.return_annotation in {None, "None"}:
         return []
-    kind = "yields" if symbol.is_generator else "returns"
+    kind: Literal["returns", "yields"] = "yields" if symbol.is_generator else "returns"
     description = "TODO: describe return value."
     return [ReturnDoc(annotation=symbol.return_annotation, description=description, kind=kind)]
 

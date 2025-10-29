@@ -473,6 +473,11 @@ add-ignore = [
     "D401",
 ]
 
+[tool.kgfoundry.docstrings.policy]
+coverage-threshold = 0.9
+require-parameters = true
+require-returns = true
+
 # pyproject.toml
 [tool.pyrefly]
 project-includes = ["src", "tests"]
@@ -482,7 +487,15 @@ project-excludes = ["**/__pycache__/**", "**/.venv/**", "**/.[!/.]*/**"]
 infer-with-first-use = true
 untyped-def-behavior = "check-and-infer-return-type"
 permissive-ignores = false
-replace-imports-with-any = []
+replace-imports-with-any = [
+    "pyserini.index.lucene",
+    "pyserini.search.lucene",
+    "libcuvs",
+    "faiss",
+    "griffe",
+    "mkdocs_gen_files",
+    "libcst",
+]
 ignore-missing-imports = []
 ignore-missing-source = false
 
