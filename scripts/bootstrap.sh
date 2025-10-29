@@ -67,12 +67,15 @@ ensure_uv_python_version() {
     err "Missing REQUIRED_PYTHON_VERSION"
     exit 1
   fi
-  if ! uv python list "${version}" --only-installed | grep -q "${version}"; then
-    log "Installing Python ${version} via uv"
-    uv python install "${version}"
-  else
+  if uv python list --installed 2>/dev/null | grep -Fq "cpython-${version}"; then
     log "uv-managed Python ${version} already installed"
+    return
   fi
+  if uv python list 2>/dev/null | grep -Fq "cpython-${version}"; then
+    log "uv-managed Python ${version} already available to install"
+  fi
+  log "Installing Python ${version} via uv"
+  uv python install "${version}"
 }
 
 need_cmd() { command -v "$1" >/dev/null 2>&1 || { err "Missing required command: $1"; exit 1; }; }
