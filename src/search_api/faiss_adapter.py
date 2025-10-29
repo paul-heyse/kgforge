@@ -74,6 +74,7 @@ except Exception:  # pragma: no cover - exercised when FAISS is unavailable
 # [nav:anchor VecArray]
 type VecArray = NDArray[np.float32]
 type IndexArray = NDArray[np.int64]
+type FloatArrayLike = NDArray[np.floating[Any]]
 
 
 # [nav:anchor DenseVecs]
@@ -248,9 +249,10 @@ Examples
         cpu = faiss_module.IndexIDMap2(cpu)
         train = vectors.mat[: min(100000, vectors.mat.shape[0])].copy()
         faiss_module.normalize_L2(train)
-        cpu.train(n=train.shape[0], x=train)
+        index_map = cast(Any, cpu)
+        index_map.train(train)
         ids64 = cast(IndexArray, np.arange(vectors.mat.shape[0], dtype=np.int64))
-        cpu.add_with_ids(n=vectors.mat.shape[0], x=vectors.mat, xids=ids64)
+        index_map.add_with_ids(vectors.mat, ids64)
         self.index = self._clone_to_gpu(cpu)
 
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
@@ -323,7 +325,7 @@ object
             options.use_cuvs = False
             return index_cpu_to_gpu(resources, 0, cpu_index, options)
 
-    def search(self, qvec: VecArray, k: int = 10) -> list[list[tuple[str, float]]]:
+    def search(self, qvec: FloatArrayLike, k: int = 10) -> list[list[tuple[str, float]]]:
         """Compute search.
 <!-- auto:docstring-builder v1 -->
 

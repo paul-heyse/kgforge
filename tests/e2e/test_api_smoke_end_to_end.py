@@ -1,6 +1,7 @@
 import importlib
 import os
 from pathlib import Path
+from typing import cast
 
 import duckdb
 import yaml
@@ -8,6 +9,7 @@ from fastapi.testclient import TestClient
 from kgfoundry.embeddings_sparse.bm25 import PurePythonBM25
 from kgfoundry.orchestration.fixture_flow import fixture_pipeline
 from kgfoundry.search_client import KGFoundryClient
+from kgfoundry.search_client.client import SupportsHttp
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -75,7 +77,7 @@ def test_fixture_and_api_smoke() -> None:
         search_app.bm25.build(docs)
 
     client = TestClient(search_app.app)
-    cli = KGFoundryClient(base_url=str(client.base_url), http=client)
+    cli = KGFoundryClient(base_url=str(client.base_url), http=cast(SupportsHttp, client))
     assert cli.healthz()["status"] == "ok"
     res = cli.search("alignment", k=3)
     assert "results" in res and isinstance(res["results"], list)

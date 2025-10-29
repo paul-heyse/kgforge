@@ -9,15 +9,34 @@ the application code from depending on the workaround.
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, Protocol, cast
+
+if TYPE_CHECKING:
+    from docstring_parser.common import Docstring
+    from docstring_parser.common import DocstringReturns
+
+    DocstringType = Docstring
+    DocstringReturnsType = DocstringReturns
+else:  # pragma: no cover - typing helpers
+    DocstringType = Any
+    DocstringReturnsType = Any
+
+
+class _DocstringCommonModule(Protocol):
+    Docstring: type[DocstringType]
+    DocstringReturns: type[DocstringReturnsType]
+    DocstringYields: type[DocstringReturnsType]
+
+_doc_common: _DocstringCommonModule | None = None
 
 try:
     # pydoclint depends on ``docstring_parser.common.DocstringYields`` which
     # is not available in every release of docstring-parser or its forks.
-    from docstring_parser import common as _doc_common
+    from docstring_parser import common as _imported_doc_common
 except Exception:  # pragma: no cover - best effort compatibility shim
-    _doc_common = None
+    pass
 else:
+    _doc_common = cast(_DocstringCommonModule, _imported_doc_common)
     if (
         _doc_common is not None
         and not hasattr(_doc_common, "DocstringYields")
@@ -38,8 +57,18 @@ else:
             return_name : str | None, optional
                 Explicit name attached to the yield block.
             """
+        docstring_returns_class: type[DocstringReturnsType] = _doc_common.DocstringReturns
 
-            def __init__(
+        def _docstring_yields_init(
+            self: DocstringReturnsType,
+            args: list[str],
+            description: str | None,
+            type_name: str | None,
+            return_name: str | None = None,
+        ) -> None:
+            """Compatibility constructor for missing ``DocstringYields``."""
+
+            docstring_returns_class.__init__(
                 self,
                 args: list[str],
                 description: str | None,
@@ -59,9 +88,7 @@ else:
         _doc_common_typing.DocstringYields = DocstringYields
 
     if _doc_common is not None and hasattr(_doc_common, "Docstring"):
-        _doc_cls = _doc_common.Docstring
-
-        DocstringType = Any  # runtime only typing used for annotations
+        _doc_cls: type[DocstringType] = _doc_common.Docstring
 
         if not hasattr(_doc_cls, "attrs"):
 
@@ -70,11 +97,15 @@ else:
 """
                 return [meta for meta in self.meta if getattr(meta, "args", None) == ["attr"]]
 
-            _doc_cls.attrs = property(_docstring_attrs)  # type: ignore[attr-defined]
+            setattr(_doc_cls, "attrs", property(_docstring_attrs))
 
-        _yield_cls = getattr(_doc_common, "DocstringYields", None)
-        if _yield_cls is None and hasattr(_doc_common, "DocstringReturns"):
+        _yield_cls: type[DocstringReturnsType] | None
+        if hasattr(_doc_common, "DocstringYields"):
+            _yield_cls = _doc_common.DocstringYields
+        elif hasattr(_doc_common, "DocstringReturns"):
             _yield_cls = _doc_common.DocstringReturns
+        else:
+            _yield_cls = None
 
         if _yield_cls is not None and not hasattr(_doc_cls, "yields"):
 
@@ -88,7 +119,7 @@ else:
                         return meta
                 return None
 
-            _doc_cls.yields = property(_docstring_yields)  # type: ignore[attr-defined]
+            setattr(_doc_cls, "yields", property(_docstring_yields))
 
         if _yield_cls is not None and not hasattr(_doc_cls, "many_yields"):
 
@@ -99,7 +130,7 @@ else:
                     return []
                 return [meta for meta in self.meta if isinstance(meta, _yield_cls)]
 
-            _doc_cls.many_yields = property(_docstring_many_yields)  # type: ignore[attr-defined]
+            setattr(_doc_cls, "many_yields", property(_docstring_many_yields))
 
         if not hasattr(_doc_cls, "size"):
 
@@ -114,4 +145,4 @@ else:
                 parts.extend(getattr(meta, "description", "") or "" for meta in self.meta)
                 return sum(len(part) for part in parts)
 
-            _doc_cls.size = property(_docstring_size)  # type: ignore[attr-defined]
+            setattr(_doc_cls, "size", property(_docstring_size))

@@ -24,7 +24,9 @@ build/
 .envrc.local
 site/_build/
 KGForge.egg-info/
-docs/_build/
+docs/_build/*
+!docs/_build/
+!docs/_build/docfacts.json
 gallery/
 *.dot
 *.svg~

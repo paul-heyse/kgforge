@@ -41,6 +41,7 @@ class BuilderConfig:
     normalize_sections: bool = False
     package_settings: PackageSettings = field(default_factory=PackageSettings)
     navmap_metadata: bool = True
+    ignore: list[str] = field(default_factory=list)
 
     @property
     def config_hash(self) -> str:
@@ -54,6 +55,7 @@ class BuilderConfig:
             "summary_verbs": self.package_settings.summary_verbs,
             "opt_out": sorted(self.package_settings.opt_out),
             "navmap_metadata": self.navmap_metadata,
+            "ignore": self.ignore,
         }
         blob = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
         return hashlib.sha256(blob).hexdigest()
@@ -83,8 +85,9 @@ def load_config(path: Path | None = None) -> BuilderConfig:
     """Load configuration from the provided path or default location."""
     config_path = path or DEFAULT_CONFIG_PATH
     data = _load_toml(config_path)
-    include = _as_list(data.get("include")) or ["src/**/*.py", "tools/**/*.py"]
-    exclude = _as_list(data.get("exclude")) or ["tests/**", "site/**", "docs/_build/**"]
+    include = _as_list(data.get("include")) or ["src/**/*.py"]
+    exclude = _as_list(data.get("exclude")) or ["tests/**", "site/**", "docs/_build/**", "tools/**"]
+    ignore = _as_list(data.get("ignore"))
     ownership_marker = data.get("ownership_marker", DEFAULT_MARKER)
     dynamic_probes = bool(data.get("dynamic_probes", False))
     normalize_sections = bool(data.get("normalize_sections", False))
@@ -106,6 +109,7 @@ def load_config(path: Path | None = None) -> BuilderConfig:
         normalize_sections=normalize_sections,
         package_settings=package_settings,
         navmap_metadata=navmap_metadata,
+        ignore=[str(pattern) for pattern in ignore],
     )
     if path:
         LOGGER.debug("Loaded docstring builder config hash: %s", config.config_hash)

@@ -45,6 +45,7 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor FloatArray]
 type FloatArray = NDArray[np.float32]
+type FloatArrayLike = NDArray[np.floating[Any]]
 
 # [nav:anchor IntArray]
 type IntArray = NDArray[np.int64]
@@ -106,7 +107,7 @@ Carry out the ensure resources operation.
             faiss = self._faiss
             self._res = faiss.StandardGpuResources()
 
-    def train(self, train_vectors: FloatArray, *, seed: int = 42) -> None:
+    def train(self, train_vectors: FloatArray | FloatArrayLike, *, seed: int = 42) -> None:
         """Compute train.
 <!-- auto:docstring-builder v1 -->
 
@@ -154,7 +155,7 @@ Examples
         except Exception:
             pass
 
-    def add(self, keys: list[str], vectors: FloatArray) -> None:
+    def add(self, keys: list[str], vectors: FloatArray | FloatArrayLike) -> None:
         """Compute add.
 <!-- auto:docstring-builder v1 -->
 
@@ -204,7 +205,7 @@ Examples
         else:
             self._index.add(vec_array)
 
-    def search(self, query: FloatArray, k: int) -> list[tuple[str, float]]:
+    def search(self, query: FloatArray | FloatArrayLike, k: int) -> list[tuple[str, float]]:
         """Compute search.
 <!-- auto:docstring-builder v1 -->
 

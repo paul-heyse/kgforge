@@ -156,13 +156,13 @@ dependencies = [
     "griffe",
     "jinja2>=3.1.4",
     "libcst>=1.4.0",
-    "doq",               # generate docstring skeletons
-    "pyment",            # fill/convert to preferred style (Google/NumPy/reST)
-    "interrogate",       # enforce docstring coverage
-    "pydoclint>=0.4.0",  # enforce numpy-style parameter/return parity
-    "pydocstyle",        # PEP-257 lint
-    "docformatter",      # format docstrings
-    "import-linter",     # enforce layered architecture
+    "doq", # generate docstring skeletons
+    "pyment", # fill/convert to preferred style (Google/NumPy/reST)
+    "interrogate", # enforce docstring coverage
+    "pydoclint>=0.4.0", # enforce numpy-style parameter/return parity
+    "pydocstyle", # PEP-257 lint
+    "docformatter", # format docstrings
+    "import-linter", # enforce layered architecture
     "mkdocs",
     "mkdocs-material",
     "mkdocstrings[python]",
@@ -177,6 +177,7 @@ dependencies = [
     "griffe2md",
     "scipy-doctest",
     "mkdocs-llmstxt",
+    "jpype1>=1.6.0",
 ]
 
 
