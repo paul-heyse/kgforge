@@ -45,6 +45,7 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor FloatArray]
 type FloatArray = NDArray[np.float32]
+type FloatArrayLike = NDArray[np.floating[Any]]
 
 # [nav:anchor IntArray]
 type IntArray = NDArray[np.int64]
@@ -111,7 +112,7 @@ class FaissGpuIndex:
             faiss = self._faiss
             self._res = faiss.StandardGpuResources()
 
-    def train(self, train_vectors: FloatArray, *, seed: int = 42) -> None:
+    def train(self, train_vectors: FloatArray | FloatArrayLike, *, seed: int = 42) -> None:
         """Compute train.
 
         Carry out the train operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -153,7 +154,7 @@ class FaissGpuIndex:
         except Exception:
             pass
 
-    def add(self, keys: list[str], vectors: FloatArray) -> None:
+    def add(self, keys: list[str], vectors: FloatArray | FloatArrayLike) -> None:
         """Compute add.
 
         Carry out the add operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -199,7 +200,7 @@ class FaissGpuIndex:
         else:
             self._index.add(vec_array)
 
-    def search(self, query: FloatArray, k: int) -> list[tuple[str, float]]:
+    def search(self, query: FloatArray | FloatArrayLike, k: int) -> list[tuple[str, float]]:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
