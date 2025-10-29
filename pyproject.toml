@@ -478,6 +478,8 @@ coverage-threshold = 0.9
 coverage-action = "error"
 missing-params-action = "error"
 missing-returns-action = "error"
+require-parameters = true
+require-returns = true
 
 # pyproject.toml
 [tool.pyrefly]
