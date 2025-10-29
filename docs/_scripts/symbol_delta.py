@@ -13,6 +13,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 DOCS_BUILD = ROOT / "docs" / "_build"
@@ -38,7 +39,7 @@ TRACKED_KEYS = {
     "is_property",
 }
 
-JSONRow = dict[str, object]
+JSONRow = dict[str, Any]
 JSONMap = dict[str, JSONRow]
 
 
@@ -99,9 +100,7 @@ def _index_rows(rows: list[JSONRow]) -> JSONMap:
     return indexed
 
 
-def _diff_rows(
-    base: JSONMap, head: JSONMap
-) -> tuple[list[str], list[str], list[JSONRow]]:
+def _diff_rows(base: JSONMap, head: JSONMap) -> tuple[list[str], list[str], list[JSONRow]]:
     """Return (added, removed, changed) deltas between ``base`` and ``head`` maps."""
     base_paths = set(base)
     head_paths = set(head)
@@ -174,7 +173,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> from docs._scripts.symbol_delta import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     global DELTA_PATH
 
@@ -206,9 +204,7 @@ def main(argv: list[str] | None = None) -> int:
     base_rows, base_sha = _load_base_snapshot(args.base)
     head_sha = _git_rev_parse("HEAD")
 
-    added, removed, changed = _diff_rows(
-        _index_rows(base_rows), _index_rows(head_validated)
-    )
+    added, removed, changed = _diff_rows(_index_rows(base_rows), _index_rows(head_validated))
 
     delta = {
         "base_sha": base_sha,

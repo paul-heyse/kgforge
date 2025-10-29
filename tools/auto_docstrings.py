@@ -1125,7 +1125,6 @@ def parse_args() -> argparse.Namespace:
     >>> from tools.auto_docstrings import parse_args
     >>> result = parse_args()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", required=True, type=Path, help="Directory to process.")
@@ -1153,7 +1152,6 @@ def module_name_for(path: Path) -> str:
     >>> from tools.auto_docstrings import module_name_for
     >>> result = module_name_for(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         relative = path.relative_to(REPO_ROOT)
@@ -1194,7 +1192,6 @@ def summarize(name: str, kind: str) -> str:
     >>> from tools.auto_docstrings import summarize
     >>> result = summarize(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     base = _humanize_identifier(name) or "value"
     if kind == "module":
@@ -1211,7 +1208,7 @@ def summarize(name: str, kind: str) -> str:
 def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | None = None) -> str:
     """Return the extended description block for a docstring."""
     handler = _EXTENDED_SUMMARY_HANDLERS.get(kind, _default_extended_summary)
-    return handler(name=name, module_name=module_name, node=node)
+    return handler(name, module_name, node)
 
 
 def _module_extended_summary(name: str, module_name: str, node: ast.AST | None) -> str:
@@ -1324,7 +1321,6 @@ def annotation_to_text(node: ast.AST | None) -> str:
     >>> from tools.auto_docstrings import annotation_to_text
     >>> result = annotation_to_text(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     if node is None:
         return "Any"
@@ -1355,7 +1351,6 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     >>> from tools.auto_docstrings import iter_docstring_nodes
     >>> result = iter_docstring_nodes(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     items: list[tuple[int, ast.AST, str]] = [(0, tree, "module")]
     for node in ast.walk(tree):
@@ -1466,7 +1461,6 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[Paramet
     >>> from tools.auto_docstrings import parameters_for
     >>> result = parameters_for(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     args = node.args
     parameters: list[ParameterInfo] = []
@@ -1516,7 +1510,6 @@ def detect_raises(node: ast.AST) -> list[str]:
     >>> from tools.auto_docstrings import detect_raises
     >>> result = detect_raises(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     seen: OrderedDict[str, None] = OrderedDict()
 
@@ -1538,11 +1531,11 @@ def detect_raises(node: ast.AST) -> list[str]:
                 return
             super().visit(current)
 
-        def visit_Raise(self, raise_node: ast.Raise) -> None:
-            name = _exception_name_for_node(raise_node.exc)
+        def visit_Raise(self, node: ast.Raise) -> None:
+            name = _exception_name_for_node(node.exc)
             if name not in seen:
                 seen[name] = None
-            self.generic_visit(raise_node)
+            self.generic_visit(node)
 
     RaiseCollector(node).visit(node)
     return list(seen.keys())
@@ -1599,7 +1592,6 @@ def build_examples(
     >>> from tools.auto_docstrings import build_examples
     >>> result = build_examples(..., ..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     lines: list[str] = ["Examples", "--------"]
     if module_name and not name.startswith("__"):
@@ -1863,7 +1855,6 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     >>> from tools.auto_docstrings import docstring_text
     >>> result = docstring_text(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     body = getattr(node, "body", [])
     if not body:
@@ -1941,7 +1932,6 @@ def process_file(path: Path) -> bool:
     >>> from tools.auto_docstrings import process_file
     >>> result = process_file(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         text = path.read_text(encoding="utf-8")
@@ -2032,9 +2022,7 @@ def _apply_docstring_update(plan: DocstringUpdatePlan, lines: list[str]) -> None
     replace(plan.expr, lines, plan.new_lines, indent, insert_at)
 
 
-def _docstring_insertion_details(
-    kind: str, node: ast.AST, lines: list[str]
-) -> tuple[str, int]:
+def _docstring_insertion_details(kind: str, node: ast.AST, lines: list[str]) -> tuple[str, int]:
     """Return the indentation and insertion index for ``node``."""
     if kind == "module":
         insert_at = 1 if lines and lines[0].startswith("#!") else 0

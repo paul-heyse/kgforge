@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Any, cast
 import mkdocs_gen_files
 
 if TYPE_CHECKING:
-    from griffe.dataclasses import Object as GriffeObject
+    from griffe import Object as GriffeObject
 else:
     GriffeObject = object  # type: ignore[misc, assignment]
 
@@ -60,7 +60,6 @@ def iter_packages() -> list[str]:
     >>> from docs._scripts.mkdocs_gen_api import iter_packages
     >>> result = iter_packages()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     packages = detect_packages()
     return packages or [detect_primary()]

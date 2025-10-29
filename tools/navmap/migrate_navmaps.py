@@ -11,16 +11,16 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Any, Final
+from typing import Final
 
-from tools.navmap.build_navmap import build_index
+from tools.navmap.build_navmap import NavIndexDict, build_index
 
 DEFAULT_OUTPUT: Final[Path] = (
     Path(__file__).resolve().parents[2] / "site" / "_build" / "navmap.json"
 )
 
 
-def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str, Any]:
+def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> NavIndexDict:
     """Compute migrate navmaps.
 
     Carry out the migrate navmaps operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -42,7 +42,6 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str
     >>> from tools.navmap.migrate_navmaps import migrate_navmaps
     >>> result = migrate_navmaps()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     index = build_index()
     if output:
@@ -102,7 +101,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> from tools.navmap.migrate_navmaps import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     args = _parse_args(argv)
     migrate_navmaps(args.output, pretty=not args.compact)
