@@ -13,13 +13,13 @@ import importlib
 import json
 import os
 import re
-import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from types import ModuleType
 from typing import Any
 
 
-def _optional_import(name: str) -> Any:
+def _optional_import(name: str) -> ModuleType | None:
     """Import module if available.
 
     Parameters
@@ -43,7 +43,7 @@ def _optional_import(name: str) -> Any:
     """
     try:
         return importlib.import_module(name)
-    except Exception:
+    except ModuleNotFoundError:
         return None
 
 
@@ -253,7 +253,6 @@ def load_policy() -> dict[str, Any]:
     >>> from tools.docs.scan_observability import load_policy
     >>> result = load_policy()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
@@ -723,7 +722,6 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     >>> from tools.docs.scan_observability import read_ast
     >>> result = read_ast(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         text = path.read_text(encoding="utf-8")
@@ -760,7 +758,6 @@ def scan_file(
     >>> from tools.docs.scan_observability import scan_file
     >>> result = scan_file(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     text, tree = read_ast(path)
     if not text or tree is None:
@@ -825,12 +822,11 @@ def scan_file(
                     source_link=_links_for(path, node.lineno),
                 )
                 traces.append(trace_row)
-            if attr in {"set_attribute", "add_event"}:
+            if attr in {"set_attribute", "add_event"} and traces:
                 # attach attributes to the last span in this file list if any
-                if traces:
-                    seg = ast.get_source_segment(text, node) or ""
-                    key = _first_str(node, text) or ""
-                    traces[-1].attributes.append(key or seg[:80])
+                seg = ast.get_source_segment(text, node) or ""
+                key = _first_str(node, text) or ""
+                traces[-1].attributes.append(key or seg[:80])
 
     return (logs, metrics, traces)
 
@@ -902,20 +898,10 @@ def _write_config_summary(
     CONFIG_MD.write_text("\n".join(lines), encoding="utf-8")
 
 
-def main() -> None:
-    """Compute main.
-
-    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Examples
-    --------
-    >>> from tools.docs.scan_observability import main
-    >>> main()  # doctest: +ELLIPSIS
-    """
-    policy = load_policy()
-    if not SRC.exists():
-        return
-
+def _scan_repository(
+    policy: dict[str, Any],
+) -> tuple[list[LogRow], list[MetricRow], list[TraceRow], list[dict[str, Any]]]:
+    """Traverse the source tree and collect observability artefacts."""
     all_logs: list[LogRow] = []
     all_metrics: list[MetricRow] = []
     all_traces: list[TraceRow] = []
@@ -934,57 +920,112 @@ def main() -> None:
         for trace in file_traces:
             lints.extend(_lint_trace(policy, trace))
 
-    # Optional runbook linking (error taxonomy)
-    tax_path = ROOT / (policy.get("error_taxonomy_json") or "")
-    if tax_path.exists():
-        tax_data: Any
-        try:
-            tax_data = json.loads(tax_path.read_text(encoding="utf-8"))
-        except Exception:
-            tax_data = {}
-        tax = tax_data if isinstance(tax_data, dict) else {}
-        # naïve example: map by message substring to extensions.runbook
-        rb: dict[str, str] = {}
-        for item in tax.get("errors", []):
-            if "message" in item and "extensions" in item and "runbook" in item["extensions"]:
-                rb[item["message"]] = item["extensions"]["runbook"]
-        for row in all_logs:
-            if not row.runbook:
-                for k, v in rb.items():
-                    if k and k in (row.message_template or ""):
-                        row.runbook = v
-                        break
+    return all_logs, all_metrics, all_traces, lints
 
-    # Write outputs
+
+def _load_runbooks(policy: dict[str, Any]) -> dict[str, str]:
+    """Load optional runbook mappings from the error taxonomy."""
+    taxonomy = policy.get("error_taxonomy_json") or ""
+    tax_path = ROOT / taxonomy if taxonomy else ROOT / ""
+    if not tax_path.exists():
+        return {}
+
+    try:
+        tax_data = json.loads(tax_path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    if not isinstance(tax_data, dict):
+        return {}
+
+    runbooks: dict[str, str] = {}
+    for item in tax_data.get("errors", []):
+        if (
+            isinstance(item, dict)
+            and "message" in item
+            and "extensions" in item
+            and isinstance(item.get("extensions"), dict)
+            and "runbook" in item["extensions"]
+        ):
+            runbooks[item["message"]] = item["extensions"]["runbook"]
+    return runbooks
+
+
+def _apply_runbooks(logs: list[LogRow], runbooks: dict[str, str]) -> None:
+    """Attach runbook URLs to log rows when taxonomy entries match."""
+    if not runbooks:
+        return
+
+    for row in logs:
+        if row.runbook:
+            continue
+        template = row.message_template or ""
+        for message, runbook in runbooks.items():
+            if message and message in template:
+                row.runbook = runbook
+                break
+
+
+def _write_outputs(
+    metrics: list[MetricRow],
+    logs: list[LogRow],
+    traces: list[TraceRow],
+    lints: list[dict[str, Any]],
+) -> None:
+    """Persist JSON artefacts used by downstream documentation builders."""
     (OUT / "metrics.json").write_text(
-        json.dumps([asdict(x) for x in all_metrics], indent=2) + "\n", encoding="utf-8"
+        json.dumps([asdict(x) for x in metrics], indent=2) + "\n",
+        encoding="utf-8",
     )
     (OUT / "log_events.json").write_text(
-        json.dumps([asdict(x) for x in all_logs], indent=2) + "\n", encoding="utf-8"
+        json.dumps([asdict(x) for x in logs], indent=2) + "\n",
+        encoding="utf-8",
     )
     (OUT / "traces.json").write_text(
-        json.dumps([asdict(x) for x in all_traces], indent=2) + "\n", encoding="utf-8"
+        json.dumps([asdict(x) for x in traces], indent=2) + "\n",
+        encoding="utf-8",
     )
     (OUT / "observability_lint.json").write_text(
-        json.dumps(lints, indent=2) + "\n", encoding="utf-8"
+        json.dumps(lints, indent=2) + "\n",
+        encoding="utf-8",
     )
-    _write_config_summary(all_metrics, all_logs, all_traces)
+    _write_config_summary(metrics, logs, traces)
 
-    # Strict mode for CI
+
+def _summarize_exit(
+    metrics: list[MetricRow],
+    logs: list[LogRow],
+    traces: list[TraceRow],
+    lints: list[dict[str, Any]],
+) -> int:
+    """Report a summary to stdout and return the desired exit code."""
     fail = os.getenv("OBS_FAIL_ON_LINT", "0") == "1"
-    if fail and any(x["severity"] == "error" for x in lints):
+    error_count = sum(1 for item in lints if item.get("severity") == "error")
+    warning_count = sum(1 for item in lints if item.get("severity") == "warning")
+    if fail and error_count:
         print(
-            f"[obs] {sum(1 for x in lints if x['severity'] == 'error')} error(s), "
-            f"{sum(1 for x in lints if x['severity'] == 'warning')} warning(s) — failing (OBS_FAIL_ON_LINT=1)"
+            f"[obs] {error_count} error(s), {warning_count} warning(s) — failing (OBS_FAIL_ON_LINT=1)"
         )
-        sys.exit(2)
-    else:
-        print(
-            f"[obs] metrics={len(all_metrics)} logs={len(all_logs)} traces={len(all_traces)}; "
-            f"lint errors={sum(1 for x in lints if x['severity'] == 'error')} warnings={sum(1 for x in lints if x['severity'] == 'warning')}"
-        )
-        sys.exit(0)
+        return 2
+
+    print(
+        f"[obs] metrics={len(metrics)} logs={len(logs)} traces={len(traces)}; "
+        f"lint errors={error_count} warnings={warning_count}"
+    )
+    return 0
+
+
+def main() -> int:
+    """Coordinate observability scanning."""
+    policy = load_policy()
+    if not SRC.exists():
+        return 0
+
+    logs, metrics, traces, lints = _scan_repository(policy)
+    runbooks = _load_runbooks(policy)
+    _apply_runbooks(logs, runbooks)
+    _write_outputs(metrics, logs, traces, lints)
+    return _summarize_exit(metrics, logs, traces, lints)
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
