@@ -50,10 +50,11 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, f
     Parameters
     ----------
     rankers : list[list[tuple[str, float]]]
-        Describe ``rankers``.
+    Describe ``rankers``.
     k : int, optional
-        Describe ``k``.
-        Defaults to ``60``.
+    Describe ``k``.
+    Defaults to ``60``.
+
 
 
 
@@ -63,7 +64,7 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, f
     Returns
     -------
     dict[str, float]
-        Describe return value.
+    Describe return value.
     """
     agg: dict[str, float] = {}
     for ranked in rankers:

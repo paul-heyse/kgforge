@@ -31,9 +31,11 @@ def build_docfacts(entries: Iterable[SemanticResult]) -> list[DocFact]:
         parameters = [
             {
                 "name": param.name,
+                "display_name": param.display_name or param.name,
                 "annotation": param.annotation,
                 "optional": param.optional,
                 "default": param.default,
+                "kind": param.kind,
             }
             for param in schema.parameters
         ]

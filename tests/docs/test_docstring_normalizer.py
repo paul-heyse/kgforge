@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from pathlib import Path
 
 import pytest
@@ -55,11 +56,14 @@ class SampleClass:
             kind="function",
             parameters=[
                 ParameterHarvest(
-                    name="texts", kind="positional", annotation="list[str]", default=None
+                    name="texts",
+                    kind=inspect._ParameterKind.POSITIONAL_OR_KEYWORD,
+                    annotation="list[str]",
+                    default=None,
                 ),
                 ParameterHarvest(
                     name="filters",
-                    kind="positional",
+                    kind=inspect._ParameterKind.POSITIONAL_OR_KEYWORD,
                     annotation="dict[str, int] | None",
                     default="None",
                 ),
@@ -80,9 +84,17 @@ class SampleClass:
             module="tests.docs.test_docstring_normalizer",
             kind="method",
             parameters=[
-                ParameterHarvest(name="self", kind="positional", annotation=None, default=None),
                 ParameterHarvest(
-                    name="values", kind="positional", annotation="list[int]", default=None
+                    name="self",
+                    kind=inspect._ParameterKind.POSITIONAL_OR_KEYWORD,
+                    annotation=None,
+                    default=None,
+                ),
+                ParameterHarvest(
+                    name="values",
+                    kind=inspect._ParameterKind.POSITIONAL_OR_KEYWORD,
+                    annotation="list[int]",
+                    default=None,
                 ),
             ],
             return_annotation="list[int]",

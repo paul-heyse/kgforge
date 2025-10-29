@@ -1,5 +1,5 @@
 {
-  "commit": "3eaedd711e5211aabc518ecee21f0cc38759b535",
+  "commit": "11ff7c10de09c2d9a6a39ee8e46d283ffe8af972",
   "policy_version": "1",
   "link_mode": "editor",
   "modules": {
@@ -10,7 +10,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -43,7 +43,7 @@
         "vlm": 50
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/docling/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/docling/__init__.py"
       },
       "meta": {
         "canonicalizer": {
@@ -86,7 +86,7 @@
         "canonicalize_text": 44
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/docling/canonicalizer.py"
+        "source": "vscode://file//workspace/kgfoundry/src/docling/canonicalizer.py"
       },
       "meta": {
         "canonicalize_text": {
@@ -119,7 +119,7 @@
         "HybridChunker": 42
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/docling/hybrid.py"
+        "source": "vscode://file//workspace/kgfoundry/src/docling/hybrid.py"
       },
       "meta": {
         "HybridChunker": {
@@ -152,7 +152,7 @@
         "GraniteDoclingVLM": 42
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/docling/vlm.py"
+        "source": "vscode://file//workspace/kgfoundry/src/docling/vlm.py"
       },
       "meta": {
         "GraniteDoclingVLM": {
@@ -188,7 +188,7 @@
         "harvester": 11
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/download/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/download/__init__.py"
       },
       "meta": {
         "cli": {
@@ -226,7 +226,7 @@
         "harvest": 46
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/download/cli.py"
+        "source": "vscode://file//workspace/kgfoundry/src/download/cli.py"
       },
       "meta": {
         "harvest": {
@@ -259,7 +259,7 @@
         "OpenAccessHarvester": 84
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/download/harvester.py"
+        "source": "vscode://file//workspace/kgfoundry/src/download/harvester.py"
       },
       "meta": {
         "OpenAccessHarvester": {
@@ -295,7 +295,7 @@
         "qwen3": 44
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/embeddings_dense/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/embeddings_dense/__init__.py"
       },
       "meta": {
         "base": {
@@ -333,7 +333,7 @@
         "DenseEmbeddingModel": 46
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/embeddings_dense/base.py"
+        "source": "vscode://file//workspace/kgfoundry/src/embeddings_dense/base.py"
       },
       "meta": {
         "DenseEmbeddingModel": {
@@ -366,7 +366,7 @@
         "Qwen3Embedder": 42
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/embeddings_dense/qwen3.py"
+        "source": "vscode://file//workspace/kgfoundry/src/embeddings_dense/qwen3.py"
       },
       "meta": {
         "Qwen3Embedder": {
@@ -405,7 +405,7 @@
         "splade": 50
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/embeddings_sparse/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/embeddings_sparse/__init__.py"
       },
       "meta": {
         "base": {
@@ -448,10 +448,10 @@
       "section_lines": {},
       "anchors": {
         "SparseEncoder": 48,
-        "SparseIndex": 103
+        "SparseIndex": 105
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/embeddings_sparse/base.py"
+        "source": "vscode://file//workspace/kgfoundry/src/embeddings_sparse/base.py"
       },
       "meta": {
         "SparseEncoder": {
@@ -494,11 +494,11 @@
       "anchors": {
         "BM25Doc": 82,
         "PurePythonBM25": 108,
-        "LuceneBM25": 348,
-        "get_bm25": 522
+        "LuceneBM25": 351,
+        "get_bm25": 529
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/embeddings_sparse/bm25.py"
+        "source": "vscode://file//workspace/kgfoundry/src/embeddings_sparse/bm25.py"
       },
       "meta": {
         "BM25Doc": {
@@ -558,12 +558,12 @@
       "section_lines": {},
       "anchors": {
         "SPLADEv3Encoder": 71,
-        "PureImpactIndex": 180,
-        "LuceneImpactIndex": 330,
-        "get_splade": 440
+        "PureImpactIndex": 183,
+        "LuceneImpactIndex": 335,
+        "get_splade": 448
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/embeddings_sparse/splade.py"
+        "source": "vscode://file//workspace/kgfoundry/src/embeddings_sparse/splade.py"
       },
       "meta": {
         "SPLADEv3Encoder": {
@@ -600,7 +600,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kf_common/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kf_common/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -630,7 +630,7 @@
         "neo4j_store": 44
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kg_builder/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kg_builder/__init__.py"
       },
       "meta": {
         "mock_kg": {
@@ -668,7 +668,7 @@
         "MockKG": 42
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kg_builder/mock_kg.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kg_builder/mock_kg.py"
       },
       "meta": {
         "MockKG": {
@@ -701,7 +701,7 @@
         "Neo4jStore": 42
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kg_builder/neo4j_store.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kg_builder/neo4j_store.py"
       },
       "meta": {
         "Neo4jStore": {
@@ -723,7 +723,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -742,7 +742,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/_namespace_proxy.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/_namespace_proxy.py"
       },
       "meta": {
         "namespace_dir": {},
@@ -761,7 +761,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/docling/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/docling/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -777,7 +777,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/download/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/download/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -793,7 +793,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/embeddings_dense/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/embeddings_dense/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -809,7 +809,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/embeddings_sparse/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/embeddings_sparse/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -828,7 +828,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/embeddings_sparse/base.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/embeddings_sparse/base.py"
       },
       "meta": {
         "SparseEncoder": {},
@@ -852,7 +852,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/embeddings_sparse/bm25.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/embeddings_sparse/bm25.py"
       },
       "meta": {
         "BM25Doc": {},
@@ -878,7 +878,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/embeddings_sparse/splade.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/embeddings_sparse/splade.py"
       },
       "meta": {
         "LuceneImpactIndex": {},
@@ -899,7 +899,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/kg_builder/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/kg_builder/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -917,7 +917,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/kg_builder/mock_kg.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/kg_builder/mock_kg.py"
       },
       "meta": {
         "MockKG": {}
@@ -935,7 +935,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/kgfoundry_common/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/kgfoundry_common/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -954,7 +954,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/kgfoundry_common/parquet_io.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/kgfoundry_common/parquet_io.py"
       },
       "meta": {
         "ParquetChunkWriter": {},
@@ -973,7 +973,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/linking/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/linking/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -989,7 +989,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/observability/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/observability/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -1005,7 +1005,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/ontology/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/ontology/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -1021,7 +1021,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/orchestration/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/orchestration/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -1044,7 +1044,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/orchestration/fixture_flow.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/orchestration/fixture_flow.py"
       },
       "meta": {
         "fixture_pipeline": {},
@@ -1067,7 +1067,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/registry/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/registry/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -1085,7 +1085,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/registry/helper.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/registry/helper.py"
       },
       "meta": {
         "DuckDBRegistryHelper": {}
@@ -1106,7 +1106,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/registry/migrate.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/registry/migrate.py"
       },
       "meta": {
         "apply": {},
@@ -1125,7 +1125,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/search_api/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/search_api/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -1150,7 +1150,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/search_api/app.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/search_api/app.py"
       },
       "meta": {
         "app": {},
@@ -1179,7 +1179,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/search_api/bm25_index.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/search_api/bm25_index.py"
       },
       "meta": {
         "BM25Doc": {},
@@ -1204,7 +1204,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/search_api/faiss_adapter.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/search_api/faiss_adapter.py"
       },
       "meta": {
         "HAVE_FAISS": {},
@@ -1227,7 +1227,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/search_client/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/search_client/__init__.py"
       },
       "meta": {
         "KGFoundryClient": {}
@@ -1250,7 +1250,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/search_client/client.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/search_client/client.py"
       },
       "meta": {
         "KGFoundryClient": {},
@@ -1271,7 +1271,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/vectorstore_faiss/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/vectorstore_faiss/__init__.py"
       },
       "meta": {},
       "module_meta": {},
@@ -1292,7 +1292,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/vectorstore_faiss/gpu.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry/vectorstore_faiss/gpu.py"
       },
       "meta": {
         "FaissGpuIndex": {},
@@ -1345,7 +1345,7 @@
         "parquet_io": 15
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry_common/__init__.py"
       },
       "meta": {
         "config": {
@@ -1413,7 +1413,7 @@
         "load_config": 44
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/config.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry_common/config.py"
       },
       "meta": {
         "load_config": {
@@ -1464,19 +1464,19 @@
       "section_lines": {},
       "anchors": {
         "DownloadError": 55,
-        "UnsupportedMIMEError": 68,
-        "DoclingError": 81,
-        "OCRTimeoutError": 94,
-        "ChunkingError": 107,
-        "EmbeddingError": 120,
-        "SpladeOOMError": 133,
-        "IndexBuildError": 146,
-        "OntologyParseError": 159,
-        "LinkerCalibrationError": 172,
-        "Neo4jError": 185
+        "UnsupportedMIMEError": 67,
+        "DoclingError": 79,
+        "OCRTimeoutError": 91,
+        "ChunkingError": 103,
+        "EmbeddingError": 115,
+        "SpladeOOMError": 127,
+        "IndexBuildError": 139,
+        "OntologyParseError": 151,
+        "LinkerCalibrationError": 163,
+        "Neo4jError": 175
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/errors.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry_common/errors.py"
       },
       "meta": {
         "ChunkingError": {
@@ -1562,7 +1562,7 @@
         "UnsupportedMIMEError": 55
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/exceptions.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry_common/exceptions.py"
       },
       "meta": {
         "DownloadError": {
@@ -1602,10 +1602,10 @@
       "section_lines": {},
       "anchors": {
         "urn_doc_from_text": 49,
-        "urn_chunk": 77
+        "urn_chunk": 78
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/ids.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry_common/ids.py"
       },
       "meta": {
         "urn_doc_from_text": {
@@ -1643,10 +1643,10 @@
       "section_lines": {},
       "anchors": {
         "JsonFormatter": 50,
-        "setup_logging": 124
+        "setup_logging": 126
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/logging.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry_common/logging.py"
       },
       "meta": {
         "JsonFormatter": {
@@ -1696,7 +1696,7 @@
         "LinkAssertion": 204
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/models.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry_common/models.py"
       },
       "meta": {
         "Id": {
@@ -1756,12 +1756,12 @@
       "anchors": {
         "Stability": 14,
         "NavSection": 25,
-        "SymbolMeta": 40,
-        "ModuleMeta": 65,
-        "NavMap": 81
+        "SymbolMeta": 39,
+        "ModuleMeta": 63,
+        "NavMap": 78
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry_common/navmap_types.py"
       },
       "meta": {
         "ModuleMeta": {
@@ -1814,10 +1814,10 @@
       "section_lines": {},
       "anchors": {
         "ParquetVectorWriter": 56,
-        "ParquetChunkWriter": 270
+        "ParquetChunkWriter": 273
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/parquet_io.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry_common/parquet_io.py"
       },
       "meta": {
         "ParquetVectorWriter": {
@@ -1846,7 +1846,7 @@
         "BaseModel": 9
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/pydantic.py"
+        "source": "vscode://file//workspace/kgfoundry/src/kgfoundry_common/pydantic.py"
       },
       "meta": {},
       "module_meta": {},
@@ -1876,7 +1876,7 @@
         "linker": 44
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/linking/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/linking/__init__.py"
       },
       "meta": {
         "calibration": {
@@ -1914,7 +1914,7 @@
         "isotonic_calibrate": 42
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/linking/calibration.py"
+        "source": "vscode://file//workspace/kgfoundry/src/linking/calibration.py"
       },
       "meta": {
         "isotonic_calibrate": {
@@ -1947,7 +1947,7 @@
         "Linker": 42
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/linking/linker.py"
+        "source": "vscode://file//workspace/kgfoundry/src/linking/linker.py"
       },
       "meta": {
         "Linker": {
@@ -1980,7 +1980,7 @@
         "metrics": 8
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/observability/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/observability/__init__.py"
       },
       "meta": {
         "metrics": {
@@ -2002,7 +2002,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/observability/metrics.py"
+        "source": "vscode://file//workspace/kgfoundry/src/observability/metrics.py"
       },
       "meta": {},
       "module_meta": {},
@@ -2032,7 +2032,7 @@
         "loader": 9
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/ontology/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/ontology/__init__.py"
       },
       "meta": {
         "catalog": {
@@ -2070,7 +2070,7 @@
         "OntologyCatalog": 67
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/ontology/catalog.py"
+        "source": "vscode://file//workspace/kgfoundry/src/ontology/catalog.py"
       },
       "meta": {
         "OntologyCatalog": {
@@ -2103,7 +2103,7 @@
         "OntologyLoader": 42
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/ontology/loader.py"
+        "source": "vscode://file//workspace/kgfoundry/src/ontology/loader.py"
       },
       "meta": {
         "OntologyLoader": {
@@ -2142,7 +2142,7 @@
         "flows": 50
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/orchestration/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/orchestration/__init__.py"
       },
       "meta": {
         "cli": {
@@ -2189,12 +2189,12 @@
       "section_lines": {},
       "anchors": {
         "index_bm25": 52,
-        "index_faiss": 129,
-        "api": 179,
-        "e2e": 198
+        "index_faiss": 132,
+        "api": 184,
+        "e2e": 203
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/orchestration/cli.py"
+        "source": "vscode://file//workspace/kgfoundry/src/orchestration/cli.py"
       },
       "meta": {
         "api": {
@@ -2249,15 +2249,15 @@
       ],
       "section_lines": {},
       "anchors": {
-        "t_prepare_dirs": 87,
-        "t_write_fixture_chunks": 132,
-        "t_write_fixture_dense": 167,
-        "t_write_fixture_splade": 204,
-        "t_register_in_duckdb": 279,
-        "fixture_pipeline": 319
+        "t_prepare_dirs": 88,
+        "t_write_fixture_chunks": 134,
+        "t_write_fixture_dense": 170,
+        "t_write_fixture_splade": 208,
+        "t_register_in_duckdb": 284,
+        "fixture_pipeline": 325
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/orchestration/fixture_flow.py"
+        "source": "vscode://file//workspace/kgfoundry/src/orchestration/fixture_flow.py"
       },
       "meta": {
         "fixture_pipeline": {
@@ -2314,11 +2314,11 @@
       ],
       "section_lines": {},
       "anchors": {
-        "t_echo": 70,
-        "e2e_flow": 104
+        "t_echo": 71,
+        "e2e_flow": 105
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/orchestration/flows.py"
+        "source": "vscode://file//workspace/kgfoundry/src/orchestration/flows.py"
       },
       "meta": {
         "e2e_flow": {
@@ -2365,7 +2365,7 @@
         "migrate": 56
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/registry/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/registry/__init__.py"
       },
       "meta": {
         "api": {
@@ -2413,7 +2413,7 @@
         "Registry": 44
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/registry/api.py"
+        "source": "vscode://file//workspace/kgfoundry/src/registry/api.py"
       },
       "meta": {
         "Registry": {
@@ -2446,7 +2446,7 @@
         "DuckDBRegistry": 48
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/registry/duckdb_registry.py"
+        "source": "vscode://file//workspace/kgfoundry/src/registry/duckdb_registry.py"
       },
       "meta": {
         "DuckDBRegistry": {
@@ -2479,7 +2479,7 @@
         "DuckDBRegistryHelper": 48
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/registry/helper.py"
+        "source": "vscode://file//workspace/kgfoundry/src/registry/helper.py"
       },
       "meta": {
         "DuckDBRegistryHelper": {
@@ -2515,7 +2515,7 @@
         "main": 81
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/registry/migrate.py"
+        "source": "vscode://file//workspace/kgfoundry/src/registry/migrate.py"
       },
       "meta": {
         "apply": {
@@ -2577,7 +2577,7 @@
         "splade_index": 28
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/search_api/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/search_api/__init__.py"
       },
       "meta": {
         "app": {
@@ -2658,14 +2658,14 @@
       "section_lines": {},
       "anchors": {
         "auth": 132,
-        "healthz": 165,
-        "rrf_fuse": 190,
-        "apply_kg_boosts": 222,
-        "search": 277,
-        "graph_concepts": 360
+        "healthz": 166,
+        "rrf_fuse": 191,
+        "apply_kg_boosts": 224,
+        "search": 280,
+        "graph_concepts": 364
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/search_api/app.py"
+        "source": "vscode://file//workspace/kgfoundry/src/search_api/app.py"
       },
       "meta": {
         "apply_kg_boosts": {
@@ -2725,11 +2725,11 @@
       "section_lines": {},
       "anchors": {
         "toks": 53,
-        "BM25Doc": 79,
-        "BM25Index": 114
+        "BM25Doc": 80,
+        "BM25Index": 115
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/search_api/bm25_index.py"
+        "source": "vscode://file//workspace/kgfoundry/src/search_api/bm25_index.py"
       },
       "meta": {
         "BM25Doc": {
@@ -2778,7 +2778,7 @@
         "FaissAdapter": 103
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/search_api/faiss_adapter.py"
+        "source": "vscode://file//workspace/kgfoundry/src/search_api/faiss_adapter.py"
       },
       "meta": {
         "DenseVecs": {
@@ -2823,11 +2823,11 @@
       "section_lines": {},
       "anchors": {
         "tokenize": 51,
-        "FixtureDoc": 77,
-        "FixtureIndex": 109
+        "FixtureDoc": 78,
+        "FixtureIndex": 110
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/search_api/fixture_index.py"
+        "source": "vscode://file//workspace/kgfoundry/src/search_api/fixture_index.py"
       },
       "meta": {
         "FixtureDoc": {
@@ -2870,7 +2870,7 @@
         "rrf_fuse": 42
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/search_api/fusion.py"
+        "source": "vscode://file//workspace/kgfoundry/src/search_api/fusion.py"
       },
       "meta": {
         "rrf_fuse": {
@@ -2904,12 +2904,12 @@
       ],
       "section_lines": {},
       "anchors": {
-        "detect_query_concepts": 68,
+        "detect_query_concepts": 67,
         "linked_concepts_for_text": 99,
-        "kg_boost": 130
+        "kg_boost": 131
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/search_api/kg_mock.py"
+        "source": "vscode://file//workspace/kgfoundry/src/search_api/kg_mock.py"
       },
       "meta": {
         "detect_query_concepts": {
@@ -2955,7 +2955,7 @@
         "SearchResult": 76
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/search_api/schemas.py"
+        "source": "vscode://file//workspace/kgfoundry/src/search_api/schemas.py"
       },
       "meta": {
         "SearchRequest": {
@@ -2995,11 +2995,11 @@
       "section_lines": {},
       "anchors": {
         "rrf_fuse": 46,
-        "apply_kg_boosts": 80,
-        "mmr_deduplicate": 109
+        "apply_kg_boosts": 81,
+        "mmr_deduplicate": 111
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/search_api/service.py"
+        "source": "vscode://file//workspace/kgfoundry/src/search_api/service.py"
       },
       "meta": {
         "apply_kg_boosts": {
@@ -3049,11 +3049,11 @@
       "section_lines": {},
       "anchors": {
         "tok": 50,
-        "SpladeDoc": 76,
-        "SpladeIndex": 105
+        "SpladeDoc": 77,
+        "SpladeIndex": 106
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/search_api/splade_index.py"
+        "source": "vscode://file//workspace/kgfoundry/src/search_api/splade_index.py"
       },
       "meta": {
         "SpladeDoc": {
@@ -3096,7 +3096,7 @@
         "KGFoundryClient": 39
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/search_client/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/search_client/__init__.py"
       },
       "meta": {
         "KGFoundryClient": {
@@ -3133,7 +3133,7 @@
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/search_client/client.py"
+        "source": "vscode://file//workspace/kgfoundry/src/search_client/client.py"
       },
       "meta": {
         "KGFoundryClient": {
@@ -3165,14 +3165,22 @@
     },
     "sitecustomize": {
       "path": "src/sitecustomize.py",
-      "exports": [],
+      "exports": [
+        "register_docstring_attrs",
+        "register_docstring_yields",
+        "register_docstring_size"
+      ],
       "sections": [],
       "section_lines": {},
       "anchors": {},
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/sitecustomize.py"
+        "source": "vscode://file//workspace/kgfoundry/src/sitecustomize.py"
       },
-      "meta": {},
+      "meta": {
+        "register_docstring_attrs": {},
+        "register_docstring_yields": {},
+        "register_docstring_size": {}
+      },
       "module_meta": {},
       "tags": [],
       "synopsis": "",
@@ -3197,7 +3205,7 @@
         "gpu": 38
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/vectorstore_faiss/__init__.py"
+        "source": "vscode://file//workspace/kgfoundry/src/vectorstore_faiss/__init__.py"
       },
       "meta": {
         "gpu": {
@@ -3239,7 +3247,7 @@
         "FaissGpuIndex": 57
       },
       "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/vectorstore_faiss/gpu.py"
+        "source": "vscode://file//workspace/kgfoundry/src/vectorstore_faiss/gpu.py"
       },
       "meta": {
         "FaissGpuIndex": {

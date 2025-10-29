@@ -58,9 +58,10 @@ class SparseEncoder(Protocol):
     Parameters
     ----------
     *args : inspect._empty
-        Describe ``args``.
+    Describe ``args``.
     **kwargs : inspect._empty
-        Describe ``kwargs``.
+    Describe ``kwargs``.
+
 
 
 
@@ -70,7 +71,7 @@ class SparseEncoder(Protocol):
     Returns
     -------
     inspect._empty
-        Describe return value.
+    Describe return value.
     """
 
     name: str
@@ -85,7 +86,8 @@ class SparseEncoder(Protocol):
         Parameters
         ----------
         texts : list[str]
-            Describe ``texts``.
+        Describe ``texts``.
+
 
 
 
@@ -95,7 +97,7 @@ class SparseEncoder(Protocol):
         Returns
         -------
         list[tuple[list[int], list[float]]]
-            Describe return value.
+        Describe return value.
         """
         ...
 
@@ -113,9 +115,10 @@ class SparseIndex(Protocol):
     Parameters
     ----------
     *args : inspect._empty
-        Describe ``args``.
+    Describe ``args``.
     **kwargs : inspect._empty
-        Describe ``kwargs``.
+    Describe ``kwargs``.
+
 
 
 
@@ -125,7 +128,7 @@ class SparseIndex(Protocol):
     Returns
     -------
     inspect._empty
-        Describe return value.
+    Describe return value.
     """
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
@@ -138,7 +141,7 @@ class SparseIndex(Protocol):
         Parameters
         ----------
         docs_iterable : Iterable[tuple[str, dict[str, str]]]
-            Describe ``docs_iterable``.
+        Describe ``docs_iterable``.
         """
         ...
 
@@ -154,12 +157,13 @@ class SparseIndex(Protocol):
         Parameters
         ----------
         query : str
-            Describe ``query``.
+        Describe ``query``.
         k : int
-            Describe ``k``.
+        Describe ``k``.
         fields : Mapping[str, str] | None, optional
-            Describe ``fields``.
-            Defaults to ``None``.
+        Describe ``fields``.
+        Defaults to ``None``.
+
 
 
 
@@ -169,6 +173,6 @@ class SparseIndex(Protocol):
         Returns
         -------
         list[tuple[str, float]]
-            Describe return value.
+        Describe return value.
         """
         ...

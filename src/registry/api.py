@@ -54,9 +54,10 @@ class Registry(Protocol):
     Parameters
     ----------
     *args : inspect._empty
-        Describe ``args``.
+    Describe ``args``.
     **kwargs : inspect._empty
-        Describe ``kwargs``.
+    Describe ``kwargs``.
+
 
 
 
@@ -66,7 +67,7 @@ class Registry(Protocol):
     Returns
     -------
     inspect._empty
-        Describe return value.
+    Describe return value.
     """
 
     def begin_dataset(self, kind: str, run_id: str) -> str:
@@ -79,9 +80,10 @@ class Registry(Protocol):
         Parameters
         ----------
         kind : str
-            Describe ``kind``.
+        Describe ``kind``.
         run_id : str
-            Describe ``run_id``.
+        Describe ``run_id``.
+
 
 
 
@@ -91,7 +93,7 @@ class Registry(Protocol):
         Returns
         -------
         str
-            Describe return value.
+        Describe return value.
         """
         ...
 
@@ -105,11 +107,11 @@ class Registry(Protocol):
         Parameters
         ----------
         dataset_id : str
-            Describe ``dataset_id``.
+        Describe ``dataset_id``.
         parquet_root : str
-            Describe ``parquet_root``.
+        Describe ``parquet_root``.
         rows : int
-            Describe ``rows``.
+        Describe ``rows``.
         """
         ...
 
@@ -123,7 +125,7 @@ class Registry(Protocol):
         Parameters
         ----------
         dataset_id : str
-            Describe ``dataset_id``.
+        Describe ``dataset_id``.
         """
         ...
 
@@ -143,13 +145,14 @@ class Registry(Protocol):
         Parameters
         ----------
         purpose : str
-            Describe ``purpose``.
+        Describe ``purpose``.
         model_id : str | None
-            Describe ``model_id``.
+        Describe ``model_id``.
         revision : str | None
-            Describe ``revision``.
+        Describe ``revision``.
         config : Mapping[str, object]
-            Describe ``config``.
+        Describe ``config``.
+
 
 
 
@@ -159,7 +162,7 @@ class Registry(Protocol):
         Returns
         -------
         str
-            Describe return value.
+        Describe return value.
         """
         ...
 
@@ -173,12 +176,12 @@ class Registry(Protocol):
         Parameters
         ----------
         run_id : str
-            Describe ``run_id``.
+        Describe ``run_id``.
         success : bool
-            Describe ``success``.
+        Describe ``success``.
         notes : str | None, optional
-            Describe ``notes``.
-            Defaults to ``None``.
+        Describe ``notes``.
+        Defaults to ``None``.
         """
         ...
 
@@ -192,7 +195,7 @@ class Registry(Protocol):
         Parameters
         ----------
         docs : list[Doc]
-            Describe ``docs``.
+        Describe ``docs``.
         """
         ...
 
@@ -206,7 +209,7 @@ class Registry(Protocol):
         Parameters
         ----------
         assets : list[DoctagsAsset]
-            Describe ``assets``.
+        Describe ``assets``.
         """
         ...
 
@@ -220,11 +223,11 @@ class Registry(Protocol):
         Parameters
         ----------
         event_name : str
-            Describe ``event_name``.
+        Describe ``event_name``.
         subject_id : str
-            Describe ``subject_id``.
+        Describe ``subject_id``.
         payload : Mapping[str, object]
-            Describe ``payload``.
+        Describe ``payload``.
         """
         ...
 
@@ -238,12 +241,12 @@ class Registry(Protocol):
         Parameters
         ----------
         event : str
-            Describe ``event``.
+        Describe ``event``.
         subject_id : str
-            Describe ``subject_id``.
+        Describe ``subject_id``.
         error_class : str
-            Describe ``error_class``.
+        Describe ``error_class``.
         message : str
-            Describe ``message``.
+        Describe ``message``.
         """
         ...

@@ -52,7 +52,8 @@ def _t_echo_impl(msg: str) -> str:
     Parameters
     ----------
     msg : str
-        Describe ``msg``.
+    Describe ``msg``.
+
 
 
 
@@ -62,7 +63,7 @@ def _t_echo_impl(msg: str) -> str:
     Returns
     -------
     str
-        Describe return value.
+    Describe return value.
     """
     return msg
 
@@ -81,7 +82,7 @@ def _e2e_flow_impl() -> list[str]:
     Returns
     -------
     list[str]
-        Describe return value.
+    Describe return value.
     """
     return [
         t_echo.submit(x).result()

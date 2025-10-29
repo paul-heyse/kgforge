@@ -26,24 +26,46 @@ that custom edits (for example, `typing.Any` fallbacks) remain reviewable in the
 diff. Commit the resulting changes under `stubs/` alongside any manual fixes
 required to satisfy `mypy --strict`.
 
-## 2. Normalise docstrings
+## 2. Regenerate documentation artefacts
 
-The docstring builder ensures every public API stays aligned with our NumPy
-style requirements and updates the DocFacts sidecar JSON used by documentation
-bots. Run it in update mode whenever you touch Python interfaces:
+Run the consolidated target whenever you touch documentation inputs:
 
 ```bash
-uv run python -m tools.docstring_builder.cli update --diff
+make artifacts
 ```
 
-The command rewrites docstrings in-place, refreshes the builder cache, and
-regenerates `docs/_build/docfacts.json`. Re-run it after resolving merge
-conflicts so the ownership markers stay consistent.
+The helper script invokes the docstring builder (with
+`--ignore-missing` to sidestep `docs._build` imports), navmap rebuild,
+test-map generation, observability scan, and schema exporter. Each phase prints
+a status line such as `[navmap] regenerated site/_build/navmap/navmap.json` so
+you immediately know which subsystem needs attention if the command exits with
+an error.
+
+| When you change…                                   | Why `make artifacts` matters                         | Notes |
+| -------------------------------------------------- | ---------------------------------------------------- | ----- |
+| Public API signatures or docstrings                | Updates rendered docstrings and `docfacts.json`      | Uses `tools.docstring_builder.cli update --all`
+| Navigation metadata (`tools/navmap/**`)             | Rebuilds `site/_build/navmap/navmap.json`            | Keeps navmaps/test maps in sync |
+| Observability policies or coverage annotations     | Refreshes observability reports under `docs/_build`  | Fails fast if new lint errors appear |
+| Pydantic models / schema exports                   | Writes JSON schema artefacts and drift reports       | Inspect `docs/_build/schema_drift.json` when it changes |
+
+### Artefact FAQ
+
+- **DocFacts still drift after running `make artifacts`?** Ensure you committed
+  the regenerated docstrings first. The command writes deterministic JSON; rerun
+  it after resolving merge conflicts to realign ownership markers.
+- **`ModuleNotFoundError: docs._build…` during manual runs?** Call
+  `python -m tools.docstring_builder.cli update --all --ignore-missing` or just
+  `make artifacts`. The compatibility flag suppresses transient imports from
+  generated directories.
+- **`[schemas] drift detected` keeps appearing?** Open
+  `docs/_build/schema_drift.json` to review the diff and commit the updates when
+  the changes look correct. The exporter leaves the drift file behind for
+  troubleshooting.
 
 ## 3. Validate locally before pushing
 
 Use the chained lint target to replicate the documentation checks that run in
-CI:
+CI after you regenerate artefacts:
 
 ```bash
 make lint-docs            # pydoclint + docstring-builder diff + mypy strict
@@ -55,14 +77,14 @@ regressions. Enable `RUN_DOCS_TESTS=1` to execute the `tests/docs` suite when
 you need additional safety.
 
 To keep the feedback loop tight, enable the optional pre-commit hook named
-`docstring-builder (diff, optional)`. It runs the same docstring diff in
-lightweight mode and honours the `SKIP_DOC_BUILDER_DIFF=1` and
+`docstring-builder (diff, optional)`. It runs the docstring diff in lightweight
+mode and honours the `SKIP_DOC_BUILDER_DIFF=1` and
 `DOC_BUILDER_SINCE=<rev>` environment flags.
 
 ## 4. Rely on CI for final verification
 
-The primary CI workflow invokes `make lint-docs` after the standard linting
-passes. The job reruns the docstring builder in check mode, confirms
-`docs/_build/docfacts.json` matches the regenerated metadata, and surfaces
+The primary CI workflow now includes a **Docs Artifacts** job that calls
+`make artifacts` and asserts the working tree stays clean. The existing
+documentation job still runs `make lint-docs`, rechecks DocFacts, and surfaces
 failures as actionable annotations. A green build means both the human-facing
 and machine-readable documentation artefacts are up to date.

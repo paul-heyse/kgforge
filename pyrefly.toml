@@ -11,7 +11,12 @@ python-version = "3.13.9"
 infer-with-first-use = true
 untyped-def-behavior = "check-and-infer-return-type"
 permissive-ignores = false
-replace-imports-with-any = []
+replace-imports-with-any = [
+    "pyserini.index.lucene",
+    "pyserini.search.lucene",
+    "libcuvs",
+    "faiss",
+]
 ignore-missing-imports = []
 ignore-missing-source = false
 ignore-errors-in-generated-code = false

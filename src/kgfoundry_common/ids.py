@@ -57,7 +57,8 @@ def urn_doc_from_text(text: str) -> str:
     Parameters
     ----------
     text : str
-        Describe ``text``.
+    Describe ``text``.
+
 
 
 
@@ -67,7 +68,7 @@ def urn_doc_from_text(text: str) -> str:
     Returns
     -------
     str
-        Describe return value.
+    Describe return value.
     """
     h = hashlib.sha256(text.encode("utf-8")).digest()[:16]
     b32 = base64.b32encode(h).decode("ascii").strip("=").lower()
@@ -85,11 +86,12 @@ def urn_chunk(doc_hash: str, start: int, end: int) -> str:
     Parameters
     ----------
     doc_hash : str
-        Describe ``doc_hash``.
+    Describe ``doc_hash``.
     start : int
-        Describe ``start``.
+    Describe ``start``.
     end : int
-        Describe ``end``.
+    Describe ``end``.
+
 
 
 
@@ -99,6 +101,6 @@ def urn_chunk(doc_hash: str, start: int, end: int) -> str:
     Returns
     -------
     str
-        Describe return value.
+    Describe return value.
     """
     return f"urn:chunk:{doc_hash.split(':')[-1]}:{start}-{end}"

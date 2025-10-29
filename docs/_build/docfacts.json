@@ -25,6 +25,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "blocks",
+        "kind": "positional_or_keyword",
         "name": "blocks",
         "optional": false
       }
@@ -46,6 +48,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "blocks",
+        "kind": "positional_or_keyword",
         "name": "blocks",
         "optional": false
       }
@@ -94,24 +98,32 @@
       {
         "annotation": "str",
         "default": "'https://api.openalex.org'",
+        "display_name": "openalex_base",
+        "kind": "positional_or_keyword",
         "name": "openalex_base",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'https://api.unpaywall.org'",
+        "display_name": "unpaywall_base",
+        "kind": "positional_or_keyword",
         "name": "unpaywall_base",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "pdf_host_base",
+        "kind": "positional_or_keyword",
         "name": "pdf_host_base",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'/data/pdfs'",
+        "display_name": "out_dir",
+        "kind": "positional_or_keyword",
         "name": "out_dir",
         "optional": true
       }
@@ -137,18 +149,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "user_agent",
+        "kind": "positional_or_keyword",
         "name": "user_agent",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "contact_email",
+        "kind": "positional_or_keyword",
         "name": "contact_email",
         "optional": false
       },
       {
         "annotation": "HarvesterConfig | None",
         "default": "None",
+        "display_name": "config",
+        "kind": "positional_or_keyword",
         "name": "config",
         "optional": true
       }
@@ -165,6 +183,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doi",
+        "kind": "positional_or_keyword",
         "name": "doi",
         "optional": false
       }
@@ -186,6 +206,8 @@
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "work",
+        "kind": "positional_or_keyword",
         "name": "work",
         "optional": false
       }
@@ -207,6 +229,8 @@
       {
         "annotation": "object",
         "default": null,
+        "display_name": "locations",
+        "kind": "positional_or_keyword",
         "name": "locations",
         "optional": false
       }
@@ -228,6 +252,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doi",
+        "kind": "positional_or_keyword",
         "name": "doi",
         "optional": false
       }
@@ -249,12 +275,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "url",
+        "kind": "positional_or_keyword",
         "name": "url",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "target_path",
+        "kind": "positional_or_keyword",
         "name": "target_path",
         "optional": false
       }
@@ -276,6 +306,8 @@
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "work",
+        "kind": "positional_or_keyword",
         "name": "work",
         "optional": false
       }
@@ -297,18 +329,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "topic",
+        "kind": "positional_or_keyword",
         "name": "topic",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "years",
+        "kind": "positional_or_keyword",
         "name": "years",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "max_works",
+        "kind": "positional_or_keyword",
         "name": "max_works",
         "optional": false
       }
@@ -330,18 +368,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "topic",
+        "kind": "positional_or_keyword",
         "name": "topic",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "years",
+        "kind": "positional_or_keyword",
         "name": "years",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "max_works",
+        "kind": "positional_or_keyword",
         "name": "max_works",
         "optional": false
       }
@@ -363,18 +407,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "topic",
+        "kind": "positional_or_keyword",
         "name": "topic",
         "optional": false
       },
       {
         "annotation": "str",
         "default": "'>=2018'",
+        "display_name": "years",
+        "kind": "positional_or_keyword",
         "name": "years",
         "optional": true
       },
       {
         "annotation": "int",
         "default": "20000",
+        "display_name": "max_works",
+        "kind": "positional_or_keyword",
         "name": "max_works",
         "optional": true
       }
@@ -391,18 +441,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "topic",
+        "kind": "positional_or_keyword",
         "name": "topic",
         "optional": false
       },
       {
         "annotation": "str",
         "default": "'>=2018'",
+        "display_name": "years",
+        "kind": "positional_or_keyword",
         "name": "years",
         "optional": true
       },
       {
         "annotation": "int",
         "default": "20000",
+        "display_name": "max_works",
+        "kind": "positional_or_keyword",
         "name": "max_works",
         "optional": true
       }
@@ -428,24 +484,32 @@
       {
         "annotation": "str",
         "default": "'https://api.openalex.org'",
+        "display_name": "openalex_base",
+        "kind": "positional_or_keyword",
         "name": "openalex_base",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'https://api.unpaywall.org'",
+        "display_name": "unpaywall_base",
+        "kind": "positional_or_keyword",
         "name": "unpaywall_base",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "pdf_host_base",
+        "kind": "positional_or_keyword",
         "name": "pdf_host_base",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'/data/pdfs'",
+        "display_name": "out_dir",
+        "kind": "positional_or_keyword",
         "name": "out_dir",
         "optional": true
       }
@@ -484,18 +548,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "user_agent",
+        "kind": "positional_or_keyword",
         "name": "user_agent",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "contact_email",
+        "kind": "positional_or_keyword",
         "name": "contact_email",
         "optional": false
       },
       {
         "annotation": "HarvesterConfig | None",
         "default": "None",
+        "display_name": "config",
+        "kind": "positional_or_keyword",
         "name": "config",
         "optional": true
       }
@@ -512,6 +582,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doi",
+        "kind": "positional_or_keyword",
         "name": "doi",
         "optional": false
       }
@@ -533,6 +605,8 @@
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "work",
+        "kind": "positional_or_keyword",
         "name": "work",
         "optional": false
       }
@@ -554,6 +628,8 @@
       {
         "annotation": "object",
         "default": null,
+        "display_name": "locations",
+        "kind": "positional_or_keyword",
         "name": "locations",
         "optional": false
       }
@@ -575,6 +651,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doi",
+        "kind": "positional_or_keyword",
         "name": "doi",
         "optional": false
       }
@@ -596,12 +674,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "url",
+        "kind": "positional_or_keyword",
         "name": "url",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "target_path",
+        "kind": "positional_or_keyword",
         "name": "target_path",
         "optional": false
       }
@@ -632,6 +714,8 @@
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "work",
+        "kind": "positional_or_keyword",
         "name": "work",
         "optional": false
       }
@@ -653,18 +737,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "topic",
+        "kind": "positional_or_keyword",
         "name": "topic",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "years",
+        "kind": "positional_or_keyword",
         "name": "years",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "max_works",
+        "kind": "positional_or_keyword",
         "name": "max_works",
         "optional": false
       }
@@ -686,18 +776,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "topic",
+        "kind": "positional_or_keyword",
         "name": "topic",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "years",
+        "kind": "positional_or_keyword",
         "name": "years",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "max_works",
+        "kind": "positional_or_keyword",
         "name": "max_works",
         "optional": false
       }
@@ -733,6 +829,8 @@
       {
         "annotation": "Sequence",
         "default": null,
+        "display_name": "texts",
+        "kind": "positional_or_keyword",
         "name": "texts",
         "optional": false
       }
@@ -772,6 +870,8 @@
       {
         "annotation": "Sequence",
         "default": null,
+        "display_name": "texts",
+        "kind": "positional_or_keyword",
         "name": "texts",
         "optional": false
       }
@@ -811,18 +911,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doc_id",
+        "kind": "positional_or_keyword",
         "name": "doc_id",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "length",
+        "kind": "positional_or_keyword",
         "name": "length",
         "optional": false
       },
       {
         "annotation": "dict",
         "default": null,
+        "display_name": "fields",
+        "kind": "positional_or_keyword",
         "name": "fields",
         "optional": false
       }
@@ -848,24 +954,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": false
       },
       {
         "annotation": "float",
         "default": "0.9",
+        "display_name": "k1",
+        "kind": "positional_or_keyword",
         "name": "k1",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "0.4",
+        "display_name": "b",
+        "kind": "positional_or_keyword",
         "name": "b",
         "optional": true
       },
       {
         "annotation": "dict[str, float] | None",
         "default": "None",
+        "display_name": "field_boosts",
+        "kind": "positional_or_keyword",
         "name": "field_boosts",
         "optional": true
       }
@@ -891,6 +1005,8 @@
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "docs_iterable",
+        "kind": "positional_or_keyword",
         "name": "docs_iterable",
         "optional": false
       }
@@ -907,18 +1023,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       },
       {
         "annotation": "dict[str, str] | None",
         "default": "None",
+        "display_name": "fields",
+        "kind": "positional_or_keyword",
         "name": "fields",
         "optional": true
       }
@@ -949,12 +1071,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": false
       },
       {
         "annotation": "str",
         "default": "'naver/splade-v3-distilbert'",
+        "display_name": "query_encoder",
+        "kind": "positional_or_keyword",
         "name": "query_encoder",
         "optional": true
       }
@@ -980,12 +1106,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       }
@@ -1016,6 +1146,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": false
       }
@@ -1032,6 +1164,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -1053,6 +1187,8 @@
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "docs_iterable",
+        "kind": "positional_or_keyword",
         "name": "docs_iterable",
         "optional": false
       }
@@ -1078,12 +1214,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       }
@@ -1114,24 +1254,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": false
       },
       {
         "annotation": "float",
         "default": "0.9",
+        "display_name": "k1",
+        "kind": "positional_or_keyword",
         "name": "k1",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "0.4",
+        "display_name": "b",
+        "kind": "positional_or_keyword",
         "name": "b",
         "optional": true
       },
       {
         "annotation": "dict[str, float] | None",
         "default": "None",
+        "display_name": "field_boosts",
+        "kind": "positional_or_keyword",
         "name": "field_boosts",
         "optional": true
       }
@@ -1148,6 +1296,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "term",
+        "kind": "positional_or_keyword",
         "name": "term",
         "optional": false
       }
@@ -1169,6 +1319,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -1190,6 +1342,8 @@
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "docs_iterable",
+        "kind": "positional_or_keyword",
         "name": "docs_iterable",
         "optional": false
       }
@@ -1215,18 +1369,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       },
       {
         "annotation": "Mapping[str, str] | None",
         "default": "None",
+        "display_name": "fields",
+        "kind": "positional_or_keyword",
         "name": "fields",
         "optional": true
       }
@@ -1257,24 +1417,32 @@
       {
         "annotation": "str",
         "default": "'naver/splade-v3-distilbert'",
+        "display_name": "model_id",
+        "kind": "positional_or_keyword",
         "name": "model_id",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'cuda'",
+        "display_name": "device",
+        "kind": "positional_or_keyword",
         "name": "device",
         "optional": true
       },
       {
         "annotation": "int",
         "default": "256",
+        "display_name": "topk",
+        "kind": "positional_or_keyword",
         "name": "topk",
         "optional": true
       },
       {
         "annotation": "int",
         "default": "512",
+        "display_name": "max_seq_len",
+        "kind": "positional_or_keyword",
         "name": "max_seq_len",
         "optional": true
       }
@@ -1291,6 +1459,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "texts",
+        "kind": "positional_or_keyword",
         "name": "texts",
         "optional": false
       }
@@ -1321,6 +1491,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "texts",
+        "kind": "positional_or_keyword",
         "name": "texts",
         "optional": false
       }
@@ -1351,6 +1523,8 @@
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "docs_iterable",
+        "kind": "positional_or_keyword",
         "name": "docs_iterable",
         "optional": false
       }
@@ -1367,18 +1541,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       },
       {
         "annotation": "Mapping[str, str] | None",
         "default": "None",
+        "display_name": "fields",
+        "kind": "positional_or_keyword",
         "name": "fields",
         "optional": true
       }
@@ -1400,30 +1580,40 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "backend",
+        "kind": "positional_or_keyword",
         "name": "backend",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": false
       },
       {
         "annotation": "float",
         "default": "0.9",
+        "display_name": "k1",
+        "kind": "keyword_only",
         "name": "k1",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "0.4",
+        "display_name": "b",
+        "kind": "keyword_only",
         "name": "b",
         "optional": true
       },
       {
         "annotation": "dict[str, float] | None",
         "default": "None",
+        "display_name": "field_boosts",
+        "kind": "keyword_only",
         "name": "field_boosts",
         "optional": true
       }
@@ -1445,18 +1635,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "backend",
+        "kind": "positional_or_keyword",
         "name": "backend",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": false
       },
       {
         "annotation": "str",
         "default": "'naver/splade-v3-distilbert'",
+        "display_name": "query_encoder",
+        "kind": "positional_or_keyword",
         "name": "query_encoder",
         "optional": true
       }
@@ -1487,6 +1683,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "texts",
+        "kind": "positional_or_keyword",
         "name": "texts",
         "optional": false
       }
@@ -1517,6 +1715,8 @@
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "docs_iterable",
+        "kind": "positional_or_keyword",
         "name": "docs_iterable",
         "optional": false
       }
@@ -1533,18 +1733,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       },
       {
         "annotation": "Mapping[str, str] | None",
         "default": "None",
+        "display_name": "fields",
+        "kind": "positional_or_keyword",
         "name": "fields",
         "optional": true
       }
@@ -1575,18 +1781,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doc_id",
+        "kind": "positional_or_keyword",
         "name": "doc_id",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "length",
+        "kind": "positional_or_keyword",
         "name": "length",
         "optional": false
       },
       {
         "annotation": "dict",
         "default": null,
+        "display_name": "fields",
+        "kind": "positional_or_keyword",
         "name": "fields",
         "optional": false
       }
@@ -1617,24 +1829,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": false
       },
       {
         "annotation": "float",
         "default": "0.9",
+        "display_name": "k1",
+        "kind": "positional_or_keyword",
         "name": "k1",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "0.4",
+        "display_name": "b",
+        "kind": "positional_or_keyword",
         "name": "b",
         "optional": true
       },
       {
         "annotation": "dict[str, float] | None",
         "default": "None",
+        "display_name": "field_boosts",
+        "kind": "positional_or_keyword",
         "name": "field_boosts",
         "optional": true
       }
@@ -1660,6 +1880,8 @@
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "docs_iterable",
+        "kind": "positional_or_keyword",
         "name": "docs_iterable",
         "optional": false
       }
@@ -1681,18 +1903,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       },
       {
         "annotation": "dict[str, str] | None",
         "default": "None",
+        "display_name": "fields",
+        "kind": "positional_or_keyword",
         "name": "fields",
         "optional": true
       }
@@ -1728,24 +1956,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": false
       },
       {
         "annotation": "float",
         "default": "0.9",
+        "display_name": "k1",
+        "kind": "positional_or_keyword",
         "name": "k1",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "0.4",
+        "display_name": "b",
+        "kind": "positional_or_keyword",
         "name": "b",
         "optional": true
       },
       {
         "annotation": "dict[str, float] | None",
         "default": "None",
+        "display_name": "field_boosts",
+        "kind": "positional_or_keyword",
         "name": "field_boosts",
         "optional": true
       }
@@ -1762,6 +1998,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "term",
+        "kind": "positional_or_keyword",
         "name": "term",
         "optional": false
       }
@@ -1783,6 +2021,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -1804,6 +2044,8 @@
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "docs_iterable",
+        "kind": "positional_or_keyword",
         "name": "docs_iterable",
         "optional": false
       }
@@ -1829,18 +2071,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       },
       {
         "annotation": "Mapping[str, str] | None",
         "default": "None",
+        "display_name": "fields",
+        "kind": "positional_or_keyword",
         "name": "fields",
         "optional": true
       }
@@ -1862,30 +2110,40 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "backend",
+        "kind": "positional_or_keyword",
         "name": "backend",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": false
       },
       {
         "annotation": "float",
         "default": "0.9",
+        "display_name": "k1",
+        "kind": "keyword_only",
         "name": "k1",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "0.4",
+        "display_name": "b",
+        "kind": "keyword_only",
         "name": "b",
         "optional": true
       },
       {
         "annotation": "dict[str, float] | None",
         "default": "None",
+        "display_name": "field_boosts",
+        "kind": "keyword_only",
         "name": "field_boosts",
         "optional": true
       }
@@ -1921,12 +2179,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": false
       },
       {
         "annotation": "str",
         "default": "'naver/splade-v3-distilbert'",
+        "display_name": "query_encoder",
+        "kind": "positional_or_keyword",
         "name": "query_encoder",
         "optional": true
       }
@@ -1957,12 +2219,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       }
@@ -1998,6 +2264,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": false
       }
@@ -2014,6 +2282,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -2035,6 +2305,8 @@
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "docs_iterable",
+        "kind": "positional_or_keyword",
         "name": "docs_iterable",
         "optional": false
       }
@@ -2060,12 +2332,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       }
@@ -2101,24 +2377,32 @@
       {
         "annotation": "str",
         "default": "'naver/splade-v3-distilbert'",
+        "display_name": "model_id",
+        "kind": "positional_or_keyword",
         "name": "model_id",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'cuda'",
+        "display_name": "device",
+        "kind": "positional_or_keyword",
         "name": "device",
         "optional": true
       },
       {
         "annotation": "int",
         "default": "256",
+        "display_name": "topk",
+        "kind": "positional_or_keyword",
         "name": "topk",
         "optional": true
       },
       {
         "annotation": "int",
         "default": "512",
+        "display_name": "max_seq_len",
+        "kind": "positional_or_keyword",
         "name": "max_seq_len",
         "optional": true
       }
@@ -2135,6 +2419,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "texts",
+        "kind": "positional_or_keyword",
         "name": "texts",
         "optional": false
       }
@@ -2161,18 +2447,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "backend",
+        "kind": "positional_or_keyword",
         "name": "backend",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": false
       },
       {
         "annotation": "str",
         "default": "'naver/splade-v3-distilbert'",
+        "display_name": "query_encoder",
+        "kind": "positional_or_keyword",
         "name": "query_encoder",
         "optional": true
       }
@@ -2212,12 +2504,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "a",
+        "kind": "positional_or_keyword",
         "name": "a",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "b",
+        "kind": "positional_or_keyword",
         "name": "b",
         "optional": false
       }
@@ -2234,12 +2530,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "chunk_id",
+        "kind": "positional_or_keyword",
         "name": "chunk_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "concept_id",
+        "kind": "positional_or_keyword",
         "name": "concept_id",
         "optional": false
       }
@@ -2256,6 +2556,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "chunk_id",
+        "kind": "positional_or_keyword",
         "name": "chunk_id",
         "optional": false
       }
@@ -2277,6 +2579,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "concept_id",
+        "kind": "positional_or_keyword",
         "name": "concept_id",
         "optional": false
       }
@@ -2325,12 +2629,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "a",
+        "kind": "positional_or_keyword",
         "name": "a",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "b",
+        "kind": "positional_or_keyword",
         "name": "b",
         "optional": false
       }
@@ -2347,12 +2655,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "chunk_id",
+        "kind": "positional_or_keyword",
         "name": "chunk_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "concept_id",
+        "kind": "positional_or_keyword",
         "name": "concept_id",
         "optional": false
       }
@@ -2369,6 +2681,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "chunk_id",
+        "kind": "positional_or_keyword",
         "name": "chunk_id",
         "optional": false
       }
@@ -2390,6 +2704,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "concept_id",
+        "kind": "positional_or_keyword",
         "name": "concept_id",
         "optional": false
       }
@@ -2434,6 +2750,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2460,6 +2778,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2476,6 +2796,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2497,12 +2819,16 @@
       {
         "annotation": "ModuleType",
         "default": null,
+        "display_name": "module",
+        "kind": "positional_or_keyword",
         "name": "module",
         "optional": false
       },
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "exports",
+        "kind": "positional_or_keyword",
         "name": "exports",
         "optional": false
       }
@@ -2524,12 +2850,16 @@
       {
         "annotation": "ModuleType",
         "default": null,
+        "display_name": "module",
+        "kind": "positional_or_keyword",
         "name": "module",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2551,12 +2881,16 @@
       {
         "annotation": "ModuleType",
         "default": null,
+        "display_name": "module",
+        "kind": "positional_or_keyword",
         "name": "module",
         "optional": false
       },
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "exports",
+        "kind": "positional_or_keyword",
         "name": "exports",
         "optional": false
       }
@@ -2578,12 +2912,16 @@
       {
         "annotation": "ModuleType",
         "default": null,
+        "display_name": "module",
+        "kind": "positional_or_keyword",
         "name": "module",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2619,6 +2957,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2654,6 +2994,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2689,6 +3031,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2724,6 +3068,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2759,6 +3105,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2794,6 +3142,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2829,6 +3179,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2864,6 +3216,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2899,6 +3253,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2934,6 +3290,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -2969,6 +3327,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -3004,6 +3364,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -3039,6 +3401,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -3074,6 +3438,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -3109,6 +3475,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -3144,6 +3512,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -3179,6 +3549,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -3214,6 +3586,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "name",
+        "kind": "positional_or_keyword",
         "name": "name",
         "optional": false
       }
@@ -3244,6 +3618,8 @@
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**data",
+        "kind": "var_keyword",
         "name": "data",
         "optional": true
       }
@@ -3258,15 +3634,107 @@
     "notes": [],
     "parameters": [
       {
-        "annotation": "object",
-        "default": "()",
-        "name": "args",
+        "annotation": "str",
+        "default": "'python'",
+        "display_name": "mode",
+        "kind": "keyword_only",
+        "name": "mode",
         "optional": true
       },
       {
-        "annotation": "object",
-        "default": "{}",
-        "name": "kwargs",
+        "annotation": "object | None",
+        "default": "None",
+        "display_name": "include",
+        "kind": "keyword_only",
+        "name": "include",
+        "optional": true
+      },
+      {
+        "annotation": "object | None",
+        "default": "None",
+        "display_name": "exclude",
+        "kind": "keyword_only",
+        "name": "exclude",
+        "optional": true
+      },
+      {
+        "annotation": "object | None",
+        "default": "None",
+        "display_name": "context",
+        "kind": "keyword_only",
+        "name": "context",
+        "optional": true
+      },
+      {
+        "annotation": "bool | None",
+        "default": "None",
+        "display_name": "by_alias",
+        "kind": "keyword_only",
+        "name": "by_alias",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "display_name": "exclude_unset",
+        "kind": "keyword_only",
+        "name": "exclude_unset",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "display_name": "exclude_defaults",
+        "kind": "keyword_only",
+        "name": "exclude_defaults",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "display_name": "exclude_none",
+        "kind": "keyword_only",
+        "name": "exclude_none",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "display_name": "exclude_computed_fields",
+        "kind": "keyword_only",
+        "name": "exclude_computed_fields",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "display_name": "round_trip",
+        "kind": "keyword_only",
+        "name": "round_trip",
+        "optional": true
+      },
+      {
+        "annotation": "bool | str",
+        "default": "True",
+        "display_name": "warnings",
+        "kind": "keyword_only",
+        "name": "warnings",
+        "optional": true
+      },
+      {
+        "annotation": "Callable[[object], object] | None",
+        "default": "None",
+        "display_name": "fallback",
+        "kind": "keyword_only",
+        "name": "fallback",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "display_name": "serialize_as_any",
+        "kind": "keyword_only",
+        "name": "serialize_as_any",
         "optional": true
       }
     ],
@@ -3285,15 +3753,115 @@
     "notes": [],
     "parameters": [
       {
-        "annotation": "object",
-        "default": "()",
-        "name": "args",
+        "annotation": "int | None",
+        "default": "None",
+        "display_name": "indent",
+        "kind": "keyword_only",
+        "name": "indent",
         "optional": true
       },
       {
-        "annotation": "object",
-        "default": "{}",
-        "name": "kwargs",
+        "annotation": "bool",
+        "default": "False",
+        "display_name": "ensure_ascii",
+        "kind": "keyword_only",
+        "name": "ensure_ascii",
+        "optional": true
+      },
+      {
+        "annotation": "object | None",
+        "default": "None",
+        "display_name": "include",
+        "kind": "keyword_only",
+        "name": "include",
+        "optional": true
+      },
+      {
+        "annotation": "object | None",
+        "default": "None",
+        "display_name": "exclude",
+        "kind": "keyword_only",
+        "name": "exclude",
+        "optional": true
+      },
+      {
+        "annotation": "object | None",
+        "default": "None",
+        "display_name": "context",
+        "kind": "keyword_only",
+        "name": "context",
+        "optional": true
+      },
+      {
+        "annotation": "bool | None",
+        "default": "None",
+        "display_name": "by_alias",
+        "kind": "keyword_only",
+        "name": "by_alias",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "display_name": "exclude_unset",
+        "kind": "keyword_only",
+        "name": "exclude_unset",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "display_name": "exclude_defaults",
+        "kind": "keyword_only",
+        "name": "exclude_defaults",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "display_name": "exclude_none",
+        "kind": "keyword_only",
+        "name": "exclude_none",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "display_name": "exclude_computed_fields",
+        "kind": "keyword_only",
+        "name": "exclude_computed_fields",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "display_name": "round_trip",
+        "kind": "keyword_only",
+        "name": "round_trip",
+        "optional": true
+      },
+      {
+        "annotation": "bool | str",
+        "default": "True",
+        "display_name": "warnings",
+        "kind": "keyword_only",
+        "name": "warnings",
+        "optional": true
+      },
+      {
+        "annotation": "Callable[[object], object] | None",
+        "default": "None",
+        "display_name": "fallback",
+        "kind": "keyword_only",
+        "name": "fallback",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "display_name": "serialize_as_any",
+        "kind": "keyword_only",
+        "name": "serialize_as_any",
         "optional": true
       }
     ],
@@ -3314,12 +3882,16 @@
       {
         "annotation": null,
         "default": null,
+        "display_name": "cls",
+        "kind": "positional_only",
         "name": "cls",
         "optional": false
       },
       {
         "annotation": "object",
         "default": null,
+        "display_name": "obj",
+        "kind": "positional_only",
         "name": "obj",
         "optional": false
       }
@@ -3422,6 +3994,8 @@
       {
         "annotation": "logging.LogRecord",
         "default": null,
+        "display_name": "record",
+        "kind": "positional_or_keyword",
         "name": "record",
         "optional": false
       }
@@ -3524,18 +4098,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "root",
+        "kind": "positional_or_keyword",
         "name": "root",
         "optional": false
       },
       {
         "annotation": "str",
         "default": "'docling_hybrid'",
+        "display_name": "model",
+        "kind": "positional_or_keyword",
         "name": "model",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'dev'",
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": true
       }
@@ -3566,6 +4146,8 @@
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "rows",
+        "kind": "positional_or_keyword",
         "name": "rows",
         "optional": false
       }
@@ -3596,6 +4178,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "root",
+        "kind": "positional_or_keyword",
         "name": "root",
         "optional": false
       }
@@ -3612,6 +4196,8 @@
       {
         "annotation": "int",
         "default": null,
+        "display_name": "dim",
+        "kind": "positional_or_keyword",
         "name": "dim",
         "optional": false
       }
@@ -3647,30 +4233,40 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "model",
+        "kind": "positional_or_keyword",
         "name": "model",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "dim",
+        "kind": "positional_or_keyword",
         "name": "dim",
         "optional": false
       },
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "records",
+        "kind": "positional_or_keyword",
         "name": "records",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "0",
+        "display_name": "shard",
+        "kind": "positional_or_keyword",
         "name": "shard",
         "optional": true
       }
@@ -3692,24 +4288,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "model",
+        "kind": "positional_or_keyword",
         "name": "model",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       },
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "records",
+        "kind": "positional_or_keyword",
         "name": "records",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "0",
+        "display_name": "shard",
+        "kind": "positional_or_keyword",
         "name": "shard",
         "optional": true
       }
@@ -3758,6 +4362,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "path",
+        "kind": "positional_or_keyword",
         "name": "path",
         "optional": false
       }
@@ -3779,6 +4385,8 @@
       {
         "annotation": "int",
         "default": "logging.INFO",
+        "display_name": "level",
+        "kind": "positional_or_keyword",
         "name": "level",
         "optional": true
       }
@@ -3795,18 +4403,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doc_hash",
+        "kind": "positional_or_keyword",
         "name": "doc_hash",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "start",
+        "kind": "positional_or_keyword",
         "name": "start",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "end",
+        "kind": "positional_or_keyword",
         "name": "end",
         "optional": false
       }
@@ -3828,6 +4442,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -3849,6 +4465,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "path",
+        "kind": "positional_or_keyword",
         "name": "path",
         "optional": false
       }
@@ -3974,18 +4592,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doc_hash",
+        "kind": "positional_or_keyword",
         "name": "doc_hash",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "start",
+        "kind": "positional_or_keyword",
         "name": "start",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "end",
+        "kind": "positional_or_keyword",
         "name": "end",
         "optional": false
       }
@@ -4007,6 +4631,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -4037,6 +4663,8 @@
       {
         "annotation": "logging.LogRecord",
         "default": null,
+        "display_name": "record",
+        "kind": "positional_or_keyword",
         "name": "record",
         "optional": false
       }
@@ -4058,6 +4686,8 @@
       {
         "annotation": "int",
         "default": "logging.INFO",
+        "display_name": "level",
+        "kind": "positional_or_keyword",
         "name": "level",
         "optional": true
       }
@@ -4155,18 +4785,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "root",
+        "kind": "positional_or_keyword",
         "name": "root",
         "optional": false
       },
       {
         "annotation": "str",
         "default": "'docling_hybrid'",
+        "display_name": "model",
+        "kind": "positional_or_keyword",
         "name": "model",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'dev'",
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": true
       }
@@ -4197,6 +4833,8 @@
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "rows",
+        "kind": "positional_or_keyword",
         "name": "rows",
         "optional": false
       }
@@ -4227,6 +4865,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "root",
+        "kind": "positional_or_keyword",
         "name": "root",
         "optional": false
       }
@@ -4243,6 +4883,8 @@
       {
         "annotation": "int",
         "default": null,
+        "display_name": "dim",
+        "kind": "positional_or_keyword",
         "name": "dim",
         "optional": false
       }
@@ -4278,30 +4920,40 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "model",
+        "kind": "positional_or_keyword",
         "name": "model",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "dim",
+        "kind": "positional_or_keyword",
         "name": "dim",
         "optional": false
       },
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "records",
+        "kind": "positional_or_keyword",
         "name": "records",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "0",
+        "display_name": "shard",
+        "kind": "positional_or_keyword",
         "name": "shard",
         "optional": true
       }
@@ -4323,24 +4975,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "model",
+        "kind": "positional_or_keyword",
         "name": "model",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       },
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "records",
+        "kind": "positional_or_keyword",
         "name": "records",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "0",
+        "display_name": "shard",
+        "kind": "positional_or_keyword",
         "name": "shard",
         "optional": true
       }
@@ -4376,6 +5036,8 @@
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**data",
+        "kind": "var_keyword",
         "name": "data",
         "optional": true
       }
@@ -4397,78 +5059,104 @@
       {
         "annotation": "str",
         "default": "'python'",
+        "display_name": "mode",
+        "kind": "keyword_only",
         "name": "mode",
         "optional": true
       },
       {
         "annotation": "object | None",
         "default": "None",
+        "display_name": "include",
+        "kind": "keyword_only",
         "name": "include",
         "optional": true
       },
       {
         "annotation": "object | None",
         "default": "None",
+        "display_name": "exclude",
+        "kind": "keyword_only",
         "name": "exclude",
         "optional": true
       },
       {
         "annotation": "object | None",
         "default": "None",
+        "display_name": "context",
+        "kind": "keyword_only",
         "name": "context",
         "optional": true
       },
       {
         "annotation": "bool | None",
         "default": "None",
+        "display_name": "by_alias",
+        "kind": "keyword_only",
         "name": "by_alias",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "exclude_unset",
+        "kind": "keyword_only",
         "name": "exclude_unset",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "exclude_defaults",
+        "kind": "keyword_only",
         "name": "exclude_defaults",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "exclude_none",
+        "kind": "keyword_only",
         "name": "exclude_none",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "exclude_computed_fields",
+        "kind": "keyword_only",
         "name": "exclude_computed_fields",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "round_trip",
+        "kind": "keyword_only",
         "name": "round_trip",
         "optional": true
       },
       {
         "annotation": "bool | str",
         "default": "True",
+        "display_name": "warnings",
+        "kind": "keyword_only",
         "name": "warnings",
         "optional": true
       },
       {
         "annotation": "Callable[[object], object] | None",
         "default": "None",
+        "display_name": "fallback",
+        "kind": "keyword_only",
         "name": "fallback",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "serialize_as_any",
+        "kind": "keyword_only",
         "name": "serialize_as_any",
         "optional": true
       }
@@ -4495,84 +5183,112 @@
       {
         "annotation": "int | None",
         "default": "None",
+        "display_name": "indent",
+        "kind": "keyword_only",
         "name": "indent",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "ensure_ascii",
+        "kind": "keyword_only",
         "name": "ensure_ascii",
         "optional": true
       },
       {
         "annotation": "object | None",
         "default": "None",
+        "display_name": "include",
+        "kind": "keyword_only",
         "name": "include",
         "optional": true
       },
       {
         "annotation": "object | None",
         "default": "None",
+        "display_name": "exclude",
+        "kind": "keyword_only",
         "name": "exclude",
         "optional": true
       },
       {
         "annotation": "object | None",
         "default": "None",
+        "display_name": "context",
+        "kind": "keyword_only",
         "name": "context",
         "optional": true
       },
       {
         "annotation": "bool | None",
         "default": "None",
+        "display_name": "by_alias",
+        "kind": "keyword_only",
         "name": "by_alias",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "exclude_unset",
+        "kind": "keyword_only",
         "name": "exclude_unset",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "exclude_defaults",
+        "kind": "keyword_only",
         "name": "exclude_defaults",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "exclude_none",
+        "kind": "keyword_only",
         "name": "exclude_none",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "exclude_computed_fields",
+        "kind": "keyword_only",
         "name": "exclude_computed_fields",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "round_trip",
+        "kind": "keyword_only",
         "name": "round_trip",
         "optional": true
       },
       {
         "annotation": "bool | str",
         "default": "True",
+        "display_name": "warnings",
+        "kind": "keyword_only",
         "name": "warnings",
         "optional": true
       },
       {
         "annotation": "Callable[[object], object] | None",
         "default": "None",
+        "display_name": "fallback",
+        "kind": "keyword_only",
         "name": "fallback",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "serialize_as_any",
+        "kind": "keyword_only",
         "name": "serialize_as_any",
         "optional": true
       }
@@ -4599,12 +5315,16 @@
       {
         "annotation": null,
         "default": null,
+        "display_name": "cls",
+        "kind": "positional_only",
         "name": "cls",
         "optional": false
       },
       {
         "annotation": "object",
         "default": null,
+        "display_name": "obj",
+        "kind": "positional_only",
         "name": "obj",
         "optional": false
       }
@@ -4640,6 +5360,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "pairs",
+        "kind": "positional_or_keyword",
         "name": "pairs",
         "optional": false
       }
@@ -4661,6 +5383,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "pairs",
+        "kind": "positional_or_keyword",
         "name": "pairs",
         "optional": false
       }
@@ -4700,12 +5424,16 @@
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -4722,12 +5450,16 @@
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -4749,12 +5481,16 @@
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -4771,12 +5507,16 @@
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -4793,12 +5533,16 @@
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -4829,12 +5573,16 @@
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -4851,12 +5599,16 @@
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -4878,12 +5630,16 @@
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -4900,12 +5656,16 @@
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -4922,12 +5682,16 @@
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -4958,12 +5722,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "id",
+        "kind": "positional_or_keyword",
         "name": "id",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "label",
+        "kind": "positional_or_keyword",
         "name": "label",
         "optional": true
       }
@@ -4989,6 +5757,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "concepts",
+        "kind": "positional_or_keyword",
         "name": "concepts",
         "optional": false
       }
@@ -5005,6 +5775,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "concept_id",
+        "kind": "positional_or_keyword",
         "name": "concept_id",
         "optional": false
       }
@@ -5026,12 +5798,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "concept_id",
+        "kind": "positional_or_keyword",
         "name": "concept_id",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "1",
+        "display_name": "depth",
+        "kind": "positional_or_keyword",
         "name": "depth",
         "optional": true
       }
@@ -5071,12 +5847,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "id",
+        "kind": "positional_or_keyword",
         "name": "id",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "label",
+        "kind": "positional_or_keyword",
         "name": "label",
         "optional": true
       }
@@ -5102,6 +5882,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "concepts",
+        "kind": "positional_or_keyword",
         "name": "concepts",
         "optional": false
       }
@@ -5118,6 +5900,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "concept_id",
+        "kind": "positional_or_keyword",
         "name": "concept_id",
         "optional": false
       }
@@ -5139,12 +5923,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "concept_id",
+        "kind": "positional_or_keyword",
         "name": "concept_id",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "1",
+        "display_name": "depth",
+        "kind": "positional_or_keyword",
         "name": "depth",
         "optional": true
       }
@@ -5189,12 +5977,16 @@
       {
         "annotation": "str",
         "default": "'/data'",
+        "display_name": "root",
+        "kind": "positional_or_keyword",
         "name": "root",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'/data/catalog/catalog.duckdb'",
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": true
       }
@@ -5216,6 +6008,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "msg",
+        "kind": "positional_or_keyword",
         "name": "msg",
         "optional": false
       }
@@ -5237,6 +6031,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "root",
+        "kind": "positional_or_keyword",
         "name": "root",
         "optional": false
       }
@@ -5258,24 +6054,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": false
       },
       {
         "annotation": "tuple",
         "default": null,
+        "display_name": "chunks_info",
+        "kind": "positional_or_keyword",
         "name": "chunks_info",
         "optional": false
       },
       {
         "annotation": "tuple",
         "default": null,
+        "display_name": "dense_info",
+        "kind": "positional_or_keyword",
         "name": "dense_info",
         "optional": false
       },
       {
         "annotation": "tuple",
         "default": null,
+        "display_name": "sparse_info",
+        "kind": "positional_or_keyword",
         "name": "sparse_info",
         "optional": false
       }
@@ -5297,6 +6101,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "chunks_root",
+        "kind": "positional_or_keyword",
         "name": "chunks_root",
         "optional": false
       }
@@ -5318,6 +6124,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dense_root",
+        "kind": "positional_or_keyword",
         "name": "dense_root",
         "optional": false
       }
@@ -5339,6 +6147,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "sparse_root",
+        "kind": "positional_or_keyword",
         "name": "sparse_root",
         "optional": false
       }
@@ -5360,6 +6170,8 @@
       {
         "annotation": "int",
         "default": "8080",
+        "display_name": "port",
+        "kind": "positional_or_keyword",
         "name": "port",
         "optional": true
       }
@@ -5385,18 +6197,24 @@
       {
         "annotation": "str",
         "default": "typer.Argument(..., help='Path to Parquet/JSONL with chunks')",
+        "display_name": "chunks_parquet",
+        "kind": "positional_or_keyword",
         "name": "chunks_parquet",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "typer.Option('lucene', help='lucene|pure')",
+        "display_name": "backend",
+        "kind": "positional_or_keyword",
         "name": "backend",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "typer.Option('./_indices/bm25', help='Output index directory')",
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": true
       }
@@ -5413,12 +6231,16 @@
       {
         "annotation": "str",
         "default": "typer.Argument(..., help='Path to dense vectors JSON (skeleton)')",
+        "display_name": "dense_vectors",
+        "kind": "positional_or_keyword",
         "name": "dense_vectors",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "typer.Option('./_indices/faiss/shard_000.idx', help='Output index (CPU .idx)')",
+        "display_name": "index_path",
+        "kind": "positional_or_keyword",
         "name": "index_path",
         "optional": true
       }
@@ -5435,6 +6257,8 @@
       {
         "annotation": "int",
         "default": "8080",
+        "display_name": "port",
+        "kind": "positional_or_keyword",
         "name": "port",
         "optional": true
       }
@@ -5465,18 +6289,24 @@
       {
         "annotation": "str",
         "default": "typer.Argument(..., help='Path to Parquet/JSONL with chunks')",
+        "display_name": "chunks_parquet",
+        "kind": "positional_or_keyword",
         "name": "chunks_parquet",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "typer.Option('lucene', help='lucene|pure')",
+        "display_name": "backend",
+        "kind": "positional_or_keyword",
         "name": "backend",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "typer.Option('./_indices/bm25', help='Output index directory')",
+        "display_name": "index_dir",
+        "kind": "positional_or_keyword",
         "name": "index_dir",
         "optional": true
       }
@@ -5493,12 +6323,16 @@
       {
         "annotation": "str",
         "default": "typer.Argument(..., help='Path to dense vectors JSON (skeleton)')",
+        "display_name": "dense_vectors",
+        "kind": "positional_or_keyword",
         "name": "dense_vectors",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "typer.Option('./_indices/faiss/shard_000.idx', help='Output index (CPU .idx)')",
+        "display_name": "index_path",
+        "kind": "positional_or_keyword",
         "name": "index_path",
         "optional": true
       }
@@ -5515,12 +6349,16 @@
       {
         "annotation": "str",
         "default": "'/data'",
+        "display_name": "root",
+        "kind": "positional_or_keyword",
         "name": "root",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'/data/catalog/catalog.duckdb'",
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": true
       }
@@ -5542,6 +6380,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "root",
+        "kind": "positional_or_keyword",
         "name": "root",
         "optional": false
       }
@@ -5563,24 +6403,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": false
       },
       {
         "annotation": "tuple",
         "default": null,
+        "display_name": "chunks_info",
+        "kind": "positional_or_keyword",
         "name": "chunks_info",
         "optional": false
       },
       {
         "annotation": "tuple",
         "default": null,
+        "display_name": "dense_info",
+        "kind": "positional_or_keyword",
         "name": "dense_info",
         "optional": false
       },
       {
         "annotation": "tuple",
         "default": null,
+        "display_name": "sparse_info",
+        "kind": "positional_or_keyword",
         "name": "sparse_info",
         "optional": false
       }
@@ -5602,6 +6450,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "chunks_root",
+        "kind": "positional_or_keyword",
         "name": "chunks_root",
         "optional": false
       }
@@ -5623,6 +6473,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dense_root",
+        "kind": "positional_or_keyword",
         "name": "dense_root",
         "optional": false
       }
@@ -5644,6 +6496,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "sparse_root",
+        "kind": "positional_or_keyword",
         "name": "sparse_root",
         "optional": false
       }
@@ -5679,6 +6533,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "msg",
+        "kind": "positional_or_keyword",
         "name": "msg",
         "optional": false
       }
@@ -5709,6 +6565,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": false
       }
@@ -5725,12 +6583,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "kind",
+        "kind": "positional_or_keyword",
         "name": "kind",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       }
@@ -5752,18 +6614,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       },
       {
         "annotation": "bool",
         "default": null,
+        "display_name": "success",
+        "kind": "positional_or_keyword",
         "name": "success",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "notes",
+        "kind": "positional_or_keyword",
         "name": "notes",
         "optional": true
       }
@@ -5780,18 +6648,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dataset_id",
+        "kind": "positional_or_keyword",
         "name": "dataset_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "parquet_root",
+        "kind": "positional_or_keyword",
         "name": "parquet_root",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "rows",
+        "kind": "positional_or_keyword",
         "name": "rows",
         "optional": false
       }
@@ -5808,18 +6682,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "event_name",
+        "kind": "positional_or_keyword",
         "name": "event_name",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "subject_id",
+        "kind": "positional_or_keyword",
         "name": "subject_id",
         "optional": false
       },
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "payload",
+        "kind": "positional_or_keyword",
         "name": "payload",
         "optional": false
       }
@@ -5836,24 +6716,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "event",
+        "kind": "positional_or_keyword",
         "name": "event",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "subject_id",
+        "kind": "positional_or_keyword",
         "name": "subject_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "error_class",
+        "kind": "positional_or_keyword",
         "name": "error_class",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "message",
+        "kind": "positional_or_keyword",
         "name": "message",
         "optional": false
       }
@@ -5870,24 +6758,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "purpose",
+        "kind": "positional_or_keyword",
         "name": "purpose",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "model_id",
+        "kind": "positional_or_keyword",
         "name": "model_id",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "revision",
+        "kind": "positional_or_keyword",
         "name": "revision",
         "optional": true
       },
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "config",
+        "kind": "positional_or_keyword",
         "name": "config",
         "optional": false
       }
@@ -5909,6 +6805,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "assets",
+        "kind": "positional_or_keyword",
         "name": "assets",
         "optional": false
       }
@@ -5925,6 +6823,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "docs",
+        "kind": "positional_or_keyword",
         "name": "docs",
         "optional": false
       }
@@ -5941,6 +6841,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dataset_id",
+        "kind": "positional_or_keyword",
         "name": "dataset_id",
         "optional": false
       }
@@ -5966,6 +6868,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": false
       }
@@ -5996,12 +6900,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "kind",
+        "kind": "positional_or_keyword",
         "name": "kind",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       }
@@ -6023,18 +6931,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       },
       {
         "annotation": "bool",
         "default": null,
+        "display_name": "success",
+        "kind": "positional_or_keyword",
         "name": "success",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "notes",
+        "kind": "positional_or_keyword",
         "name": "notes",
         "optional": true
       }
@@ -6051,18 +6965,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dataset_id",
+        "kind": "positional_or_keyword",
         "name": "dataset_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "parquet_root",
+        "kind": "positional_or_keyword",
         "name": "parquet_root",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "rows",
+        "kind": "positional_or_keyword",
         "name": "rows",
         "optional": false
       }
@@ -6079,18 +6999,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "event_name",
+        "kind": "positional_or_keyword",
         "name": "event_name",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "subject_id",
+        "kind": "positional_or_keyword",
         "name": "subject_id",
         "optional": false
       },
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "payload",
+        "kind": "positional_or_keyword",
         "name": "payload",
         "optional": false
       }
@@ -6107,24 +7033,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "purpose",
+        "kind": "positional_or_keyword",
         "name": "purpose",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "model_id",
+        "kind": "positional_or_keyword",
         "name": "model_id",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "revision",
+        "kind": "positional_or_keyword",
         "name": "revision",
         "optional": true
       },
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "config",
+        "kind": "positional_or_keyword",
         "name": "config",
         "optional": false
       }
@@ -6146,6 +7080,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "assets",
+        "kind": "positional_or_keyword",
         "name": "assets",
         "optional": false
       }
@@ -6162,6 +7098,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "docs",
+        "kind": "positional_or_keyword",
         "name": "docs",
         "optional": false
       }
@@ -6178,6 +7116,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dataset_id",
+        "kind": "positional_or_keyword",
         "name": "dataset_id",
         "optional": false
       }
@@ -6203,12 +7143,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "kind",
+        "kind": "positional_or_keyword",
         "name": "kind",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       }
@@ -6230,18 +7174,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       },
       {
         "annotation": "bool",
         "default": null,
+        "display_name": "success",
+        "kind": "positional_or_keyword",
         "name": "success",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "notes",
+        "kind": "positional_or_keyword",
         "name": "notes",
         "optional": true
       }
@@ -6258,18 +7208,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dataset_id",
+        "kind": "positional_or_keyword",
         "name": "dataset_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "parquet_root",
+        "kind": "positional_or_keyword",
         "name": "parquet_root",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "rows",
+        "kind": "positional_or_keyword",
         "name": "rows",
         "optional": false
       }
@@ -6286,18 +7242,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "event_name",
+        "kind": "positional_or_keyword",
         "name": "event_name",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "subject_id",
+        "kind": "positional_or_keyword",
         "name": "subject_id",
         "optional": false
       },
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "payload",
+        "kind": "positional_or_keyword",
         "name": "payload",
         "optional": false
       }
@@ -6314,24 +7276,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "event",
+        "kind": "positional_or_keyword",
         "name": "event",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "subject_id",
+        "kind": "positional_or_keyword",
         "name": "subject_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "error_class",
+        "kind": "positional_or_keyword",
         "name": "error_class",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "message",
+        "kind": "positional_or_keyword",
         "name": "message",
         "optional": false
       }
@@ -6348,24 +7318,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "purpose",
+        "kind": "positional_or_keyword",
         "name": "purpose",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "model_id",
+        "kind": "positional_or_keyword",
         "name": "model_id",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "revision",
+        "kind": "positional_or_keyword",
         "name": "revision",
         "optional": true
       },
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "config",
+        "kind": "positional_or_keyword",
         "name": "config",
         "optional": false
       }
@@ -6387,6 +7365,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "assets",
+        "kind": "positional_or_keyword",
         "name": "assets",
         "optional": false
       }
@@ -6403,6 +7383,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "docs",
+        "kind": "positional_or_keyword",
         "name": "docs",
         "optional": false
       }
@@ -6419,6 +7401,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dataset_id",
+        "kind": "positional_or_keyword",
         "name": "dataset_id",
         "optional": false
       }
@@ -6435,12 +7419,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db",
+        "kind": "positional_or_keyword",
         "name": "db",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "migrations_dir",
+        "kind": "positional_or_keyword",
         "name": "migrations_dir",
         "optional": false
       }
@@ -6475,12 +7463,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "kind",
+        "kind": "positional_or_keyword",
         "name": "kind",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       }
@@ -6502,18 +7494,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       },
       {
         "annotation": "bool",
         "default": null,
+        "display_name": "success",
+        "kind": "positional_or_keyword",
         "name": "success",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "notes",
+        "kind": "positional_or_keyword",
         "name": "notes",
         "optional": true
       }
@@ -6530,18 +7528,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dataset_id",
+        "kind": "positional_or_keyword",
         "name": "dataset_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "parquet_root",
+        "kind": "positional_or_keyword",
         "name": "parquet_root",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "rows",
+        "kind": "positional_or_keyword",
         "name": "rows",
         "optional": false
       }
@@ -6558,18 +7562,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "event_name",
+        "kind": "positional_or_keyword",
         "name": "event_name",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "subject_id",
+        "kind": "positional_or_keyword",
         "name": "subject_id",
         "optional": false
       },
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "payload",
+        "kind": "positional_or_keyword",
         "name": "payload",
         "optional": false
       }
@@ -6586,24 +7596,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "event",
+        "kind": "positional_or_keyword",
         "name": "event",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "subject_id",
+        "kind": "positional_or_keyword",
         "name": "subject_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "error_class",
+        "kind": "positional_or_keyword",
         "name": "error_class",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "message",
+        "kind": "positional_or_keyword",
         "name": "message",
         "optional": false
       }
@@ -6620,24 +7638,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "purpose",
+        "kind": "positional_or_keyword",
         "name": "purpose",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "model_id",
+        "kind": "positional_or_keyword",
         "name": "model_id",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "revision",
+        "kind": "positional_or_keyword",
         "name": "revision",
         "optional": true
       },
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "config",
+        "kind": "positional_or_keyword",
         "name": "config",
         "optional": false
       }
@@ -6659,6 +7685,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "assets",
+        "kind": "positional_or_keyword",
         "name": "assets",
         "optional": false
       }
@@ -6675,6 +7703,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "docs",
+        "kind": "positional_or_keyword",
         "name": "docs",
         "optional": false
       }
@@ -6691,6 +7721,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dataset_id",
+        "kind": "positional_or_keyword",
         "name": "dataset_id",
         "optional": false
       }
@@ -6716,6 +7748,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": false
       }
@@ -6732,12 +7766,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "kind",
+        "kind": "positional_or_keyword",
         "name": "kind",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       }
@@ -6759,18 +7797,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       },
       {
         "annotation": "bool",
         "default": null,
+        "display_name": "success",
+        "kind": "positional_or_keyword",
         "name": "success",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "notes",
+        "kind": "positional_or_keyword",
         "name": "notes",
         "optional": true
       }
@@ -6787,18 +7831,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dataset_id",
+        "kind": "positional_or_keyword",
         "name": "dataset_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "parquet_root",
+        "kind": "positional_or_keyword",
         "name": "parquet_root",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "rows",
+        "kind": "positional_or_keyword",
         "name": "rows",
         "optional": false
       }
@@ -6815,18 +7865,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "event_name",
+        "kind": "positional_or_keyword",
         "name": "event_name",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "subject_id",
+        "kind": "positional_or_keyword",
         "name": "subject_id",
         "optional": false
       },
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "payload",
+        "kind": "positional_or_keyword",
         "name": "payload",
         "optional": false
       }
@@ -6843,24 +7899,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "event",
+        "kind": "positional_or_keyword",
         "name": "event",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "subject_id",
+        "kind": "positional_or_keyword",
         "name": "subject_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "error_class",
+        "kind": "positional_or_keyword",
         "name": "error_class",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "message",
+        "kind": "positional_or_keyword",
         "name": "message",
         "optional": false
       }
@@ -6877,24 +7941,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "purpose",
+        "kind": "positional_or_keyword",
         "name": "purpose",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "model_id",
+        "kind": "positional_or_keyword",
         "name": "model_id",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "revision",
+        "kind": "positional_or_keyword",
         "name": "revision",
         "optional": true
       },
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "config",
+        "kind": "positional_or_keyword",
         "name": "config",
         "optional": false
       }
@@ -6916,6 +7988,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "assets",
+        "kind": "positional_or_keyword",
         "name": "assets",
         "optional": false
       }
@@ -6932,6 +8006,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "docs",
+        "kind": "positional_or_keyword",
         "name": "docs",
         "optional": false
       }
@@ -6948,6 +8024,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dataset_id",
+        "kind": "positional_or_keyword",
         "name": "dataset_id",
         "optional": false
       }
@@ -6973,6 +8051,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": false
       }
@@ -7003,12 +8083,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "kind",
+        "kind": "positional_or_keyword",
         "name": "kind",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       }
@@ -7030,18 +8114,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "run_id",
+        "kind": "positional_or_keyword",
         "name": "run_id",
         "optional": false
       },
       {
         "annotation": "bool",
         "default": null,
+        "display_name": "success",
+        "kind": "positional_or_keyword",
         "name": "success",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "notes",
+        "kind": "positional_or_keyword",
         "name": "notes",
         "optional": true
       }
@@ -7058,18 +8148,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dataset_id",
+        "kind": "positional_or_keyword",
         "name": "dataset_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "parquet_root",
+        "kind": "positional_or_keyword",
         "name": "parquet_root",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "rows",
+        "kind": "positional_or_keyword",
         "name": "rows",
         "optional": false
       }
@@ -7086,18 +8182,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "event_name",
+        "kind": "positional_or_keyword",
         "name": "event_name",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "subject_id",
+        "kind": "positional_or_keyword",
         "name": "subject_id",
         "optional": false
       },
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "payload",
+        "kind": "positional_or_keyword",
         "name": "payload",
         "optional": false
       }
@@ -7114,24 +8216,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "purpose",
+        "kind": "positional_or_keyword",
         "name": "purpose",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "model_id",
+        "kind": "positional_or_keyword",
         "name": "model_id",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "revision",
+        "kind": "positional_or_keyword",
         "name": "revision",
         "optional": true
       },
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "config",
+        "kind": "positional_or_keyword",
         "name": "config",
         "optional": false
       }
@@ -7153,6 +8263,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "assets",
+        "kind": "positional_or_keyword",
         "name": "assets",
         "optional": false
       }
@@ -7169,6 +8281,8 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "docs",
+        "kind": "positional_or_keyword",
         "name": "docs",
         "optional": false
       }
@@ -7185,6 +8299,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "dataset_id",
+        "kind": "positional_or_keyword",
         "name": "dataset_id",
         "optional": false
       }
@@ -7201,12 +8317,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db",
+        "kind": "positional_or_keyword",
         "name": "db",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "migrations_dir",
+        "kind": "positional_or_keyword",
         "name": "migrations_dir",
         "optional": false
       }
@@ -7241,36 +8361,48 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "chunk_id",
+        "kind": "positional_or_keyword",
         "name": "chunk_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doc_id",
+        "kind": "positional_or_keyword",
         "name": "doc_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "title",
+        "kind": "positional_or_keyword",
         "name": "title",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "section",
+        "kind": "positional_or_keyword",
         "name": "section",
         "optional": false
       },
       {
         "annotation": "dict",
         "default": null,
+        "display_name": "tf",
+        "kind": "positional_or_keyword",
         "name": "tf",
         "optional": false
       },
       {
         "annotation": "float",
         "default": null,
+        "display_name": "dl",
+        "kind": "positional_or_keyword",
         "name": "dl",
         "optional": false
       }
@@ -7296,12 +8428,16 @@
       {
         "annotation": "float",
         "default": "0.9",
+        "display_name": "k1",
+        "kind": "positional_or_keyword",
         "name": "k1",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "0.4",
+        "display_name": "b",
+        "kind": "positional_or_keyword",
         "name": "b",
         "optional": true
       }
@@ -7318,6 +8454,8 @@
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "rows",
+        "kind": "positional_or_keyword",
         "name": "rows",
         "optional": false
       }
@@ -7334,6 +8472,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "term",
+        "kind": "positional_or_keyword",
         "name": "term",
         "optional": false
       }
@@ -7355,12 +8495,16 @@
       {
         "annotation": null,
         "default": null,
+        "display_name": "cls",
+        "kind": "positional_or_keyword",
         "name": "cls",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": false
       }
@@ -7382,6 +8526,8 @@
       {
         "annotation": "int",
         "default": null,
+        "display_name": "index",
+        "kind": "positional_or_keyword",
         "name": "index",
         "optional": false
       }
@@ -7403,24 +8549,32 @@
       {
         "annotation": null,
         "default": null,
+        "display_name": "cls",
+        "kind": "positional_or_keyword",
         "name": "cls",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "path",
+        "kind": "positional_or_keyword",
         "name": "path",
         "optional": false
       },
       {
         "annotation": "float",
         "default": "0.9",
+        "display_name": "k1",
+        "kind": "keyword_only",
         "name": "k1",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "0.4",
+        "display_name": "b",
+        "kind": "keyword_only",
         "name": "b",
         "optional": true
       }
@@ -7442,12 +8596,16 @@
       {
         "annotation": null,
         "default": null,
+        "display_name": "cls",
+        "kind": "positional_or_keyword",
         "name": "cls",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "path",
+        "kind": "positional_or_keyword",
         "name": "path",
         "optional": false
       }
@@ -7469,6 +8627,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "path",
+        "kind": "positional_or_keyword",
         "name": "path",
         "optional": false
       }
@@ -7485,12 +8645,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "10",
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": true
       }
@@ -7530,12 +8694,16 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "ids",
+        "kind": "positional_or_keyword",
         "name": "ids",
         "optional": false
       },
       {
         "annotation": "VecArray",
         "default": null,
+        "display_name": "mat",
+        "kind": "positional_or_keyword",
         "name": "mat",
         "optional": false
       }
@@ -7561,18 +8729,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": false
       },
       {
         "annotation": "str",
         "default": "'OPQ64,IVF8192,PQ64'",
+        "display_name": "factory",
+        "kind": "positional_or_keyword",
         "name": "factory",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'ip'",
+        "display_name": "metric",
+        "kind": "positional_or_keyword",
         "name": "metric",
         "optional": true
       }
@@ -7589,6 +8763,8 @@
       {
         "annotation": "object",
         "default": null,
+        "display_name": "cpu_index",
+        "kind": "positional_or_keyword",
         "name": "cpu_index",
         "optional": false
       }
@@ -7610,6 +8786,8 @@
       {
         "annotation": "Path",
         "default": null,
+        "display_name": "source",
+        "kind": "positional_or_keyword",
         "name": "source",
         "optional": false
       }
@@ -7645,6 +8823,8 @@
       {
         "annotation": "VecArray",
         "default": null,
+        "display_name": "qvec",
+        "kind": "positional_or_keyword",
         "name": "qvec",
         "optional": false
       }
@@ -7666,12 +8846,16 @@
       {
         "annotation": "VecArray",
         "default": null,
+        "display_name": "queries",
+        "kind": "positional_or_keyword",
         "name": "queries",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       }
@@ -7693,12 +8877,16 @@
       {
         "annotation": "VecArray",
         "default": null,
+        "display_name": "queries",
+        "kind": "positional_or_keyword",
         "name": "queries",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       }
@@ -7729,6 +8917,8 @@
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "cpu_index_path",
+        "kind": "positional_or_keyword",
         "name": "cpu_index_path",
         "optional": true
       }
@@ -7745,12 +8935,16 @@
       {
         "annotation": "FloatArrayLike",
         "default": null,
+        "display_name": "qvec",
+        "kind": "positional_or_keyword",
         "name": "qvec",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "10",
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": true
       }
@@ -7781,30 +8975,40 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "chunk_id",
+        "kind": "positional_or_keyword",
         "name": "chunk_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doc_id",
+        "kind": "positional_or_keyword",
         "name": "doc_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "title",
+        "kind": "positional_or_keyword",
         "name": "title",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "section",
+        "kind": "positional_or_keyword",
         "name": "section",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -7830,12 +9034,16 @@
       {
         "annotation": "str",
         "default": "'/data'",
+        "display_name": "root",
+        "kind": "positional_or_keyword",
         "name": "root",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'/data/catalog/catalog.duckdb'",
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": true
       }
@@ -7870,6 +9078,8 @@
       {
         "annotation": "int",
         "default": null,
+        "display_name": "index",
+        "kind": "positional_or_keyword",
         "name": "index",
         "optional": false
       }
@@ -7891,12 +9101,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "10",
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": true
       }
@@ -7945,24 +9159,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "chunk_id",
+        "kind": "positional_or_keyword",
         "name": "chunk_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doc_id",
+        "kind": "positional_or_keyword",
         "name": "doc_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "section",
+        "kind": "positional_or_keyword",
         "name": "section",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -7988,18 +9210,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "chunks_dataset_root",
+        "kind": "positional_or_keyword",
         "name": "chunks_dataset_root",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "sparse_root",
+        "kind": "positional_or_keyword",
         "name": "sparse_root",
         "optional": true
       }
@@ -8016,6 +9244,8 @@
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "chunks_root",
+        "kind": "positional_or_keyword",
         "name": "chunks_root",
         "optional": true
       }
@@ -8032,6 +9262,8 @@
       {
         "annotation": "int",
         "default": null,
+        "display_name": "index",
+        "kind": "positional_or_keyword",
         "name": "index",
         "optional": false
       }
@@ -8053,12 +9285,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "10",
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": true
       }
@@ -8080,12 +9316,16 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "fused",
+        "kind": "positional_or_keyword",
         "name": "fused",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       }
@@ -8107,6 +9347,8 @@
       {
         "annotation": "str | None",
         "default": "Header(default=None)",
+        "display_name": "authorization",
+        "kind": "positional_or_keyword",
         "name": "authorization",
         "optional": true
       }
@@ -8123,6 +9365,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       }
@@ -8144,12 +9388,16 @@
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "body",
+        "kind": "positional_or_keyword",
         "name": "body",
         "optional": false
       },
       {
         "annotation": "None",
         "default": "Depends(auth)",
+        "display_name": "_",
+        "kind": "positional_or_keyword",
         "name": "_",
         "optional": true
       }
@@ -8185,24 +9433,32 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "query_concepts",
+        "kind": "positional_or_keyword",
         "name": "query_concepts",
         "optional": false
       },
       {
         "annotation": "list",
         "default": null,
+        "display_name": "chunk_concepts",
+        "kind": "positional_or_keyword",
         "name": "chunk_concepts",
         "optional": false
       },
       {
         "annotation": "float",
         "default": "0.08",
+        "display_name": "direct",
+        "kind": "positional_or_keyword",
         "name": "direct",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "0.04",
+        "display_name": "one_hop",
+        "kind": "positional_or_keyword",
         "name": "one_hop",
         "optional": true
       }
@@ -8224,6 +9480,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -8245,12 +9503,16 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "results",
+        "kind": "positional_or_keyword",
         "name": "results",
         "optional": false
       },
       {
         "annotation": "float",
         "default": "0.7",
+        "display_name": "lambda_",
+        "kind": "positional_or_keyword",
         "name": "lambda_",
         "optional": true
       }
@@ -8272,12 +9534,24 @@
       {
         "annotation": "list",
         "default": null,
-        "name": "rankers",
+        "display_name": "dense",
+        "kind": "positional_or_keyword",
+        "name": "dense",
+        "optional": false
+      },
+      {
+        "annotation": "list",
+        "default": null,
+        "display_name": "sparse",
+        "kind": "positional_or_keyword",
+        "name": "sparse",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "60",
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": true
       }
@@ -8286,7 +9560,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "dict",
+        "annotation": "list",
         "kind": "returns"
       }
     ]
@@ -8299,12 +9573,16 @@
       {
         "annotation": "SearchRequest",
         "default": null,
+        "display_name": "req",
+        "kind": "positional_or_keyword",
         "name": "req",
         "optional": false
       },
       {
         "annotation": "None",
         "default": "Depends(auth)",
+        "display_name": "_",
+        "kind": "positional_or_keyword",
         "name": "_",
         "optional": true
       }
@@ -8326,6 +9604,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -8347,6 +9627,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -8368,6 +9650,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -8389,24 +9673,32 @@
       {
         "annotation": "dict",
         "default": null,
+        "display_name": "cands",
+        "kind": "positional_or_keyword",
         "name": "cands",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "float",
         "default": "0.08",
+        "display_name": "direct",
+        "kind": "positional_or_keyword",
         "name": "direct",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "0.04",
+        "display_name": "one_hop",
+        "kind": "positional_or_keyword",
         "name": "one_hop",
         "optional": true
       }
@@ -8428,6 +9720,8 @@
       {
         "annotation": "str | None",
         "default": "Header(default=None)",
+        "display_name": "authorization",
+        "kind": "positional_or_keyword",
         "name": "authorization",
         "optional": true
       }
@@ -8449,12 +9743,16 @@
       {
         "annotation": "Mapping",
         "default": null,
+        "display_name": "body",
+        "kind": "positional_or_keyword",
         "name": "body",
         "optional": false
       },
       {
         "annotation": "None",
         "default": "Depends(auth)",
+        "display_name": "_",
+        "kind": "positional_or_keyword",
         "name": "_",
         "optional": true
       }
@@ -8490,12 +9788,16 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "lists",
+        "kind": "positional_or_keyword",
         "name": "lists",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k_rrf",
+        "kind": "positional_or_keyword",
         "name": "k_rrf",
         "optional": false
       }
@@ -8517,12 +9819,16 @@
       {
         "annotation": "SearchRequest",
         "default": null,
+        "display_name": "req",
+        "kind": "positional_or_keyword",
         "name": "req",
         "optional": false
       },
       {
         "annotation": "None",
         "default": "Depends(auth)",
+        "display_name": "_",
+        "kind": "positional_or_keyword",
         "name": "_",
         "optional": true
       }
@@ -8553,36 +9859,48 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "chunk_id",
+        "kind": "positional_or_keyword",
         "name": "chunk_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doc_id",
+        "kind": "positional_or_keyword",
         "name": "doc_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "title",
+        "kind": "positional_or_keyword",
         "name": "title",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "section",
+        "kind": "positional_or_keyword",
         "name": "section",
         "optional": false
       },
       {
         "annotation": "dict",
         "default": null,
+        "display_name": "tf",
+        "kind": "positional_or_keyword",
         "name": "tf",
         "optional": false
       },
       {
         "annotation": "float",
         "default": null,
+        "display_name": "dl",
+        "kind": "positional_or_keyword",
         "name": "dl",
         "optional": false
       }
@@ -8608,12 +9926,16 @@
       {
         "annotation": "float",
         "default": "0.9",
+        "display_name": "k1",
+        "kind": "positional_or_keyword",
         "name": "k1",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "0.4",
+        "display_name": "b",
+        "kind": "positional_or_keyword",
         "name": "b",
         "optional": true
       }
@@ -8630,6 +9952,8 @@
       {
         "annotation": "Iterable",
         "default": null,
+        "display_name": "rows",
+        "kind": "positional_or_keyword",
         "name": "rows",
         "optional": false
       }
@@ -8646,6 +9970,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "term",
+        "kind": "positional_or_keyword",
         "name": "term",
         "optional": false
       }
@@ -8667,12 +9993,16 @@
       {
         "annotation": null,
         "default": null,
+        "display_name": "cls",
+        "kind": "positional_or_keyword",
         "name": "cls",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": false
       }
@@ -8694,6 +10024,8 @@
       {
         "annotation": "int",
         "default": null,
+        "display_name": "index",
+        "kind": "positional_or_keyword",
         "name": "index",
         "optional": false
       }
@@ -8715,24 +10047,32 @@
       {
         "annotation": null,
         "default": null,
+        "display_name": "cls",
+        "kind": "positional_or_keyword",
         "name": "cls",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "path",
+        "kind": "positional_or_keyword",
         "name": "path",
         "optional": false
       },
       {
         "annotation": "float",
         "default": "0.9",
+        "display_name": "k1",
+        "kind": "keyword_only",
         "name": "k1",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "0.4",
+        "display_name": "b",
+        "kind": "keyword_only",
         "name": "b",
         "optional": true
       }
@@ -8754,12 +10094,16 @@
       {
         "annotation": null,
         "default": null,
+        "display_name": "cls",
+        "kind": "positional_or_keyword",
         "name": "cls",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "path",
+        "kind": "positional_or_keyword",
         "name": "path",
         "optional": false
       }
@@ -8781,6 +10125,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "path",
+        "kind": "positional_or_keyword",
         "name": "path",
         "optional": false
       }
@@ -8797,12 +10143,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "10",
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": true
       }
@@ -8824,6 +10174,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -8854,12 +10206,16 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "ids",
+        "kind": "positional_or_keyword",
         "name": "ids",
         "optional": false
       },
       {
         "annotation": "VecArray",
         "default": null,
+        "display_name": "mat",
+        "kind": "positional_or_keyword",
         "name": "mat",
         "optional": false
       }
@@ -8890,18 +10246,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": false
       },
       {
         "annotation": "str",
         "default": "'OPQ64,IVF8192,PQ64'",
+        "display_name": "factory",
+        "kind": "positional_or_keyword",
         "name": "factory",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'ip'",
+        "display_name": "metric",
+        "kind": "positional_or_keyword",
         "name": "metric",
         "optional": true
       }
@@ -8918,6 +10280,8 @@
       {
         "annotation": "object",
         "default": null,
+        "display_name": "cpu_index",
+        "kind": "positional_or_keyword",
         "name": "cpu_index",
         "optional": false
       }
@@ -8939,6 +10303,8 @@
       {
         "annotation": "Path",
         "default": null,
+        "display_name": "source",
+        "kind": "positional_or_keyword",
         "name": "source",
         "optional": false
       }
@@ -8984,6 +10350,8 @@
       {
         "annotation": "VecArray",
         "default": null,
+        "display_name": "qvec",
+        "kind": "positional_or_keyword",
         "name": "qvec",
         "optional": false
       }
@@ -9005,12 +10373,16 @@
       {
         "annotation": "VecArray",
         "default": null,
+        "display_name": "queries",
+        "kind": "positional_or_keyword",
         "name": "queries",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       }
@@ -9037,12 +10409,16 @@
       {
         "annotation": "VecArray",
         "default": null,
+        "display_name": "queries",
+        "kind": "positional_or_keyword",
         "name": "queries",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       }
@@ -9078,6 +10454,8 @@
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "cpu_index_path",
+        "kind": "positional_or_keyword",
         "name": "cpu_index_path",
         "optional": true
       }
@@ -9094,12 +10472,16 @@
       {
         "annotation": "FloatArrayLike",
         "default": null,
+        "display_name": "qvec",
+        "kind": "positional_or_keyword",
         "name": "qvec",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "10",
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": true
       }
@@ -9130,30 +10512,40 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "chunk_id",
+        "kind": "positional_or_keyword",
         "name": "chunk_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doc_id",
+        "kind": "positional_or_keyword",
         "name": "doc_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "title",
+        "kind": "positional_or_keyword",
         "name": "title",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "section",
+        "kind": "positional_or_keyword",
         "name": "section",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -9179,12 +10571,16 @@
       {
         "annotation": "str",
         "default": "'/data'",
+        "display_name": "root",
+        "kind": "positional_or_keyword",
         "name": "root",
         "optional": true
       },
       {
         "annotation": "str",
         "default": "'/data/catalog/catalog.duckdb'",
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": true
       }
@@ -9219,6 +10615,8 @@
       {
         "annotation": "int",
         "default": null,
+        "display_name": "index",
+        "kind": "positional_or_keyword",
         "name": "index",
         "optional": false
       }
@@ -9240,12 +10638,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "10",
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": true
       }
@@ -9267,6 +10669,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -9288,12 +10692,16 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "rankers",
+        "kind": "positional_or_keyword",
         "name": "rankers",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "60",
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": true
       }
@@ -9324,6 +10732,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       }
@@ -9345,24 +10755,32 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "query_concepts",
+        "kind": "positional_or_keyword",
         "name": "query_concepts",
         "optional": false
       },
       {
         "annotation": "list",
         "default": null,
+        "display_name": "chunk_concepts",
+        "kind": "positional_or_keyword",
         "name": "chunk_concepts",
         "optional": false
       },
       {
         "annotation": "float",
         "default": "0.08",
+        "display_name": "direct",
+        "kind": "positional_or_keyword",
         "name": "direct",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "0.04",
+        "display_name": "one_hop",
+        "kind": "positional_or_keyword",
         "name": "one_hop",
         "optional": true
       }
@@ -9384,6 +10802,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -9423,12 +10843,16 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "fused",
+        "kind": "positional_or_keyword",
         "name": "fused",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       }
@@ -9450,12 +10874,16 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "results",
+        "kind": "positional_or_keyword",
         "name": "results",
         "optional": false
       },
       {
         "annotation": "float",
         "default": "0.7",
+        "display_name": "lambda_",
+        "kind": "positional_or_keyword",
         "name": "lambda_",
         "optional": true
       }
@@ -9477,18 +10905,24 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "dense",
+        "kind": "positional_or_keyword",
         "name": "dense",
         "optional": false
       },
       {
         "annotation": "list",
         "default": null,
+        "display_name": "sparse",
+        "kind": "positional_or_keyword",
         "name": "sparse",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "60",
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": true
       }
@@ -9519,24 +10953,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "chunk_id",
+        "kind": "positional_or_keyword",
         "name": "chunk_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "doc_id",
+        "kind": "positional_or_keyword",
         "name": "doc_id",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "section",
+        "kind": "positional_or_keyword",
         "name": "section",
         "optional": false
       },
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -9562,18 +11004,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "db_path",
+        "kind": "positional_or_keyword",
         "name": "db_path",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "chunks_dataset_root",
+        "kind": "positional_or_keyword",
         "name": "chunks_dataset_root",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "sparse_root",
+        "kind": "positional_or_keyword",
         "name": "sparse_root",
         "optional": true
       }
@@ -9590,6 +11038,8 @@
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "chunks_root",
+        "kind": "positional_or_keyword",
         "name": "chunks_root",
         "optional": true
       }
@@ -9606,6 +11056,8 @@
       {
         "annotation": "int",
         "default": null,
+        "display_name": "index",
+        "kind": "positional_or_keyword",
         "name": "index",
         "optional": false
       }
@@ -9627,12 +11079,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "10",
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": true
       }
@@ -9654,6 +11110,8 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "text",
+        "kind": "positional_or_keyword",
         "name": "text",
         "optional": false
       }
@@ -9684,24 +11142,32 @@
       {
         "annotation": "str",
         "default": "'http://localhost:8080'",
+        "display_name": "base_url",
+        "kind": "positional_or_keyword",
         "name": "base_url",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "api_key",
+        "kind": "positional_or_keyword",
         "name": "api_key",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "30.0",
+        "display_name": "timeout",
+        "kind": "positional_or_keyword",
         "name": "timeout",
         "optional": true
       },
       {
         "annotation": "SupportsHttp | None",
         "default": "None",
+        "display_name": "http",
+        "kind": "positional_or_keyword",
         "name": "http",
         "optional": true
       }
@@ -9732,12 +11198,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "q",
+        "kind": "positional_or_keyword",
         "name": "q",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "50",
+        "display_name": "limit",
+        "kind": "positional_or_keyword",
         "name": "limit",
         "optional": true
       }
@@ -9773,24 +11243,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "10",
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": true
       },
       {
         "annotation": "dict[str, Any] | None",
         "default": "None",
+        "display_name": "filters",
+        "kind": "positional_or_keyword",
         "name": "filters",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "explain",
+        "kind": "positional_or_keyword",
         "name": "explain",
         "optional": true
       }
@@ -9821,18 +11299,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "url",
+        "kind": "positional_only",
         "name": "url",
         "optional": false
       },
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -9854,18 +11338,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "url",
+        "kind": "positional_only",
         "name": "url",
         "optional": false
       },
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -9896,18 +11386,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "url",
+        "kind": "positional_only",
         "name": "url",
         "optional": false
       },
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -9929,18 +11425,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "url",
+        "kind": "positional_only",
         "name": "url",
         "optional": false
       },
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -10003,24 +11505,32 @@
       {
         "annotation": "str",
         "default": "'http://localhost:8080'",
+        "display_name": "base_url",
+        "kind": "positional_or_keyword",
         "name": "base_url",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "api_key",
+        "kind": "positional_or_keyword",
         "name": "api_key",
         "optional": true
       },
       {
         "annotation": "float",
         "default": "30.0",
+        "display_name": "timeout",
+        "kind": "positional_or_keyword",
         "name": "timeout",
         "optional": true
       },
       {
         "annotation": "SupportsHttp | None",
         "default": "None",
+        "display_name": "http",
+        "kind": "positional_or_keyword",
         "name": "http",
         "optional": true
       }
@@ -10051,12 +11561,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "q",
+        "kind": "positional_or_keyword",
         "name": "q",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "50",
+        "display_name": "limit",
+        "kind": "positional_or_keyword",
         "name": "limit",
         "optional": true
       }
@@ -10092,24 +11606,32 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "10",
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": true
       },
       {
         "annotation": "dict[str, Any] | None",
         "default": "None",
+        "display_name": "filters",
+        "kind": "positional_or_keyword",
         "name": "filters",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "False",
+        "display_name": "explain",
+        "kind": "positional_or_keyword",
         "name": "explain",
         "optional": true
       }
@@ -10140,18 +11662,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "url",
+        "kind": "positional_only",
         "name": "url",
         "optional": false
       },
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -10173,18 +11701,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "url",
+        "kind": "positional_only",
         "name": "url",
         "optional": false
       },
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -10215,18 +11749,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "url",
+        "kind": "positional_only",
         "name": "url",
         "optional": false
       },
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -10248,18 +11788,24 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "url",
+        "kind": "positional_only",
         "name": "url",
         "optional": false
       },
       {
         "annotation": "object",
         "default": "()",
+        "display_name": "*args",
+        "kind": "var_positional",
         "name": "args",
         "optional": true
       },
       {
         "annotation": "object",
         "default": "{}",
+        "display_name": "**kwargs",
+        "kind": "var_keyword",
         "name": "kwargs",
         "optional": true
       }
@@ -10310,6 +11856,42 @@
     "module": "sitecustomize",
     "notes": [],
     "parameters": [],
+    "qname": "sitecustomize.DocstringAttrProto",
+    "raises": [],
+    "returns": []
+  },
+  {
+    "kind": "class",
+    "module": "sitecustomize",
+    "notes": [],
+    "parameters": [],
+    "qname": "sitecustomize.DocstringCommonModuleProto",
+    "raises": [],
+    "returns": []
+  },
+  {
+    "kind": "class",
+    "module": "sitecustomize",
+    "notes": [],
+    "parameters": [],
+    "qname": "sitecustomize.DocstringMetaProto",
+    "raises": [],
+    "returns": []
+  },
+  {
+    "kind": "class",
+    "module": "sitecustomize",
+    "notes": [],
+    "parameters": [],
+    "qname": "sitecustomize.DocstringProto",
+    "raises": [],
+    "returns": []
+  },
+  {
+    "kind": "class",
+    "module": "sitecustomize",
+    "notes": [],
+    "parameters": [],
     "qname": "sitecustomize.DocstringYields",
     "raises": [],
     "returns": []
@@ -10320,31 +11902,48 @@
     "notes": [],
     "parameters": [
       {
-        "annotation": "list",
+        "annotation": "Sequence",
         "default": null,
+        "display_name": "args",
+        "kind": "positional_or_keyword",
         "name": "args",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "description",
+        "kind": "positional_or_keyword",
         "name": "description",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": null,
+        "display_name": "type_name",
+        "kind": "positional_or_keyword",
         "name": "type_name",
         "optional": true
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "return_name",
+        "kind": "positional_or_keyword",
         "name": "return_name",
         "optional": true
       }
     ],
     "qname": "sitecustomize.DocstringYields.__init__",
+    "raises": [],
+    "returns": []
+  },
+  {
+    "kind": "class",
+    "module": "sitecustomize",
+    "notes": [],
+    "parameters": [],
+    "qname": "sitecustomize.DocstringYieldsProto",
     "raises": [],
     "returns": []
   },
@@ -10414,6 +12013,91 @@
     ]
   },
   {
+    "kind": "function",
+    "module": "sitecustomize",
+    "notes": [],
+    "parameters": [
+      {
+        "annotation": "type",
+        "default": null,
+        "display_name": "doc_cls",
+        "kind": "positional_or_keyword",
+        "name": "doc_cls",
+        "optional": false
+      },
+      {
+        "annotation": "type",
+        "default": null,
+        "display_name": "attr_cls",
+        "kind": "positional_or_keyword",
+        "name": "attr_cls",
+        "optional": false
+      }
+    ],
+    "qname": "sitecustomize.register_docstring_attrs",
+    "raises": [],
+    "returns": [
+      {
+        "annotation": "bool",
+        "kind": "returns"
+      }
+    ]
+  },
+  {
+    "kind": "function",
+    "module": "sitecustomize",
+    "notes": [],
+    "parameters": [
+      {
+        "annotation": "type",
+        "default": null,
+        "display_name": "doc_cls",
+        "kind": "positional_or_keyword",
+        "name": "doc_cls",
+        "optional": false
+      }
+    ],
+    "qname": "sitecustomize.register_docstring_size",
+    "raises": [],
+    "returns": [
+      {
+        "annotation": "bool",
+        "kind": "returns"
+      }
+    ]
+  },
+  {
+    "kind": "function",
+    "module": "sitecustomize",
+    "notes": [],
+    "parameters": [
+      {
+        "annotation": "type",
+        "default": null,
+        "display_name": "doc_cls",
+        "kind": "positional_or_keyword",
+        "name": "doc_cls",
+        "optional": false
+      },
+      {
+        "annotation": "type",
+        "default": null,
+        "display_name": "yields_cls",
+        "kind": "positional_or_keyword",
+        "name": "yields_cls",
+        "optional": false
+      }
+    ],
+    "qname": "sitecustomize.register_docstring_yields",
+    "raises": [],
+    "returns": [
+      {
+        "annotation": "tuple",
+        "kind": "returns"
+      }
+    ]
+  },
+  {
     "kind": "class",
     "module": "vectorstore_faiss.__init__",
     "notes": [],
@@ -10430,24 +12114,32 @@
       {
         "annotation": "str",
         "default": "'OPQ64,IVF8192,PQ64'",
+        "display_name": "factory",
+        "kind": "positional_or_keyword",
         "name": "factory",
         "optional": true
       },
       {
         "annotation": "int",
         "default": "64",
+        "display_name": "nprobe",
+        "kind": "positional_or_keyword",
         "name": "nprobe",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "True",
+        "display_name": "gpu",
+        "kind": "positional_or_keyword",
         "name": "gpu",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "True",
+        "display_name": "cuvs",
+        "kind": "positional_or_keyword",
         "name": "cuvs",
         "optional": true
       }
@@ -10473,12 +12165,16 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "keys",
+        "kind": "positional_or_keyword",
         "name": "keys",
         "optional": false
       },
       {
         "annotation": "FloatArray | FloatArrayLike",
         "default": null,
+        "display_name": "vectors",
+        "kind": "positional_or_keyword",
         "name": "vectors",
         "optional": false
       }
@@ -10495,12 +12191,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_uri",
+        "kind": "positional_or_keyword",
         "name": "index_uri",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "idmap_uri",
+        "kind": "positional_or_keyword",
         "name": "idmap_uri",
         "optional": true
       }
@@ -10517,12 +12217,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_uri",
+        "kind": "positional_or_keyword",
         "name": "index_uri",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "idmap_uri",
+        "kind": "positional_or_keyword",
         "name": "idmap_uri",
         "optional": true
       }
@@ -10539,12 +12243,16 @@
       {
         "annotation": "FloatArray | FloatArrayLike",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       }
@@ -10566,12 +12274,16 @@
       {
         "annotation": "FloatArray | FloatArrayLike",
         "default": null,
+        "display_name": "train_vectors",
+        "kind": "positional_or_keyword",
         "name": "train_vectors",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "42",
+        "display_name": "seed",
+        "kind": "keyword_only",
         "name": "seed",
         "optional": true
       }
@@ -10602,24 +12314,32 @@
       {
         "annotation": "str",
         "default": "'OPQ64,IVF8192,PQ64'",
+        "display_name": "factory",
+        "kind": "positional_or_keyword",
         "name": "factory",
         "optional": true
       },
       {
         "annotation": "int",
         "default": "64",
+        "display_name": "nprobe",
+        "kind": "positional_or_keyword",
         "name": "nprobe",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "True",
+        "display_name": "gpu",
+        "kind": "positional_or_keyword",
         "name": "gpu",
         "optional": true
       },
       {
         "annotation": "bool",
         "default": "True",
+        "display_name": "cuvs",
+        "kind": "positional_or_keyword",
         "name": "cuvs",
         "optional": true
       }
@@ -10645,12 +12365,16 @@
       {
         "annotation": "list",
         "default": null,
+        "display_name": "keys",
+        "kind": "positional_or_keyword",
         "name": "keys",
         "optional": false
       },
       {
         "annotation": "FloatArray | FloatArrayLike",
         "default": null,
+        "display_name": "vectors",
+        "kind": "positional_or_keyword",
         "name": "vectors",
         "optional": false
       }
@@ -10672,12 +12396,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_uri",
+        "kind": "positional_or_keyword",
         "name": "index_uri",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "idmap_uri",
+        "kind": "positional_or_keyword",
         "name": "idmap_uri",
         "optional": true
       }
@@ -10699,12 +12427,16 @@
       {
         "annotation": "str",
         "default": null,
+        "display_name": "index_uri",
+        "kind": "positional_or_keyword",
         "name": "index_uri",
         "optional": false
       },
       {
         "annotation": "str | None",
         "default": "None",
+        "display_name": "idmap_uri",
+        "kind": "positional_or_keyword",
         "name": "idmap_uri",
         "optional": true
       }
@@ -10726,12 +12458,16 @@
       {
         "annotation": "FloatArray | FloatArrayLike",
         "default": null,
+        "display_name": "query",
+        "kind": "positional_or_keyword",
         "name": "query",
         "optional": false
       },
       {
         "annotation": "int",
         "default": null,
+        "display_name": "k",
+        "kind": "positional_or_keyword",
         "name": "k",
         "optional": false
       }
@@ -10758,12 +12494,16 @@
       {
         "annotation": "FloatArray | FloatArrayLike",
         "default": null,
+        "display_name": "train_vectors",
+        "kind": "positional_or_keyword",
         "name": "train_vectors",
         "optional": false
       },
       {
         "annotation": "int",
         "default": "42",
+        "display_name": "seed",
+        "kind": "keyword_only",
         "name": "seed",
         "optional": true
       }
