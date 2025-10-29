@@ -99,61 +99,61 @@
         - `doctor` completes <1s with clear suggestions when misconfigurations exist.
 
 ## 1. Implementation
-- [ ] 1.1 Build typed docstring shims
-    - [ ] 1.1.1 Define Protocols in `src/sitecustomize.py` for docstring objects (`DocstringProto`, `DocstringMetaProto`, `DocstringAttrProto`, `DocstringYieldsProto`).
-    - [ ] 1.1.2 Implement helper functions (`ensure_docstring_attrs`, `ensure_docstring_yields`, `ensure_docstring_size`) that perform guarded `setattr` calls and return status booleans.
-    - [ ] 1.1.3 Replace direct monkey patches with the new helpers; log debug messages when attributes are newly created vs. already present.
+- [x] 1.1 Build typed docstring shims
+    - [x] 1.1.1 Define Protocols in `src/sitecustomize.py` for docstring objects (`DocstringProto`, `DocstringMetaProto`, `DocstringAttrProto`, `DocstringYieldsProto`).
+    - [x] 1.1.2 Implement helper functions (`ensure_docstring_attrs`, `ensure_docstring_yields`, `ensure_docstring_size`) that perform guarded `setattr` calls and return status booleans.
+    - [x] 1.1.3 Replace direct monkey patches with the new helpers; log debug messages when attributes are newly created vs. already present.
     - AC:
         - Protocols compile under strict mypy.
         - Helpers are used in all shim locations and covered by tests.
 
-- [ ] 1.2 Provide third-party stubs
-    - [ ] 1.2.1 Create `stubs/griffe/__init__.pyi` etc., covering the symbols we import (`Module`, `Function`, `Object`, `GriffeLoader`).
-    - [ ] 1.2.2 Add stubs for `libcst` (classes we interact with) and `mkdocs_gen_files` (functions used in generator scripts).
-    - [ ] 1.2.3 Update `pyproject.toml` / `mypy.ini` to include the `stubs/` directory; remove redundant ignores.
+- [x] 1.2 Provide third-party stubs
+    - [x] 1.2.1 Create `stubs/griffe/__init__.pyi` etc., covering the symbols we import (`Module`, `Function`, `Object`, `GriffeLoader`).
+    - [x] 1.2.2 Add stubs for `libcst` (classes we interact with) and `mkdocs_gen_files` (functions used in generator scripts).
+    - [x] 1.2.3 Update `pyproject.toml` / `mypy.ini` to include the `stubs/` directory; remove redundant ignores.
     - AC:
         - `uv run mypy` finds no missing attributes/types for these libs.
         - Stubs are documented with a short “how to extend” guideline.
 
-- [ ] 1.3 Annotate docstring builder core modules
-    - [ ] 1.3.1 Convert data containers (`ParameterHarvest`, `SymbolHarvest`, etc.) to typed dataclasses, referencing stubbed types.
-    - [ ] 1.3.2 Add explicit return types to `_resolve_object`, `_resolve_callable`, `_module_name`, and `_collect_symbols`.
-    - [ ] 1.3.3 Write/refine module/function docstrings per NumPy style.
+- [x] 1.3 Annotate docstring builder core modules
+    - [x] 1.3.1 Convert data containers (`ParameterHarvest`, `SymbolHarvest`, etc.) to typed dataclasses, referencing stubbed types.
+    - [x] 1.3.2 Add explicit return types to `_resolve_object`, `_resolve_callable`, `_module_name`, and `_collect_symbols`.
+    - [x] 1.3.3 Write/refine module/function docstrings per NumPy style.
     - AC:
         - No `Any` leaks in public surfaces (checked via mypy strict).
         - Docstrings pass pydocstyle/pydoclint/interrogate gates.
 
-- [ ] 1.4 Introduce plugin architecture
-    - [ ] 1.4.1 Define Protocols/ABCs for `Harvester`, `Transformer`, `Formatter` with `run(context)` and optional `on_start`/`on_finish`.
-    - [ ] 1.4.2 Implement entry-point discovery under `kgfoundry.docstrings.plugins`.
-    - [ ] 1.4.3 Add CLI/config filters: `--only-plugin`, `--disable-plugin`.
-    - [ ] 1.4.4 Ship a sample plugin `normalize_numpy_params`.
+- [x] 1.4 Introduce plugin architecture
+    - [x] 1.4.1 Define Protocols/ABCs for `Harvester`, `Transformer`, `Formatter` with `run(context)` and optional `on_start`/`on_finish`.
+    - [x] 1.4.2 Implement entry-point discovery under `kgfoundry.docstrings.plugins`.
+    - [x] 1.4.3 Add CLI/config filters: `--only-plugin`, `--disable-plugin`.
+    - [x] 1.4.4 Ship a sample plugin `normalize_numpy_params`.
     - AC:
         - Plugins can be enabled/disabled without code changes.
         - A sample plugin runs in `generate` and affects output deterministically.
 
-- [ ] 1.5 Define versioned Intermediate Representation (IR)
-    - [ ] 1.5.1 Create IR dataclasses: `IRSymbol`, `IRParameter`, `IRDocstring`.
-    - [ ] 1.5.2 Add `ir_version` and stable identifiers (`symbol_id`, `source_path`).
-    - [ ] 1.5.3 Generate JSON Schema at `docs/_build/schema_docstrings.json`.
-    - [ ] 1.5.4 Validate IR during pipeline execution.
+- [x] 1.5 Define versioned Intermediate Representation (IR)
+    - [x] 1.5.1 Create IR dataclasses: `IRSymbol`, `IRParameter`, `IRDocstring`.
+    - [x] 1.5.2 Add `ir_version` and stable identifiers (`symbol_id`, `source_path`).
+    - [x] 1.5.3 Generate JSON Schema at `docs/_build/schema_docstrings.json`.
+    - [x] 1.5.4 Validate IR during pipeline execution.
     - AC:
         - Schema file exists and validates IR for a sample run.
         - Breaking schema changes bump `ir_version`.
 
-- [ ] 1.6 Implement policy engine and quality gates
-    - [ ] 1.6.1 Define config schema in `pyproject.toml` or YAML.
-    - [ ] 1.6.2 Support rules: coverage %, missing params/returns, exceptions.
-    - [ ] 1.6.3 Support actions: `error`, `warn`, `autofix` with precedence: CLI > env > config > defaults.
-    - [ ] 1.6.4 Implement exceptions allowlist with `expires_on` and `justification`.
+- [x] 1.6 Implement policy engine and quality gates
+    - [x] 1.6.1 Define config schema in `pyproject.toml` or YAML.
+    - [x] 1.6.2 Support rules: coverage %, missing params/returns, exceptions.
+    - [x] 1.6.3 Support actions: `error`, `warn`, `autofix` with precedence: CLI > env > config > defaults.
+    - [x] 1.6.4 Implement exceptions allowlist with `expires_on` and `justification`.
     - AC:
         - Failing a threshold exits with code `1` and a clear report.
         - Allowlist expiry is enforced in CI.
 
-- [ ] 1.7 Add incremental executor and manifest
-    - [ ] 1.7.1 Create `docs/_build/docstrings_manifest.json` with inputs (hashes), plugins, config fingerprint, outputs, and timings.
-    - [ ] 1.7.2 Rebuild only changed files and dependents.
-    - [ ] 1.7.3 Add `--since <rev>` and `--changed-only` flags.
+- [x] 1.7 Add incremental executor and manifest
+    - [x] 1.7.1 Create `docs/_build/docstrings_manifest.json` with inputs (hashes), plugins, config fingerprint, outputs, and timings.
+    - [x] 1.7.2 Rebuild only changed files and dependents.
+    - [x] 1.7.3 Add `--since <rev>` and `--changed-only` flags.
     - AC:
         - Touching 1 file only rebuilds that file and dependents.
         - Changing config or plugin version invalidates cache.

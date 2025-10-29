@@ -45,14 +45,20 @@ def test_process_file_ignore_missing(monkeypatch: pytest.MonkeyPatch, tmp_path: 
         force=False,
         ignore_missing=True,
         missing_patterns=tuple(cli.MISSING_MODULE_PATTERNS),
+        skip_docfacts=False,
     )
     result = cli._process_file(
         file_path,
         config,
         cache,
         options,
+        plugin_manager=None,
     )
-    assert result == (0, [], None, False)
+    assert result.status == cli.ExitStatus.SUCCESS
+    assert result.docfacts == []
+    assert result.preview is None
+    assert result.changed is False
+    assert result.skipped is True
 
     options_error = dataclasses.replace(options, ignore_missing=False)
     result_error = cli._process_file(
@@ -60,5 +66,6 @@ def test_process_file_ignore_missing(monkeypatch: pytest.MonkeyPatch, tmp_path: 
         config,
         cache,
         options_error,
+        plugin_manager=None,
     )
-    assert result_error[0] == 1
+    assert result_error.status == cli.ExitStatus.CONFIG
