@@ -1,11 +1,20 @@
-"""Search - tiny corpus smoke (no GPU).
-====================================
+"""Search - tiny corpus smoke (no GPU)
+===================================
 
 Exercise the tiny-corpus search smoke flow.
 
 Exercise the bundled tiny corpus utilities without requiring accelerators.
 
 .. tags:: search, smoke
+
+Metadata
+--------
+
+- **Title:** Search - tiny corpus smoke (no GPU)
+- **Tags:** search, smoke
+- **Time:** <2s
+- **GPU:** no
+- **Network:** no
 
 Constraints
 -----------
