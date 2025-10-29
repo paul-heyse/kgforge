@@ -2,14 +2,36 @@
 
 from __future__ import annotations
 
+import importlib
 import shutil
 import subprocess
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Protocol, cast
 
 import networkx as nx
 import pytest
-from tools.docs import build_graphs
-from tools.docs.build_graphs import collapse_to_packages, style_and_render
+
+build_graphs = importlib.import_module("tools.docs.build_graphs")
+
+
+class _CollapseToPackages(Protocol):
+    def __call__(self, dot_path: Path) -> nx.DiGraph[str]: ...
+
+
+class _StyleAndRender(Protocol):
+    def __call__(
+        self,
+        graph: nx.DiGraph[str],
+        layers: Mapping[str, object],
+        analysis: Mapping[str, object],
+        out_svg: Path,
+        fmt: str = "svg",
+    ) -> None: ...
+
+
+collapse_to_packages = cast(_CollapseToPackages, build_graphs.collapse_to_packages)
+style_and_render = cast(_StyleAndRender, build_graphs.style_and_render)
 
 
 def _write_dot(path: Path) -> None:
