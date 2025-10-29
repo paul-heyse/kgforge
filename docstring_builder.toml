@@ -5,9 +5,9 @@ dynamic_probes = false
 navmap_metadata = true
 
 [packages]
-summary_verbs = {
-  kgfoundry = "Document",
-  kgfoundry_common = "Describe",
-  tools = "Automate",
-}
 opt_out = []
+
+[packages.summary_verbs]
+kgfoundry = "Document"
+kgfoundry_common = "Describe"
+tools = "Automate"

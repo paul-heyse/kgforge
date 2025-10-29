@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import ast
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
-from .config import BuilderConfig
-from .harvest import HarvestResult, SymbolHarvest
-from .schema import DocstringSchema, ParameterDoc, RaiseDoc, ReturnDoc
+from tools.docstring_builder.config import BuilderConfig
+from tools.docstring_builder.harvest import HarvestResult, SymbolHarvest
+from tools.docstring_builder.overrides import extended_summary as overrides_extended_summary
+from tools.docstring_builder.schema import DocstringSchema, ParameterDoc, RaiseDoc, ReturnDoc
 
 
 @dataclass(slots=True)
@@ -26,7 +27,9 @@ def _summary_for(symbol: SymbolHarvest, config: BuilderConfig) -> str:
     return f"{verb.capitalize()} {target}."
 
 
-def _infer_optional(parameter: ParameterDoc, raw_annotation: str | None, default: str | None) -> bool:
+def _infer_optional(
+    parameter: ParameterDoc, raw_annotation: str | None, default: str | None
+) -> bool:
     if default is not None and default != "...":
         return True
     if raw_annotation and ("Optional" in raw_annotation or "None" in raw_annotation):
@@ -103,21 +106,21 @@ def _ast_index(result: HarvestResult) -> dict[str, ast.AST]:
         def _qualify(self, name: str) -> str:
             return ".".join(part for part in [result.module, *self.namespace, name] if part)
 
-        def visit_ClassDef(self, node: ast.ClassDef) -> None:  # noqa: D401
+        def visit_ClassDef(self, node: ast.ClassDef) -> None:
             qname = self._qualify(node.name)
             index[qname] = node
             self.namespace.append(node.name)
             self.generic_visit(node)
             self.namespace.pop()
 
-        def visit_FunctionDef(self, node: ast.FunctionDef) -> None:  # noqa: D401
+        def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
             qname = self._qualify(node.name)
             index[qname] = node
             self.namespace.append(node.name)
             self.generic_visit(node)
             self.namespace.pop()
 
-        def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:  # noqa: D401
+        def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
             qname = self._qualify(node.name)
             index[qname] = node
             self.namespace.append(node.name)
@@ -130,7 +133,6 @@ def _ast_index(result: HarvestResult) -> dict[str, ast.AST]:
 
 def build_semantic_schemas(result: HarvestResult, config: BuilderConfig) -> list[SemanticResult]:
     """Generate docstring schemas for the harvested symbols in a file."""
-
     ast_nodes = _ast_index(result)
     entries: list[SemanticResult] = []
     for symbol in result.symbols:
@@ -145,9 +147,11 @@ def build_semantic_schemas(result: HarvestResult, config: BuilderConfig) -> list
             notes.append("This coroutine executes asynchronously.")
         if symbol.is_generator:
             notes.append("This callable yields values instead of returning once.")
+        simple_name = symbol.qname.split(".")[-1]
+        extended = overrides_extended_summary(symbol.kind, simple_name, symbol.module, ast_node)
         schema = DocstringSchema(
             summary=_summary_for(symbol, config),
-            extended=None,
+            extended=extended,
             parameters=parameters,
             returns=returns,
             raises=raises,

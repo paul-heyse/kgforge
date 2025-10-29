@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Bootstrap a reproducible dev env (base + docs only) using uv.
+# Bootstrap a reproducible dev env (standard deps only) using uv.
 # Works on Linux and macOS (Bash 3.2+ compatible; avoids arrays/process substitution).
 #
 # Behavior:
 # - Creates .venv if missing
-# - Installs project editable + extras=docs (NOT gpu)
+# - Installs project editable with the standard dependency set (no gpu extras)
 # - Respects uv.lock (frozen); optionally offline
 # - Activates .venv for this shell
 # - Installs pre-commit hooks
@@ -29,7 +29,7 @@ cd "${REPO_ROOT}"
 
 # -------- configurable knobs (env overrides allowed) --------
 PYTHON_SPEC="${PYTHON_SPEC:-3.13}"
-EXTRAS="${EXTRAS:-docs}"           # NEVER include "gpu" here
+EXTRAS="${EXTRAS:-}"                # Provide comma-separated extras as needed (never include "gpu")
 FROZEN="${FROZEN:-1}"               # 1 = respect uv.lock; 0 = allow relock/updates
 OFFLINE="${OFFLINE:-0}"             # 1 = no network (uses cache / local wheelhouse)
 USE_WHEELHOUSE="${USE_WHEELHOUSE:-0}" # 1 = add ./.wheelhouse to candidate wheels
@@ -110,7 +110,7 @@ if grep -qE '^\[project\.scripts\]' pyproject.toml 2>/dev/null; then
 fi
 
 # -------- quick tips --------
-ok "Environment ready (base + docs, no gpu). Next steps:"
+ok "Environment ready (standard deps, no gpu). Next steps:"
 echo "  - Lint/format : uvx ruff check --fix && uvx ruff format"
 echo "  - Type-check  : uvx mypy --strict"
 echo "  - Tests       : uv run pytest -q"

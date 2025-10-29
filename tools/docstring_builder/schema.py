@@ -57,9 +57,9 @@ class DocstringEdit:
 
 
 __all__ = [
+    "DocstringEdit",
     "DocstringSchema",
     "ParameterDoc",
-    "ReturnDoc",
     "RaiseDoc",
-    "DocstringEdit",
+    "ReturnDoc",
 ]

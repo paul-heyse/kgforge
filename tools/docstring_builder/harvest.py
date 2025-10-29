@@ -2,21 +2,26 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable, Iterator, Literal
+from typing import Literal
 
 import libcst as cst
-
-from .config import BuilderConfig
+from tools.docstring_builder.config import BuilderConfig
+from tools.griffe_utils import resolve_griffe
 
 try:  # Import lazily so unit tests can patch when griffe is unavailable.
-    from griffe.dataclasses import Class, Function, Module, Object
-    from griffe.loader import GriffeLoader
-except ModuleNotFoundError as exc:  # pragma: no cover - handled in runtime tests
-    raise RuntimeError(
-        "Griffe is required to run the docstring builder. Install the optional dependency via ``uv sync``."
-    ) from exc
+    _GRIFFE_API = resolve_griffe()
+except (ModuleNotFoundError, AttributeError) as exc:  # pragma: no cover - runtime guard
+    message = "Griffe is required to run the docstring builder. Install the optional dependency via ``uv sync``."
+    raise RuntimeError(message) from exc
+
+Class = _GRIFFE_API.class_type
+Function = _GRIFFE_API.function_type
+Module = _GRIFFE_API.module_type
+Object = _GRIFFE_API.object_type
+GriffeLoader = _GRIFFE_API.loader_type
 
 
 @dataclass(slots=True)
@@ -69,25 +74,77 @@ def _module_name(root: Path, file_path: Path) -> str:
 
 def _load_module(module_name: str, search_paths: list[str]) -> Module:
     loader = GriffeLoader(search_paths=search_paths)
-    return loader.load_module(module_name)
+    load_fn = getattr(loader, "load_module", None)
+    if load_fn is None:
+        load_fn = loader.load
+    try:
+        return load_fn(module_name)
+    except Exception:
+        if module_name.endswith(".__init__"):
+            package_name = module_name.rsplit(".", 1)[0]
+            return load_fn(package_name)
+        raise
+
+
+def _safe_getattr(value: object, attr: str) -> object | None:
+    try:
+        return getattr(value, attr)
+    except Exception:  # pragma: no cover - defensive fallback
+        return None
+
+
+def _extract_string_attribute(value: object, attr: str) -> str | None:
+    candidate = _safe_getattr(value, attr)
+    if isinstance(candidate, str):
+        return candidate
+    return None
+
+
+def _expr_to_str(value: object | None) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return value
+    as_string = _safe_getattr(value, "as_string")
+    if callable(as_string):
+        try:
+            candidate = as_string()
+        except Exception:  # pragma: no cover - defensive fallback
+            candidate = None
+        if isinstance(candidate, str):
+            return candidate
+    for attribute in ("name", "path", "value"):
+        attr_value = _extract_string_attribute(value, attribute)
+        if attr_value is not None:
+            return attr_value
+    try:
+        return str(value)
+    except Exception:  # pragma: no cover - defensive fallback
+        return None
 
 
 def _annotation_to_str(annotation: object | None) -> str | None:
-    if annotation is None:
-        return None
-    try:
-        return annotation.as_string()
-    except AttributeError:  # pragma: no cover - defensive fallback
-        return str(annotation)
+    return _expr_to_str(annotation)
 
 
 def _default_to_str(default: object | None) -> str | None:
-    if default is None:
-        return None
-    try:
-        return default.as_string()
-    except AttributeError:  # pragma: no cover - defensive fallback
-        return str(default)
+    return _expr_to_str(default)
+
+
+def _decorator_names(decorators: Iterable[object]) -> list[str]:
+    names: list[str] = []
+    for decorator in decorators or []:
+        name_attr = _safe_getattr(decorator, "name")
+        if isinstance(name_attr, str):
+            names.append(name_attr)
+            continue
+        value_attr = _safe_getattr(decorator, "value") or decorator
+        name = _expr_to_str(value_attr)
+        if name is not None:
+            names.append(name)
+        else:  # pragma: no cover - defensive fallback
+            names.append(str(decorator))
+    return names
 
 
 def _iter_parameters(function: Function) -> Iterator[ParameterHarvest]:
@@ -125,10 +182,10 @@ def _collect_symbols(
             filepath=file_path,
             lineno=obj.lineno or 1,
             end_lineno=obj.endlineno,
-            col_offset=obj.col_offset or 0,
-            decorators=[decorator.name for decorator in obj.decorators],
-            is_async=False,
-            is_generator=False,
+            col_offset=getattr(obj, "col_offset", 0) or 0,
+            decorators=_decorator_names(getattr(obj, "decorators", [])),
+            is_async=bool(getattr(obj, "is_async", False)),
+            is_generator=bool(getattr(obj, "is_generator", False)),
         )
         yield from _walk_members(obj, module_name, file_path, config, [*prefix, obj.name])
         return
@@ -139,21 +196,24 @@ def _collect_symbols(
         owned = (docstring and config.ownership_marker in docstring) or docstring is None
         if qname in config.package_settings.opt_out:
             owned = False
+        return_annotation_obj = getattr(obj, "return_annotation", None) or getattr(
+            obj, "returns", None
+        )
         yield SymbolHarvest(
             qname=qname,
             module=module_name,
             kind="method" if prefix else "function",
             parameters=parameters,
-            return_annotation=_annotation_to_str(obj.return_annotation),
+            return_annotation=_annotation_to_str(return_annotation_obj),
             docstring=docstring,
             owned=owned,
             filepath=file_path,
             lineno=obj.lineno or 1,
             end_lineno=obj.endlineno,
-            col_offset=obj.col_offset or 0,
-            decorators=[decorator.name for decorator in obj.decorators],
-            is_async=obj.is_async,
-            is_generator=obj.is_generator,
+            col_offset=getattr(obj, "col_offset", 0) or 0,
+            decorators=_decorator_names(getattr(obj, "decorators", [])),
+            is_async=bool(getattr(obj, "is_async", False)),
+            is_generator=bool(getattr(obj, "is_generator", False)),
         )
         return
     if isinstance(obj, Module):
@@ -182,22 +242,22 @@ class _IndexVisitor(cst.CSTVisitor):
         pieces = [self.module_name, *self.namespace, name]
         return ".".join(piece for piece in pieces if piece)
 
-    def visit_ClassDef(self, node: cst.ClassDef) -> bool:  # noqa: D401 - behaviour doc inherited
+    def visit_ClassDef(self, node: cst.ClassDef) -> bool:  # noqa: N802 - LibCST API contract
         qname = self._qualify(node.name.value)
         self.index[qname] = node
         self.namespace.append(node.name.value)
         return True
 
-    def leave_ClassDef(self, original_node: cst.ClassDef) -> None:  # noqa: D401
+    def leave_ClassDef(self, original_node: cst.ClassDef) -> None:  # noqa: N802
         self.namespace.pop()
 
-    def visit_FunctionDef(self, node: cst.FunctionDef) -> bool:  # noqa: D401
+    def visit_FunctionDef(self, node: cst.FunctionDef) -> bool:  # noqa: N802 - LibCST API contract
         qname = self._qualify(node.name.value)
         self.index[qname] = node
         self.namespace.append(node.name.value)
         return True
 
-    def leave_FunctionDef(self, original_node: cst.FunctionDef) -> None:  # noqa: D401
+    def leave_FunctionDef(self, original_node: cst.FunctionDef) -> None:  # noqa: N802
         self.namespace.pop()
 
 
@@ -210,7 +270,6 @@ def _build_cst_index(module_name: str, file_path: Path) -> dict[str, cst.CSTNode
 
 def harvest_file(file_path: Path, config: BuilderConfig, repo_root: Path) -> HarvestResult:
     """Collect symbol metadata for a single file."""
-
     module_name = _module_name(repo_root, file_path)
     if not module_name:
         module_name = file_path.stem
@@ -223,7 +282,6 @@ def harvest_file(file_path: Path, config: BuilderConfig, repo_root: Path) -> Har
 
 def iter_target_files(config: BuilderConfig, repo_root: Path) -> Iterator[Path]:
     """Yield files matching include/exclude patterns."""
-
     for pattern in config.include:
         for candidate in repo_root.glob(pattern):
             if not candidate.is_file() or candidate.suffix != ".py":
@@ -236,8 +294,8 @@ def iter_target_files(config: BuilderConfig, repo_root: Path) -> Iterator[Path]:
 
 __all__ = [
     "HarvestResult",
-    "SymbolHarvest",
     "ParameterHarvest",
+    "SymbolHarvest",
     "harvest_file",
     "iter_target_files",
 ]

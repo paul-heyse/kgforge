@@ -28,7 +28,10 @@ if str(ROOT) not in sys.path:
 
 from tools.griffe_utils import resolve_griffe  # noqa: E402
 
-_griffe_module, _griffe_object_type, GriffeLoader = resolve_griffe()
+_griffe_api = resolve_griffe()
+_griffe_module = _griffe_api.package
+_griffe_object_type = _griffe_api.object_type
+GriffeLoader = _griffe_api.loader_type
 
 
 class DocstringLike(Protocol):

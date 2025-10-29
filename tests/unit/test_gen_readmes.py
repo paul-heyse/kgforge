@@ -25,11 +25,17 @@ class _LoaderStub:
 class _FakeGriffeModule(ModuleType):
     Object: type[SimpleNamespace]
     GriffeLoader: type[_LoaderStub]
+    Class: type[SimpleNamespace]
+    Function: type[SimpleNamespace]
+    Module: type[SimpleNamespace]
 
     def __init__(self) -> None:
         super().__init__("griffe")
         self.Object = SimpleNamespace
         self.GriffeLoader = _LoaderStub
+        self.Class = type("FakeClass", (SimpleNamespace,), {})
+        self.Function = type("FakeFunction", (SimpleNamespace,), {})
+        self.Module = type("FakeModule", (SimpleNamespace,), {})
 
 
 class _FakeLoaderModule(ModuleType):
@@ -70,7 +76,19 @@ sys.modules.setdefault("griffe.loader", fake_loader_module)
 fake_detect_pkg = _FakeDetectModule()
 sys.modules.setdefault("detect_pkg", fake_detect_pkg)
 
+from tools.griffe_utils import resolve_griffe  # noqa: E402
+
+resolve_griffe.cache_clear()
 gr = importlib.import_module("tools.gen_readmes")
+
+
+def test_resolve_griffe_returns_stub_types() -> None:
+    api = resolve_griffe()
+    assert api.class_type is fake_griffe.Class
+    assert api.function_type is fake_griffe.Function
+    assert api.module_type is fake_griffe.Module
+    assert api.loader_type is fake_griffe.GriffeLoader
+    assert api.object_type is fake_griffe.Object
 
 
 def _docstring(text: str | None) -> SimpleNamespace | None:

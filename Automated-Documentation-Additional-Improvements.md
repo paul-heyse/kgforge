@@ -225,8 +225,9 @@ Here’s a repo-ready, fully integrated plan to ship **recommendations 2–6** i
 ### 1) `pyproject.toml` (deps + pytest config)
 
 ```toml
-[project.optional-dependencies]
-docs = [
+[project]
+dependencies = [
+  # existing dependencies...
   "sphinx>=7.3",
   "myst-parser",
   "pydata-sphinx-theme",
@@ -790,8 +791,8 @@ graphs:
 In your existing docs job:
 
 ```yaml
-- name: Install docs extras
-  run: uv pip install -e ".[docs]"
+- name: Install project dependencies
+  run: uv pip install -e "."
 
 - name: System deps (graphs)
   run: sudo apt-get update && sudo apt-get install -y graphviz
@@ -872,13 +873,14 @@ I verified that **`README-AUTOMATED-DOCUMENTATION.md`** exists in `paul-heyse/kg
 * System packages (CI): `graphviz` (for SVG rendering of .dot), `jq` (diff checks).
 * Use `uv` for installs (aligns with your toolchain):
 
-  * `uv pip install -e ".[docs]"` for local dev and CI docs job.
+* `uv pip install -e "."` for local dev and CI docs job.
 
 **`pyproject.toml` additions (merge these blocks)**
 
 ```toml
-[project.optional-dependencies]
-docs = [
+[project]
+dependencies = [
+  # existing dependencies...
   "sphinx>=7.3",
   "myst-parser>=3.0.1",
   "pydata-sphinx-theme>=0.16.1",
@@ -1018,8 +1020,8 @@ jobs:
       - name: Install system deps
         run: sudo apt-get update && sudo apt-get install -y graphviz jq
 
-      - name: Install docs extras
-        run: uv pip install -e ".[docs]"
+      - name: Install project dependencies
+        run: uv pip install -e "."
 
       - name: Build complete docs pipeline
         run: bash tools/update_docs.sh
@@ -1168,7 +1170,7 @@ def tiny_search():
 **Local run**
 
 ```bash
-uv pip install -e ".[docs]"
+uv pip install -e "."
 pytest -q --xdoctest
 python -m sphinx -b html docs docs/_build/html
 ```
@@ -1682,7 +1684,7 @@ pytest -q tests/docs/test_pipeline_artifacts.py
 
 ```bash
 # Full docs refresh (all generators + Sphinx)
-uv pip install -e ".[docs]" && bash tools/update_docs.sh
+uv pip install -e "." && bash tools/update_docs.sh
 
 # Just rebuild gallery + HTML
 python -m sphinx -b html docs docs/_build/html
@@ -1733,4 +1735,3 @@ gallery/
   * **Reference →** Test Matrix, Observability (3 pages), Schemas, Graphs
   * **Gallery →** index + examples
 * CI `Docs` job completes; fails if schemas drift or if docs drift from committed state (if you choose to commit artifacts).
-

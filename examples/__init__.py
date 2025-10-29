@@ -1,4 +1,4 @@
-"""Gallery examples package
+"""Gallery examples package.
 ========================
 
 Expose common utilities used by the gallery doctests.

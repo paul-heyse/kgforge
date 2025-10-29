@@ -291,7 +291,7 @@ def ensure_bin(name: str) -> None:
     if not shutil.which(name):
         print(f"[graphs] Missing required executable on PATH: {name}", file=sys.stderr)
         print(
-            "[graphs] Run 'uv sync --frozen --extra docs' (or './scripts/bootstrap.sh') to install it.",
+            "[graphs] Run 'uv sync --frozen' (or './scripts/bootstrap.sh') to install it.",
             file=sys.stderr,
         )
         sys.exit(2)
@@ -1297,7 +1297,7 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
 
 
 def _final_output_paths(pkg: str, fmt: str) -> tuple[Path, Path]:
-    """Final output paths.
+    """Return final output paths.
 
     Parameters
     ----------

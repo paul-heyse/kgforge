@@ -9,6 +9,8 @@ the application code from depending on the workaround.
 
 from __future__ import annotations
 
+from typing import Any, cast
+
 try:
     # pydoclint depends on ``docstring_parser.common.DocstringYields`` which
     # is not available in every release of docstring-parser or its forks.
@@ -68,19 +70,21 @@ else:
                 )
 
         DocstringYields.__module__ = _doc_common.DocstringReturns.__module__
-        _doc_common.DocstringYields = DocstringYields
+        _doc_common_typing = cast(Any, _doc_common)
+        _doc_common_typing.DocstringYields = DocstringYields
 
     if _doc_common is not None and hasattr(_doc_common, "Docstring"):
         _doc_cls = _doc_common.Docstring
 
+        DocstringType = Any  # runtime only typing used for annotations
+
         if not hasattr(_doc_cls, "attrs"):
 
-            @property
-            def attrs(self) -> list[object]:
+            def _docstring_attrs(self: DocstringType) -> list[object]:
                 """Return documented attributes if parsing supports them."""
                 return [meta for meta in self.meta if getattr(meta, "args", None) == ["attr"]]
 
-            _doc_cls.attrs = attrs  # type: ignore[attr-defined]
+            _doc_cls.attrs = property(_docstring_attrs)  # type: ignore[attr-defined]
 
         _yield_cls = getattr(_doc_common, "DocstringYields", None)
         if _yield_cls is None and hasattr(_doc_common, "DocstringReturns"):
@@ -88,40 +92,37 @@ else:
 
         if _yield_cls is not None and not hasattr(_doc_cls, "yields"):
 
-            @property
-            def yields(self) -> object | None:
+            def _docstring_yields(self: DocstringType) -> object | None:
                 """Return the first yields section if available."""
+                if _yield_cls is None:  # pragma: no cover - defensive guard
+                    return None
                 for meta in self.meta:
                     if isinstance(meta, _yield_cls):
                         return meta
                 return None
 
-            _doc_cls.yields = yields  # type: ignore[attr-defined]
+            _doc_cls.yields = property(_docstring_yields)  # type: ignore[attr-defined]
 
         if _yield_cls is not None and not hasattr(_doc_cls, "many_yields"):
 
-            @property
-            def many_yields(self) -> list[object]:
+            def _docstring_many_yields(self: DocstringType) -> list[object]:
                 """Return all yields sections."""
-                return [
-                    meta for meta in self.meta if isinstance(meta, _yield_cls)
-                ]
+                if _yield_cls is None:  # pragma: no cover - defensive guard
+                    return []
+                return [meta for meta in self.meta if isinstance(meta, _yield_cls)]
 
-            _doc_cls.many_yields = many_yields  # type: ignore[attr-defined]
+            _doc_cls.many_yields = property(_docstring_many_yields)  # type: ignore[attr-defined]
 
         if not hasattr(_doc_cls, "size"):
 
-            @property
-            def size(self) -> int:
+            def _docstring_size(self: DocstringType) -> int:
                 """Estimate docstring size for style heuristics."""
                 parts: list[str] = []
                 if self.short_description:
                     parts.append(self.short_description)
                 if self.long_description:
                     parts.append(self.long_description)
-                parts.extend(
-                    getattr(meta, "description", "") or "" for meta in self.meta
-                )
+                parts.extend(getattr(meta, "description", "") or "" for meta in self.meta)
                 return sum(len(part) for part in parts)
 
-            _doc_cls.size = size  # type: ignore[attr-defined]
+            _doc_cls.size = property(_docstring_size)  # type: ignore[attr-defined]

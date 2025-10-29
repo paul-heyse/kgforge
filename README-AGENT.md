@@ -5,7 +5,7 @@
 ## 0) Install
 ```bash
 pip install -U pip
-pip install -e ".[docs]"   # adds Sphinx stack + docstring tools
+pip install -e "."   # adds Sphinx stack + docstring tools
 ```
 
 ## 1) Drop these files into the repo root (keeping directories)

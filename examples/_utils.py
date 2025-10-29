@@ -1,4 +1,4 @@
-"""Utility helpers used by Sphinx gallery examples
+"""Utility helpers used by Sphinx gallery examples.
 ===============================================
 
 Explain the utility helpers used by Sphinx gallery examples.

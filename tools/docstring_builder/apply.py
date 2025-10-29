@@ -3,20 +3,19 @@
 from __future__ import annotations
 
 import ast
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Iterable, Mapping
+from typing import cast
 
 import libcst as cst
-
-from .harvest import HarvestResult
-from .schema import DocstringEdit
+from tools.docstring_builder.harvest import HarvestResult
+from tools.docstring_builder.schema import DocstringEdit
 
 
 def _escape_docstring(text: str) -> str:
-    escaped = text.replace("\r\n", "\n").rstrip("\n") + "\n"
-    escaped = escaped.replace('"""', '\\"""')
-    return escaped
+    normalized = text.replace("\r\n", "\n").rstrip("\n")
+    escaped = normalized.replace('"""', '\\"""')
+    return f"{escaped}\n"
 
 
 @dataclass(slots=True)
@@ -41,58 +40,63 @@ class _DocstringTransformer(cst.CSTTransformer):
         desired = _escape_docstring(edit.text)
         literal = cst.SimpleString(f'"""{desired}"""')
         expr = cst.Expr(value=literal)
-        docstring_stmt = cst.SimpleStatementLine(body=[expr])
+        docstring_stmt: cst.BaseStatement = cst.SimpleStatementLine(body=[expr])
         body = node.body
-        statements = list(body.body)
+        statements = cast(tuple[cst.BaseStatement, ...], body.body)
+        updated_body: tuple[cst.BaseStatement, ...]
         if statements and isinstance(statements[0], cst.SimpleStatementLine):
             first = statements[0]
-            if first.body and isinstance(first.body[0], cst.Expr) and isinstance(
-                first.body[0].value, cst.SimpleString
+            if (
+                first.body
+                and isinstance(first.body[0], cst.Expr)
+                and isinstance(first.body[0].value, cst.SimpleString)
             ):
                 current_value = ast.literal_eval(first.body[0].value.value)
                 if current_value == desired:
                     return node
-                statements[0] = docstring_stmt
+                updated_body = (docstring_stmt, *statements[1:])
             else:
-                statements.insert(0, docstring_stmt)
+                updated_body = (docstring_stmt, *statements)
         else:
-            statements.insert(0, docstring_stmt)
+            updated_body = (docstring_stmt, *statements)
+        if updated_body == statements:
+            return node
         self.changed = True
-        return node.with_changes(body=body.with_changes(body=tuple(statements)))
+        return node.with_changes(body=body.with_changes(body=updated_body))
 
-    def visit_ClassDef(self, node: cst.ClassDef) -> bool:  # noqa: D401
-        qname = self._qualify(node.name.value)
+    def visit_ClassDef(self, node: cst.ClassDef) -> bool:  # noqa: N802 - LibCST API contract
         self.namespace.append(node.name.value)
         return True
 
-    def leave_ClassDef(
+    def leave_ClassDef(  # noqa: N802 - LibCST API contract
         self, original_node: cst.ClassDef, updated_node: cst.ClassDef
-    ) -> cst.CSTNode:  # noqa: D401
+    ) -> cst.BaseStatement:
         qname = self._qualify(original_node.name.value)
         updated = self._inject_docstring(updated_node, qname)
         self.namespace.pop()
         return updated
 
-    def visit_FunctionDef(self, node: cst.FunctionDef) -> bool:  # noqa: D401
+    def visit_FunctionDef(self, node: cst.FunctionDef) -> bool:  # noqa: N802 - LibCST API contract
         self.namespace.append(node.name.value)
         return True
 
-    def leave_FunctionDef(
+    def leave_FunctionDef(  # noqa: N802 - LibCST API contract
         self, original_node: cst.FunctionDef, updated_node: cst.FunctionDef
-    ) -> cst.CSTNode:  # noqa: D401
+    ) -> cst.BaseStatement:
         qname = self._qualify(original_node.name.value)
         updated = self._inject_docstring(updated_node, qname)
         self.namespace.pop()
         return updated
 
 
-def apply_edits(result: HarvestResult, edits: Iterable[DocstringEdit], write: bool = True) -> tuple[bool, str | None]:
+def apply_edits(
+    result: HarvestResult, edits: Iterable[DocstringEdit], write: bool = True
+) -> tuple[bool, str | None]:
     """Apply docstring edits to the harvested file.
 
     Returns a tuple of ``(changed, code)`` where ``code`` contains the rendered text when ``write`` is
     ``False`` for dry-run mode.
     """
-
     mapping = {edit.qname: edit for edit in edits}
     if not mapping:
         return False, None

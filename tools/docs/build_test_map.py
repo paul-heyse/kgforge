@@ -632,7 +632,7 @@ def _normalize_repo_rel(path_like: str) -> str:
 
 
 def _executed_lines(info: Mapping[str, object]) -> set[int]:
-    """Executed lines.
+    """Return executed line numbers.
 
     Parameters
     ----------

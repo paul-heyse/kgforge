@@ -2,6 +2,6 @@
 
 from __future__ import annotations
 
-from .cli import main
+from tools.docstring_builder.cli import main
 
 __all__ = ["main"]

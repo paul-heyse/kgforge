@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, asdict
+from collections.abc import Iterable
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Iterable
 
-from .semantics import SemanticResult
+from tools.docstring_builder.semantics import SemanticResult
 
 
 @dataclass(slots=True)
@@ -25,7 +25,6 @@ class DocFact:
 
 def build_docfacts(entries: Iterable[SemanticResult]) -> list[DocFact]:
     """Convert semantic results to DocFacts dataclasses."""
-
     payload: list[DocFact] = []
     for entry in entries:
         schema = entry.schema
@@ -68,7 +67,6 @@ def build_docfacts(entries: Iterable[SemanticResult]) -> list[DocFact]:
 
 def write_docfacts(path: Path, facts: Iterable[DocFact]) -> None:
     """Persist DocFacts to the provided path as JSON."""
-
     data = [asdict(fact) for fact in facts]
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
