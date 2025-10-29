@@ -23,8 +23,9 @@ Module docstrings should start with an imperative summary and may include `Notes
 
 ## Templates
 
-Docstring generation uses templates in `tools/doq_templates/numpy/`. When writing
-manual docstrings, mirror the structure below:
+Docstring generation now runs through `python -m tools.docstring_builder update`.
+The builder emits NumPy-style sections automatically, but when writing manual
+docstrings you should mirror the structure below so re-runs remain idempotent:
 
 ```python
 """Summarise the function in the imperative mood.

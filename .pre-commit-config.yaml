@@ -47,6 +47,11 @@ repos:
         entry: python tools/navmap/check_navmap.py
         language: system
         pass_filenames: false
+      - id: docstring-builder
+        name: docstring-builder (check)
+        entry: python -m tools.docstring_builder.cli check
+        language: system
+        always_run: true
       - id: navmap-build
         name: navmap-build
         entry: python tools/navmap/build_navmap.py
