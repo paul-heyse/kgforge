@@ -59,7 +59,6 @@ def toks(text: str) -> list[str]:
     Parameters
     ----------
     text : str
-    text : str
         Description for ``text``.
     
     Returns
@@ -74,6 +73,7 @@ def toks(text: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -112,12 +112,11 @@ class BM25Index:
         Parameters
         ----------
         k1 : float | None
-        k1 : float | None, optional, default=0.9
-            Description for ``k1``.
+            Optional parameter default ``0.9``. Description for ``k1``.
         b : float | None
-        b : float | None, optional, default=0.4
-            Description for ``b``.
+            Optional parameter default ``0.4``. Description for ``b``.
         """
+        
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -134,7 +133,6 @@ class BM25Index:
         Parameters
         ----------
         db_path : str
-        db_path : str
             Description for ``db_path``.
         
         Returns
@@ -149,6 +147,7 @@ class BM25Index:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         index = cls()
         con = duckdb.connect(db_path)
         try:
@@ -234,18 +233,18 @@ class BM25Index:
         """Compute save.
 
         Carry out the save operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         path : str
-        path : str
             Description for ``path``.
-
+        
         Examples
         --------
         >>> from search_api.bm25_index import save
         >>> save(...)  # doctest: +ELLIPSIS
         """
+        
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as handle:
             pickle.dump(
@@ -269,7 +268,6 @@ class BM25Index:
         Parameters
         ----------
         path : str
-        path : str
             Description for ``path``.
         
         Returns
@@ -284,6 +282,7 @@ class BM25Index:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         with open(path, "rb") as handle:
             payload = pickle.load(handle)
         index = cls(payload.get("k1", 0.9), payload.get("b", 0.4))
@@ -321,11 +320,9 @@ class BM25Index:
         Parameters
         ----------
         query : str
-        query : str
             Description for ``query``.
         k : int | None
-        k : int | None, optional, default=10
-            Description for ``k``.
+            Optional parameter default ``10``. Description for ``k``.
         
         Returns
         -------
@@ -339,6 +336,7 @@ class BM25Index:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         if self.N == 0:
             return []
         terms = toks(query)
@@ -364,7 +362,6 @@ class BM25Index:
         Parameters
         ----------
         index : int
-        index : int
             Description for ``index``.
         
         Returns
@@ -379,4 +376,5 @@ class BM25Index:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         return self.docs[index]

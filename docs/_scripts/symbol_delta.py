@@ -151,8 +151,7 @@ def main(argv: list[str] | None = None) -> int:
     Parameters
     ----------
     argv : List[str] | None
-    argv : List[str] | None, optional, default=None
-        Description for ``argv``.
+        Optional parameter default ``None``. Description for ``argv``.
     
     Returns
     -------
@@ -171,6 +170,7 @@ def main(argv: list[str] | None = None) -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     global DELTA_PATH
 
     parser = argparse.ArgumentParser(description=__doc__)

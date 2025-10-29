@@ -123,12 +123,9 @@ def gh_url(rel_path: str, start: int, end: int | None) -> str:
     Parameters
     ----------
     rel_path : str
-    rel_path : str
         Description for ``rel_path``.
     start : int
-    start : int
         Description for ``start``.
-    end : int | None
     end : int | None
         Description for ``end``.
     
@@ -144,6 +141,7 @@ def gh_url(rel_path: str, start: int, end: int | None) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     fragment = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel_path}{fragment}"
 
@@ -179,7 +177,6 @@ def summarize(node: Any) -> str:
     Parameters
     ----------
     node : typing.Any
-    node : typing.Any
         Description for ``node``.
     
     Returns
@@ -194,6 +191,7 @@ def summarize(node: Any) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     doc = getattr(node, "docstring", None)
     if not doc or not getattr(doc, "value", None):
         return ""
@@ -218,7 +216,6 @@ def is_public(node: Any) -> bool:
     Parameters
     ----------
     node : typing.Any
-    node : typing.Any
         Description for ``node``.
     
     Returns
@@ -233,6 +230,7 @@ def is_public(node: Any) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return not getattr(node, "name", "").startswith("_")
 
 
@@ -244,9 +242,7 @@ def get_open_link(node: Any, readme_dir: Path) -> str | None:
     Parameters
     ----------
     node : typing.Any
-    node : typing.Any
         Description for ``node``.
-    readme_dir : Path
     readme_dir : Path
         Description for ``readme_dir``.
     
@@ -262,6 +258,7 @@ def get_open_link(node: Any, readme_dir: Path) -> str | None:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -283,7 +280,6 @@ def get_view_link(node: Any) -> str | None:
     Parameters
     ----------
     node : typing.Any
-    node : typing.Any
         Description for ``node``.
     
     Returns
@@ -298,6 +294,7 @@ def get_view_link(node: Any) -> str | None:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -320,7 +317,6 @@ def iter_public_members(node: Any) -> Iterable[Any]:
     Parameters
     ----------
     node : typing.Any
-    node : typing.Any
         Description for ``node``.
     
     Returns
@@ -335,6 +331,7 @@ def iter_public_members(node: Any) -> Iterable[Any]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     members = getattr(node, "members", {})
     public = [m for m in members.values() if is_public(m)]
 
@@ -573,7 +570,6 @@ def badges_for(qname: str) -> Badges:
     Parameters
     ----------
     qname : str
-    qname : str
         Description for ``qname``.
     
     Returns
@@ -588,6 +584,7 @@ def badges_for(qname: str) -> Badges:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     symbol_meta, defaults = _lookup_nav(qname)
     merged = {**defaults, **symbol_meta}
     tests: list[dict[str, Any]] = []
@@ -652,11 +649,9 @@ def format_badges(qname: str, base_length: int = 0) -> str:
     Parameters
     ----------
     qname : str
-    qname : str
         Description for ``qname``.
     base_length : int | None
-    base_length : int | None, optional, default=0
-        Description for ``base_length``.
+        Optional parameter default ``0``. Description for ``base_length``.
     
     Returns
     -------
@@ -670,6 +665,7 @@ def format_badges(qname: str, base_length: int = 0) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     badge = badges_for(qname)
     parts: list[str] = []
     if badge.stability:
@@ -716,12 +712,9 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
     Parameters
     ----------
     abs_path : Path
-    abs_path : Path
         Description for ``abs_path``.
     lineno : int
-    lineno : int
         Description for ``lineno``.
-    editor_mode : str
     editor_mode : str
         Description for ``editor_mode``.
     
@@ -737,6 +730,7 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     if editor_mode == "vscode":
         return f"vscode://file/{abs_path}:{lineno}:1"
     if editor_mode == "relative":
@@ -794,7 +788,6 @@ def bucket_for(node: Any) -> str:
     Parameters
     ----------
     node : typing.Any
-    node : typing.Any
         Description for ``node``.
     
     Returns
@@ -809,6 +802,7 @@ def bucket_for(node: Any) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     kind = getattr(getattr(node, "kind", None), "value", "")
     if kind in {"module", "package"}:
         return "Modules"
@@ -827,12 +821,9 @@ def render_line(node: Any, readme_dir: Path, cfg: Config) -> str | None:
     Parameters
     ----------
     node : typing.Any
-    node : typing.Any
         Description for ``node``.
     readme_dir : Path
-    readme_dir : Path
         Description for ``readme_dir``.
-    cfg : Config
     cfg : Config
         Description for ``cfg``.
     
@@ -848,6 +839,7 @@ def render_line(node: Any, readme_dir: Path, cfg: Config) -> str | None:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     qname = getattr(node, "path", "")
     summary = summarize(node)
 
@@ -890,9 +882,7 @@ def write_if_changed(path: Path, content: str) -> bool:
     Parameters
     ----------
     path : Path
-    path : Path
         Description for ``path``.
-    content : str
     content : str
         Description for ``content``.
     
@@ -908,6 +898,7 @@ def write_if_changed(path: Path, content: str) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     digest = hashlib.sha256(content.encode("utf-8")).hexdigest()[:12]
     rendered = content.rstrip() + f"\n<!-- agent:readme v1 sha:{SHA} content:{digest} -->\n"
     previous = path.read_text(encoding="utf-8") if path.exists() else ""
@@ -926,9 +917,7 @@ def write_readme(node: Any, cfg: Config) -> bool:
     Parameters
     ----------
     node : typing.Any
-    node : typing.Any
         Description for ``node``.
-    cfg : Config
     cfg : Config
         Description for ``cfg``.
     
@@ -944,6 +933,7 @@ def write_readme(node: Any, cfg: Config) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"
 

@@ -57,9 +57,9 @@ class AllDictTemplate:
         Parameters
         ----------
         template : typing.Any
-        template : typing.Any
             Description for ``template``.
         """
+        
         self.template = template
 
 
@@ -426,11 +426,9 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
     Parameters
     ----------
     root : Path | None
-    root : Path | None, optional, default=SRC
-        Description for ``root``.
+        Optional parameter default ``SRC``. Description for ``root``.
     json_path : Path | None
-    json_path : Path | None, optional, default=None
-        Description for ``json_path``.
+        Optional parameter default ``None``. Description for ``json_path``.
     
     Returns
     -------
@@ -444,6 +442,7 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, An
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     files = _discover_py_files()
     data: dict[str, Any] = {
         "commit": _git_sha(),

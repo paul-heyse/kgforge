@@ -192,14 +192,11 @@ def sh(
     Parameters
     ----------
     cmd : List[str]
-    cmd : List[str]
         Description for ``cmd``.
     cwd : Path | None
-    cwd : Path | None, optional, default=None
-        Description for ``cwd``.
+        Optional parameter default ``None``. Description for ``cwd``.
     check : bool | None
-    check : bool | None, optional, default=True
-        Description for ``check``.
+        Optional parameter default ``True``. Description for ``check``.
     
     Returns
     -------
@@ -213,6 +210,7 @@ def sh(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return subprocess.run(
         cmd, check=check, cwd=str(cwd) if cwd else None, text=True, capture_output=False
     )
@@ -222,18 +220,18 @@ def ensure_bin(name: str) -> None:
     """Compute ensure bin.
 
     Carry out the ensure bin operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     name : str
-    name : str
         Description for ``name``.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import ensure_bin
     >>> ensure_bin(...)  # doctest: +ELLIPSIS
     """
+    
     if not shutil.which(name):
         print(f"[graphs] Missing required executable on PATH: {name}", file=sys.stderr)
         print(
@@ -289,30 +287,26 @@ def build_pydeps_for_package(
     """Compute build pydeps for package.
 
     Carry out the build pydeps for package operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     pkg : str
-    pkg : str
         Description for ``pkg``.
-    out_svg : Path
     out_svg : Path
         Description for ``out_svg``.
     excludes : List[str]
-    excludes : List[str]
         Description for ``excludes``.
-    max_bacon : int
     max_bacon : int
         Description for ``max_bacon``.
     fmt : str
-    fmt : str
         Description for ``fmt``.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import build_pydeps_for_package
     >>> build_pydeps_for_package(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
+    
     dot_tmp = out_svg.with_suffix(".dot")
     dot_tmp.parent.mkdir(parents=True, exist_ok=True)
     dot_target = dot_tmp if dot_tmp.is_absolute() else dot_tmp.resolve()
@@ -349,24 +343,22 @@ def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
     """Compute build pyreverse for package.
 
     Carry out the build pyreverse for package operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     pkg : str
-    pkg : str
         Description for ``pkg``.
-    out_dir : Path
     out_dir : Path
         Description for ``out_dir``.
     fmt : str
-    fmt : str
         Description for ``fmt``.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import build_pyreverse_for_package
     >>> build_pyreverse_for_package(..., ..., ...)  # doctest: +ELLIPSIS
     """
+    
     # classes_<project>.dot is named by -p <project>; use the package name to get unique names.
     out_dir.mkdir(parents=True, exist_ok=True)
     sh(
@@ -419,24 +411,22 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
     """Compute build global pydeps.
 
     Carry out the build global pydeps operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     dot_out : Path
-    dot_out : Path
         Description for ``dot_out``.
-    excludes : List[str]
     excludes : List[str]
         Description for ``excludes``.
     max_bacon : int
-    max_bacon : int
         Description for ``max_bacon``.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import build_global_pydeps
     >>> build_global_pydeps(..., ..., ...)  # doctest: +ELLIPSIS
     """
+    
     dot_out.parent.mkdir(parents=True, exist_ok=True)
     dot_target = dot_out if dot_out.is_absolute() else dot_out.resolve()
 
@@ -483,7 +473,6 @@ def collapse_to_packages(dot_path: Path) -> Any:
     Parameters
     ----------
     dot_path : Path
-    dot_path : Path
         Description for ``dot_path``.
     
     Returns
@@ -503,6 +492,7 @@ def collapse_to_packages(dot_path: Path) -> Any:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     if nx is None or pydot is None:
         raise RuntimeError("networkx and pydot are required to collapse graphs")
 
@@ -563,9 +553,7 @@ def analyze_graph(g: Any, layers: dict[str, Any]) -> dict[str, Any]:
     Parameters
     ----------
     g : typing.Any
-    g : typing.Any
         Description for ``g``.
-    layers : collections.abc.Mapping
     layers : collections.abc.Mapping
         Description for ``layers``.
     
@@ -586,6 +574,7 @@ def analyze_graph(g: Any, layers: dict[str, Any]) -> dict[str, Any]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     if nx is None:
         raise RuntimeError("networkx is required for graph analysis")
 
@@ -671,35 +660,31 @@ def style_and_render(
     """Compute style and render.
 
     Carry out the style and render operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     g : typing.Any
-    g : typing.Any
         Description for ``g``.
-    layers : collections.abc.Mapping
     layers : collections.abc.Mapping
         Description for ``layers``.
     analysis : collections.abc.Mapping
-    analysis : collections.abc.Mapping
         Description for ``analysis``.
-    out_svg : Path
     out_svg : Path
         Description for ``out_svg``.
     fmt : str | None
-    fmt : str | None, optional, default='svg'
-        Description for ``fmt``.
-
+        Optional parameter default ``'svg'``. Description for ``fmt``.
+    
     Raises
     ------
     RuntimeError
         Raised when validation fails.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import style_and_render
     >>> style_and_render(..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
+    
     if pydot is None:
         raise RuntimeError("pydot is required for rendering graphs")
 
@@ -749,21 +734,20 @@ def write_meta(meta: dict[str, Any], out_json: Path) -> None:
     """Compute write meta.
 
     Carry out the write meta operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     meta : collections.abc.Mapping
-    meta : collections.abc.Mapping
         Description for ``meta``.
     out_json : Path
-    out_json : Path
         Description for ``out_json``.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import write_meta
     >>> write_meta(..., ...)  # doctest: +ELLIPSIS
     """
+    
     out_json.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
 
@@ -773,27 +757,24 @@ def enforce_policy(
     """Compute enforce policy.
 
     Carry out the enforce policy operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     analysis : collections.abc.Mapping
-    analysis : collections.abc.Mapping
         Description for ``analysis``.
-    allow : collections.abc.Mapping
     allow : collections.abc.Mapping
         Description for ``allow``.
     fail_cycles : bool
-    fail_cycles : bool
         Description for ``fail_cycles``.
     fail_layers : bool
-    fail_layers : bool
         Description for ``fail_layers``.
-
+    
     Examples
     --------
     >>> from tools.docs.build_graphs import enforce_policy
     >>> enforce_policy(..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
+    
     allowed_cycles = set(tuple(c) for c in (allow.get("cycles") or []))
     allowed_edges = set(tuple(e) for e in (allow.get("edges") or []))
     new_cycles = [c for c in analysis["cycles"] if tuple(c) not in allowed_cycles]
@@ -877,12 +858,9 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
     Parameters
     ----------
     cache_dir : Path
-    cache_dir : Path
         Description for ``cache_dir``.
     pkg : str
-    pkg : str
         Description for ``pkg``.
-    tree_hash : str
     tree_hash : str
         Description for ``tree_hash``.
     
@@ -898,6 +876,7 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return cache_dir / pkg / tree_hash
 
 
@@ -917,24 +896,17 @@ def build_one_package(
     Parameters
     ----------
     pkg : str
-    pkg : str
         Description for ``pkg``.
-    fmt : str
     fmt : str
         Description for ``fmt``.
     excludes : List[str]
-    excludes : List[str]
         Description for ``excludes``.
-    max_bacon : int
     max_bacon : int
         Description for ``max_bacon``.
     cache_dir : Path
-    cache_dir : Path
         Description for ``cache_dir``.
     use_cache : bool
-    use_cache : bool
         Description for ``use_cache``.
-    verbose : bool
     verbose : bool
         Description for ``verbose``.
     
@@ -950,6 +922,7 @@ def build_one_package(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     used_cache = False
     pydeps_ok = True
     pyrev_ok = True
