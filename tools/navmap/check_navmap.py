@@ -9,10 +9,13 @@ for implementation specifics.
 
 from __future__ import annotations
 
+import ast
 import re
 import sys
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
+from functools import singledispatch
+from typing import TypedDict
 
 from packaging.version import InvalidVersion, Version
 
@@ -28,23 +31,235 @@ IDENT_RE = re.compile(r"^[A-Za-z_]\w*$")
 STABILITY = {"stable", "beta", "experimental", "deprecated", "internal", "frozen"}
 
 
-class _AllDictTemplate:
-    """Sentinel for {name: TEMPLATE for name in __all__} structures."""
+class NavmapError(Exception):
+    """Base exception for navmap parsing issues."""
+
+
+class NavmapLiteralError(NavmapError):
+    """Raised when a navmap literal cannot be parsed safely."""
+
+
+class NavmapPlaceholderError(NavmapError):
+    """Raised when placeholder expansion fails."""
+
+
+class AllPlaceholder:
+    """Sentinel for ``__all__`` placeholders."""
 
     __slots__ = ("template",)
 
-    def __init__(self, template: Any) -> None:
-        """Compute init.
+    def __repr__(self) -> str:
+        return "AllPlaceholder()"
 
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
 
-        Parameters
-        ----------
-        template : typing.Any
-            Description for ``template``.
-        """
-        
+class AllDictTemplate:
+    """Sentinel for ``{name: TEMPLATE for name in __all__}`` structures."""
+
+    __slots__ = ("template",)
+
+    def __init__(self, template: NavTree) -> None:
         self.template = template
+
+
+NavPrimitive = str | int | float | bool | None
+type NavTree = (
+    NavPrimitive
+    | list[NavTree]
+    | dict[str, NavTree]
+    | set[NavTree]
+    | AllDictTemplate
+    | AllPlaceholder
+)
+type ResolvedNavValue = NavPrimitive | list["ResolvedNavValue"] | dict[str, "ResolvedNavValue"] | set[str]
+
+PLACEHOLDER_ALL = AllPlaceholder()
+
+
+class SymbolMetaDict(TypedDict, total=False):
+    """Metadata requirements for a single symbol."""
+
+    owner: str
+    stability: str
+    since: str
+    deprecated_in: str
+
+
+class ModuleEntryDict(TypedDict, total=False):
+    """Minimal navmap subset used by the checker."""
+
+    exports: list[str]
+    sections: list[dict[str, ResolvedNavValue]]
+    symbols: dict[str, SymbolMetaDict]
+
+
+@singledispatch
+def _eval_nav_literal(node: ast.AST) -> NavTree:
+    """Return the navmap literal represented by ``node``."""
+    message = f"Unsupported navmap literal node: {ast.dump(node)}"
+    raise NavmapLiteralError(message)
+
+
+@_eval_nav_literal.register
+def _(node: ast.Constant) -> NavTree:
+    value = node.value
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    message = f"Unsupported constant in navmap literal: {value!r}"
+    raise NavmapLiteralError(message)
+
+
+@_eval_nav_literal.register
+def _(node: ast.Name) -> NavTree:
+    if node.id == "__all__":
+        return PLACEHOLDER_ALL
+    message = f"Unsupported name in navmap literal: {node.id!r}"
+    raise NavmapLiteralError(message)
+
+
+def _eval_sequence(nodes: Sequence[ast.AST]) -> list[NavTree]:
+    """Return a list of evaluated navmap literals for ``nodes``."""
+    return [_literal_eval_navmap(child) for child in nodes]
+
+
+@_eval_nav_literal.register
+def _(node: ast.List) -> NavTree:
+    return _eval_sequence(node.elts)
+
+
+@_eval_nav_literal.register
+def _(node: ast.Tuple) -> NavTree:
+    return _eval_sequence(node.elts)
+
+
+@_eval_nav_literal.register
+def _(node: ast.Set) -> NavTree:
+    return {_literal_eval_navmap(elt) for elt in node.elts}
+
+
+def _eval_dict(node: ast.Dict) -> dict[str, NavTree]:
+    """Evaluate a dict literal, enforcing string keys."""
+    result: dict[str, NavTree] = {}
+    for key_node, value_node in zip(node.keys, node.values, strict=False):
+        key = _literal_eval_navmap(key_node)
+        if not isinstance(key, str):
+            message = "Navmap dictionary keys must be strings."
+            raise NavmapLiteralError(message)
+        result[key] = _literal_eval_navmap(value_node)
+    return result
+
+
+@_eval_nav_literal.register
+def _(node: ast.Dict) -> NavTree:
+    return _eval_dict(node)
+
+
+def _eval_dict_comprehension(node: ast.DictComp) -> AllDictTemplate:
+    """Evaluate supported dict comprehensions into ``AllDictTemplate`` placeholders."""
+    if len(node.generators) != 1:
+        message = "Navmap dict comprehension must contain exactly one generator."
+        raise NavmapLiteralError(message)
+    generator = node.generators[0]
+    if generator.ifs:
+        message = "Navmap dict comprehension may not include filters."
+        raise NavmapLiteralError(message)
+    if generator.is_async:
+        message = "Navmap dict comprehension may not be async."
+        raise NavmapLiteralError(message)
+    target = generator.target
+    iterator = generator.iter
+    if not isinstance(target, ast.Name):
+        message = "Navmap dict comprehension target must be a simple name."
+        raise NavmapLiteralError(message)
+    if not isinstance(iterator, ast.Name) or iterator.id != "__all__":
+        message = "Navmap dict comprehension iterator must be __all__."
+        raise NavmapLiteralError(message)
+    template = _literal_eval_navmap(node.value)
+    return AllDictTemplate(template)
+
+
+@_eval_nav_literal.register
+def _(node: ast.DictComp) -> NavTree:
+    return _eval_dict_comprehension(node)
+
+
+def _literal_eval_navmap(node: ast.AST | None) -> NavTree:
+    """Evaluate ``node`` into a navmap literal."""
+    if node is None:
+        message = "Navmap literal must not be empty."
+        raise NavmapLiteralError(message)
+    return _eval_nav_literal(node)
+
+
+def _dedupe_str_list(items: Sequence[str]) -> list[str]:
+    """Return ``items`` with original ordering and duplicates removed."""
+    return list(dict.fromkeys(items))
+
+
+def _expand_all_placeholder(exports: Sequence[str]) -> list[str]:
+    """Return concrete export lists for ``__all__`` placeholders."""
+    return _dedupe_str_list(exports)
+
+
+def _expand_dict_template(
+    template: NavTree, exports: Sequence[str]
+) -> dict[str, ResolvedNavValue]:
+    """Expand ``AllDictTemplate`` placeholders."""
+    expanded: dict[str, ResolvedNavValue] = {}
+    for name in exports:
+        expanded[name] = _expand_nav_value(template, exports)
+    return expanded
+
+
+def _expand_list(values: Sequence[NavTree], exports: Sequence[str]) -> list[ResolvedNavValue]:
+    """Expand navmap lists, flattening nested lists that arise from placeholders."""
+    expanded: list[ResolvedNavValue] = []
+    for entry in values:
+        resolved = _expand_nav_value(entry, exports)
+        if isinstance(resolved, list):
+            expanded.extend(resolved)
+        else:
+            expanded.append(resolved)
+    return expanded
+
+
+def _expand_dict(values: dict[str, NavTree], exports: Sequence[str]) -> dict[str, ResolvedNavValue]:
+    """Expand navmap dict values recursively."""
+    return {key: _expand_nav_value(sub_value, exports) for key, sub_value in values.items()}
+
+
+def _expand_set(values: set[NavTree], exports: Sequence[str]) -> set[str]:
+    """Expand navmap sets and ensure all members resolve to strings."""
+    resolved: set[str] = set()
+    for entry in values:
+        expanded = _expand_nav_value(entry, exports)
+        if isinstance(expanded, list):
+            for item in expanded:
+                if isinstance(item, str):
+                    resolved.add(item)
+                else:
+                    message = "Navmap sets may only contain strings after expansion."
+                    raise NavmapPlaceholderError(message)
+        elif isinstance(expanded, str):
+            resolved.add(expanded)
+        else:
+            message = "Navmap sets must resolve to strings."
+            raise NavmapPlaceholderError(message)
+    return resolved
+
+
+def _expand_nav_value(value: NavTree, exports: Sequence[str]) -> ResolvedNavValue:
+    """Expand navmap placeholders for ``value`` using ``exports``."""
+    if isinstance(value, AllPlaceholder):
+        return _expand_all_placeholder(exports)
+    if isinstance(value, AllDictTemplate):
+        return _expand_dict_template(value.template, exports)
+    if isinstance(value, list):
+        return _expand_list(value, exports)
+    if isinstance(value, dict):
+        return _expand_dict(value, exports)
+    if isinstance(value, set):
+        return _expand_set(value, exports)
+    return value
 
 
 def _read_text(py: Path) -> list[str]:
@@ -106,7 +321,7 @@ def _parse_navmap_dict(py: Path) -> dict[str, Any]:
             return expanded_set
         if isinstance(value, dict):
             return {k: _expand_placeholders(v, exports) for k, v in value.items()}
-        if isinstance(value, _AllDictTemplate):
+        if isinstance(value, AllDictTemplate):
             template = value.template
             template_results: dict[str, Any] = {}
             for name in exports:
@@ -163,7 +378,7 @@ def _parse_navmap_dict(py: Path) -> dict[str, Any]:
             if comp.iter.id != "__all__":
                 raise ValueError("unsupported dict comprehension iterator")
             template = _safe_eval(value.value)
-            return _AllDictTemplate(template)
+            return AllDictTemplate(template)
         raise ValueError(ast.dump(value))
 
     for node in tree.body:
@@ -290,16 +505,17 @@ def _validate_pep440(field_val: Any) -> str | None:
         return "packaging not installed (cannot validate PEP 440)"
     try:
         Version(str(field_val))
-        return None
     except InvalidVersion:
         return f"non-PEP440 version: {field_val!r}"
+    else:
+        return None
 
 
 def _inspect(py: Path) -> list[str]:
     """Validate a module at ``py`` and return collected violation messages."""
     errs: list[str] = []
     nav = _parse_navmap_dict(py)
-    sections_inline, anchors_inline = _scan_inline(py)
+    _, anchors_inline = _scan_inline(py)
     exports = _exports_for(py, nav)
 
     # If module exports anything, __navmap__ must exist
@@ -362,17 +578,17 @@ def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     argv : List[str] | None
         Optional parameter default ``None``. Description for ``argv``.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.check_navmap import main
@@ -380,7 +596,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     errors: list[str] = []
     for py in sorted(SRC.rglob("*.py")):
         errors.extend(_inspect(py))

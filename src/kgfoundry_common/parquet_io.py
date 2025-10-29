@@ -67,17 +67,17 @@ class ParquetVectorWriter:
         """Compute dense schema.
 
         Carry out the dense schema operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         dim : int
             Description for ``dim``.
-        
+
         Returns
         -------
         pa.schema
             Description of return value.
-        
+
         Examples
         --------
         >>> from kgfoundry_common.parquet_io import dense_schema
@@ -85,7 +85,6 @@ class ParquetVectorWriter:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -108,7 +107,6 @@ class ParquetVectorWriter:
         root : str
             Description for ``root``.
         """
-        
         self.root = Path(root)
 
     def write_dense(
@@ -122,7 +120,7 @@ class ParquetVectorWriter:
         """Compute write dense.
 
         Carry out the write dense operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         model : str
@@ -135,12 +133,12 @@ class ParquetVectorWriter:
             Description for ``records``.
         shard : int | None
             Optional parameter default ``0``. Description for ``shard``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
+
         Examples
         --------
         >>> from kgfoundry_common.parquet_io import write_dense
@@ -148,7 +146,6 @@ class ParquetVectorWriter:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -179,12 +176,12 @@ class ParquetVectorWriter:
         """Compute splade schema.
 
         Carry out the splade schema operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Returns
         -------
         pa.schema
             Description of return value.
-        
+
         Examples
         --------
         >>> from kgfoundry_common.parquet_io import splade_schema
@@ -214,7 +211,7 @@ class ParquetVectorWriter:
         """Compute write splade.
 
         Carry out the write splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         model : str
@@ -225,12 +222,12 @@ class ParquetVectorWriter:
             Description for ``records``.
         shard : int | None
             Optional parameter default ``0``. Description for ``shard``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
+
         Examples
         --------
         >>> from kgfoundry_common.parquet_io import write_splade
@@ -238,7 +235,6 @@ class ParquetVectorWriter:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -279,12 +275,12 @@ class ParquetChunkWriter:
         """Compute chunk schema.
 
         Carry out the chunk schema operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Returns
         -------
         pa.schema
             Description of return value.
-        
+
         Examples
         --------
         >>> from kgfoundry_common.parquet_io import chunk_schema
@@ -330,7 +326,6 @@ class ParquetChunkWriter:
         run_id : str | None
             Optional parameter default ``'dev'``. Description for ``run_id``.
         """
-        
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
@@ -338,17 +333,17 @@ class ParquetChunkWriter:
         """Compute write.
 
         Carry out the write operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         rows : collections.abc.Iterable
             Description for ``rows``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
+
         Examples
         --------
         >>> from kgfoundry_common.parquet_io import write
@@ -356,7 +351,6 @@ class ParquetChunkWriter:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(
             table,

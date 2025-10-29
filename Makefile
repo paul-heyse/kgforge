@@ -65,7 +65,7 @@ readmes:
 	-which doctoc >/dev/null 2>&1 && doctoc src/$(PKG) || echo "Install doctoc to auto-update TOCs."
 
 html:
-	$(PY) -m sphinx -b html docs docs/_build/html
+	$(PY) -m sphinx -b html -w sphinx-warn.log docs docs/_build/html
 
 json:
 	rm -rf docs/_build/json

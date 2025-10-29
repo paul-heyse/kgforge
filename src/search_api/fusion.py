@@ -44,19 +44,19 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, f
     """Compute rrf fuse.
 
     Carry out the rrf fuse operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     rankers : List[List[Tuple[str, float]]]
         Description for ``rankers``.
     k : int | None
         Optional parameter default ``60``. Description for ``k``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.fusion import rrf_fuse
@@ -64,7 +64,6 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, f
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     agg: dict[str, float] = {}
     for ranked in rankers:
         for r, (key, _score) in enumerate(ranked, start=1):

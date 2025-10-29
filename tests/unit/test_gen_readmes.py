@@ -173,7 +173,7 @@ def _package_tree(src: Path) -> SimpleNamespace:
             "make_widget": func,
         },
     )
-    pkg = _node(
+    return _node(
         path="pkg",
         kind="package",
         rel_path="pkg/__init__.py",
@@ -181,7 +181,6 @@ def _package_tree(src: Path) -> SimpleNamespace:
         is_package=True,
         members={"module": module},
     )
-    return pkg
 
 
 def test_write_readme_is_deterministic(

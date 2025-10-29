@@ -53,17 +53,17 @@ def tokenize(text: str) -> list[str]:
     """Compute tokenize.
 
     Carry out the tokenize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     text : str
         Description for ``text``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.fixture_index import tokenize
@@ -71,7 +71,6 @@ def tokenize(text: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -113,7 +112,6 @@ class FixtureIndex:
         db_path : str | None
             Optional parameter default ``'/data/catalog/catalog.duckdb'``. Description for ``db_path``.
         """
-        
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []
@@ -186,19 +184,19 @@ class FixtureIndex:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         query : str
             Description for ``query``.
         k : int | None
             Optional parameter default ``10``. Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[int, float]]
             Description of return value.
-        
+
         Examples
         --------
         >>> from search_api.fixture_index import search
@@ -206,7 +204,6 @@ class FixtureIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         if getattr(self, "N", 0) == 0:
             return []
         qtoks = tokenize(query)
@@ -228,17 +225,17 @@ class FixtureIndex:
         """Compute doc.
 
         Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         index : int
             Description for ``index``.
-        
+
         Returns
         -------
         src.search_api.fixture_index.FixtureDoc
             Description of return value.
-        
+
         Examples
         --------
         >>> from search_api.fixture_index import doc
@@ -246,5 +243,4 @@ class FixtureIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         return self.docs[index]

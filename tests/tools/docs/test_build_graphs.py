@@ -107,52 +107,29 @@ def test_dirty_worktree_invalidates_cache(tmp_path: Path, monkeypatch: pytest.Mo
     monkeypatch.setattr(build_graphs, "build_pydeps_for_package", fake_pydeps)
     monkeypatch.setattr(build_graphs, "build_pyreverse_for_package", fake_pyreverse)
 
-    first = build_graphs.build_one_package(
-        "sample_pkg",
-        "svg",
-        [],
-        4,
-        cache_dir,
+    config = build_graphs.PackageBuildConfig(
+        fmt="svg",
+        excludes=(),
+        max_bacon=4,
+        cache_dir=cache_dir,
         use_cache=True,
         verbose=False,
     )
+
+    first = build_graphs.build_one_package("sample_pkg", config)
     assert first == ("sample_pkg", False, True, True)
     assert counters == {"pydeps": 1, "pyrev": 1}
 
-    second = build_graphs.build_one_package(
-        "sample_pkg",
-        "svg",
-        [],
-        4,
-        cache_dir,
-        use_cache=True,
-        verbose=False,
-    )
+    second = build_graphs.build_one_package("sample_pkg", config)
     assert second == ("sample_pkg", True, True, True)
     assert counters == {"pydeps": 1, "pyrev": 1}
 
     package_file.write_text("CONST = 2\n", encoding="utf-8")
 
-    third = build_graphs.build_one_package(
-        "sample_pkg",
-        "svg",
-        [],
-        4,
-        cache_dir,
-        use_cache=True,
-        verbose=False,
-    )
+    third = build_graphs.build_one_package("sample_pkg", config)
     assert third == ("sample_pkg", False, True, True)
     assert counters == {"pydeps": 2, "pyrev": 2}
 
-    fourth = build_graphs.build_one_package(
-        "sample_pkg",
-        "svg",
-        [],
-        4,
-        cache_dir,
-        use_cache=True,
-        verbose=False,
-    )
+    fourth = build_graphs.build_one_package("sample_pkg", config)
     assert fourth == ("sample_pkg", True, True, True)
     assert counters == {"pydeps": 2, "pyrev": 2}

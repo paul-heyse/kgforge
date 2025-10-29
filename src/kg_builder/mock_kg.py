@@ -60,40 +60,38 @@ class MockKG:
         """Compute add mention.
 
         Carry out the add mention operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         chunk_id : str
             Description for ``chunk_id``.
         concept_id : str
             Description for ``concept_id``.
-        
+
         Examples
         --------
         >>> from kg_builder.mock_kg import add_mention
         >>> add_mention(..., ...)  # doctest: +ELLIPSIS
         """
-        
         self.chunk2concepts.setdefault(chunk_id, set()).add(concept_id)
 
     def add_edge(self, a: str, b: str) -> None:
         """Compute add edge.
 
         Carry out the add edge operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         a : str
             Description for ``a``.
         b : str
             Description for ``b``.
-        
+
         Examples
         --------
         >>> from kg_builder.mock_kg import add_edge
         >>> add_edge(..., ...)  # doctest: +ELLIPSIS
         """
-        
         self.neighbors.setdefault(a, set()).add(b)
         self.neighbors.setdefault(b, set()).add(a)
 
@@ -101,17 +99,17 @@ class MockKG:
         """Compute linked concepts.
 
         Carry out the linked concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         chunk_id : str
             Description for ``chunk_id``.
-        
+
         Returns
         -------
         List[str]
             Description of return value.
-        
+
         Examples
         --------
         >>> from kg_builder.mock_kg import linked_concepts
@@ -119,24 +117,23 @@ class MockKG:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         return sorted(self.chunk2concepts.get(chunk_id, set()))
 
     def one_hop(self, concept_id: str) -> list[str]:
         """Compute one hop.
 
         Carry out the one hop operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         concept_id : str
             Description for ``concept_id``.
-        
+
         Returns
         -------
         List[str]
             Description of return value.
-        
+
         Examples
         --------
         >>> from kg_builder.mock_kg import one_hop
@@ -144,5 +141,4 @@ class MockKG:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         return sorted(self.neighbors.get(concept_id, set()))

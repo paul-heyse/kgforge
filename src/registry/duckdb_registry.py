@@ -64,7 +64,6 @@ class DuckDBRegistry:
         db_path : str
             Description for ``db_path``.
         """
-        
         self.db_path = db_path
         self.con = duckdb.connect(db_path, read_only=False)
         self.con.execute("PRAGMA threads=14")
@@ -73,19 +72,19 @@ class DuckDBRegistry:
         """Compute begin dataset.
 
         Carry out the begin dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         kind : str
             Description for ``kind``.
         run_id : str
             Description for ``run_id``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
+
         Examples
         --------
         >>> from registry.duckdb_registry import begin_dataset
@@ -93,7 +92,6 @@ class DuckDBRegistry:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         dataset_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -109,7 +107,7 @@ class DuckDBRegistry:
         """Compute commit dataset.
 
         Carry out the commit dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         dataset_id : str
@@ -118,13 +116,12 @@ class DuckDBRegistry:
             Description for ``parquet_root``.
         rows : int
             Description for ``rows``.
-        
+
         Examples
         --------
         >>> from registry.duckdb_registry import commit_dataset
         >>> commit_dataset(..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
         self.con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
         )
@@ -133,18 +130,17 @@ class DuckDBRegistry:
         """Compute rollback dataset.
 
         Carry out the rollback dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         dataset_id : str
             Description for ``dataset_id``.
-        
+
         Examples
         --------
         >>> from registry.duckdb_registry import rollback_dataset
         >>> rollback_dataset(...)  # doctest: +ELLIPSIS
         """
-        
         self.con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
 
     def insert_run(
@@ -157,7 +153,7 @@ class DuckDBRegistry:
         """Compute insert run.
 
         Carry out the insert run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         purpose : str
@@ -168,12 +164,12 @@ class DuckDBRegistry:
             Description for ``revision``.
         config : collections.abc.Mapping
             Description for ``config``.
-        
+
         Returns
         -------
         str
             Description of return value.
-        
+
         Examples
         --------
         >>> from registry.duckdb_registry import insert_run
@@ -181,7 +177,6 @@ class DuckDBRegistry:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         run_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -197,7 +192,7 @@ class DuckDBRegistry:
         """Compute close run.
 
         Carry out the close run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         run_id : str
@@ -206,13 +201,12 @@ class DuckDBRegistry:
             Description for ``success``.
         notes : str | None
             Optional parameter default ``None``. Description for ``notes``.
-        
+
         Examples
         --------
         >>> from registry.duckdb_registry import close_run
         >>> close_run(..., ...)  # doctest: +ELLIPSIS
         """
-        
         _ = success  # placeholder until success flag/notes are persisted
         _ = notes
         self.con.execute("UPDATE runs SET finished_at=now() WHERE run_id=?", [run_id])
@@ -221,18 +215,17 @@ class DuckDBRegistry:
         """Compute register documents.
 
         Carry out the register documents operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         docs : List[src.kgfoundry_common.models.Doc]
             Description for ``docs``.
-        
+
         Examples
         --------
         >>> from registry.duckdb_registry import register_documents
         >>> register_documents(...)  # doctest: +ELLIPSIS
         """
-        
         for doc in docs:
             self.con.execute(
                 (
@@ -262,18 +255,17 @@ class DuckDBRegistry:
         """Compute register doctags.
 
         Carry out the register doctags operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         assets : List[src.kgfoundry_common.models.DoctagsAsset]
             Description for ``assets``.
-        
+
         Examples
         --------
         >>> from registry.duckdb_registry import register_doctags
         >>> register_doctags(...)  # doctest: +ELLIPSIS
         """
-        
         for asset in assets:
             self.con.execute(
                 (
@@ -295,7 +287,7 @@ class DuckDBRegistry:
         """Compute emit event.
 
         Carry out the emit event operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         event_name : str
@@ -304,13 +296,12 @@ class DuckDBRegistry:
             Description for ``subject_id``.
         payload : collections.abc.Mapping
             Description for ``payload``.
-        
+
         Examples
         --------
         >>> from registry.duckdb_registry import emit_event
         >>> emit_event(..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
         self.con.execute(
             (
                 "INSERT INTO pipeline_events("
@@ -324,7 +315,7 @@ class DuckDBRegistry:
         """Compute incident.
 
         Carry out the incident operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         event : str
@@ -335,13 +326,12 @@ class DuckDBRegistry:
             Description for ``error_class``.
         message : str
             Description for ``message``.
-        
+
         Examples
         --------
         >>> from registry.duckdb_registry import incident
         >>> incident(..., ..., ..., ...)  # doctest: +ELLIPSIS
         """
-        
         self.con.execute(
             (
                 "INSERT INTO incidents("

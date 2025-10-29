@@ -1,5 +1,6 @@
-"""Search - tiny corpus smoke (no GPU)
-===================================
+"""Search - tiny corpus smoke (no GPU).
+
+======================================
 
 Exercise the tiny-corpus search smoke flow.
 

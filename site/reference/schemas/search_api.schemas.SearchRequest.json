@@ -1,0 +1,49 @@
+{
+  "$id": "https://kgfoundry/schemas/search_api.schemas.SearchRequest.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Model the SearchRequest.\n\nPydantic model defining the structured payload used across the system. Validation ensures inputs\nconform to the declared schema while producing clear error messages. Use this class when\nserialising or parsing data for the surrounding feature.",
+  "examples": [
+    {
+      "explain": false,
+      "filters": {},
+      "k": 10,
+      "query": null
+    }
+  ],
+  "properties": {
+    "explain": {
+      "default": false,
+      "title": "Explain",
+      "type": "boolean"
+    },
+    "filters": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Filters"
+    },
+    "k": {
+      "default": 10,
+      "title": "K",
+      "type": "integer"
+    },
+    "query": {
+      "minLength": 1,
+      "title": "Query",
+      "type": "string"
+    }
+  },
+  "required": [
+    "query"
+  ],
+  "title": "SearchRequest",
+  "type": "object",
+  "x-version-introduced": "0.2.0"
+}

@@ -19,17 +19,17 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
     """Compute iter module nodes.
 
     Carry out the iter module nodes operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     Tuple[ast.Module, ast.Expr | None]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.strip_navmap_sections import iter_module_nodes
@@ -37,7 +37,6 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if not tree.body:
@@ -56,17 +55,17 @@ def clean_docstring(text: str) -> str:
     """Compute clean docstring.
 
     Carry out the clean docstring operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     text : str
         Description for ``text``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.strip_navmap_sections import clean_docstring
@@ -74,7 +73,6 @@ def clean_docstring(text: str) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     lines: list[str] = []
     for raw in text.splitlines():
         if raw.strip().startswith("NavMap:"):
@@ -88,17 +86,17 @@ def rewrite_module(path: Path) -> bool:
     """Compute rewrite module.
 
     Carry out the rewrite module operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.strip_navmap_sections import rewrite_module
@@ -106,7 +104,6 @@ def rewrite_module(path: Path) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     tree, doc_expr = iter_module_nodes(path)
     if doc_expr is None:
         return False

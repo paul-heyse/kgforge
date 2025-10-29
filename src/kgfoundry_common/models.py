@@ -7,13 +7,14 @@ implementation specifics.
 
 from __future__ import annotations
 
-from typing import Final, Literal, TypeAlias
+from typing import Final, Literal
 
-from pydantic import BaseModel
+from pydantic import Field
 
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.pydantic import BaseModel
 
-__all__ = ["Id", "Chunk", "Doc", "DoctagsAsset", "LinkAssertion"]
+__all__ = ["Chunk", "Doc", "DoctagsAsset", "Id", "LinkAssertion"]
 
 __navmap__: Final[NavMap] = {
     "title": "kgfoundry_common.models",
@@ -61,7 +62,7 @@ __navmap__: Final[NavMap] = {
 }
 
 # [nav:anchor Id]
-Id: TypeAlias = str
+type Id = str
 
 
 # [nav:anchor Doc]
@@ -79,7 +80,7 @@ class Doc(BaseModel):
     arxiv_id: str | None = None
     pmcid: str | None = None
     title: str = ""
-    authors: list[str] = []
+    authors: list[str] = Field(default_factory=list)
     pub_date: str | None = None
     license: str | None = None
     language: str | None = "en"
@@ -138,5 +139,5 @@ class LinkAssertion(BaseModel):
     score: float
     decision: Literal["link", "reject", "uncertain"]
     evidence_span: str | None = None
-    features: dict[str, float] = {}
+    features: dict[str, float] = Field(default_factory=dict)
     run_id: str

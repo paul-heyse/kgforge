@@ -13,7 +13,6 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 DOCS_BUILD = ROOT / "docs" / "_build"
@@ -39,8 +38,11 @@ TRACKED_KEYS = {
     "is_property",
 }
 
+JSONRow = dict[str, object]
+JSONMap = dict[str, JSONRow]
 
-def _read_json(path: Path) -> Any:
+
+def _read_json(path: Path) -> object:
     """Load JSON data from ``path``."""
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -53,7 +55,7 @@ def _git_rev_parse(ref: str) -> str | None:
         return None
 
 
-def _load_base_snapshot(arg: str) -> tuple[list[dict[str, Any]], str | None]:
+def _load_base_snapshot(arg: str) -> tuple[list[JSONRow], str | None]:
     """Return the base snapshot rows and resolved SHA from ``arg``."""
     candidate = Path(arg)
     if candidate.exists():
@@ -80,12 +82,16 @@ def _load_base_snapshot(arg: str) -> tuple[list[dict[str, Any]], str | None]:
     if not isinstance(data, list):
         message = f"Git ref '{arg}' does not contain a JSON array for symbols.json"
         raise SystemExit(message)
-    return data, _git_rev_parse(arg)
+    validated: list[JSONRow] = []
+    for item in data:
+        if isinstance(item, dict):
+            validated.append(item)
+    return validated, _git_rev_parse(arg)
 
 
-def _index_rows(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+def _index_rows(rows: list[JSONRow]) -> JSONMap:
     """Index rows by their ``path`` field."""
-    indexed: dict[str, dict[str, Any]] = {}
+    indexed: JSONMap = {}
     for row in rows:
         path = row.get("path")
         if isinstance(path, str):
@@ -94,8 +100,8 @@ def _index_rows(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
 
 
 def _diff_rows(
-    base: dict[str, dict[str, Any]], head: dict[str, dict[str, Any]]
-) -> tuple[list[str], list[str], list[dict[str, Any]]]:
+    base: JSONMap, head: JSONMap
+) -> tuple[list[str], list[str], list[JSONRow]]:
     """Return (added, removed, changed) deltas between ``base`` and ``head`` maps."""
     base_paths = set(base)
     head_paths = set(head)
@@ -103,13 +109,13 @@ def _diff_rows(
     added = sorted(head_paths - base_paths)
     removed = sorted(base_paths - head_paths)
 
-    changed: list[dict[str, Any]] = []
+    changed: list[JSONRow] = []
     for path in sorted(base_paths & head_paths):
         before = base[path]
         after = head[path]
         reasons: list[str] = []
-        before_subset: dict[str, Any] = {}
-        after_subset: dict[str, Any] = {}
+        before_subset: JSONRow = {}
+        after_subset: JSONRow = {}
         for key in sorted(TRACKED_KEYS):
             before_val = before.get(key)
             after_val = after.get(key)
@@ -130,7 +136,7 @@ def _diff_rows(
     return added, removed, changed
 
 
-def _write_delta(delta: dict[str, Any]) -> None:
+def _write_delta(delta: JSONRow) -> None:
     """Write the delta file if it changed."""
     serialized = json.dumps(delta, indent=2, ensure_ascii=False) + "\n"
     if DELTA_PATH.exists():
@@ -147,22 +153,22 @@ def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     argv : List[str] | None
         Optional parameter default ``None``. Description for ``argv``.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Raises
     ------
     SystemExit
         Raised when validation fails.
-    
+
     Examples
     --------
     >>> from docs._scripts.symbol_delta import main
@@ -170,7 +176,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     global DELTA_PATH
 
     parser = argparse.ArgumentParser(description=__doc__)
@@ -197,10 +202,13 @@ def main(argv: list[str] | None = None) -> int:
         message = f"{SYMBOLS_PATH} is not a JSON array"
         raise SystemExit(message)
 
+    head_validated: list[JSONRow] = [row for row in head_rows if isinstance(row, dict)]
     base_rows, base_sha = _load_base_snapshot(args.base)
     head_sha = _git_rev_parse("HEAD")
 
-    added, removed, changed = _diff_rows(_index_rows(base_rows), _index_rows(head_rows))
+    added, removed, changed = _diff_rows(
+        _index_rows(base_rows), _index_rows(head_validated)
+    )
 
     delta = {
         "base_sha": base_sha,

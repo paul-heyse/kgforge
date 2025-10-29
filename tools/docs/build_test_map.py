@@ -15,7 +15,7 @@ import re
 import sys
 from collections import defaultdict
 from pathlib import Path
-from typing import Any
+from typing import Any, Final
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
@@ -27,6 +27,8 @@ OUTFILE_MAP = OUTDIR / "test_map.json"
 OUTFILE_COV = OUTDIR / "test_map_coverage.json"
 OUTFILE_SUM = OUTDIR / "test_map_summary.json"
 OUTFILE_LINT = OUTDIR / "test_map_lint.json"
+
+MAX_CONTEXT_WINDOWS: Final[int] = 5
 
 
 class NavMapLoadError(RuntimeError):
@@ -76,12 +78,12 @@ def load_symbol_candidates() -> set[str]:
     """Compute load symbol candidates.
 
     Carry out the load symbol candidates operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     collections.abc.Set
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import load_symbol_candidates
@@ -178,12 +180,12 @@ def load_symbol_spans() -> dict[str, dict[str, Any]]:
     """Compute load symbol spans.
 
     Carry out the load symbol spans operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import load_symbol_spans
@@ -214,17 +216,17 @@ def load_public_symbols() -> set[str]:
     """Compute load public symbols.
 
     Carry out the load public symbols operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     collections.abc.Set
         Description of return value.
-    
+
     Raises
     ------
     NavMapLoadError
         Raised when validation fails.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import load_public_symbols
@@ -303,19 +305,19 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     """Compute scan test file.
 
     Carry out the scan test file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
         Description for ``path``.
     symbols : collections.abc.Set
         Description for ``symbols``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import scan_test_file
@@ -323,7 +325,6 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -356,8 +357,8 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
             for lineno, raw in enumerate(text.splitlines(), start=1):
                 if symbol in raw or (tail and tail in raw):
                     line_hits.append(lineno)
-                if len(line_hits) >= 5:
-                    break
+            if len(line_hits) >= MAX_CONTEXT_WINDOWS:
+                break
             windows = [{"start": max(1, n - WINDOW), "end": n + WINDOW} for n in line_hits]
             matches.setdefault(symbol, []).append(
                 {
@@ -415,12 +416,12 @@ def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]
     """Compute load coverage.
 
     Carry out the load coverage operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     Tuple[dict[str, collections.abc.Set], dict[Tuple[str, int], collections.abc.Set]]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import load_coverage
@@ -457,17 +458,17 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     """Compute build test map.
 
     Carry out the build test map operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     symbols : collections.abc.Set
         Description for ``symbols``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import build_test_map
@@ -475,7 +476,6 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     table: dict[str, list[dict[str, object]]] = defaultdict(list)
     if not TESTS.exists():
         return {}
@@ -496,7 +496,7 @@ def attach_coverage(
     """Compute attach coverage.
 
     Carry out the attach coverage operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     symbol_spans : collections.abc.Mapping
@@ -505,12 +505,12 @@ def attach_coverage(
         Description for ``executed``.
     ctx_by_line : collections.abc.Mapping
         Description for ``ctx_by_line``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import attach_coverage
@@ -518,7 +518,6 @@ def attach_coverage(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     result: dict[str, dict[str, Any]] = {}
     for sym, meta in symbol_spans.items():
         f = meta.get("file")
@@ -528,8 +527,7 @@ def attach_coverage(
         hits: list[int] = []
         if rel and rel in executed:
             span = set(range(ln, en + 1))
-            hits = sorted(list(executed[rel].intersection(span)))
-        # contexts (optional)
+            hits = sorted(executed[rel].intersection(span))
         contexts: set[str] = set()
         if hits and rel:
             for h in hits[:50]:  # limit
@@ -543,7 +541,7 @@ def attach_coverage(
             "hit_lines": hits[:100],  # trim
             "file": rel,
             "span": [ln, en],
-            "contexts": sorted(list(contexts))[:100],
+            "contexts": sorted(contexts)[:100],
         }
     return result
 
@@ -557,7 +555,7 @@ def summarize(
     """Compute summarize.
 
     Carry out the summarize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     public_syms : collections.abc.Set
@@ -568,12 +566,12 @@ def summarize(
         Description for ``coverage``.
     budget : int
         Description for ``budget``.
-    
+
     Returns
     -------
     Tuple[dict[str, typing.Any], List[dict[str, typing.Any]]]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_test_map import summarize
@@ -581,7 +579,6 @@ def summarize(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     # group by module
     by_mod: dict[str, list[str]] = defaultdict(list)
     for s in public_syms:

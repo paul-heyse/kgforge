@@ -12,9 +12,24 @@ import argparse
 import ast
 import inspect
 from collections import OrderedDict
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Final, cast
+
+MIN_DOC_BODY_LINES: Final[int] = 2
+LEGACY_MIN_ARGS: Final[int] = 3
+LEGACY_NODE_NAME_INDEX: Final[int] = 3
+LEGACY_INCLUDE_EXAMPLES_INDEX: Final[int] = 4
+
+_DOCSTRING_BOILERPLATE_TOKENS: Final[tuple[str, ...]] = (
+    "Provide utilities for module.",
+    "This module exposes the primary interfaces for the package.",
+    "See Also\n--------\n",
+    "Attributes\n----------\nNone",
+    "Method description.",
+    "Provide usage considerations, constraints, or complexity notes.",
+)
 
 
 def _paragraph(*sentences: str) -> str:
@@ -1085,16 +1100,26 @@ class DocstringChange:
     path: Path
 
 
+@dataclass
+class DocstringUpdatePlan:
+    """Describe a pending docstring replacement for ``process_file``."""
+
+    kind: str
+    node: ast.AST
+    expr: ast.Expr | None
+    new_lines: list[str]
+
+
 def parse_args() -> argparse.Namespace:
     """Compute parse args.
 
     Carry out the parse args operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     argparse.Namespace
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.auto_docstrings import parse_args
@@ -1112,17 +1137,17 @@ def module_name_for(path: Path) -> str:
     """Compute module name for.
 
     Carry out the module name for operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.auto_docstrings import module_name_for
@@ -1130,7 +1155,6 @@ def module_name_for(path: Path) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     try:
         relative = path.relative_to(REPO_ROOT)
     except ValueError:
@@ -1152,19 +1176,19 @@ def summarize(name: str, kind: str) -> str:
     """Compute summarize.
 
     Carry out the summarize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     name : str
         Description for ``name``.
     kind : str
         Description for ``kind``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.auto_docstrings import summarize
@@ -1172,7 +1196,6 @@ def summarize(name: str, kind: str) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     base = _humanize_identifier(name) or "value"
     if kind == "module":
         text = f"Overview of {base}."
@@ -1186,92 +1209,87 @@ def summarize(name: str, kind: str) -> str:
 
 
 def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | None = None) -> str:
-    """Compute extended summary.
+    """Return the extended description block for a docstring."""
+    handler = _EXTENDED_SUMMARY_HANDLERS.get(kind, _default_extended_summary)
+    return handler(name=name, module_name=module_name, node=node)
 
-    Carry out the extended summary operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
-    Parameters
-    ----------
-    kind : str
-        Description for ``kind``.
-    name : str
-        Description for ``name``.
-    module_name : str
-        Description for ``module_name``.
-    node : ast.AST | None
-        Optional parameter default ``None``. Description for ``node``.
-    
-    Returns
-    -------
-    str
-        Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.auto_docstrings import extended_summary
-    >>> result = extended_summary(..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    """
-    
+
+def _module_extended_summary(name: str, module_name: str, node: ast.AST | None) -> str:
+    """Build the module-specific extended summary paragraph."""
+    _ = node  # Module nodes are ignored but kept for signature consistency.
+    module_segment = module_name.split(".")[-1] if module_name else name
+    module_pretty = _humanize_identifier(module_segment)
+    if module_pretty:
+        return _paragraph(
+            f"This module bundles {module_pretty.lower()} logic for the kgfoundry stack.",
+            "It groups related helpers so downstream packages can import a single cohesive namespace.",
+            "Refer to the functions and classes below for implementation specifics.",
+        )
+    return _paragraph(
+        "Utility module providing KGFoundry helpers.",
+        "It exists to keep documentation coverage consistent for internal support code.",
+        "Consumers should rely on the documented public functions rather than touching private members.",
+    )
+
+
+def _class_extended_summary(name: str, module_name: str, node: ast.AST | None) -> str:
+    """Build the class-specific extended summary paragraph."""
+    _ = module_name  # The import path is not needed for class summaries.
+    if not isinstance(node, ast.ClassDef):
+        return _default_extended_summary(name=name, module_name=module_name, node=node)
+    if _is_pydantic_model(node):
+        return _paragraph(
+            "Pydantic model defining the structured payload used across the system.",
+            "Validation ensures inputs conform to the declared schema while producing clear error messages.",
+            "Use this class when serialising or parsing data for the surrounding feature.",
+        )
     pretty = _humanize_identifier(name)
-    if kind == "module":
-        module_pretty = _humanize_identifier(module_name.split(".")[-1] if module_name else name)
-        if module_pretty:
-            return _paragraph(
-                f"This module bundles {module_pretty.lower()} logic for the kgfoundry stack.",
-                "It groups related helpers so downstream packages can import a single cohesive namespace.",
-                "Refer to the functions and classes below for implementation specifics.",
-            )
+    if pretty:
         return _paragraph(
-            "Utility module providing KGFoundry helpers.",
-            "It exists to keep documentation coverage consistent for internal support code.",
-            "Consumers should rely on the documented public functions rather than touching private members.",
+            f"Represent the {pretty.lower()} data structure used throughout the project.",
+            "The class encapsulates behaviour behind a well-defined interface for collaborating components.",
+            "Instances are typically created by factories or runtime orchestrators documented nearby.",
         )
-    if kind == "class" and isinstance(node, ast.ClassDef):
-        if _is_pydantic_model(node):
-            return _paragraph(
-                "Pydantic model defining the structured payload used across the system.",
-                "Validation ensures inputs conform to the declared schema while producing clear error messages.",
-                "Use this class when serialising or parsing data for the surrounding feature.",
-            )
-        if pretty:
-            return _paragraph(
-                f"Represent the {pretty.lower()} data structure used throughout the project.",
-                "The class encapsulates behaviour behind a well-defined interface for collaborating components.",
-                "Instances are typically created by factories or runtime orchestrators documented nearby.",
-            )
-        return _paragraph(
-            "Core data structure used within kgfoundry.",
-            "It organises related behaviour and provides lifecycle management for the feature domain.",
-            "Review the attribute descriptions below for usage guidance.",
-        )
+    return _paragraph(
+        "Core data structure used within kgfoundry.",
+        "It organises related behaviour and provides lifecycle management for the feature domain.",
+        "Review the attribute descriptions below for usage guidance.",
+    )
+
+
+def _function_extended_summary(name: str, module_name: str, node: ast.AST | None) -> str:
+    """Build the function-specific extended summary paragraph."""
+    _ = (module_name, node)  # Function summaries rely only on the identifier.
     if _is_pydantic_artifact(name):
         return PYDANTIC_ARTIFACT_SUMMARIES.get(name, DEFAULT_PYDANTIC_ARTIFACT_SUMMARY)
-    if kind == "function" and name == "__init__":
+    if name == "__init__":
         return _paragraph(
             "Initialise a new instance with validated parameters.",
             "The constructor prepares internal state and coordinates any setup required by the class.",
             "Subclasses should call ``super().__init__`` to keep validation and defaults intact.",
         )
-    if kind == "function" and name in MAGIC_METHOD_EXTENDED_SUMMARIES:
-        return MAGIC_METHOD_EXTENDED_SUMMARIES[name]
-    if kind == "function" and name in _STANDARD_METHOD_EXTENDED_SUMMARIES:
-        return _STANDARD_METHOD_EXTENDED_SUMMARIES[name]
-    if kind == "function" and _is_magic(name):
+    combined_summaries = MAGIC_METHOD_EXTENDED_SUMMARIES | _STANDARD_METHOD_EXTENDED_SUMMARIES
+    if name in combined_summaries:
+        return combined_summaries[name]
+    if _is_magic(name):
         return DEFAULT_MAGIC_METHOD_FALLBACK
-    if kind == "function":
-        if pretty:
-            return _paragraph(
-                f"Carry out the {pretty.lower()} operation for the surrounding component.",
-                "Generated documentation highlights how this helper collaborates with neighbouring utilities.",
-                "Callers rely on the routine to remain stable across releases.",
-            )
+    pretty = _humanize_identifier(name)
+    if pretty:
         return _paragraph(
-            "Perform the requested operation.",
-            "The helper abstracts lower-level details so feature code can stay concise.",
-            "Consult inline parameter documentation for usage guidance.",
+            f"Carry out the {pretty.lower()} operation for the surrounding component.",
+            "Generated documentation highlights how this helper collaborates with neighbouring utilities.",
+            "Callers rely on the routine to remain stable across releases.",
         )
+    return _paragraph(
+        "Perform the requested operation.",
+        "The helper abstracts lower-level details so feature code can stay concise.",
+        "Consult inline parameter documentation for usage guidance.",
+    )
+
+
+def _default_extended_summary(name: str, module_name: str, node: ast.AST | None) -> str:
+    """Return the fallback extended summary used for unsupported kinds."""
+    _ = (name, module_name, node)  # The fallback text is static.
     return _paragraph(
         "Auto-generated reference for project internals.",
         "Documentation generation surfaces private helpers to maintain discoverability.",
@@ -1279,21 +1297,28 @@ def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | Non
     )
 
 
+_EXTENDED_SUMMARY_HANDLERS: dict[str, Callable[[str, str, ast.AST | None], str]] = {
+    "module": _module_extended_summary,
+    "class": _class_extended_summary,
+    "function": _function_extended_summary,
+}
+
+
 def annotation_to_text(node: ast.AST | None) -> str:
     """Compute annotation to text.
 
     Carry out the annotation to text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : ast.AST | None
         Description for ``node``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.auto_docstrings import annotation_to_text
@@ -1301,7 +1326,6 @@ def annotation_to_text(node: ast.AST | None) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     if node is None:
         return "Any"
     try:
@@ -1315,17 +1339,17 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     """Compute iter docstring nodes.
 
     Carry out the iter docstring nodes operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     tree : ast.Module
         Description for ``tree``.
-    
+
     Returns
     -------
     List[Tuple[int, ast.AST, str]]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.auto_docstrings import iter_docstring_nodes
@@ -1333,7 +1357,6 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     items: list[tuple[int, ast.AST, str]] = [(0, tree, "module")]
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
@@ -1360,21 +1383,84 @@ class ParameterInfo:
     default_text: str | None = None
 
 
+@dataclass(frozen=True)
+class DocstringContext:
+    """Bundle docstring metadata for downstream helpers."""
+
+    kind: str
+    parameters: list[ParameterInfo]
+    returns: str | None
+    raises: list[str]
+    node_name: str | None
+    include_examples: bool
+
+
+def _parameter_from_arg(arg: ast.arg, default: ast.AST | None) -> ParameterInfo | None:
+    """Return metadata describing ``arg`` or ``None`` for implicit parameters."""
+    name = arg.arg
+    if name in {"self", "cls"}:
+        return None
+    has_default = default is not None
+    annotation_text = annotation_to_text(arg.annotation)
+    annotation = _annotation_with_default(annotation_text, has_default)
+    default_text = _default_text_for(default) if has_default else None
+    return ParameterInfo(
+        name=name,
+        annotation=annotation,
+        required=not has_default,
+        has_default=has_default,
+        default_text=default_text,
+    )
+
+
+def _variadic_parameter(name: str, annotation: ast.AST | None) -> ParameterInfo:
+    """Return metadata describing ``*args`` or ``**kwargs`` style parameters."""
+    annotation_text = annotation_to_text(annotation)
+    return ParameterInfo(name=name, annotation=annotation_text or "Any", required=False)
+
+
+def _annotation_with_default(annotation: str, has_default: bool) -> str:
+    """Normalise ``annotation`` when ``has_default`` implies ``None`` is acceptable."""
+    text = annotation or "Any"
+    if not has_default:
+        return text
+    if text.endswith(" | None"):
+        text = text[: -len(" | None")]
+    base = text or "Any"
+    return f"{base} | None"
+
+
+def _default_text_for(default: ast.AST | None) -> str | None:
+    """Return a literal representation for ``default`` suitable for documentation."""
+    if default is None:
+        return None
+    evaluated_default: Any = _DEFAULT_SENTINEL
+    try:
+        evaluated_default = ast.literal_eval(default)
+    except (TypeError, ValueError):
+        evaluated_default = _DEFAULT_SENTINEL
+    except Exception:  # pragma: no cover - defensive
+        evaluated_default = _DEFAULT_SENTINEL
+    if evaluated_default is _DEFAULT_SENTINEL:
+        return _unparse_or_none(default)
+    return repr(evaluated_default)
+
+
 def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[ParameterInfo]:
     """Compute parameters for.
 
     Carry out the parameters for operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : ast.FunctionDef | ast.AsyncFunctionDef
         Description for ``node``.
-    
+
     Returns
     -------
     List[ParameterInfo]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.auto_docstrings import parameters_for
@@ -1382,92 +1468,49 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[Paramet
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
-    params: list[ParameterInfo] = []
     args = node.args
-
-    def add(arg: ast.arg, default: ast.AST | None) -> None:
-        """Collect metadata for a single parameter."""
-        name = arg.arg
-        if name in {"self", "cls"}:
-            return
-        annotation_text = annotation_to_text(arg.annotation)
-        display_annotation = annotation_text
-        has_default = default is not None
-        if has_default and display_annotation.endswith(" | None"):
-            display_annotation = display_annotation[: -len(" | None")]
-        if has_default:
-            cleaned = display_annotation or "Any"
-            display_annotation = f"{cleaned} | None"
-        default_text: str | None = None
-        if default is not None:
-            evaluated_default: Any = _DEFAULT_SENTINEL
-            try:
-                evaluated_default = ast.literal_eval(default)
-            except (TypeError, ValueError):
-                evaluated_default = _DEFAULT_SENTINEL
-            except Exception:  # pragma: no cover - defensive
-                evaluated_default = _DEFAULT_SENTINEL
-            if evaluated_default is not _DEFAULT_SENTINEL:
-                default_text = repr(evaluated_default)
-            else:
-                default_text = _unparse_or_none(default)
-        params.append(
-            ParameterInfo(
-                name=name,
-                annotation=display_annotation or "Any",
-                required=not has_default,
-                has_default=has_default,
-                default_text=default_text,
-            )
-        )
+    parameters: list[ParameterInfo] = []
 
     positional = args.posonlyargs + args.args
     defaults = [None] * (len(positional) - len(args.defaults)) + list(args.defaults)
     for arg, default in zip(positional, defaults, strict=True):
-        add(arg, default)
+        parameter = _parameter_from_arg(arg, default)
+        if parameter is not None:
+            parameters.append(parameter)
 
     if args.vararg:
-        annotation_text = annotation_to_text(args.vararg.annotation)
-        params.append(
-            ParameterInfo(
-                name=f"*{args.vararg.arg}",
-                annotation=annotation_text or "Any",
-                required=False,
-            )
+        parameters.append(
+            _variadic_parameter(name=f"*{args.vararg.arg}", annotation=args.vararg.annotation)
         )
 
     for arg, default in zip(args.kwonlyargs, args.kw_defaults, strict=True):
-        add(arg, default)
+        parameter = _parameter_from_arg(arg, default)
+        if parameter is not None:
+            parameters.append(parameter)
 
     if args.kwarg:
-        annotation_text = annotation_to_text(args.kwarg.annotation)
-        params.append(
-            ParameterInfo(
-                name=f"**{args.kwarg.arg}",
-                annotation=annotation_text or "Any",
-                required=False,
-            )
+        parameters.append(
+            _variadic_parameter(name=f"**{args.kwarg.arg}", annotation=args.kwarg.annotation)
         )
 
-    return params
+    return parameters
 
 
 def detect_raises(node: ast.AST) -> list[str]:
     """Compute detect raises.
 
     Carry out the detect raises operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : ast.AST
         Description for ``node``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.auto_docstrings import detect_raises
@@ -1475,45 +1518,7 @@ def detect_raises(node: ast.AST) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     seen: OrderedDict[str, None] = OrderedDict()
-
-    def _exception_name(exc: ast.AST | None) -> str:
-        """Exception name.
-
-        Parameters
-        ----------
-        exc : ast.AST | None
-            Description.
-
-        Returns
-        -------
-        str
-            Description.
-
-        Raises
-        ------
-        Exception
-            Description.
-
-        Examples
-        --------
-        >>> _exception_name(...)
-        """
-        if exc is None:
-            return "Exception"
-        if isinstance(exc, ast.Call):
-            func = exc.func
-            if isinstance(func, ast.Name):
-                return func.id
-            if isinstance(func, ast.Attribute):
-                return ast.unparse(func)
-            return "Exception"  # pragma: no cover - defensive
-        if isinstance(exc, ast.Name):
-            return exc.id
-        if isinstance(exc, ast.Attribute):
-            return ast.unparse(exc)
-        return "Exception"
 
     class RaiseCollector(ast.NodeVisitor):
         """Collect ``raise`` statements while respecting scope boundaries."""
@@ -1526,78 +1531,15 @@ def detect_raises(node: ast.AST) -> list[str]:
         )
 
         def __init__(self, root: ast.AST) -> None:
-            """Init  .
-
-            Parameters
-            ----------
-            root : ast.AST
-                Description.
-
-            Returns
-            -------
-            None
-                Description.
-
-            Raises
-            ------
-            Exception
-                Description.
-
-            Examples
-            --------
-            >>> __init__(...)
-            """
             self._root = root
 
-        def visit(self, current: ast.AST) -> Any:
-            """Visit.
-
-            Parameters
-            ----------
-            current : ast.AST
-                Description.
-
-            Returns
-            -------
-            Any
-                Description.
-
-            Raises
-            ------
-            Exception
-                Description.
-
-            Examples
-            --------
-            >>> visit(...)
-            """
-            if current is not self._root and isinstance(current, self._NESTED_SCOPES):
-                return None
-            return super().visit(current)
+        def visit(self, current: ast.AST) -> None:  # type: ignore[override]
+            if _is_nested_scope(self._root, current, self._NESTED_SCOPES):
+                return
+            super().visit(current)
 
         def visit_Raise(self, raise_node: ast.Raise) -> None:
-            """Visit raise.
-
-            Parameters
-            ----------
-            raise_node : ast.Raise
-                Description.
-
-            Returns
-            -------
-            None
-                Description.
-
-            Raises
-            ------
-            Exception
-                Description.
-
-            Examples
-            --------
-            >>> visit_Raise(...)
-            """
-            name = _exception_name(raise_node.exc)
+            name = _exception_name_for_node(raise_node.exc)
             if name not in seen:
                 seen[name] = None
             self.generic_visit(raise_node)
@@ -1606,13 +1548,36 @@ def detect_raises(node: ast.AST) -> list[str]:
     return list(seen.keys())
 
 
+def _is_nested_scope(
+    root: ast.AST,
+    current: ast.AST,
+    disallowed: tuple[type[ast.AST], ...],
+) -> bool:
+    """Return ``True`` when ``current`` should not be traversed from ``root``."""
+    if current is root:
+        return False
+    return isinstance(current, disallowed)
+
+
+def _exception_name_for_node(exc: ast.AST | None) -> str:
+    """Return the exception name extracted from ``exc``."""
+    if exc is None:
+        return "Exception"
+    candidate: ast.AST = exc.func if isinstance(exc, ast.Call) else exc
+    if isinstance(candidate, ast.Name):
+        return candidate.id
+    if isinstance(candidate, ast.Attribute):
+        return ast.unparse(candidate)
+    return "Exception"
+
+
 def build_examples(
     module_name: str, name: str, parameters: list[ParameterInfo], has_return: bool
 ) -> list[str]:
     """Compute build examples.
 
     Carry out the build examples operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     module_name : str
@@ -1623,12 +1588,12 @@ def build_examples(
         Description for ``parameters``.
     has_return : bool
         Description for ``has_return``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.auto_docstrings import build_examples
@@ -1636,7 +1601,6 @@ def build_examples(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     lines: list[str] = ["Examples", "--------"]
     if module_name and not name.startswith("__"):
         lines.append(f">>> from {module_name} import {name}")
@@ -1657,148 +1621,224 @@ def build_examples(
     return lines
 
 
-def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
-    """Compute build docstring.
+def build_docstring(
+    kind: str,
+    node: ast.AST,
+    module_name: str,
+    context: DocstringContext | None = None,
+) -> list[str]:
+    """Return the generated docstring lines for ``node``."""
+    doc_context = context or build_docstring_context(kind, node)
+    summary, extended = _summary_components(kind, node, module_name)
 
-    Carry out the build docstring operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
-    Parameters
-    ----------
-    kind : str
-        Description for ``kind``.
-    node : ast.AST
-        Description for ``node``.
-    module_name : str
-        Description for ``module_name``.
-    
-    Returns
-    -------
-    List[str]
-        Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.auto_docstrings import build_docstring
-    >>> result = build_docstring(..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    """
-    
-    if kind == "module":
-        module_display = module_name.split(".")[-1] if module_name else "module"
-        summary = summarize(module_display, kind)
-        extended = extended_summary(kind, module_display, module_name, node)
-    else:
-        object_name = getattr(node, "name", "value")
-        summary = summarize(object_name, kind)
-        extended = extended_summary(kind, object_name, module_name, node)
+    lines: list[str] = ['"""', summary]
+    if extended:
+        lines.extend(["", extended])
 
+    if doc_context.kind == "module":
+        lines.append('"""')
+        return lines
+
+    if doc_context.kind == "class" and isinstance(node, ast.ClassDef):
+        lines.append('"""')
+        return lines
+
+    if doc_context.kind != "function" or not isinstance(
+        node, (ast.FunctionDef, ast.AsyncFunctionDef)
+    ):
+        lines.append('"""')
+        return lines
+
+    lines.extend(_function_sections(doc_context, module_name))
+    lines.append('"""')
+    return lines
+
+
+def build_docstring_context(kind: str, node: ast.AST) -> DocstringContext:
+    """Construct docstring metadata for ``node``."""
     parameters: list[ParameterInfo] = []
     returns: str | None = None
     raises: list[str] = []
+    include_examples = False
+    node_name = getattr(node, "name", None)
+
     if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         parameters = parameters_for(node)
         return_annotation = annotation_to_text(node.returns)
         if return_annotation not in {"None", "NoReturn"}:
             returns = return_annotation
         raises = detect_raises(node)
+        include_examples = bool(node_name) and not node_name.startswith("_")
 
-    lines: list[str] = ['"""', summary]
-    if extended:
-        lines.extend(["", extended])
+    return DocstringContext(
+        kind=kind,
+        parameters=parameters,
+        returns=returns,
+        raises=raises,
+        node_name=node_name,
+        include_examples=include_examples,
+    )
 
+
+def _summary_components(kind: str, node: ast.AST, module_name: str) -> tuple[str, str]:
+    """Return the summary and extended summary strings for ``node``."""
     if kind == "module":
-        lines.append('"""')
-        return lines
+        module_display = module_name.split(".")[-1] if module_name else "module"
+        summary = summarize(module_display, kind)
+        extended = extended_summary(kind, module_display, module_name, node)
+        return summary, extended
+    object_name = getattr(node, "name", "value")
+    summary = summarize(object_name, kind)
+    extended = extended_summary(kind, object_name, module_name, node)
+    return summary, extended
 
-    if kind == "class" and isinstance(node, ast.ClassDef):
-        lines.append('"""')
-        return lines
 
-    if parameters:
-        lines.extend(["", "Parameters", "----------"])
-        for parameter in parameters:
-            lines.append(f"{parameter.name} : {parameter.annotation}")
-            details: list[str] = []
-            if parameter.has_default:
-                details.append("Optional parameter")
-                literal = _format_default_literal(parameter.default_text)
-                details.append(f"default {literal}")
-            prefix = f"{' '.join(details)}. " if details else ""
-            lines.append(f"    {prefix}Description for ``{parameter.name}``.")
+def _function_sections(context: DocstringContext, module_name: str) -> list[str]:
+    """Return the docstring sections specific to function nodes."""
+    sections: list[str] = []
+    if context.parameters:
+        sections.extend(_parameters_section(context.parameters))
+    if context.returns:
+        sections.extend(_returns_section(context.returns))
+    if context.raises:
+        sections.extend(_raises_section(context.raises))
+    if context.include_examples and context.node_name:
+        sections.extend(
+            _examples_section(
+                module_name,
+                context.node_name,
+                context.parameters,
+                bool(context.returns),
+            )
+        )
+    return sections
 
-    if returns:
-        lines.extend(["", "Returns", "-------", returns, "    Description of return value."])
 
-    if raises:
-        lines.extend(["", "Raises", "------"])
-        for exc in raises:
-            lines.append(f"{exc}")
-            lines.append("    Raised when validation fails.")
-
-    if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-        name = getattr(node, "name", "")
-        is_public = bool(name) and not name.startswith("_")
-        if is_public:
-            example_lines = build_examples(module_name, name, parameters, bool(returns))
-            if example_lines:
-                lines.extend(["", *example_lines])
-
-    lines.append('"""')
+def _parameters_section(parameters: list[ParameterInfo]) -> list[str]:
+    """Return the formatted ``Parameters`` section."""
+    lines = ["", "Parameters", "----------"]
+    for parameter in parameters:
+        lines.append(f"{parameter.name} : {parameter.annotation}")
+        details: list[str] = []
+        if parameter.has_default:
+            details.append("Optional parameter")
+            literal = _format_default_literal(parameter.default_text)
+            details.append(f"default {literal}")
+        prefix = f"{' '.join(details)}. " if details else ""
+        lines.append(f"    {prefix}Description for ``{parameter.name}``.")
     return lines
 
 
-def _required_sections(
-    kind: str,
+def _returns_section(returns: str) -> list[str]:
+    """Return the formatted ``Returns`` section."""
+    return ["", "Returns", "-------", returns, "    Description of return value."]
+
+
+def _raises_section(exceptions: list[str]) -> list[str]:
+    """Return the formatted ``Raises`` section."""
+    lines = ["", "Raises", "------"]
+    for exc in exceptions:
+        lines.append(exc)
+        lines.append("    Raised when validation fails.")
+    return lines
+
+
+def _examples_section(
+    module_name: str,
+    name: str,
     parameters: list[ParameterInfo],
-    returns: str | None,
-    raises: list[str],
-    node_name: str | None,
-    include_examples: bool,
+    has_return: bool,
+) -> list[str]:
+    """Return the formatted ``Examples`` section."""
+    example_lines = build_examples(module_name, name, parameters, has_return)
+    if not example_lines:
+        return []
+    return ["", *example_lines]
+
+
+def _required_sections(
+    context_or_kind: DocstringContext | str,
+    *legacy_args: object,
+    **legacy_kwargs: object,
 ) -> set[str]:
-    """Return placeholder markers emitted by the fallback generator.
+    """Return placeholder markers emitted by the fallback generator."""
+    if isinstance(context_or_kind, DocstringContext):
+        context = context_or_kind
+    else:
+        context = _legacy_required_sections_context(
+            kind=context_or_kind,
+            args=legacy_args,
+            kwargs=legacy_kwargs,
+        )
+    return _required_sections_from_context(context)
 
-    Parameters
-    ----------
-    kind : str
-        Description for ``kind``.
-    parameters : List[ParameterInfo]
-        Description for ``parameters``.
-    returns : str | None
-        Description for ``returns``.
-    raises : List[str]
-        Description for ``raises``.
-    node_name : str | None
-        Description for ``node_name``.
-    include_examples : bool
-        Description for ``include_examples``.
 
-    Returns
-    -------
-    Set[str]
-        Description of return value.
-    """
-    if kind in {"module", "class"}:
+def _legacy_required_sections_context(
+    *, kind: str, args: tuple[object, ...], kwargs: dict[str, object]
+) -> DocstringContext:
+    """Return a :class:`DocstringContext` reconstructed from legacy arguments."""
+    if kwargs:
+        parameters = cast(list[ParameterInfo], kwargs.get("parameters"))
+        raises = cast(list[str], kwargs.get("raises"))
+        include_examples = cast(bool, kwargs.get("include_examples"))
+        if parameters is None or raises is None or include_examples is None:
+            msg = "Incomplete keyword arguments supplied for _required_sections"
+            raise ValueError(msg)
+        returns = cast(str | None, kwargs.get("returns"))
+        node_name = cast(str | None, kwargs.get("node_name"))
+    else:
+        if len(args) < LEGACY_MIN_ARGS:
+            msg = (
+                "Legacy _required_sections calls must supply parameters, returns, raises, "
+                "node_name, include_examples"
+            )
+            raise ValueError(msg)
+        parameters = cast(list[ParameterInfo], args[0])
+        returns = cast(str | None, args[1]) if len(args) > 1 else None
+        raises = cast(list[str], args[2])
+        node_name = (
+            cast(str | None, args[LEGACY_NODE_NAME_INDEX])
+            if len(args) > LEGACY_NODE_NAME_INDEX
+            else None
+        )
+        include_examples = (
+            cast(bool, args[LEGACY_INCLUDE_EXAMPLES_INDEX])
+            if len(args) > LEGACY_INCLUDE_EXAMPLES_INDEX
+            else False
+        )
+    return DocstringContext(
+        kind=kind,
+        parameters=parameters,
+        returns=returns,
+        raises=raises,
+        node_name=node_name,
+        include_examples=include_examples,
+    )
+
+
+def _required_sections_from_context(context: DocstringContext) -> set[str]:
+    """Return placeholder markers derived from ``context``."""
+    if context.kind in {"module", "class"}:
         return set()
 
     markers: set[str] = set()
-    if node_name:
-        operation = _humanize_identifier(node_name).lower()
+    if context.node_name:
+        operation = _humanize_identifier(context.node_name).lower()
         markers.add(f"Carry out the {operation} operation for the surrounding component.")
         markers.add(
             "Generated documentation highlights how this helper collaborates with neighbouring utilities.",
         )
         markers.add("Callers rely on the routine to remain stable across releases.")
-    for parameter in parameters:
+    for parameter in context.parameters:
         markers.add(f"Description for ``{parameter.name}``.")
     required: set[str] = set()
-    if include_examples:
+    if context.include_examples:
         required.add("Examples")
-    if parameters:
+    if context.parameters:
         required.add("Parameters")
-    if returns:
+    if context.returns:
         markers.add("Description of return value.")
-    if raises:
+    if context.raises:
         markers.add("Raised when validation fails.")
     return markers
 
@@ -1807,17 +1847,17 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     """Compute docstring text.
 
     Carry out the docstring text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : ast.AST
         Description for ``node``.
-    
+
     Returns
     -------
     Tuple[str | None, ast.Expr | None]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.auto_docstrings import docstring_text
@@ -1825,7 +1865,6 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     body = getattr(node, "body", [])
     if not body:
         return None, None
@@ -1845,7 +1884,7 @@ def replace(
     """Compute replace.
 
     Carry out the replace operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     doc_expr : ast.Expr | None
@@ -1858,13 +1897,12 @@ def replace(
         Description for ``indent``.
     insert_at : int
         Description for ``insert_at``.
-    
+
     Examples
     --------
     >>> from tools.auto_docstrings import replace
     >>> replace(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
     formatted = [indent + line + "\n" for line in new_lines]
     existing_blank_line = False
     if doc_expr is not None:
@@ -1887,17 +1925,17 @@ def process_file(path: Path) -> bool:
     """Compute process file.
 
     Carry out the process file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.auto_docstrings import process_file
@@ -1905,106 +1943,108 @@ def process_file(path: Path) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     try:
         text = path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
         return False
-    tree = ast.parse(text)
-    lines = text.splitlines()
-    lines = [line + "\n" for line in lines]
-    changed = False
 
+    tree = ast.parse(text)
+    lines = [line + "\n" for line in text.splitlines()]
     module_name = module_name_for(path)
 
+    plans: list[DocstringUpdatePlan] = []
     for _, node, kind in iter_docstring_nodes(tree):
         node_name = getattr(node, "name", None)
-        if kind != "module" and isinstance(
-            node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
-        ):
-            if node_name and _is_magic(node_name) and node_name != "__init__":
-                if node_name not in MAGIC_METHOD_EXTENDED_SUMMARIES:
-                    continue
-            if node_name and node_name.startswith("_") and not node_name.startswith("__"):
-                continue
+        if _should_skip_node(kind, node, node_name):
+            continue
 
         doc, expr = docstring_text(node)
-        parameters: list[ParameterInfo] = []
-        returns: str | None = None
-        raises: list[str] = []
-        include_examples = False
-        if kind == "function" and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            parameters = parameters_for(node)
-            return_annotation: str = annotation_to_text(node.returns)
-            if return_annotation not in {"None", "NoReturn"}:
-                returns = return_annotation
-            raises = detect_raises(node)
-            include_examples = False
-            if node_name:
-                include_examples = not node_name.startswith("_")
-
-        placeholder_markers = _required_sections(
-            kind,
-            parameters,
-            returns,
-            raises,
-            node_name,
-            include_examples,
-        )
-        needs_update = doc is None or "TODO" in (doc or "") or "NavMap:" in (doc or "")
-        if not needs_update and doc and placeholder_markers:
-            if any(marker in doc for marker in placeholder_markers):
-                needs_update = True
-            else:
-                lower_doc = doc.lower()
-                lower_markers = tuple(marker.lower() for marker in placeholder_markers)
-                if any(marker in lower_doc for marker in lower_markers):
-                    needs_update = True
-        if not needs_update and doc is not None:
-            boilerplate_tokens = (
-                "Provide utilities for module.",
-                "This module exposes the primary interfaces for the package.",
-                "See Also\n--------\n",
-                "Attributes\n----------\nNone",
-                "Method description.",
-                "Provide usage considerations, constraints, or complexity notes.",
-            )
-            if any(token in doc for token in boilerplate_tokens):
-                needs_update = True
         if kind == "module" and doc is None:
             continue
-        if not needs_update:
+
+        context = build_docstring_context(kind, node)
+        placeholder_markers = _required_sections(context)
+        if not _needs_docstring_update(doc, placeholder_markers):
             continue
 
-        new_lines = build_docstring(kind, node, module_name)
-        generated_body = "\n".join(new_lines[1:-1]) if len(new_lines) >= 2 else ""
-        existing_body = inspect.cleandoc(doc) if doc is not None else ""
-        if doc is not None and existing_body == generated_body:
+        new_lines = build_docstring(kind, node, module_name, context)
+        if _docstring_matches_existing(doc, new_lines):
             continue
 
-        if kind == "module":
-            indent = ""
-            insert_at = 1 if lines and lines[0].startswith("#!") else 0
-            replace(expr, lines, new_lines, indent, insert_at)
-        else:
-            if not isinstance(
-                node,
-                (
-                    ast.FunctionDef,
-                    ast.AsyncFunctionDef,
-                    ast.ClassDef,
-                ),
-            ):
-                continue
-            indent = " " * (node.col_offset + 4)
-            body: list[ast.stmt] = node.body
-            insert_at = body[0].lineno - 1 if body else node.lineno
-            replace(expr, lines, new_lines, indent, insert_at)
-        changed = True
+        plans.append(
+            DocstringUpdatePlan(
+                kind=kind,
+                node=node,
+                expr=expr,
+                new_lines=new_lines,
+            )
+        )
 
-    if changed:
-        path.write_text("".join(lines), encoding="utf-8")
-    return changed
+    if not plans:
+        return False
+
+    for plan in plans:
+        _apply_docstring_update(plan, lines)
+
+    path.write_text("".join(lines), encoding="utf-8")
+    return True
+
+
+def _should_skip_node(kind: str, node: ast.AST, node_name: str | None) -> bool:
+    """Return ``True`` when ``node`` should not be processed."""
+    if kind == "module":
+        return False
+    if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+        return False
+    if node_name and _is_magic(node_name) and node_name != "__init__":
+        return node_name not in MAGIC_METHOD_EXTENDED_SUMMARIES
+    return bool(node_name and node_name.startswith("_") and not node_name.startswith("__"))
+
+
+def _needs_docstring_update(doc: str | None, placeholder_markers: set[str]) -> bool:
+    """Return ``True`` when ``doc`` should be regenerated."""
+    if doc is None:
+        return True
+    if "TODO" in doc or "NavMap:" in doc:
+        return True
+    if placeholder_markers:
+        if any(marker in doc for marker in placeholder_markers):
+            return True
+        lower_doc = doc.lower()
+        lower_markers = tuple(marker.lower() for marker in placeholder_markers)
+        if any(marker in lower_doc for marker in lower_markers):
+            return True
+    return any(token in doc for token in _DOCSTRING_BOILERPLATE_TOKENS)
+
+
+def _docstring_matches_existing(doc: str | None, new_lines: list[str]) -> bool:
+    """Return ``True`` when ``doc`` already mirrors ``new_lines``."""
+    if doc is None:
+        return False
+    generated_body = "\n".join(new_lines[1:-1]) if len(new_lines) >= MIN_DOC_BODY_LINES else ""
+    existing_body = inspect.cleandoc(doc)
+    return existing_body == generated_body
+
+
+def _apply_docstring_update(plan: DocstringUpdatePlan, lines: list[str]) -> None:
+    """Apply ``plan`` to ``lines`` using :func:`replace`."""
+    indent, insert_at = _docstring_insertion_details(plan.kind, plan.node, lines)
+    replace(plan.expr, lines, plan.new_lines, indent, insert_at)
+
+
+def _docstring_insertion_details(
+    kind: str, node: ast.AST, lines: list[str]
+) -> tuple[str, int]:
+    """Return the indentation and insertion index for ``node``."""
+    if kind == "module":
+        insert_at = 1 if lines and lines[0].startswith("#!") else 0
+        return "", insert_at
+    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+        indent = " " * (node.col_offset + 4)
+        body: list[ast.stmt] = getattr(node, "body", [])
+        insert_at = body[0].lineno - 1 if body else node.lineno
+        return indent, insert_at
+    return "", getattr(node, "lineno", 0)
 
 
 def main() -> None:

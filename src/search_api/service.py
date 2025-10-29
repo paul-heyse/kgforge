@@ -50,7 +50,7 @@ def rrf_fuse(
     """Compute rrf fuse.
 
     Carry out the rrf fuse operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     dense : List[Tuple[str, float]]
@@ -59,12 +59,12 @@ def rrf_fuse(
         Description for ``sparse``.
     k : int | None
         Optional parameter default ``60``. Description for ``k``.
-    
+
     Returns
     -------
     List[Tuple[str, float]]
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.service import rrf_fuse
@@ -72,7 +72,6 @@ def rrf_fuse(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     # NOTE: implement stable RRF across rankers when ranker outputs are wired
     return []
 
@@ -82,19 +81,19 @@ def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[st
     """Compute apply kg boosts.
 
     Carry out the apply kg boosts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     fused : List[Tuple[str, float]]
         Description for ``fused``.
     query : str
         Description for ``query``.
-    
+
     Returns
     -------
     List[Tuple[str, float]]
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.service import apply_kg_boosts
@@ -102,7 +101,6 @@ def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[st
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     # NOTE: apply boosts for direct & one-hop concept matches once KG signals exist
     return fused
 
@@ -114,19 +112,19 @@ def mmr_deduplicate(
     """Compute mmr deduplicate.
 
     Carry out the mmr deduplicate operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     results : List[Tuple[str, float]]
         Description for ``results``.
     lambda_ : float | None
         Optional parameter default ``0.7``. Description for ``lambda_``.
-    
+
     Returns
     -------
     List[Tuple[str, float]]
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.service import mmr_deduplicate
@@ -134,6 +132,5 @@ def mmr_deduplicate(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     # NOTE: add doc-level diversity via MMR when result scoring is available
     return results

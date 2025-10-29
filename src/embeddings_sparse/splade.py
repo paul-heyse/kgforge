@@ -101,7 +101,6 @@ class SPLADEv3Encoder:
         max_seq_len : int | None
             Optional parameter default ``512``. Description for ``max_seq_len``.
         """
-        
         self.model_id = model_id
         self.device = device
         self.topk = topk
@@ -111,22 +110,22 @@ class SPLADEv3Encoder:
         """Compute encode.
 
         Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         texts : List[str]
             Description for ``texts``.
-        
+
         Returns
         -------
         List[Tuple[List[int], List[float]]]
             Description of return value.
-        
+
         Raises
         ------
         NotImplementedError
             Raised when validation fails.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.splade import encode
@@ -134,7 +133,6 @@ class SPLADEv3Encoder:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
@@ -161,7 +159,6 @@ class PureImpactIndex:
         index_dir : str
             Description for ``index_dir``.
         """
-        
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -189,18 +186,17 @@ class PureImpactIndex:
         """Compute build.
 
         Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         docs_iterable : collections.abc.Iterable
             Description for ``docs_iterable``.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.splade import build
         >>> build(...)  # doctest: +ELLIPSIS
         """
-        
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -251,19 +247,19 @@ class PureImpactIndex:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         query : str
             Description for ``query``.
         k : int
             Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.splade import search
@@ -271,7 +267,6 @@ class PureImpactIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
         for token in tokens:
@@ -302,7 +297,6 @@ class LuceneImpactIndex:
         index_dir : str
             Description for ``index_dir``.
         """
-        
         self.index_dir = index_dir
         self._searcher: Any | None = None
 
@@ -329,24 +323,24 @@ class LuceneImpactIndex:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         query : str
             Description for ``query``.
         k : int
             Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-        
+
         Raises
         ------
         RuntimeError
             Raised when validation fails.
-        
+
         Examples
         --------
         >>> from embeddings_sparse.splade import search
@@ -354,7 +348,6 @@ class LuceneImpactIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
@@ -368,19 +361,19 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
     """Compute get splade.
 
     Carry out the get splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     backend : str
         Description for ``backend``.
     index_dir : str
         Description for ``index_dir``.
-    
+
     Returns
     -------
     PureImpactIndex | LuceneImpactIndex
         Description of return value.
-    
+
     Examples
     --------
     >>> from embeddings_sparse.splade import get_splade
@@ -388,7 +381,6 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     if backend == "lucene":
         try:
             return LuceneImpactIndex(index_dir)

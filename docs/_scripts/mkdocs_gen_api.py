@@ -10,16 +10,21 @@ from __future__ import annotations
 import sys
 from importlib import import_module
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import mkdocs_gen_files
 
+if TYPE_CHECKING:
+    from griffe.dataclasses import Object as GriffeObject
+else:
+    GriffeObject = object  # type: ignore[misc, assignment]
+
 griffe_module = import_module("griffe")
-Object = cast(Any, getattr(griffe_module, "Object"))
+Object = cast(Any, griffe_module.Object)
 try:
     loader_module = import_module("griffe.loader")
 except ModuleNotFoundError:
-    GriffeLoader = cast(Any, getattr(griffe_module, "GriffeLoader"))
+    GriffeLoader = cast(Any, griffe_module.GriffeLoader)
 else:
     GriffeLoader = cast(Any, loader_module.GriffeLoader)
 
@@ -44,12 +49,12 @@ def iter_packages() -> list[str]:
     """Compute iter packages.
 
     Carry out the iter packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from docs._scripts.mkdocs_gen_api import iter_packages
@@ -64,22 +69,21 @@ def iter_packages() -> list[str]:
 loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
 
 
-def write_node(node: Any) -> None:
+def write_node(node: GriffeObject) -> None:
     """Compute write node.
 
     Carry out the write node operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : typing.Any
         Description for ``node``.
-    
+
     Examples
     --------
     >>> from docs._scripts.mkdocs_gen_api import write_node
     >>> write_node(...)  # doctest: +ELLIPSIS
     """
-    
     rel = node.path.replace(".", "/")
     page = out / rel / "index.md"
     with mkdocs_gen_files.open(page, "w") as f:

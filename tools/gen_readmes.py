@@ -19,7 +19,7 @@ import time
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Final, cast
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,18 +38,21 @@ NAVMAP_PATH = ROOT / "site" / "_build" / "navmap" / "navmap.json"
 TESTMAP_PATH = ROOT / "docs" / "_build" / "test_map.json"
 
 DEFAULT_SYNOPSIS = "Package synopsis not yet documented."
+MIN_REMOTE_PARTS: Final[int] = 2
+README_WRAP_COLUMN: Final[int] = 80
+README_BADGE_INDENT: Final[int] = 4
 
 
 def detect_repo() -> tuple[str, str]:
     """Compute detect repo.
 
     Carry out the detect repo operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     Tuple[str, str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import detect_repo
@@ -82,7 +85,7 @@ def detect_repo() -> tuple[str, str]:
 
     if path:
         parts = path.split("/")
-        if len(parts) >= 2:
+        if len(parts) >= MIN_REMOTE_PARTS:
             return parts[0], parts[1]
 
     return override_owner or "your-org", override_repo or "your-repo"
@@ -92,12 +95,12 @@ def git_sha() -> str:
     """Compute git sha.
 
     Carry out the git sha operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import git_sha
@@ -119,7 +122,7 @@ def gh_url(rel_path: str, start: int, end: int | None) -> str:
     """Compute gh url.
 
     Carry out the gh url operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     rel_path : str
@@ -128,12 +131,12 @@ def gh_url(rel_path: str, start: int, end: int | None) -> str:
         Description for ``start``.
     end : int | None
         Description for ``end``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import gh_url
@@ -141,7 +144,6 @@ def gh_url(rel_path: str, start: int, end: int | None) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     fragment = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel_path}{fragment}"
 
@@ -150,12 +152,12 @@ def iter_packages() -> list[str]:
     """Compute iter packages.
 
     Carry out the iter packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import iter_packages
@@ -173,17 +175,17 @@ def summarize(node: Any) -> str:
     """Compute summarize.
 
     Carry out the summarize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : typing.Any
         Description for ``node``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import summarize
@@ -191,7 +193,6 @@ def summarize(node: Any) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     doc = getattr(node, "docstring", None)
     if not doc or not getattr(doc, "value", None):
         return ""
@@ -212,17 +213,17 @@ def is_public(node: Any) -> bool:
     """Compute is public.
 
     Carry out the is public operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : typing.Any
         Description for ``node``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import is_public
@@ -230,7 +231,6 @@ def is_public(node: Any) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return not getattr(node, "name", "").startswith("_")
 
 
@@ -238,19 +238,19 @@ def get_open_link(node: Any, readme_dir: Path) -> str | None:
     """Compute get open link.
 
     Carry out the get open link operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : typing.Any
         Description for ``node``.
     readme_dir : Path
         Description for ``readme_dir``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import get_open_link
@@ -258,7 +258,6 @@ def get_open_link(node: Any, readme_dir: Path) -> str | None:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -276,17 +275,17 @@ def get_view_link(node: Any) -> str | None:
     """Compute get view link.
 
     Carry out the get view link operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : typing.Any
         Description for ``node``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import get_view_link
@@ -294,7 +293,6 @@ def get_view_link(node: Any) -> str | None:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     rel_path = getattr(node, "relative_package_filepath", None)
     if not rel_path:
         return None
@@ -313,17 +311,17 @@ def iter_public_members(node: Any) -> Iterable[Any]:
     """Compute iter public members.
 
     Carry out the iter public members operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : typing.Any
         Description for ``node``.
-    
+
     Returns
     -------
     collections.abc.Iterable
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import iter_public_members
@@ -331,7 +329,6 @@ def iter_public_members(node: Any) -> Iterable[Any]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     members = getattr(node, "members", {})
     public = [m for m in members.values() if is_public(m)]
 
@@ -439,12 +436,12 @@ def parse_config() -> Config:
     """Compute parse config.
 
     Carry out the parse config operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     Config
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import parse_config
@@ -566,17 +563,17 @@ def badges_for(qname: str) -> Badges:
     """Compute badges for.
 
     Carry out the badges for operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     qname : str
         Description for ``qname``.
-    
+
     Returns
     -------
     Badges
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import badges_for
@@ -584,7 +581,6 @@ def badges_for(qname: str) -> Badges:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     symbol_meta, defaults = _lookup_nav(qname)
     merged = {**defaults, **symbol_meta}
     tests: list[dict[str, Any]] = []
@@ -645,19 +641,19 @@ def format_badges(qname: str, base_length: int = 0) -> str:
     """Compute format badges.
 
     Carry out the format badges operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     qname : str
         Description for ``qname``.
     base_length : int | None
         Optional parameter default ``0``. Description for ``base_length``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import format_badges
@@ -665,7 +661,6 @@ def format_badges(qname: str, base_length: int = 0) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     badge = badges_for(qname)
     parts: list[str] = []
     if badge.stability:
@@ -684,11 +679,11 @@ def format_badges(qname: str, base_length: int = 0) -> str:
     if not parts:
         return ""
     badge_line = " ".join(parts)
-    if base_length and base_length + 1 + len(badge_line) > 80:
+    if base_length and base_length + 1 + len(badge_line) > README_WRAP_COLUMN:
         wrapped: list[str] = []
         current: list[str] = []
         current_len = 0
-        available = 80 - 4
+        available = README_WRAP_COLUMN - README_BADGE_INDENT
         for part in parts:
             part_len = len(part) + (1 if current else 0)
             if current and current_len + part_len > available:
@@ -708,7 +703,7 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
     """Compute editor link.
 
     Carry out the editor link operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     abs_path : Path
@@ -717,12 +712,12 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
         Description for ``lineno``.
     editor_mode : str
         Description for ``editor_mode``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import editor_link
@@ -730,7 +725,6 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     if editor_mode == "vscode":
         return f"vscode://file/{abs_path}:{lineno}:1"
     if editor_mode == "relative":
@@ -784,17 +778,17 @@ def bucket_for(node: Any) -> str:
     """Compute bucket for.
 
     Carry out the bucket for operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : typing.Any
         Description for ``node``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import bucket_for
@@ -802,7 +796,6 @@ def bucket_for(node: Any) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     kind = getattr(getattr(node, "kind", None), "value", "")
     if kind in {"module", "package"}:
         return "Modules"
@@ -817,7 +810,7 @@ def render_line(node: Any, readme_dir: Path, cfg: Config) -> str | None:
     """Compute render line.
 
     Carry out the render line operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : typing.Any
@@ -826,12 +819,12 @@ def render_line(node: Any, readme_dir: Path, cfg: Config) -> str | None:
         Description for ``readme_dir``.
     cfg : Config
         Description for ``cfg``.
-    
+
     Returns
     -------
     str | None
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import render_line
@@ -839,7 +832,6 @@ def render_line(node: Any, readme_dir: Path, cfg: Config) -> str | None:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     qname = getattr(node, "path", "")
     summary = summarize(node)
 
@@ -878,19 +870,19 @@ def write_if_changed(path: Path, content: str) -> bool:
     """Compute write if changed.
 
     Carry out the write if changed operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
         Description for ``path``.
     content : str
         Description for ``content``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import write_if_changed
@@ -898,7 +890,6 @@ def write_if_changed(path: Path, content: str) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     digest = hashlib.sha256(content.encode("utf-8")).hexdigest()[:12]
     rendered = content.rstrip() + f"\n<!-- agent:readme v1 sha:{SHA} content:{digest} -->\n"
     previous = path.read_text(encoding="utf-8") if path.exists() else ""
@@ -913,19 +904,19 @@ def write_readme(node: Any, cfg: Config) -> bool:
     """Compute write readme.
 
     Carry out the write readme operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : typing.Any
         Description for ``node``.
     cfg : Config
         Description for ``cfg``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.gen_readmes import write_readme
@@ -933,7 +924,6 @@ def write_readme(node: Any, cfg: Config) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"
 

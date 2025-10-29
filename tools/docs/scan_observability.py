@@ -242,12 +242,12 @@ def load_policy() -> dict[str, Any]:
     """Compute load policy.
 
     Carry out the load policy operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.scan_observability import load_policy
@@ -707,17 +707,17 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     """Compute read ast.
 
     Carry out the read ast operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
         Description for ``path``.
-    
+
     Returns
     -------
     Tuple[str, ast.AST | None]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.scan_observability import read_ast
@@ -725,7 +725,6 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     try:
         text = path.read_text(encoding="utf-8")
     except OSError:
@@ -743,19 +742,19 @@ def scan_file(
     """Compute scan file.
 
     Carry out the scan file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : Path
         Description for ``path``.
     policy : collections.abc.Mapping
         Description for ``policy``.
-    
+
     Returns
     -------
     Tuple[List[LogRow], List[MetricRow], List[TraceRow]]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.scan_observability import scan_file
@@ -763,7 +762,6 @@ def scan_file(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     text, tree = read_ast(path)
     if not text or tree is None:
         return ([], [], [])
@@ -784,7 +782,7 @@ def scan_file(
                 if node.args:
                     seg = ast.get_source_segment(text, node.args[0])
                     msg = (seg or "").strip()[:240]
-                keys, ok_struct = _is_structured_logging(node, text)
+                keys, _ = _is_structured_logging(node, text)
                 log_row = LogRow(
                     logger=base_name,
                     level=attr,
@@ -815,7 +813,7 @@ def scan_file(
                 )
                 metrics.append(metric_row)
 
-            # --- TRACES (OpenTelemetry)
+            # Trace instrumentation (OpenTelemetry)
             if attr in {"start_span", "start_as_current_span"}:
                 span_name = _first_str(node, text)
                 trace_row = TraceRow(

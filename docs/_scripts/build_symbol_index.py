@@ -13,10 +13,16 @@ import os
 import subprocess
 import sys
 from collections import defaultdict
+from collections.abc import Iterable, Mapping, MutableMapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
+
+if TYPE_CHECKING:
+    from griffe.dataclasses import Object as GriffeObject
+else:
+    GriffeObject = object  # type: ignore[misc, assignment]
 
 griffe_module = importlib.import_module("griffe")
 loader_module: ModuleType | None
@@ -64,8 +70,8 @@ class NavLookup:
     created by factories or runtime orchestrators documented nearby.
     """
 
-    symbol_meta: dict[str, dict[str, Any]]
-    module_meta: dict[str, dict[str, Any]]
+    symbol_meta: dict[str, dict[str, object]]
+    module_meta: dict[str, dict[str, object]]
     sections: dict[str, str]
 
 
@@ -73,12 +79,12 @@ def iter_packages() -> list[str]:
     """Compute iter packages.
 
     Carry out the iter packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from docs._scripts.build_symbol_index import iter_packages
@@ -92,11 +98,11 @@ def iter_packages() -> list[str]:
     return packages or [detect_primary()]
 
 
-def safe_attr(node: Any, attr: str, default: object | None = None) -> object | None:
+def safe_attr(node: object, attr: str, default: object | None = None) -> object | None:
     """Compute safe attr.
 
     Carry out the safe attr operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     node : typing.Any
@@ -105,12 +111,12 @@ def safe_attr(node: Any, attr: str, default: object | None = None) -> object | N
         Description for ``attr``.
     default : object | None
         Optional parameter default ``None``. Description for ``default``.
-    
+
     Returns
     -------
     object | None
         Description of return value.
-    
+
     Examples
     --------
     >>> from docs._scripts.build_symbol_index import safe_attr
@@ -118,7 +124,6 @@ def safe_attr(node: Any, attr: str, default: object | None = None) -> object | N
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     try:
         return getattr(node, attr)
     except Exception:
@@ -144,7 +149,7 @@ def _package_for(module: str | None, path: str | None) -> str | None:
     return target.split(".", 1)[0]
 
 
-def _canonical_path(node: Any) -> str | None:
+def _canonical_path(node: object) -> str | None:
     """Return the canonical path for ``node`` if available."""
     canonical = safe_attr(node, "canonical_path")
     if isinstance(canonical, Object):
@@ -154,7 +159,7 @@ def _canonical_path(node: Any) -> str | None:
     return str(canonical)
 
 
-def _string_signature(node: Any) -> str | None:
+def _string_signature(node: object) -> str | None:
     """Return a printable signature for callable ``node`` objects."""
     signature = safe_attr(node, "signature")
     if signature is None:
@@ -194,54 +199,94 @@ def _load_navmap() -> NavLookup:
     return NavLookup(symbol_meta={}, module_meta={}, sections={})
 
 
-def _index_navmap(data: dict[str, Any]) -> NavLookup:
+def _clean_meta(meta: Mapping[str, object] | None) -> dict[str, object]:
+    """Return a copy of ``meta`` with ``None`` entries removed."""
+    if not isinstance(meta, Mapping):
+        return {}
+    return {key: value for key, value in meta.items() if value is not None}
+
+
+def _record_module_defaults(
+    module_name: str,
+    payload: Mapping[str, object],
+    module_meta: MutableMapping[str, dict[str, object]],
+    symbol_meta: MutableMapping[str, dict[str, object]],
+) -> dict[str, object]:
+    """Extract module-level defaults and prime symbol metadata with them."""
+    defaults = _clean_meta(cast(Mapping[str, object] | None, payload.get("module_meta")))
+    module_meta[module_name] = defaults
+    if defaults:
+        symbol_meta.setdefault(module_name, dict(defaults))
+    return defaults
+
+
+def _record_symbol_meta(
+    module_name: str,
+    per_symbol_meta: Mapping[str, object] | None,
+    symbol_meta: MutableMapping[str, dict[str, object]],
+) -> None:
+    """Merge per-symbol metadata into the index."""
+    if not isinstance(per_symbol_meta, Mapping):
+        return
+    for name, meta in per_symbol_meta.items():
+        if not isinstance(name, str) or not isinstance(meta, Mapping):
+            continue
+        fq_name = _join_symbol(module_name, name)
+        symbol_meta[fq_name] = _clean_meta(meta)
+
+
+def _record_sections(
+    module_name: str,
+    sections_payload: Sequence[object] | None,
+    sections: MutableMapping[str, str],
+) -> None:
+    """Associate section ids with fully qualified symbol names."""
+    if sections_payload is None:
+        return
+    for section_obj in sections_payload:
+        if not isinstance(section_obj, Mapping):
+            continue
+        section_id = section_obj.get("id")
+        if not isinstance(section_id, str):
+            continue
+        symbols = section_obj.get("symbols")
+        if not isinstance(symbols, Sequence):
+            continue
+        for symbol in symbols:
+            if not isinstance(symbol, str):
+                continue
+            fq_name = _join_symbol(module_name, symbol)
+            sections[fq_name] = section_id
+
+
+def _index_navmap(data: Mapping[str, object]) -> NavLookup:
     """Index NavMap metadata for symbol enrichment."""
-    symbol_meta: dict[str, dict[str, Any]] = {}
-    module_meta: dict[str, dict[str, Any]] = {}
+    symbol_meta: dict[str, dict[str, object]] = {}
+    module_meta: dict[str, dict[str, object]] = {}
     sections: dict[str, str] = {}
 
     modules = data.get("modules")
-    if not isinstance(modules, dict):
+    if not isinstance(modules, Mapping):
         return NavLookup(symbol_meta, module_meta, sections)
 
     for module_name, payload in modules.items():
-        if not isinstance(payload, dict):
+        if not isinstance(module_name, str) or not isinstance(payload, Mapping):
             continue
 
-        module_defaults = payload.get("module_meta") or {}
-        if isinstance(module_defaults, dict):
-            module_meta[module_name] = {
-                key: value for key, value in module_defaults.items() if value is not None
-            }
-            if module_defaults:
-                symbol_meta.setdefault(module_name, dict(module_meta[module_name]))
-        else:
-            module_meta[module_name] = {}
-
-        per_symbol_meta = payload.get("meta") or {}
-        if isinstance(per_symbol_meta, dict):
-            for name, meta in per_symbol_meta.items():
-                if not isinstance(meta, dict):
-                    continue
-                fq_name = _join_symbol(module_name, name)
-                symbol_meta[fq_name] = {k: v for k, v in meta.items() if v is not None}
-
-        for section in payload.get("sections") or []:
-            if not isinstance(section, dict):
-                continue
-            section_id = section.get("id")
-            if not section_id:
-                continue
-            for symbol in section.get("symbols") or []:
-                if not isinstance(symbol, str):
-                    continue
-                fq_name = _join_symbol(module_name, symbol)
-                sections[fq_name] = section_id
+        _record_module_defaults(module_name, payload, module_meta, symbol_meta)
+        _record_symbol_meta(
+            module_name, cast(Mapping[str, object] | None, payload.get("meta")), symbol_meta
+        )
+        _record_sections(
+            module_name,
+            cast(Sequence[object] | None, payload.get("sections")),
+            sections,
+        )
 
     return NavLookup(symbol_meta=symbol_meta, module_meta=module_meta, sections=sections)
 
 
-def _load_test_map() -> dict[str, Any]:
+def _load_test_map() -> dict[str, object]:
     """Return the optional test map produced earlier in the docs pipeline."""
     test_map_path = DOCS_BUILD / "test_map.json"
     if test_map_path.exists():
@@ -298,10 +343,10 @@ def _source_links(file_rel: str | None, start: int | None, end: int | None) -> d
 
 
 def _meta_value(
-    symbol_meta: dict[str, Any] | None,
-    module_defaults: dict[str, Any] | None,
+    symbol_meta: Mapping[str, object] | None,
+    module_defaults: Mapping[str, object] | None,
     key: str,
-) -> Any:
+) -> object | None:
     """Return the metadata value for ``key`` using symbol overrides then module defaults."""
     if symbol_meta and key in symbol_meta and symbol_meta[key] is not None:
         return symbol_meta[key]
@@ -310,7 +355,7 @@ def _meta_value(
     return None
 
 
-def _doc_first_paragraph(node: Any) -> str:
+def _doc_first_paragraph(node: object) -> str:
     """Return the first paragraph of a node's docstring."""
     doc = safe_attr(node, "docstring")
     if doc is None:
@@ -324,98 +369,135 @@ def _doc_first_paragraph(node: Any) -> str:
     return ""
 
 
-def _collect_rows(nav: NavLookup, test_map: dict[str, Any]) -> list[dict[str, Any]]:
+def _kind_name(node: object) -> str | None:
+    """Return the normalized kind string for a node."""
+    kind_obj = safe_attr(node, "kind")
+    if isinstance(kind_obj, str):
+        return kind_obj
+    value = safe_attr(kind_obj, "value")
+    return value if isinstance(value, str) else None
+
+
+def _relative_file(node: object) -> str | None:
+    """Return a node's relative filename if available."""
+    file_rel_obj = safe_attr(node, "relative_package_filepath") or safe_attr(
+        node, "relative_filepath"
+    )
+    if isinstance(file_rel_obj, Path):
+        return str(file_rel_obj)
+    return str(file_rel_obj) if isinstance(file_rel_obj, str) else None
+
+
+def _normalize_tests(value: object) -> list[str]:
+    """Normalize the ``tested_by`` payload into a list of string labels."""
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, Sequence):
+        return [str(item) for item in value]
+    return []
+
+
+def _row_section(
+    nav: NavLookup,
+    module: str | None,
+    path: str,
+    canonical: str | None,
+    kind: str,
+) -> str | None:
+    """Resolve the section id for a symbol."""
+    direct = nav.sections.get(path)
+    if direct:
+        return direct
+    if canonical:
+        canonical_section = nav.sections.get(canonical)
+        if canonical_section:
+            return canonical_section
+    if module:
+        module_section = nav.sections.get(module)
+        if module_section:
+            return module_section
+    if kind == "module":
+        return "module"
+    if kind == "class":
+        return "class"
+    return None
+
+
+def _iter_members(node: object) -> Iterable[GriffeObject]:
+    """Yield member nodes from a griffe object."""
+    members_attr = safe_attr(node, "members")
+    if not isinstance(members_attr, Mapping):
+        return ()
+    try:
+        return tuple(cast(Iterable[GriffeObject], members_attr.values()))
+    except Exception:  # pragma: no cover - fallback when values() unavailable
+        return ()
+
+
+def _row_from_node(
+    node: GriffeObject,
+    nav: NavLookup,
+    test_map: Mapping[str, object],
+) -> dict[str, object] | None:
+    """Construct a row describing ``node`` if it has a valid path."""
+    path = getattr(node, "path", None)
+    if not isinstance(path, str):
+        return None
+
+    kind = _kind_name(node)
+    if kind is None:
+        return None
+
+    module = _module_for(path, kind)
+    package = _package_for(module, path)
+    file_rel = _relative_file(node)
+
+    lineno = _normalize_lineno(safe_attr(node, "lineno"))
+    endlineno = _normalize_lineno(safe_attr(node, "endlineno"))
+
+    canonical = _canonical_path(node)
+    symbol_meta = nav.symbol_meta.get(path)
+    if symbol_meta is None and canonical:
+        symbol_meta = nav.symbol_meta.get(canonical)
+    module_defaults = nav.module_meta.get(module or "")
+
+    tested_by = _normalize_tests(test_map.get(path))
+    if not tested_by and canonical:
+        tested_by = _normalize_tests(test_map.get(canonical))
+
+    row: dict[str, object] = {
+        "path": path,
+        "canonical_path": canonical,
+        "kind": kind,
+        "package": package,
+        "module": module,
+        "file": file_rel,
+        "lineno": lineno,
+        "endlineno": endlineno,
+        "doc": _doc_first_paragraph(node),
+        "signature": _string_signature(node),
+        "is_async": bool(safe_attr(node, "is_async")),
+        "is_property": kind == "property",
+        "owner": _meta_value(symbol_meta, module_defaults, "owner"),
+        "stability": _meta_value(symbol_meta, module_defaults, "stability"),
+        "since": _meta_value(symbol_meta, module_defaults, "since"),
+        "deprecated_in": _meta_value(symbol_meta, module_defaults, "deprecated_in"),
+        "section": _row_section(nav, module, path, canonical, kind),
+        "tested_by": tested_by,
+        "source_link": _source_links(file_rel, lineno, endlineno),
+    }
+    return row
+
+
+def _collect_rows(nav: NavLookup, test_map: Mapping[str, object]) -> list[dict[str, object]]:
     """Traverse packages and return enriched symbol rows."""
-    rows: dict[str, dict[str, Any]] = {}
+    rows: dict[str, dict[str, object]] = {}
 
-    def _walk(node: Any) -> None:
-        """Walk.
-
-        Parameters
-        ----------
-        node : Object
-            Description.
-
-        Returns
-        -------
-        None
-            Description.
-
-        Raises
-        ------
-        Exception
-            Description.
-
-        Examples
-        --------
-        >>> _walk(...)
-        """
-        path = getattr(node, "path", None)
-        if not isinstance(path, str):
-            return
-
-        kind_obj = getattr(node, "kind", None)
-        kind_val = getattr(kind_obj, "value", None)
-        if not isinstance(kind_val, str):
-            return
-        kind = kind_val
-        module = _module_for(path, kind)
-        package = _package_for(module, path)
-
-        file_rel_obj = safe_attr(node, "relative_package_filepath") or safe_attr(
-            node, "relative_filepath"
-        )
-        file_rel = str(file_rel_obj) if file_rel_obj else None
-        lineno = _normalize_lineno(safe_attr(node, "lineno"))
-        endlineno = _normalize_lineno(safe_attr(node, "endlineno"))
-
-        canonical = _canonical_path(node)
-        signature = _string_signature(node)
-
-        symbol_meta = nav.symbol_meta.get(path)
-        if not symbol_meta and canonical:
-            symbol_meta = nav.symbol_meta.get(canonical)
-        module_defaults = nav.module_meta.get(module or "")
-
-        section = nav.sections.get(path)
-        if not section and canonical:
-            section = nav.sections.get(canonical)
-
-        tested_by = test_map.get(path)
-        if tested_by is None and canonical:
-            tested_by = test_map.get(canonical)
-        if tested_by is None:
-            tested_by = []
-
-        row = {
-            "path": path,
-            "canonical_path": canonical,
-            "kind": kind,
-            "package": package,
-            "module": module,
-            "file": file_rel,
-            "lineno": lineno,
-            "endlineno": endlineno,
-            "doc": _doc_first_paragraph(node),
-            "signature": signature,
-            "is_async": bool(safe_attr(node, "is_async")),
-            "is_property": kind == "property",
-            "owner": _meta_value(symbol_meta, module_defaults, "owner"),
-            "stability": _meta_value(symbol_meta, module_defaults, "stability"),
-            "since": _meta_value(symbol_meta, module_defaults, "since"),
-            "deprecated_in": _meta_value(symbol_meta, module_defaults, "deprecated_in"),
-            "section": section,
-            "tested_by": tested_by,
-            "source_link": _source_links(file_rel, lineno, endlineno),
-        }
-
-        rows[path] = row
-
-        try:
-            members = list(node.members.values())
-        except Exception:  # pragma: no cover - defensive
-            members = []
-        for member in members:
+    def _walk(node: GriffeObject) -> None:
+        row = _row_from_node(node, nav, test_map)
+        if row is not None:
+            rows[row["path"]] = row
+        for member in _iter_members(node):
             _walk(member)
 
     for pkg in iter_packages():
@@ -426,7 +508,7 @@ def _collect_rows(nav: NavLookup, test_map: dict[str, Any]) -> list[dict[str, An
 
 
 def _build_reverse_maps(
-    rows: list[dict[str, Any]],
+    rows: list[dict[str, object]],
 ) -> tuple[dict[str, list[str]], dict[str, list[str]]]:
     """Build reverse lookup tables keyed by file and module."""
     by_file: dict[str, set[str]] = defaultdict(set)
@@ -451,7 +533,7 @@ def _build_reverse_maps(
     return by_file_sorted, by_module_sorted
 
 
-def _write_json_if_changed(path: Path, data: Any) -> bool:
+def _write_json_if_changed(path: Path, data: object) -> bool:
     """Write ``data`` to ``path`` if the serialized content changed."""
     serialized = json.dumps(data, indent=2, ensure_ascii=False) + "\n"
     if path.exists():
@@ -467,12 +549,12 @@ def main() -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Examples
     --------
     >>> from docs._scripts.build_symbol_index import main
