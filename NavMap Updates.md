@@ -166,7 +166,7 @@ Add:
 
 ```python
 # check_navmap.py (add utility near top)
-from packaging.version import Version, InvalidVersion  # add to docs extras
+from packaging.version import Version, InvalidVersion  # ensure in project dependencies
 
 STABILITY = {"stable","beta","experimental","deprecated"}
 
@@ -343,7 +343,7 @@ __navmap__["symbols"]["Foo"]["deprecated_in"] = "0.9.0"
 
 ## Ready-to-run sequence
 
-1. **Land policy files** in `docs/policies/` and add `packaging` to your `[docs]` extra (for PEP 440 checks).
+1. **Land policy files** in `docs/policies/` and add `packaging` to your project dependencies (for PEP 440 checks).
 2. **Patch `build_navmap.py`** with link-mode + module defaults + schema fields. 
 3. **Patch `check_navmap.py`** with meta-required + PEP 440 + round-trip call. 
 4. **Enhance `repair_navmaps.py`** with anchor/section inserters. 

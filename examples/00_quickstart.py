@@ -1,4 +1,6 @@
-"""Quickstart - minimal import smoke test
+# ruff: noqa: N999
+
+"""Quickstart - minimal import smoke test.
 ======================================
 
 Run the quickstart import smoke test.

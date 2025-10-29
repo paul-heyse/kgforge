@@ -1,23 +1,23 @@
 ## Environment Setup (Preferred Order)
 
-1. **direnv (recommended default)**
+1. **Bootstrap script (recommended default)**
+   - Execute `bash scripts/bootstrap.sh` from the repository root.
+   - The script mirrors the `.envrc` workflow: pins Python if needed, creates `.venv`, runs `uv sync --frozen`, activates the environment, and installs pre-commit hooks.
+   - Supports overrides such as `OFFLINE=1`, `USE_WHEELHOUSE=1`, or additional extras (GPU installs require `ALLOW_GPU=1`).
+
+2. **direnv (auto-activation)**
    - Install `direnv` for your shell (`sudo apt install direnv` or `brew install direnv`) and hook it via `eval "$(direnv hook bash)"` / `eval "$(direnv hook zsh)"` in your shell rc.
    - Ensure `uv` is installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`).
    - From the repo root run `direnv allow` once. The committed `.envrc` will:
      - create or reuse `.venv/` via `uv venv`
-     - run `uv sync --frozen --extra docs` (no `gpu` extras)
+     - run `uv sync --frozen` (docs tooling ships with the standard lock)
      - activate the environment for that shell and install pre-commit hooks automatically.
    - Future shell entries auto-refresh whenever `pyproject.toml`, `uv.lock`, or `.env` change.
-
-2. **Bootstrap script (when direnv is unavailable)**
-   - Execute `bash scripts/bootstrap.sh` from the repository root.
-   - The script mirrors the `.envrc` workflow: pins Python if needed, creates `.venv`, runs `uv sync --frozen --extra docs`, activates the environment, and installs pre-commit hooks.
-   - Supports overrides such as `OFFLINE=1`, `USE_WHEELHOUSE=1`, or additional extras (GPU installs require `ALLOW_GPU=1`).
 
 3. **Manual uv flow (last resort / CI snippets)**
    - `uv python pin 3.13`
    - `uv venv`
-   - `uv sync --frozen --extra docs`
+   - `uv sync --frozen`
    - `uvx pre-commit install -t pre-commit -t pre-push`
    - Activate via `. .venv/bin/activate` or run tools with `uv run` / `uvx`.
 
@@ -443,23 +443,23 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 ## Environment Setup (Preferred Order)
 
-1. **direnv (recommended default)**
+1. **Bootstrap script (recommended default)**
+   - Execute `bash scripts/bootstrap.sh` from the repository root.
+   - The script mirrors the `.envrc` workflow: pins Python if needed, creates `.venv`, runs `uv sync --frozen`, activates the environment, and installs pre-commit hooks.
+   - Supports overrides such as `OFFLINE=1`, `USE_WHEELHOUSE=1`, or additional extras (GPU installs require `ALLOW_GPU=1`).
+
+2. **direnv (auto-activation)**
    - Install `direnv` for your shell (`sudo apt install direnv` or `brew install direnv`) and hook it via `eval "$(direnv hook bash)"` / `eval "$(direnv hook zsh)"` in your shell rc.
    - Ensure `uv` is installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`).
    - From the repo root run `direnv allow` once. The committed `.envrc` will:
      - create or reuse `.venv/` via `uv venv`
-     - run `uv sync --frozen --extra docs` (no `gpu` extras)
+     - run `uv sync --frozen` (docs tooling ships with the standard lock)
      - activate the environment for that shell and install pre-commit hooks automatically.
    - Future shell entries auto-refresh whenever `pyproject.toml`, `uv.lock`, or `.env` change.
-
-2. **Bootstrap script (when direnv is unavailable)**
-   - Execute `bash scripts/bootstrap.sh` from the repository root.
-   - The script mirrors the `.envrc` workflow: pins Python if needed, creates `.venv`, runs `uv sync --frozen --extra docs`, activates the environment, and installs pre-commit hooks.
-   - Supports overrides such as `OFFLINE=1`, `USE_WHEELHOUSE=1`, or additional extras (GPU installs require `ALLOW_GPU=1`).
 
 3. **Manual uv flow (last resort / CI snippets)**
    - `uv python pin 3.13`
    - `uv venv`
-   - `uv sync --frozen --extra docs`
+   - `uv sync --frozen`
    - `uvx pre-commit install -t pre-commit -t pre-push`
    - Activate via `. .venv/bin/activate` or run tools with `uv run` / `uvx`.

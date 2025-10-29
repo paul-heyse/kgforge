@@ -130,7 +130,7 @@
       {
         "label": "env: setup (uv)",
         "type": "shell",
-        "command": "uv python pin 3.13 && uv venv && uv sync --frozen --extra docs && uvx pre-commit install -t pre-commit -t pre-push",
+        "command": "uv python pin 3.13 && uv venv && uv sync --frozen && uvx pre-commit install -t pre-commit -t pre-push",
         "options": { "cwd": "${workspaceFolder:kgfoundry}" },
         "problemMatcher": []
       },

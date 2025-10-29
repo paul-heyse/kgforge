@@ -7,7 +7,7 @@ generation pipeline, explaining every component, tool, and step in the process.
 
 > **TL;DR**
 >
-> 1. Install extras: `pip install -e ".[docs]"`
+> 1. Install dependencies: `uv sync --frozen`
 > 2. Regenerate all documentation: `tools/update_docs.sh`
 > 3. Pre-commit enforces docstring formatting, coverage, linting, and navmap validation automatically.
 >
@@ -164,7 +164,7 @@ ensure_tools() {
   local missing=0
   for tool in doq docformatter pydocstyle pydoclint interrogate; do
     if [[ ! -x "$BIN/$tool" ]]; then
-      echo "error: missing '$tool'; install docs extras..." >&2
+      echo "error: missing '$tool'; reinstall project dependencies (uv sync --frozen)..." >&2
       missing=1
     fi
   done
@@ -181,32 +181,31 @@ ensure_tools() {
 **Why they're essential:**
 - Each tool performs a non-redundant stage in docstring generation
 - Missing any tool breaks the entire documentation pipeline
-- Cannot be auto-installed (must come from `[docs]` extras)
+- They ship with the standard dependency set; missing binaries mean the environment drifted
 
 **Recovery:**
 ```bash
-pip install -e ".[docs]"
+uv sync --frozen
 ```
 
 #### 3. Optional MkDocs Detection
 ```bash
 if [[ ! -x "$BIN/mkdocs" ]]; then
-  echo "warning: mkdocs not installed; skipping mkdocs build..." >&2
-  BUILD_MKDOCS=0
-else
-  BUILD_MKDOCS=1
+  echo "error: missing 'mkdocs'; run 'uv sync --frozen' (or './scripts/bootstrap.sh')." >&2
+  exit 1
 fi
+BUILD_MKDOCS=1
 ```
 
 **MkDocs behavior:**
-- Optional but recommended
-- Missing MkDocs issues a warning, not an error
-- Pipeline continues without it
-- Skips `mkdocs build` stage if unavailable
+- Required for the documentation pipeline
+- Missing MkDocs terminates the script early with an actionable message
+- Ensures MkDocs builds stay in lockstep with Sphinx artifacts
+- Guarantees CI mirrors local runs
 
-**Recovery (optional):**
+**Recovery:**
 ```bash
-pip install -e ".[docs-mkdocs]"
+uv sync --frozen
 ```
 
 ### Environment Setup
@@ -1024,7 +1023,7 @@ def func1():
 | [`.pre-commit-config.yaml`](.pre-commit-config.yaml) | Pre-commit hooks: Ruff (imports/lint/format), Black, Mypy, docformatter, **pydoclint**, navmap-build, navmap-check, validate-gallery, pydocstyle, interrogate. |
 | [`tools/validate_gallery.py`](tools/validate_gallery.py) | Parses `examples/*.py` to ensure docstrings follow the Sphinx-Gallery title, tag, and constraints conventions. Fails early when examples drift. |
 | [`.numpydoc`](.numpydoc) | Global numpydoc validation settings (`GL01`, `SS01`, `ES01`, `RT01`, `PR01`) used by Sphinx during HTML/JSON builds. |
-| [`pyproject.toml`](pyproject.toml) | Configures Ruff (lint/format), Black, pytest, mypy, pydocstyle, and docs extras (`[project.optional-dependencies.docs]`). |
+| [`pyproject.toml`](pyproject.toml) | Configures Ruff (lint/format), Black, pytest, mypy, pydocstyle, and documentation tooling (bundled with project dependencies). |
 | [`mypy.ini`](mypy.ini) | Strict type-check configuration (Python 3.13, `mypy_path=src`, third-party ignores for packages lacking stubs). |
 | [`tools/doq_templates/numpy/`](tools/doq_templates/numpy/) | Legacy NumPy-style templates kept for one-off skeleton seeding with `doq` when bootstrapping new modules. |
 
@@ -2203,7 +2202,7 @@ make bootstrap
 **Details:**
 - Creates `.venv/` directory
 - Installs pip and wheel
-- Installs package with `[dev,docs]` extras
+- Installs the project with its standard dependency set (docs tooling included)
 - Sets up pre-commit hooks
 - Takes 2-5 minutes
 
@@ -2211,7 +2210,7 @@ make bootstrap
 
 **Error message:**
 ```
-error: missing 'doq'; install docs extras via 'pip install -e ".[docs]"' (inside .venv).
+error: missing 'doq'; reinstall project dependencies via 'uv sync --frozen' (inside .venv).
 ```
 
 **Cause:**
@@ -2221,7 +2220,7 @@ error: missing 'doq'; install docs extras via 'pip install -e ".[docs]"' (inside
 **Recovery:**
 ```bash
 source .venv/bin/activate
-pip install -e ".[docs]"
+uv sync --frozen
 ```
 
 **Details:**
@@ -3246,7 +3245,7 @@ def func1():
 | [`Makefile`](Makefile) | Defines developer tasks: `docstrings`, `readmes`, `html`, `json`, `symbols`, `navmap-build`, `navmap-check`, `watch`, `fmt`, `lint`, `bootstrap`. |
 | [`mkdocs.yml`](mkdocs.yml) | MkDocs configuration for Material theme with plugins: search, gen-files (dynamic API pages), mkdocstrings (Python docs), literate-nav, section-index. |
 | [`.pre-commit-config.yaml`](.pre-commit-config.yaml) | Pre-commit hooks: Ruff (imports/lint/format), Black, Mypy, docformatter, pydocstyle, interrogate, navmap-build, navmap-check. |
-| [`pyproject.toml`](pyproject.toml) | Configures Ruff (lint/format), Black, pytest, mypy, pydocstyle, and docs extras (`[project.optional-dependencies.docs]`). |
+| [`pyproject.toml`](pyproject.toml) | Configures Ruff (lint/format), Black, pytest, mypy, pydocstyle, and documentation tooling (bundled with project dependencies). |
 | [`mypy.ini`](mypy.ini) | Strict type-check configuration (Python 3.13, `mypy_path=src`, third-party ignores for packages lacking stubs). |
 | [`tools/doq_templates/numpy/`](tools/doq_templates/numpy/) | Legacy NumPy-style templates kept for one-off skeleton seeding with `doq` when bootstrapping new modules. |
 

@@ -53,8 +53,6 @@ sqlalchemy>=2.0.44
 redis>=6.4.0
 polars
 duckdb>=1.4.1
-
-[docs]
 sphinx>=8.2.3
 myst-parser>=3.0.1
 myst-parser[linkify]>=3.0.1

@@ -43,7 +43,7 @@ ensure_tools() {
   done
   if ((${#missing_tools[@]} != 0)); then
     echo "error: missing required tools: ${missing_tools[*]}." >&2
-    echo "       Run 'uv sync --frozen --extra docs' (or './scripts/bootstrap.sh')." >&2
+    echo "       Run 'uv sync --frozen' (or './scripts/bootstrap.sh')." >&2
     exit 1
   fi
 }
@@ -51,7 +51,7 @@ ensure_tools() {
 ensure_tools
 
 if [[ ! -x "$BIN/mkdocs" ]]; then
-  echo "error: missing 'mkdocs'; run 'uv sync --frozen --extra docs --extra docs-mkdocs'." >&2
+  echo "error: missing 'mkdocs'; run 'uv sync --frozen' (or './scripts/bootstrap.sh')." >&2
   exit 1
 fi
 BUILD_MKDOCS=1

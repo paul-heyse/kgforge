@@ -6,14 +6,15 @@ import hashlib
 import json
 import logging
 import os
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 try:  # Python 3.11+
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover - fallback for environments without tomllib
-    import tomli as tomllib  # type: ignore
+    import tomli as tomllib  # type: ignore[import-not-found]
 
 LOGGER = logging.getLogger(__name__)
 
@@ -43,7 +44,6 @@ class BuilderConfig:
     @property
     def config_hash(self) -> str:
         """Return a stable hash representing the config values."""
-
         payload = {
             "include": self.include,
             "exclude": self.exclude,
@@ -66,19 +66,19 @@ def _load_toml(path: Path) -> dict[str, Any]:
         return tomllib.load(stream)
 
 
-def _as_list(value: Any) -> list[str]:
+def _as_list(value: object) -> list[str]:
     if value is None:
         return []
     if isinstance(value, str):
         return [value]
     if isinstance(value, Iterable):
         return [str(item) for item in value]
-    raise TypeError(f"Unsupported list-like value: {value!r}")
+    msg = f"Unsupported list-like value: {value!r}"
+    raise TypeError(msg)
 
 
 def load_config(path: Path | None = None) -> BuilderConfig:
     """Load configuration from the provided path or default location."""
-
     config_path = path or DEFAULT_CONFIG_PATH
     data = _load_toml(config_path)
     include = _as_list(data.get("include")) or ["src/**/*.py", "tools/**/*.py"]
@@ -110,7 +110,6 @@ def load_config(path: Path | None = None) -> BuilderConfig:
 
 def resolve_config_path(start: Path | None = None) -> Path:
     """Find configuration file by walking up the directory tree."""
-
     current = start or Path.cwd()
     for directory in [current, *current.parents]:
         candidate = directory / DEFAULT_CONFIG_PATH
@@ -121,10 +120,15 @@ def resolve_config_path(start: Path | None = None) -> Path:
 
 def load_config_from_env() -> BuilderConfig:
     """Load configuration using ``DOCSTRING_BUILDER_CONFIG`` override when set."""
-
     env_override = os.environ.get("DOCSTRING_BUILDER_CONFIG")
     config_path = Path(env_override) if env_override else resolve_config_path()
     return load_config(config_path)
 
 
-__all__ = ["BuilderConfig", "PackageSettings", "load_config", "load_config_from_env", "resolve_config_path"]
+__all__ = [
+    "BuilderConfig",
+    "PackageSettings",
+    "load_config",
+    "load_config_from_env",
+    "resolve_config_path",
+]
