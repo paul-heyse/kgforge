@@ -22,7 +22,6 @@ def module_name(path: Path) -> str:
     Parameters
     ----------
     path : Path
-    path : Path
         Description for ``path``.
     
     Returns
@@ -37,6 +36,7 @@ def module_name(path: Path) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     rel = path.relative_to(SRC).with_suffix("")
     parts = list(rel.parts)
     if parts and parts[-1] == "__init__":
@@ -52,7 +52,6 @@ def needs_docstring(text: str) -> bool:
     Parameters
     ----------
     text : str
-    text : str
         Description for ``text``.
     
     Returns
@@ -67,6 +66,7 @@ def needs_docstring(text: str) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     try:
         tree = ast.parse(text)
     except SyntaxError:
@@ -82,7 +82,6 @@ def insert_docstring(path: Path) -> bool:
     Parameters
     ----------
     path : Path
-    path : Path
         Description for ``path``.
     
     Returns
@@ -97,6 +96,7 @@ def insert_docstring(path: Path) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     text = path.read_text()
     if not needs_docstring(text):
         return False

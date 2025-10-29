@@ -48,11 +48,9 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, f
     Parameters
     ----------
     rankers : List[List[Tuple[str, float]]]
-    rankers : List[List[Tuple[str, float]]]
         Description for ``rankers``.
     k : int | None
-    k : int | None, optional, default=60
-        Description for ``k``.
+        Optional parameter default ``60``. Description for ``k``.
     
     Returns
     -------
@@ -66,6 +64,7 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, f
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     agg: dict[str, float] = {}
     for ranked in rankers:
         for r, (key, _score) in enumerate(ranked, start=1):

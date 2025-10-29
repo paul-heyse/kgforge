@@ -44,7 +44,6 @@ def module_docstring(path: Path) -> str | None:
     Parameters
     ----------
     path : Path
-    path : Path
         Description for ``path``.
     
     Returns
@@ -59,6 +58,7 @@ def module_docstring(path: Path) -> str | None:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     try:
         tree = ast.parse(path.read_text(encoding="utf-8"))
     except UnicodeDecodeError:

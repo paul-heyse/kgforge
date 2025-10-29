@@ -71,9 +71,9 @@ class OntologyCatalog:
         Parameters
         ----------
         concepts : List[src.ontology.catalog.Concept]
-        concepts : List[src.ontology.catalog.Concept]
             Description for ``concepts``.
         """
+        
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
@@ -84,11 +84,9 @@ class OntologyCatalog:
         Parameters
         ----------
         concept_id : str
-        concept_id : str
             Description for ``concept_id``.
         depth : int | None
-        depth : int | None, optional, default=1
-            Description for ``depth``.
+            Optional parameter default ``1``. Description for ``depth``.
         
         Returns
         -------
@@ -102,6 +100,7 @@ class OntologyCatalog:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return set()
 
@@ -112,7 +111,6 @@ class OntologyCatalog:
         
         Parameters
         ----------
-        concept_id : str
         concept_id : str
             Description for ``concept_id``.
         
@@ -128,4 +126,5 @@ class OntologyCatalog:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         return {}

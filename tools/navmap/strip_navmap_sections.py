@@ -23,7 +23,6 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
     Parameters
     ----------
     path : Path
-    path : Path
         Description for ``path``.
     
     Returns
@@ -38,6 +37,7 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
     if not tree.body:
@@ -60,7 +60,6 @@ def clean_docstring(text: str) -> str:
     Parameters
     ----------
     text : str
-    text : str
         Description for ``text``.
     
     Returns
@@ -75,6 +74,7 @@ def clean_docstring(text: str) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     lines: list[str] = []
     for raw in text.splitlines():
         if raw.strip().startswith("NavMap:"):
@@ -92,7 +92,6 @@ def rewrite_module(path: Path) -> bool:
     Parameters
     ----------
     path : Path
-    path : Path
         Description for ``path``.
     
     Returns
@@ -107,6 +106,7 @@ def rewrite_module(path: Path) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     tree, doc_expr = iter_module_nodes(path)
     if doc_expr is None:
         return False

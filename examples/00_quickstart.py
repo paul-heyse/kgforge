@@ -3,7 +3,8 @@
 
 Run the quickstart import smoke test.
 
-Ensure the :mod:`kgfoundry` package can be imported without side effects.
+Ensure the :mod:`src.kgfoundry` package (installed for import as :mod:`kgfoundry`) can be
+imported without side effects.
 
 .. tags:: getting-started, smoke
 

@@ -68,18 +68,18 @@ def write_node(node: Any) -> None:
     """Compute write node.
 
     Carry out the write node operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     node : typing.Any
-    node : typing.Any
         Description for ``node``.
-
+    
     Examples
     --------
     >>> from docs._scripts.mkdocs_gen_api import write_node
     >>> write_node(...)  # doctest: +ELLIPSIS
     """
+    
     rel = node.path.replace(".", "/")
     page = out / rel / "index.md"
     with mkdocs_gen_files.open(page, "w") as f:
