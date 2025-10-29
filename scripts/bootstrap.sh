@@ -14,7 +14,6 @@ set -euo pipefail
 
 REQUIRED_UV_VERSION="${REQUIRED_UV_VERSION:-0.93.0}"
 REQUIRED_PYTHON_VERSION="${REQUIRED_PYTHON_VERSION:-3.13.9}"
-REQUIRED_CUDA_VERSION="${REQUIRED_CUDA_VERSION:-13.0}"
 
 # Prefer uv-managed Python (avoid picking system Python)
 export UV_MANAGED_PYTHON=true
@@ -76,80 +75,12 @@ ensure_uv_python_version() {
   fi
 }
 
-ensure_cuda_toolkit() {
-  local required_version="${REQUIRED_CUDA_VERSION}"
-  local detected_version=""
-  local has_cuda=0
-
-  if command -v nvcc >/dev/null 2>&1; then
-    local nvcc_output=""
-    nvcc_output="$(nvcc --version 2>/dev/null || true)"
-    if [ -n "${nvcc_output}" ]; then
-      detected_version="$(printf '%s\n' "${nvcc_output}" | awk '/release/{for (i = 1; i <= NF; i++) { if ($i == "release") { gsub(",", "", $(i+1)); print $(i+1); exit } }}')"
-      if [ -n "${detected_version}" ] && version_ge "${detected_version}" "${required_version}"; then
-        has_cuda=1
-      fi
-    fi
-  fi
-
-  if [ "${has_cuda}" -eq 0 ] && command -v dpkg-query >/dev/null 2>&1; then
-    local pkg_version=""
-    pkg_version="$(dpkg-query -W -f='${Version}' cuda-toolkit-13-0 2>/dev/null || true)"
-    if [ -n "${pkg_version}" ]; then
-      detected_version="$(printf '%s\n' "${pkg_version}" | cut -d- -f1)"
-      [ -z "${detected_version}" ] && detected_version="${pkg_version}"
-      if version_ge "${detected_version}" "${required_version}"; then
-        has_cuda=1
-      fi
-    fi
-    if [ "${has_cuda}" -eq 0 ]; then
-      pkg_version="$(dpkg-query -W -f='${Version}' cuda-toolkit 2>/dev/null || true)"
-      if [ -n "${pkg_version}" ]; then
-        detected_version="$(printf '%s\n' "${pkg_version}" | cut -d- -f1)"
-        [ -z "${detected_version}" ] && detected_version="${pkg_version}"
-        if version_ge "${detected_version}" "${required_version}"; then
-          has_cuda=1
-        fi
-      fi
-    fi
-  fi
-
-  if [ "${has_cuda}" -eq 1 ]; then
-    log "CUDA toolkit ${detected_version:-unknown} already satisfies >= ${required_version}"
-    return
-  fi
-
-  if [ "$(uname -s)" != "Linux" ]; then
-    warn "CUDA toolkit >= ${required_version} not detected; skipping install on non-Linux host"
-    return
-  fi
-
-  if ! command -v sudo >/dev/null 2>&1; then
-    warn "CUDA toolkit >= ${required_version} not detected and sudo unavailable; skipping install"
-    return
-  fi
-
-  if ! command -v apt-get >/dev/null 2>&1; then
-    warn "CUDA toolkit >= ${required_version} not detected and apt-get unavailable; skipping install"
-    return
-  fi
-
-  if ! command -v dpkg >/dev/null 2>&1; then
-    warn "CUDA toolkit >= ${required_version} not detected and dpkg unavailable; skipping install"
-    return
-  fi
-
-  log "Installing CUDA toolkit >= ${required_version}"
-  sudo bash -lc 'curl -fsSL -o /tmp/cuda-keyring.deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb && dpkg -i /tmp/cuda-keyring.deb && apt-get update && apt-get -y install cuda-toolkit-13-0'
-}
-
 need_cmd() { command -v "$1" >/dev/null 2>&1 || { err "Missing required command: $1"; exit 1; }; }
 
 ensure_uv_installed "${REQUIRED_UV_VERSION}"
 need_cmd uv
 log "uv $(uv --version || echo "(version unknown)")"
 ensure_uv_python_version "${REQUIRED_PYTHON_VERSION}"
-ensure_cuda_toolkit
 
 # -------- repo root detection --------
 # Resolve to repo root even when invoked via symlink
@@ -166,7 +97,7 @@ OFFLINE="${OFFLINE:-0}"             # 1 = no network (uses cache / local wheelho
 USE_WHEELHOUSE="${USE_WHEELHOUSE:-0}" # 1 = add ./.wheelhouse to candidate wheels
 
 # Hard safety: block gpu extra unless explicitly allowed
-ALLOW_GPU="${ALLOW_GPU:-1}"
+ALLOW_GPU="${ALLOW_GPU:-0}"
 case ",${EXTRAS}," in
   *,gpu,*) if [ "${ALLOW_GPU}" != "1" ]; then
               err "The 'gpu' extra is disallowed by default. Set ALLOW_GPU=1 to proceed (not recommended for bootstrap)."
@@ -214,6 +145,10 @@ if [ -f "${ACTIVATE}" ]; then
   # shellcheck disable=SC1090
   . "${ACTIVATE}"
   ok "Activated .venv for this shell"
+  log "Upgrading pip tooling via uv"
+  uv pip install -U pip certifi
+  log "Installing cuvs-cu13 from NVIDIA index via uv"
+  uv pip install --extra-index-url https://pypi.nvidia.com cuvs-cu13
 else
   warn "Could not auto-activate .venv; use:  . .venv/bin/activate"
 fi
