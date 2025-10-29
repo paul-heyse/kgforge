@@ -141,7 +141,10 @@ class FaissAdapter:
             message = f"No dense vectors discovered in {source}"
             raise RuntimeError(message)
         ids = [row[0] for row in rows]
-        mat = cast(VecArray, np.stack([np.asarray(row[1], dtype=np.float32) for row in rows]))
+        mat = np.stack([np.asarray(row[1], dtype=np.float32) for row in rows]).astype(
+            np.float32,
+            copy=False,
+        )
         norms = np.linalg.norm(mat, axis=1, keepdims=True) + 1e-9
         normalized = cast(VecArray, mat / norms)
         return DenseVecs(ids=ids, mat=normalized)
@@ -188,7 +191,10 @@ class FaissAdapter:
         finally:
             con.close()
         ids = [row[0] for row in rows]
-        mat = cast(VecArray, np.stack([np.asarray(row[1], dtype=np.float32) for row in rows]))
+        mat = np.stack([np.asarray(row[1], dtype=np.float32) for row in rows]).astype(
+            np.float32,
+            copy=False,
+        )
         norms = np.linalg.norm(mat, axis=1, keepdims=True) + 1e-9
         normalized = cast(VecArray, mat / norms)
         return DenseVecs(ids=ids, mat=normalized)
@@ -205,27 +211,22 @@ class FaissAdapter:
         """
         vectors = self._load_dense_parquet()
         self.vecs = vectors
-        if not HAVE_FAISS:
+        self.idmap = vectors.ids
+
+        faiss_module = faiss
+        if not HAVE_FAISS or faiss_module is None:
             return
         dimension = vectors.mat.shape[1]
-        metric_type = faiss.METRIC_INNER_PRODUCT if self.metric == "ip" else faiss.METRIC_L2
+        metric_type = faiss_module.METRIC_INNER_PRODUCT if self.metric == "ip" else faiss_module.METRIC_L2
         factory = self.factory if dimension >= MIN_FACTORY_DIMENSION else "Flat"
-        cpu = faiss.index_factory(dimension, factory, metric_type)
-        cpu = faiss.IndexIDMap2(cpu)
+        cpu = faiss_module.index_factory(dimension, factory, metric_type)
+        cpu = faiss_module.IndexIDMap2(cpu)
         train = vectors.mat[: min(100000, vectors.mat.shape[0])].copy()
-        faiss.normalize_L2(train)
+        faiss_module.normalize_L2(train)
         cpu.train(train)
         ids64 = cast(IndexArray, np.arange(vectors.mat.shape[0], dtype=np.int64))
         cpu.add_with_ids(vectors.mat, ids64)
-        resources = faiss.StandardGpuResources()
-        options = faiss.GpuClonerOptions()
-        options.use_cuvs = True
-        try:
-            self.index = faiss.index_cpu_to_gpu(resources, 0, cpu, options)
-        except Exception:  # pragma: no cover - fallback path without cuVS
-            options.use_cuvs = False
-            self.index = faiss.index_cpu_to_gpu(resources, 0, cpu, options)
-        self.idmap = vectors.ids
+        self.index = self._clone_to_gpu(cpu)
 
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
         """Compute load or build.
@@ -242,17 +243,14 @@ class FaissAdapter:
         >>> from search_api.faiss_adapter import load_or_build
         >>> load_or_build()  # doctest: +ELLIPSIS
         """
+        faiss_module = faiss
+        if faiss_module is None:
+            self.build()
+            return
         try:
             if HAVE_FAISS and cpu_index_path and Path(cpu_index_path).exists():
-                cpu = faiss.read_index(cpu_index_path)
-                resources = faiss.StandardGpuResources()
-                options = faiss.GpuClonerOptions()
-                options.use_cuvs = True
-                try:
-                    self.index = faiss.index_cpu_to_gpu(resources, 0, cpu, options)
-                except Exception:  # pragma: no cover - fallback path without cuVS
-                    options.use_cuvs = False
-                    self.index = faiss.index_cpu_to_gpu(resources, 0, cpu, options)
+                cpu = faiss_module.read_index(cpu_index_path)
+                self.index = self._clone_to_gpu(cpu)
                 dense = self._load_dense_parquet()
                 self.vecs = dense
                 self.idmap = dense.ids
@@ -260,6 +258,25 @@ class FaissAdapter:
         except Exception:
             pass
         self.build()
+
+    def _clone_to_gpu(self, cpu_index: Any) -> Any:
+        """Return a GPU-backed index when FAISS provides the necessary bindings."""
+        faiss_module = faiss
+        if faiss_module is None:
+            return cpu_index
+        standard_resources = getattr(faiss_module, "StandardGpuResources", None)
+        gpu_cloner_options = getattr(faiss_module, "GpuClonerOptions", None)
+        index_cpu_to_gpu = getattr(faiss_module, "index_cpu_to_gpu", None)
+        if standard_resources is None or gpu_cloner_options is None or index_cpu_to_gpu is None:
+            return cpu_index
+        resources = standard_resources()
+        options = gpu_cloner_options()
+        options.use_cuvs = True
+        try:
+            return index_cpu_to_gpu(resources, 0, cpu_index, options)
+        except Exception:  # pragma: no cover - fallback path without cuVS
+            options.use_cuvs = False
+            return index_cpu_to_gpu(resources, 0, cpu_index, options)
 
     def search(self, qvec: VecArray, k: int = 10) -> list[list[tuple[str, float]]]:
         """Compute search.
@@ -299,10 +316,10 @@ class FaissAdapter:
 
     def _prepare_queries(self, qvec: VecArray) -> VecArray:
         """Normalise query input into a 2D float32 array."""
-        query_arr = np.asarray(qvec, dtype=np.float32, order="C")
+        query_arr: VecArray = np.asarray(qvec, dtype=np.float32, order="C")
         if query_arr.ndim == 1:
             query_arr = query_arr[None, :]
-        return cast(VecArray, query_arr)
+        return query_arr
 
     def _search_with_faiss(self, queries: VecArray, k: int) -> list[list[tuple[str, float]]]:
         """Execute a FAISS search using the configured index."""

@@ -19,7 +19,6 @@ dependencies = [
     "url-normalize>=2.2.0",
     "uvicorn>=0.38.0",
     "fastapi>=0.115.0",
-
     # ============================================================================
     # Data Processing & Storage
     # ============================================================================
@@ -27,51 +26,43 @@ dependencies = [
     "numpy>=2.2.6",
     "jsonlines>=4.0.0",
     "libarchive-c>=5.3",
-
     # ============================================================================
     # Pydantic Ecosystem
     # ============================================================================
     "pydantic>=2.0",
     "pydantic-core>=2.41.4",
     "pydantic-settings>=2.11.0",
-
     # ============================================================================
     # Document Processing
     # ============================================================================
     "docling-core>=2.48.4",
-
     # ============================================================================
     # Domain-Specific APIs
     # ============================================================================
     "pyalex>=0.18",
     "waybackpy>=3.0.6",
-
     # ============================================================================
     # Ontology & Knowledge Graphs
     # ============================================================================
     "bioregistry>=0.12.43",
     "arelle>=2.2",
     "rdflib>=7.2.1",
-
     # ============================================================================
     # Web Scraping
     # ============================================================================
     "trafilatura>=2.0.0",
     "beautifulsoup4>=4.14.2",
-
     # ============================================================================
     # ML/Embeddings (lazy imports - consider making optional)
     # ============================================================================
     "transformers>=4.57.1",
     "lupyne",
-
     # ============================================================================
     # Observability & Reliability
     # ============================================================================
     "prometheus-client>=0.23.1",
     "tenacity>=9.1.2",
     "pybreaker",
-
     # ============================================================================
     # CLI & User Experience
     # ============================================================================
@@ -88,7 +79,6 @@ dependencies = [
     "prefect>=3.4.25",
     "types-docutils",
     "types-networkx",
-
     # ============================================================================
     # Utilities
     # ============================================================================
@@ -97,7 +87,7 @@ dependencies = [
     "typing-extensions>=4.15.0",
     "pyyaml>=6",
     "jsonschema>=4.25.1",
-
+    "pyrefly",
     # ============================================================================
     # Testing Framework (if tests are in src/)
     # ============================================================================
@@ -107,16 +97,14 @@ dependencies = [
     "hypothesis>=6.141.0",
     "requests>=2.32.5",
     "psutil>=7.1.0",
-
     # ============================================================================
     # Cloud & Databases
     # ============================================================================
-    "boto3",  # for AWS S3 storage
-    "psycopg>=3",  # for PostgreSQL
-    "psycopg-pool",  # for PostgreSQL connection pooling
-    "sqlalchemy>=2.0.44",  # for PostgreSQL via ORM
-    "redis>=6.4.0",  # for Redis caching
-
+    "boto3", # for AWS S3 storage
+    "psycopg>=3", # for PostgreSQL
+    "psycopg-pool", # for PostgreSQL connection pooling
+    "sqlalchemy>=2.0.44", # for PostgreSQL via ORM
+    "redis>=6.4.0", # for Redis caching
     # ============================================================================
     # Advanced Analytics
     # ============================================================================
@@ -412,20 +400,20 @@ show_error_codes = true
 
 # Tell uv that vllm should come ONLY from the vllm-nightly index.
 [tool.uv.sources]
-vllm = { index = "vllm-nightly" }
+#vllm = { index = "vllm-nightly" }
 faiss = { index = "wheelhouse" }
 
 # point torch packages to the *named* PyTorch cu130 index
-torch = [       { index = "pytorch-cu130" } ]
-torchvision = [ { index = "pytorch-cu130" } ]
-torchaudio = [  { index = "pytorch-cu130" } ]
+torch = [       { index = "pytorch-cu129" } ]
+torchvision = [ { index = "pytorch-cu129" } ]
+torchaudio = [  { index = "pytorch-cu129" } ]
 
 
 # Define named indexes uv can use.
-[[tool.uv.index]]
-name = "vllm-nightly"
-url = "https://wheels.vllm.ai/nightly"
-explicit = true          # prevents accidental installs of other deps from here
+#[[tool.uv.index]]
+#name = "vllm-nightly"
+#url = "https://wheels.vllm.ai/nightly"
+#explicit = true          # prevents accidental installs of other deps from here
 
 # Tell uv there's a local, flat index of wheels.
 [[tool.uv.index]]
@@ -436,8 +424,8 @@ explicit = true
 
 # NEW — define the cu130 index *by name*, then reference it above
 [[tool.uv.index]]
-name = "pytorch-cu130"
-url  = "https://download.pytorch.org/whl/cu130"
+name = "pytorch-cu129"
+url  = "https://download.pytorch.org/whl/cu129"
 explicit = true
 
 
