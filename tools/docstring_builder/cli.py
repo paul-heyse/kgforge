@@ -24,6 +24,40 @@ LOGGER = logging.getLogger("docstring_builder")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CACHE_PATH = REPO_ROOT / ".cache" / "docstring_builder.json"
 DOCFACTS_PATH = REPO_ROOT / "docs" / "_build" / "docfacts.json"
+DEFAULT_IGNORE_PATTERNS = [
+    "tests/e2e/**",
+    "tests/mock_servers/**",
+    "tests/tools/**",
+    "docs/_scripts/**",
+    "docs/conf.py",
+    "src/__init__.py",
+]
+
+
+def _module_to_path(module: str) -> Path | None:
+    if not module:
+        return None
+    parts = module.split(".")
+    relative = Path("src", *parts)
+    file_candidate = REPO_ROOT / relative
+    if file_candidate.suffix:
+        # Already points to a concrete file (e.g., pkg.module).
+        return file_candidate
+    file_path = file_candidate.with_suffix(".py")
+    if file_path.exists():
+        return file_path
+    package_init = file_candidate / "__init__.py"
+    if package_init.exists():
+        return package_init
+    return file_path
+
+
+def _resolve_ignore_patterns(config: BuilderConfig) -> list[str]:
+    patterns = list(DEFAULT_IGNORE_PATTERNS)
+    for pattern in config.ignore:
+        if pattern not in patterns:
+            patterns.append(pattern)
+    return patterns
 
 
 def _select_files(config: BuilderConfig, args: argparse.Namespace) -> Iterable[Path]:
@@ -38,7 +72,11 @@ def _select_files(config: BuilderConfig, args: argparse.Namespace) -> Iterable[P
             selected.append(candidate)
         return selected
 
-    files = list(iter_target_files(config, REPO_ROOT))
+    files = [
+        path
+        for path in iter_target_files(config, REPO_ROOT)
+        if not _should_ignore(path, config)
+    ]
     if args.module:
         filtered: list[Path] = []
         for candidate in files:
@@ -52,7 +90,17 @@ def _select_files(config: BuilderConfig, args: argparse.Namespace) -> Iterable[P
     if args.since:
         changed = set(_changed_files_since(args.since))
         files = [path for path in files if str(path.relative_to(REPO_ROOT)) in changed]
-    return files
+    return [file_path for file_path in files if not _should_ignore(file_path, config)]
+
+
+def _should_ignore(path: Path, config: BuilderConfig) -> bool:
+    rel = path.relative_to(REPO_ROOT)
+    patterns = _resolve_ignore_patterns(config)
+    for pattern in patterns:
+        if rel.match(pattern):
+            LOGGER.debug("Skipping %s because it matches ignore pattern %s", rel, pattern)
+            return True
+    return False
 
 
 def _changed_files_since(revision: str) -> set[str]:
@@ -136,7 +184,7 @@ def _process_file(
     """Harvest, render, and apply docstrings for a single file."""
     is_update = command == "update"
     is_check = command == "check"
-    if not force and not cache.needs_update(file_path, config.config_hash):
+    if command != "harvest" and not force and not cache.needs_update(file_path, config.config_hash):
         LOGGER.debug("Skipping %s; cache is fresh", file_path)
         return 0, [], None, False
     try:
@@ -145,6 +193,9 @@ def _process_file(
         LOGGER.exception("Failed to harvest %s", file_path)
         return 1, [], None, False
     edits, semantics = _collect_edits(result, config)
+    if command == "harvest":
+        docfacts = build_docfacts(semantics)
+        return 0, docfacts, None, False
     if not semantics:
         if is_update:
             cache.update(file_path, config.config_hash)
@@ -163,6 +214,11 @@ def _process_file(
 def _run(files: Iterable[Path], args: argparse.Namespace, config: BuilderConfig) -> int:
     cache = BuilderCache(CACHE_PATH)
     docfact_entries = _load_docfacts_from_disk()
+    docfact_sources: dict[str, Path] = {}
+    for qname, fact in docfact_entries.items():
+        source = _module_to_path(fact.module)
+        if source is not None:
+            docfact_sources[qname] = source
     is_update = args.command == "update"
     is_check = args.command == "check"
     exit_code = 0
@@ -179,8 +235,16 @@ def _run(files: Iterable[Path], args: argparse.Namespace, config: BuilderConfig)
             sys.stdout.write(preview or "")
         for fact in docfacts:
             docfact_entries[fact.qname] = fact
+            docfact_sources[fact.qname] = file_path
     if args.command in {"update", "check"}:
-        drift = _handle_docfacts(list(docfact_entries.values()), check_mode=is_check)
+        filtered: list[DocFact] = []
+        for qname, fact in docfact_entries.items():
+            source = docfact_sources.get(qname) or _module_to_path(fact.module)
+            if source is not None and _should_ignore(source, config):
+                LOGGER.debug("Dropping docfact %s due to ignore rules", qname)
+                continue
+            filtered.append(fact)
+        drift = _handle_docfacts(filtered, check_mode=is_check)
         if drift:
             exit_code = 1
     if is_update:
@@ -199,6 +263,14 @@ def _command_check(args: argparse.Namespace) -> int:
     config = load_config_from_env()
     files = _select_files(config, args)
     args.command = "check"
+    return _run(files, args, config)
+
+
+def _command_harvest(args: argparse.Namespace) -> int:
+    config = load_config_from_env()
+    files = _select_files(config, args)
+    args.command = "harvest"
+    args.force = True
     return _run(files, args, config)
 
 
@@ -226,6 +298,31 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--since", help="Only consider files changed since revision", default="")
     parser.add_argument("--force", action="store_true", help="Ignore cache entries")
     parser.add_argument("--diff", action="store_true", help="Show diffs in check mode")
+    parser.add_argument("--all", action="store_true", help="Process all files, ignoring cache entries")
+    parser.add_argument(
+        "--update",
+        dest="flag_update",
+        action="store_true",
+        help="Legacy flag: run in update mode",
+    )
+    parser.add_argument(
+        "--check",
+        dest="flag_check",
+        action="store_true",
+        help="Legacy flag: run in check mode",
+    )
+    parser.add_argument(
+        "--harvest",
+        dest="flag_harvest",
+        action="store_true",
+        help="Legacy flag: harvest symbols without writing",
+    )
+    parser.add_argument(
+        "--diff-only",
+        dest="flag_diff",
+        action="store_true",
+        help="Legacy flag: run check mode and show diffs",
+    )
     subparsers = parser.add_subparsers(dest="subcommand")
 
     update = subparsers.add_parser("update", help="Synchronize docstrings")
@@ -242,6 +339,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     clear = subparsers.add_parser("clear-cache", help="Clear the builder cache")
     clear.set_defaults(func=_command_clear_cache)
+    harvest = subparsers.add_parser("harvest", help="Harvest metadata without applying edits")
+    harvest.add_argument("paths", nargs="*", help="Optional Python paths to limit processing")
+    harvest.set_defaults(func=_command_harvest)
+
     return parser
 
 
@@ -249,6 +350,17 @@ def main(argv: list[str] | None = None) -> int:
     """Execute the docstring builder CLI."""
     parser = build_parser()
     args = parser.parse_args(argv)
+    if getattr(args, "all", False):
+        args.force = True
+    if getattr(args, "flag_diff", False):
+        args.diff = True
+        args.flag_check = True
+    if getattr(args, "flag_harvest", False):
+        args.func = _command_harvest
+    elif getattr(args, "flag_update", False):
+        args.func = _command_update
+    elif getattr(args, "flag_check", False):
+        args.func = _command_check
     logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
     if not hasattr(args, "func"):
         parser.print_help()
