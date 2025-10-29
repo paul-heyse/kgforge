@@ -14,10 +14,11 @@ import json
 import os
 import pkgutil
 import sys
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
+from types import ModuleType
 from typing import Any, cast
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -44,26 +45,38 @@ JSON_SCHEMA_DIALECT = "https://json-schema.org/draft/2020-12/schema"
 DEFAULT_BASE_URL = os.getenv("SCHEMA_BASE_URL", "https://kgfoundry/schemas")
 
 
+def _load_pandera_module() -> ModuleType | None:
+    """Load ``pandera`` using ``importlib`` to avoid strict import-time failures."""
+    try:
+        module = importlib.import_module("pandera")
+    except ModuleNotFoundError:
+        return None
+    return module
+
+
 # --------------------------- utils ---------------------------
 
 
-def _sorted(obj: Any) -> Any:
+def _sorted(obj: object) -> object:
     """Recursively sort dict keys; leave arrays as-is for semantics."""
     if isinstance(obj, dict):
         return {k: _sorted(obj[k]) for k in sorted(obj.keys())}
     if isinstance(obj, list):
         return [_sorted(x) for x in obj]
     try:
-        from pydantic_core import PydanticUndefined
-
-        if obj is PydanticUndefined:
-            return None
-    except Exception:
+        core = importlib.import_module("pydantic_core")
+    except ModuleNotFoundError:
         pass
+    else:
+        undefined_attr = "PydanticUndefined"
+        if getattr(core, undefined_attr, None) is obj:
+            return None
     return obj
 
 
-def _write_if_changed(path: Path, data: dict[str, Any]) -> tuple[bool, str | None, str | None]:
+def _write_if_changed(
+    path: Path, data: Mapping[str, object]
+) -> tuple[bool, str | None, str | None]:
     """Write JSON with sorted keys + trailing newline if content changed.
 
     Return (changed, old, new).
@@ -109,7 +122,6 @@ def is_pydantic_model(obj: object) -> bool:
     >>> from tools.docs.export_schemas import is_pydantic_model
     >>> result = is_pydantic_model(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         from pydantic import BaseModel
@@ -138,11 +150,9 @@ def is_pandera_model(obj: object) -> bool:
     >>> from tools.docs.export_schemas import is_pandera_model
     >>> result = is_pandera_model(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
-    try:
-        import pandera as pa
-    except Exception:
+    pa = _load_pandera_module()
+    if pa is None:
         return False
     schema_model = getattr(pa, "SchemaModel", None)
     return bool(schema_model and inspect.isclass(obj) and issubclass(obj, schema_model))
@@ -195,35 +205,32 @@ def _nav_versions(module_name: str, class_name: str, nav: dict[str, Any]) -> dic
 # --------------------------- examples (safe synthesis) ---------------------------
 
 
-def _placeholder(py_type: Any) -> Any:
-    """Generate lightweight placeholders for basic Python types.
-
-    Nested models become {} or [] to avoid heavy imports.
-    """
+def _placeholder(py_type: object) -> object:
+    """Generate lightweight placeholders for basic Python types."""
     origin = getattr(py_type, "__origin__", None)
     if origin in (list, set, tuple):
         return []
     if origin is dict:
         return {}
-    if py_type in (str,):
-        return "example"
-    if py_type in (int,):
-        return 0
-    if py_type in (float,):
-        return 0.0
-    if py_type in (bool,):
-        return False
-    # fallback
+
+    builtin_defaults: dict[type[object], object] = {
+        str: "example",
+        int: 0,
+        float: 0.0,
+        bool: False,
+    }
+    if isinstance(py_type, type) and py_type in builtin_defaults:
+        return builtin_defaults[py_type]
     return {}
 
 
-def _example_for_pydantic(model_cls: type[object]) -> dict[str, Any]:
+def _example_for_pydantic(model_cls: type[object]) -> dict[str, object]:
     """Synthesize a minimal example dict from model_fields (Pydantic v2)."""
     try:
         fields = getattr(model_cls, "model_fields", {})
     except Exception:
         return {}
-    example: dict[str, Any] = {}
+    example: dict[str, object] = {}
     for name, finfo in (fields or {}).items():
         # prefer default; else type-based placeholder
         if getattr(finfo, "default", None) is not None:
@@ -234,11 +241,16 @@ def _example_for_pydantic(model_cls: type[object]) -> dict[str, Any]:
     return example
 
 
-def _example_for_pandera(model_cls: type[object]) -> dict[str, Any]:
+def _example_for_pandera(model_cls: type[object]) -> dict[str, object]:
     """Produce a minimal 'row' example based on class attributes / schema JSON."""
-    model_any = cast(Any, model_cls)
+    attr_name = "to_schema"
     try:
-        schema_json = model_any.to_schema().to_json()
+        to_schema = getattr(model_cls, attr_name)
+    except AttributeError:
+        return {}
+
+    try:
+        schema_json = to_schema().to_json()
         data = json.loads(schema_json)
     except Exception:
         return {}
@@ -257,7 +269,7 @@ def _example_for_pandera(model_cls: type[object]) -> dict[str, Any]:
 
 
 def _apply_headers(
-    schema: dict[str, Any], module_name: str, class_name: str, base_url: str
+    schema: dict[str, object], module_name: str, class_name: str, base_url: str
 ) -> None:
     """Apply headers.
 
@@ -290,7 +302,7 @@ def _apply_headers(
     schema["$id"] = f"{base_url.rstrip('/')}/{module_name}.{class_name}.json#"
 
 
-def _inject_examples(schema: dict[str, Any], example: dict[str, Any] | None) -> None:
+def _inject_examples(schema: dict[str, object], example: Mapping[str, object] | None) -> None:
     """Inject examples.
 
     Parameters
@@ -324,7 +336,7 @@ def _inject_examples(schema: dict[str, Any], example: dict[str, Any] | None) -> 
         schema["examples"] = ex
 
 
-def _inject_versions(schema: dict[str, Any], versions: dict[str, Any] | None) -> None:
+def _inject_versions(schema: dict[str, object], versions: Mapping[str, object] | None) -> None:
     """Inject versions.
 
     Parameters
@@ -357,16 +369,16 @@ def _inject_versions(schema: dict[str, Any], versions: dict[str, Any] | None) ->
 # --------------------------- drift summarizer ---------------------------
 
 
-def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
+def _diff_summary(old: Mapping[str, object], new: Mapping[str, object]) -> dict[str, object]:
     """Summarize differences: top-level keys +/-; property changes (top 10)."""
-    out: dict[str, Any] = {}
+    out: dict[str, object] = {}
     old_keys, new_keys = set(old.keys()), set(new.keys())
     add_keys = sorted(new_keys - old_keys)
     del_keys = sorted(old_keys - new_keys)
     out["top_level_added"] = add_keys
     out["top_level_removed"] = del_keys
 
-    def prop_keys(d: dict[str, Any]) -> set[str]:
+    def prop_keys(d: Mapping[str, object]) -> set[str]:
         """Compute prop keys.
 
         Carry out the prop keys operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -386,7 +398,6 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
         >>> from tools.docs.export_schemas import prop_keys
         >>> result = prop_keys(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         props = d.get("properties")
         return set(props.keys()) if isinstance(props, dict) else set()
@@ -419,7 +430,7 @@ class Cfg:
 
 def _export_one_pydantic(
     module_name: str, name: str, model_cls: type[object], cfg: Cfg, nav: dict[str, Any]
-) -> tuple[Path, dict[str, Any]]:
+) -> tuple[Path, dict[str, object]]:
     """Export one pydantic.
 
     Parameters
@@ -459,16 +470,16 @@ def _export_one_pydantic(
         kwargs["ref_template"] = cfg.ref_template
 
     model_any = cast(Any, model_cls)
-    schema = cast(dict[str, Any], model_any.model_json_schema(**kwargs))
+    schema = cast(dict[str, object], model_any.model_json_schema(**kwargs))
     _apply_headers(schema, module_name, name, cfg.base_url)
     _inject_versions(schema, _nav_versions(module_name, name, nav))
     _inject_examples(schema, _example_for_pydantic(model_cls))
-    return (OUT / f"{module_name}.{name}.json", cast(dict[str, Any], _sorted(schema)))
+    return (OUT / f"{module_name}.{name}.json", cast(dict[str, object], _sorted(schema)))
 
 
 def _export_one_pandera(
     module_name: str, name: str, model_cls: type[object], cfg: Cfg, nav: dict[str, Any]
-) -> tuple[Path, dict[str, Any]]:
+) -> tuple[Path, dict[str, object]]:
     """Export one pandera.
 
     Parameters
@@ -499,17 +510,22 @@ def _export_one_pandera(
     >>> _export_one_pandera(...)
     """
     # Pandera emits JSON string; normalize to dict, enrich, and sort.
-    model_any = cast(Any, model_cls)
+    attr_name = "to_schema"
     try:
-        schema_json = model_any.to_schema().to_json()
+        to_schema = getattr(model_cls, attr_name)
+    except AttributeError:
+        return (OUT / f"{module_name}.{name}.json", {})
+
+    try:
+        schema_json = to_schema().to_json()
         schema_obj = json.loads(schema_json)
     except Exception:
         return (OUT / f"{module_name}.{name}.json", {})
-    schema: dict[str, Any] = dict(schema_obj)
+    schema: dict[str, object] = dict(schema_obj)
     _apply_headers(schema, module_name, name, cfg.base_url)
     _inject_versions(schema, _nav_versions(module_name, name, nav))
     _inject_examples(schema, _example_for_pandera(model_cls))
-    return (OUT / f"{module_name}.{name}.json", cast(dict[str, Any], _sorted(schema)))
+    return (OUT / f"{module_name}.{name}.json", cast(dict[str, object], _sorted(schema)))
 
 
 def _iter_models() -> Iterator[tuple[str, str, type[object]]]:
@@ -535,112 +551,125 @@ def _iter_models() -> Iterator[tuple[str, str, type[object]]]:
                 yield module_name, name, model_cls
 
 
-def main(argv: list[str] | None = None) -> int:
-    """Compute main.
-
-    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    argv : List[str] | None
-        Optional parameter default ``None``. Description for ``argv``.
-
-    Returns
-    -------
-    int
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.docs.export_schemas import main
-    >>> result = main()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    """
+def _parse_args(argv: Sequence[str] | None) -> Cfg:
+    """Parse CLI arguments into a :class:`Cfg`."""
     import argparse
 
-    p = argparse.ArgumentParser()
-    p.add_argument(
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
         "--ref-template",
         default="#/$defs/{model}",
         help="Pydantic $ref template (default Pydantic; examples: '#/$defs/{model}', '#/components/schemas/{model}')",
     )
-    p.add_argument(
+
+    parser.add_argument(
         "--base-url",
         default=DEFAULT_BASE_URL,
         help="Base URL for $id (default: env SCHEMA_BASE_URL or https://kgfoundry/schemas)",
     )
-    p.add_argument(
+    parser.add_argument(
         "--by-alias", action="store_true", help="Generate Pydantic schemas using field aliases"
     )
-    p.add_argument(
+    parser.add_argument(
         "--check-drift",
         action="store_true",
         help="Do not write; fail with summary if any drift exists",
     )
-    args = p.parse_args(argv or [])
-    cfg = Cfg(
+    args = parser.parse_args(argv or [])
+    return Cfg(
         ref_template=args.ref_template,
         base_url=args.base_url,
         by_alias=args.by_alias,
         check_drift=args.check_drift,
     )
 
-    nav = _load_navmap()
-    drift_summaries: dict[str, Any] = {}
+
+def _load_existing_schema(path: Path) -> dict[str, object] | None:
+    """Read an existing JSON schema from disk."""
+    if not path.exists():
+        return None
+    try:
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    return loaded if isinstance(loaded, dict) else None
+
+
+def _schemas_match(previous: Mapping[str, object] | None, current: Mapping[str, object]) -> bool:
+    """Return ``True`` when two schema mappings represent the same data."""
+    if previous is None:
+        return False
+    return _sorted(previous) == current
+
+
+def _record_drift(
+    path: Path,
+    previous: Mapping[str, object] | None,
+    current: Mapping[str, object],
+    drift_summaries: dict[str, object],
+) -> None:
+    """Store a drift summary for ``path`` in ``drift_summaries``."""
+    drift_summaries[str(path)] = _diff_summary(previous or {}, current)
+
+
+def _export_model(
+    module_name: str,
+    name: str,
+    model_cls: type[object],
+    cfg: Cfg,
+    nav: dict[str, Any],
+) -> tuple[Path, dict[str, object]]:
+    """Dispatch to the correct exporter based on model type."""
+    if is_pydantic_model(model_cls):
+        return _export_one_pydantic(module_name, name, model_cls, cfg, nav)
+    return _export_one_pandera(module_name, name, model_cls, cfg, nav)
+
+
+def _remove_stale_schemas(
+    produced_paths: set[Path], cfg: Cfg, drift_summaries: dict[str, object]
+) -> bool:
+    """Remove schema files that were not produced in the current run."""
     changed = False
-    produced_paths: set[Path] = set()
-
-    for module_name, name, model_cls in _iter_models():
-        path: Path
-        data: dict[str, Any]
-        if is_pydantic_model(model_cls):
-            path, data = _export_one_pydantic(module_name, name, model_cls, cfg, nav)
-        else:
-            path, data = _export_one_pandera(module_name, name, model_cls, cfg, nav)
-        if not data:
-            continue
-
-        produced_paths.add(path)
-
-        # Drift handling
-        old: dict[str, Any] | None = None
-        if path.exists():
-            try:
-                loaded = json.loads(path.read_text(encoding="utf-8"))
-                old = cast(dict[str, Any], loaded)
-            except Exception:
-                old = None
-
-        if cfg.check_drift:
-            if old is None or _sorted(old) != data:
-                drift_summaries[str(path)] = _diff_summary(old or {}, data)
-                changed = True
-            continue
-        wrote, old_text, _ = _write_if_changed(path, data)
-        if wrote:
-            drift_summaries[str(path)] = _diff_summary(
-                cast(dict[str, Any], json.loads(old_text)) if old_text else {}, data
-            )
-            changed = True
-
-    # Remove any schema files that were not regenerated in this run.
-    existing_paths = {p for p in OUT.glob("*.json")}
-    stale_paths = existing_paths - produced_paths
-    for stale_path in sorted(stale_paths):
-        old_data: dict[str, Any] = {}
-        if stale_path.exists():
-            try:
-                old_loaded = json.loads(stale_path.read_text(encoding="utf-8"))
-                old_data = cast(dict[str, Any], old_loaded)
-            except Exception:
-                old_data = {}
-        drift_summaries[str(stale_path)] = _diff_summary(old_data, {})
+    existing_paths = set(OUT.glob("*.json"))
+    for stale_path in sorted(existing_paths - produced_paths):
+        old_data = _load_existing_schema(stale_path) or {}
+        _record_drift(stale_path, old_data, {}, drift_summaries)
         changed = True
         if cfg.check_drift:
             continue
         with suppress(FileNotFoundError):
             stale_path.unlink()
+    return changed
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    """Compute main."""
+    cfg = _parse_args(argv)
+    nav = _load_navmap()
+    drift_summaries: dict[str, object] = {}
+    changed = False
+    produced_paths: set[Path] = set()
+
+    for module_name, name, model_cls in _iter_models():
+        path, data = _export_model(module_name, name, model_cls, cfg, nav)
+        if not data:
+            continue
+        produced_paths.add(path)
+
+        previous = _load_existing_schema(path)
+        if cfg.check_drift:
+            if not _schemas_match(previous, data):
+                _record_drift(path, previous, data, drift_summaries)
+                changed = True
+            continue
+
+        wrote, _, _ = _write_if_changed(path, data)
+        if wrote:
+            _record_drift(path, previous or {}, data, drift_summaries)
+            changed = True
+
+    if _remove_stale_schemas(produced_paths, cfg, drift_summaries):
+        changed = True
 
     if drift_summaries:
         DRIFT_OUT.parent.mkdir(parents=True, exist_ok=True)
