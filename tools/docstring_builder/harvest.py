@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import inspect
-from collections.abc import Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import libcst as cst
 from tools.docstring_builder.config import BuilderConfig
@@ -18,11 +18,20 @@ except (ModuleNotFoundError, AttributeError) as exc:  # pragma: no cover - runti
     message = "Griffe is required to run the docstring builder. Install the optional dependency via ``uv sync``."
     raise RuntimeError(message) from exc
 
-Class = _GRIFFE_API.class_type
-Function = _GRIFFE_API.function_type
-Module = _GRIFFE_API.module_type
-Object = _GRIFFE_API.object_type
-GriffeLoader = _GRIFFE_API.loader_type
+if TYPE_CHECKING:
+    from griffe import Class as GriffeClass
+    from griffe import Function as GriffeFunction
+    from griffe import GriffeLoader as GriffeLoaderType
+    from griffe import Module as GriffeModule
+    from griffe import Object as GriffeObject
+else:  # pragma: no cover - typing fallback when ``griffe`` is absent at runtime
+    GriffeClass = GriffeFunction = GriffeModule = GriffeObject = GriffeLoaderType = object
+
+Class = cast(type[GriffeClass], _GRIFFE_API.class_type)
+Function = cast(type[GriffeFunction], _GRIFFE_API.function_type)
+Module = cast(type[GriffeModule], _GRIFFE_API.module_type)
+Object = cast(type[GriffeObject], _GRIFFE_API.object_type)
+GriffeLoader = cast(type[GriffeLoaderType], _GRIFFE_API.loader_type)
 
 
 _KIND_LOOKUP: dict[str, inspect._ParameterKind] = {
@@ -107,11 +116,14 @@ def _module_name(root: Path, file_path: Path) -> str:
     return ".".join(parts)
 
 
-def _load_module(module_name: str, search_paths: list[str]) -> Module:
-    loader = GriffeLoader(search_paths=search_paths)
-    load_fn = getattr(loader, "load_module", None)
-    if load_fn is None:
-        load_fn = loader.load
+def _load_module(module_name: str, search_paths: list[str]) -> GriffeModule:
+    loader: GriffeLoaderType = GriffeLoader(search_paths=search_paths)
+    load_candidate = getattr(loader, "load_module", None)
+    load_fn: Callable[[str], GriffeModule]
+    if callable(load_candidate):
+        load_fn = cast(Callable[[str], GriffeModule], load_candidate)
+    else:
+        load_fn = cast(Callable[[str], GriffeModule], loader.load)
     try:
         return load_fn(module_name)
     except Exception:
@@ -123,9 +135,10 @@ def _load_module(module_name: str, search_paths: list[str]) -> Module:
 
 def _safe_getattr(value: object, attr: str) -> object | None:
     try:
-        return getattr(value, attr)
+        attr_value = getattr(value, attr)
     except Exception:  # pragma: no cover - defensive fallback
         return None
+    return cast(object, attr_value)
 
 
 def _extract_string_attribute(value: object, attr: str) -> str | None:
@@ -182,7 +195,7 @@ def _decorator_names(decorators: Iterable[object]) -> list[str]:
     return names
 
 
-def _iter_parameters(function: Function) -> Iterator[ParameterHarvest]:
+def _iter_parameters(function: GriffeFunction) -> Iterator[ParameterHarvest]:
     for param in function.parameters:
         yield ParameterHarvest(
             name=param.name,
@@ -193,7 +206,7 @@ def _iter_parameters(function: Function) -> Iterator[ParameterHarvest]:
 
 
 def _collect_symbols(
-    obj: Object,
+    obj: GriffeObject,
     module_name: str,
     file_path: Path,
     config: BuilderConfig,
@@ -256,7 +269,7 @@ def _collect_symbols(
 
 
 def _walk_members(
-    obj: Module | Class,
+    obj: GriffeModule | GriffeClass,
     module_name: str,
     file_path: Path,
     config: BuilderConfig,

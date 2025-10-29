@@ -73,6 +73,9 @@ docstrings:
 docfacts-diff:
 	uv run --no-project --with libcst --with griffe python -m tools.docstring_builder.cli --diff-only --all
 
+stubs-check:
+	uv run --no-project --with libcst --with griffe --with mkdocs-gen-files python tools/stubs/drift_check.py
+
 artifacts:
 	uv run python tools/docs/build_artifacts.py
 
