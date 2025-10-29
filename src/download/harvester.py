@@ -51,7 +51,20 @@ HTTP_OK = 200
 
 @dataclass(frozen=True)
 class HarvesterConfig:
-    """Immutable configuration bundle for harvester endpoints."""
+    """Immutable configuration bundle for harvester endpoints.
+<!-- auto:docstring-builder v1 -->
+
+    Attributes
+    ----------
+    openalex_base : str
+        Base URL for the OpenAlex API.
+    unpaywall_base : str
+        Base URL for Unpaywall requests.
+    pdf_host_base : str | None
+        Optional override for the PDF hosting service.
+    out_dir : str
+        Directory used to persist downloaded PDFs.
+    """
 
     openalex_base: str = "https://api.openalex.org"
     unpaywall_base: str = "https://api.unpaywall.org"
@@ -61,11 +74,20 @@ class HarvesterConfig:
 
 # [nav:anchor OpenAccessHarvester]
 class OpenAccessHarvester:
-    """Model the OpenAccessHarvester.
+    """Harvest open-access works using OpenAlex and Unpaywall APIs.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the openaccessharvester data structure used throughout the project. The class
-    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-    are typically created by factories or runtime orchestrators documented nearby.
+    The harvester owns the HTTP session and normalises URL construction so download
+    logic can be reused across pipelines.
+
+    Parameters
+    ----------
+    user_agent : str
+        User agent string sent with outbound requests.
+    contact_email : str
+        Contact email appended to the ``User-Agent`` header.
+    config : HarvesterConfig | None, optional
+        Optional configuration overrides. Defaults to ``HarvesterConfig()``.
     """
 
     def __init__(
@@ -74,19 +96,6 @@ class OpenAccessHarvester:
         contact_email: str,
         config: HarvesterConfig | None = None,
     ) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-
-        Parameters
-        ----------
-        user_agent : str
-            Description for ``user_agent``.
-        contact_email : str
-            Description for ``contact_email``.
-        config : HarvesterConfig | None
-            Optional parameter default ``None``. Description for ``config``.
-        """
         cfg = config or HarvesterConfig()
         self.ua = user_agent
         self.email = contact_email
@@ -100,34 +109,41 @@ class OpenAccessHarvester:
 
     def search(self, topic: str, years: str, max_works: int) -> list[dict[str, object]]:
         """Compute search.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        topic : str
-            Description for ``topic``.
-        years : str
-            Description for ``years``.
-        max_works : int
-            Description for ``max_works``.
+Parameters
+----------
+topic : str
+    Description for ``topic``.
+years : str
+    Description for ``years``.
+max_works : int
+    Description for ``max_works``.
+    
+    
+    
 
-        Returns
-        -------
-        List[dict[str, object]]
-            Description of return value.
+Returns
+-------
+list[dict[str, object]]
+    Description of return value.
+    
+    
+    
 
-        Raises
-        ------
-        TypeError
-            Raised when validation fails.
+Raises
+------
+TypeError
+    Raised when validation fails.
 
-        Examples
-        --------
-        >>> from download.harvester import search
-        >>> result = search(..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from download.harvester import search
+>>> result = search(..., ..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
             "topic": topic,
@@ -154,25 +170,32 @@ class OpenAccessHarvester:
 
     def resolve_pdf(self, work: Mapping[str, object]) -> str | None:
         """Compute resolve pdf.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the resolve pdf operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the resolve pdf operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        work : collections.abc.Mapping
-            Description for ``work``.
+Parameters
+----------
+work : Mapping[str, object]
+    Description for ``work``.
+    
+    
+    
 
-        Returns
-        -------
-        str | None
-            Description of return value.
+Returns
+-------
+str | None
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from download.harvester import resolve_pdf
-        >>> result = resolve_pdf(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from download.harvester import resolve_pdf
+>>> result = resolve_pdf(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         direct = self._lookup_direct_pdf(work)
         if direct:
             return direct
@@ -192,7 +215,21 @@ class OpenAccessHarvester:
         return None
 
     def _lookup_direct_pdf(self, work: Mapping[str, object]) -> str | None:
-        """Return the primary PDF URL if embedded directly in the payload."""
+        """Return the primary PDF URL if embedded directly in the payload.
+<!-- auto:docstring-builder v1 -->
+
+Parameters
+----------
+work : Mapping[str, object]
+    Describe ``work``.
+    
+    
+
+Returns
+-------
+str | None
+    Describe return value.
+"""
         best = work.get("best_oa_location")
         if isinstance(best, Mapping):
             pdf_url = best.get("pdf_url")
@@ -201,7 +238,21 @@ class OpenAccessHarvester:
         return None
 
     def _lookup_locations_pdf(self, locations: object) -> str | None:
-        """Scan secondary locations for a resolvable PDF link."""
+        """Scan secondary locations for a resolvable PDF link.
+<!-- auto:docstring-builder v1 -->
+
+Parameters
+----------
+locations : object
+    Describe ``locations``.
+    
+    
+
+Returns
+-------
+str | None
+    Describe return value.
+"""
         if isinstance(locations, (str, bytes)):
             return None
         if not isinstance(locations, Sequence):
@@ -214,7 +265,21 @@ class OpenAccessHarvester:
         return None
 
     def _resolve_unpaywall_pdf(self, doi: str) -> str | None:
-        """Resolve a DOI via Unpaywall when available."""
+        """Resolve a DOI via Unpaywall when available.
+<!-- auto:docstring-builder v1 -->
+
+Parameters
+----------
+doi : str
+    Describe ``doi``.
+    
+    
+
+Returns
+-------
+str | None
+    Describe return value.
+"""
         response = self.session.get(
             f"{self.unpaywall}/v2/{doi}", params={"email": self.email}, timeout=15
         )
@@ -230,41 +295,62 @@ class OpenAccessHarvester:
         return None
 
     def _host_pdf_url(self, doi: str) -> str | None:
-        """Return a hosted PDF URL when a distribution host is configured."""
+        """Return a hosted PDF URL when a distribution host is configured.
+<!-- auto:docstring-builder v1 -->
+
+Parameters
+----------
+doi : str
+    Describe ``doi``.
+    
+    
+
+Returns
+-------
+str | None
+    Describe return value.
+"""
         if not self.pdf_host:
             return None
         return f"{self.pdf_host}/pdf/{doi.replace('/', '_')}.pdf"
 
     def download_pdf(self, url: str, target_path: str) -> str:
         """Compute download pdf.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the download pdf operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the download pdf operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        url : str
-            Description for ``url``.
-        target_path : str
-            Description for ``target_path``.
+Parameters
+----------
+url : str
+    Description for ``url``.
+target_path : str
+    Description for ``target_path``.
+    
+    
+    
 
-        Returns
-        -------
-        str
-            Description of return value.
+Returns
+-------
+str
+    Description of return value.
+    
+    
+    
 
-        Raises
-        ------
-        DownloadError
-            Raised when validation fails.
-        UnsupportedMIMEError
-            Raised when validation fails.
+Raises
+------
+DownloadError
+    Raised when validation fails.
+UnsupportedMIMEError
+    Raised when validation fails.
 
-        Examples
-        --------
-        >>> from download.harvester import download_pdf
-        >>> result = download_pdf(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from download.harvester import download_pdf
+>>> result = download_pdf(..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
             message = f"Bad status {response.status_code} for {url}"
@@ -279,29 +365,36 @@ class OpenAccessHarvester:
 
     def run(self, topic: str, years: str, max_works: int) -> list[Doc]:
         """Compute run.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        topic : str
-            Description for ``topic``.
-        years : str
-            Description for ``years``.
-        max_works : int
-            Description for ``max_works``.
+Parameters
+----------
+topic : str
+    Description for ``topic``.
+years : str
+    Description for ``years``.
+max_works : int
+    Description for ``max_works``.
+    
+    
+    
 
-        Returns
-        -------
-        List[src.kgfoundry_common.models.Doc]
-            Description of return value.
+Returns
+-------
+list[Doc]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from download.harvester import run
-        >>> result = run(..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from download.harvester import run
+>>> result = run(..., ..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)
         for work in works:

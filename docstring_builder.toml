@@ -9,6 +9,7 @@ ignore = [
 ]
 ownership_marker = "<!-- auto:docstring-builder v1 -->"
 dynamic_probes = false
+normalize_sections = true
 navmap_metadata = true
 
 [packages]

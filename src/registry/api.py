@@ -44,73 +44,96 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor Registry]
 class Registry(Protocol):
     """Model the Registry.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the registry data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the registry data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+
+Parameters
+----------
+*args : Any
+    Describe ``args``.
+**kwargs : Any
+    Describe ``kwargs``.
+"""
 
     def begin_dataset(self, kind: str, run_id: str) -> str:
         """Compute begin dataset.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the begin dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the begin dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        kind : str
-            Description for ``kind``.
-        run_id : str
-            Description for ``run_id``.
+Parameters
+----------
+kind : str
+    Description for ``kind``.
+run_id : str
+    Description for ``run_id``.
+    
+    
+    
 
-        Returns
-        -------
-        str
-            Description of return value.
+Returns
+-------
+str
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from registry.api import begin_dataset
-        >>> result = begin_dataset(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from registry.api import begin_dataset
+>>> result = begin_dataset(..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
         ...
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
         """Compute commit dataset.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the commit dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the commit dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        dataset_id : str
-            Description for ``dataset_id``.
-        parquet_root : str
-            Description for ``parquet_root``.
-        rows : int
-            Description for ``rows``.
+Parameters
+----------
+dataset_id : str
+    Description for ``dataset_id``.
+parquet_root : str
+    Description for ``parquet_root``.
+rows : int
+    Description for ``rows``.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from registry.api import commit_dataset
-        >>> commit_dataset(..., ..., ...)  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from registry.api import commit_dataset
+>>> commit_dataset(..., ..., ...)  # doctest: +ELLIPSIS
+"""
         ...
 
     def rollback_dataset(self, dataset_id: str) -> None:
         """Compute rollback dataset.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the rollback dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the rollback dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        dataset_id : str
-            Description for ``dataset_id``.
+Parameters
+----------
+dataset_id : str
+    Description for ``dataset_id``.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from registry.api import rollback_dataset
-        >>> rollback_dataset(...)  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from registry.api import rollback_dataset
+>>> rollback_dataset(...)  # doctest: +ELLIPSIS
+"""
         ...
 
     def insert_run(
@@ -121,128 +144,157 @@ class Registry(Protocol):
         config: Mapping[str, object],
     ) -> str:
         """Compute insert run.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the insert run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the insert run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        purpose : str
-            Description for ``purpose``.
-        model_id : str | None
-            Description for ``model_id``.
-        revision : str | None
-            Description for ``revision``.
-        config : collections.abc.Mapping
-            Description for ``config``.
+Parameters
+----------
+purpose : str
+    Description for ``purpose``.
+model_id : str | None
+    Description for ``model_id``.
+revision : str | None
+    Description for ``revision``.
+config : Mapping[str, object]
+    Description for ``config``.
+    
+    
+    
 
-        Returns
-        -------
-        str
-            Description of return value.
+Returns
+-------
+str
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from registry.api import insert_run
-        >>> result = insert_run(..., ..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from registry.api import insert_run
+>>> result = insert_run(..., ..., ..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
         ...
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
         """Compute close run.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the close run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the close run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        run_id : str
-            Description for ``run_id``.
-        success : bool
-            Description for ``success``.
-        notes : str | None
-            Optional parameter default ``None``. Description for ``notes``.
+Parameters
+----------
+run_id : str
+    Description for ``run_id``.
+success : bool
+    Description for ``success``.
+notes : str | None, optional
+    Defaults to ``None``.
+    Description for ``notes``.
+    
+    
+    
+    Defaults to ``None``.
 
-        Examples
-        --------
-        >>> from registry.api import close_run
-        >>> close_run(..., ...)  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from registry.api import close_run
+>>> close_run(..., ...)  # doctest: +ELLIPSIS
+"""
         ...
 
     def register_documents(self, docs: list[Doc]) -> None:
         """Compute register documents.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the register documents operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the register documents operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        docs : List[src.kgfoundry_common.models.Doc]
-            Description for ``docs``.
+Parameters
+----------
+docs : list[Doc]
+    Description for ``docs``.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from registry.api import register_documents
-        >>> register_documents(...)  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from registry.api import register_documents
+>>> register_documents(...)  # doctest: +ELLIPSIS
+"""
         ...
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
         """Compute register doctags.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the register doctags operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the register doctags operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        assets : List[src.kgfoundry_common.models.DoctagsAsset]
-            Description for ``assets``.
+Parameters
+----------
+assets : list[DoctagsAsset]
+    Description for ``assets``.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from registry.api import register_doctags
-        >>> register_doctags(...)  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from registry.api import register_doctags
+>>> register_doctags(...)  # doctest: +ELLIPSIS
+"""
         ...
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
         """Compute emit event.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the emit event operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the emit event operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        event_name : str
-            Description for ``event_name``.
-        subject_id : str
-            Description for ``subject_id``.
-        payload : collections.abc.Mapping
-            Description for ``payload``.
+Parameters
+----------
+event_name : str
+    Description for ``event_name``.
+subject_id : str
+    Description for ``subject_id``.
+payload : Mapping[str, object]
+    Description for ``payload``.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from registry.api import emit_event
-        >>> emit_event(..., ..., ...)  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from registry.api import emit_event
+>>> emit_event(..., ..., ...)  # doctest: +ELLIPSIS
+"""
         ...
 
     def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
         """Compute incident.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the incident operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the incident operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        event : str
-            Description for ``event``.
-        subject_id : str
-            Description for ``subject_id``.
-        error_class : str
-            Description for ``error_class``.
-        message : str
-            Description for ``message``.
+Parameters
+----------
+event : str
+    Description for ``event``.
+subject_id : str
+    Description for ``subject_id``.
+error_class : str
+    Description for ``error_class``.
+message : str
+    Description for ``message``.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from registry.api import incident
-        >>> incident(..., ..., ..., ...)  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from registry.api import incident
+>>> incident(..., ..., ..., ...)  # doctest: +ELLIPSIS
+"""
         ...

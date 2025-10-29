@@ -82,11 +82,17 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 # [nav:anchor BM25Doc]
 @dataclass
 class BM25Doc:
-    """Model the BM25Doc.
+    """Document payload stored in the BM25 index.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the bm25doc data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Attributes
+    ----------
+    doc_id : str
+        Identifier that links the document back to upstream storage.
+    length : int
+        Total token count for the combined fields.
+    fields : dict[str, str]
+        Mapping of field name to the raw text that feeds the scorer.
     """
 
     doc_id: str
@@ -96,11 +102,22 @@ class BM25Doc:
 
 # [nav:anchor PurePythonBM25]
 class PurePythonBM25:
-    """Model the PurePythonBM25.
+    """Pure Python BM25 scorer backed by dictionaries.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the purepythonbm25 data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    The implementation pre-computes document frequencies and caches postings on disk,
+    making it suitable for unit tests and small deployments that do not ship Lucene.
+
+    Parameters
+    ----------
+    index_dir : str
+        Directory that stores serialized postings and statistics.
+    k1 : float, optional
+        Saturation parameter controlling term frequency scaling. Defaults to ``0.9``.
+    b : float, optional
+        Length normalisation parameter. Defaults to ``0.4``.
+    field_boosts : dict[str, float] | None, optional
+        Per-field weighting overrides applied during scoring. Defaults to ``None``.
     """
 
     def __init__(
@@ -110,21 +127,6 @@ class PurePythonBM25:
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
     ) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-
-        Parameters
-        ----------
-        index_dir : str
-            Description for ``index_dir``.
-        k1 : float | None
-            Optional parameter default ``0.9``. Description for ``k1``.
-        b : float | None
-            Optional parameter default ``0.4``. Description for ``b``.
-        field_boosts : Mapping[str, float] | None
-            Optional parameter default ``None``. Description for ``field_boosts``.
-        """
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -138,36 +140,44 @@ class PurePythonBM25:
     @staticmethod
     def _tokenize(text: str) -> list[str]:
         """Compute tokenize.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the tokenize operation.
+Carry out the tokenize operation.
 
-        Parameters
-        ----------
-        text : str
-            Description for ``text``.
+Parameters
+----------
+text : str
+    Description for ``text``.
+    
+    
+    
 
-        Returns
-        -------
-        List[str]
-            Description of return value.
-        """
+Returns
+-------
+list[str]
+    Description of return value.
+"""
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Compute build.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        docs_iterable : collections.abc.Iterable
-            Description for ``docs_iterable``.
+Parameters
+----------
+docs_iterable : Iterable[tuple[str, dict[str, str]]]
+    Description for ``docs_iterable``.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from embeddings_sparse.bm25 import build
-        >>> build(...)  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_sparse.bm25 import build
+>>> build(...)  # doctest: +ELLIPSIS
+"""
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
@@ -216,14 +226,15 @@ class PurePythonBM25:
 
     def load(self) -> None:
         """Compute load.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Examples
-        --------
-        >>> from embeddings_sparse.bm25 import load
-        >>> load()  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_sparse.bm25 import load
+>>> load()  # doctest: +ELLIPSIS
+"""
         path = os.path.join(self.index_dir, "pure_bm25.pkl")
         with open(path, "rb") as f:
             data = pickle.load(f)
@@ -238,19 +249,23 @@ class PurePythonBM25:
 
     def _idf(self, term: str) -> float:
         """Compute idf.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the idf operation.
+Carry out the idf operation.
 
-        Parameters
-        ----------
-        term : str
-            Description for ``term``.
+Parameters
+----------
+term : str
+    Description for ``term``.
+    
+    
+    
 
-        Returns
-        -------
-        float
-            Description of return value.
-        """
+Returns
+-------
+float
+    Description of return value.
+"""
         n_t = self.df.get(term, 0)
         if n_t == 0:
             return 0.0
@@ -261,29 +276,38 @@ class PurePythonBM25:
         self, query: str, k: int, fields: Mapping[str, str] | None = None
     ) -> list[tuple[str, float]]:
         """Compute search.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        query : str
-            Description for ``query``.
-        k : int
-            Description for ``k``.
-        fields : Mapping[str, str] | None
-            Optional parameter default ``None``. Description for ``fields``.
+Parameters
+----------
+query : str
+    Description for ``query``.
+k : int
+    Description for ``k``.
+fields : Mapping[str, str] | None, optional
+    Defaults to ``None``.
+    Description for ``fields``.
+    
+    
+    
+    Defaults to ``None``.
 
-        Returns
-        -------
-        List[Tuple[str, float]]
-            Description of return value.
+Returns
+-------
+list[tuple[str, float]]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from embeddings_sparse.bm25 import search
-        >>> result = search(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_sparse.bm25 import search
+>>> result = search(..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -303,11 +327,19 @@ class PurePythonBM25:
 
 # [nav:anchor LuceneBM25]
 class LuceneBM25:
-    """Model the LuceneBM25.
+    """Pyserini-backed BM25 scorer that proxies to Lucene indexes.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the lucenebm25 data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Parameters
+    ----------
+    index_dir : str
+        Directory that stores the Pyserini/Lucene index.
+    k1 : float, optional
+        Saturation parameter controlling the BM25 term frequency component. Defaults to ``0.9``.
+    b : float, optional
+        Length normalisation parameter. Defaults to ``0.4``.
+    field_boosts : dict[str, float] | None, optional
+        Optional field-specific boosts forwarded to Pyserini. Defaults to ``None``.
     """
 
     def __init__(
@@ -317,21 +349,6 @@ class LuceneBM25:
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
     ) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-
-        Parameters
-        ----------
-        index_dir : str
-            Description for ``index_dir``.
-        k1 : float | None
-            Optional parameter default ``0.9``. Description for ``k1``.
-        b : float | None
-            Optional parameter default ``0.4``. Description for ``b``.
-        field_boosts : Mapping[str, float] | None
-            Optional parameter default ``None``. Description for ``field_boosts``.
-        """
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -340,24 +357,28 @@ class LuceneBM25:
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Compute build.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        docs_iterable : collections.abc.Iterable
-            Description for ``docs_iterable``.
+Parameters
+----------
+docs_iterable : Iterable[tuple[str, dict[str, str]]]
+    Description for ``docs_iterable``.
+    
+    
+    
 
-        Raises
-        ------
-        RuntimeError
-            Raised when validation fails.
+Raises
+------
+RuntimeError
+    Raised when validation fails.
 
-        Examples
-        --------
-        >>> from embeddings_sparse.bm25 import build
-        >>> build(...)  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_sparse.bm25 import build
+>>> build(...)  # doctest: +ELLIPSIS
+"""
         try:
             from pyserini.index.lucene import LuceneIndexer
         except Exception as exc:
@@ -382,9 +403,10 @@ class LuceneBM25:
 
     def _ensure_searcher(self) -> None:
         """Compute ensure searcher.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the ensure searcher operation.
-        """
+Carry out the ensure searcher operation.
+"""
         if self._searcher is not None:
             return
         from pyserini.search.lucene import LuceneSearcher
@@ -396,34 +418,43 @@ class LuceneBM25:
         self, query: str, k: int, fields: dict[str, str] | None = None
     ) -> list[tuple[str, float]]:
         """Compute search.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        query : str
-            Description for ``query``.
-        k : int
-            Description for ``k``.
-        fields : Mapping[str, str] | None
-            Optional parameter default ``None``. Description for ``fields``.
+Parameters
+----------
+query : str
+    Description for ``query``.
+k : int
+    Description for ``k``.
+fields : dict[str, str] | None, optional
+    Defaults to ``None``.
+    Description for ``fields``.
+    
+    
+    
+    Defaults to ``None``.
 
-        Returns
-        -------
-        List[Tuple[str, float]]
-            Description of return value.
+Returns
+-------
+list[tuple[str, float]]
+    Description of return value.
+    
+    
+    
 
-        Raises
-        ------
-        RuntimeError
-            Raised when validation fails.
+Raises
+------
+RuntimeError
+    Raised when validation fails.
 
-        Examples
-        --------
-        >>> from embeddings_sparse.bm25 import search
-        >>> result = search(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_sparse.bm25 import search
+>>> result = search(..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
         self._ensure_searcher()
         if self._searcher is None:
             message = "Lucene searcher not initialized"
@@ -442,33 +473,46 @@ def get_bm25(
     field_boosts: dict[str, float] | None = None,
 ) -> PurePythonBM25 | LuceneBM25:
     """Compute get bm25.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the get bm25 operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the get bm25 operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    backend : str
-        Description for ``backend``.
-    index_dir : str
-        Description for ``index_dir``.
-    k1 : float | None
-        Optional parameter default ``0.9``. Description for ``k1``.
-    b : float | None
-        Optional parameter default ``0.4``. Description for ``b``.
-    field_boosts : Mapping[str, float] | None
-        Optional parameter default ``None``. Description for ``field_boosts``.
+Parameters
+----------
+backend : str
+    Description for ``backend``.
+index_dir : str
+    Description for ``index_dir``.
+k1 : float, optional
+    Defaults to ``0.9``.
+    Description for ``k1``.
+    Defaults to ``0.9``.
+b : float, optional
+    Defaults to ``0.4``.
+    Description for ``b``.
+    Defaults to ``0.4``.
+field_boosts : dict[str, float] | None, optional
+    Defaults to ``None``.
+    Description for ``field_boosts``.
+    
+    
+    
+    Defaults to ``None``.
 
-    Returns
-    -------
-    PurePythonBM25 | LuceneBM25
-        Description of return value.
+Returns
+-------
+PurePythonBM25 | LuceneBM25
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from embeddings_sparse.bm25 import get_bm25
-    >>> result = get_bm25(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from embeddings_sparse.bm25 import get_bm25
+>>> result = get_bm25(..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
     if backend == "lucene":
         try:
             return LuceneBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)

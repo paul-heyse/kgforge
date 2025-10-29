@@ -50,36 +50,51 @@ TOKEN = re.compile(r"[A-Za-z0-9]+")
 # [nav:anchor tok]
 def tok(text: str) -> list[str]:
     """Compute tok.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the tok operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the tok operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    text : str
-        Description for ``text``.
+Parameters
+----------
+text : str
+    Description for ``text``.
+    
+    
+    
 
-    Returns
-    -------
-    List[str]
-        Description of return value.
+Returns
+-------
+list[str]
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from search_api.splade_index import tok
-    >>> result = tok(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from search_api.splade_index import tok
+>>> result = tok(...)
+>>> result  # doctest: +ELLIPSIS
+"""
     return [token.lower() for token in TOKEN.findall(text or "")]
 
 
 # [nav:anchor SpladeDoc]
 @dataclass
 class SpladeDoc:
-    """Model the SpladeDoc.
+    """Fixture SPLADE document loaded from the DuckDB catalog.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the spladedoc data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Attributes
+    ----------
+    chunk_id : str
+        Unique chunk identifier.
+    doc_id : str
+        Parent document identifier.
+    section : str
+        Section heading captured with the chunk.
+    text : str
+        Raw text body of the chunk.
     """
 
     chunk_id: str
@@ -90,11 +105,18 @@ class SpladeDoc:
 
 # [nav:anchor SpladeIndex]
 class SpladeIndex:
-    """Model the SpladeIndex.
+    """Simplified SPLADE index for fixtures and tutorials.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the spladeindex data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Parameters
+    ----------
+    db_path : str
+        DuckDB database containing the fixture datasets.
+    chunks_dataset_root : str | None, optional
+        Optional explicit path to the chunks dataset. Defaults to ``None`` to
+        auto-discover via DuckDB metadata.
+    sparse_root : str | None, optional
+        Reserved parameter for compatibility with production code paths.
     """
 
     def __init__(
@@ -103,19 +125,6 @@ class SpladeIndex:
         chunks_dataset_root: str | None = None,
         sparse_root: str | None = None,
     ) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-
-        Parameters
-        ----------
-        db_path : str
-            Description for ``db_path``.
-        chunks_dataset_root : str | None
-            Optional parameter default ``None``. Description for ``chunks_dataset_root``.
-        sparse_root : str | None
-            Optional parameter default ``None``. Description for ``sparse_root``.
-        """
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -125,14 +134,15 @@ class SpladeIndex:
 
     def _load(self, chunks_root: str | None) -> None:
         """Compute load.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the load operation.
+Carry out the load operation.
 
-        Parameters
-        ----------
-        chunks_root : str | None
-            Description for ``chunks_root``.
-        """
+Parameters
+----------
+chunks_root : str | None
+    Description for ``chunks_root``.
+"""
         _ = chunks_root  # optional override currently unused
         if not Path(self.db_path).exists():
             return
@@ -165,27 +175,36 @@ class SpladeIndex:
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
         """Compute search.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        query : str
-            Description for ``query``.
-        k : int | None
-            Optional parameter default ``10``. Description for ``k``.
+Parameters
+----------
+query : str
+    Description for ``query``.
+k : int, optional
+    Defaults to ``10``.
+    Description for ``k``.
+    
+    
+    
+    Defaults to ``10``.
 
-        Returns
-        -------
-        List[Tuple[int, float]]
-            Description of return value.
+Returns
+-------
+list[tuple[int, float]]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from search_api.splade_index import search
-        >>> result = search(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from search_api.splade_index import search
+>>> result = search(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         if self.N == 0:
             return []
         terms = tok(query)
@@ -207,23 +226,30 @@ class SpladeIndex:
 
     def doc(self, index: int) -> SpladeDoc:
         """Compute doc.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        index : int
-            Description for ``index``.
+Parameters
+----------
+index : int
+    Description for ``index``.
+    
+    
+    
 
-        Returns
-        -------
-        src.search_api.splade_index.SpladeDoc
-            Description of return value.
+Returns
+-------
+SpladeDoc
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from search_api.splade_index import doc
-        >>> result = doc(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from search_api.splade_index import doc
+>>> result = doc(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         return self.docs[index]

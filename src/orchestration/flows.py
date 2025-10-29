@@ -44,25 +44,32 @@ __navmap__: Final[NavMap] = {
 
 def _t_echo_impl(msg: str) -> str:
     """Compute t echo.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the t echo operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the t echo operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    msg : str
-        Description for ``msg``.
+Parameters
+----------
+msg : str
+    Description for ``msg``.
+    
+    
+    
 
-    Returns
-    -------
-    str
-        Description of return value.
+Returns
+-------
+str
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from orchestration.flows import t_echo
-    >>> result = t_echo(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from orchestration.flows import t_echo
+>>> result = t_echo(...)
+>>> result  # doctest: +ELLIPSIS
+"""
     return msg
 
 
@@ -72,20 +79,24 @@ t_echo = task(_t_echo_impl)
 
 def _e2e_flow_impl() -> list[str]:
     """Compute e2e flow.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the e2e flow operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the e2e flow operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Returns
-    -------
-    List[str]
-        Description of return value.
+Returns
+-------
+list[str]
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from orchestration.flows import e2e_flow
-    >>> result = e2e_flow()
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from orchestration.flows import e2e_flow
+>>> result = e2e_flow()
+>>> result  # doctest: +ELLIPSIS
+"""
     return [
         t_echo.submit(x).result()
         for x in [

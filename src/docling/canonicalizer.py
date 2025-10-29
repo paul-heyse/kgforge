@@ -44,25 +44,32 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor canonicalize_text]
 def canonicalize_text(blocks: list[str]) -> str:
     """Compute canonicalize text.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the canonicalize text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the canonicalize text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    blocks : List[str]
-        Description for ``blocks``.
+Parameters
+----------
+blocks : list[str]
+    Description for ``blocks``.
+    
+    
+    
 
-    Returns
-    -------
-    str
-        Description of return value.
+Returns
+-------
+str
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from docling.canonicalizer import canonicalize_text
-    >>> result = canonicalize_text(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from docling.canonicalizer import canonicalize_text
+>>> result = canonicalize_text(...)
+>>> result  # doctest: +ELLIPSIS
+"""
 
     def norm(s: str) -> str:
         """Compute norm.

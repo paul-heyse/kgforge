@@ -30,106 +30,105 @@ try:
 except Exception:  # pragma: no cover - minimal no-op fallbacks
 
     class _NoopMetric:
-        """Describe NoopMetric."""
+        """Describe NoopMetric.
+"""
 
         def labels(self, *args: object, **kwargs: object) -> _NoopMetric:
             """Compute labels.
 
-            Carry out the labels operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the labels operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-            Parameters
-            ----------
-            *args : object
-                Description for ``*args``.
-            **kwargs : object
-                Description for ``**kwargs``.
+Parameters
+----------
+*args : object
+    Description for ``*args``.
+**kwargs : object
+    Description for ``**kwargs``.
 
-            Returns
-            -------
-            _NoopMetric
-                Description of return value.
+Returns
+-------
+_NoopMetric
+    Description of return value.
 
-            Examples
-            --------
-            >>> from observability.metrics import labels
-            >>> result = labels(*args, **kwargs)
-            >>> result  # doctest: +ELLIPSIS
-            """
+Examples
+--------
+>>> from observability.metrics import labels
+>>> result = labels(*args, **kwargs)
+>>> result  # doctest: +ELLIPSIS
+"""
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
             """Compute observe.
 
-            Carry out the observe operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the observe operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-            Parameters
-            ----------
-            *args : object
-                Description for ``*args``.
-            **kwargs : object
-                Description for ``**kwargs``.
+Parameters
+----------
+*args : object
+    Description for ``*args``.
+**kwargs : object
+    Description for ``**kwargs``.
 
-            Examples
-            --------
-            >>> from observability.metrics import observe
-            >>> observe(*args, **kwargs)  # doctest: +ELLIPSIS
-            """
+Examples
+--------
+>>> from observability.metrics import observe
+>>> observe(*args, **kwargs)  # doctest: +ELLIPSIS
+"""
             return
 
         def inc(self, *args: object, **kwargs: object) -> None:
             """Compute inc.
 
-            Carry out the inc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the inc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-            Parameters
-            ----------
-            *args : object
-                Description for ``*args``.
-            **kwargs : object
-                Description for ``**kwargs``.
+Parameters
+----------
+*args : object
+    Description for ``*args``.
+**kwargs : object
+    Description for ``**kwargs``.
 
-            Examples
-            --------
-            >>> from observability.metrics import inc
-            >>> inc(*args, **kwargs)  # doctest: +ELLIPSIS
-            """
+Examples
+--------
+>>> from observability.metrics import inc
+>>> inc(*args, **kwargs)  # doctest: +ELLIPSIS
+"""
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
             """Compute set.
 
-            Carry out the set operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the set operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-            Parameters
-            ----------
-            *args : object
-                Description for ``*args``.
-            **kwargs : object
-                Description for ``**kwargs``.
+Parameters
+----------
+*args : object
+    Description for ``*args``.
+**kwargs : object
+    Description for ``**kwargs``.
 
-            Examples
-            --------
-            >>> from observability.metrics import set
-            >>> set(*args, **kwargs)  # doctest: +ELLIPSIS
-            """
+Examples
+--------
+>>> from observability.metrics import set
+>>> set(*args, **kwargs)  # doctest: +ELLIPSIS
+"""
             return
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:
-        """Compute make noop metric.
-
-        Carry out the make noop metric operation.
+        """Return a metric stub that ignores all inputs.
 
         Parameters
         ----------
-        *args : Any
-            Description for ``*args``.
-        **kwargs : Any
-            Description for ``**kwargs``.
+        *args : object
+            Positional arguments accepted for API compatibility and ignored.
+        **kwargs : object
+            Keyword arguments accepted for API compatibility and ignored.
 
         Returns
         -------
         _NoopMetric
-            Description of return value.
+            Object implementing the ``set`` and ``observe`` methods as no-ops.
         """
         return _NoopMetric()
 

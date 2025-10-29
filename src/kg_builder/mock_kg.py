@@ -41,102 +41,120 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor MockKG]
 class MockKG:
-    """Model the MockKG.
+    """Lightweight in-memory knowledge graph used in tests and demos.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the mockkg data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    The mock graph keeps adjacency and mention mappings in dictionaries so unit tests can
+    exercise higher-level logic without hitting a real backend.
     """
 
     def __init__(self) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-        """
         self.chunk2concepts: dict[str, set[str]] = {}
         self.neighbors: dict[str, set[str]] = {}
 
     def add_mention(self, chunk_id: str, concept_id: str) -> None:
         """Compute add mention.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the add mention operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the add mention operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        chunk_id : str
-            Description for ``chunk_id``.
-        concept_id : str
-            Description for ``concept_id``.
+Parameters
+----------
+chunk_id : str
+    Description for ``chunk_id``.
+concept_id : str
+    Description for ``concept_id``.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from kg_builder.mock_kg import add_mention
-        >>> add_mention(..., ...)  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from kg_builder.mock_kg import add_mention
+>>> add_mention(..., ...)  # doctest: +ELLIPSIS
+"""
         self.chunk2concepts.setdefault(chunk_id, set()).add(concept_id)
 
     def add_edge(self, a: str, b: str) -> None:
         """Compute add edge.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the add edge operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the add edge operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        a : str
-            Description for ``a``.
-        b : str
-            Description for ``b``.
+Parameters
+----------
+a : str
+    Description for ``a``.
+b : str
+    Description for ``b``.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from kg_builder.mock_kg import add_edge
-        >>> add_edge(..., ...)  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from kg_builder.mock_kg import add_edge
+>>> add_edge(..., ...)  # doctest: +ELLIPSIS
+"""
         self.neighbors.setdefault(a, set()).add(b)
         self.neighbors.setdefault(b, set()).add(a)
 
     def linked_concepts(self, chunk_id: str) -> list[str]:
         """Compute linked concepts.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the linked concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the linked concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        chunk_id : str
-            Description for ``chunk_id``.
+Parameters
+----------
+chunk_id : str
+    Description for ``chunk_id``.
+    
+    
+    
 
-        Returns
-        -------
-        List[str]
-            Description of return value.
+Returns
+-------
+list[str]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from kg_builder.mock_kg import linked_concepts
-        >>> result = linked_concepts(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from kg_builder.mock_kg import linked_concepts
+>>> result = linked_concepts(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         return sorted(self.chunk2concepts.get(chunk_id, set()))
 
     def one_hop(self, concept_id: str) -> list[str]:
         """Compute one hop.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the one hop operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the one hop operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        concept_id : str
-            Description for ``concept_id``.
+Parameters
+----------
+concept_id : str
+    Description for ``concept_id``.
+    
+    
+    
 
-        Returns
-        -------
-        List[str]
-            Description of return value.
+Returns
+-------
+list[str]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from kg_builder.mock_kg import one_hop
-        >>> result = one_hop(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from kg_builder.mock_kg import one_hop
+>>> result = one_hop(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         return sorted(self.neighbors.get(concept_id, set()))
