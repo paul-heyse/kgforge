@@ -14,7 +14,7 @@ from typing import Any
 try:  # Python 3.11+
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover - fallback for environments without tomllib
-    import tomli as tomllib  # type: ignore[import-not-found]
+    import tomli as tomllib  # type: ignore[import-not-found, no-redef]
 
 LOGGER = logging.getLogger(__name__)
 
