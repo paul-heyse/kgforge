@@ -223,9 +223,9 @@ class FaissAdapter:
         cpu = faiss_module.IndexIDMap2(cpu)
         train = vectors.mat[: min(100000, vectors.mat.shape[0])].copy()
         faiss_module.normalize_L2(train)
-        cpu.train(train)
+        cpu.train(n=train.shape[0], x=train)
         ids64 = cast(IndexArray, np.arange(vectors.mat.shape[0], dtype=np.int64))
-        cpu.add_with_ids(vectors.mat, ids64)
+        cpu.add_with_ids(n=vectors.mat.shape[0], x=vectors.mat, xids=ids64)
         self.index = self._clone_to_gpu(cpu)
 
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
