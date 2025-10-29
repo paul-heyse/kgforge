@@ -7,6 +7,7 @@ Welcome to the kgfoundry documentation set. Use the sections below to find onboa
 :caption: Guide
 getting-started
 how-to/index
+contributing/quality
 ```
 
 ```{toctree}
