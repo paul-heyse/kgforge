@@ -32,6 +32,7 @@ sparse_embedding:
   splade:
     index_dir: ./_indices/splade_impact
     topk: 256
+    query_encoder: naver/splade-v3-distilbert  # HF model powering Lucene SPLADE queries
 faiss:
   gpu: true
   cuvs: true

@@ -82,6 +82,11 @@ BM25_DIR = CFG.get("sparse_embedding", {}).get("bm25", {}).get("index_dir", "./_
 SPLADE_DIR = (
     CFG.get("sparse_embedding", {}).get("splade", {}).get("index_dir", "./_indices/splade_impact")
 )
+SPLADE_QUERY_ENCODER = (
+    CFG.get("sparse_embedding", {})
+    .get("splade", {})
+    .get("query_encoder", "naver/splade-v3-distilbert")
+)
 FAISS_PATH = "./_indices/faiss/shard_000.idx"
 
 bm25 = get_bm25(
@@ -98,7 +103,7 @@ try:
 except Exception:
     pass
 
-splade = get_splade(SPARSE_BACKEND, SPLADE_DIR)
+splade = get_splade(SPARSE_BACKEND, SPLADE_DIR, query_encoder=SPLADE_QUERY_ENCODER)
 try:
     # for PureImpactIndex, try to load
     if hasattr(splade, "load"):
