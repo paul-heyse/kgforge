@@ -424,6 +424,15 @@ name = "vllm-nightly"
 url = "https://wheels.vllm.ai/nightly"
 explicit = true          # prevents accidental installs of other deps from here
 
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+
+[[tool.uv.index]]
+name = "nvidia"
+url = "https://pypi.nvidia.com/simple"
+default = true
+
 # Tell uv there's a local, flat index of wheels.
 [[tool.uv.index]]
 name = "wheelhouse"

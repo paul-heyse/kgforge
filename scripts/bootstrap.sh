@@ -150,8 +150,6 @@ if [ -f "${ACTIVATE}" ]; then
   ok "Activated .venv for this shell"
   log "Upgrading pip tooling via uv"
   uv pip install -U pip certifi
-  log "Installing cuvs-cu13 from NVIDIA index via uv"
-  uv pip install --extra-index-url https://pypi.nvidia.com cuvs-cu13
 else
   warn "Could not auto-activate .venv; use:  . .venv/bin/activate"
 fi
