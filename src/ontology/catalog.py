@@ -15,11 +15,15 @@ from kgfoundry_common.navmap_types import NavMap
 
 @dataclass
 class Concept:
-    """Model the Concept.
+    """Lightweight concept metadata record.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the concept data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Attributes
+    ----------
+    id : str
+        Unique identifier for the concept.
+    label : str | None
+        Optional human-readable label associated with the concept.
     """
 
     id: str
@@ -56,70 +60,79 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor OntologyCatalog]
 class OntologyCatalog:
-    """Model the OntologyCatalog.
+    """Simple in-memory catalogue for ontology lookups.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the ontologycatalog data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Parameters
+    ----------
+    concepts : list[Concept]
+        Concepts that seed the lookup map.
     """
 
     def __init__(self, concepts: list[Concept]) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-
-        Parameters
-        ----------
-        concepts : List[src.ontology.catalog.Concept]
-            Description for ``concepts``.
-        """
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
         """Compute neighbors.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the neighbors operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the neighbors operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        concept_id : str
-            Description for ``concept_id``.
-        depth : int | None
-            Optional parameter default ``1``. Description for ``depth``.
+Parameters
+----------
+concept_id : str
+    Description for ``concept_id``.
+depth : int, optional
+    Defaults to ``1``.
+    Description for ``depth``.
+    
+    
+    
+    Defaults to ``1``.
 
-        Returns
-        -------
-        collections.abc.Set
-            Description of return value.
+Returns
+-------
+set[str]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from ontology.catalog import neighbors
-        >>> result = neighbors(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from ontology.catalog import neighbors
+>>> result = neighbors(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return set()
 
     def hydrate(self, concept_id: str) -> dict[str, Any]:
         """Compute hydrate.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the hydrate operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the hydrate operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        concept_id : str
-            Description for ``concept_id``.
+Parameters
+----------
+concept_id : str
+    Description for ``concept_id``.
+    
+    
+    
 
-        Returns
-        -------
-        collections.abc.Mapping
-            Description of return value.
+Returns
+-------
+dict[str, Any]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from ontology.catalog import hydrate
-        >>> result = hydrate(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from ontology.catalog import hydrate
+>>> result = hydrate(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         return {}

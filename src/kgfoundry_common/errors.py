@@ -56,10 +56,10 @@ __navmap__: Final[NavMap] = {
 class DownloadError(Exception):
     """Model the DownloadError.
 
-    Represent the downloaderror data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the downloaderror data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     ...
 
@@ -68,10 +68,10 @@ class DownloadError(Exception):
 class UnsupportedMIMEError(Exception):
     """Model the UnsupportedMIMEError.
 
-    Represent the unsupportedmimeerror data structure used throughout the project. The class
-    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-    are typically created by factories or runtime orchestrators documented nearby.
-    """
+Represent the unsupportedmimeerror data structure used throughout the project. The class
+encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+are typically created by factories or runtime orchestrators documented nearby.
+"""
 
     ...
 
@@ -80,10 +80,10 @@ class UnsupportedMIMEError(Exception):
 class DoclingError(Exception):
     """Model the DoclingError.
 
-    Represent the doclingerror data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the doclingerror data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     ...
 
@@ -92,10 +92,10 @@ class DoclingError(Exception):
 class OCRTimeoutError(Exception):
     """Model the OCRTimeoutError.
 
-    Represent the ocrtimeouterror data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the ocrtimeouterror data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     ...
 
@@ -104,10 +104,10 @@ class OCRTimeoutError(Exception):
 class ChunkingError(Exception):
     """Model the ChunkingError.
 
-    Represent the chunkingerror data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the chunkingerror data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     ...
 
@@ -116,10 +116,10 @@ class ChunkingError(Exception):
 class EmbeddingError(Exception):
     """Model the EmbeddingError.
 
-    Represent the embeddingerror data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the embeddingerror data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     ...
 
@@ -128,10 +128,10 @@ class EmbeddingError(Exception):
 class SpladeOOMError(Exception):
     """Model the SpladeOOMError.
 
-    Represent the spladeoomerror data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the spladeoomerror data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     ...
 
@@ -140,10 +140,10 @@ class SpladeOOMError(Exception):
 class IndexBuildError(Exception):
     """Model the IndexBuildError.
 
-    Represent the indexbuilderror data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the indexbuilderror data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     ...
 
@@ -152,10 +152,10 @@ class IndexBuildError(Exception):
 class OntologyParseError(Exception):
     """Model the OntologyParseError.
 
-    Represent the ontologyparseerror data structure used throughout the project. The class
-    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-    are typically created by factories or runtime orchestrators documented nearby.
-    """
+Represent the ontologyparseerror data structure used throughout the project. The class
+encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+are typically created by factories or runtime orchestrators documented nearby.
+"""
 
     ...
 
@@ -164,10 +164,10 @@ class OntologyParseError(Exception):
 class LinkerCalibrationError(Exception):
     """Model the LinkerCalibrationError.
 
-    Represent the linkercalibrationerror data structure used throughout the project. The class
-    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-    are typically created by factories or runtime orchestrators documented nearby.
-    """
+Represent the linkercalibrationerror data structure used throughout the project. The class
+encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+are typically created by factories or runtime orchestrators documented nearby.
+"""
 
     ...
 
@@ -176,9 +176,9 @@ class LinkerCalibrationError(Exception):
 class Neo4jError(Exception):
     """Model the Neo4jError.
 
-    Represent the neo4jerror data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the neo4jerror data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     ...

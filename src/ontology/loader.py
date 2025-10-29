@@ -42,10 +42,11 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor OntologyLoader]
 class OntologyLoader:
     """Model the OntologyLoader.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the ontologyloader data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the ontologyloader data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     ...

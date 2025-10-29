@@ -75,14 +75,12 @@ def __getattr__(name: str) -> object:
 
 
 def __dir__() -> list[str]:
-    """Compute dir.
-
-    Return the ordered collection of attribute names visible on the instance. Interactive tools and auto-completion engines call this hook when exploring objects. Include dynamic attributes so users discover extension points easily.
+    """Return the sorted list of public symbols exposed by the package.
 
     Returns
     -------
-    List[str]
-        Description of return value.
+    list[str]
+        Names exported via ``__all__`` including lazy-loaded aliases.
     """
     return sorted(set(__all__))
 

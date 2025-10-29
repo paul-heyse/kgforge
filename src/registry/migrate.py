@@ -46,26 +46,21 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor apply]
 def apply(db: str, migrations_dir: str) -> None:
-    """Compute apply.
-
-    Carry out the apply operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Apply every SQL migration file in ``migrations_dir`` to the DuckDB database.
+<!-- auto:docstring-builder v1 -->
 
     Parameters
     ----------
     db : str
-        Description for ``db``.
+        Path to the DuckDB database file.
     migrations_dir : str
-        Description for ``migrations_dir``.
+        Directory containing ``.sql`` migration scripts.
 
     Raises
     ------
-    Exception
-        Raised when validation fails.
-
-    Examples
-    --------
-    >>> from registry.migrate import apply
-    >>> apply(..., ...)  # doctest: +ELLIPSIS
+    duckdb.Error
+        Raised when a migration statement fails to execute. ``READ_PARQUET`` view
+        migrations are skipped if DuckDB requires constant arguments.
     """
     con = duckdb.connect(db)
     for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
@@ -89,14 +84,15 @@ def apply(db: str, migrations_dir: str) -> None:
 # [nav:anchor main]
 def main() -> None:
     """Compute main.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Examples
-    --------
-    >>> from registry.migrate import main
-    >>> main()  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from registry.migrate import main
+>>> main()  # doctest: +ELLIPSIS
+"""
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
     a = sp.add_parser("apply")

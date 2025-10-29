@@ -43,10 +43,10 @@ __navmap__: Final[NavMap] = {
 class ConceptMeta(TypedDict):
     """Model the ConceptMeta.
 
-    Represent the conceptmeta data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the conceptmeta data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     label: str
     keywords: list[str]
@@ -67,25 +67,32 @@ CONCEPTS: Final[dict[str, ConceptMeta]] = {
 # [nav:anchor detect_query_concepts]
 def detect_query_concepts(query: str) -> set[str]:
     """Compute detect query concepts.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the detect query concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the detect query concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    query : str
-        Description for ``query``.
+Parameters
+----------
+query : str
+    Description for ``query``.
+    
+    
+    
 
-    Returns
-    -------
-    collections.abc.Set
-        Description of return value.
+Returns
+-------
+set[str]
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from search_api.kg_mock import detect_query_concepts
-    >>> result = detect_query_concepts(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from search_api.kg_mock import detect_query_concepts
+>>> result = detect_query_concepts(...)
+>>> result  # doctest: +ELLIPSIS
+"""
     lowered = query.lower()
     hits: set[str] = set()
     for concept_id, meta in CONCEPTS.items():
@@ -97,25 +104,32 @@ def detect_query_concepts(query: str) -> set[str]:
 # [nav:anchor linked_concepts_for_text]
 def linked_concepts_for_text(text: str) -> list[str]:
     """Compute linked concepts for text.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the linked concepts for text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the linked concepts for text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    text : str
-        Description for ``text``.
+Parameters
+----------
+text : str
+    Description for ``text``.
+    
+    
+    
 
-    Returns
-    -------
-    List[str]
-        Description of return value.
+Returns
+-------
+list[str]
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from search_api.kg_mock import linked_concepts_for_text
-    >>> result = linked_concepts_for_text(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from search_api.kg_mock import linked_concepts_for_text
+>>> result = linked_concepts_for_text(...)
+>>> result  # doctest: +ELLIPSIS
+"""
     lowered = text.lower()
     hits = []
     for concept_id, meta in CONCEPTS.items():
@@ -132,30 +146,41 @@ def kg_boost(
     one_hop: float = 0.04,
 ) -> float:
     """Compute kg boost.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the kg boost operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the kg boost operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    query_concepts : List[str]
-        Description for ``query_concepts``.
-    chunk_concepts : List[str]
-        Description for ``chunk_concepts``.
-    direct : float | None
-        Optional parameter default ``0.08``. Description for ``direct``.
-    one_hop : float | None
-        Optional parameter default ``0.04``. Description for ``one_hop``.
+Parameters
+----------
+query_concepts : list[str]
+    Description for ``query_concepts``.
+chunk_concepts : list[str]
+    Description for ``chunk_concepts``.
+direct : float, optional
+    Defaults to ``0.08``.
+    Description for ``direct``.
+    Defaults to ``0.08``.
+one_hop : float, optional
+    Defaults to ``0.04``.
+    Description for ``one_hop``.
+    
+    
+    
+    Defaults to ``0.04``.
 
-    Returns
-    -------
-    float
-        Description of return value.
+Returns
+-------
+float
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from search_api.kg_mock import kg_boost
-    >>> result = kg_boost(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from search_api.kg_mock import kg_boost
+>>> result = kg_boost(..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

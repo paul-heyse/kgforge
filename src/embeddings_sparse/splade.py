@@ -70,11 +70,28 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 
 # [nav:anchor SPLADEv3Encoder]
 class SPLADEv3Encoder:
-    """Model the SPLADEv3Encoder.
+    """Encode text into SPLADE v3 sparse embeddings.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the spladev3encoder data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    The encoder keeps track of model metadata so sparse indices can reference a
+    consistent identifier when materialising impact weights.
+
+    Parameters
+    ----------
+    model_id : str, optional
+        Hugging Face model identifier used to load the encoder. Defaults to
+        ``"naver/splade-v3-distilbert"``.
+    device : str, optional
+        Device identifier passed to the underlying transformer. Defaults to ``"cuda"``.
+    topk : int, optional
+        Number of highest-weight terms to retain per document. Defaults to ``256``.
+    max_seq_len : int, optional
+        Maximum sequence length fed to the encoder. Defaults to ``512``.
+
+    Attributes
+    ----------
+    name : str
+        Canonical encoder label surfaced in index metadata.
     """
 
     name = "SPLADE-v3-distilbert"
@@ -86,21 +103,6 @@ class SPLADEv3Encoder:
         topk: int = 256,
         max_seq_len: int = 512,
     ) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-
-        Parameters
-        ----------
-        model_id : str | None
-            Optional parameter default ``'naver/splade-v3-distilbert'``. Description for ``model_id``.
-        device : str | None
-            Optional parameter default ``'cuda'``. Description for ``device``.
-        topk : int | None
-            Optional parameter default ``256``. Description for ``topk``.
-        max_seq_len : int | None
-            Optional parameter default ``512``. Description for ``max_seq_len``.
-        """
         self.model_id = model_id
         self.device = device
         self.topk = topk
@@ -108,30 +110,37 @@ class SPLADEv3Encoder:
 
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
         """Compute encode.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        texts : List[str]
-            Description for ``texts``.
+Parameters
+----------
+texts : list[str]
+    Description for ``texts``.
+    
+    
+    
 
-        Returns
-        -------
-        List[Tuple[List[int], List[float]]]
-            Description of return value.
+Returns
+-------
+list[tuple[list[int], list[float]]]
+    Description of return value.
+    
+    
+    
 
-        Raises
-        ------
-        NotImplementedError
-            Raised when validation fails.
+Raises
+------
+NotImplementedError
+    Raised when validation fails.
 
-        Examples
-        --------
-        >>> from embeddings_sparse.splade import encode
-        >>> result = encode(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_sparse.splade import encode
+>>> result = encode(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
@@ -141,23 +150,16 @@ class SPLADEv3Encoder:
 
 # [nav:anchor PureImpactIndex]
 class PureImpactIndex:
-    """Model the PureImpactIndex.
+    """In-memory SPLADE impact scorer backed by pickled postings.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the pureimpactindex data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Parameters
+    ----------
+    index_dir : str
+        Directory that stores the pickled impact weights.
     """
 
     def __init__(self, index_dir: str) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-
-        Parameters
-        ----------
-        index_dir : str
-            Description for ``index_dir``.
-        """
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -166,36 +168,44 @@ class PureImpactIndex:
     @staticmethod
     def _tokenize(text: str) -> list[str]:
         """Compute tokenize.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the tokenize operation.
+Carry out the tokenize operation.
 
-        Parameters
-        ----------
-        text : str
-            Description for ``text``.
+Parameters
+----------
+text : str
+    Description for ``text``.
+    
+    
+    
 
-        Returns
-        -------
-        List[str]
-            Description of return value.
-        """
+Returns
+-------
+list[str]
+    Description of return value.
+"""
         return [token.lower() for token in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Compute build.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        docs_iterable : collections.abc.Iterable
-            Description for ``docs_iterable``.
+Parameters
+----------
+docs_iterable : Iterable[tuple[str, dict[str, str]]]
+    Description for ``docs_iterable``.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from embeddings_sparse.splade import build
-        >>> build(...)  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_sparse.splade import build
+>>> build(...)  # doctest: +ELLIPSIS
+"""
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -228,14 +238,15 @@ class PureImpactIndex:
 
     def load(self) -> None:
         """Compute load.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Examples
-        --------
-        >>> from embeddings_sparse.splade import load
-        >>> load()  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_sparse.splade import load
+>>> load()  # doctest: +ELLIPSIS
+"""
         with open(os.path.join(self.index_dir, "impact.pkl"), "rb") as handle:
             data = pickle.load(handle)
         self.df = data["df"]
@@ -244,27 +255,34 @@ class PureImpactIndex:
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
         """Compute search.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        query : str
-            Description for ``query``.
-        k : int
-            Description for ``k``.
+Parameters
+----------
+query : str
+    Description for ``query``.
+k : int
+    Description for ``k``.
+    
+    
+    
 
-        Returns
-        -------
-        List[Tuple[str, float]]
-            Description of return value.
+Returns
+-------
+list[tuple[str, float]]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from embeddings_sparse.splade import search
-        >>> result = search(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_sparse.splade import search
+>>> result = search(..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
         for token in tokens:
@@ -278,39 +296,34 @@ class PureImpactIndex:
 
 # [nav:anchor LuceneImpactIndex]
 class LuceneImpactIndex:
-    """Model the LuceneImpactIndex.
+    """Lucene-backed SPLADE impact scorer exposed through Pyserini.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the luceneimpactindex data structure used throughout the project. The class
-    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-    are typically created by factories or runtime orchestrators documented nearby.
+    Parameters
+    ----------
+    index_dir : str
+        Directory containing the Lucene impact index.
+    query_encoder : str, optional
+        SPLADE encoder identifier used for token expansion. Defaults to
+        ``"naver/splade-v3-distilbert"``.
     """
 
     def __init__(self, index_dir: str, query_encoder: str = "naver/splade-v3-distilbert") -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-
-        Parameters
-        ----------
-        index_dir : str
-            Description for ``index_dir``.
-        query_encoder : str | None
-            Optional parameter default ``'naver/splade-v3-distilbert'``. Description for ``query_encoder``.
-        """
         self.index_dir = index_dir
         self.query_encoder = query_encoder
         self._searcher: Any | None = None
 
     def _ensure(self) -> None:
         """Compute ensure.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the ensure operation.
+Carry out the ensure operation.
 
-        Raises
-        ------
-        RuntimeError
-            Raised when validation fails.
-        """
+Raises
+------
+RuntimeError
+    Raised when validation fails.
+"""
         if self._searcher is not None:
             return
         try:
@@ -322,32 +335,39 @@ class LuceneImpactIndex:
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
         """Compute search.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        query : str
-            Description for ``query``.
-        k : int
-            Description for ``k``.
+Parameters
+----------
+query : str
+    Description for ``query``.
+k : int
+    Description for ``k``.
+    
+    
+    
 
-        Returns
-        -------
-        List[Tuple[str, float]]
-            Description of return value.
+Returns
+-------
+list[tuple[str, float]]
+    Description of return value.
+    
+    
+    
 
-        Raises
-        ------
-        RuntimeError
-            Raised when validation fails.
+Raises
+------
+RuntimeError
+    Raised when validation fails.
 
-        Examples
-        --------
-        >>> from embeddings_sparse.splade import search
-        >>> result = search(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_sparse.splade import search
+>>> result = search(..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
         self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
@@ -363,29 +383,38 @@ def get_splade(
     query_encoder: str = "naver/splade-v3-distilbert",
 ) -> PureImpactIndex | LuceneImpactIndex:
     """Compute get splade.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the get splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the get splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    backend : str
-        Description for ``backend``.
-    index_dir : str
-        Description for ``index_dir``.
-    query_encoder : str | None
-        Optional parameter default ``'naver/splade-v3-distilbert'``. Description for ``query_encoder``.
+Parameters
+----------
+backend : str
+    Description for ``backend``.
+index_dir : str
+    Description for ``index_dir``.
+query_encoder : str, optional
+    Defaults to ``'naver/splade-v3-distilbert'``.
+    Description for ``query_encoder``.
+    
+    
+    
+    Defaults to ``'naver/splade-v3-distilbert'``.
 
-    Returns
-    -------
-    PureImpactIndex | LuceneImpactIndex
-        Description of return value.
+Returns
+-------
+PureImpactIndex | LuceneImpactIndex
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from embeddings_sparse.splade import get_splade
-    >>> result = get_splade(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from embeddings_sparse.splade import get_splade
+>>> result = get_splade(..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
     if backend == "lucene":
         try:
             return LuceneImpactIndex(index_dir=index_dir, query_encoder=query_encoder)

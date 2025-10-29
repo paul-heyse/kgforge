@@ -67,11 +67,37 @@ type Id = str
 
 # [nav:anchor Doc]
 class Doc(BaseModel):
-    """Model the Doc.
+    """Document metadata captured by the registry services.
+<!-- auto:docstring-builder v1 -->
 
-    Pydantic model defining the structured payload used across the system. Validation ensures inputs
-    conform to the declared schema while producing clear error messages. Use this class when
-    serialising or parsing data for the surrounding feature.
+    Attributes
+    ----------
+    id : Id
+        Internal identifier for the document record.
+    openalex_id : str | None
+        Optional OpenAlex identifier associated with the document.
+    doi : str | None
+        Digital Object Identifier string, if available.
+    arxiv_id : str | None
+        Optional arXiv identifier for preprint content.
+    pmcid : str | None
+        Optional PubMed Central identifier.
+    title : str
+        Human-readable title for the document.
+    authors : list[str]
+        Ordered list of author names.
+    pub_date : str | None
+        Publication date formatted as an ISO string when supplied.
+    license : str | None
+        License or usage rights flag associated with the document.
+    language : str | None
+        ISO language code representing the document language. Defaults to ``"en"``.
+    pdf_uri : str
+        URI pointing to the primary PDF asset.
+    source : str
+        Source system or ingestion pipeline that produced the record.
+    content_hash : str | None
+        Optional checksum for deduplication and change detection.
     """
 
     id: Id
@@ -91,11 +117,23 @@ class Doc(BaseModel):
 
 # [nav:anchor DoctagsAsset]
 class DoctagsAsset(BaseModel):
-    """Model the DoctagsAsset.
+    """Metadata describing generated doctags artefacts.
+<!-- auto:docstring-builder v1 -->
 
-    Pydantic model defining the structured payload used across the system. Validation ensures inputs
-    conform to the declared schema while producing clear error messages. Use this class when
-    serialising or parsing data for the surrounding feature.
+    Attributes
+    ----------
+    doc_id : Id
+        Document identifier tied to the doctags asset.
+    doctags_uri : str
+        URI where the doctags artefact is stored.
+    pages : int
+        Number of pages covered by the doctags generation process.
+    vlm_model : str
+        Name of the vision-language model that produced the tags.
+    vlm_revision : str
+        Revision of the VLM model used during inference.
+    avg_logprob : float | None
+        Optional average log probability reported by the VLM.
     """
 
     doc_id: Id
@@ -108,11 +146,25 @@ class DoctagsAsset(BaseModel):
 
 # [nav:anchor Chunk]
 class Chunk(BaseModel):
-    """Model the Chunk.
+    """Chunk metadata describing a passage extracted from a document.
+<!-- auto:docstring-builder v1 -->
 
-    Pydantic model defining the structured payload used across the system. Validation ensures inputs
-    conform to the declared schema while producing clear error messages. Use this class when
-    serialising or parsing data for the surrounding feature.
+    Attributes
+    ----------
+    id : Id
+        Identifier for the chunk record.
+    doc_id : Id
+        Identifier of the document that produced the chunk.
+    section : str | None
+        Optional section label associated with the chunk.
+    start_char : int
+        Inclusive start character offset within the source document.
+    end_char : int
+        Exclusive end character offset within the source document.
+    tokens : int
+        Token count used for downstream budgeting.
+    doctags_span : dict[str, int]
+        Mapping describing the span within doctags artefacts.
     """
 
     id: Id
@@ -126,11 +178,27 @@ class Chunk(BaseModel):
 
 # [nav:anchor LinkAssertion]
 class LinkAssertion(BaseModel):
-    """Model the LinkAssertion.
+    """Assertion linking a chunk to a knowledge-graph concept.
+<!-- auto:docstring-builder v1 -->
 
-    Pydantic model defining the structured payload used across the system. Validation ensures inputs
-    conform to the declared schema while producing clear error messages. Use this class when
-    serialising or parsing data for the surrounding feature.
+    Attributes
+    ----------
+    id : Id
+        Identifier for the assertion event.
+    chunk_id : Id
+        Chunk that the assertion refers to.
+    concept_id : Id
+        Target concept identifier referenced by the link.
+    score : float
+        Confidence score produced by the linker.
+    decision : Literal['link', 'reject', 'uncertain']
+        Decision outcome assigned to the assertion.
+    evidence_span : str | None
+        Optional textual span used as supporting evidence.
+    features : dict[str, float]
+        Per-feature scores contributing to the decision.
+    run_id : str
+        Pipeline run identifier that produced the assertion.
     """
 
     id: Id
