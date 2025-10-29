@@ -16,10 +16,10 @@ import shutil
 import subprocess
 import sys
 import time
-from collections.abc import Iterable
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Final, cast
+from typing import Any, Final, Protocol
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,8 +28,41 @@ if str(ROOT) not in sys.path:
 
 from tools.griffe_utils import resolve_griffe  # noqa: E402
 
-_, griffe_object_cls, GriffeLoader = resolve_griffe()
-Object = cast(Any, griffe_object_cls)
+_griffe_module, _griffe_object_type, GriffeLoader = resolve_griffe()
+
+
+class DocstringLike(Protocol):
+    """Minimal interface of ``griffe`` docstrings used by this module."""
+
+    value: str | None
+
+
+class KindLike(Protocol):
+    """Subset of the ``griffe`` kind enumeration accessed during rendering."""
+
+    value: str
+
+
+class BaseLike(Protocol):
+    """Shape of base classes referenced when classifying exceptions."""
+
+    full: str | None
+    name: str | None
+
+
+class GriffeObjectLike(Protocol):
+    """Structural type describing the ``griffe`` objects we inspect."""
+
+    path: str
+    name: str
+    docstring: DocstringLike | None
+    kind: KindLike | None
+    members: Mapping[str, GriffeObjectLike] | None
+    relative_package_filepath: str | None
+    lineno: int | None
+    endlineno: int | None
+    bases: Sequence[BaseLike] | None
+    is_package: bool | None
 
 from tools.detect_pkg import detect_packages, detect_primary  # noqa: E402
 
@@ -171,7 +204,7 @@ def iter_packages() -> list[str]:
     return detect_packages() or [detect_primary()]
 
 
-def summarize(node: Any) -> str:
+def summarize(node: GriffeObjectLike) -> str:
     """Compute summarize.
 
     Carry out the summarize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -193,8 +226,8 @@ def summarize(node: Any) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    doc = getattr(node, "docstring", None)
-    if not doc or not getattr(doc, "value", None):
+    doc = node.docstring
+    if doc is None or not doc.value:
         return ""
     raw = doc.value.strip()
     if not raw:
@@ -209,7 +242,7 @@ def summarize(node: Any) -> str:
     return first_line
 
 
-def is_public(node: Any) -> bool:
+def is_public(node: GriffeObjectLike) -> bool:
     """Compute is public.
 
     Carry out the is public operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -231,10 +264,10 @@ def is_public(node: Any) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    return not getattr(node, "name", "").startswith("_")
+    return not node.name.startswith("_")
 
 
-def get_open_link(node: Any, readme_dir: Path) -> str | None:
+def get_open_link(node: GriffeObjectLike, readme_dir: Path) -> str | None:
     """Compute get open link.
 
     Carry out the get open link operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -258,7 +291,7 @@ def get_open_link(node: Any, readme_dir: Path) -> str | None:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    rel_path = getattr(node, "relative_package_filepath", None)
+    rel_path = node.relative_package_filepath
     if not rel_path:
         return None
     base = SRC if SRC.exists() else ROOT
@@ -267,11 +300,11 @@ def get_open_link(node: Any, readme_dir: Path) -> str | None:
         relative = abs_path.relative_to(readme_dir).as_posix()
     except ValueError:
         return None
-    start = int(getattr(node, "lineno", 1) or 1)
+    start = int(node.lineno or 1)
     return f"./{relative}:{start}:1"
 
 
-def get_view_link(node: Any) -> str | None:
+def get_view_link(node: GriffeObjectLike) -> str | None:
     """Compute get view link.
 
     Carry out the get view link operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -293,7 +326,7 @@ def get_view_link(node: Any) -> str | None:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    rel_path = getattr(node, "relative_package_filepath", None)
+    rel_path = node.relative_package_filepath
     if not rel_path:
         return None
     base = SRC if SRC.exists() else ROOT
@@ -302,12 +335,12 @@ def get_view_link(node: Any) -> str | None:
         rel = abs_path.relative_to(ROOT)
     except ValueError:
         return None
-    start = int(getattr(node, "lineno", 1) or 1)
-    end = getattr(node, "endlineno", None)
+    start = int(node.lineno or 1)
+    end = node.endlineno
     return gh_url(str(rel).replace("\\", "/"), start, end)
 
 
-def iter_public_members(node: Any) -> Iterable[Any]:
+def iter_public_members(node: GriffeObjectLike) -> list[GriffeObjectLike]:
     """Compute iter public members.
 
     Carry out the iter public members operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -329,15 +362,17 @@ def iter_public_members(node: Any) -> Iterable[Any]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    members = getattr(node, "members", {})
-    public = [m for m in members.values() if is_public(m)]
+    members = node.members
+    if not members:
+        return []
+    public = [member for member in members.values() if is_public(member)]
 
-    def _member_key(member: Any) -> str:
+    def _member_key(member: GriffeObjectLike) -> str:
         """Member key.
 
         Parameters
         ----------
-        member : Any
+        member : GriffeObjectLike
             Description.
 
         Returns
@@ -354,11 +389,9 @@ def iter_public_members(node: Any) -> Iterable[Any]:
         --------
         >>> _member_key(...)
         """
-        path = getattr(member, "path", None)
-        if isinstance(path, str):
-            return path
-        name = getattr(member, "name", None)
-        return str(name) if name is not None else ""
+        if member.path:
+            return member.path
+        return member.name
 
     return sorted(public, key=_member_key)
 
@@ -430,6 +463,83 @@ class Badges:
     since: str | None = None
     deprecated_in: str | None = None
     tested_by: list[dict[str, Any]] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class NavMatch:
+    """Computed data for a symbol while scanning the NavMap."""
+
+    symbol_meta: dict[str, Any]
+    defaults: dict[str, Any]
+    matches_symbol_list: bool
+    matches_prefix: bool
+
+
+def _module_defaults(module: Mapping[str, Any]) -> dict[str, Any]:
+    """Return module-level defaults for badge metadata."""
+    module_meta = module.get("module_meta")
+    if isinstance(module_meta, Mapping):
+        return dict(module_meta)
+    defaults: dict[str, Any] = {}
+    for key in ("owner", "stability", "since", "deprecated_in"):
+        value = module.get(key)
+        if value is not None:
+            defaults[key] = value
+    return defaults
+
+
+def _section_for_symbol(module: Mapping[str, Any], symbol: str) -> str | None:
+    """Return the section identifier for ``symbol`` when present."""
+    sections = module.get("sections")
+    if not isinstance(sections, Sequence):
+        return None
+    for section in sections:
+        if not isinstance(section, Mapping):
+            continue
+        section_id = section.get("id")
+        symbols = section.get("symbols")
+        if (
+            isinstance(section_id, str)
+            and isinstance(symbols, Sequence)
+            and any(entry == symbol for entry in symbols)
+        ):
+            return section_id
+    return None
+
+
+def _module_match_for_symbol(
+    module_id: str,
+    module: Mapping[str, Any],
+    qname: str,
+    symbol: str,
+) -> NavMatch:
+    """Return per-module metadata for ``symbol``."""
+    symbol_meta: dict[str, Any] = {}
+    meta = module.get("meta")
+    if isinstance(meta, Mapping):
+        candidate = meta.get(qname) or meta.get(symbol)
+        if isinstance(candidate, Mapping):
+            symbol_meta = dict(candidate)
+            if "section" not in symbol_meta:
+                section_id = _section_for_symbol(module, symbol)
+                if section_id:
+                    symbol_meta = {**symbol_meta, "section": section_id}
+
+    defaults = _module_defaults(module)
+
+    symbol_entries = module.get("symbols")
+    matches_symbol_list = False
+    if isinstance(symbol_entries, Sequence):
+        matches_symbol_list = any(entry == symbol for entry in symbol_entries)
+
+    matches_prefix = qname.startswith(module_id)
+
+    return NavMatch(
+        symbol_meta=symbol_meta,
+        defaults=defaults,
+        matches_symbol_list=matches_symbol_list,
+        matches_prefix=matches_prefix,
+    )
 
 
 def parse_config() -> Config:
@@ -505,55 +615,22 @@ def _lookup_nav(qname: str) -> tuple[dict[str, Any], dict[str, Any]]:
     values that cascade to every symbol in the module.  We normalise the lookup
     so ``badges_for`` can merge overrides with defaults seamlessly.
     """
-    modules = NAVMAP.get("modules", {}) if isinstance(NAVMAP, dict) else {}
-    if not isinstance(modules, dict):
+    modules = NAVMAP.get("modules", {}) if isinstance(NAVMAP, Mapping) else {}
+    if not isinstance(modules, Mapping):
         return {}, {}
 
     symbol = qname.split(".")[-1]
     best_defaults: dict[str, Any] = {}
     for module_id, module in modules.items():
-        if not isinstance(module_id, str):
+        if not isinstance(module_id, str) or not isinstance(module, Mapping):
             continue
-        if not isinstance(module, dict):
-            continue
-        meta = module.get("meta")
-        if not isinstance(meta, dict):
-            continue
-        symbol_meta = meta.get(qname) or meta.get(symbol) or {}
-        if not isinstance(symbol_meta, dict):
-            symbol_meta = {}
-        if symbol_meta:
-            section_id = None
-            for section in module.get("sections", []) or []:
-                if (
-                    isinstance(section, dict)
-                    and symbol in section.get("symbols", [])
-                    and isinstance(section.get("id"), str)
-                ):
-                    section_id = section["id"]
-                    break
-            if section_id and "section" not in symbol_meta:
-                symbol_meta = {**symbol_meta, "section": section_id}
-
-            defaults: dict[str, Any] = {}
-            module_meta = module.get("module_meta")
-            if isinstance(module_meta, dict):
-                defaults = module_meta
-            else:
-                for key in ("owner", "stability", "since", "deprecated_in"):
-                    if key in module:
-                        defaults[key] = module[key]
-
-            if symbol_meta:
-                return symbol_meta, defaults
-
-            if defaults and (
-                qname.startswith(module_id) or symbol in (module.get("symbols") or [])
-            ):
-                return {}, defaults
-
-            if defaults and qname.startswith(module_id):
-                best_defaults = defaults
+        match = _module_match_for_symbol(module_id, module, qname, symbol)
+        if match.symbol_meta:
+            return match.symbol_meta, match.defaults
+        if match.defaults and (match.matches_symbol_list or match.matches_prefix):
+            return {}, match.defaults
+        if match.defaults and match.matches_prefix:
+            best_defaults = match.defaults
     if best_defaults:
         return {}, best_defaults
     return {}, {}
@@ -599,27 +676,7 @@ def badges_for(qname: str) -> Badges:
 
 
 def _format_test_badge(entries: list[dict[str, Any]] | None) -> str | None:
-    """Format test badge.
-
-    Parameters
-    ----------
-    entries : list[dict[str, Any]] | None
-        Description.
-
-    Returns
-    -------
-    str | None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _format_test_badge(...)
-    """
+    """Format the ``tested-by`` badge snippet when entries exist."""
     if not entries:
         return None
     formatted: list[str] = []
@@ -635,6 +692,46 @@ def _format_test_badge(entries: list[dict[str, Any]] | None) -> str | None:
     if not formatted:
         return None
     return "`tested-by: " + ", ".join(formatted) + "`"
+
+
+def _badge_parts(badge: Badges) -> list[str]:
+    """Return textual fragments that make up the badge line."""
+    attributes = [
+        ("stability", "stability"),
+        ("owner", "owner"),
+        ("section", "section"),
+        ("since", "since"),
+        ("deprecated_in", "deprecated"),
+    ]
+    parts = [
+        f"`{label}:{value}`"
+        for attr, label in attributes
+        if (value := getattr(badge, attr))
+    ]
+    test_badge = _format_test_badge(badge.tested_by)
+    if test_badge:
+        parts.append(test_badge)
+    return parts
+
+
+def _wrap_badge_parts(parts: Sequence[str]) -> list[str]:
+    """Wrap badge fragments to respect the configured line width."""
+    wrapped: list[str] = []
+    current: list[str] = []
+    current_len = 0
+    available = README_WRAP_COLUMN - README_BADGE_INDENT
+    for part in parts:
+        part_len = len(part) + (1 if current else 0)
+        if current and current_len + part_len > available:
+            wrapped.append(" ".join(current))
+            current = [part]
+            current_len = len(part)
+        else:
+            current.append(part)
+            current_len += part_len
+    if current:
+        wrapped.append(" ".join(current))
+    return wrapped
 
 
 def format_badges(qname: str, base_length: int = 0) -> str:
@@ -662,41 +759,14 @@ def format_badges(qname: str, base_length: int = 0) -> str:
     ...
     """
     badge = badges_for(qname)
-    parts: list[str] = []
-    if badge.stability:
-        parts.append(f"`stability:{badge.stability}`")
-    if badge.owner:
-        parts.append(f"`owner:{badge.owner}`")
-    if badge.section:
-        parts.append(f"`section:{badge.section}`")
-    if badge.since:
-        parts.append(f"`since:{badge.since}`")
-    if badge.deprecated_in:
-        parts.append(f"`deprecated:{badge.deprecated_in}`")
-    test_badge = _format_test_badge(badge.tested_by)
-    if test_badge:
-        parts.append(test_badge)
+    parts = _badge_parts(badge)
     if not parts:
         return ""
     badge_line = " ".join(parts)
-    if base_length and base_length + 1 + len(badge_line) > README_WRAP_COLUMN:
-        wrapped: list[str] = []
-        current: list[str] = []
-        current_len = 0
-        available = README_WRAP_COLUMN - README_BADGE_INDENT
-        for part in parts:
-            part_len = len(part) + (1 if current else 0)
-            if current and current_len + part_len > available:
-                wrapped.append(" ".join(current))
-                current = [part]
-                current_len = len(part)
-            else:
-                current.append(part)
-                current_len += part_len
-        if current:
-            wrapped.append(" ".join(current))
-        return "\n    " + "\n    ".join(wrapped)
-    return " " + badge_line
+    if not base_length or base_length + 1 + len(badge_line) <= README_WRAP_COLUMN:
+        return " " + badge_line
+    wrapped = _wrap_badge_parts(parts)
+    return "\n    " + "\n    ".join(wrapped)
 
 
 def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
@@ -736,7 +806,7 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
     return None
 
 
-def _is_exception(node: Any) -> bool:
+def _is_exception(node: GriffeObjectLike) -> bool:
     """Is exception.
 
     Parameters
@@ -758,15 +828,14 @@ def _is_exception(node: Any) -> bool:
     --------
     >>> _is_exception(...)
     """
-    kind = getattr(getattr(node, "kind", None), "value", "")
+    kind = node.kind.value if node.kind else ""
     if kind != "class":
         return False
-    name = getattr(node, "name", "")
-    if name.endswith(("Error", "Exception")):
+    if node.name.endswith(("Error", "Exception")):
         return True
-    for base in getattr(node, "bases", []) or []:
-        base_name = getattr(base, "full", None) or getattr(base, "name", None)
-        if isinstance(base_name, str) and base_name.endswith(("Error", "Exception")):
+    for base in node.bases or []:
+        base_name = base.full or base.name
+        if base_name and base_name.endswith(("Error", "Exception")):
             return True
     return False
 
@@ -774,7 +843,7 @@ def _is_exception(node: Any) -> bool:
 KINDS = {"module", "package", "class", "function"}
 
 
-def bucket_for(node: Any) -> str:
+def bucket_for(node: GriffeObjectLike) -> str:
     """Compute bucket for.
 
     Carry out the bucket for operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -796,7 +865,7 @@ def bucket_for(node: Any) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    kind = getattr(getattr(node, "kind", None), "value", "")
+    kind = node.kind.value if node.kind else ""
     if kind in {"module", "package"}:
         return "Modules"
     if kind == "class":
@@ -806,7 +875,7 @@ def bucket_for(node: Any) -> str:
     return "Other"
 
 
-def render_line(node: Any, readme_dir: Path, cfg: Config) -> str | None:
+def render_line(node: GriffeObjectLike, readme_dir: Path, cfg: Config) -> str | None:
     """Compute render line.
 
     Carry out the render line operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -832,20 +901,18 @@ def render_line(node: Any, readme_dir: Path, cfg: Config) -> str | None:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    qname = getattr(node, "path", "")
+    qname = node.path
     summary = summarize(node)
 
     open_link = get_open_link(node, readme_dir) if cfg.link_mode in {"editor", "both"} else None
     view_link = get_view_link(node) if cfg.link_mode in {"github", "both"} else None
 
-    if cfg.link_mode in {"editor", "both"}:
-        rel_path = getattr(node, "relative_package_filepath", None)
-        if rel_path:
-            base = SRC if SRC.exists() else ROOT
-            abs_path = (base / rel_path).resolve()
-            direct = editor_link(abs_path, int(getattr(node, "lineno", 1) or 1), cfg.editor)
-            if direct:
-                open_link = direct
+    if cfg.link_mode in {"editor", "both"} and node.relative_package_filepath:
+        base = SRC if SRC.exists() else ROOT
+        abs_path = (base / node.relative_package_filepath).resolve()
+        direct = editor_link(abs_path, int(node.lineno or 1), cfg.editor)
+        if direct:
+            open_link = direct
 
     if not (open_link or view_link):
         return None
@@ -900,7 +967,7 @@ def write_if_changed(path: Path, content: str) -> bool:
     return True
 
 
-def write_readme(node: Any, cfg: Config) -> bool:
+def write_readme(node: GriffeObjectLike, cfg: Config) -> bool:
     """Compute write readme.
 
     Carry out the write readme operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -931,12 +998,10 @@ def write_readme(node: Any, cfg: Config) -> bool:
         name: [] for name in ("Modules", "Classes", "Functions", "Exceptions", "Other")
     }
     children = [
-        child
-        for child in iter_public_members(node)
-        if getattr(getattr(child, "kind", None), "value", "") in KINDS
+        child for child in iter_public_members(node) if child.kind and child.kind.value in KINDS
     ]
 
-    for child in sorted(children, key=lambda child: getattr(child, "path", "")):
+    for child in sorted(children, key=lambda child: child.path):
         line = render_line(child, pkg_dir, cfg)
         if line:
             buckets[bucket_for(child)].append(line)
@@ -995,7 +1060,7 @@ def _maybe_run_doctoc(readme: Path, cfg: Config) -> None:
         )
 
 
-def _collect_missing_metadata(node: Any, missing: set[str]) -> None:
+def _collect_missing_metadata(node: GriffeObjectLike, missing: set[str]) -> None:
     """Collect missing metadata.
 
     Parameters
@@ -1020,14 +1085,56 @@ def _collect_missing_metadata(node: Any, missing: set[str]) -> None:
     >>> _collect_missing_metadata(...)
     """
     for child in iter_public_members(node):
-        kind = getattr(getattr(child, "kind", None), "value", "")
+        kind = child.kind.value if child.kind else ""
         if kind in KINDS:
-            qname = getattr(child, "path", "")
+            qname = child.path
             badge = badges_for(qname)
             if not badge.stability or not badge.owner:
                 missing.add(qname)
         if kind in {"module", "package"}:
             _collect_missing_metadata(child, missing)
+
+
+def _ensure_packages_selected(packages: Sequence[str]) -> None:
+    """Exit when no packages are available for processing."""
+    if packages:
+        return
+    message = "No packages detected; set DOCS_PKG or add packages under src/."
+    raise SystemExit(message)
+
+
+def _warn_missing_inputs() -> None:
+    """Emit warnings when auxiliary metadata files are missing."""
+    if not NAVMAP_PATH.exists():
+        print(f"Warning: NavMap not found at {NAVMAP_PATH}; badges will be empty")
+    if not TESTMAP_PATH.exists():
+        print(f"Warning: Test map not found at {TESTMAP_PATH}; tested-by badges will be empty")
+
+
+def _process_module(module: GriffeObjectLike, cfg: Config, missing_meta: set[str]) -> bool:
+    """Render README files for ``module`` and its package members."""
+    changed = False
+    if cfg.fail_on_metadata_miss:
+        _collect_missing_metadata(module, missing_meta)
+    changed |= write_readme(module, cfg)
+
+    members = module.members
+    if not members:
+        return changed
+
+    for member in members.values():
+        if not member.is_package:
+            continue
+        if cfg.fail_on_metadata_miss:
+            _collect_missing_metadata(member, missing_meta)
+        changed |= write_readme(member, cfg)
+    return changed
+
+
+def _report_duration(start: float, changed_any: bool) -> None:
+    """Print a timing summary when verbose mode is enabled."""
+    duration = time.time() - start
+    print(f"completed in {duration:.2f}s; changed={changed_any}")
 
 
 def main() -> None:
@@ -1046,13 +1153,8 @@ def main() -> None:
     >>> main()  # doctest: +ELLIPSIS
     """
     cfg = parse_config()
-    if not cfg.packages:
-        raise SystemExit("No packages detected; set DOCS_PKG or add packages under src/.")
-
-    if not NAVMAP_PATH.exists():
-        print(f"Warning: NavMap not found at {NAVMAP_PATH}; badges will be empty")
-    if not TESTMAP_PATH.exists():
-        print(f"Warning: Test map not found at {TESTMAP_PATH}; tested-by badges will be empty")
+    _ensure_packages_selected(cfg.packages)
+    _warn_missing_inputs()
 
     loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
     missing_meta: set[str] = set()
@@ -1061,15 +1163,7 @@ def main() -> None:
 
     for pkg in cfg.packages:
         module = loader.load(pkg)
-        if cfg.fail_on_metadata_miss:
-            _collect_missing_metadata(module, missing_meta)
-        changed_any |= write_readme(module, cfg)
-
-        for member in module.members.values():
-            if getattr(member, "is_package", False):
-                if cfg.fail_on_metadata_miss:
-                    _collect_missing_metadata(member, missing_meta)
-                changed_any |= write_readme(member, cfg)
+        changed_any |= _process_module(module, cfg, missing_meta)
 
     if cfg.fail_on_metadata_miss and missing_meta:
         print(
@@ -1079,8 +1173,7 @@ def main() -> None:
         raise SystemExit(2)
 
     if cfg.verbose:
-        duration = time.time() - start
-        print(f"completed in {duration:.2f}s; changed={changed_any}")
+        _report_duration(start, changed_any)
 
 
 if __name__ == "__main__":
