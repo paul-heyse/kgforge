@@ -129,9 +129,7 @@ def resolve_config_path(start: Path | None = None) -> Path:
 
 
 def load_config_from_env() -> BuilderConfig:
-    """Load configuration using ``DOCSTRING_BUILDER_CONFIG`` override when
-    set.
-    """
+    """Load configuration using ``DOCSTRING_BUILDER_CONFIG`` override when set."""
     env_override = os.environ.get("DOCSTRING_BUILDER_CONFIG")
     config_path = Path(env_override) if env_override else resolve_config_path()
     return load_config(config_path)

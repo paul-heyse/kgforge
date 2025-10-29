@@ -1,9 +1,8 @@
 """Overview of harvester.
 
-This module bundles harvester logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles harvester logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -54,27 +53,27 @@ HTTP_OK = 200
 class HarvesterConfig:
     """Describe HarvesterConfig.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-openalex_base : str, optional
-    Describe ``openalex_base``.
-    Defaults to ``'https://api.openalex.org'``.
-unpaywall_base : str, optional
-    Describe ``unpaywall_base``.
-    Defaults to ``'https://api.unpaywall.org'``.
-pdf_host_base : str | None, optional
-    Describe ``pdf_host_base``.
-    Defaults to ``None``.
-out_dir : str, optional
-    Describe ``out_dir``.
-    Defaults to ``'/data/pdfs'``.
-"""
+    Parameters
+    ----------
+    openalex_base : str, optional
+        Describe ``openalex_base``.
+        Defaults to ``'https://api.openalex.org'``.
+    unpaywall_base : str, optional
+        Describe ``unpaywall_base``.
+        Defaults to ``'https://api.unpaywall.org'``.
+    pdf_host_base : str | None, optional
+        Describe ``pdf_host_base``.
+        Defaults to ``None``.
+    out_dir : str, optional
+        Describe ``out_dir``.
+        Defaults to ``'/data/pdfs'``.
+    """
 
     openalex_base: str = "https://api.openalex.org"
     unpaywall_base: str = "https://api.unpaywall.org"
@@ -86,29 +85,34 @@ out_dir : str, optional
 class OpenAccessHarvester:
     """Describe OpenAccessHarvester.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 
-Parameters
-----------
-user_agent : str
-    Describe ``user_agent``.
-contact_email : str
-    Describe ``contact_email``.
-config : HarvesterConfig | None, optional
-    Describe ``config``.
-    Defaults to ``None``.
+    Parameters
+    ----------
+    user_agent : str
+        Describe ``user_agent``.
+    contact_email : str
+        Describe ``contact_email``.
+    config : HarvesterConfig | None, optional
+        Describe ``config``.
+        Defaults to ``None``.
 
-Raises
-------
-TypeError
+
+
+
+
+
+    Raises
+    ------
+    TypeError
     Raised when TODO for TypeError.
-DownloadError
+    DownloadError
     Raised when TODO for DownloadError.
-UnsupportedMIMEError
+    UnsupportedMIMEError
     Raised when TODO for UnsupportedMIMEError.
-"""
+    """
 
     def __init__(
         self,
@@ -118,20 +122,20 @@ UnsupportedMIMEError
     ) -> None:
         """Describe   init  .
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-user_agent : str
-    Describe ``user_agent``.
-contact_email : str
-    Describe ``contact_email``.
-config : HarvesterConfig | None, optional
-    Describe ``config``.
-    Defaults to ``None``.
-"""
+        Parameters
+        ----------
+        user_agent : str
+            Describe ``user_agent``.
+        contact_email : str
+            Describe ``contact_email``.
+        config : HarvesterConfig | None, optional
+            Describe ``config``.
+            Defaults to ``None``.
+        """
         cfg = config or HarvesterConfig()
         self.ua = user_agent
         self.email = contact_email
@@ -146,29 +150,40 @@ config : HarvesterConfig | None, optional
     def search(self, topic: str, years: str, max_works: int) -> list[dict[str, object]]:
         """Describe search.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-topic : str
-    Describe ``topic``.
-years : str
-    Describe ``years``.
-max_works : int
-    Describe ``max_works``.
+        Parameters
+        ----------
+        topic : str
+            Describe ``topic``.
+        years : str
+            Describe ``years``.
+        max_works : int
+            Describe ``max_works``.
 
-Returns
--------
-list[dict[str, object]]
-    Describe return value.
 
-Raises
-------
-TypeError
-Raised when TODO for TypeError.
-"""
+
+
+
+
+        Returns
+        -------
+        list[dict[str, object]]
+            Describe return value.
+
+
+
+
+
+
+
+        Raises
+        ------
+        TypeError
+        Raised when TODO for TypeError.
+        """
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
             "topic": topic,
@@ -196,20 +211,25 @@ Raised when TODO for TypeError.
     def resolve_pdf(self, work: Mapping[str, object]) -> str | None:
         """Describe resolve pdf.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-work : Mapping[str, object]
-    Describe ``work``.
+        Parameters
+        ----------
+        work : Mapping[str, object]
+            Describe ``work``.
 
-Returns
--------
-str | None
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        str | None
+            Describe return value.
+        """
         direct = self._lookup_direct_pdf(work)
         if direct:
             return direct
@@ -231,20 +251,25 @@ str | None
     def _lookup_direct_pdf(self, work: Mapping[str, object]) -> str | None:
         """Describe  lookup direct pdf.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-work : Mapping[str, object]
-    Describe ``work``.
+        Parameters
+        ----------
+        work : Mapping[str, object]
+            Describe ``work``.
 
-Returns
--------
-str | None
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        str | None
+            Describe return value.
+        """
         best = work.get("best_oa_location")
         if isinstance(best, Mapping):
             pdf_url = best.get("pdf_url")
@@ -255,20 +280,25 @@ str | None
     def _lookup_locations_pdf(self, locations: object) -> str | None:
         """Describe  lookup locations pdf.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-locations : object
-    Describe ``locations``.
+        Parameters
+        ----------
+        locations : object
+            Describe ``locations``.
 
-Returns
--------
-str | None
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        str | None
+            Describe return value.
+        """
         if isinstance(locations, (str, bytes)):
             return None
         if not isinstance(locations, Sequence):
@@ -283,20 +313,25 @@ str | None
     def _resolve_unpaywall_pdf(self, doi: str) -> str | None:
         """Describe  resolve unpaywall pdf.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-doi : str
-    Describe ``doi``.
+        Parameters
+        ----------
+        doi : str
+            Describe ``doi``.
 
-Returns
--------
-str | None
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        str | None
+            Describe return value.
+        """
         response = self.session.get(
             f"{self.unpaywall}/v2/{doi}", params={"email": self.email}, timeout=15
         )
@@ -314,20 +349,25 @@ str | None
     def _host_pdf_url(self, doi: str) -> str | None:
         """Describe  host pdf url.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-doi : str
-    Describe ``doi``.
+        Parameters
+        ----------
+        doi : str
+            Describe ``doi``.
 
-Returns
--------
-str | None
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        str | None
+            Describe return value.
+        """
         if not self.pdf_host:
             return None
         return f"{self.pdf_host}/pdf/{doi.replace('/', '_')}.pdf"
@@ -335,29 +375,40 @@ str | None
     def download_pdf(self, url: str, target_path: str) -> str:
         """Describe download pdf.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-url : str
-    Describe ``url``.
-target_path : str
-    Describe ``target_path``.
+        Parameters
+        ----------
+        url : str
+            Describe ``url``.
+        target_path : str
+            Describe ``target_path``.
 
-Returns
--------
-str
-    Describe return value.
 
-Raises
-------
-DownloadError
-Raised when TODO for DownloadError.
-UnsupportedMIMEError
-Raised when TODO for UnsupportedMIMEError.
-"""
+
+
+
+
+        Returns
+        -------
+        str
+            Describe return value.
+
+
+
+
+
+
+
+        Raises
+        ------
+        DownloadError
+        Raised when TODO for DownloadError.
+        UnsupportedMIMEError
+        Raised when TODO for UnsupportedMIMEError.
+        """
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
             message = f"Bad status {response.status_code} for {url}"
@@ -373,24 +424,29 @@ Raised when TODO for UnsupportedMIMEError.
     def run(self, topic: str, years: str, max_works: int) -> list[Doc]:
         """Describe run.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-topic : str
-    Describe ``topic``.
-years : str
-    Describe ``years``.
-max_works : int
-    Describe ``max_works``.
+        Parameters
+        ----------
+        topic : str
+            Describe ``topic``.
+        years : str
+            Describe ``years``.
+        max_works : int
+            Describe ``max_works``.
 
-Returns
--------
-list[Doc]
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        list[Doc]
+            Describe return value.
+        """
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)
         for work in works:

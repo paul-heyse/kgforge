@@ -12,36 +12,45 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Protocol, cast
 
 if TYPE_CHECKING:
-    from docstring_parser.common import Docstring, DocstringReturns
+    from docstring_parser.common import Docstring, DocstringAttr, DocstringReturns, DocstringYields
 
     DocstringType = Docstring
     DocstringReturnsType = DocstringReturns
+    DocstringYieldsType = DocstringYields
+    DocstringAttrType = DocstringAttr
 else:  # pragma: no cover - typing helpers
     DocstringType = Any
     DocstringReturnsType = Any
+    DocstringYieldsType = Any
+    DocstringAttrType = Any
 
 
 class _DocstringCommonModule(Protocol):
     """Describe  DocstringCommonModule.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-*args : inspect._empty
-    Describe ``args``.
-**kwargs : inspect._empty
-    Describe ``kwargs``.
+    Parameters
+    ----------
+    *args : inspect._empty
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
 
-Returns
--------
-inspect._empty
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+    """
 
     Docstring: type[DocstringType]
     DocstringReturns: type[DocstringReturnsType]
@@ -67,9 +76,11 @@ else:
         class DocstringYields(_doc_common.DocstringReturns):
             """Describe DocstringYields.
 
-<!-- auto:docstring-builder v1 -->
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+            <!-- auto:docstring-builder v1 -->
+
+            Describe the data structure and how instances collaborate with the surrounding package.
+            Highlight how the class supports nearby modules to guide readers through the codebase.
+            """
 
             def __init__(
                 self,
@@ -78,18 +89,22 @@ Describe the data structure and how instances collaborate with the surrounding p
                 type_name: str | None,
                 return_name: str | None = None,
             ) -> None:
-                """Initialise the compatibility shim.
+                """Describe   init  .
+
+                <!-- auto:docstring-builder v1 -->
+
+                Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
                 Parameters
                 ----------
-                args : list[str]
-                    Positional argument names from the original signature.
+                args : list
+                    TODO: describe ``args``.
                 description : str | None, optional
-                    Human readable summary for the yield block.
+                    TODO: describe ``description``.
                 type_name : str | None, optional
-                    Name of the yielded type when available.
-                return_name : str | None, optional
-                    Explicit return alias, by default ``None``.
+                    TODO: describe ``type_name``.
+                return_name : str | None, optional, by default None
+                    TODO: describe ``return_name``.
                 """
                 super().__init__(
                     args,
@@ -111,16 +126,18 @@ Describe the data structure and how instances collaborate with the surrounding p
 
         if not hasattr(_doc_cls, "attrs"):
 
-            def _docstring_attrs(self: DocstringType) -> list[object]:
+            def _docstring_attrs(self: DocstringType) -> list[DocstringAttrType]:
                 """Describe  docstring attrs.
 
-<!-- auto:docstring-builder v1 -->
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-Returns
--------
-list
-    TODO: describe return value.
-"""
+                <!-- auto:docstring-builder v1 -->
+
+                Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+                Returns
+                -------
+                list
+                    TODO: describe return value.
+                """
                 return [meta for meta in self.meta if getattr(meta, "args", None) == ["attr"]]
 
             _doc_cls.attrs = property(_docstring_attrs)
@@ -135,40 +152,48 @@ list
 
         if _yield_cls is not None and not hasattr(_doc_cls, "yields"):
 
-            def _docstring_yields(self: DocstringType) -> object | None:
+            def _docstring_yields(self: DocstringType) -> DocstringYieldsType | None:
                 """Describe  docstring yields.
 
-<!-- auto:docstring-builder v1 -->
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-Returns
--------
-object | None
-    TODO: describe return value.
-"""
+                <!-- auto:docstring-builder v1 -->
+
+                Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+                Returns
+                -------
+                object | None
+                    TODO: describe return value.
+                """
                 if _yield_cls is None:  # pragma: no cover - defensive guard
                     return None
                 for meta in self.meta:
                     if isinstance(meta, _yield_cls):
-                        return meta
+                        return cast("DocstringYieldsType", meta)
                 return None
 
             _doc_cls.yields = property(_docstring_yields)
 
         if _yield_cls is not None and not hasattr(_doc_cls, "many_yields"):
 
-            def _docstring_many_yields(self: DocstringType) -> list[object]:
+            def _docstring_many_yields(self: DocstringType) -> list[DocstringYieldsType]:
                 """Describe  docstring many yields.
 
-<!-- auto:docstring-builder v1 -->
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-Returns
--------
-list
-    TODO: describe return value.
-"""
+                <!-- auto:docstring-builder v1 -->
+
+                Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+                Returns
+                -------
+                list
+                    TODO: describe return value.
+                """
                 if _yield_cls is None:  # pragma: no cover - defensive guard
                     return []
-                return [meta for meta in self.meta if isinstance(meta, _yield_cls)]
+                return [
+                    cast("DocstringYieldsType", meta)
+                    for meta in self.meta
+                    if isinstance(meta, _yield_cls)
+                ]
 
             _doc_cls.many_yields = property(_docstring_many_yields)
 
@@ -177,13 +202,15 @@ list
             def _docstring_size(self: DocstringType) -> int:
                 """Describe  docstring size.
 
-<!-- auto:docstring-builder v1 -->
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-Returns
--------
-int
-    TODO: describe return value.
-"""
+                <!-- auto:docstring-builder v1 -->
+
+                Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+                Returns
+                -------
+                int
+                    TODO: describe return value.
+                """
                 parts: list[str] = []
                 if self.short_description:
                     parts.append(self.short_description)

@@ -1,9 +1,8 @@
 """Overview of duckdb registry.
 
-This module bundles duckdb registry logic for the kgfoundry stack. It
-groups related helpers so downstream packages can import a single
-cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles duckdb registry logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from __future__ import annotations
@@ -50,30 +49,30 @@ __navmap__: Final[NavMap] = {
 class DuckDBRegistry:
     """Describe DuckDBRegistry.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-db_path : str
-    Describe ``db_path``.
-"""
+    Parameters
+    ----------
+    db_path : str
+        Describe ``db_path``.
+    """
 
     def __init__(self, db_path: str) -> None:
         """Describe   init  .
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-db_path : str
-    Describe ``db_path``.
-"""
+        Parameters
+        ----------
+        db_path : str
+            Describe ``db_path``.
+        """
         self.db_path = db_path
         self.con = duckdb.connect(db_path, read_only=False)
         self.con.execute("PRAGMA threads=14")
@@ -81,22 +80,27 @@ db_path : str
     def begin_dataset(self, kind: str, run_id: str) -> str:
         """Describe begin dataset.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-kind : str
-    Describe ``kind``.
-run_id : str
-    Describe ``run_id``.
+        Parameters
+        ----------
+        kind : str
+            Describe ``kind``.
+        run_id : str
+            Describe ``run_id``.
 
-Returns
--------
-str
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        str
+            Describe return value.
+        """
         dataset_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -111,19 +115,19 @@ str
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
         """Describe commit dataset.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-dataset_id : str
-    Describe ``dataset_id``.
-parquet_root : str
-    Describe ``parquet_root``.
-rows : int
-    Describe ``rows``.
-"""
+        Parameters
+        ----------
+        dataset_id : str
+            Describe ``dataset_id``.
+        parquet_root : str
+            Describe ``parquet_root``.
+        rows : int
+            Describe ``rows``.
+        """
         self.con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
         )
@@ -131,15 +135,15 @@ rows : int
     def rollback_dataset(self, dataset_id: str) -> None:
         """Describe rollback dataset.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-dataset_id : str
-    Describe ``dataset_id``.
-"""
+        Parameters
+        ----------
+        dataset_id : str
+            Describe ``dataset_id``.
+        """
         self.con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
 
     def insert_run(
@@ -151,26 +155,31 @@ dataset_id : str
     ) -> str:
         """Describe insert run.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-purpose : str
-    Describe ``purpose``.
-model_id : str | None
-    Describe ``model_id``.
-revision : str | None
-    Describe ``revision``.
-config : Mapping[str, object]
-    Describe ``config``.
+        Parameters
+        ----------
+        purpose : str
+            Describe ``purpose``.
+        model_id : str | None
+            Describe ``model_id``.
+        revision : str | None
+            Describe ``revision``.
+        config : Mapping[str, object]
+            Describe ``config``.
 
-Returns
--------
-str
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        str
+            Describe return value.
+        """
         run_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -185,20 +194,20 @@ str
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
         """Describe close run.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-run_id : str
-    Describe ``run_id``.
-success : bool
-    Describe ``success``.
-notes : str | None, optional
-    Describe ``notes``.
-    Defaults to ``None``.
-"""
+        Parameters
+        ----------
+        run_id : str
+            Describe ``run_id``.
+        success : bool
+            Describe ``success``.
+        notes : str | None, optional
+            Describe ``notes``.
+            Defaults to ``None``.
+        """
         _ = success  # placeholder until success flag/notes are persisted
         _ = notes
         self.con.execute("UPDATE runs SET finished_at=now() WHERE run_id=?", [run_id])
@@ -206,15 +215,15 @@ notes : str | None, optional
     def register_documents(self, docs: list[Doc]) -> None:
         """Describe register documents.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-docs : list[Doc]
-    Describe ``docs``.
-"""
+        Parameters
+        ----------
+        docs : list[Doc]
+            Describe ``docs``.
+        """
         for doc in docs:
             self.con.execute(
                 (
@@ -243,15 +252,15 @@ docs : list[Doc]
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
         """Describe register doctags.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-assets : list[DoctagsAsset]
-    Describe ``assets``.
-"""
+        Parameters
+        ----------
+        assets : list[DoctagsAsset]
+            Describe ``assets``.
+        """
         for asset in assets:
             self.con.execute(
                 (
@@ -272,19 +281,19 @@ assets : list[DoctagsAsset]
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
         """Describe emit event.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-event_name : str
-    Describe ``event_name``.
-subject_id : str
-    Describe ``subject_id``.
-payload : Mapping[str, object]
-    Describe ``payload``.
-"""
+        Parameters
+        ----------
+        event_name : str
+            Describe ``event_name``.
+        subject_id : str
+            Describe ``subject_id``.
+        payload : Mapping[str, object]
+            Describe ``payload``.
+        """
         self.con.execute(
             (
                 "INSERT INTO pipeline_events("
@@ -297,21 +306,21 @@ payload : Mapping[str, object]
     def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
         """Describe incident.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-event : str
-    Describe ``event``.
-subject_id : str
-    Describe ``subject_id``.
-error_class : str
-    Describe ``error_class``.
-message : str
-    Describe ``message``.
-"""
+        Parameters
+        ----------
+        event : str
+            Describe ``event``.
+        subject_id : str
+            Describe ``subject_id``.
+        error_class : str
+            Describe ``error_class``.
+        message : str
+            Describe ``message``.
+        """
         self.con.execute(
             (
                 "INSERT INTO incidents("

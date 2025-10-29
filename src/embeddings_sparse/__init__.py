@@ -1,9 +1,8 @@
 """Overview of embeddings sparse.
 
-This module bundles embeddings sparse logic for the kgfoundry stack. It
-groups related helpers so downstream packages can import a single
-cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles embeddings sparse logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from embeddings_sparse import base, bm25, splade

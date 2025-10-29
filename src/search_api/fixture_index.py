@@ -1,9 +1,8 @@
 """Overview of fixture index.
 
-This module bundles fixture index logic for the kgfoundry stack. It
-groups related helpers so downstream packages can import a single
-cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles fixture index logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from __future__ import annotations
@@ -53,20 +52,25 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 def tokenize(text: str) -> list[str]:
     """Describe tokenize.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-text : str
-    Describe ``text``.
+    Parameters
+    ----------
+    text : str
+        Describe ``text``.
 
-Returns
--------
-list[str]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    list[str]
+        Describe return value.
+    """
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -75,25 +79,25 @@ list[str]
 class FixtureDoc:
     """Describe FixtureDoc.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-chunk_id : str
-    Describe ``chunk_id``.
-doc_id : str
-    Describe ``doc_id``.
-title : str
-    Describe ``title``.
-section : str
-    Describe ``section``.
-text : str
-    Describe ``text``.
-"""
+    Parameters
+    ----------
+    chunk_id : str
+        Describe ``chunk_id``.
+    doc_id : str
+        Describe ``doc_id``.
+    title : str
+        Describe ``title``.
+    section : str
+        Describe ``section``.
+    text : str
+        Describe ``text``.
+    """
 
     chunk_id: str
     doc_id: str
@@ -106,38 +110,38 @@ text : str
 class FixtureIndex:
     """Describe FixtureIndex.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-root : str, optional
-    Describe ``root``.
-    Defaults to ``'/data'``.
-db_path : str, optional
-    Describe ``db_path``.
-    Defaults to ``'/data/catalog/catalog.duckdb'``.
-"""
+    Parameters
+    ----------
+    root : str, optional
+        Describe ``root``.
+        Defaults to ``'/data'``.
+    db_path : str, optional
+        Describe ``db_path``.
+        Defaults to ``'/data/catalog/catalog.duckdb'``.
+    """
 
     def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb") -> None:
         """Describe   init  .
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-root : str, optional
-    Describe ``root``.
-    Defaults to ``'/data'``.
-db_path : str, optional
-    Describe ``db_path``.
-    Defaults to ``'/data/catalog/catalog.duckdb'``.
-"""
+        Parameters
+        ----------
+        root : str, optional
+            Describe ``root``.
+            Defaults to ``'/data'``.
+        db_path : str, optional
+            Describe ``db_path``.
+            Defaults to ``'/data/catalog/catalog.duckdb'``.
+        """
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []
@@ -148,12 +152,12 @@ db_path : str, optional
     def _load_from_duckdb(self) -> None:
         """Describe  load from duckdb.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Python's object protocol for this class. Use it to integrate
-with built-in operators, protocols, or runtime behaviours that
-expect instances to participate in the language's data model.
-"""
+        Python's object protocol for this class. Use it to integrate with built-in operators,
+        protocols, or runtime behaviours that expect instances to participate in the language's data
+        model.
+        """
         if not Path(self.db_path).exists():
             return
         con = duckdb.connect(self.db_path)
@@ -196,12 +200,12 @@ expect instances to participate in the language's data model.
     def _build_lex(self) -> None:
         """Describe  build lex.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Python's object protocol for this class. Use it to integrate
-with built-in operators, protocols, or runtime behaviours that
-expect instances to participate in the language's data model.
-"""
+        Python's object protocol for this class. Use it to integrate with built-in operators,
+        protocols, or runtime behaviours that expect instances to participate in the language's data
+        model.
+        """
         self.tf.clear()
         self.df.clear()
         for doc in self.docs:
@@ -217,23 +221,28 @@ expect instances to participate in the language's data model.
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
         """Describe search.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-query : str
-    Describe ``query``.
-k : int, optional
-    Describe ``k``.
-    Defaults to ``10``.
+        Parameters
+        ----------
+        query : str
+            Describe ``query``.
+        k : int, optional
+            Describe ``k``.
+            Defaults to ``10``.
 
-Returns
--------
-list[tuple[int, float]]
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        list[tuple[int, float]]
+            Describe return value.
+        """
         if getattr(self, "N", 0) == 0:
             return []
         qtoks = tokenize(query)
@@ -254,18 +263,23 @@ list[tuple[int, float]]
     def doc(self, index: int) -> FixtureDoc:
         """Describe doc.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-index : int
-    Describe ``index``.
+        Parameters
+        ----------
+        index : int
+            Describe ``index``.
 
-Returns
--------
-FixtureDoc
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        FixtureDoc
+            Describe return value.
+        """
         return self.docs[index]

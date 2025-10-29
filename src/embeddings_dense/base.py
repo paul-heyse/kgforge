@@ -1,9 +1,8 @@
 """Overview of base.
 
-This module bundles base logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles base logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -48,40 +47,50 @@ __navmap__: Final[NavMap] = {
 class DenseEmbeddingModel(Protocol):
     """Describe DenseEmbeddingModel.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-*args : inspect._empty
-    Describe ``args``.
-**kwargs : inspect._empty
-    Describe ``kwargs``.
+    Parameters
+    ----------
+    *args : inspect._empty
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
 
-Returns
--------
-inspect._empty
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+    """
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]:
         """Describe encode.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-texts : Sequence[str]
-    Describe ``texts``.
+        Parameters
+        ----------
+        texts : Sequence[str]
+            Describe ``texts``.
 
-Returns
--------
-NDArray[np.float32]
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        NDArray[np.float32]
+            Describe return value.
+        """
         ...

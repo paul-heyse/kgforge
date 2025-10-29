@@ -2447,7 +2447,7 @@
     ],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2491,6 +2491,114 @@
   },
   {
     "kind": "function",
+    "module": "kgfoundry.__init__",
+    "notes": [],
+    "parameters": [
+      {
+        "annotation": "ModuleType",
+        "default": null,
+        "name": "module",
+        "optional": false
+      },
+      {
+        "annotation": "Iterable",
+        "default": null,
+        "name": "exports",
+        "optional": false
+      }
+    ],
+    "qname": "kgfoundry.__init__.namespace_dir",
+    "raises": [],
+    "returns": [
+      {
+        "annotation": "list",
+        "kind": "returns"
+      }
+    ]
+  },
+  {
+    "kind": "function",
+    "module": "kgfoundry.__init__",
+    "notes": [],
+    "parameters": [
+      {
+        "annotation": "ModuleType",
+        "default": null,
+        "name": "module",
+        "optional": false
+      },
+      {
+        "annotation": "str",
+        "default": null,
+        "name": "name",
+        "optional": false
+      }
+    ],
+    "qname": "kgfoundry.__init__.namespace_getattr",
+    "raises": [],
+    "returns": [
+      {
+        "annotation": "object",
+        "kind": "returns"
+      }
+    ]
+  },
+  {
+    "kind": "function",
+    "module": "kgfoundry._namespace_proxy",
+    "notes": [],
+    "parameters": [
+      {
+        "annotation": "ModuleType",
+        "default": null,
+        "name": "module",
+        "optional": false
+      },
+      {
+        "annotation": "Iterable",
+        "default": null,
+        "name": "exports",
+        "optional": false
+      }
+    ],
+    "qname": "kgfoundry._namespace_proxy.namespace_dir",
+    "raises": [],
+    "returns": [
+      {
+        "annotation": "list",
+        "kind": "returns"
+      }
+    ]
+  },
+  {
+    "kind": "function",
+    "module": "kgfoundry._namespace_proxy",
+    "notes": [],
+    "parameters": [
+      {
+        "annotation": "ModuleType",
+        "default": null,
+        "name": "module",
+        "optional": false
+      },
+      {
+        "annotation": "str",
+        "default": null,
+        "name": "name",
+        "optional": false
+      }
+    ],
+    "qname": "kgfoundry._namespace_proxy.namespace_getattr",
+    "raises": [],
+    "returns": [
+      {
+        "annotation": "object",
+        "kind": "returns"
+      }
+    ]
+  },
+  {
+    "kind": "function",
     "module": "kgfoundry.docling.__init__",
     "notes": [],
     "parameters": [],
@@ -2519,7 +2627,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2554,7 +2662,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2589,7 +2697,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2624,7 +2732,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2659,7 +2767,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2694,7 +2802,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2729,7 +2837,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2764,7 +2872,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2799,7 +2907,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2834,7 +2942,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2869,7 +2977,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2904,7 +3012,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2939,7 +3047,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -2974,7 +3082,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -3009,7 +3117,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -3044,7 +3152,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -3079,7 +3187,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -3114,7 +3222,7 @@
     "raises": [],
     "returns": [
       {
-        "annotation": "Any",
+        "annotation": "object",
         "kind": "returns"
       }
     ]
@@ -4287,15 +4395,81 @@
     "notes": [],
     "parameters": [
       {
-        "annotation": "object",
-        "default": "()",
-        "name": "args",
+        "annotation": "str",
+        "default": "'python'",
+        "name": "mode",
         "optional": true
       },
       {
-        "annotation": "object",
-        "default": "{}",
-        "name": "kwargs",
+        "annotation": "object | None",
+        "default": "None",
+        "name": "include",
+        "optional": true
+      },
+      {
+        "annotation": "object | None",
+        "default": "None",
+        "name": "exclude",
+        "optional": true
+      },
+      {
+        "annotation": "object | None",
+        "default": "None",
+        "name": "context",
+        "optional": true
+      },
+      {
+        "annotation": "bool | None",
+        "default": "None",
+        "name": "by_alias",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "name": "exclude_unset",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "name": "exclude_defaults",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "name": "exclude_none",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "name": "exclude_computed_fields",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "name": "round_trip",
+        "optional": true
+      },
+      {
+        "annotation": "bool | str",
+        "default": "True",
+        "name": "warnings",
+        "optional": true
+      },
+      {
+        "annotation": "Callable[[object], object] | None",
+        "default": "None",
+        "name": "fallback",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "name": "serialize_as_any",
         "optional": true
       }
     ],
@@ -4319,15 +4493,87 @@
     "notes": [],
     "parameters": [
       {
-        "annotation": "object",
-        "default": "()",
-        "name": "args",
+        "annotation": "int | None",
+        "default": "None",
+        "name": "indent",
         "optional": true
       },
       {
-        "annotation": "object",
-        "default": "{}",
-        "name": "kwargs",
+        "annotation": "bool",
+        "default": "False",
+        "name": "ensure_ascii",
+        "optional": true
+      },
+      {
+        "annotation": "object | None",
+        "default": "None",
+        "name": "include",
+        "optional": true
+      },
+      {
+        "annotation": "object | None",
+        "default": "None",
+        "name": "exclude",
+        "optional": true
+      },
+      {
+        "annotation": "object | None",
+        "default": "None",
+        "name": "context",
+        "optional": true
+      },
+      {
+        "annotation": "bool | None",
+        "default": "None",
+        "name": "by_alias",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "name": "exclude_unset",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "name": "exclude_defaults",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "name": "exclude_none",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "name": "exclude_computed_fields",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "name": "round_trip",
+        "optional": true
+      },
+      {
+        "annotation": "bool | str",
+        "default": "True",
+        "name": "warnings",
+        "optional": true
+      },
+      {
+        "annotation": "Callable[[object], object] | None",
+        "default": "None",
+        "name": "fallback",
+        "optional": true
+      },
+      {
+        "annotation": "bool",
+        "default": "False",
+        "name": "serialize_as_any",
         "optional": true
       }
     ],

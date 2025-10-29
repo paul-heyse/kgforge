@@ -1,9 +1,8 @@
 """Overview of hybrid.
 
-This module bundles hybrid logic for the kgfoundry stack. It groups
-related helpers so downstream packages can import a single cohesive
-namespace. Refer to the functions and classes below for implementation
-specifics.
+This module bundles hybrid logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -44,8 +43,10 @@ __navmap__: Final[NavMap] = {
 class HybridChunker:
     """Describe HybridChunker.
 
-<!-- auto:docstring-builder v1 -->
-Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    <!-- auto:docstring-builder v1 -->
+
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
+    """
 
     ...

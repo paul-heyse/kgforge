@@ -1,8 +1,8 @@
 """Overview of app.
 
-This module bundles app logic for the kgfoundry stack. It groups related
-helpers so downstream packages can import a single cohesive namespace.
-Refer to the functions and classes below for implementation specifics.
+This module bundles app logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -133,21 +133,26 @@ kg.add_edge("C:42", "C:99")
 def auth(authorization: str | None = Header(default=None)) -> None:
     """Describe auth.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-authorization : str | None, optional
-    Describe ``authorization``.
-    Defaults to ``Header(None)``.
+    Parameters
+    ----------
+    authorization : str | None, optional
+        Describe ``authorization``.
+        Defaults to ``Header(None)``.
 
-Raises
-------
-HTTPException
+
+
+
+
+
+    Raises
+    ------
+    HTTPException
     Raised when TODO for HTTPException.
-"""
+    """
     if not API_KEYS:
         return  # disabled in skeleton
     if not authorization or not authorization.startswith("Bearer "):
@@ -161,15 +166,15 @@ HTTPException
 def healthz() -> dict[str, Any]:
     """Describe healthz.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Returns
--------
-dict[str, Any]
-    Describe return value.
-"""
+    Returns
+    -------
+    dict[str, Any]
+        Describe return value.
+    """
     return {
         "status": "ok",
         "components": {
@@ -186,22 +191,27 @@ dict[str, Any]
 def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, float]:
     """Describe rrf fuse.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-lists : list[list[tuple[str, float]]]
-    Describe ``lists``.
-k_rrf : int
-    Describe ``k_rrf``.
+    Parameters
+    ----------
+    lists : list[list[tuple[str, float]]]
+        Describe ``lists``.
+    k_rrf : int
+        Describe ``k_rrf``.
 
-Returns
--------
-dict[str, float]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    dict[str, float]
+        Describe return value.
+    """
     scores: dict[str, float] = {}
     for hits in lists:
         for rank, (doc_id, _score) in enumerate(hits, start=1):
@@ -218,28 +228,33 @@ def apply_kg_boosts(
 ) -> dict[str, float]:
     """Describe apply kg boosts.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-cands : dict[str, float]
-    Describe ``cands``.
-query : str
-    Describe ``query``.
-direct : float, optional
-    Describe ``direct``.
-    Defaults to ``0.08``.
-one_hop : float, optional
-    Describe ``one_hop``.
-    Defaults to ``0.04``.
+    Parameters
+    ----------
+    cands : dict[str, float]
+        Describe ``cands``.
+    query : str
+        Describe ``query``.
+    direct : float, optional
+        Describe ``direct``.
+        Defaults to ``0.08``.
+    one_hop : float, optional
+        Describe ``one_hop``.
+        Defaults to ``0.04``.
 
-Returns
--------
-dict[str, float]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    dict[str, float]
+        Describe return value.
+    """
     q_concepts = set()
     for w in query.lower().split():
         if w.startswith("concept"):
@@ -263,23 +278,28 @@ dict[str, float]
 def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     """Describe search.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-req : SearchRequest
-    Describe ``req``.
-_ : None, optional
-    Describe ``_``.
-    Defaults to ``Depends(auth)``.
+    Parameters
+    ----------
+    req : SearchRequest
+        Describe ``req``.
+    _ : None, optional
+        Describe ``_``.
+        Defaults to ``Depends(auth)``.
 
-Returns
--------
-dict[str, Any]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    dict[str, Any]
+        Describe return value.
+    """
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
     dense_hits: list[tuple[str, float]] = []
@@ -341,23 +361,28 @@ dict[str, Any]
 def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str, Any]:
     """Describe graph concepts.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-body : Mapping[str, Any]
-    Describe ``body``.
-_ : None, optional
-    Describe ``_``.
-    Defaults to ``Depends(auth)``.
+    Parameters
+    ----------
+    body : Mapping[str, Any]
+        Describe ``body``.
+    _ : None, optional
+        Describe ``_``.
+        Defaults to ``Depends(auth)``.
 
-Returns
--------
-dict[str, Any]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    dict[str, Any]
+        Describe return value.
+    """
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring
     concepts = [

@@ -47,12 +47,19 @@ def _build_parameters(symbol: SymbolHarvest) -> list[ParameterDoc]:
         if parameter.name == "self":
             continue
         annotation = parameter.annotation
+        display = parameter.name
+        kind_lower = parameter.kind.lower()
+        if "variadic positional" in kind_lower or "var positional" in kind_lower:
+            display = f"*{display}"
+        elif "variadic keyword" in kind_lower or "var keyword" in kind_lower:
+            display = f"**{display}"
         doc = ParameterDoc(
             name=parameter.name,
             annotation=annotation,
             description=_describe_parameter(parameter.name),
             optional=False,
             default=parameter.default,
+            display_name=display,
         )
         doc.optional = _infer_optional(doc, annotation, parameter.default)
         docs.append(doc)

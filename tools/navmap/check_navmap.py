@@ -2,10 +2,9 @@
 #!/usr/bin/env python3
 """Overview of check navmap.
 
-This module bundles check navmap logic for the kgfoundry stack. It
-groups related helpers so downstream packages can import a single
-cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles check navmap logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from __future__ import annotations
@@ -317,9 +316,7 @@ def _(node: ast.Dict) -> NavTree:
 
 
 def _eval_dict_comprehension(node: ast.DictComp) -> AllDictTemplate:
-    """Evaluate supported dict comprehensions into ``AllDictTemplate``
-    placeholders.
-    """
+    """Evaluate supported dict comprehensions into ``AllDictTemplate`` placeholders."""
     if len(node.generators) != 1:
         message = "Navmap dict comprehension must contain exactly one generator."
         raise NavmapLiteralError(message)
@@ -395,9 +392,7 @@ def _expand_dict_template(template: NavTree, exports: Sequence[str]) -> dict[str
 
 
 def _expand_list(values: Sequence[NavTree], exports: Sequence[str]) -> list[ResolvedNavValue]:
-    """Expand navmap lists, flattening nested lists that arise from
-    placeholders.
-    """
+    """Expand navmap lists, flattening nested lists that arise from placeholders."""
     expanded: list[ResolvedNavValue] = []
     for entry in values:
         resolved = _expand_nav_value(entry, exports)
@@ -536,9 +531,7 @@ def _scan_inline(py: Path) -> tuple[dict[str, int], dict[str, int]]:
 
 
 def _parse_navmap_dict(py: Path) -> dict[str, ResolvedNavValue]:
-    """Return the literal ``__navmap__`` dictionary for ``py`` if one
-    exists.
-    """
+    """Return the literal ``__navmap__`` dictionary for ``py`` if one exists."""
     module = _parse_module(py)
     if module is None:
         return {}
@@ -552,9 +545,7 @@ def _parse_navmap_dict(py: Path) -> dict[str, ResolvedNavValue]:
 
 
 def _literal_string_sequence(node: ast.AST | None) -> list[str] | None:
-    """Return a list of identifier/constant strings from ``node`` when
-    possible.
-    """
+    """Return a list of identifier/constant strings from ``node`` when possible."""
     if node is None:
         return None
     if isinstance(node, (ast.List, ast.Tuple)):
@@ -571,9 +562,7 @@ def _literal_string_sequence(node: ast.AST | None) -> list[str] | None:
 
 
 def _extract_all_literal(module: ast.Module) -> list[str]:
-    """Return the literal ``__all__`` declaration within ``module`` when
-    present.
-    """
+    """Return the literal ``__all__`` declaration within ``module`` when present."""
     for node in module.body:
         value: ast.AST | None = None
         if isinstance(node, ast.Assign):
@@ -620,9 +609,7 @@ def _parse_all(py: Path) -> list[str]:
 
 
 def _exports_for(py: Path, nav: dict[str, ResolvedNavValue]) -> list[str]:
-    """Derive the export list from ``__navmap__`` or ``__all__``
-    definitions.
-    """
+    """Derive the export list from ``__navmap__`` or ``__all__`` definitions."""
     nav_exports = nav.get("exports")
     if isinstance(nav_exports, list):
         strings = [item for item in nav_exports if isinstance(item, str)]
@@ -806,9 +793,7 @@ def _module_path(py: Path) -> str | None:
 
 
 def _validate_pep440(field_val: object) -> str | None:
-    """Validate PEP 440 version strings and report an error message when
-    invalid.
-    """
+    """Validate PEP 440 version strings and report an error message when invalid."""
     if field_val is None or field_val == "":
         return None
     if Version is None:

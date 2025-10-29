@@ -1,8 +1,8 @@
 """Overview of cli.
 
-This module bundles cli logic for the kgfoundry stack. It groups related
-helpers so downstream packages can import a single cohesive namespace.
-Refer to the functions and classes below for implementation specifics.
+This module bundles cli logic for the kgfoundry stack. It groups related helpers so downstream
+packages can import a single cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -57,22 +57,37 @@ def index_bm25(
 ) -> None:
     """Describe index bm25.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-chunks_parquet : str, optional
-    Describe ``chunks_parquet``.
-    Defaults to ``<typer.models.ArgumentInfo object at 0x7350d51b3e00>``.
-backend : str, optional
-    Describe ``backend``.
-    Defaults to ``<typer.models.OptionInfo object at 0x7350d502ae90>``.
-index_dir : str, optional
-    Describe ``index_dir``.
-    Defaults to ``<typer.models.OptionInfo object at 0x7350d502b4d0>``.
-"""
+    Parameters
+    ----------
+    chunks_parquet : str, optional
+        Describe ``chunks_parquet``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7f7991b89a90>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7de3249197f0>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7c42a2e49940>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7549f5e817f0>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7f491ce7d7f0>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7af9d40d97f0>``.
+    backend : str, optional
+        Describe ``backend``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7f7991bad450>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7de3781b0a50>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7c42a2e8c7d0>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7549f5ea4910>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7f491cea0910>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7af9d40f8910>``.
+    index_dir : str, optional
+        Describe ``index_dir``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7f7991bad590>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7de3781b0b90>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7c42a2e8c910>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7549f5ea4a50>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7f491cea0a50>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7af9d40f8a50>``.
+    """
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
@@ -120,19 +135,29 @@ def index_faiss(
 ) -> None:
     """Describe index faiss.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-dense_vectors : str, optional
-    Describe ``dense_vectors``.
-    Defaults to ``<typer.models.ArgumentInfo object at 0x7350d502b750>``.
-index_path : str, optional
-    Describe ``index_path``.
-    Defaults to ``<typer.models.OptionInfo object at 0x7350d502b890>``.
-"""
+    Parameters
+    ----------
+    dense_vectors : str, optional
+        Describe ``dense_vectors``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7f7991bad6d0>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7de3781b0cd0>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7c42a2e8ca50>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7549f5ea4b90>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7f491cea0b90>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7af9d40f8b90>``.
+    index_path : str, optional
+        Describe ``index_path``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7f7991bad810>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7de3781b0e10>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7c42a2e8cb90>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7549f5ea4cd0>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7f491cea0cd0>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7af9d40f8cd0>``.
+    """
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
         vecs = json.load(fh)
@@ -155,16 +180,16 @@ index_path : str, optional
 def api(port: int = 8080) -> None:
     """Describe api.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-port : int, optional
-    Describe ``port``.
-    Defaults to ``8080``.
-"""
+    Parameters
+    ----------
+    port : int, optional
+        Describe ``port``.
+        Defaults to ``8080``.
+    """
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
@@ -174,15 +199,15 @@ port : int, optional
 def e2e() -> None:
     """Describe e2e.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Raises
-------
-Exit
+    Raises
+    ------
+    Exit
     Raised when TODO for Exit.
-"""
+    """
     try:
         from orchestration.flows import e2e_flow
     except ModuleNotFoundError as exc:  # pragma: no cover - defensive messaging

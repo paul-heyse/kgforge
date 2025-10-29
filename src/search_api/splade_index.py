@@ -1,9 +1,8 @@
 """Overview of splade index.
 
-This module bundles splade index logic for the kgfoundry stack. It
-groups related helpers so downstream packages can import a single
-cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles splade index logic for the kgfoundry stack. It groups related helpers so
+downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+for implementation specifics.
 """
 
 from __future__ import annotations
@@ -52,20 +51,25 @@ TOKEN = re.compile(r"[A-Za-z0-9]+")
 def tok(text: str) -> list[str]:
     """Describe tok.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-text : str
-    Describe ``text``.
+    Parameters
+    ----------
+    text : str
+        Describe ``text``.
 
-Returns
--------
-list[str]
-    Describe return value.
-"""
+
+
+
+
+
+    Returns
+    -------
+    list[str]
+        Describe return value.
+    """
     return [token.lower() for token in TOKEN.findall(text or "")]
 
 
@@ -74,23 +78,23 @@ list[str]
 class SpladeDoc:
     """Describe SpladeDoc.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-chunk_id : str
-    Describe ``chunk_id``.
-doc_id : str
-    Describe ``doc_id``.
-section : str
-    Describe ``section``.
-text : str
-    Describe ``text``.
-"""
+    Parameters
+    ----------
+    chunk_id : str
+        Describe ``chunk_id``.
+    doc_id : str
+        Describe ``doc_id``.
+    section : str
+        Describe ``section``.
+    text : str
+        Describe ``text``.
+    """
 
     chunk_id: str
     doc_id: str
@@ -102,23 +106,23 @@ text : str
 class SpladeIndex:
     """Describe SpladeIndex.
 
-<!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-how instances collaborate with the surrounding package. Highlight
-how the class supports nearby modules to guide readers through the
-codebase.
+    how instances collaborate with the surrounding package. Highlight
+    how the class supports nearby modules to guide readers through the
+    codebase.
 
-Parameters
-----------
-db_path : str
-    Describe ``db_path``.
-chunks_dataset_root : str | None, optional
-    Describe ``chunks_dataset_root``.
-    Defaults to ``None``.
-sparse_root : str | None, optional
-    Describe ``sparse_root``.
-    Defaults to ``None``.
-"""
+    Parameters
+    ----------
+    db_path : str
+        Describe ``db_path``.
+    chunks_dataset_root : str | None, optional
+        Describe ``chunks_dataset_root``.
+        Defaults to ``None``.
+    sparse_root : str | None, optional
+        Describe ``sparse_root``.
+        Defaults to ``None``.
+    """
 
     def __init__(
         self,
@@ -128,21 +132,21 @@ sparse_root : str | None, optional
     ) -> None:
         """Describe   init  .
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-db_path : str
-    Describe ``db_path``.
-chunks_dataset_root : str | None, optional
-    Describe ``chunks_dataset_root``.
-    Defaults to ``None``.
-sparse_root : str | None, optional
-    Describe ``sparse_root``.
-    Defaults to ``None``.
-"""
+        Parameters
+        ----------
+        db_path : str
+            Describe ``db_path``.
+        chunks_dataset_root : str | None, optional
+            Describe ``chunks_dataset_root``.
+            Defaults to ``None``.
+        sparse_root : str | None, optional
+            Describe ``sparse_root``.
+            Defaults to ``None``.
+        """
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -153,15 +157,15 @@ sparse_root : str | None, optional
     def _load(self, chunks_root: str | None) -> None:
         """Describe  load.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-chunks_root : str | None
-    Describe ``chunks_root``.
-"""
+        Parameters
+        ----------
+        chunks_root : str | None
+            Describe ``chunks_root``.
+        """
         _ = chunks_root  # optional override currently unused
         if not Path(self.db_path).exists():
             return
@@ -195,23 +199,28 @@ chunks_root : str | None
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
         """Describe search.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-query : str
-    Describe ``query``.
-k : int, optional
-    Describe ``k``.
-    Defaults to ``10``.
+        Parameters
+        ----------
+        query : str
+            Describe ``query``.
+        k : int, optional
+            Describe ``k``.
+            Defaults to ``10``.
 
-Returns
--------
-list[tuple[int, float]]
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        list[tuple[int, float]]
+            Describe return value.
+        """
         if self.N == 0:
             return []
         terms = tok(query)
@@ -234,18 +243,23 @@ list[tuple[int, float]]
     def doc(self, index: int) -> SpladeDoc:
         """Describe doc.
 
-<!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-Parameters
-----------
-index : int
-    Describe ``index``.
+        Parameters
+        ----------
+        index : int
+            Describe ``index``.
 
-Returns
--------
-SpladeDoc
-    Describe return value.
-"""
+
+
+
+
+
+        Returns
+        -------
+        SpladeDoc
+            Describe return value.
+        """
         return self.docs[index]

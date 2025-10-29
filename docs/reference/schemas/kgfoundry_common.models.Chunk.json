@@ -1,0 +1,71 @@
+{
+  "$defs": {
+    "Id": {
+      "type": "string"
+    }
+  },
+  "$id": "https://kgfoundry/schemas/kgfoundry_common.models.Chunk.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Describe Chunk.\n\n<!-- auto:docstring-builder v1 -->\n\nthe behaviour it provides to callers. Callers interact with\nvalidated data through this model.\n\nParameters\n----------\nid : Id\n    Describe ``id``.\ndoc_id : Id\n    Describe ``doc_id``.\nsection : str | None\n    Describe ``section``.\nstart_char : int\n    Describe ``start_char``.\nend_char : int\n    Describe ``end_char``.\ntokens : int\n    Describe ``tokens``.\ndoctags_span : dict[str, int]\n    Describe ``doctags_span``.",
+  "examples": [
+    {
+      "doc_id": null,
+      "doctags_span": null,
+      "end_char": null,
+      "id": null,
+      "section": null,
+      "start_char": null,
+      "tokens": null
+    }
+  ],
+  "properties": {
+    "doc_id": {
+      "$ref": "#/$defs/Id"
+    },
+    "doctags_span": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Doctags Span",
+      "type": "object"
+    },
+    "end_char": {
+      "title": "End Char",
+      "type": "integer"
+    },
+    "id": {
+      "$ref": "#/$defs/Id"
+    },
+    "section": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Section"
+    },
+    "start_char": {
+      "title": "Start Char",
+      "type": "integer"
+    },
+    "tokens": {
+      "title": "Tokens",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "doc_id",
+    "section",
+    "start_char",
+    "end_char",
+    "tokens",
+    "doctags_span"
+  ],
+  "title": "Chunk",
+  "type": "object",
+  "x-version-introduced": "0.1.0"
+}

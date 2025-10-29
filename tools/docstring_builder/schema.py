@@ -15,6 +15,7 @@ class ParameterDoc:
     description: str
     optional: bool = False
     default: str | None = None
+    display_name: str | None = None
 
 
 @dataclass(slots=True)
