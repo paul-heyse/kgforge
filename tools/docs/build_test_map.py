@@ -14,6 +14,7 @@ import os
 import re
 import sys
 from collections import defaultdict
+from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any, Final
 
@@ -29,6 +30,14 @@ OUTFILE_SUM = OUTDIR / "test_map_summary.json"
 OUTFILE_LINT = OUTDIR / "test_map_lint.json"
 
 MAX_CONTEXT_WINDOWS: Final[int] = 5
+DOTTED_IDENTIFIER = re.compile(r"[A-Za-z_][\w\.]+")
+
+JSONPrimitive = str | int | float | bool | None
+type JSONValue = JSONPrimitive | dict[str, JSONValue] | list[JSONValue]
+
+NAVMAP_MISSING_MESSAGE = (
+    "navmap.json is missing. Build the documentation navigation map before running this script."
+)
 
 
 class NavMapLoadError(RuntimeError):
@@ -46,134 +55,108 @@ FAIL_BUDGET = int(os.getenv("TESTMAP_FAIL_BUDGET", "5"))
 FAIL_ON_UNTESTED = os.getenv("TESTMAP_FAIL_ON_UNTESTED", "0") == "1"
 
 
-def _load_json(path: Path) -> Any:
-    """Load json.
-
-    Parameters
-    ----------
-    path : Path
-        Description.
-
-    Returns
-    -------
-    Any
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _load_json(...)
-    """
+def _load_json(path: Path) -> JSONValue | None:
+    """Return JSON data from ``path`` or ``None`` if the file is unreadable."""
     try:
         return json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+    except (OSError, json.JSONDecodeError):
         return None
 
 
-def load_symbol_candidates() -> set[str]:
-    """Compute load symbol candidates.
+def _normalize_module_name(name: str) -> str:
+    """Collapse ``__init__`` suffixes to create a canonical module path."""
+    return name[: -len(".__init__")] if name.endswith(".__init__") else name
 
-    Carry out the load symbol candidates operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Returns
-    -------
-    collections.abc.Set
-        Description of return value.
+def _add_exports(
+    bucket: set[str],
+    module_name: str,
+    exports: Iterable[object] | None = None,
+) -> None:
+    """Record ``module_name`` and any exported symbols in ``bucket``."""
+    module = _normalize_module_name(module_name)
+    if not module:
+        return
 
-    Examples
-    --------
-    >>> from tools.docs.build_test_map import load_symbol_candidates
-    >>> result = load_symbol_candidates()
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    """
+    bucket.add(module)
+
+    if exports is None:
+        return
+
+    for symbol in exports:
+        if not isinstance(symbol, str) or not symbol:
+            continue
+        qualified = symbol if symbol.startswith(f"{module}.") else f"{module}.{symbol}"
+        bucket.add(qualified)
+
+
+def _candidates_from_symbols_json(symbols_json: Path) -> set[str]:
+    """Load module paths from the symbol index produced during docs generation."""
+    payload = _load_json(symbols_json)
+    if not isinstance(payload, list):
+        return set()
+
     candidates: set[str] = set()
-
-    def _record(module_name: str, exports: list[object] | None = None) -> None:
-        """Record.
-
-        Parameters
-        ----------
-        module_name : str
-            Description.
-        exports : list[object] | None
-            Description.
-
-        Returns
-        -------
-        None
-            Description.
-
-        Raises
-        ------
-        Exception
-            Description.
-
-        Examples
-        --------
-        >>> _record(...)
-        """
-        module = (
-            module_name[: -len(".__init__")] if module_name.endswith(".__init__") else module_name
-        )
-        if not module:
-            return
-        candidates.add(module)
-        if exports:
-            for symbol in exports:
-                if isinstance(symbol, str) and symbol:
-                    if symbol.startswith(f"{module}."):
-                        candidates.add(symbol)
-                    else:
-                        candidates.add(f"{module}.{symbol}")
-
-    symbols_json = ROOT / "docs" / "_build" / "symbols.json"
-    if symbols_json.exists():
-        try:
-            data = json.loads(symbols_json.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            data = []
-        for row in data:
+    for row in payload:
+        if isinstance(row, Mapping):
             path = row.get("path")
             if isinstance(path, str):
-                _record(path)
-    if candidates:
-        return candidates
+                _add_exports(candidates, path)
+    return candidates
 
-    navmap = ROOT / "site" / "_build" / "navmap" / "navmap.json"
-    if navmap.exists():
-        try:
-            nav_data = json.loads(navmap.read_text(encoding="utf-8"))
-        except Exception:
-            nav_data = {}
-        modules = nav_data.get("modules") if isinstance(nav_data, dict) else None
-        if isinstance(modules, dict):
-            for module_name, entry in modules.items():
-                exports: list[object] | None = None
-                if isinstance(entry, dict):
-                    ex = entry.get("exports")
-                    if isinstance(ex, list):
-                        exports = ex
-                if isinstance(module_name, str):
-                    _record(module_name, exports)
-    if candidates:
-        return candidates
 
+def _candidates_from_navmap(navmap_json: Path) -> set[str]:
+    """Load modules and exports from the navigation map."""
+    payload = _load_json(navmap_json)
+    if not isinstance(payload, Mapping):
+        return set()
+
+    modules = payload.get("modules")
+    if not isinstance(modules, Mapping):
+        return set()
+
+    candidates: set[str] = set()
+    for module_name, entry in modules.items():
+        if not isinstance(module_name, str):
+            continue
+        exports: Iterable[object] | None = None
+        if isinstance(entry, Mapping):
+            raw_exports = entry.get("exports")
+            if isinstance(raw_exports, list):
+                exports = raw_exports
+        _add_exports(candidates, module_name, exports)
+    return candidates
+
+
+def _candidates_from_source_tree() -> set[str]:
+    """Derive module names by scanning the ``src`` tree."""
+    candidates: set[str] = set()
     for pyfile in SRC.rglob("*.py"):
         try:
             rel = pyfile.relative_to(SRC)
         except ValueError:
             continue
-        module = ".".join(rel.with_suffix("").parts)
-        if module.endswith(".__init__"):
-            module = module[: -len(".__init__")]
+        module = _normalize_module_name(".".join(rel.with_suffix("").parts))
         if module:
             candidates.add(module)
     return candidates
+
+
+def load_symbol_candidates() -> set[str]:
+    """Return potential module and attribute targets for documentation lookup."""
+    symbols_json = ROOT / "docs" / "_build" / "symbols.json"
+    if symbols_json.exists():
+        candidates = _candidates_from_symbols_json(symbols_json)
+        if candidates:
+            return candidates
+
+    navmap_json = ROOT / "site" / "_build" / "navmap" / "navmap.json"
+    if navmap_json.exists():
+        candidates = _candidates_from_navmap(navmap_json)
+        if candidates:
+            return candidates
+
+    return _candidates_from_source_tree()
 
 
 def load_symbol_spans() -> dict[str, dict[str, Any]]:
@@ -191,7 +174,6 @@ def load_symbol_spans() -> dict[str, dict[str, Any]]:
     >>> from tools.docs.build_test_map import load_symbol_spans
     >>> result = load_symbol_spans()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     out: dict[str, dict[str, Any]] = {}
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
@@ -232,13 +214,10 @@ def load_public_symbols() -> set[str]:
     >>> from tools.docs.build_test_map import load_public_symbols
     >>> result = load_public_symbols()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     nav = ROOT / "site" / "_build" / "navmap" / "navmap.json"
     if not nav.exists():
-        raise NavMapLoadError(
-            "navmap.json is missing. Build the documentation navigation map before running this script.",
-        )
+        raise NavMapLoadError(NAVMAP_MISSING_MESSAGE)
     try:
         j = json.loads(nav.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
@@ -248,126 +227,144 @@ def load_public_symbols() -> set[str]:
         message = f"Failed to read {nav}: {exc}"
         raise NavMapLoadError(message) from exc
     exports: set[str] = set()
-    mods = (j.get("modules") or {}).items()
-    for mod, entry in mods:
-        ex = entry.get("exports") or []
-        for s in ex:
-            if isinstance(s, str):
-                exports.add(f"{mod}.{s}" if not s.startswith(f"{mod}.") else s)
+    modules = j.get("modules")
+    if not isinstance(modules, Mapping):
+        return exports
+
+    for module_name, entry in modules.items():
+        if not isinstance(module_name, str) or not isinstance(entry, Mapping):
+            continue
+        raw_exports = entry.get("exports")
+        if not isinstance(raw_exports, list):
+            continue
+        for symbol in raw_exports:
+            if isinstance(symbol, str):
+                fully_qualified = (
+                    symbol if symbol.startswith(f"{module_name}.") else f"{module_name}.{symbol}"
+                )
+                exports.add(fully_qualified)
     return exports
 
 
+def _collect_import(node: ast.Import, names: set[str]) -> None:
+    for alias in node.names:
+        names.add(alias.name)
+
+
+def _collect_import_from(node: ast.ImportFrom, names: set[str]) -> None:
+    module = node.module or ""
+    if module:
+        names.add(module)
+    for alias in node.names:
+        if module:
+            names.add(f"{module}.{alias.name}")
+        names.add(alias.name)
+
+
+def _collect_attribute(node: ast.Attribute, names: set[str]) -> None:
+    if isinstance(node.value, ast.Name):
+        names.add(f"{node.value.id}.{node.attr}")
+
+
 def _names_from_ast(tree: ast.AST | None) -> set[str]:
-    """Names from ast.
-
-    Parameters
-    ----------
-    tree : ast.AST | None
-        Description.
-
-    Returns
-    -------
-    set[str]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _names_from_ast(...)
-    """
+    """Return identifiers discovered while walking ``tree``."""
     names: set[str] = set()
     if tree is None:
         return names
+
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
-            for alias in node.names:
-                names.add(alias.name)
+            _collect_import(node, names)
         elif isinstance(node, ast.ImportFrom):
-            if node.module:
-                names.add(node.module)
-            for alias in node.names:
-                if node.module:
-                    names.add(f"{node.module}.{alias.name}")
-                names.add(alias.name)
+            _collect_import_from(node, names)
         elif isinstance(node, ast.Attribute):
-            if isinstance(node.value, ast.Name):
-                names.add(f"{node.value.id}.{node.attr}")
+            _collect_attribute(node, names)
         elif isinstance(node, ast.Name):
             names.add(node.id)
     return names
 
 
-def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, object]]]:
-    """Compute scan test file.
-
-    Carry out the scan test file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    path : Path
-        Description for ``path``.
-    symbols : collections.abc.Set
-        Description for ``symbols``.
-
-    Returns
-    -------
-    collections.abc.Mapping
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.docs.build_test_map import scan_test_file
-    >>> result = scan_test_file(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    """
+def _read_source(path: Path) -> str | None:
     try:
-        text = path.read_text("utf-8")
+        return path.read_text(encoding="utf-8")
     except OSError:
+        return None
+
+
+def _parse_source(text: str) -> ast.AST | None:
+    try:
+        return ast.parse(text)
+    except SyntaxError:
+        return None
+
+
+def _symbol_tail(symbol: str) -> str:
+    return symbol.rsplit(".", 1)[-1]
+
+
+def _match_reason(symbol: str, dotted_tokens: set[str], ast_tokens: set[str]) -> str | None:
+    top = symbol.split(".", 1)[0]
+    tail = _symbol_tail(symbol)
+    if symbol in dotted_tokens:
+        return "dotted"
+    if symbol in ast_tokens:
+        return "ast_fqn"
+    if top in ast_tokens:
+        return "ast_top"
+    if tail in dotted_tokens:
+        return "tail"
+    return None
+
+
+def _line_hits(text: str, symbol: str) -> list[int]:
+    tail = _symbol_tail(symbol)
+    hits: list[int] = []
+    for lineno, raw in enumerate(text.splitlines(), start=1):
+        if symbol in raw or (tail and tail in raw):
+            hits.append(lineno)
+            if len(hits) >= MAX_CONTEXT_WINDOWS:
+                break
+    return hits
+
+
+def _context_windows(line_hits: Iterable[int]) -> list[dict[str, int]]:
+    return [{"start": max(1, line - WINDOW), "end": line + WINDOW} for line in line_hits]
+
+
+def _relative_repo_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
+def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, object]]]:
+    """Return symbol matches discovered inside ``path`` for reporting."""
+    text = _read_source(path)
+    if text is None:
         return {}
 
-    try:
-        tree = ast.parse(text)
-    except SyntaxError:
-        tree = None
-
-    dotted_tokens = set(re.findall(r"[A-Za-z_][\w\.]+", text))
+    tree = _parse_source(text)
+    dotted_tokens = set(DOTTED_IDENTIFIER.findall(text))
     ast_tokens = _names_from_ast(tree)
     matches: dict[str, list[dict[str, object]]] = {}
 
     for symbol in symbols:
-        top = symbol.split(".", 1)[0]
-        tail = symbol.split(".")[-1]
-        reason = None
-        if symbol in dotted_tokens:
-            reason = "dotted"
-        elif symbol in ast_tokens:
-            reason = "ast_fqn"
-        elif top in ast_tokens:
-            reason = "ast_top"
-        elif tail in dotted_tokens:
-            reason = "tail"
-        if reason:
-            # locate up to 5 hit windows
-            line_hits: list[int] = []
-            for lineno, raw in enumerate(text.splitlines(), start=1):
-                if symbol in raw or (tail and tail in raw):
-                    line_hits.append(lineno)
-            if len(line_hits) >= MAX_CONTEXT_WINDOWS:
-                break
-            windows = [{"start": max(1, n - WINDOW), "end": n + WINDOW} for n in line_hits]
-            matches.setdefault(symbol, []).append(
-                {
-                    "file": str(path.relative_to(ROOT)),
-                    "lines": line_hits,
-                    "windows": windows,
-                    "reason": reason,
-                }
-            )
+        reason = _match_reason(symbol, dotted_tokens, ast_tokens)
+        if reason is None:
+            continue
+        line_hits = _line_hits(text, symbol)
+        if len(line_hits) >= MAX_CONTEXT_WINDOWS:
+            break
+        windows = _context_windows(line_hits)
+        matches.setdefault(symbol, []).append(
+            {
+                "file": _relative_repo_path(path),
+                "lines": line_hits,
+                "windows": windows,
+                "reason": reason,
+            }
+        )
     return matches
 
 
@@ -396,20 +393,41 @@ def _normalize_repo_rel(path_like: str) -> str:
     --------
     >>> _normalize_repo_rel(...)
     """
-    p = Path(path_like)
+    try:
+        p = Path(path_like)
+    except TypeError:
+        return str(path_like)
+
     try:
         return str(p.relative_to(ROOT))
-    except Exception:
-        # coverage JSON often records absolute paths; make repo-relative if possible
-        try:
-            raw = str(p)
-            root = str(ROOT)
-            idx = raw.find(root)
-            if idx != -1:
-                return raw[idx + len(root) :].lstrip(os.sep)
-        except Exception:
-            pass
-        return str(p)
+    except ValueError:
+        raw = str(p)
+        root = str(ROOT)
+        idx = raw.find(root)
+        if idx != -1:
+            return raw[idx + len(root) :].lstrip(os.sep)
+        return raw
+
+
+def _executed_lines(info: Mapping[str, object]) -> set[int]:
+    raw = info.get("executed_lines")
+    if not isinstance(raw, list):
+        return set()
+    return {line for line in raw if isinstance(line, int)}
+
+
+def _contexts_for_file(info: Mapping[str, object], rel: str) -> dict[tuple[str, int], set[str]]:
+    contexts = info.get("contexts")
+    if not isinstance(contexts, Mapping):
+        return {}
+    by_line: dict[tuple[str, int], set[str]] = {}
+    for ctx_name, ln_list in contexts.items():
+        if not isinstance(ln_list, list):
+            continue
+        for ln in ln_list:
+            if isinstance(ln, int):
+                by_line.setdefault((rel, ln), set()).add(str(ctx_name))
+    return by_line
 
 
 def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]]]:
@@ -427,27 +445,29 @@ def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]
     >>> from tools.docs.build_test_map import load_coverage
     >>> result = load_coverage()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     if not COV_JSON.exists():
         return ({}, {})
     data = _load_json(COV_JSON)
-    if not isinstance(data, dict):
+    if not isinstance(data, Mapping):
         return ({}, {})
-    files = data.get("files") or {}
+
+    files = data.get("files")
+    if not isinstance(files, Mapping):
+        return ({}, {})
+
     executed: dict[str, set[int]] = {}
     ctx_by_line: dict[tuple[str, int], set[str]] = {}
+
     for fpath, info in files.items():
+        if not isinstance(fpath, str) or not isinstance(info, Mapping):
+            continue
+
         rel = _normalize_repo_rel(fpath)
-        lines = set(info.get("executed_lines") or [])
-        executed[rel] = lines
-        # contexts are optional; enabled when [json] show_contexts = True
-        # Coverage JSON may record contexts as mapping of context -> [lines]
-        ctxs = info.get("contexts") or {}
-        if isinstance(ctxs, dict):
-            for ctx, ln_list in ctxs.items():
-                for ln in ln_list or []:
-                    ctx_by_line.setdefault((rel, ln), set()).add(str(ctx))
+        executed[rel] = _executed_lines(info)
+
+        for key, ctx_names in _contexts_for_file(info, rel).items():
+            ctx_by_line.setdefault(key, set()).update(ctx_names)
     return (executed, ctx_by_line)
 
 
@@ -474,7 +494,6 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     >>> from tools.docs.build_test_map import build_test_map
     >>> result = build_test_map(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     table: dict[str, list[dict[str, object]]] = defaultdict(list)
     if not TESTS.exists():
@@ -516,7 +535,6 @@ def attach_coverage(
     >>> from tools.docs.build_test_map import attach_coverage
     >>> result = attach_coverage(..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     result: dict[str, dict[str, Any]] = {}
     for sym, meta in symbol_spans.items():
@@ -577,7 +595,6 @@ def summarize(
     >>> from tools.docs.build_test_map import summarize
     >>> result = summarize(..., ..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     # group by module
     by_mod: dict[str, list[str]] = defaultdict(list)
