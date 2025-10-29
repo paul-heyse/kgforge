@@ -57,7 +57,6 @@ def tokenize(text: str) -> list[str]:
     Parameters
     ----------
     text : str
-    text : str
         Description for ``text``.
     
     Returns
@@ -72,6 +71,7 @@ def tokenize(text: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -109,12 +109,11 @@ class FixtureIndex:
         Parameters
         ----------
         root : str | None
-        root : str | None, optional, default='/data'
-            Description for ``root``.
+            Optional parameter default ``'/data'``. Description for ``root``.
         db_path : str | None
-        db_path : str | None, optional, default='/data/catalog/catalog.duckdb'
-            Description for ``db_path``.
+            Optional parameter default ``'/data/catalog/catalog.duckdb'``. Description for ``db_path``.
         """
+        
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []
@@ -191,11 +190,9 @@ class FixtureIndex:
         Parameters
         ----------
         query : str
-        query : str
             Description for ``query``.
         k : int | None
-        k : int | None, optional, default=10
-            Description for ``k``.
+            Optional parameter default ``10``. Description for ``k``.
         
         Returns
         -------
@@ -209,6 +206,7 @@ class FixtureIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         if getattr(self, "N", 0) == 0:
             return []
         qtoks = tokenize(query)
@@ -234,7 +232,6 @@ class FixtureIndex:
         Parameters
         ----------
         index : int
-        index : int
             Description for ``index``.
         
         Returns
@@ -249,4 +246,5 @@ class FixtureIndex:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         return self.docs[index]

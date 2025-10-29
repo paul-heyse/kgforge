@@ -41,9 +41,9 @@ class _AllDictTemplate:
         Parameters
         ----------
         template : typing.Any
-        template : typing.Any
             Description for ``template``.
         """
+        
         self.template = template
 
 
@@ -366,8 +366,7 @@ def main(argv: list[str] | None = None) -> int:
     Parameters
     ----------
     argv : List[str] | None
-    argv : List[str] | None, optional, default=None
-        Description for ``argv``.
+        Optional parameter default ``None``. Description for ``argv``.
     
     Returns
     -------
@@ -381,6 +380,7 @@ def main(argv: list[str] | None = None) -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     errors: list[str] = []
     for py in sorted(SRC.rglob("*.py")):
         errors.extend(_inspect(py))

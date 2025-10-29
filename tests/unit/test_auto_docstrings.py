@@ -86,6 +86,7 @@ def _get_function(code: str) -> ast.FunctionDef:
         ("__eq__", "Compare the instance for equality"),
         ("__pydantic_core_schema__", "schema object"),
         ("model_dump", "Serialise the model instance"),
+        ("clear", "Remove every entry"),
     ],
 )
 def test_extended_summary_overrides(name: str, expected_fragment: str) -> None:
@@ -189,6 +190,31 @@ def test_build_docstring_appends_examples(
     emitted_examples = doc_lines[examples_index + 2 : closing_index]
     for line in expected_lines:
         assert line in emitted_examples
+
+
+def test_process_file_injects_magic_and_pydantic_summaries(repo_layout: Path) -> None:
+    target = repo_layout / "src" / "pkg" / "sample.py"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        dedent(
+            """
+            class Sample(BaseModel):
+                def __len__(self) -> int:
+                    return 0
+
+                def model_dump(self) -> dict[str, int]:
+                    return {}
+            """
+        ),
+        encoding="utf-8",
+    )
+
+    changed = process_file(target)
+
+    assert changed
+    contents = target.read_text(encoding="utf-8")
+    assert "Report how many items the instance contains." in contents
+    assert "Serialise the model instance into a plain Python mapping." in contents
 
 
 def test_build_examples_skip_optional_parameters_while_showing_variadics() -> None:

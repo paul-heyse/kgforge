@@ -307,9 +307,7 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     Parameters
     ----------
     path : Path
-    path : Path
         Description for ``path``.
-    symbols : collections.abc.Set
     symbols : collections.abc.Set
         Description for ``symbols``.
     
@@ -325,6 +323,7 @@ def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, ob
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     try:
         text = path.read_text("utf-8")
     except OSError:
@@ -462,7 +461,6 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     Parameters
     ----------
     symbols : collections.abc.Set
-    symbols : collections.abc.Set
         Description for ``symbols``.
     
     Returns
@@ -477,6 +475,7 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     table: dict[str, list[dict[str, object]]] = defaultdict(list)
     if not TESTS.exists():
         return {}
@@ -501,12 +500,9 @@ def attach_coverage(
     Parameters
     ----------
     symbol_spans : collections.abc.Mapping
-    symbol_spans : collections.abc.Mapping
         Description for ``symbol_spans``.
     executed : collections.abc.Mapping
-    executed : collections.abc.Mapping
         Description for ``executed``.
-    ctx_by_line : collections.abc.Mapping
     ctx_by_line : collections.abc.Mapping
         Description for ``ctx_by_line``.
     
@@ -522,6 +518,7 @@ def attach_coverage(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     result: dict[str, dict[str, Any]] = {}
     for sym, meta in symbol_spans.items():
         f = meta.get("file")
@@ -564,15 +561,11 @@ def summarize(
     Parameters
     ----------
     public_syms : collections.abc.Set
-    public_syms : collections.abc.Set
         Description for ``public_syms``.
-    symbol_spans : collections.abc.Mapping
     symbol_spans : collections.abc.Mapping
         Description for ``symbol_spans``.
     coverage : collections.abc.Mapping
-    coverage : collections.abc.Mapping
         Description for ``coverage``.
-    budget : int
     budget : int
         Description for ``budget``.
     
@@ -588,6 +581,7 @@ def summarize(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     # group by module
     by_mod: dict[str, list[str]] = defaultdict(list)
     for s in public_syms:

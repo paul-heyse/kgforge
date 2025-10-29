@@ -54,14 +54,11 @@ def rrf_fuse(
     Parameters
     ----------
     dense : List[Tuple[str, float]]
-    dense : List[Tuple[str, float]]
         Description for ``dense``.
-    sparse : List[Tuple[str, float]]
     sparse : List[Tuple[str, float]]
         Description for ``sparse``.
     k : int | None
-    k : int | None, optional, default=60
-        Description for ``k``.
+        Optional parameter default ``60``. Description for ``k``.
     
     Returns
     -------
@@ -75,6 +72,7 @@ def rrf_fuse(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     # NOTE: implement stable RRF across rankers when ranker outputs are wired
     return []
 
@@ -88,9 +86,7 @@ def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[st
     Parameters
     ----------
     fused : List[Tuple[str, float]]
-    fused : List[Tuple[str, float]]
         Description for ``fused``.
-    query : str
     query : str
         Description for ``query``.
     
@@ -106,6 +102,7 @@ def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[st
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     # NOTE: apply boosts for direct & one-hop concept matches once KG signals exist
     return fused
 
@@ -121,11 +118,9 @@ def mmr_deduplicate(
     Parameters
     ----------
     results : List[Tuple[str, float]]
-    results : List[Tuple[str, float]]
         Description for ``results``.
     lambda_ : float | None
-    lambda_ : float | None, optional, default=0.7
-        Description for ``lambda_``.
+        Optional parameter default ``0.7``. Description for ``lambda_``.
     
     Returns
     -------
@@ -139,5 +134,6 @@ def mmr_deduplicate(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     # NOTE: add doc-level diversity via MMR when result scoring is available
     return results

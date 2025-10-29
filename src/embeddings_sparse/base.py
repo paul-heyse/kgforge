@@ -64,7 +64,6 @@ class SparseEncoder(Protocol):
         Parameters
         ----------
         texts : List[str]
-        texts : List[str]
             Description for ``texts``.
         
         Returns
@@ -79,6 +78,7 @@ class SparseEncoder(Protocol):
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         ...
 
 
@@ -95,18 +95,18 @@ class SparseIndex(Protocol):
         """Compute build.
 
         Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         docs_iterable : collections.abc.Iterable
-        docs_iterable : collections.abc.Iterable
             Description for ``docs_iterable``.
-
+        
         Examples
         --------
         >>> from embeddings_sparse.base import build
         >>> build(...)  # doctest: +ELLIPSIS
         """
+        
         ...
 
     def search(
@@ -119,14 +119,11 @@ class SparseIndex(Protocol):
         Parameters
         ----------
         query : str
-        query : str
             Description for ``query``.
-        k : int
         k : int
             Description for ``k``.
         fields : Mapping[str, str] | None
-        fields : Mapping[str, str] | None, optional, default=None
-            Description for ``fields``.
+            Optional parameter default ``None``. Description for ``fields``.
         
         Returns
         -------
@@ -140,4 +137,5 @@ class SparseIndex(Protocol):
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         ...

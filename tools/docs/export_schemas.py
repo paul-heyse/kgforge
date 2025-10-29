@@ -97,7 +97,6 @@ def is_pydantic_model(obj: object) -> bool:
     Parameters
     ----------
     obj : object
-    obj : object
         Description for ``obj``.
     
     Returns
@@ -112,6 +111,7 @@ def is_pydantic_model(obj: object) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     try:
         from pydantic import BaseModel
     except Exception:
@@ -127,7 +127,6 @@ def is_pandera_model(obj: object) -> bool:
     Parameters
     ----------
     obj : object
-    obj : object
         Description for ``obj``.
     
     Returns
@@ -142,6 +141,7 @@ def is_pandera_model(obj: object) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     try:
         import pandera as pa
     except Exception:
@@ -376,7 +376,6 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
         Parameters
         ----------
         d : collections.abc.Mapping
-        d : collections.abc.Mapping
             Description for ``d``.
         
         Returns
@@ -391,6 +390,7 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         props = d.get("properties")
         return set(props.keys()) if isinstance(props, dict) else set()
 
@@ -546,8 +546,7 @@ def main(argv: list[str] | None = None) -> int:
     Parameters
     ----------
     argv : List[str] | None
-    argv : List[str] | None, optional, default=None
-        Description for ``argv``.
+        Optional parameter default ``None``. Description for ``argv``.
     
     Returns
     -------
@@ -561,6 +560,7 @@ def main(argv: list[str] | None = None) -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     import argparse
 
     p = argparse.ArgumentParser()

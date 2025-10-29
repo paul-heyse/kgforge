@@ -566,6 +566,37 @@ _MISCELLANEOUS_MAGIC_METHODS: dict[str, str] = {
 }
 
 
+_STANDARD_METHOD_EXTENDED_SUMMARIES: dict[str, str] = {
+    "clear": _paragraph(
+        "Remove every entry from the mapping so callers can start from a clean slate.",
+        "The helper mirrors ``dict.clear`` so code interacting with mapping-like models behaves consistently.",
+        "Return ``None`` to match the built-in contract and avoid implying a meaningful value.",
+    ),
+    "copy": _paragraph(
+        "Return a shallow copy of the mapping suitable for defensive mutation.",
+        "Consumers can tweak the duplicate without affecting the original instance or violating validation rules.",
+        "Prefer this helper over direct constructors to preserve model-specific behaviours.",
+    ),
+    "get": _paragraph(
+        "Retrieve a value for ``key`` while falling back to a default when absent.",
+        "The convenience wrapper mirrors ``dict.get`` so configuration objects remain ergonomic.",
+        "Use it to express optional access without raising ``KeyError``.",
+    ),
+    "items": _collection_summary(
+        "Return a dynamic view exposing each ``(key, value)`` pair.",
+        "mapping iteration and dictionary-style inspection",
+    ),
+    "keys": _collection_summary(
+        "Expose a set-like view of the mapping's keys.",
+        "mapping introspection and membership checks",
+    ),
+    "values": _collection_summary(
+        "Provide a view of the mapping's stored values.",
+        "mapping iteration utilities",
+    ),
+}
+
+
 MAGIC_METHOD_EXTENDED_SUMMARIES: dict[str, str] = {
     **_CORE_MAGIC_METHOD_SUMMARIES,
     **_OBJECT_LIFECYCLE_MAGIC_METHODS,
@@ -617,6 +648,10 @@ PYDANTIC_ARTIFACT_SUMMARIES: dict[str, str] = {
     "model_extra": _pydantic_summary(
         "Store attributes captured by ``extra='allow'`` or similar configuration.",
         "Pydantic keeps these values separate from standard fields to prevent accidental schema drift.",
+    ),
+    "__class_vars__": _pydantic_summary(
+        "Expose class variable annotations preserved on the model for introspection.",
+        "Entries reflect ``ClassVar`` declarations so tooling can distinguish runtime fields from static metadata.",
     ),
     "model_post_init": _pydantic_summary(
         "Provide a hook executed after ``__init__`` completes validation.",
@@ -698,6 +733,14 @@ PYDANTIC_ARTIFACT_SUMMARIES: dict[str, str] = {
         "Hold arbitrary attributes permitted by the model configuration.",
         "Values appear here when ``extra`` behaviour allows storing keys beyond the declared schema.",
     ),
+    "__pydantic_complete__": _pydantic_summary(
+        "Flag whether Pydantic finished constructing the model class and its helpers.",
+        "Consumers can guard against premature access to partially initialised models using this boolean.",
+    ),
+    "__pydantic_computed_fields__": _pydantic_summary(
+        "Track computed field definitions attached to the model.",
+        "The mapping stores decorator metadata so serialisation honours lazily evaluated properties.",
+    ),
     "__pydantic_fields_set__": _pydantic_summary(
         "Track which fields were provided to the constructor.",
         "This mirrors ``model_fields_set`` but lives on the instance for quick access.",
@@ -730,9 +773,25 @@ PYDANTIC_ARTIFACT_SUMMARIES: dict[str, str] = {
         "Store private attributes declared with ``PrivateAttr``.",
         "Private values live outside the public schema yet remain accessible on the instance.",
     ),
+    "__pydantic_root_model__": _pydantic_summary(
+        "Describe configuration applied when the model uses the root-model pattern.",
+        "It captures type information so validation and schema generation remain aligned with the wrapped value.",
+    ),
+    "__pydantic_setattr_handlers__": _pydantic_summary(
+        "Maintain the compiled attribute-assignment hooks for the model.",
+        "Pydantic uses these handlers to enforce validators and field protections during runtime mutation.",
+    ),
     "__pydantic_init_subclass__": _pydantic_summary(
         "Provide Pydantic's subclass initialisation helper.",
         "The hook wraps ``__init_subclass__`` to ensure generated models maintain validation metadata.",
+    ),
+    "__pydantic_post_init__": _pydantic_summary(
+        "Point to the function executed immediately after ``__init__`` finishes.",
+        "It mirrors ``model_post_init`` but is stored under a Pydantic-reserved name for internal scheduling.",
+    ),
+    "__private_attributes__": _pydantic_summary(
+        "Expose private attribute descriptors declared on the model.",
+        "The mapping mirrors ``__pydantic_private__`` but tracks definitions at the class level for introspection.",
     ),
     "__get_pydantic_core_schema__": _pydantic_summary(
         "Compute the core schema for custom types or dataclasses.",
@@ -741,6 +800,10 @@ PYDANTIC_ARTIFACT_SUMMARIES: dict[str, str] = {
     "__get_pydantic_json_schema__": _pydantic_summary(
         "Customise JSON Schema generation for user-defined types.",
         "Implementations adapt the default schema based on context provided by Pydantic.",
+    ),
+    "__signature__": _pydantic_summary(
+        "Expose the generated call signature for the model's constructor.",
+        "Introspection tools rely on the ``inspect``-style signature to surface parameters and defaults accurately.",
     ),
 }
 
@@ -752,8 +815,10 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
     "StrArray": "src.vectorstore_faiss.gpu.StrArray",
     "VecArray": "src.search_api.faiss_adapter.VecArray",
     # === Project-specific client helpers ===
-    "_SupportsHttp": "src.search_client.client._SupportsHttp",
-    "_SupportsResponse": "src.search_client.client._SupportsResponse",
+    "_SupportsHttp": "src.search_client.client.SupportsHttp",
+    "_SupportsResponse": "src.search_client.client.SupportsResponse",
+    "SupportsHttp": "src.search_client.client.SupportsHttp",
+    "SupportsResponse": "src.search_client.client.SupportsResponse",
     # === Project-specific models ===
     "Chunk": "src.kgfoundry_common.models.Chunk",
     "Concept": "src.ontology.catalog.Concept",
@@ -810,6 +875,7 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
     "numpy.uint32": "numpy.uint32",
     "numpy.uint64": "numpy.uint64",
     "numpy.uint8": "numpy.uint8",
+    "numpy.str_": "numpy.str_",
     # === NumPy scalar types (short aliases) ===
     "np.complex128": "numpy.complex128",
     "np.complex64": "numpy.complex64",
@@ -824,6 +890,7 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
     "np.uint32": "numpy.uint32",
     "np.uint64": "numpy.uint64",
     "np.uint8": "numpy.uint8",
+    "np.str_": "numpy.str_",
     # === PyArrow core types ===
     "pyarrow.Array": "pyarrow.Array",
     "pyarrow.DataType": "pyarrow.DataType",
@@ -877,10 +944,16 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
     "uuid.UUID": "uuid.UUID",
     # === External service integrations ===
     "duckdb.DuckDBPyConnection": "duckdb.DuckDBPyConnection",
-    "Exit": "typer.Exit",
-    "fastapi.HTTPException": "fastapi.HTTPException",
+    "Depends": "fastapi.Depends",
+    "fastapi.Depends": "fastapi.Depends",
+    "Header": "fastapi.Header",
+    "fastapi.Header": "fastapi.Header",
     "HTTPException": "fastapi.HTTPException",
+    "fastapi.HTTPException": "fastapi.HTTPException",
+    "Exit": "typer.Exit",
+    "typer.Argument": "typer.Argument",
     "typer.Exit": "typer.Exit",
+    "typer.Option": "typer.Option",
 }
 
 
@@ -950,6 +1023,16 @@ def _format_annotation_string(value: str) -> str:
         inner_text = _normalize_qualified_name(_format_annotation_string(inner))
         return f"Optional[{inner_text}]"
     return text
+
+
+def _format_default_literal(value: str | None) -> str:
+    """Return ``value`` wrapped as inline code for docstring rendering."""
+    if value is None:
+        return "``None``"
+    cleaned = value.strip()
+    # Escape any embedded backticks so the literal renders correctly.
+    escaped = cleaned.replace("`", "``")
+    return f"``{escaped}``"
 
 
 def _annotation_accepts_none(text: str) -> bool:
@@ -1033,7 +1116,6 @@ def module_name_for(path: Path) -> str:
     Parameters
     ----------
     path : Path
-    path : Path
         Description for ``path``.
     
     Returns
@@ -1048,6 +1130,7 @@ def module_name_for(path: Path) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     try:
         relative = path.relative_to(REPO_ROOT)
     except ValueError:
@@ -1073,9 +1156,7 @@ def summarize(name: str, kind: str) -> str:
     Parameters
     ----------
     name : str
-    name : str
         Description for ``name``.
-    kind : str
     kind : str
         Description for ``kind``.
     
@@ -1091,6 +1172,7 @@ def summarize(name: str, kind: str) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     base = _humanize_identifier(name) or "value"
     if kind == "module":
         text = f"Overview of {base}."
@@ -1111,17 +1193,13 @@ def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | Non
     Parameters
     ----------
     kind : str
-    kind : str
         Description for ``kind``.
-    name : str
     name : str
         Description for ``name``.
     module_name : str
-    module_name : str
         Description for ``module_name``.
     node : ast.AST | None
-    node : ast.AST | None, optional, default=None
-        Description for ``node``.
+        Optional parameter default ``None``. Description for ``node``.
     
     Returns
     -------
@@ -1135,6 +1213,7 @@ def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | Non
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     pretty = _humanize_identifier(name)
     if kind == "module":
         module_pretty = _humanize_identifier(module_name.split(".")[-1] if module_name else name)
@@ -1177,6 +1256,8 @@ def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | Non
         )
     if kind == "function" and name in MAGIC_METHOD_EXTENDED_SUMMARIES:
         return MAGIC_METHOD_EXTENDED_SUMMARIES[name]
+    if kind == "function" and name in _STANDARD_METHOD_EXTENDED_SUMMARIES:
+        return _STANDARD_METHOD_EXTENDED_SUMMARIES[name]
     if kind == "function" and _is_magic(name):
         return DEFAULT_MAGIC_METHOD_FALLBACK
     if kind == "function":
@@ -1206,7 +1287,6 @@ def annotation_to_text(node: ast.AST | None) -> str:
     Parameters
     ----------
     node : ast.AST | None
-    node : ast.AST | None
         Description for ``node``.
     
     Returns
@@ -1221,6 +1301,7 @@ def annotation_to_text(node: ast.AST | None) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     if node is None:
         return "Any"
     try:
@@ -1238,7 +1319,6 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     Parameters
     ----------
     tree : ast.Module
-    tree : ast.Module
         Description for ``tree``.
     
     Returns
@@ -1253,6 +1333,7 @@ def iter_docstring_nodes(tree: ast.Module) -> list[tuple[int, ast.AST, str]]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     items: list[tuple[int, ast.AST, str]] = [(0, tree, "module")]
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
@@ -1287,7 +1368,6 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[Paramet
     Parameters
     ----------
     node : ast.FunctionDef | ast.AsyncFunctionDef
-    node : ast.FunctionDef | ast.AsyncFunctionDef
         Description for ``node``.
     
     Returns
@@ -1302,6 +1382,7 @@ def parameters_for(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[Paramet
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     params: list[ParameterInfo] = []
     args = node.args
 
@@ -1380,7 +1461,6 @@ def detect_raises(node: ast.AST) -> list[str]:
     Parameters
     ----------
     node : ast.AST
-    node : ast.AST
         Description for ``node``.
     
     Returns
@@ -1395,6 +1475,7 @@ def detect_raises(node: ast.AST) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     seen: OrderedDict[str, None] = OrderedDict()
 
     def _exception_name(exc: ast.AST | None) -> str:
@@ -1535,15 +1616,11 @@ def build_examples(
     Parameters
     ----------
     module_name : str
-    module_name : str
         Description for ``module_name``.
-    name : str
     name : str
         Description for ``name``.
     parameters : List[ParameterInfo]
-    parameters : List[ParameterInfo]
         Description for ``parameters``.
-    has_return : bool
     has_return : bool
         Description for ``has_return``.
     
@@ -1559,6 +1636,7 @@ def build_examples(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     lines: list[str] = ["Examples", "--------"]
     if module_name and not name.startswith("__"):
         lines.append(f">>> from {module_name} import {name}")
@@ -1587,12 +1665,9 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     Parameters
     ----------
     kind : str
-    kind : str
         Description for ``kind``.
     node : ast.AST
-    node : ast.AST
         Description for ``node``.
-    module_name : str
     module_name : str
         Description for ``module_name``.
     
@@ -1608,6 +1683,7 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     if kind == "module":
         module_display = module_name.split(".")[-1] if module_name else "module"
         summary = summarize(module_display, kind)
@@ -1643,14 +1719,13 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
         lines.extend(["", "Parameters", "----------"])
         for parameter in parameters:
             lines.append(f"{parameter.name} : {parameter.annotation}")
-            extras: list[str] = []
+            details: list[str] = []
             if parameter.has_default:
-                extras.append("optional")
-                if parameter.default_text is not None:
-                    extras.append(f"default={parameter.default_text}")
-            suffix = f", {', '.join(extras)}" if extras else ""
-            lines.append(f"{parameter.name} : {parameter.annotation}{suffix}")
-            lines.append(f"    Description for ``{parameter.name}``.")
+                details.append("Optional parameter")
+                literal = _format_default_literal(parameter.default_text)
+                details.append(f"default {literal}")
+            prefix = f"{' '.join(details)}. " if details else ""
+            lines.append(f"    {prefix}Description for ``{parameter.name}``.")
 
     if returns:
         lines.extend(["", "Returns", "-------", returns, "    Description of return value."])
@@ -1736,7 +1811,6 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     Parameters
     ----------
     node : ast.AST
-    node : ast.AST
         Description for ``node``.
     
     Returns
@@ -1751,6 +1825,7 @@ def docstring_text(node: ast.AST) -> tuple[str | None, ast.Expr | None]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     body = getattr(node, "body", [])
     if not body:
         return None, None
@@ -1770,30 +1845,26 @@ def replace(
     """Compute replace.
 
     Carry out the replace operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+    
     Parameters
     ----------
     doc_expr : ast.Expr | None
-    doc_expr : ast.Expr | None
         Description for ``doc_expr``.
-    lines : List[str]
     lines : List[str]
         Description for ``lines``.
     new_lines : List[str]
-    new_lines : List[str]
         Description for ``new_lines``.
-    indent : str
     indent : str
         Description for ``indent``.
     insert_at : int
-    insert_at : int
         Description for ``insert_at``.
-
+    
     Examples
     --------
     >>> from tools.auto_docstrings import replace
     >>> replace(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
+    
     formatted = [indent + line + "\n" for line in new_lines]
     existing_blank_line = False
     if doc_expr is not None:
@@ -1820,7 +1891,6 @@ def process_file(path: Path) -> bool:
     Parameters
     ----------
     path : Path
-    path : Path
         Description for ``path``.
     
     Returns
@@ -1835,6 +1905,7 @@ def process_file(path: Path) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     try:
         text = path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
@@ -1851,13 +1922,9 @@ def process_file(path: Path) -> bool:
         if kind != "module" and isinstance(
             node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
         ):
-            if (
-                node_name
-                and node_name.startswith("__")
-                and node_name.endswith("__")
-                and node_name != "__init__"
-            ):
-                continue
+            if node_name and _is_magic(node_name) and node_name != "__init__":
+                if node_name not in MAGIC_METHOD_EXTENDED_SUMMARIES:
+                    continue
             if node_name and node_name.startswith("_") and not node_name.startswith("__"):
                 continue
 

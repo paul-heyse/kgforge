@@ -72,24 +72,19 @@ class OpenAccessHarvester:
         Parameters
         ----------
         user_agent : str
-        user_agent : str
             Description for ``user_agent``.
-        contact_email : str
         contact_email : str
             Description for ``contact_email``.
         openalex_base : str | None
-        openalex_base : str | None, optional, default='https://api.openalex.org'
-            Description for ``openalex_base``.
+            Optional parameter default ``'https://api.openalex.org'``. Description for ``openalex_base``.
         unpaywall_base : str | None
-        unpaywall_base : str | None, optional, default='https://api.unpaywall.org'
-            Description for ``unpaywall_base``.
+            Optional parameter default ``'https://api.unpaywall.org'``. Description for ``unpaywall_base``.
         pdf_host_base : str | None
-        pdf_host_base : str | None, optional, default=None
-            Description for ``pdf_host_base``.
+            Optional parameter default ``None``. Description for ``pdf_host_base``.
         out_dir : str | None
-        out_dir : str | None, optional, default='/data/pdfs'
-            Description for ``out_dir``.
+            Optional parameter default ``'/data/pdfs'``. Description for ``out_dir``.
         """
+        
         self.ua = user_agent
         self.email = contact_email
         self.openalex = openalex_base.rstrip("/")
@@ -108,12 +103,9 @@ class OpenAccessHarvester:
         Parameters
         ----------
         topic : str
-        topic : str
             Description for ``topic``.
         years : str
-        years : str
             Description for ``years``.
-        max_works : int
         max_works : int
             Description for ``max_works``.
         
@@ -129,6 +121,7 @@ class OpenAccessHarvester:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
             "topic": topic,
@@ -150,7 +143,6 @@ class OpenAccessHarvester:
         Parameters
         ----------
         work : collections.abc.Mapping
-        work : collections.abc.Mapping
             Description for ``work``.
         
         Returns
@@ -165,6 +157,7 @@ class OpenAccessHarvester:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         best = work.get("best_oa_location") or {}
         if best and best.get("pdf_url"):
             return best["pdf_url"]
@@ -193,9 +186,7 @@ class OpenAccessHarvester:
         Parameters
         ----------
         url : str
-        url : str
             Description for ``url``.
-        target_path : str
         target_path : str
             Description for ``target_path``.
         
@@ -218,6 +209,7 @@ class OpenAccessHarvester:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
             message = f"Bad status {response.status_code} for {url}"
@@ -238,12 +230,9 @@ class OpenAccessHarvester:
         Parameters
         ----------
         topic : str
-        topic : str
             Description for ``topic``.
         years : str
-        years : str
             Description for ``years``.
-        max_works : int
         max_works : int
             Description for ``max_works``.
         
@@ -259,6 +248,7 @@ class OpenAccessHarvester:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)
         for work in works:
