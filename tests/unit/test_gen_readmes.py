@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import importlib
 import sys
-from collections.abc import Callable
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
 
@@ -78,30 +79,34 @@ def _docstring(text: str | None) -> SimpleNamespace | None:
     return SimpleNamespace(value=text)
 
 
-def _node(
-    *,
-    path: str,
-    kind: str,
-    rel_path: str,
-    summary: str | None = None,
-    lineno: int = 1,
-    endlineno: int | None = None,
-    bases: list[SimpleNamespace] | None = None,
-    members: dict[str, SimpleNamespace] | None = None,
-    is_package: bool = False,
-) -> SimpleNamespace:
-    name = path.split(".")[-1]
+@dataclass(slots=True)
+class NodeSpec:
+    path: str
+    kind: str
+    rel_path: str
+    summary: str | None = None
+    lineno: int = 1
+    endlineno: int | None = None
+    bases: Sequence[SimpleNamespace] | None = None
+    members: Mapping[str, SimpleNamespace] | None = None
+    is_package: bool = False
+
+
+def _node(spec: NodeSpec) -> SimpleNamespace:
+    name = spec.path.split(".")[-1]
+    bases = list(spec.bases) if spec.bases is not None else []
+    members = dict(spec.members) if spec.members is not None else {}
     return SimpleNamespace(
-        path=path,
+        path=spec.path,
         name=name,
-        kind=SimpleNamespace(value=kind),
-        docstring=_docstring(summary),
-        relative_package_filepath=rel_path,
-        lineno=lineno,
-        endlineno=endlineno,
-        bases=bases or [],
-        members=members or {},
-        is_package=is_package,
+        kind=SimpleNamespace(value=spec.kind),
+        docstring=_docstring(spec.summary),
+        relative_package_filepath=spec.rel_path,
+        lineno=spec.lineno,
+        endlineno=spec.endlineno,
+        bases=bases,
+        members=members,
+        is_package=spec.is_package,
     )
 
 
@@ -136,50 +141,60 @@ def _package_tree(src: Path) -> SimpleNamespace:
     module_path.write_text("class Widget: ...\n", encoding="utf-8")
 
     func = _node(
-        path="pkg.module.make_widget",
-        kind="function",
-        rel_path="pkg/module.py",
-        summary="Create a widget.",
-        lineno=10,
-        endlineno=12,
+        NodeSpec(
+            path="pkg.module.make_widget",
+            kind="function",
+            rel_path="pkg/module.py",
+            summary="Create a widget.",
+            lineno=10,
+            endlineno=12,
+        )
     )
     cls = _node(
-        path="pkg.module.Widget",
-        kind="class",
-        rel_path="pkg/module.py",
-        summary="Widget container class.",
-        lineno=20,
-        endlineno=40,
+        NodeSpec(
+            path="pkg.module.Widget",
+            kind="class",
+            rel_path="pkg/module.py",
+            summary="Widget container class.",
+            lineno=20,
+            endlineno=40,
+        )
     )
     exc = _node(
-        path="pkg.module.WidgetError",
-        kind="class",
-        rel_path="pkg/module.py",
-        summary="Raised when widget configuration fails.",
-        lineno=42,
-        endlineno=55,
-        bases=[SimpleNamespace(name="Exception")],
+        NodeSpec(
+            path="pkg.module.WidgetError",
+            kind="class",
+            rel_path="pkg/module.py",
+            summary="Raised when widget configuration fails.",
+            lineno=42,
+            endlineno=55,
+            bases=[SimpleNamespace(name="Exception")],
+        )
     )
     module = _node(
-        path="pkg.module",
-        kind="module",
-        rel_path="pkg/module.py",
-        summary="Module utilities for widgets.",
-        lineno=1,
-        endlineno=80,
-        members={
-            "Widget": cls,
-            "WidgetError": exc,
-            "make_widget": func,
-        },
+        NodeSpec(
+            path="pkg.module",
+            kind="module",
+            rel_path="pkg/module.py",
+            summary="Module utilities for widgets.",
+            lineno=1,
+            endlineno=80,
+            members={
+                "Widget": cls,
+                "WidgetError": exc,
+                "make_widget": func,
+            },
+        )
     )
     return _node(
-        path="pkg",
-        kind="package",
-        rel_path="pkg/__init__.py",
-        summary="Primary widget package. Additional docs ignored.",
-        is_package=True,
-        members={"module": module},
+        NodeSpec(
+            path="pkg",
+            kind="package",
+            rel_path="pkg/__init__.py",
+            summary="Primary widget package. Additional docs ignored.",
+            is_package=True,
+            members={"module": module},
+        )
     )
 
 
@@ -277,12 +292,14 @@ def test_render_line_respects_link_modes(
     readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch
 ) -> None:
     node = _node(
-        path="pkg.module.func",
-        kind="function",
-        rel_path="pkg/module.py",
-        summary="Make something.",
-        lineno=12,
-        endlineno=18,
+        NodeSpec(
+            path="pkg.module.func",
+            kind="function",
+            rel_path="pkg/module.py",
+            summary="Make something.",
+            lineno=12,
+            endlineno=18,
+        )
     )
     pkg_dir = readme_env["src"] / "pkg"
     pkg_dir.mkdir(exist_ok=True)
@@ -305,16 +322,25 @@ def test_render_line_respects_link_modes(
 
 
 def test_bucket_for_assignments() -> None:
-    module = _node(path="pkg.mod", kind="module", rel_path="pkg/mod.py")
-    package = _node(path="pkg", kind="package", rel_path="pkg/__init__.py", is_package=True)
-    cls = _node(path="pkg.mod.Widget", kind="class", rel_path="pkg/mod.py")
-    exc = _node(
-        path="pkg.mod.WidgetError",
-        kind="class",
-        rel_path="pkg/mod.py",
-        bases=[SimpleNamespace(name="Exception")],
+    module = _node(NodeSpec(path="pkg.mod", kind="module", rel_path="pkg/mod.py"))
+    package = _node(
+        NodeSpec(
+            path="pkg",
+            kind="package",
+            rel_path="pkg/__init__.py",
+            is_package=True,
+        )
     )
-    func = _node(path="pkg.mod.build", kind="function", rel_path="pkg/mod.py")
+    cls = _node(NodeSpec(path="pkg.mod.Widget", kind="class", rel_path="pkg/mod.py"))
+    exc = _node(
+        NodeSpec(
+            path="pkg.mod.WidgetError",
+            kind="class",
+            rel_path="pkg/mod.py",
+            bases=[SimpleNamespace(name="Exception")],
+        )
+    )
+    func = _node(NodeSpec(path="pkg.mod.build", kind="function", rel_path="pkg/mod.py"))
 
     assert gr.bucket_for(module) == "Modules"
     assert gr.bucket_for(package) == "Modules"
@@ -330,12 +356,14 @@ def test_render_line_wraps_badges(
     readme_dir.mkdir(exist_ok=True)
     (readme_dir / "widget.py").write_text("class Widget: ...\n", encoding="utf-8")
     node = _node(
-        path="pkg.widget.Widget",
-        kind="class",
-        rel_path="pkg/widget.py",
-        summary="Widget class summary sentence that is intentionally long to trigger wrapping.",
-        lineno=5,
-        endlineno=40,
+        NodeSpec(
+            path="pkg.widget.Widget",
+            kind="class",
+            rel_path="pkg/widget.py",
+            summary="Widget class summary sentence that is intentionally long to trigger wrapping.",
+            lineno=5,
+            endlineno=40,
+        )
     )
     monkeypatch.setattr(
         gr,
