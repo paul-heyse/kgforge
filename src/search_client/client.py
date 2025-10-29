@@ -41,7 +41,8 @@ __navmap__: Final[NavMap] = {
 }
 
 
-class _SupportsResponse(Protocol):
+# [nav:anchor SupportsResponse]
+class SupportsResponse(Protocol):
     """Describe SupportsResponse."""
 
     def raise_for_status(self) -> None:
@@ -74,10 +75,11 @@ class _SupportsResponse(Protocol):
         """
 
 
-class _SupportsHttp(Protocol):
+# [nav:anchor SupportsHttp]
+class SupportsHttp(Protocol):
     """Describe SupportsHttp."""
 
-    def get(self, url: str, *, timeout: float) -> _SupportsResponse:
+    def get(self, url: str, *, timeout: float) -> SupportsResponse:
         """Compute get.
 
         Carry out the get operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -85,15 +87,13 @@ class _SupportsHttp(Protocol):
         Parameters
         ----------
         url : str
-        url : str
             Description for ``url``.
-        timeout : float
         timeout : float
             Description for ``timeout``.
         
         Returns
         -------
-        src.search_client.client._SupportsResponse
+        src.search_client.client.SupportsResponse
             Description of return value.
         
         Examples
@@ -111,7 +111,7 @@ class _SupportsHttp(Protocol):
         json: dict[str, Any],
         headers: dict[str, str],
         timeout: float,
-    ) -> _SupportsResponse:
+    ) -> SupportsResponse:
         """Compute post.
 
         Carry out the post operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -119,21 +119,17 @@ class _SupportsHttp(Protocol):
         Parameters
         ----------
         url : str
-        url : str
             Description for ``url``.
-        json : collections.abc.Mapping
         json : collections.abc.Mapping
             Description for ``json``.
         headers : collections.abc.Mapping
-        headers : collections.abc.Mapping
             Description for ``headers``.
-        timeout : float
         timeout : float
             Description for ``timeout``.
         
         Returns
         -------
-        src.search_client.client._SupportsResponse
+        src.search_client.client.SupportsResponse
             Description of return value.
         
         Examples
@@ -159,7 +155,7 @@ class KGFoundryClient:
         base_url: str = "http://localhost:8080",
         api_key: str | None = None,
         timeout: float = 30.0,
-        http: _SupportsHttp | None = None,
+        http: SupportsHttp | None = None,
     ) -> None:
         """Compute init.
 
@@ -168,22 +164,19 @@ class KGFoundryClient:
         Parameters
         ----------
         base_url : str | None
-        base_url : str | None, optional, default='http://localhost:8080'
-            Description for ``base_url``.
+            Optional parameter default ``'http://localhost:8080'``. Description for ``base_url``.
         api_key : str | None
-        api_key : str | None, optional, default=None
-            Description for ``api_key``.
+            Optional parameter default ``None``. Description for ``api_key``.
         timeout : float | None
-        timeout : float | None, optional, default=30.0
-            Description for ``timeout``.
-        http : _SupportsHttp | None
-        http : _SupportsHttp | None, optional, default=None
-            Description for ``http``.
+            Optional parameter default ``30.0``. Description for ``timeout``.
+        http : SupportsHttp | None
+            Optional parameter default ``None``. Description for ``http``.
         """
+        
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
-        self._http: _SupportsHttp = http or requests
+        self._http: SupportsHttp = http or requests
 
     def _headers(self) -> dict[str, str]:
         """Compute headers.
@@ -235,17 +228,13 @@ class KGFoundryClient:
         Parameters
         ----------
         query : str
-        query : str
             Description for ``query``.
         k : int | None
-        k : int | None, optional, default=10
-            Description for ``k``.
+            Optional parameter default ``10``. Description for ``k``.
         filters : Mapping[str, Any] | None
-        filters : Mapping[str, Any] | None, optional, default=None
-            Description for ``filters``.
+            Optional parameter default ``None``. Description for ``filters``.
         explain : bool | None
-        explain : bool | None, optional, default=False
-            Description for ``explain``.
+            Optional parameter default ``False``. Description for ``explain``.
         
         Returns
         -------
@@ -259,6 +248,7 @@ class KGFoundryClient:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
             f"{self.base_url}/search", json=payload, headers=self._headers(), timeout=self.timeout
@@ -274,11 +264,9 @@ class KGFoundryClient:
         Parameters
         ----------
         q : str
-        q : str
             Description for ``q``.
         limit : int | None
-        limit : int | None, optional, default=50
-            Description for ``limit``.
+            Optional parameter default ``50``. Description for ``limit``.
         
         Returns
         -------
@@ -292,6 +280,7 @@ class KGFoundryClient:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         r = self._http.post(
             f"{self.base_url}/graph/concepts",
             json={"q": q, "limit": limit},

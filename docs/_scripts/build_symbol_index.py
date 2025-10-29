@@ -100,14 +100,11 @@ def safe_attr(node: Any, attr: str, default: object | None = None) -> object | N
     Parameters
     ----------
     node : typing.Any
-    node : typing.Any
         Description for ``node``.
-    attr : str
     attr : str
         Description for ``attr``.
     default : object | None
-    default : object | None, optional, default=None
-        Description for ``default``.
+        Optional parameter default ``None``. Description for ``default``.
     
     Returns
     -------
@@ -121,6 +118,7 @@ def safe_attr(node: Any, attr: str, default: object | None = None) -> object | N
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     try:
         return getattr(node, attr)
     except Exception:

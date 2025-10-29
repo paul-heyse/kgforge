@@ -7,10 +7,10 @@ Overview of linking.
 
 ## Modules
 
-- **`linking.calibration`** — Overview of calibration. → [open](vscode://file//home/paul/kgfoundry/src/linking/calibration.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/003c82161377a9d2105e9ca618e8679ba2a602ff/src/linking/calibration.py#L1)
-- **`linking.linker`** — Overview of linker. → [open](vscode://file//home/paul/kgfoundry/src/linking/linker.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/003c82161377a9d2105e9ca618e8679ba2a602ff/src/linking/linker.py#L1)
+- **`linking.calibration`** — Overview of calibration. → [open](vscode://file//workspace/kgfoundry/src/linking/calibration.py:1:1) | [view](https://github.com/your-org/your-repo/blob/46a51f319338d544a6cfb6b7491a80695ba1dfde/src/linking/calibration.py#L1)
+- **`linking.linker`** — Overview of linker. → [open](vscode://file//workspace/kgfoundry/src/linking/linker.py:1:1) | [view](https://github.com/your-org/your-repo/blob/46a51f319338d544a6cfb6b7491a80695ba1dfde/src/linking/linker.py#L1)
 
 ## Classes
 
-- **`linking.NavMap`** — Model the NavMap. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:60:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/003c82161377a9d2105e9ca618e8679ba2a602ff/src/kgfoundry_common/navmap_types.py#L60-L79)
-<!-- agent:readme v1 sha:003c82161377a9d2105e9ca618e8679ba2a602ff content:d637433f6d5e -->
+- **`linking.NavMap`** — Model the NavMap. → [open](vscode://file//workspace/kgfoundry/src/kgfoundry_common/navmap_types.py:74:1) | [view](https://github.com/your-org/your-repo/blob/46a51f319338d544a6cfb6b7491a80695ba1dfde/src/kgfoundry_common/navmap_types.py#L74-L93)
+<!-- agent:readme v1 sha:46a51f319338d544a6cfb6b7491a80695ba1dfde content:ba18a6960b6c -->

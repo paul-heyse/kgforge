@@ -28,11 +28,9 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str
     Parameters
     ----------
     output : Path | None
-    output : Path | None, optional, default=None
-        Description for ``output``.
+        Optional parameter default ``None``. Description for ``output``.
     pretty : bool | None
-    pretty : bool | None, optional, default=True
-        Description for ``pretty``.
+        Optional parameter default ``True``. Description for ``pretty``.
     
     Returns
     -------
@@ -46,6 +44,7 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     index = build_index()
     if output:
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -92,8 +91,7 @@ def main(argv: list[str] | None = None) -> int:
     Parameters
     ----------
     argv : List[str] | None
-    argv : List[str] | None, optional, default=None
-        Description for ``argv``.
+        Optional parameter default ``None``. Description for ``argv``.
     
     Returns
     -------
@@ -107,6 +105,7 @@ def main(argv: list[str] | None = None) -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
+    
     args = _parse_args(argv)
     migrate_navmaps(args.output, pretty=not args.compact)
     print(f"Wrote navmap index to {args.output}")

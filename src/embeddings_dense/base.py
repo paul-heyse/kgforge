@@ -60,7 +60,6 @@ class DenseEmbeddingModel(Protocol):
         Parameters
         ----------
         texts : collections.abc.Sequence
-        texts : collections.abc.Sequence
             Description for ``texts``.
         
         Returns
@@ -75,4 +74,5 @@ class DenseEmbeddingModel(Protocol):
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         ...

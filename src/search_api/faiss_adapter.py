@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Final, cast
+from typing import Any, Final, TypeAlias, cast
 
 import duckdb
 import numpy as np
@@ -69,11 +69,9 @@ except Exception:  # pragma: no cover - exercised when FAISS is unavailable
     HAVE_FAISS = False
 
 
-type VecArray = NDArray[np.float32]
-type IndexArray = NDArray[np.int64]
-
-
 # [nav:anchor VecArray]
+VecArray: TypeAlias = NDArray[np.float32]
+IndexArray: TypeAlias = NDArray[np.int64]
 
 
 # [nav:anchor DenseVecs]
@@ -112,15 +110,13 @@ class FaissAdapter:
         Parameters
         ----------
         db_path : str
-        db_path : str
             Description for ``db_path``.
         factory : str | None
-        factory : str | None, optional, default='OPQ64,IVF8192,PQ64'
-            Description for ``factory``.
+            Optional parameter default ``'OPQ64,IVF8192,PQ64'``. Description for ``factory``.
         metric : str | None
-        metric : str | None, optional, default='ip'
-            Description for ``metric``.
+            Optional parameter default ``'ip'``. Description for ``metric``.
         """
+        
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
@@ -234,18 +230,18 @@ class FaissAdapter:
         """Compute load or build.
 
         Carry out the load or build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
+        
         Parameters
         ----------
         cpu_index_path : str | None
-        cpu_index_path : str | None, optional, default=None
-            Description for ``cpu_index_path``.
-
+            Optional parameter default ``None``. Description for ``cpu_index_path``.
+        
         Examples
         --------
         >>> from search_api.faiss_adapter import load_or_build
         >>> load_or_build()  # doctest: +ELLIPSIS
         """
+        
         try:
             if HAVE_FAISS and cpu_index_path and Path(cpu_index_path).exists():
                 cpu = faiss.read_index(cpu_index_path)
@@ -273,11 +269,9 @@ class FaissAdapter:
         Parameters
         ----------
         qvec : src.search_api.faiss_adapter.VecArray
-        qvec : src.search_api.faiss_adapter.VecArray
             Description for ``qvec``.
         k : int | None
-        k : int | None, optional, default=10
-            Description for ``k``.
+            Optional parameter default ``10``. Description for ``k``.
         
         Returns
         -------
@@ -296,6 +290,7 @@ class FaissAdapter:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
+        
         if self.vecs is None and self.index is None:
             return []
         if HAVE_FAISS and self.index is not None:

@@ -7,13 +7,13 @@ implementation specifics.
 
 from __future__ import annotations
 
-from typing import Final, Literal
+from typing import Final, Literal, TypeAlias
 
 from pydantic import BaseModel
 
 from kgfoundry_common.navmap_types import NavMap
 
-__all__ = ["Chunk", "Doc", "DoctagsAsset", "LinkAssertion"]
+__all__ = ["Id", "Chunk", "Doc", "DoctagsAsset", "LinkAssertion"]
 
 __navmap__: Final[NavMap] = {
     "title": "kgfoundry_common.models",
@@ -23,7 +23,7 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["Doc", "DoctagsAsset", "Chunk", "LinkAssertion"],
+            "symbols": ["Id", "Doc", "DoctagsAsset", "Chunk", "LinkAssertion"],
         },
     ],
     "module_meta": {
@@ -32,6 +32,11 @@ __navmap__: Final[NavMap] = {
         "since": "0.1.0",
     },
     "symbols": {
+        "Id": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
         "Doc": {
             "owner": "@kgfoundry-common",
             "stability": "stable",
@@ -55,7 +60,8 @@ __navmap__: Final[NavMap] = {
     },
 }
 
-Id = str
+# [nav:anchor Id]
+Id: TypeAlias = str
 
 
 # [nav:anchor Doc]
