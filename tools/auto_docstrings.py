@@ -566,6 +566,37 @@ _MISCELLANEOUS_MAGIC_METHODS: dict[str, str] = {
 }
 
 
+_STANDARD_METHOD_EXTENDED_SUMMARIES: dict[str, str] = {
+    "clear": _paragraph(
+        "Remove every entry from the mapping so callers can start from a clean slate.",
+        "The helper mirrors ``dict.clear`` so code interacting with mapping-like models behaves consistently.",
+        "Return ``None`` to match the built-in contract and avoid implying a meaningful value.",
+    ),
+    "copy": _paragraph(
+        "Return a shallow copy of the mapping suitable for defensive mutation.",
+        "Consumers can tweak the duplicate without affecting the original instance or violating validation rules.",
+        "Prefer this helper over direct constructors to preserve model-specific behaviours.",
+    ),
+    "get": _paragraph(
+        "Retrieve a value for ``key`` while falling back to a default when absent.",
+        "The convenience wrapper mirrors ``dict.get`` so configuration objects remain ergonomic.",
+        "Use it to express optional access without raising ``KeyError``.",
+    ),
+    "items": _collection_summary(
+        "Return a dynamic view exposing each ``(key, value)`` pair.",
+        "mapping iteration and dictionary-style inspection",
+    ),
+    "keys": _collection_summary(
+        "Expose a set-like view of the mapping's keys.",
+        "mapping introspection and membership checks",
+    ),
+    "values": _collection_summary(
+        "Provide a view of the mapping's stored values.",
+        "mapping iteration utilities",
+    ),
+}
+
+
 MAGIC_METHOD_EXTENDED_SUMMARIES: dict[str, str] = {
     **_CORE_MAGIC_METHOD_SUMMARIES,
     **_OBJECT_LIFECYCLE_MAGIC_METHODS,
@@ -617,6 +648,10 @@ PYDANTIC_ARTIFACT_SUMMARIES: dict[str, str] = {
     "model_extra": _pydantic_summary(
         "Store attributes captured by ``extra='allow'`` or similar configuration.",
         "Pydantic keeps these values separate from standard fields to prevent accidental schema drift.",
+    ),
+    "__class_vars__": _pydantic_summary(
+        "Expose class variable annotations preserved on the model for introspection.",
+        "Entries reflect ``ClassVar`` declarations so tooling can distinguish runtime fields from static metadata.",
     ),
     "model_post_init": _pydantic_summary(
         "Provide a hook executed after ``__init__`` completes validation.",
@@ -698,6 +733,14 @@ PYDANTIC_ARTIFACT_SUMMARIES: dict[str, str] = {
         "Hold arbitrary attributes permitted by the model configuration.",
         "Values appear here when ``extra`` behaviour allows storing keys beyond the declared schema.",
     ),
+    "__pydantic_complete__": _pydantic_summary(
+        "Flag whether Pydantic finished constructing the model class and its helpers.",
+        "Consumers can guard against premature access to partially initialised models using this boolean.",
+    ),
+    "__pydantic_computed_fields__": _pydantic_summary(
+        "Track computed field definitions attached to the model.",
+        "The mapping stores decorator metadata so serialisation honours lazily evaluated properties.",
+    ),
     "__pydantic_fields_set__": _pydantic_summary(
         "Track which fields were provided to the constructor.",
         "This mirrors ``model_fields_set`` but lives on the instance for quick access.",
@@ -730,9 +773,25 @@ PYDANTIC_ARTIFACT_SUMMARIES: dict[str, str] = {
         "Store private attributes declared with ``PrivateAttr``.",
         "Private values live outside the public schema yet remain accessible on the instance.",
     ),
+    "__pydantic_root_model__": _pydantic_summary(
+        "Describe configuration applied when the model uses the root-model pattern.",
+        "It captures type information so validation and schema generation remain aligned with the wrapped value.",
+    ),
+    "__pydantic_setattr_handlers__": _pydantic_summary(
+        "Maintain the compiled attribute-assignment hooks for the model.",
+        "Pydantic uses these handlers to enforce validators and field protections during runtime mutation.",
+    ),
     "__pydantic_init_subclass__": _pydantic_summary(
         "Provide Pydantic's subclass initialisation helper.",
         "The hook wraps ``__init_subclass__`` to ensure generated models maintain validation metadata.",
+    ),
+    "__pydantic_post_init__": _pydantic_summary(
+        "Point to the function executed immediately after ``__init__`` finishes.",
+        "It mirrors ``model_post_init`` but is stored under a Pydantic-reserved name for internal scheduling.",
+    ),
+    "__private_attributes__": _pydantic_summary(
+        "Expose private attribute descriptors declared on the model.",
+        "The mapping mirrors ``__pydantic_private__`` but tracks definitions at the class level for introspection.",
     ),
     "__get_pydantic_core_schema__": _pydantic_summary(
         "Compute the core schema for custom types or dataclasses.",
@@ -741,6 +800,10 @@ PYDANTIC_ARTIFACT_SUMMARIES: dict[str, str] = {
     "__get_pydantic_json_schema__": _pydantic_summary(
         "Customise JSON Schema generation for user-defined types.",
         "Implementations adapt the default schema based on context provided by Pydantic.",
+    ),
+    "__signature__": _pydantic_summary(
+        "Expose the generated call signature for the model's constructor.",
+        "Introspection tools rely on the ``inspect``-style signature to surface parameters and defaults accurately.",
     ),
 }
 
@@ -1177,6 +1240,8 @@ def extended_summary(kind: str, name: str, module_name: str, node: ast.AST | Non
         )
     if kind == "function" and name in MAGIC_METHOD_EXTENDED_SUMMARIES:
         return MAGIC_METHOD_EXTENDED_SUMMARIES[name]
+    if kind == "function" and name in _STANDARD_METHOD_EXTENDED_SUMMARIES:
+        return _STANDARD_METHOD_EXTENDED_SUMMARIES[name]
     if kind == "function" and _is_magic(name):
         return DEFAULT_MAGIC_METHOD_FALLBACK
     if kind == "function":
@@ -1851,13 +1916,9 @@ def process_file(path: Path) -> bool:
         if kind != "module" and isinstance(
             node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
         ):
-            if (
-                node_name
-                and node_name.startswith("__")
-                and node_name.endswith("__")
-                and node_name != "__init__"
-            ):
-                continue
+            if node_name and _is_magic(node_name) and node_name != "__init__":
+                if node_name not in MAGIC_METHOD_EXTENDED_SUMMARIES:
+                    continue
             if node_name and node_name.startswith("_") and not node_name.startswith("__"):
                 continue
 

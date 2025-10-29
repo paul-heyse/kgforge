@@ -111,6 +111,7 @@ PYDANTIC_EXPECTED: set[str] = {
     "model_computed_fields",
     "model_fields_set",
     "model_extra",
+    "__class_vars__",
     "model_post_init",
     "model_rebuild",
     "model_parametrized_name",
@@ -131,6 +132,8 @@ PYDANTIC_EXPECTED: set[str] = {
     "__pydantic_core_config__",
     "__pydantic_decorators__",
     "__pydantic_extra__",
+    "__pydantic_complete__",
+    "__pydantic_computed_fields__",
     "__pydantic_fields_set__",
     "__pydantic_parent_namespace__",
     "__pydantic_generic_metadata__",
@@ -139,9 +142,14 @@ PYDANTIC_EXPECTED: set[str] = {
     "__pydantic_validator__",
     "__pydantic_custom_init__",
     "__pydantic_private__",
+    "__private_attributes__",
+    "__pydantic_root_model__",
+    "__pydantic_setattr_handlers__",
     "__pydantic_init_subclass__",
+    "__pydantic_post_init__",
     "__get_pydantic_core_schema__",
     "__get_pydantic_json_schema__",
+    "__signature__",
 }
 
 
