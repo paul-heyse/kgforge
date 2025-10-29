@@ -49,25 +49,32 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor urn_doc_from_text]
 def urn_doc_from_text(text: str) -> str:
     """Compute urn doc from text.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the urn doc from text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the urn doc from text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    text : str
-        Description for ``text``.
+Parameters
+----------
+text : str
+    Description for ``text``.
+    
+    
+    
 
-    Returns
-    -------
-    str
-        Description of return value.
+Returns
+-------
+str
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from kgfoundry_common.ids import urn_doc_from_text
-    >>> result = urn_doc_from_text(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from kgfoundry_common.ids import urn_doc_from_text
+>>> result = urn_doc_from_text(...)
+>>> result  # doctest: +ELLIPSIS
+"""
     h = hashlib.sha256(text.encode("utf-8")).digest()[:16]
     b32 = base64.b32encode(h).decode("ascii").strip("=").lower()
     return f"urn:doc:sha256:{b32}"
@@ -76,27 +83,34 @@ def urn_doc_from_text(text: str) -> str:
 # [nav:anchor urn_chunk]
 def urn_chunk(doc_hash: str, start: int, end: int) -> str:
     """Compute urn chunk.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the urn chunk operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the urn chunk operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    doc_hash : str
-        Description for ``doc_hash``.
-    start : int
-        Description for ``start``.
-    end : int
-        Description for ``end``.
+Parameters
+----------
+doc_hash : str
+    Description for ``doc_hash``.
+start : int
+    Description for ``start``.
+end : int
+    Description for ``end``.
+    
+    
+    
 
-    Returns
-    -------
-    str
-        Description of return value.
+Returns
+-------
+str
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from kgfoundry_common.ids import urn_chunk
-    >>> result = urn_chunk(..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from kgfoundry_common.ids import urn_chunk
+>>> result = urn_chunk(..., ..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
     return f"urn:chunk:{doc_hash.split(':')[-1]}:{start}-{end}"

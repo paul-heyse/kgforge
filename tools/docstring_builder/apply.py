@@ -28,7 +28,10 @@ class _DocstringTransformer(cst.CSTTransformer):
         self.namespace: list[str] = []
 
     def _qualify(self, name: str) -> str:
-        pieces = [self.module_name, *self.namespace, name]
+        if self.namespace:
+            pieces = [self.module_name, *self.namespace[:-1], name]
+        else:
+            pieces = [self.module_name, name]
         return ".".join(piece for piece in pieces if piece)
 
     def _inject_docstring(

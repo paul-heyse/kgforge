@@ -46,31 +46,46 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor DenseEmbeddingModel]
 class DenseEmbeddingModel(Protocol):
     """Model the DenseEmbeddingModel.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the denseembeddingmodel data structure used throughout the project. The class
-    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-    are typically created by factories or runtime orchestrators documented nearby.
-    """
+Represent the denseembeddingmodel data structure used throughout the project. The class
+encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+are typically created by factories or runtime orchestrators documented nearby.
+
+Parameters
+----------
+*args : Any
+    Describe ``args``.
+**kwargs : Any
+    Describe ``kwargs``.
+"""
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]:
         """Compute encode.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        texts : collections.abc.Sequence
-            Description for ``texts``.
+Parameters
+----------
+texts : Sequence[str]
+    Description for ``texts``.
+    
+    
+    
 
-        Returns
-        -------
-        numpy.typing.NDArray
-            Description of return value.
+Returns
+-------
+NDArray[np.float32]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from embeddings_dense.base import encode
-        >>> result = encode(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from embeddings_dense.base import encode
+>>> result = encode(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         ...

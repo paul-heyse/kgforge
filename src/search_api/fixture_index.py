@@ -51,36 +51,53 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 # [nav:anchor tokenize]
 def tokenize(text: str) -> list[str]:
     """Compute tokenize.
+<!-- auto:docstring-builder v1 -->
 
-    Carry out the tokenize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the tokenize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Parameters
-    ----------
-    text : str
-        Description for ``text``.
+Parameters
+----------
+text : str
+    Description for ``text``.
+    
+    
+    
 
-    Returns
-    -------
-    List[str]
-        Description of return value.
+Returns
+-------
+list[str]
+    Description of return value.
+    
+    
+    
 
-    Examples
-    --------
-    >>> from search_api.fixture_index import tokenize
-    >>> result = tokenize(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+Examples
+--------
+>>> from search_api.fixture_index import tokenize
+>>> result = tokenize(...)
+>>> result  # doctest: +ELLIPSIS
+"""
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
 # [nav:anchor FixtureDoc]
 @dataclass
 class FixtureDoc:
-    """Model the FixtureDoc.
+    """Fixture document loaded from the DuckDB tutorial dataset.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the fixturedoc data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Attributes
+    ----------
+    chunk_id : str
+        Unique chunk identifier.
+    doc_id : str
+        Document identifier associated with the chunk.
+    title : str
+        Document title used for display.
+    section : str
+        Optional section heading captured for the chunk.
+    text : str
+        Raw text body of the chunk.
     """
 
     chunk_id: str
@@ -92,25 +109,19 @@ class FixtureDoc:
 
 # [nav:anchor FixtureIndex]
 class FixtureIndex:
-    """Model the FixtureIndex.
+    """BM25-style fixture index used for demos and regression tests.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the fixtureindex data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Parameters
+    ----------
+    root : str, optional
+        Root directory containing fixture assets. Defaults to ``"/data"``.
+    db_path : str, optional
+        DuckDB catalog path used to discover parquet datasets. Defaults to
+        ``"/data/catalog/catalog.duckdb"``.
     """
 
     def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb") -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-
-        Parameters
-        ----------
-        root : str | None
-            Optional parameter default ``'/data'``. Description for ``root``.
-        db_path : str | None
-            Optional parameter default ``'/data/catalog/catalog.duckdb'``. Description for ``db_path``.
-        """
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []
@@ -120,9 +131,10 @@ class FixtureIndex:
 
     def _load_from_duckdb(self) -> None:
         """Compute load from duckdb.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the load from duckdb operation.
-        """
+Carry out the load from duckdb operation.
+"""
         if not Path(self.db_path).exists():
             return
         con = duckdb.connect(self.db_path)
@@ -164,9 +176,10 @@ class FixtureIndex:
 
     def _build_lex(self) -> None:
         """Compute build lex.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the build lex operation.
-        """
+Carry out the build lex operation.
+"""
         self.tf.clear()
         self.df.clear()
         for doc in self.docs:
@@ -181,27 +194,36 @@ class FixtureIndex:
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
         """Compute search.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        query : str
-            Description for ``query``.
-        k : int | None
-            Optional parameter default ``10``. Description for ``k``.
+Parameters
+----------
+query : str
+    Description for ``query``.
+k : int, optional
+    Defaults to ``10``.
+    Description for ``k``.
+    
+    
+    
+    Defaults to ``10``.
 
-        Returns
-        -------
-        List[Tuple[int, float]]
-            Description of return value.
+Returns
+-------
+list[tuple[int, float]]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from search_api.fixture_index import search
-        >>> result = search(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from search_api.fixture_index import search
+>>> result = search(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         if getattr(self, "N", 0) == 0:
             return []
         qtoks = tokenize(query)
@@ -221,23 +243,30 @@ class FixtureIndex:
 
     def doc(self, index: int) -> FixtureDoc:
         """Compute doc.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        index : int
-            Description for ``index``.
+Parameters
+----------
+index : int
+    Description for ``index``.
+    
+    
+    
 
-        Returns
-        -------
-        src.search_api.fixture_index.FixtureDoc
-            Description of return value.
+Returns
+-------
+FixtureDoc
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from search_api.fixture_index import doc
-        >>> result = doc(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from search_api.fixture_index import doc
+>>> result = doc(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         return self.docs[index]

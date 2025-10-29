@@ -45,11 +45,19 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor SearchRequest]
 class SearchRequest(BaseModel):
-    """Model the SearchRequest.
+    """Request model describing an incoming search query.
+<!-- auto:docstring-builder v1 -->
 
-    Pydantic model defining the structured payload used across the system. Validation ensures inputs
-    conform to the declared schema while producing clear error messages. Use this class when
-    serialising or parsing data for the surrounding feature.
+    Attributes
+    ----------
+    query : str
+        Full-text query string supplied by the caller.
+    k : int
+        Maximum number of results to return. Defaults to ``10``.
+    filters : dict[str, object] | None
+        Optional filter expression forwarded to the backend.
+    explain : bool
+        Flag indicating whether to return scoring breakdowns. Defaults to ``False``.
     """
 
     query: str = Field(min_length=1)
@@ -60,11 +68,27 @@ class SearchRequest(BaseModel):
 
 # [nav:anchor SearchResult]
 class SearchResult(BaseModel):
-    """Model the SearchResult.
+    """Result model produced by the search API.
+<!-- auto:docstring-builder v1 -->
 
-    Pydantic model defining the structured payload used across the system. Validation ensures inputs
-    conform to the declared schema while producing clear error messages. Use this class when
-    serialising or parsing data for the surrounding feature.
+    Attributes
+    ----------
+    doc_id : str
+        Identifier for the matched document.
+    chunk_id : str
+        Identifier for the specific chunk within the document.
+    title : str
+        Title of the source document.
+    section : str
+        Section heading captured for the chunk.
+    score : float
+        Score assigned by the retrieval backend.
+    signals : dict[str, float]
+        Optional per-feature contribution breakdown.
+    spans : dict[str, int]
+        Mapping of matched spans to offsets.
+    concepts : list[dict[str, str]]
+        Optional knowledge graph annotations returned with the result.
     """
 
     doc_id: str

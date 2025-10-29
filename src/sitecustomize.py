@@ -43,6 +43,20 @@ else:
         and hasattr(_doc_common, "DocstringReturns")
     ):
 
+        class DocstringYields(_doc_common.DocstringReturns):
+            """Compatibility stub for missing ``DocstringYields``.
+
+            Parameters
+            ----------
+            args : list[str]
+                Names associated with the yielded values.
+            description : str | None
+                Optional description rendered in the docstring.
+            type_name : str | None
+                Type annotation captured for the yield expression.
+            return_name : str | None, optional
+                Explicit name attached to the yield block.
+            """
         docstring_returns_class: type[DocstringReturnsType] = _doc_common.DocstringReturns
 
         def _docstring_yields_init(
@@ -56,24 +70,18 @@ else:
 
             docstring_returns_class.__init__(
                 self,
-                args=args,
-                description=description,
-                type_name=type_name,
-                is_generator=True,
-                return_name=return_name,
-            )
-
-        DocstringYields = cast(
-            type[DocstringReturnsType],
-            type(
-                "DocstringYields",
-                (docstring_returns_class,),
-                {
-                    "__doc__": "Compatibility stub for missing ``DocstringYields``.",
-                    "__init__": _docstring_yields_init,
-                },
-            ),
-        )
+                args: list[str],
+                description: str | None,
+                type_name: str | None,
+                return_name: str | None = None,
+            ) -> None:
+                super().__init__(
+                    args=args,
+                    description=description,
+                    type_name=type_name,
+                    is_generator=True,
+                    return_name=return_name,
+                )
 
         DocstringYields.__module__ = _doc_common.DocstringReturns.__module__
         _doc_common_typing = cast(Any, _doc_common)
@@ -85,7 +93,8 @@ else:
         if not hasattr(_doc_cls, "attrs"):
 
             def _docstring_attrs(self: DocstringType) -> list[object]:
-                """Return documented attributes if parsing supports them."""
+                """Return documented attributes if parsing supports them.
+"""
                 return [meta for meta in self.meta if getattr(meta, "args", None) == ["attr"]]
 
             setattr(_doc_cls, "attrs", property(_docstring_attrs))
@@ -101,7 +110,8 @@ else:
         if _yield_cls is not None and not hasattr(_doc_cls, "yields"):
 
             def _docstring_yields(self: DocstringType) -> object | None:
-                """Return the first yields section if available."""
+                """Return the first yields section if available.
+"""
                 if _yield_cls is None:  # pragma: no cover - defensive guard
                     return None
                 for meta in self.meta:
@@ -114,7 +124,8 @@ else:
         if _yield_cls is not None and not hasattr(_doc_cls, "many_yields"):
 
             def _docstring_many_yields(self: DocstringType) -> list[object]:
-                """Return all yields sections."""
+                """Return all yields sections.
+"""
                 if _yield_cls is None:  # pragma: no cover - defensive guard
                     return []
                 return [meta for meta in self.meta if isinstance(meta, _yield_cls)]
@@ -124,7 +135,8 @@ else:
         if not hasattr(_doc_cls, "size"):
 
             def _docstring_size(self: DocstringType) -> int:
-                """Estimate docstring size for style heuristics."""
+                """Estimate docstring size for style heuristics.
+"""
                 parts: list[str] = []
                 if self.short_description:
                     parts.append(self.short_description)

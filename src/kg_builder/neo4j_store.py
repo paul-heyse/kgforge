@@ -42,10 +42,11 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor Neo4jStore]
 class Neo4jStore:
     """Model the Neo4jStore.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the neo4jstore data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the neo4jstore data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     ...

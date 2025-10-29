@@ -16,6 +16,7 @@ from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.config import BuilderConfig, load_config_from_env
 from tools.docstring_builder.docfacts import DocFact, build_docfacts, write_docfacts
 from tools.docstring_builder.harvest import HarvestResult, harvest_file, iter_target_files
+from tools.docstring_builder.normalizer import normalize_docstring
 from tools.docstring_builder.render import render_docstring
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult, build_semantic_schemas
@@ -116,13 +117,18 @@ def _collect_edits(
     result: HarvestResult, config: BuilderConfig
 ) -> tuple[list[DocstringEdit], list[SemanticResult]]:
     semantics = build_semantic_schemas(result, config)
-    edits = [
-        DocstringEdit(
-            qname=entry.symbol.qname,
-            text=render_docstring(entry.schema, config.ownership_marker),
-        )
-        for entry in semantics
-    ]
+    edits: list[DocstringEdit] = []
+    for entry in semantics:
+        text: str
+        if config.normalize_sections:
+            normalized = normalize_docstring(entry.symbol, config.ownership_marker)
+            if normalized is not None:
+                text = normalized
+            else:
+                text = render_docstring(entry.schema, config.ownership_marker)
+        else:
+            text = render_docstring(entry.schema, config.ownership_marker)
+        edits.append(DocstringEdit(qname=entry.symbol.qname, text=text))
     return edits, semantics
 
 

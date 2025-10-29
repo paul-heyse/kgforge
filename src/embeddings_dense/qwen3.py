@@ -42,10 +42,11 @@ __navmap__: Final[NavMap] = {
 # [nav:anchor Qwen3Embedder]
 class Qwen3Embedder:
     """Model the Qwen3Embedder.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the qwen3embedder data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+Represent the qwen3embedder data structure used throughout the project. The class encapsulates
+behaviour behind a well-defined interface for collaborating components. Instances are typically
+created by factories or runtime orchestrators documented nearby.
+"""
 
     ...

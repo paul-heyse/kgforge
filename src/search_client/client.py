@@ -43,42 +43,63 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor SupportsResponse]
 class SupportsResponse(Protocol):
-    """Describe SupportsResponse."""
+    """Describe SupportsResponse.
+<!-- auto:docstring-builder v1 -->
+
+Parameters
+----------
+*args : Any
+    Describe ``args``.
+**kwargs : Any
+    Describe ``kwargs``.
+"""
 
     def raise_for_status(self) -> None:
         """Compute raise for status.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the raise for status operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the raise for status operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Examples
-        --------
-        >>> from search_client.client import raise_for_status
-        >>> raise_for_status()  # doctest: +ELLIPSIS
-        """
-        ...
+Examples
+--------
+>>> from search_client.client import raise_for_status
+>>> raise_for_status()  # doctest: +ELLIPSIS
+"""
 
     def json(self) -> dict[str, Any]:
         """Compute json.
+<!-- auto:docstring-builder v1 -->
 
-        Serialise the instance to JSON text. It respects include and exclude options so APIs can shape their payloads precisely. Pydantic populates this attribute during model construction, so applications should treat it as read-only metadata.
+Serialise the instance to JSON text. It respects include and exclude options so APIs can shape their payloads precisely. Pydantic populates this attribute during model construction, so applications should treat it as read-only metadata.
 
-        Returns
-        -------
-        collections.abc.Mapping
-            Description of return value.
+Returns
+-------
+dict[str, Any]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from search_client.client import json
-        >>> result = json()
-        >>> result  # doctest: +ELLIPSIS
-        """
-        ...
+Examples
+--------
+>>> from search_client.client import json
+>>> result = json()
+>>> result  # doctest: +ELLIPSIS
+"""
 
 
 # [nav:anchor SupportsHttp]
 class SupportsHttp(Protocol):
-    """Describe SupportsHttp."""
+    """Describe SupportsHttp.
+<!-- auto:docstring-builder v1 -->
+
+Parameters
+----------
+*args : Any
+    Describe ``args``.
+**kwargs : Any
+    Describe ``kwargs``.
+"""
 
     def get(
         self,
@@ -94,28 +115,34 @@ class SupportsHttp(Protocol):
         **kwargs: Any,
     ) -> Any:
         """Compute get.
+<!-- auto:docstring-builder v1 -->
 
-        Retrieve a value for ``key`` while falling back to a default when absent. The convenience wrapper mirrors ``dict.get`` so configuration objects remain ergonomic. Use it to express optional access without raising ``KeyError``.
+Retrieve a value for ``key`` while falling back to a default when absent. The convenience wrapper mirrors ``dict.get`` so configuration objects remain ergonomic. Use it to express optional access without raising ``KeyError``.
 
-        Parameters
-        ----------
-        url : str
-            Description for ``url``.
-        timeout : float
-            Description for ``timeout``.
+Parameters
+----------
+url : str
+    Description for ``url``.
+timeout : float
+    Description for ``timeout``.
+    
+    
+    
 
-        Returns
-        -------
-        src.search_client.client.SupportsResponse
-            Description of return value.
+Returns
+-------
+SupportsResponse
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from search_client.client import get
-        >>> result = get(..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
-        ...
+Examples
+--------
+>>> from search_client.client import get
+>>> result = get(..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
 
     def post(
         self,
@@ -134,6 +161,38 @@ class SupportsHttp(Protocol):
         **kwargs: Any,
     ) -> Any:
         """Compute post.
+<!-- auto:docstring-builder v1 -->
+
+Carry out the post operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+Parameters
+----------
+url : str
+    Description for ``url``.
+json : dict[str, Any]
+    Description for ``json``.
+headers : dict[str, str]
+    Description for ``headers``.
+timeout : float
+    Description for ``timeout``.
+    
+    
+    
+
+Returns
+-------
+SupportsResponse
+    Description of return value.
+    
+    
+    
+
+Examples
+--------
+>>> from search_client.client import post
+>>> result = post(..., ..., ..., ...)
+>>> result  # doctest: +ELLIPSIS
+"""
 
         Carry out the post operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
@@ -163,8 +222,29 @@ class SupportsHttp(Protocol):
 
 
 class RequestsHttp(SupportsHttp):
-    """Adapter that fulfils :class:`SupportsHttp` using ``requests``."""
+    """Adapter that fulfils :class:`SupportsHttp` using ``requests``.
+<!-- auto:docstring-builder v1 -->
+"""
 
+    def get(self, url: str, *, timeout: float) -> SupportsResponse:
+        """Issue a GET request via :mod:`requests`.
+<!-- auto:docstring-builder v1 -->
+
+Parameters
+----------
+url : str
+    Describe ``url``.
+timeout : float
+    Describe ``timeout``.
+    
+    
+
+Returns
+-------
+SupportsResponse
+    Describe return value.
+"""
+        response = requests.get(url, timeout=timeout)
     def get(
         self,
         url: Any,
@@ -198,6 +278,32 @@ class RequestsHttp(SupportsHttp):
         self,
         url: Any,
         *,
+        json: dict[str, Any],
+        headers: dict[str, str],
+        timeout: float,
+    ) -> SupportsResponse:
+        """Issue a POST request via :mod:`requests`.
+<!-- auto:docstring-builder v1 -->
+
+Parameters
+----------
+url : str
+    Describe ``url``.
+json : dict[str, Any]
+    Describe ``json``.
+headers : dict[str, str]
+    Describe ``headers``.
+timeout : float
+    Describe ``timeout``.
+    
+    
+
+Returns
+-------
+SupportsResponse
+    Describe return value.
+"""
+        response = requests.post(url, json=json, headers=headers, timeout=timeout)
         content: Any | None = None,
         data: Any | None = None,
         files: Any | None = None,
@@ -236,11 +342,19 @@ _DEFAULT_HTTP: Final[SupportsHttp] = RequestsHttp()
 
 # [nav:anchor KGFoundryClient]
 class KGFoundryClient:
-    """Model the KGFoundryClient.
+    """HTTP client for interacting with the KGFoundry search service.
+<!-- auto:docstring-builder v1 -->
 
-    Represent the kgfoundryclient data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Parameters
+    ----------
+    base_url : str, optional
+        Base URL for the API. Defaults to ``"http://localhost:8080"``.
+    api_key : str | None, optional
+        Optional bearer token used for authentication.
+    timeout : float, optional
+        Request timeout applied to every call. Defaults to ``30.0`` seconds.
+    http : SupportsHttp | None, optional
+        Custom HTTP transport implementation, primarily for testing.
     """
 
     def __init__(
@@ -250,21 +364,6 @@ class KGFoundryClient:
         timeout: float = 30.0,
         http: SupportsHttp | None = None,
     ) -> None:
-        """Compute init.
-
-        Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
-
-        Parameters
-        ----------
-        base_url : str | None
-            Optional parameter default ``'http://localhost:8080'``. Description for ``base_url``.
-        api_key : str | None
-            Optional parameter default ``None``. Description for ``api_key``.
-        timeout : float | None
-            Optional parameter default ``30.0``. Description for ``timeout``.
-        http : SupportsHttp | None
-            Optional parameter default ``None``. Description for ``http``.
-        """
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
@@ -272,14 +371,15 @@ class KGFoundryClient:
 
     def _headers(self) -> dict[str, str]:
         """Compute headers.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the headers operation.
+Carry out the headers operation.
 
-        Returns
-        -------
-        Mapping[str, str]
-            Description of return value.
-        """
+Returns
+-------
+dict[str, str]
+    Description of return value.
+"""
         h = {"Content-Type": "application/json"}
         if self.api_key:
             h["Authorization"] = f"Bearer {self.api_key}"
@@ -287,20 +387,24 @@ class KGFoundryClient:
 
     def healthz(self) -> dict[str, Any]:
         """Compute healthz.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the healthz operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the healthz operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Returns
-        -------
-        collections.abc.Mapping
-            Description of return value.
+Returns
+-------
+dict[str, Any]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from search_client.client import healthz
-        >>> result = healthz()
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from search_client.client import healthz
+>>> result = healthz()
+>>> result  # doctest: +ELLIPSIS
+"""
         r = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         r.raise_for_status()
         return cast(dict[str, Any], r.json())
@@ -313,31 +417,44 @@ class KGFoundryClient:
         explain: bool = False,
     ) -> dict[str, Any]:
         """Compute search.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        query : str
-            Description for ``query``.
-        k : int | None
-            Optional parameter default ``10``. Description for ``k``.
-        filters : Mapping[str, Any] | None
-            Optional parameter default ``None``. Description for ``filters``.
-        explain : bool | None
-            Optional parameter default ``False``. Description for ``explain``.
+Parameters
+----------
+query : str
+    Description for ``query``.
+k : int, optional
+    Defaults to ``10``.
+    Description for ``k``.
+    Defaults to ``10``.
+filters : dict[str, Any] | None, optional
+    Defaults to ``None``.
+    Description for ``filters``.
+    Defaults to ``None``.
+explain : bool, optional
+    Defaults to ``False``.
+    Description for ``explain``.
+    
+    
+    
+    Defaults to ``False``.
 
-        Returns
-        -------
-        collections.abc.Mapping
-            Description of return value.
+Returns
+-------
+dict[str, Any]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from search_client.client import search
-        >>> result = search(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from search_client.client import search
+>>> result = search(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         r = self._http.post(
             f"{self.base_url}/search",
@@ -350,27 +467,36 @@ class KGFoundryClient:
 
     def concepts(self, q: str, limit: int = 50) -> dict[str, Any]:
         """Compute concepts.
+<!-- auto:docstring-builder v1 -->
 
-        Carry out the concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Carry out the concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-        Parameters
-        ----------
-        q : str
-            Description for ``q``.
-        limit : int | None
-            Optional parameter default ``50``. Description for ``limit``.
+Parameters
+----------
+q : str
+    Description for ``q``.
+limit : int, optional
+    Defaults to ``50``.
+    Description for ``limit``.
+    
+    
+    
+    Defaults to ``50``.
 
-        Returns
-        -------
-        collections.abc.Mapping
-            Description of return value.
+Returns
+-------
+dict[str, Any]
+    Description of return value.
+    
+    
+    
 
-        Examples
-        --------
-        >>> from search_client.client import concepts
-        >>> result = concepts(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Examples
+--------
+>>> from search_client.client import concepts
+>>> result = concepts(...)
+>>> result  # doctest: +ELLIPSIS
+"""
         r = self._http.post(
             f"{self.base_url}/graph/concepts",
             json={"q": q, "limit": limit},
