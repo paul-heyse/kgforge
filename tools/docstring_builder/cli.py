@@ -593,6 +593,9 @@ def _run(
     )
     try:
         plugin_manager = load_plugins(
+    for file_path in files_list:
+        outcome = _process_file(
+            file_path,
             config,
             REPO_ROOT,
             only=_parse_plugin_names(getattr(args, "only_plugin", None)),
