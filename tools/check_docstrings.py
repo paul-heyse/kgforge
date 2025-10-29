@@ -38,7 +38,6 @@ def parse_args() -> argparse.Namespace:
     >>> from tools.check_docstrings import parse_args
     >>> result = parse_args()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -69,7 +68,6 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
     >>> from tools.check_docstrings import iter_docstrings
     >>> result = iter_docstrings(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
@@ -98,7 +96,6 @@ def check_placeholders() -> int:
     >>> from tools.check_docstrings import check_placeholders
     >>> result = check_placeholders()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     errors: list[str] = []
     keywords = {"TODO", "TBD", "FIXME"}

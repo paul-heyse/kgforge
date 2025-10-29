@@ -1,11 +1,16 @@
 {
+  "$defs": {
+    "Id": {
+      "type": "string"
+    }
+  },
   "$id": "https://kgfoundry/schemas/registry.duckdb_registry.Doc.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "Model the Doc.\n\nPydantic model defining the structured payload used across the system. Validation ensures inputs\nconform to the declared schema while producing clear error messages. Use this class when\nserialising or parsing data for the surrounding feature.",
   "examples": [
     {
       "arxiv_id": {},
-      "authors": [],
+      "authors": null,
       "content_hash": {},
       "doi": {},
       "id": null,
@@ -33,7 +38,6 @@
       "title": "Arxiv Id"
     },
     "authors": {
-      "default": [],
       "items": {
         "type": "string"
       },
@@ -65,8 +69,7 @@
       "title": "Doi"
     },
     "id": {
-      "title": "Id",
-      "type": "string"
+      "$ref": "#/$defs/Id"
     },
     "language": {
       "anyOf": [

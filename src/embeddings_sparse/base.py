@@ -76,7 +76,6 @@ class SparseEncoder(Protocol):
         >>> from embeddings_sparse.base import encode
         >>> result = encode(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         ...
 
@@ -133,6 +132,5 @@ class SparseIndex(Protocol):
         >>> from embeddings_sparse.base import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         ...

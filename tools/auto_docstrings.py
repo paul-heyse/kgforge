@@ -1524,14 +1524,74 @@ def detect_raises(node: ast.AST) -> list[str]:
         )
 
         def __init__(self, root: ast.AST) -> None:
+            """  init  .
+
+            Parameters
+            ----------
+            root : ast.AST
+                Description.
+
+            Returns
+            -------
+            None
+                Description.
+            Raises
+            ------
+            Exception
+                Description.
+
+            Examples
+            --------
+            >>> __init__(...)
+            """
             self._root = root
 
         def visit(self, current: ast.AST) -> None:  # type: ignore[override]
             if _is_nested_scope(self._root, current, self._NESTED_SCOPES):
+            """Visit.
+
+            Parameters
+            ----------
+            current : ast.AST
+                Description.
+
+            Returns
+            -------
+            None
+                Description.
+            Raises
+            ------
+            Exception
+                Description.
+
+            Examples
+            --------
+            >>> visit(...)
+            """
                 return
             super().visit(current)
 
         def visit_Raise(self, node: ast.Raise) -> None:
+            """Visit raise.
+
+            Parameters
+            ----------
+            node : ast.Raise
+                Description.
+
+            Returns
+            -------
+            None
+                Description.
+            Raises
+            ------
+            Exception
+                Description.
+
+            Examples
+            --------
+            >>> visit_Raise(...)
+            """
             name = _exception_name_for_node(node.exc)
             if name not in seen:
                 seen[name] = None

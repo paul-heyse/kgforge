@@ -110,7 +110,6 @@ class DuckDBRegistryHelper:
         >>> from registry.helper import new_run
         >>> result = new_run(..., ..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         run_id = str(uuid.uuid4())
         con = self._con()
@@ -179,7 +178,6 @@ class DuckDBRegistryHelper:
         >>> from registry.helper import begin_dataset
         >>> result = begin_dataset(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         dataset_id = str(uuid.uuid4())
         con = self._con()

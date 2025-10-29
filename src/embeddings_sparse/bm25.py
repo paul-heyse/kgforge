@@ -283,7 +283,6 @@ class PurePythonBM25:
         >>> from embeddings_sparse.bm25 import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
@@ -426,7 +425,6 @@ class LuceneBM25:
         >>> from embeddings_sparse.bm25 import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         self._ensure_searcher()
         if self._searcher is None:
@@ -472,7 +470,6 @@ def get_bm25(
     >>> from embeddings_sparse.bm25 import get_bm25
     >>> result = get_bm25(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     if backend == "lucene":
         try:

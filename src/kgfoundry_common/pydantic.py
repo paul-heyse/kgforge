@@ -33,7 +33,6 @@ __navmap__ = {
 
 
 if TYPE_CHECKING:
-
     # [nav:anchor BaseModel]
     class BaseModel:
         """Structural subset of :class:`pydantic.BaseModel` exposed for mypy."""

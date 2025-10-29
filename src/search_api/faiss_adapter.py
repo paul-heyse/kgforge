@@ -217,7 +217,9 @@ class FaissAdapter:
         if not HAVE_FAISS or faiss_module is None:
             return
         dimension = vectors.mat.shape[1]
-        metric_type = faiss_module.METRIC_INNER_PRODUCT if self.metric == "ip" else faiss_module.METRIC_L2
+        metric_type = (
+            faiss_module.METRIC_INNER_PRODUCT if self.metric == "ip" else faiss_module.METRIC_L2
+        )
         factory = self.factory if dimension >= MIN_FACTORY_DIMENSION else "Flat"
         cpu = faiss_module.index_factory(dimension, factory, metric_type)
         cpu = faiss_module.IndexIDMap2(cpu)
@@ -259,7 +261,7 @@ class FaissAdapter:
             pass
         self.build()
 
-    def _clone_to_gpu(self, cpu_index: Any) -> Any:
+    def _clone_to_gpu(self, cpu_index: object) -> object:
         """Return a GPU-backed index when FAISS provides the necessary bindings."""
         faiss_module = faiss
         if faiss_module is None:
@@ -295,17 +297,11 @@ class FaissAdapter:
         List[List[Tuple[str, float]]]
             Description of return value.
 
-        Raises
-        ------
-        RuntimeError
-            Raised when validation fails.
-
         Examples
         --------
         >>> from search_api.faiss_adapter import search
         >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         if self.vecs is None and self.index is None:
             return []
