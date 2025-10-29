@@ -7,7 +7,7 @@ import importlib.util
 import types
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Literal
+from typing import Literal
 
 import pytest
 
@@ -47,8 +47,8 @@ class FakeExecutor:
         self,
         fn: Callable[..., tuple[str, bool, bool, bool]],
         pkg: str,
-        *args: Any,
-        **kwargs: Any,
+        *args: object,
+        **kwargs: object,
     ) -> FakeFuture:
         return FakeFuture(self._results[pkg])
 
