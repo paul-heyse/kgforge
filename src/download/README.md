@@ -7,10 +7,10 @@ Overview of download.
 
 ## Modules
 
-- **`download.cli`** — Overview of cli. → [open](vscode://file//home/paul/kgfoundry/src/download/cli.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/003c82161377a9d2105e9ca618e8679ba2a602ff/src/download/cli.py#L1)
-- **`download.harvester`** — Overview of harvester. → [open](vscode://file//home/paul/kgfoundry/src/download/harvester.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/003c82161377a9d2105e9ca618e8679ba2a602ff/src/download/harvester.py#L1)
+- **`download.cli`** — Overview of cli. → [open](vscode://file//workspace/kgfoundry/src/download/cli.py:1:1) | [view](https://github.com/your-org/your-repo/blob/46a51f319338d544a6cfb6b7491a80695ba1dfde/src/download/cli.py#L1)
+- **`download.harvester`** — Overview of harvester. → [open](vscode://file//workspace/kgfoundry/src/download/harvester.py:1:1) | [view](https://github.com/your-org/your-repo/blob/46a51f319338d544a6cfb6b7491a80695ba1dfde/src/download/harvester.py#L1)
 
 ## Classes
 
-- **`download.NavMap`** — Model the NavMap. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:60:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/003c82161377a9d2105e9ca618e8679ba2a602ff/src/kgfoundry_common/navmap_types.py#L60-L79)
-<!-- agent:readme v1 sha:003c82161377a9d2105e9ca618e8679ba2a602ff content:a6f0b88a5925 -->
+- **`download.NavMap`** — Model the NavMap. → [open](vscode://file//workspace/kgfoundry/src/kgfoundry_common/navmap_types.py:60:1) | [view](https://github.com/your-org/your-repo/blob/46a51f319338d544a6cfb6b7491a80695ba1dfde/src/kgfoundry_common/navmap_types.py#L60-L79)
+<!-- agent:readme v1 sha:46a51f319338d544a6cfb6b7491a80695ba1dfde content:9498793f4924 -->

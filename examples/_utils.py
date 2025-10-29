@@ -1,4 +1,4 @@
-"""Utility helpers used by Sphinx gallery examples.
+"""Utility helpers used by Sphinx gallery examples
 ================================================
 
 Explain the utility helpers used by Sphinx gallery examples.
@@ -8,6 +8,15 @@ that doctest and gallery generation remain fast. Keep the data tiny and avoid
 network or GPU side effects.
 
 .. tags:: utils, helpers
+
+Metadata
+--------
+
+- **Title:** Utility helpers used by Sphinx gallery examples
+- **Tags:** utils, helpers
+- **Time:** <1s
+- **GPU:** no
+- **Network:** no
 
 Constraints
 -----------
