@@ -9,9 +9,10 @@ from __future__ import annotations
 
 from typing import Final
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.pydantic import BaseModel
 
 __all__ = ["SearchRequest", "SearchResult"]
 
@@ -71,6 +72,6 @@ class SearchResult(BaseModel):
     title: str
     section: str
     score: float
-    signals: dict[str, float] = {}
-    spans: dict[str, int] = {}
-    concepts: list[dict[str, str]] = []
+    signals: dict[str, float] = Field(default_factory=dict)
+    spans: dict[str, int] = Field(default_factory=dict)
+    concepts: list[dict[str, str]] = Field(default_factory=list)

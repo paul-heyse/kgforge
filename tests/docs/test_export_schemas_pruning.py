@@ -16,7 +16,8 @@ def _load_exporter() -> ModuleType:
         "tests.docs.export_schemas_pruning", Path("tools/docs/export_schemas.py")
     )
     if spec is None or spec.loader is None:
-        raise RuntimeError("Unable to load export_schemas module for testing")
+        message = "Unable to load export_schemas module for testing"
+        raise RuntimeError(message)
     module = importlib.util.module_from_spec(spec)
     sys.modules.setdefault(spec.name, module)
     spec.loader.exec_module(module)

@@ -150,15 +150,16 @@ def test_build_one_package_supports_png_and_cache(
     monkeypatch.setattr(build_graphs, "build_pydeps_for_package", fake_pydeps)
     monkeypatch.setattr(build_graphs, "build_pyreverse_for_package", fake_pyreverse)
 
-    result = build_graphs.build_one_package(
-        pkg="demo_pkg",
+    config = build_graphs.PackageBuildConfig(
         fmt=fmt,
-        excludes=[],
+        excludes=(),
         max_bacon=4,
         cache_dir=cache_dir,
         use_cache=True,
         verbose=False,
     )
+
+    result = build_graphs.build_one_package("demo_pkg", config)
 
     imports_path = out_dir / "demo_pkg-imports.png"
     uml_path = out_dir / "demo_pkg-uml.png"
@@ -181,15 +182,7 @@ def test_build_one_package_supports_png_and_cache(
     monkeypatch.setattr(build_graphs, "build_pydeps_for_package", fail_pydeps)
     monkeypatch.setattr(build_graphs, "build_pyreverse_for_package", fail_pyreverse)
 
-    cached_result = build_graphs.build_one_package(
-        pkg="demo_pkg",
-        fmt=fmt,
-        excludes=[],
-        max_bacon=4,
-        cache_dir=cache_dir,
-        use_cache=True,
-        verbose=False,
-    )
+    cached_result = build_graphs.build_one_package("demo_pkg", config)
 
     assert cached_result == ("demo_pkg", True, True, True)
     assert imports_path.exists()

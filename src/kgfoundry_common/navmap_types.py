@@ -7,12 +7,12 @@ for implementation specifics.
 
 from __future__ import annotations
 
-from typing import Final, Literal, NotRequired, TypeAlias, TypedDict
+from typing import Final, Literal, NotRequired, TypedDict
 
-__all__ = ["Stability", "NavSection", "SymbolMeta", "ModuleMeta", "NavMap"]
+__all__ = ["ModuleMeta", "NavMap", "NavSection", "Stability", "SymbolMeta"]
 
 # [nav:anchor Stability]
-Stability: TypeAlias = Literal[
+type Stability = Literal[
     "frozen",
     "stable",
     "experimental",

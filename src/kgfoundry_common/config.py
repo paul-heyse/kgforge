@@ -46,17 +46,17 @@ def load_config(path: str) -> dict[str, Any]:
     """Compute load config.
 
     Carry out the load config operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     path : str
         Description for ``path``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from kgfoundry_common.config import load_config
@@ -64,6 +64,15 @@ def load_config(path: str) -> dict[str, Any]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     with open(path, encoding="utf-8") as f:
-        return yaml.safe_load(f)
+        loaded = yaml.safe_load(f)
+    if not isinstance(loaded, dict):
+        message = f"Configuration at {path} must decode to a mapping"
+        raise TypeError(message)
+    validated: dict[str, Any] = {}
+    for key, value in loaded.items():
+        if not isinstance(key, str):
+            message = f"Configuration keys must be strings; received {key!r}"
+            raise TypeError(message)
+        validated[key] = value
+    return validated

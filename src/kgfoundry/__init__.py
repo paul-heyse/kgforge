@@ -51,7 +51,7 @@ def _load(name: str) -> object:
 def __getattr__(name: str) -> object:
     """Compute getattr.
 
-    Carry out the getattr operation.
+    Provide a fallback attribute lookup when normal resolution fails. The hook enables dynamic attributes and lazy loading for missing names. Raise ``AttributeError`` to preserve Python's attribute access semantics.
 
     Parameters
     ----------
@@ -77,7 +77,7 @@ def __getattr__(name: str) -> object:
 def __dir__() -> list[str]:
     """Compute dir.
 
-    Carry out the dir operation.
+    Return the ordered collection of attribute names visible on the instance. Interactive tools and auto-completion engines call this hook when exploring objects. Include dynamic attributes so users discover extension points easily.
 
     Returns
     -------

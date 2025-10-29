@@ -93,17 +93,17 @@ def is_pydantic_model(obj: object) -> bool:
     """Compute is pydantic model.
 
     Carry out the is pydantic model operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     obj : object
         Description for ``obj``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.export_schemas import is_pydantic_model
@@ -111,7 +111,6 @@ def is_pydantic_model(obj: object) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     try:
         from pydantic import BaseModel
     except Exception:
@@ -123,17 +122,17 @@ def is_pandera_model(obj: object) -> bool:
     """Compute is pandera model.
 
     Carry out the is pandera model operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     obj : object
         Description for ``obj``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.export_schemas import is_pandera_model
@@ -141,7 +140,6 @@ def is_pandera_model(obj: object) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     try:
         import pandera as pa
     except Exception:
@@ -322,7 +320,7 @@ def _inject_examples(schema: dict[str, Any], example: dict[str, Any] | None) -> 
             ex = []
         # Only push if not present
         if example not in ex:
-            ex = [example] + ex
+            ex = [example, *ex]
         schema["examples"] = ex
 
 
@@ -363,8 +361,8 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
     """Summarize differences: top-level keys +/-; property changes (top 10)."""
     out: dict[str, Any] = {}
     old_keys, new_keys = set(old.keys()), set(new.keys())
-    add_keys = sorted(list(new_keys - old_keys))
-    del_keys = sorted(list(old_keys - new_keys))
+    add_keys = sorted(new_keys - old_keys)
+    del_keys = sorted(old_keys - new_keys)
     out["top_level_added"] = add_keys
     out["top_level_removed"] = del_keys
 
@@ -372,17 +370,17 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
         """Compute prop keys.
 
         Carry out the prop keys operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         d : collections.abc.Mapping
             Description for ``d``.
-        
+
         Returns
         -------
         collections.abc.Set
             Description of return value.
-        
+
         Examples
         --------
         >>> from tools.docs.export_schemas import prop_keys
@@ -390,13 +388,12 @@ def _diff_summary(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         props = d.get("properties")
         return set(props.keys()) if isinstance(props, dict) else set()
 
     pk_old, pk_new = prop_keys(old), prop_keys(new)
-    prop_added = sorted(list(pk_new - pk_old))[:10]
-    prop_removed = sorted(list(pk_old - pk_new))[:10]
+    prop_added = sorted(pk_new - pk_old)[:10]
+    prop_removed = sorted(pk_old - pk_new)[:10]
     out["properties_added_top10"] = prop_added
     out["properties_removed_top10"] = prop_removed
     return out
@@ -542,17 +539,17 @@ def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     argv : List[str] | None
         Optional parameter default ``None``. Description for ``argv``.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.export_schemas import main
@@ -560,7 +557,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     import argparse
 
     p = argparse.ArgumentParser()
@@ -621,7 +617,7 @@ def main(argv: list[str] | None = None) -> int:
                 drift_summaries[str(path)] = _diff_summary(old or {}, data)
                 changed = True
             continue
-        wrote, old_text, new_text = _write_if_changed(path, data)
+        wrote, old_text, _ = _write_if_changed(path, data)
         if wrote:
             drift_summaries[str(path)] = _diff_summary(
                 cast(dict[str, Any], json.loads(old_text)) if old_text else {}, data

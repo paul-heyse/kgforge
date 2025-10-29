@@ -56,17 +56,17 @@ class DenseEmbeddingModel(Protocol):
         """Compute encode.
 
         Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         texts : collections.abc.Sequence
             Description for ``texts``.
-        
+
         Returns
         -------
         numpy.typing.NDArray
             Description of return value.
-        
+
         Examples
         --------
         >>> from embeddings_dense.base import encode
@@ -74,5 +74,4 @@ class DenseEmbeddingModel(Protocol):
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         ...

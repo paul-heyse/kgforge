@@ -1,0 +1,79 @@
+{
+  "$id": "https://kgfoundry/schemas/kgfoundry_common.models.LinkAssertion.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Model the LinkAssertion.\n\nPydantic model defining the structured payload used across the system. Validation ensures inputs\nconform to the declared schema while producing clear error messages. Use this class when\nserialising or parsing data for the surrounding feature.",
+  "examples": [
+    {
+      "chunk_id": null,
+      "concept_id": null,
+      "decision": null,
+      "evidence_span": {},
+      "features": {},
+      "id": null,
+      "run_id": null,
+      "score": null
+    }
+  ],
+  "properties": {
+    "chunk_id": {
+      "title": "Chunk Id",
+      "type": "string"
+    },
+    "concept_id": {
+      "title": "Concept Id",
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "link",
+        "reject",
+        "uncertain"
+      ],
+      "title": "Decision",
+      "type": "string"
+    },
+    "evidence_span": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Evidence Span"
+    },
+    "features": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "default": {},
+      "title": "Features",
+      "type": "object"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "score": {
+      "title": "Score",
+      "type": "number"
+    }
+  },
+  "required": [
+    "id",
+    "chunk_id",
+    "concept_id",
+    "score",
+    "decision",
+    "run_id"
+  ],
+  "title": "LinkAssertion",
+  "type": "object",
+  "x-version-introduced": "0.1.0"
+}

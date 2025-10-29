@@ -129,23 +129,22 @@ def auth(authorization: str | None = Header(default=None)) -> None:
     """Compute auth.
 
     Carry out the auth operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     authorization : str | None
         Optional parameter default ``Header(default=None)``. Description for ``authorization``.
-    
+
     Raises
     ------
     HTTPException
         Raised when validation fails.
-    
+
     Examples
     --------
     >>> from search_api.app import auth
     >>> auth()  # doctest: +ELLIPSIS
     """
-    
     if not API_KEYS:
         return  # disabled in skeleton
     if not authorization or not authorization.startswith("Bearer "):
@@ -156,17 +155,16 @@ def auth(authorization: str | None = Header(default=None)) -> None:
 
 
 # [nav:anchor healthz]
-@app.get("/healthz")
 def healthz() -> dict[str, Any]:
     """Compute healthz.
 
     Carry out the healthz operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.app import healthz
@@ -191,19 +189,19 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
     """Compute rrf fuse.
 
     Carry out the rrf fuse operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     lists : List[List[Tuple[str, float]]]
         Description for ``lists``.
     k_rrf : int
         Description for ``k_rrf``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.app import rrf_fuse
@@ -211,7 +209,6 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     scores: dict[str, float] = {}
     for hits in lists:
         for rank, (doc_id, _score) in enumerate(hits, start=1):
@@ -229,7 +226,7 @@ def apply_kg_boosts(
     """Compute apply kg boosts.
 
     Carry out the apply kg boosts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     cands : collections.abc.Mapping
@@ -240,12 +237,12 @@ def apply_kg_boosts(
         Optional parameter default ``0.08``. Description for ``direct``.
     one_hop : float | None
         Optional parameter default ``0.04``. Description for ``one_hop``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.app import apply_kg_boosts
@@ -253,7 +250,6 @@ def apply_kg_boosts(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     q_concepts = set()
     for w in query.lower().split():
         if w.startswith("concept"):
@@ -274,24 +270,23 @@ def apply_kg_boosts(
 
 
 # [nav:anchor search]
-@app.post("/search", response_model=dict)
 def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     """Compute search.
 
     Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     req : src.search_api.schemas.SearchRequest
         Description for ``req``.
     _ : None | None
         Optional parameter default ``Depends(auth)``. Description for ``_``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.app import search
@@ -299,7 +294,6 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
     dense_hits: list[tuple[str, float]] = []
@@ -358,24 +352,23 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
 
 
 # [nav:anchor graph_concepts]
-@app.post("/graph/concepts", response_model=dict)
 def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str, Any]:
     """Compute graph concepts.
 
     Carry out the graph concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     body : collections.abc.Mapping
         Description for ``body``.
     _ : None | None
         Optional parameter default ``Depends(auth)``. Description for ``_``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.app import graph_concepts
@@ -383,7 +376,6 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring
     concepts = [
@@ -392,3 +384,8 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
         if q in c.lower()
     ][: body.get("limit", 50)]
     return {"concepts": concepts}
+
+
+app.get("/healthz")(healthz)
+app.post("/search", response_model=dict)(search)
+app.post("/graph/concepts", response_model=dict)(graph_concepts)

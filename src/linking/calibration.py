@@ -44,17 +44,17 @@ def isotonic_calibrate(pairs: list[tuple[float, int]]) -> dict[str, object]:
     """Compute isotonic calibrate.
 
     Carry out the isotonic calibrate operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     pairs : List[Tuple[float, int]]
         Description for ``pairs``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from linking.calibration import isotonic_calibrate
@@ -62,6 +62,5 @@ def isotonic_calibrate(pairs: list[tuple[float, int]]) -> dict[str, object]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     # NOTE: fit isotonic regression parameters when calibrator is implemented
     return {"kind": "isotonic", "params": []}

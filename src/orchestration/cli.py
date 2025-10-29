@@ -50,7 +50,6 @@ app = typer.Typer(help="kgfoundry orchestration CLI")
 
 
 # [nav:anchor index_bm25]
-@app.command()
 def index_bm25(
     chunks_parquet: str = typer.Argument(..., help="Path to Parquet/JSONL with chunks"),
     backend: str = typer.Option("lucene", help="lucene|pure"),
@@ -59,7 +58,7 @@ def index_bm25(
     """Compute index bm25.
 
     Carry out the index bm25 operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     chunks_parquet : str | None
@@ -68,13 +67,12 @@ def index_bm25(
         Optional parameter default ``typer.Option('lucene', help='lucene|pure')``. Description for ``backend``.
     index_dir : str | None
         Optional parameter default ``typer.Option('./_indices/bm25', help='Output index directory')``. Description for ``index_dir``.
-    
+
     Examples
     --------
     >>> from orchestration.cli import index_bm25
     >>> index_bm25()  # doctest: +ELLIPSIS
     """
-    
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
@@ -114,7 +112,6 @@ def index_bm25(
 
 
 # [nav:anchor index_faiss]
-@app.command()
 def index_faiss(
     dense_vectors: str = typer.Argument(..., help="Path to dense vectors JSON (skeleton)"),
     index_path: str = typer.Option(
@@ -124,20 +121,19 @@ def index_faiss(
     """Compute index faiss.
 
     Carry out the index faiss operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     dense_vectors : str | None
         Optional parameter default ``typer.Argument(..., help='Path to dense vectors JSON (skeleton)')``. Description for ``dense_vectors``.
     index_path : str | None
         Optional parameter default ``typer.Option('./_indices/faiss/shard_000.idx', help='Output index (CPU .idx)')``. Description for ``index_path``.
-    
+
     Examples
     --------
     >>> from orchestration.cli import index_faiss
     >>> index_faiss()  # doctest: +ELLIPSIS
     """
-    
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
         vecs = json.load(fh)
@@ -157,30 +153,27 @@ def index_faiss(
 
 
 # [nav:anchor api]
-@app.command()
 def api(port: int = 8080) -> None:
     """Compute api.
 
     Carry out the api operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     port : int | None
         Optional parameter default ``8080``. Description for ``port``.
-    
+
     Examples
     --------
     >>> from orchestration.cli import api
     >>> api()  # doctest: +ELLIPSIS
     """
-    
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
 
 
 # [nav:anchor e2e]
-@app.command()
 def e2e() -> None:
     """Compute e2e.
 
@@ -209,6 +202,12 @@ def e2e() -> None:
     stages = e2e_flow()
     for step in stages:
         typer.echo(step)
+
+
+app.command()(index_bm25)
+app.command()(index_faiss)
+app.command()(api)
+app.command()(e2e)
 
 
 if __name__ == "__main__":

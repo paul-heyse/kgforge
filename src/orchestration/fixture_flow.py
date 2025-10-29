@@ -8,7 +8,7 @@ for implementation specifics.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Final
+from typing import Final, cast
 
 from prefect import flow, task
 
@@ -54,22 +54,21 @@ __navmap__: Final[NavMap] = {
 
 
 # [nav:anchor t_prepare_dirs]
-@task
-def t_prepare_dirs(root: str) -> dict[str, bool]:
+def _t_prepare_dirs_impl(root: str) -> dict[str, bool]:
     """Compute t prepare dirs.
 
     Carry out the t prepare dirs operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     root : str
         Description for ``root``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from orchestration.fixture_flow import t_prepare_dirs
@@ -77,7 +76,6 @@ def t_prepare_dirs(root: str) -> dict[str, bool]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     path = Path(root)
     (path / "parquet" / "dense").mkdir(parents=True, exist_ok=True)
     (path / "parquet" / "sparse").mkdir(parents=True, exist_ok=True)
@@ -86,23 +84,26 @@ def t_prepare_dirs(root: str) -> dict[str, bool]:
     return {"ok": True}
 
 
+# [nav:anchor t_prepare_dirs]
+t_prepare_dirs = task(_t_prepare_dirs_impl)
+
+
 # [nav:anchor t_write_fixture_chunks]
-@task
-def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
+def _t_write_fixture_chunks_impl(chunks_root: str) -> tuple[str, int]:
     """Compute t write fixture chunks.
 
     Carry out the t write fixture chunks operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     chunks_root : str
         Description for ``chunks_root``.
-    
+
     Returns
     -------
     Tuple[str, int]
         Description of return value.
-    
+
     Examples
     --------
     >>> from orchestration.fixture_flow import t_write_fixture_chunks
@@ -110,7 +111,6 @@ def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     writer = ParquetChunkWriter(chunks_root, model="docling_hybrid", run_id="fixture")
     rows = [
         {
@@ -129,23 +129,26 @@ def t_write_fixture_chunks(chunks_root: str) -> tuple[str, int]:
     return dataset_root, len(rows)
 
 
+# [nav:anchor t_write_fixture_chunks]
+t_write_fixture_chunks = task(_t_write_fixture_chunks_impl)
+
+
 # [nav:anchor t_write_fixture_dense]
-@task
-def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
+def _t_write_fixture_dense_impl(dense_root: str) -> tuple[str, int]:
     """Compute t write fixture dense.
 
     Carry out the t write fixture dense operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     dense_root : str
         Description for ``dense_root``.
-    
+
     Returns
     -------
     Tuple[str, int]
         Description of return value.
-    
+
     Examples
     --------
     >>> from orchestration.fixture_flow import t_write_fixture_dense
@@ -153,7 +156,6 @@ def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     writer = ParquetVectorWriter(dense_root)
     vector = [0.0] * 2560
     out_root = writer.write_dense(
@@ -162,23 +164,26 @@ def t_write_fixture_dense(dense_root: str) -> tuple[str, int]:
     return out_root, 1
 
 
+# [nav:anchor t_write_fixture_dense]
+t_write_fixture_dense = task(_t_write_fixture_dense_impl)
+
+
 # [nav:anchor t_write_fixture_splade]
-@task
-def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
+def _t_write_fixture_splade_impl(sparse_root: str) -> tuple[str, int]:
     """Compute t write fixture splade.
 
     Carry out the t write fixture splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     sparse_root : str
         Description for ``sparse_root``.
-    
+
     Returns
     -------
     Tuple[str, int]
         Description of return value.
-    
+
     Examples
     --------
     >>> from orchestration.fixture_flow import t_write_fixture_splade
@@ -186,7 +191,6 @@ def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     writer = ParquetVectorWriter(sparse_root)
     out_root = writer.write_splade(
         "SPLADE-v3-distilbert",
@@ -197,9 +201,12 @@ def t_write_fixture_splade(sparse_root: str) -> tuple[str, int]:
     return out_root, 1
 
 
+# [nav:anchor t_write_fixture_splade]
+t_write_fixture_splade = task(_t_write_fixture_splade_impl)
+
+
 # [nav:anchor t_register_in_duckdb]
-@task
-def t_register_in_duckdb(
+def _t_register_in_duckdb_impl(
     db_path: str,
     chunks_info: tuple[str, int],
     dense_info: tuple[str, int],
@@ -208,7 +215,7 @@ def t_register_in_duckdb(
     """Compute t register in duckdb.
 
     Carry out the t register in duckdb operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     db_path : str
@@ -219,12 +226,12 @@ def t_register_in_duckdb(
         Description for ``dense_info``.
     sparse_info : Tuple[str, int]
         Description for ``sparse_info``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from orchestration.fixture_flow import t_register_in_duckdb
@@ -232,7 +239,6 @@ def t_register_in_duckdb(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     registry = DuckDBRegistryHelper(db_path)
     dense_run = registry.new_run("dense_embed", "Qwen3-Embedding-4B", "main", {"dim": 2560})
     sparse_run = registry.new_run("splade_encode", "SPLADE-v3-distilbert", "main", {"topk": 256})
@@ -270,27 +276,30 @@ def t_register_in_duckdb(
     return {"runs": [dense_run, sparse_run]}
 
 
+# [nav:anchor t_register_in_duckdb]
+t_register_in_duckdb = task(_t_register_in_duckdb_impl)
+
+
 # [nav:anchor fixture_pipeline]
-@flow(name="kgfoundry_fixture_pipeline")
-def fixture_pipeline(
+def _fixture_pipeline_impl(
     root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb"
 ) -> dict[str, list[str]]:
     """Compute fixture pipeline.
 
     Carry out the fixture pipeline operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     root : str | None
         Optional parameter default ``'/data'``. Description for ``root``.
     db_path : str | None
         Optional parameter default ``'/data/catalog/catalog.duckdb'``. Description for ``db_path``.
-    
+
     Returns
     -------
     collections.abc.Mapping
         Description of return value.
-    
+
     Examples
     --------
     >>> from orchestration.fixture_flow import fixture_pipeline
@@ -298,12 +307,16 @@ def fixture_pipeline(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     t_prepare_dirs(root)
     chunks_info = t_write_fixture_chunks(f"{root}/parquet/chunks")
     dense_info = t_write_fixture_dense(f"{root}/parquet/dense")
     sparse_info = t_write_fixture_splade(f"{root}/parquet/sparse")
-    return t_register_in_duckdb(db_path, chunks_info, dense_info, sparse_info)
+    result = t_register_in_duckdb(db_path, chunks_info, dense_info, sparse_info)
+    return cast(dict[str, list[str]], result)
+
+
+# [nav:anchor fixture_pipeline]
+fixture_pipeline = flow(name="kgfoundry_fixture_pipeline")(_fixture_pipeline_impl)
 
 
 if __name__ == "__main__":

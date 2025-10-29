@@ -16,9 +16,12 @@ import sys
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Final
 
 TITLE_MAX_LENGTH = 79
 UNDERLINE_TOLERANCE = 1
+MIN_LINES_WITH_UNDERLINE: Final[int] = 2
+BLANK_LINE_INDEX: Final[int] = 2
 
 TITLE_UNDERLINE_PATTERN = re.compile(r"^(?P<char>=)\1*$")
 CUSTOM_LABEL_PATTERN = re.compile(r"(?m)^\.\.\s+_gallery_[\w-]+:\s*$")
@@ -60,18 +63,17 @@ class ValidationResult:
         """Compute extend.
 
         Carry out the extend operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         messages : collections.abc.Iterable
             Description for ``messages``.
-        
+
         Examples
         --------
         >>> from tools.validate_gallery import extend
         >>> extend(...)  # doctest: +ELLIPSIS
         """
-        
         self.errors.extend(messages)
 
     @property
@@ -79,12 +81,12 @@ class ValidationResult:
         """Compute ok.
 
         Carry out the ok operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Returns
         -------
         bool
             Description of return value.
-        
+
         Examples
         --------
         >>> from tools.validate_gallery import ok
@@ -108,17 +110,17 @@ def validate_title_format(docstring: str) -> tuple[bool, str]:
     """Compute validate title format.
 
     Carry out the validate title format operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     docstring : str
         Description for ``docstring``.
-    
+
     Returns
     -------
     Tuple[bool, str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.validate_gallery import validate_title_format
@@ -126,7 +128,6 @@ def validate_title_format(docstring: str) -> tuple[bool, str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     lines = [line.rstrip() for line in inspect.cleandoc(docstring).splitlines()]
     while lines and not lines[0].strip():
         lines.pop(0)
@@ -137,7 +138,7 @@ def validate_title_format(docstring: str) -> tuple[bool, str]:
     if len(title) > TITLE_MAX_LENGTH:
         return False, f"title exceeds {TITLE_MAX_LENGTH} characters"
 
-    if len(lines) < 2:
+    if len(lines) < MIN_LINES_WITH_UNDERLINE:
         return False, "missing underline under the title"
 
     underline = lines[1]
@@ -147,7 +148,7 @@ def validate_title_format(docstring: str) -> tuple[bool, str]:
     if abs(len(underline) - len(title)) > UNDERLINE_TOLERANCE:
         return False, "title underline length must match the title (±1 character)"
 
-    if len(lines) < 3 or lines[2].strip():
+    if len(lines) <= BLANK_LINE_INDEX or lines[BLANK_LINE_INDEX].strip():
         return False, "expected a blank line after the title underline"
 
     return True, ""
@@ -157,17 +158,17 @@ def check_orphan_directive(docstring: str) -> bool:
     """Compute check orphan directive.
 
     Carry out the check orphan directive operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     docstring : str
         Description for ``docstring``.
-    
+
     Returns
     -------
     bool
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.validate_gallery import check_orphan_directive
@@ -175,7 +176,6 @@ def check_orphan_directive(docstring: str) -> bool:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return ":orphan:" in docstring
 
 
@@ -183,17 +183,17 @@ def check_custom_labels(docstring: str) -> list[str]:
     """Compute check custom labels.
 
     Carry out the check custom labels operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     docstring : str
         Description for ``docstring``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.validate_gallery import check_custom_labels
@@ -201,7 +201,6 @@ def check_custom_labels(docstring: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return CUSTOM_LABEL_PATTERN.findall(docstring)
 
 
@@ -233,19 +232,19 @@ def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]
     """Compute validate example file.
 
     Carry out the validate example file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     file_path : Path
         Description for ``file_path``.
     strict : bool | None
         Optional parameter default ``False``. Description for ``strict``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.validate_gallery import validate_example_file
@@ -253,7 +252,6 @@ def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     errors: list[str] = []
     docstring = _load_docstring(file_path)
     if docstring is None:
@@ -298,7 +296,7 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     examples_dir : Path
@@ -307,12 +305,12 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
         Optional parameter default ``False``. Description for ``strict``.
     verbose : bool | None
         Optional parameter default ``False``. Description for ``verbose``.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.validate_gallery import main
@@ -320,7 +318,6 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     results: list[ValidationResult] = []
     exit_code = 0
     for path in _iter_example_files(examples_dir):

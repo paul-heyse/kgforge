@@ -18,12 +18,25 @@ import subprocess
 import sys
 import time
 import warnings
+from collections.abc import Iterator, Mapping, Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, cast
+from types import ModuleType
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    import networkx as nx_mod
+    import pydot
+
+    DiGraph = nx_mod.DiGraph
+    PydotDot = pydot.Dot
+else:  # pragma: no cover - type-checking aid
+    DiGraph = object  # type: ignore[assignment]
+    PydotDot = object  # type: ignore[assignment]
 
 
-def _optional_import(name: str) -> Any:
+def _optional_import(name: str) -> ModuleType | None:
     """Import module if available.
 
     Parameters
@@ -33,7 +46,7 @@ def _optional_import(name: str) -> Any:
 
     Returns
     -------
-    Any
+    ModuleType | None
         Description.
 
     Raises
@@ -49,6 +62,55 @@ def _optional_import(name: str) -> Any:
         return importlib.import_module(name)
     except Exception:
         return None
+
+
+CYCLE_LIMIT_ENV = "GRAPH_CYCLE_LIMIT"
+CYCLE_LENGTH_ENV = "GRAPH_CYCLE_LEN"
+EDGE_BUDGET_ENV = "GRAPH_EDGE_BUDGET"
+DEFAULT_EDGE_BUDGET = 50_000
+EDGE_COMPONENTS = 2
+SCC_SUMMARY_LIMIT = 10
+SCC_MEMBER_PREVIEW = 20
+
+LayerConfig = Mapping[str, object]
+AnalysisResult = dict[str, object]
+CycleList = list[list[str]]
+
+
+@dataclass(frozen=True)
+class CacheContext:
+    """Represent the cache state for a single package build."""
+
+    used_cache: bool
+    tree_hash: str | None
+    bucket: Path | None
+
+
+@dataclass(frozen=True)
+class StagePaths:
+    """File system paths used while staging package graph artifacts."""
+
+    staging_dir: Path
+    staged_imports: Path
+    staged_uml: Path
+    final_imports: Path
+    final_uml: Path
+
+
+@dataclass(frozen=True)
+class PackageBuildConfig:
+    """Configuration values required to render per-package graphs."""
+
+    fmt: str
+    excludes: tuple[str, ...]
+    max_bacon: int
+    cache_dir: Path
+    use_cache: bool
+    verbose: bool
+
+    def excludes_list(self) -> list[str]:
+        """Return a mutable copy of the package exclusion patterns."""
+        return list(self.excludes)
 
 
 pydot = _optional_import("pydot")
@@ -97,12 +159,12 @@ def parse_args() -> argparse.Namespace:
     """Compute parse args.
 
     Carry out the parse args operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     argparse.Namespace
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import parse_args
@@ -188,7 +250,7 @@ def sh(
     """Compute sh.
 
     Carry out the sh operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     cmd : List[str]
@@ -197,12 +259,12 @@ def sh(
         Optional parameter default ``None``. Description for ``cwd``.
     check : bool | None
         Optional parameter default ``True``. Description for ``check``.
-    
+
     Returns
     -------
     subprocess.CompletedProcess[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import sh
@@ -210,7 +272,6 @@ def sh(
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return subprocess.run(
         cmd, check=check, cwd=str(cwd) if cwd else None, text=True, capture_output=False
     )
@@ -220,18 +281,17 @@ def ensure_bin(name: str) -> None:
     """Compute ensure bin.
 
     Carry out the ensure bin operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     name : str
         Description for ``name``.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import ensure_bin
     >>> ensure_bin(...)  # doctest: +ELLIPSIS
     """
-    
     if not shutil.which(name):
         print(f"[graphs] Missing required executable on PATH: {name}", file=sys.stderr)
         print(
@@ -245,12 +305,12 @@ def find_top_packages() -> list[str]:
     """Compute find top packages.
 
     Carry out the find top packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import find_top_packages
@@ -287,7 +347,7 @@ def build_pydeps_for_package(
     """Compute build pydeps for package.
 
     Carry out the build pydeps for package operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     pkg : str
@@ -300,13 +360,12 @@ def build_pydeps_for_package(
         Description for ``max_bacon``.
     fmt : str
         Description for ``fmt``.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import build_pydeps_for_package
     >>> build_pydeps_for_package(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
     dot_tmp = out_svg.with_suffix(".dot")
     dot_tmp.parent.mkdir(parents=True, exist_ok=True)
     dot_target = dot_tmp if dot_tmp.is_absolute() else dot_tmp.resolve()
@@ -343,7 +402,7 @@ def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
     """Compute build pyreverse for package.
 
     Carry out the build pyreverse for package operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     pkg : str
@@ -352,13 +411,12 @@ def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
         Description for ``out_dir``.
     fmt : str
         Description for ``fmt``.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import build_pyreverse_for_package
     >>> build_pyreverse_for_package(..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
     # classes_<project>.dot is named by -p <project>; use the package name to get unique names.
     out_dir.mkdir(parents=True, exist_ok=True)
     sh(
@@ -407,11 +465,188 @@ def _pkg_of(dotted: str) -> str:
     return head
 
 
+def _module_label(node: object, data: Mapping[str, object]) -> str:
+    """Normalize the label associated with a pydeps node."""
+    label = data.get("label")
+    if label is None:
+        return str(node)
+    raw = str(label).strip('"')
+    normalized = raw.replace(r"\n", "\n").replace(r"\.", ".").replace(r"\\", "\\")
+    return normalized.replace("\n", "")
+
+
+def _coerce_sequence(value: object) -> list[str]:
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        return [str(item) for item in value]
+    return []
+
+
+def _coerce_mapping(value: object) -> dict[str, str]:
+    if isinstance(value, Mapping):
+        return {str(key): str(val) for key, val in value.items()}
+    return {}
+
+
+def _allow_outward_rule(layers: LayerConfig) -> bool:
+    rules = layers.get("rules")
+    if not isinstance(rules, Mapping):
+        return False
+    return bool(rules.get("allow_outward", False))
+
+
+def _env_int(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except ValueError:
+        return default
+
+
+def _rank_map(order: Sequence[str]) -> dict[str, int]:
+    return {name: idx for idx, name in enumerate(order)}
+
+
+def _prune_outward_edges(
+    graph: DiGraph,
+    pkg2layer: Mapping[str, str],
+    layer_rank: Mapping[str, int],
+    allow_outward: bool,
+) -> DiGraph:
+    if allow_outward:
+        return graph.copy()
+    pruned = graph.copy()
+    edges_to_remove = []
+    for src, dst in graph.edges():
+        src_layer = pkg2layer.get(src)
+        dst_layer = pkg2layer.get(dst)
+        if (
+            src_layer is not None
+            and dst_layer is not None
+            and src_layer in layer_rank
+            and dst_layer in layer_rank
+            and layer_rank[dst_layer] > layer_rank[src_layer]
+        ):
+            edges_to_remove.append((src, dst))
+    if edges_to_remove:
+        pruned.remove_edges_from(edges_to_remove)
+    return pruned
+
+
+def _cycle_generator(graph: DiGraph, length_bound: int) -> Iterator[list[str]]:
+    if nx is None:
+        return iter(())
+    if length_bound > 0:
+        try:
+            return cast(Iterator[list[str]], nx.simple_cycles(graph, length_bound=length_bound))
+        except TypeError:
+            pass
+    return cast(Iterator[list[str]], nx.simple_cycles(graph))
+
+
+def _enumerate_cycles(
+    pruned_graph: DiGraph,
+    cycle_limit: int,
+    length_bound: int,
+    edge_budget: int,
+    scc_graph: DiGraph,
+) -> tuple[CycleList, bool, list[dict[str, object]]]:
+    generator = _cycle_generator(pruned_graph, length_bound)
+    if cycle_limit > 0:
+        cycles: CycleList = []
+        for idx, cycle in enumerate(generator, 1):
+            cycles.append(cycle)
+            if idx >= cycle_limit:
+                break
+        return cycles, False, []
+
+    if pruned_graph.number_of_edges() > edge_budget:
+        components = sorted(
+            (sorted(component) for component in nx.strongly_connected_components(scc_graph)),
+            key=len,
+            reverse=True,
+        )
+        summary: list[dict[str, object]] = []
+        for members in components[:SCC_SUMMARY_LIMIT]:
+            truncated = len(members) > SCC_MEMBER_PREVIEW
+            preview = members if not truncated else [*members[:SCC_MEMBER_PREVIEW], "..."]
+            summary.append(
+                {
+                    "members": preview,
+                    "size": len(members),
+                    "truncated": truncated,
+                    "has_cycle": len(members) > 1,
+                }
+            )
+        if not summary:
+            summary.append(
+                {
+                    "members": [],
+                    "size": 0,
+                    "truncated": False,
+                    "has_cycle": False,
+                }
+            )
+        return [], True, summary
+
+    return list(generator), False, []
+
+
+def _collect_layer_violations(
+    graph: DiGraph,
+    layer_rank: Mapping[str, int],
+    pkg2layer: Mapping[str, str],
+    allow_outward: bool,
+) -> CycleList:
+    if allow_outward:
+        return []
+    violations: CycleList = []
+    for src, dst in graph.edges():
+        src_layer = pkg2layer.get(src)
+        dst_layer = pkg2layer.get(dst)
+        if (
+            src_layer is not None
+            and dst_layer is not None
+            and src_layer in layer_rank
+            and dst_layer in layer_rank
+            and layer_rank[dst_layer] > layer_rank[src_layer]
+        ):
+            violations.append([src_layer, dst_layer, f"edge:{src}->{dst}"])
+    return violations
+
+
+def _degree_centrality(graph: DiGraph) -> dict[str, float]:
+    if nx is None or graph.number_of_nodes() == 0:
+        return {}
+    return cast(dict[str, float], nx.degree_centrality(graph))
+
+
+def _sequence_of_sequences(value: object) -> list[list[str]]:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        return []
+    result: list[list[str]] = []
+    for entry in value:
+        if isinstance(entry, Sequence) and not isinstance(entry, (str, bytes)):
+            result.append([str(item) for item in entry])
+    return result
+
+
+def _edge_from_violation(record: Sequence[str]) -> tuple[str, str] | None:
+    if not record:
+        return None
+    edge_marker = record[-1].split("edge:")[-1]
+    parts = edge_marker.split("->")
+    if len(parts) != EDGE_COMPONENTS:
+        return None
+    return parts[0], parts[1]
+
+
 def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> None:
     """Compute build global pydeps.
 
     Carry out the build global pydeps operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     dot_out : Path
@@ -420,13 +655,12 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
         Description for ``excludes``.
     max_bacon : int
         Description for ``max_bacon``.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import build_global_pydeps
     >>> build_global_pydeps(..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
     dot_out.parent.mkdir(parents=True, exist_ok=True)
     dot_target = dot_out if dot_out.is_absolute() else dot_out.resolve()
 
@@ -465,189 +699,67 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
             leftover.unlink()
 
 
-def collapse_to_packages(dot_path: Path) -> Any:
-    """Compute collapse to packages.
-
-    Carry out the collapse to packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
-    Parameters
-    ----------
-    dot_path : Path
-        Description for ``dot_path``.
-    
-    Returns
-    -------
-    typing.Any
-        Description of return value.
-    
-    Raises
-    ------
-    RuntimeError
-        Raised when validation fails.
-    
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import collapse_to_packages
-    >>> result = collapse_to_packages(...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    """
-    
+def collapse_to_packages(dot_path: Path) -> DiGraph:
+    """Load a pydeps graph and collapse modules into package-level edges."""
     if nx is None or pydot is None:
-        raise RuntimeError("networkx and pydot are required to collapse graphs")
+        message = "networkx and pydot are required to collapse graphs"
+        raise RuntimeError(message)
 
     graphs = pydot.graph_from_dot_file(str(dot_path))
-    pd = graphs[0] if isinstance(graphs, list) else graphs
-    g = nx.drawing.nx_pydot.from_pydot(pd).to_directed()
+    pd_obj = graphs[0] if isinstance(graphs, list) else graphs
+    pd_graph = cast("PydotDot", pd_obj)
+    directed = cast("DiGraph", nx.drawing.nx_pydot.from_pydot(pd_graph).to_directed())
     collapsed = nx.DiGraph()
 
-    def _module_name(node: Any, data: dict[str, Any]) -> str:
-        """Return module name.
-
-        Parameters
-        ----------
-        node : Any
-            Description.
-        data : dict[str, Any]
-            Description.
-
-        Returns
-        -------
-        str
-            Description.
-
-        Raises
-        ------
-        Exception
-            Description.
-
-        Examples
-        --------
-        >>> _module_name(...)
-        """
-        label = data.get("label")
-        if label:
-            raw = str(label).strip('"')
-            normalized = raw.replace(r"\n", "\n").replace(r"\.", ".").replace(r"\\", "\\")
-            return normalized.replace("\n", "")
-        return str(node)
-
-    module_names = {node: _module_name(node, data) for node, data in g.nodes(data=True)}
+    module_names = {
+        node: _module_label(node, data)
+        for node, data in directed.nodes(data=True)
+    }
 
     package_nodes = {_pkg_of(name) for name in module_names.values()}
     collapsed.add_nodes_from(sorted(package_nodes))
 
-    for u, v in g.edges():
-        pu, pv = _pkg_of(module_names.get(u, str(u))), _pkg_of(module_names.get(v, str(v)))
-        if pu != pv:
-            w = collapsed.get_edge_data(pu, pv, {}).get("weight", 0) + 1
-            collapsed.add_edge(pu, pv, weight=w)
+    for source, target in directed.edges():
+        pkg_src = _pkg_of(module_names.get(source, str(source)))
+        pkg_dst = _pkg_of(module_names.get(target, str(target)))
+        if pkg_src == pkg_dst:
+            continue
+        weight = collapsed.get_edge_data(pkg_src, pkg_dst, {}).get("weight", 0) + 1
+        collapsed.add_edge(pkg_src, pkg_dst, weight=weight)
     return collapsed
 
 
-def analyze_graph(g: Any, layers: dict[str, Any]) -> dict[str, Any]:
-    """Compute analyze graph.
-
-    Carry out the analyze graph operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
-    Parameters
-    ----------
-    g : typing.Any
-        Description for ``g``.
-    layers : collections.abc.Mapping
-        Description for ``layers``.
-    
-    Returns
-    -------
-    collections.abc.Mapping
-        Description of return value.
-    
-    Raises
-    ------
-    RuntimeError
-        Raised when validation fails.
-    
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import analyze_graph
-    >>> result = analyze_graph(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    """
-    
+def analyze_graph(graph: DiGraph, layers: LayerConfig) -> AnalysisResult:
+    """Analyse a collapsed dependency graph and surface policy signals."""
     if nx is None:
-        raise RuntimeError("networkx is required for graph analysis")
+        message = "networkx is required for graph analysis"
+        raise RuntimeError(message)
 
-    # cycles (Johnson's algorithm) & degree centrality
-    # 1) prune forbidden outward edges before cycle enumeration
-    order = layers.get("order", [])
-    pkg2layer: dict[str, str] = layers.get("packages", {}) or {}
-    rank = {name: i for i, name in enumerate(order)}
-    rules = layers.get("rules", {})
-    allow_outward = bool(rules.get("allow_outward", False))
-    gp = g.copy()
-    to_drop = []
-    for u, v in g.edges():
-        lu, lv = pkg2layer.get(u), pkg2layer.get(v)
-        if lu and lv and lu in rank and lv in rank and rank[lv] > rank[lu] and not allow_outward:
-            to_drop.append((u, v))
-    if to_drop:
-        gp.remove_edges_from(to_drop)
+    order = _coerce_sequence(layers.get("order"))
+    pkg2layer = _coerce_mapping(layers.get("packages"))
+    allow_outward = _allow_outward_rule(layers)
+    rank = _rank_map(order)
 
-    # Prefer bounded enumeration if available (NetworkX >= 3.5)
-    cycle_limit = int(os.getenv("GRAPH_CYCLE_LIMIT", "0"))  # 0 = unbounded stream
-    length_bound = int(os.getenv("GRAPH_CYCLE_LEN", "0"))  # 0 = unbounded
-    cycles = []
-    try:
-        if length_bound > 0:
-            cyc_iter = nx.simple_cycles(gp, length_bound=length_bound)
-        else:
-            cyc_iter = nx.simple_cycles(gp)
-    except TypeError:
-        # older NetworkX without length_bound
-        cyc_iter = nx.simple_cycles(gp)
+    pruned = _prune_outward_edges(graph, pkg2layer, rank, allow_outward)
 
-    cycle_enumeration_skipped = False
-    scc_summary: list[dict[str, Any]] = []
+    cycle_limit = _env_int(CYCLE_LIMIT_ENV, 0)
+    length_bound = _env_int(CYCLE_LENGTH_ENV, 0)
+    edge_budget = _env_int(EDGE_BUDGET_ENV, DEFAULT_EDGE_BUDGET)
 
-    if cycle_limit > 0:
-        for i, c in enumerate(cyc_iter, 1):
-            cycles.append(c)
-            if i >= cycle_limit:
-                break
+    cycles, skipped, scc_summary = _enumerate_cycles(pruned, cycle_limit, length_bound, edge_budget)
+
+    if skipped:
+        centrality = _degree_centrality(pruned)
+        violations: CycleList = []
     else:
-        # Guard against pathological blow-ups: if graph is too large, skip enumeration and use SCCs
-        EDGE_BUDGET = int(os.getenv("GRAPH_EDGE_BUDGET", "50000"))
-        if gp.number_of_edges() > EDGE_BUDGET:
-            cycle_enumeration_skipped = True
-            sccs = [list(s) for s in nx.strongly_connected_components(gp) if len(s) > 1]
-            scc_summary = [{"members": s, "size": len(s)} for s in sccs]
-        else:
-            cycles = [c for c in cyc_iter]
+        centrality = _degree_centrality(graph)
+        violations = _collect_layer_violations(graph, rank, pkg2layer, allow_outward)
 
-    if cycle_enumeration_skipped:
-        centrality = nx.degree_centrality(gp) if gp.number_of_nodes() else {}
-        violations: list[list[str]] = []
-    else:
-        centrality = nx.degree_centrality(g) if g.number_of_nodes() else {}
-        # layer policy violations (dependencies should point inward in the layer order)
-        order = layers.get("order", [])
-        pkg2layer = cast(dict[str, str], layers.get("packages", {}) or {})
-        rank = {name: i for i, name in enumerate(order)}
-        violations = []
-        rules = layers.get("rules", {})
-        allow_outward = bool(rules.get("allow_outward", False))
-        for u, v in g.edges():
-            lu, lv = pkg2layer.get(u), pkg2layer.get(v)
-            if lu and lv and lu in rank and lv in rank:
-                if rank[lv] > rank[lu] and not allow_outward:
-                    violations.append([lu, lv, f"edge:{u}->{v}"])
-
-    result: dict[str, Any] = {
+    result: AnalysisResult = {
         "cycles": cycles,
         "centrality": centrality,
         "layer_violations": violations,
-        "cycle_enumeration_skipped": cycle_enumeration_skipped,
+        "cycle_enumeration_skipped": skipped,
     }
     if scc_summary:
         result["scc_summary"] = scc_summary
@@ -655,40 +767,37 @@ def analyze_graph(g: Any, layers: dict[str, Any]) -> dict[str, Any]:
 
 
 def style_and_render(
-    g: Any, layers: dict[str, Any], analysis: dict[str, Any], out_svg: Path, fmt: str = "svg"
+    graph: DiGraph,
+    layers: LayerConfig,
+    analysis: Mapping[str, object],
+    out_svg: Path,
+    fmt: str = "svg",
 ) -> None:
-    """Compute style and render.
+    """Render the collapsed graph with styling derived from analysis metadata.
 
-    Carry out the style and render operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
     Parameters
     ----------
-    g : typing.Any
-        Description for ``g``.
-    layers : collections.abc.Mapping
-        Description for ``layers``.
-    analysis : collections.abc.Mapping
-        Description for ``analysis``.
+    graph : networkx.DiGraph
+        Directed dependency graph collapsed to packages.
+    layers : Mapping[str, object]
+        Layer configuration describing allowed dependencies.
+    analysis : Mapping[str, object]
+        Precomputed metrics produced by :func:`analyze_graph`.
     out_svg : Path
-        Description for ``out_svg``.
-    fmt : str | None
-        Optional parameter default ``'svg'``. Description for ``fmt``.
-    
+        Destination path for the rendered image.
+    fmt : str, optional
+        Rendering format (``"svg"`` or ``"png"``).
+
     Raises
     ------
     RuntimeError
-        Raised when validation fails.
-    
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import style_and_render
-    >>> style_and_render(..., ..., ..., ...)  # doctest: +ELLIPSIS
+        If the required rendering dependencies are unavailable.
     """
-    
     if pydot is None:
-        raise RuntimeError("pydot is required for rendering graphs")
+        message = "pydot is required for rendering graphs"
+        raise RuntimeError(message)
 
-    pkg2layer = layers.get("packages", {}) or {}
+    pkg2layer = _coerce_mapping(layers.get("packages"))
     palette = {
         "domain": "#2f855a",
         "application": "#3182ce",
@@ -696,68 +805,73 @@ def style_and_render(
         "infra": "#dd6b20",
     }
 
-    cent = analysis["centrality"] or {}
-    values = list(cent.values())
+    centrality = cast(dict[str, float], analysis.get("centrality", {}))
+    values = list(centrality.values())
     q80 = sorted(values)[int(0.80 * len(values))] if values else 0.0
 
-    cycle_edges = set()
-    for cyc in analysis["cycles"]:
-        for i in range(len(cyc)):
-            u, v = cyc[i], cyc[(i + 1) % len(cyc)]
-            cycle_edges.add((u, v))
+    cycles = cast(CycleList, analysis.get("cycles", []))
+    cycle_edges: set[tuple[str, str]] = set()
+    for cyc in cycles:
+        for index, node in enumerate(cyc):
+            nxt = cyc[(index + 1) % len(cyc)]
+            cycle_edges.add((node, nxt))
 
-    pd: Any = pydot.Dot(graph_type="digraph", rankdir="LR")
+    dot_graph = cast("PydotDot", pydot.Dot(graph_type="digraph", rankdir="LR"))
 
     # nodes
-    for n in sorted(g.nodes()):
-        layer = pkg2layer.get(n, "unknown")
+    for node in sorted(graph.nodes()):
+        layer = pkg2layer.get(node, "unknown")
         color = palette.get(layer, "#718096")
-        width = 2.5 if cent.get(n, 0) >= q80 else 1.2
-        pd.add_node(
-            pydot.Node(n, color=color, penwidth=str(width), style="bold", fontcolor="#1a202c")
+        width = 2.5 if centrality.get(node, 0.0) >= q80 else 1.2
+        dot_graph.add_node(
+            pydot.Node(node, color=color, penwidth=str(width), style="bold", fontcolor="#1a202c")
         )
 
     # edges
-    for u, v, data in g.edges(data=True):
-        layer_u = pkg2layer.get(u, "unknown")
-        layer_v = pkg2layer.get(v, "unknown")
-        edge_color = "#e53e3e" if (u, v) in cycle_edges else "#a0aec0"
-        penw = "2.5" if (u, v) in cycle_edges else "1.2"
+    for src, dst, _ in graph.edges(data=True):
+        layer_u = pkg2layer.get(src, "unknown")
+        layer_v = pkg2layer.get(dst, "unknown")
+        edge_color = "#e53e3e" if (src, dst) in cycle_edges else "#a0aec0"
+        penw = "2.5" if (src, dst) in cycle_edges else "1.2"
         label = f"{layer_u}→{layer_v}" if layer_u != layer_v else ""
-        pd.add_edge(pydot.Edge(u, v, color=edge_color, penwidth=penw, fontsize="8", label=label))
+        dot_graph.add_edge(
+            pydot.Edge(src, dst, color=edge_color, penwidth=penw, fontsize="8", label=label)
+        )
 
-    data = pd.create_svg() if fmt == "svg" else pd.create_png()
-    out_svg.write_bytes(data)
+    payload = dot_graph.create_svg() if fmt == "svg" else dot_graph.create_png()
+    out_svg.write_bytes(payload)
 
 
-def write_meta(meta: dict[str, Any], out_json: Path) -> None:
+def write_meta(meta: Mapping[str, object], out_json: Path) -> None:
     """Compute write meta.
 
     Carry out the write meta operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     meta : collections.abc.Mapping
         Description for ``meta``.
     out_json : Path
         Description for ``out_json``.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import write_meta
     >>> write_meta(..., ...)  # doctest: +ELLIPSIS
     """
-    
-    out_json.write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    out_json.write_text(json.dumps(dict(meta), indent=2), encoding="utf-8")
 
 
 def enforce_policy(
-    analysis: dict[str, Any], allow: dict[str, Any], fail_cycles: bool, fail_layers: bool
+    analysis: Mapping[str, object],
+    allow: Mapping[str, object],
+    fail_cycles: bool,
+    fail_layers: bool,
 ) -> None:
     """Compute enforce policy.
 
     Carry out the enforce policy operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     analysis : collections.abc.Mapping
@@ -768,27 +882,34 @@ def enforce_policy(
         Description for ``fail_cycles``.
     fail_layers : bool
         Description for ``fail_layers``.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import enforce_policy
     >>> enforce_policy(..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
-    
-    allowed_cycles = set(tuple(c) for c in (allow.get("cycles") or []))
-    allowed_edges = set(tuple(e) for e in (allow.get("edges") or []))
-    new_cycles = [c for c in analysis["cycles"] if tuple(c) not in allowed_cycles]
-    new_viol = [
-        v
-        for v in analysis["layer_violations"]
-        if tuple(v[-1].split(":")[-1].split("->")) not in allowed_edges
+    allowed_cycle_set = {tuple(cycle) for cycle in _sequence_of_sequences(allow.get("cycles"))}
+    allowed_edge_set = {
+        tuple(edge)
+        for edge in _sequence_of_sequences(allow.get("edges"))
+        if len(edge) == EDGE_COMPONENTS
+    }
+
+    cycles = cast(CycleList, analysis.get("cycles", []))
+    violations = cast(CycleList, analysis.get("layer_violations", []))
+
+    new_cycles = [cycle for cycle in cycles if tuple(cycle) not in allowed_cycle_set]
+    new_violations = [
+        record
+        for record in violations
+        if (edge := _edge_from_violation(record)) is not None and edge not in allowed_edge_set
     ]
 
     errs = []
     if fail_cycles and new_cycles:
         errs.append(f"{len(new_cycles)} cycle(s) not allowlisted")
-    if fail_layers and new_viol:
-        errs.append(f"{len(new_viol)} layer violation edge(s) not allowlisted")
+    if fail_layers and new_violations:
+        errs.append(f"{len(new_violations)} layer violation edge(s) not allowlisted")
     if errs:
         print("[graphs] policy violations:", "; ".join(errs))
         sys.exit(2)
@@ -854,7 +975,7 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
     """Compute cache bucket.
 
     Carry out the cache bucket operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     cache_dir : Path
@@ -863,12 +984,12 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
         Description for ``pkg``.
     tree_hash : str
         Description for ``tree_hash``.
-    
+
     Returns
     -------
     Path
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.docs.build_graphs import cache_bucket
@@ -876,121 +997,340 @@ def cache_bucket(cache_dir: Path, pkg: str, tree_hash: str) -> Path:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return cache_dir / pkg / tree_hash
 
 
-def build_one_package(
+def _final_output_paths(pkg: str, fmt: str) -> tuple[Path, Path]:
+    return OUT / f"{pkg}-imports.{fmt}", OUT / f"{pkg}-uml.{fmt}"
+
+
+def _maybe_restore_from_cache(
+    pkg: str,
+    fmt: str,
+    cache_dir: Path,
+    use_cache: bool,
+    verbose: bool,
+) -> CacheContext:
+    imports_out, uml_out = _final_output_paths(pkg, fmt)
+    if not use_cache:
+        return CacheContext(False, None, None)
+
+    tree_hash = last_tree_commit(pkg)
+    bucket = cache_bucket(cache_dir, pkg, tree_hash)
+    cache_imports = bucket / imports_out.name
+    cache_uml = bucket / uml_out.name
+    if cache_imports.exists() and cache_uml.exists():
+        imports_out.parent.mkdir(parents=True, exist_ok=True)
+        uml_out.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(cache_imports, imports_out)
+        shutil.copy2(cache_uml, uml_out)
+        if verbose:
+            snippet = tree_hash[:7]
+            print(f"[graphs] cache hit: {pkg}@{snippet}")
+        return CacheContext(True, tree_hash, bucket)
+
+    return CacheContext(False, tree_hash, bucket)
+
+
+def _prepare_staging(pkg: str, fmt: str) -> StagePaths:
+    imports_out, uml_out = _final_output_paths(pkg, fmt)
+    staging_dir = STAGING_ROOT / pkg
+    shutil.rmtree(staging_dir, ignore_errors=True)
+    staging_dir.mkdir(parents=True, exist_ok=True)
+    return StagePaths(
+        staging_dir=staging_dir,
+        staged_imports=staging_dir / imports_out.name,
+        staged_uml=staging_dir / uml_out.name,
+        final_imports=imports_out,
+        final_uml=uml_out,
+    )
+
+
+def _build_artifacts(
     pkg: str,
     fmt: str,
     excludes: list[str],
     max_bacon: int,
-    cache_dir: Path,
-    use_cache: bool,
-    verbose: bool,
-) -> tuple[str, bool, bool, bool]:
-    """Compute build one package.
-
-    Carry out the build one package operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
-    Parameters
-    ----------
-    pkg : str
-        Description for ``pkg``.
-    fmt : str
-        Description for ``fmt``.
-    excludes : List[str]
-        Description for ``excludes``.
-    max_bacon : int
-        Description for ``max_bacon``.
-    cache_dir : Path
-        Description for ``cache_dir``.
-    use_cache : bool
-        Description for ``use_cache``.
-    verbose : bool
-        Description for ``verbose``.
-    
-    Returns
-    -------
-    Tuple[str, bool, bool, bool]
-        Description of return value.
-    
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import build_one_package
-    >>> result = build_one_package(..., ..., ..., ..., ..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    ...
-    """
-    
-    used_cache = False
+    stage: StagePaths,
+) -> tuple[bool, bool]:
     pydeps_ok = True
-    pyrev_ok = True
-
-    imports_out = OUT / f"{pkg}-imports.{fmt}"
-    uml_out = OUT / f"{pkg}-uml.{fmt}"
-
-    tree_h: str | None = None
-    bucket: Path | None = None
-    if use_cache:
-        tree_h = last_tree_commit(pkg)
-        bucket = cache_bucket(cache_dir, pkg, tree_h)
-        cache_imp = bucket / imports_out.name
-        cache_uml = bucket / uml_out.name
-        if cache_imp.exists() and cache_uml.exists():
-            shutil.copy2(cache_imp, imports_out)
-            shutil.copy2(cache_uml, uml_out)
-            used_cache = True
-            if verbose:
-                print(f"[graphs] cache hit: {pkg}@{tree_h[:7]}")
-            return (pkg, True, pydeps_ok, pyrev_ok)
-
-    # Build fresh using a staging directory so existing docs remain intact.
-    staging_dir = STAGING_ROOT / pkg
-    shutil.rmtree(staging_dir, ignore_errors=True)
-    staging_dir.mkdir(parents=True, exist_ok=True)
-    stage_imports = staging_dir / imports_out.name
-    stage_uml = staging_dir / uml_out.name
-
     try:
-        build_pydeps_for_package(pkg, stage_imports, excludes, max_bacon, fmt)
+        build_pydeps_for_package(pkg, stage.staged_imports, excludes, max_bacon, fmt)
     except Exception:
         pydeps_ok = False
+
+    pyrev_ok = True
     try:
-        build_pyreverse_for_package(pkg, staging_dir, fmt)
+        build_pyreverse_for_package(pkg, stage.staging_dir, fmt)
     except Exception:
         pyrev_ok = False
 
+    return pydeps_ok, pyrev_ok
+
+
+def _promote_outputs(stage: StagePaths) -> bool:
+    stage.final_imports.parent.mkdir(parents=True, exist_ok=True)
+    stage.final_uml.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        stage.staged_imports.replace(stage.final_imports)
+        stage.staged_uml.replace(stage.final_uml)
+    except Exception:
+        return False
+    return True
+
+
+def _update_cache(pkg: str, cache_ctx: CacheContext, stage: StagePaths, verbose: bool) -> None:
+    if cache_ctx.bucket is None or cache_ctx.tree_hash is None:
+        return
+    cache_ctx.bucket.mkdir(parents=True, exist_ok=True)
+    try:
+        shutil.copy2(stage.final_imports, cache_ctx.bucket / stage.final_imports.name)
+        shutil.copy2(stage.final_uml, cache_ctx.bucket / stage.final_uml.name)
+    except Exception:
+        if verbose:
+            snippet = cache_ctx.tree_hash[:7]
+            print(f"[graphs] warning: failed to update cache for {pkg}@{snippet}")
+        return
+    if verbose:
+        snippet = cache_ctx.tree_hash[:7]
+        print(f"[graphs] cached: {pkg}@{snippet}")
+
+
+def build_one_package(pkg: str, config: PackageBuildConfig) -> tuple[str, bool, bool, bool]:
+    """Compute build one package.
+
+    Carry out the build one package operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+    Parameters
+    ----------
+    pkg : str
+        Package name to render.
+    config : PackageBuildConfig
+        Rendering configuration and cache preferences.
+
+    Returns
+    -------
+    tuple[str, bool, bool, bool]
+        ``(pkg, used_cache, pydeps_ok, pyreverse_ok)`` summarising build results.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> from tools.docs.build_graphs import PackageBuildConfig, build_one_package
+    >>> cfg = PackageBuildConfig("svg", tuple(), 4, Path("/tmp/cache"), False, False)
+    >>> result = build_one_package("demo_pkg", cfg)
+    >>> isinstance(result, tuple)
+    True
+    """
+    cache_ctx = _maybe_restore_from_cache(
+        pkg,
+        config.fmt,
+        config.cache_dir,
+        config.use_cache,
+        config.verbose,
+    )
+    if cache_ctx.used_cache:
+        return (pkg, True, True, True)
+
+    stage = _prepare_staging(pkg, config.fmt)
+    pydeps_ok, pyrev_ok = _build_artifacts(
+        pkg,
+        config.fmt,
+        config.excludes_list(),
+        config.max_bacon,
+        stage,
+    )
+
     if pydeps_ok and pyrev_ok:
-        imports_out.parent.mkdir(parents=True, exist_ok=True)
-        uml_out.parent.mkdir(parents=True, exist_ok=True)
-        try:
-            stage_imports.replace(imports_out)
-            stage_uml.replace(uml_out)
-        except Exception:
+        promoted = _promote_outputs(stage)
+        if not promoted:
             pydeps_ok = False
             pyrev_ok = False
     else:
-        # Preserve previously generated docs; only clean staging artifacts.
-        stage_imports.unlink(missing_ok=True)
-        stage_uml.unlink(missing_ok=True)
+        stage.staged_imports.unlink(missing_ok=True)
+        stage.staged_uml.unlink(missing_ok=True)
 
-    shutil.rmtree(staging_dir, ignore_errors=True)
+    shutil.rmtree(stage.staging_dir, ignore_errors=True)
 
-    # Save to cache if requested and successful
-    if use_cache and pydeps_ok and pyrev_ok and tree_h and bucket is not None:
-        bucket.mkdir(parents=True, exist_ok=True)
-        try:
-            shutil.copy2(imports_out, bucket / imports_out.name)
-            shutil.copy2(uml_out, bucket / uml_out.name)
-        except Exception:
-            if verbose:
-                print(f"[graphs] warning: failed to update cache for {pkg}@{tree_h[:7]}")
-        else:
-            if verbose:
-                print(f"[graphs] cached: {pkg}@{tree_h[:7]}")
+    if config.use_cache and pydeps_ok and pyrev_ok and not cache_ctx.used_cache:
+        _update_cache(pkg, cache_ctx, stage, config.verbose)
 
-    return (pkg, used_cache, pydeps_ok, pyrev_ok)
+    return (pkg, cache_ctx.used_cache, pydeps_ok, pyrev_ok)
+
+
+def _validate_runtime_dependencies() -> None:
+    missing = []
+    if pydot is None:
+        missing.append("pydot")
+    if nx is None:
+        missing.append("networkx")
+    if yaml is None:
+        missing.append("pyyaml")
+    if missing:
+        print(
+            f"[graphs] Missing Python packages: {', '.join(missing)}. Install them in the docs env.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+    if not shutil.which("dot"):
+        print("[graphs] graphviz 'dot' not found on PATH. Install graphviz.", file=sys.stderr)
+        sys.exit(2)
+
+    ensure_bin("pydeps")
+    ensure_bin("pyreverse")
+
+
+def _resolve_packages(args: argparse.Namespace) -> list[str]:
+    if args.packages:
+        return [s.strip() for s in args.packages.split(",") if s.strip()]
+    return find_top_packages()
+
+
+def _prepare_cache(args: argparse.Namespace) -> tuple[Path, bool]:
+    cache_dir = Path(args.cache_dir)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    return cache_dir, not args.no_cache
+
+
+def _log_configuration(
+    verbose: bool, packages: Sequence[str], cache_dir: Path, use_cache: bool
+) -> None:
+    if not verbose:
+        return
+    print(f"[graphs] packages={list(packages)}")
+    print(f"[graphs] cache_dir={cache_dir} use_cache={use_cache}")
+
+
+def _build_per_package_graphs(
+    packages: Sequence[str],
+    config: PackageBuildConfig,
+    max_workers: int | None,
+) -> list[tuple[str, bool, bool, bool]]:
+    worker_count = max_workers or os.cpu_count() or 1
+    results: list[tuple[str, bool, bool, bool]] = []
+    with ProcessPoolExecutor(max_workers=worker_count) as executor:
+        futures = [
+            executor.submit(
+                build_one_package,
+                pkg,
+                config,
+            )
+            for pkg in packages
+        ]
+        for future in as_completed(futures):
+            pkg, used_cache, pydeps_ok, pyrev_ok = future.result()
+            results.append((pkg, used_cache, pydeps_ok, pyrev_ok))
+            if config.verbose:
+                source = "cache" if used_cache else "built"
+                status = f"pydeps={'ok' if pydeps_ok else 'FAIL'}; pyreverse={'ok' if pyrev_ok else 'FAIL'}"
+                print(f"[graphs] {pkg}: {source}; {status}")
+    return results
+
+
+def _report_package_failures(results: Sequence[tuple[str, bool, bool, bool]]) -> None:
+    failed = [(pkg, ok1, ok2) for pkg, _, ok1, ok2 in results if not (ok1 and ok2)]
+    if not failed:
+        return
+    lines = ["[graphs] build failures detected during per-package graph generation:"]
+    for pkg, pydeps_ok, pyrev_ok in failed:
+        parts: list[str] = []
+        if not pydeps_ok:
+            parts.append("pydeps")
+        if not pyrev_ok:
+            parts.append("pyreverse")
+        lines.append(f" - {pkg}: {', '.join(parts)} failed")
+    print("\n".join(lines), file=sys.stderr)
+    sys.exit(3)
+
+
+def _build_global_graph(fmt: str, excludes: list[str], max_bacon: int) -> DiGraph:
+    dot_path = OUT / "subsystems.dot"
+    build_global_pydeps(dot_path, excludes, max_bacon)
+    try:
+        return collapse_to_packages(dot_path)
+    finally:
+        if dot_path.exists():
+            dot_path.unlink()
+
+
+def _load_layers_config(path: str) -> LayerConfig:
+    file_path = Path(path)
+    if yaml is None or not file_path.exists():
+        return {"order": [], "packages": {}, "rules": {}}
+    data = yaml.safe_load(file_path.read_text())
+    if not isinstance(data, Mapping):
+        return {"order": [], "packages": {}, "rules": {}}
+    return cast(LayerConfig, data)
+
+
+def _load_allowlist(path: str) -> dict[str, object]:
+    file_path = Path(path)
+    if not file_path.exists():
+        return {"cycles": [], "edges": []}
+    data = json.loads(file_path.read_text())
+    if not isinstance(data, dict):
+        return {"cycles": [], "edges": []}
+    return data
+
+
+def _render_summary_markdown(meta: Mapping[str, object]) -> str:
+    lines = ["# Subsystem Graph Metadata", ""]
+    skipped = bool(meta.get("cycle_enumeration_skipped"))
+    lines.append("*Cycle enumeration skipped:* Yes" if skipped else "*Cycle enumeration skipped:* No")
+    scc_summary = meta.get("scc_summary")
+    if isinstance(scc_summary, Sequence) and scc_summary:
+        lines.append("")
+        lines.append("The fallback strongly connected components are:")
+        for entry in scc_summary:
+            if not isinstance(entry, Mapping):
+                continue
+            members = entry.get("members")
+            if isinstance(members, Sequence):
+                pretty = ", ".join(sorted(str(m) for m in members))
+                lines.append(f"- size {entry.get('size', '?')}: {pretty}")
+    else:
+        lines.append("")
+        lines.append("Cycle enumeration completed normally.")
+    return "\n".join(lines) + "\n"
+
+
+def _write_global_artifacts(
+    graph: DiGraph,
+    layers: LayerConfig,
+    fmt: str,
+    analysis: AnalysisResult,
+) -> None:
+    style_and_render(graph, layers, analysis, OUT / f"subsystems.{fmt}", fmt=fmt)
+    meta: AnalysisResult = {
+        "packages": sorted(str(node) for node in graph.nodes()),
+        "cycles": analysis.get("cycles", []),
+        "centrality": analysis.get("centrality", {}),
+        "layer_violations": analysis.get("layer_violations", []),
+        "cycle_enumeration_skipped": analysis.get("cycle_enumeration_skipped", False),
+        "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+    }
+    if analysis.get("scc_summary"):
+        meta["scc_summary"] = analysis["scc_summary"]
+    write_meta(meta, OUT / "graph_meta.json")
+    (OUT / "subsystems_meta.md").write_text(_render_summary_markdown(meta), encoding="utf-8")
+
+
+def _log_run_summary(
+    use_cache: bool,
+    cache_dir: Path,
+    results: Sequence[tuple[str, bool, bool, bool]],
+    duration_s: float,
+    verbose: bool,
+) -> None:
+    built = sum(1 for _, used_cache, _, _ in results if not used_cache)
+    cached = sum(1 for _, used_cache, _, _ in results if used_cache)
+    if use_cache:
+        print(
+            f"[graphs] cache summary: per-package built={built} cached={cached}; cache_dir={cache_dir}"
+        )
+    if verbose:
+        print(f"[graphs] done in {duration_s:.2f}s; outputs in {OUT}")
 
 
 # --------------------------------------------------------------------------------------
@@ -1010,172 +1350,44 @@ def main() -> None:
     """
     args = parse_args()
 
-    # Lazy imports check for global graph path
-    missing = []
-    if pydot is None:
-        missing.append("pydot")
-    if nx is None:
-        missing.append("networkx")
-    if yaml is None:
-        missing.append("pyyaml")
-    if missing:
-        print(
-            f"[graphs] Missing Python packages: {', '.join(missing)}. Install them in the docs env.",
-            file=sys.stderr,
-        )
-        sys.exit(2)
+    _validate_runtime_dependencies()
 
-    # graphviz 'dot' is required for rendering both pydeps (to svg/png) and pyreverse
-    if not shutil.which("dot"):
-        print("[graphs] graphviz 'dot' not found on PATH. Install graphviz.", file=sys.stderr)
-        sys.exit(2)
-
-    ensure_bin("pydeps")
-    ensure_bin("pyreverse")
-
-    packages: list[str] = (
-        [s.strip() for s in args.packages.split(",") if s.strip()]
-        if args.packages
-        else find_top_packages()
-    )
+    packages = _resolve_packages(args)
     excludes = args.exclude or ["tests/.*", "site/.*"]
-    fmt = args.format
-    use_cache = not args.no_cache
-    cache_dir = Path(args.cache_dir)
-    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_dir, use_cache = _prepare_cache(args)
 
-    if args.verbose:
-        print(f"[graphs] packages={packages}")
-        print(f"[graphs] cache_dir={cache_dir} use_cache={use_cache}")
+    config = PackageBuildConfig(
+        fmt=args.format,
+        excludes=tuple(excludes),
+        max_bacon=args.max_bacon,
+        cache_dir=cache_dir,
+        use_cache=use_cache,
+        verbose=args.verbose,
+    )
 
-    # 1) Per-package graphs (PARALLEL + CACHE)
-    t0 = time.time()
-    max_workers = args.max_workers or os.cpu_count() or 1
-    results: list[tuple[str, bool, bool, bool]] = []
-    with ProcessPoolExecutor(max_workers=max_workers) as ex:
-        futs = [
-            ex.submit(
-                build_one_package,
-                pkg,
-                fmt,
-                excludes,
-                args.max_bacon,
-                cache_dir,
-                use_cache,
-                args.verbose,
-            )
-            for pkg in packages
-        ]
-        for fut in as_completed(futs):
-            pkg, used_cache, ok1, ok2 = fut.result()
-            results.append((pkg, used_cache, ok1, ok2))
-            if args.verbose:
-                src = "cache" if used_cache else "built"
-                print(
-                    f"[graphs] {pkg}: {src}; pydeps={'ok' if ok1 else 'FAIL'}; pyreverse={'ok' if ok2 else 'FAIL'}"
-                )
+    _log_configuration(args.verbose, packages, cache_dir, use_cache)
 
-    failure_messages: list[str] = []
-    for pkg, _, ok1, ok2 in results:
-        reasons: list[str] = []
-        if not ok1:
-            reasons.append("pydeps")
-        if not ok2:
-            reasons.append("pyreverse")
-        if reasons:
-            failure_messages.append(f"{pkg} ({', '.join(reasons)})")
+    start = time.time()
+    results = _build_per_package_graphs(packages, config, args.max_workers)
 
-    if failure_messages:
-        print(
-            f"[graphs] per-package build failures: {', '.join(sorted(failure_messages))}",
-            file=sys.stderr,
-        )
-    failed_packages: list[tuple[str, bool, bool]] = [
-        (pkg, ok1, ok2) for pkg, _, ok1, ok2 in results if not (ok1 and ok2)
-    ]
-    if failed_packages:
-        lines = ["[graphs] build failures detected during per-package graph generation:"]
-        for pkg, ok1, ok2 in failed_packages:
-            failed_parts: list[str] = []
-            if not ok1:
-                failed_parts.append("pydeps")
-            if not ok2:
-                failed_parts.append("pyreverse")
-            parts = ", ".join(failed_parts)
-            lines.append(f" - {pkg}: {parts} failed")
-        print("\n".join(lines), file=sys.stderr)
-        sys.exit(3)
+    _report_package_failures(results)
 
-    # 2) Global collapsed graph (subsystems)
-    dot_all = OUT / "subsystems.dot"
     try:
-        build_global_pydeps(dot_all, excludes, args.max_bacon)
-        g = collapse_to_packages(dot_all)
-    except Exception as e:
-        print(f"[graphs] building global graph failed: {e}", file=sys.stderr)
+        global_graph = _build_global_graph(args.format, excludes, args.max_bacon)
+    except Exception as exc:  # pragma: no cover - defensive guard
+        print(f"[graphs] building global graph failed: {exc}", file=sys.stderr)
         sys.exit(2)
 
-    # 3) Load policy & allowlist
-    layers = (
-        yaml.safe_load(Path(args.layers).read_text())
-        if Path(args.layers).exists()
-        else {"order": [], "packages": {}, "rules": {}}
-    )
-    allow = (
-        json.loads(Path(args.allowlist).read_text())
-        if Path(args.allowlist).exists()
-        else {"cycles": [], "edges": []}
-    )
+    layers = _load_layers_config(args.layers)
+    allow = _load_allowlist(args.allowlist)
 
-    # 4) Analyze, render, write meta
-    analysis = analyze_graph(g, layers)
-    style_and_render(g, layers, analysis, OUT / f"subsystems.{fmt}", fmt=fmt)
-    meta: dict[str, Any] = {
-        "packages": sorted([str(n) for n in g.nodes()]),
-        "cycles": analysis["cycles"],
-        "centrality": analysis["centrality"],
-        "layer_violations": analysis["layer_violations"],
-        "cycle_enumeration_skipped": analysis.get("cycle_enumeration_skipped", False),
-        "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-    }
-    if analysis.get("scc_summary"):
-        meta["scc_summary"] = analysis["scc_summary"]
-    (OUT / "graph_meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    analysis = analyze_graph(global_graph, layers)
+    _write_global_artifacts(global_graph, layers, args.format, analysis)
 
-    summary_lines = [
-        "# Subsystem Graph Metadata",
-        "",
-        (
-            "*Cycle enumeration skipped:* Yes"
-            if meta["cycle_enumeration_skipped"]
-            else "*Cycle enumeration skipped:* No"
-        ),
-    ]
-    if meta.get("scc_summary"):
-        summary_lines += [
-            "",
-            "The fallback strongly connected components are:",
-        ]
-        for entry in meta["scc_summary"]:
-            members = ", ".join(sorted(entry["members"]))
-            summary_lines.append(f"- size {entry['size']}: {members}")
-    else:
-        summary_lines.append("")
-        summary_lines.append("Cycle enumeration completed normally.")
-    (OUT / "subsystems_meta.md").write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
-
-    # 5) Enforce policy
     enforce_policy(analysis, allow, args.fail_on_cycles, args.fail_on_layer_violations)
 
-    dt = time.time() - t0
-    built = sum(1 for _, c, _, _ in results if not c)
-    cached = sum(1 for _, c, _, _ in results if c)
-    if use_cache:
-        print(
-            f"[graphs] cache summary: per-package built={built} cached={cached}; cache_dir={cache_dir}"
-        )
-    if args.verbose:
-        print(f"[graphs] done in {dt:.2f}s; outputs in {OUT}")
+    duration = time.time() - start
+    _log_run_summary(use_cache, cache_dir, results, duration, args.verbose)
 
 
 if __name__ == "__main__":

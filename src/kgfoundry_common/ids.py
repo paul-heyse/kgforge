@@ -51,17 +51,17 @@ def urn_doc_from_text(text: str) -> str:
     """Compute urn doc from text.
 
     Carry out the urn doc from text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     text : str
         Description for ``text``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
     Examples
     --------
     >>> from kgfoundry_common.ids import urn_doc_from_text
@@ -69,7 +69,6 @@ def urn_doc_from_text(text: str) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     h = hashlib.sha256(text.encode("utf-8")).digest()[:16]
     b32 = base64.b32encode(h).decode("ascii").strip("=").lower()
     return f"urn:doc:sha256:{b32}"
@@ -80,7 +79,7 @@ def urn_chunk(doc_hash: str, start: int, end: int) -> str:
     """Compute urn chunk.
 
     Carry out the urn chunk operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     doc_hash : str
@@ -89,12 +88,12 @@ def urn_chunk(doc_hash: str, start: int, end: int) -> str:
         Description for ``start``.
     end : int
         Description for ``end``.
-    
+
     Returns
     -------
     str
         Description of return value.
-    
+
     Examples
     --------
     >>> from kgfoundry_common.ids import urn_chunk
@@ -102,5 +101,4 @@ def urn_chunk(doc_hash: str, start: int, end: int) -> str:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return f"urn:chunk:{doc_hash.split(':')[-1]}:{start}-{end}"

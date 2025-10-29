@@ -55,17 +55,17 @@ def toks(text: str) -> list[str]:
     """Compute toks.
 
     Carry out the toks operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     text : str
         Description for ``text``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from search_api.bm25_index import toks
@@ -73,7 +73,6 @@ def toks(text: str) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -116,7 +115,6 @@ class BM25Index:
         b : float | None
             Optional parameter default ``0.4``. Description for ``b``.
         """
-        
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -129,17 +127,17 @@ class BM25Index:
         """Compute build from duckdb.
 
         Carry out the build from duckdb operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         db_path : str
             Description for ``db_path``.
-        
+
         Returns
         -------
         BM25Index
             Description of return value.
-        
+
         Examples
         --------
         >>> from search_api.bm25_index import build_from_duckdb
@@ -147,7 +145,6 @@ class BM25Index:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         index = cls()
         con = duckdb.connect(db_path)
         try:
@@ -233,18 +230,17 @@ class BM25Index:
         """Compute save.
 
         Carry out the save operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         path : str
             Description for ``path``.
-        
+
         Examples
         --------
         >>> from search_api.bm25_index import save
         >>> save(...)  # doctest: +ELLIPSIS
         """
-        
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as handle:
             pickle.dump(
@@ -264,17 +260,17 @@ class BM25Index:
         """Compute load.
 
         Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         path : str
             Description for ``path``.
-        
+
         Returns
         -------
         BM25Index
             Description of return value.
-        
+
         Examples
         --------
         >>> from search_api.bm25_index import load
@@ -282,7 +278,6 @@ class BM25Index:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         with open(path, "rb") as handle:
             payload = pickle.load(handle)
         index = cls(payload.get("k1", 0.9), payload.get("b", 0.4))
@@ -316,19 +311,19 @@ class BM25Index:
         """Compute search.
 
         Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         query : str
             Description for ``query``.
         k : int | None
             Optional parameter default ``10``. Description for ``k``.
-        
+
         Returns
         -------
         List[Tuple[str, float]]
             Description of return value.
-        
+
         Examples
         --------
         >>> from search_api.bm25_index import search
@@ -336,7 +331,6 @@ class BM25Index:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         if self.N == 0:
             return []
         terms = toks(query)
@@ -358,17 +352,17 @@ class BM25Index:
         """Compute doc.
 
         Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-        
+
         Parameters
         ----------
         index : int
             Description for ``index``.
-        
+
         Returns
         -------
         BM25Doc
             Description of return value.
-        
+
         Examples
         --------
         >>> from search_api.bm25_index import doc
@@ -376,5 +370,4 @@ class BM25Index:
         >>> result  # doctest: +ELLIPSIS
         ...
         """
-        
         return self.docs[index]

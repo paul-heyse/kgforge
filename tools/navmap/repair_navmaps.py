@@ -289,7 +289,7 @@ def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, Any]:
 
     sections = navmap.get("sections", [])
     remaining = [section for section in sections if section.get("id") != "public-api"]
-    navmap["sections"] = [{"id": "public-api", "symbols": exports}] + remaining
+    navmap["sections"] = [{"id": "public-api", "symbols": exports}, *remaining]
 
     module_meta: dict[str, Any] = dict(navmap.get("module_meta", {}))
     top_level_meta = {
@@ -327,19 +327,19 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     """Compute repair module.
 
     Carry out the repair module operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     info : ModuleInfo
         Description for ``info``.
     apply : bool | None
         Optional parameter default ``False``. Description for ``apply``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.repair_navmaps import repair_module
@@ -347,7 +347,6 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     path = info.path
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
@@ -379,10 +378,8 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
 
     if insertions:
         insertions.sort(key=lambda item: item[0])
-        offset = 0
-        for index, content in insertions:
+        for offset, (index, content) in enumerate(insertions):
             lines.insert(index + offset, content)
-            offset += 1
         changed = True
 
     updated_navmap: dict[str, Any] | None = None
@@ -403,7 +400,7 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
         else:
             all_end = _all_assignment_end(tree) or 0
             updated_navmap = _ensure_navmap_structure(info)
-            navmap_lines = _serialize_navmap(updated_navmap) + [""]
+            navmap_lines = [*_serialize_navmap(updated_navmap), ""]
             lines[all_end:all_end] = navmap_lines
             messages.append(f"{path}: created __navmap__ stub with defaults")
             changed = True
@@ -421,19 +418,19 @@ def repair_all(root: Path, apply: bool) -> list[str]:
     """Compute repair all.
 
     Carry out the repair all operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     root : Path
         Description for ``root``.
     apply : bool
         Description for ``apply``.
-    
+
     Returns
     -------
     List[str]
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.repair_navmaps import repair_all
@@ -441,7 +438,6 @@ def repair_all(root: Path, apply: bool) -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     messages: list[str] = []
     for info in _collect_modules(root):
         messages.extend(repair_module(info, apply=apply))
@@ -490,17 +486,17 @@ def main(argv: list[str] | None = None) -> int:
     """Compute main.
 
     Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-    
+
     Parameters
     ----------
     argv : List[str] | None
         Optional parameter default ``None``. Description for ``argv``.
-    
+
     Returns
     -------
     int
         Description of return value.
-    
+
     Examples
     --------
     >>> from tools.navmap.repair_navmaps import main
@@ -508,7 +504,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> result  # doctest: +ELLIPSIS
     ...
     """
-    
     args = _parse_args(argv)
     root = args.root.resolve()
     messages = repair_all(root, apply=args.apply)
