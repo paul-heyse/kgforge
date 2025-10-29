@@ -1,5 +1,5 @@
 
-.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json
+.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings docfacts-diff readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json
 
 VENV := .venv
 PY := $(VENV)/bin/python
@@ -59,6 +59,9 @@ docstrings:
 	$(VENV)/bin/docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i $(DOCSTRING_DIRS) || true
 	$(VENV)/bin/pydocstyle $(DOCSTRING_DIRS)
 	$(VENV)/bin/interrogate -i src --fail-under 90
+
+docfacts-diff:
+	uv run --no-project --with libcst --with griffe python -m tools.docstring_builder.cli --diff-only --all
 
 readmes:
 	$(PY) tools/gen_readmes.py
