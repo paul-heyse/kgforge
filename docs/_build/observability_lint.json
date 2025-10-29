@@ -2,10 +2,73 @@
   {
     "severity": "warning",
     "kind": "log",
+    "name": "\"docstring_parser.common unavailable; skipping com",
+    "rule": "structured_logging",
+    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
+    "file": "src/sitecustomize.py",
+    "lineno": 265
+  },
+  {
+    "severity": "warning",
+    "kind": "log",
+    "name": "\"Registered DocstringYields compatibility shim\"",
+    "rule": "structured_logging",
+    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
+    "file": "src/sitecustomize.py",
+    "lineno": 324
+  },
+  {
+    "severity": "warning",
+    "kind": "log",
+    "name": "\"Docstring size shim installed\"",
+    "rule": "structured_logging",
+    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
+    "file": "src/sitecustomize.py",
+    "lineno": 344
+  },
+  {
+    "severity": "warning",
+    "kind": "log",
+    "name": "\"Docstring.attrs shim installed\"",
+    "rule": "structured_logging",
+    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
+    "file": "src/sitecustomize.py",
+    "lineno": 332
+  },
+  {
+    "severity": "warning",
+    "kind": "log",
+    "name": "\"Docstring already exposes attrs property\"",
+    "rule": "structured_logging",
+    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
+    "file": "src/sitecustomize.py",
+    "lineno": 334
+  },
+  {
+    "severity": "warning",
+    "kind": "log",
+    "name": "\"Docstring yields shim installed (single=%s many=%",
+    "rule": "structured_logging",
+    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
+    "file": "src/sitecustomize.py",
+    "lineno": 339
+  },
+  {
+    "severity": "warning",
+    "kind": "log",
+    "name": "\"Docstring already exposes yields helpers\"",
+    "rule": "structured_logging",
+    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
+    "file": "src/sitecustomize.py",
+    "lineno": 341
+  },
+  {
+    "severity": "warning",
+    "kind": "log",
     "name": "\"BM25 search failed, falling back to empty results",
     "rule": "structured_logging",
     "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
     "file": "src/search_api/app.py",
-    "lineno": 312
+    "lineno": 316
   }
 ]

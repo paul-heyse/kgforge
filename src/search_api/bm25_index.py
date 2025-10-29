@@ -61,7 +61,8 @@ def toks(text: str) -> list[str]:
     Parameters
     ----------
     text : str
-        Describe ``text``.
+    Describe ``text``.
+
 
 
 
@@ -71,7 +72,7 @@ def toks(text: str) -> list[str]:
     Returns
     -------
     list[str]
-        Describe return value.
+    Describe return value.
     """
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
@@ -90,17 +91,17 @@ class BM25Doc:
     Parameters
     ----------
     chunk_id : str
-        Describe ``chunk_id``.
+    Describe ``chunk_id``.
     doc_id : str
-        Describe ``doc_id``.
+    Describe ``doc_id``.
     title : str
-        Describe ``title``.
+    Describe ``title``.
     section : str
-        Describe ``section``.
+    Describe ``section``.
     tf : dict[str, float]
-        Describe ``tf``.
+    Describe ``tf``.
     dl : float
-        Describe ``dl``.
+    Describe ``dl``.
     """
 
     chunk_id: str
@@ -124,11 +125,11 @@ class BM25Index:
     Parameters
     ----------
     k1 : float, optional
-        Describe ``k1``.
-        Defaults to ``0.9``.
+    Describe ``k1``.
+    Defaults to ``0.9``.
     b : float, optional
-        Describe ``b``.
-        Defaults to ``0.4``.
+    Describe ``b``.
+    Defaults to ``0.4``.
     """
 
     def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
@@ -141,11 +142,11 @@ class BM25Index:
         Parameters
         ----------
         k1 : float, optional
-            Describe ``k1``.
-            Defaults to ``0.9``.
+        Describe ``k1``.
+        Defaults to ``0.9``.
         b : float, optional
-            Describe ``b``.
-            Defaults to ``0.4``.
+        Describe ``b``.
+        Defaults to ``0.4``.
         """
         self.k1 = k1
         self.b = b
@@ -165,7 +166,8 @@ class BM25Index:
         Parameters
         ----------
         db_path : str
-            Describe ``db_path``.
+        Describe ``db_path``.
+
 
 
 
@@ -175,7 +177,7 @@ class BM25Index:
         Returns
         -------
         BM25Index
-            Describe return value.
+        Describe return value.
         """
         index = cls()
         con = duckdb.connect(db_path)
@@ -209,7 +211,7 @@ class BM25Index:
         Parameters
         ----------
         rows : Iterable[tuple[str, str, str, str, str]]
-            Describe ``rows``.
+        Describe ``rows``.
         """
         self.docs.clear()
         self.df.clear()
@@ -250,13 +252,14 @@ class BM25Index:
         Parameters
         ----------
         path : str
-            Describe ``path``.
+        Describe ``path``.
         k1 : float, optional
-            Describe ``k1``.
-            Defaults to ``0.9``.
+        Describe ``k1``.
+        Defaults to ``0.9``.
         b : float, optional
-            Describe ``b``.
-            Defaults to ``0.4``.
+        Describe ``b``.
+        Defaults to ``0.4``.
+
 
 
 
@@ -266,7 +269,7 @@ class BM25Index:
         Returns
         -------
         BM25Index
-            Describe return value.
+        Describe return value.
         """
         index = cls(k1=k1, b=b)
         con = duckdb.connect(database=":memory:")
@@ -296,7 +299,7 @@ class BM25Index:
         Parameters
         ----------
         path : str
-            Describe ``path``.
+        Describe ``path``.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as handle:
@@ -323,7 +326,8 @@ class BM25Index:
         Parameters
         ----------
         path : str
-            Describe ``path``.
+        Describe ``path``.
+
 
 
 
@@ -333,7 +337,7 @@ class BM25Index:
         Returns
         -------
         BM25Index
-            Describe return value.
+        Describe return value.
         """
         with open(path, "rb") as handle:
             payload = pickle.load(handle)
@@ -354,7 +358,8 @@ class BM25Index:
         Parameters
         ----------
         term : str
-            Describe ``term``.
+        Describe ``term``.
+
 
 
 
@@ -364,7 +369,7 @@ class BM25Index:
         Returns
         -------
         float
-            Describe return value.
+        Describe return value.
         """
         df = self.df.get(term, 0)
         if self.N == 0 or df == 0:
@@ -381,10 +386,11 @@ class BM25Index:
         Parameters
         ----------
         query : str
-            Describe ``query``.
+        Describe ``query``.
         k : int, optional
-            Describe ``k``.
-            Defaults to ``10``.
+        Describe ``k``.
+        Defaults to ``10``.
+
 
 
 
@@ -394,7 +400,7 @@ class BM25Index:
         Returns
         -------
         list[tuple[str, float]]
-            Describe return value.
+        Describe return value.
         """
         if self.N == 0:
             return []
@@ -423,7 +429,8 @@ class BM25Index:
         Parameters
         ----------
         index : int
-            Describe ``index``.
+        Describe ``index``.
+
 
 
 
@@ -433,6 +440,6 @@ class BM25Index:
         Returns
         -------
         BM25Doc
-            Describe return value.
+        Describe return value.
         """
         return self.docs[index]

@@ -1,13 +1,97 @@
 [
   {
     "logger": "logger",
+    "level": "debug",
+    "message_template": "\"docstring_parser.common unavailable; skipping compatibility shim\"",
+    "structured_keys": [],
+    "file": "src/sitecustomize.py",
+    "lineno": 265,
+    "source_link": {
+      "editor": "vscode://file/src/sitecustomize.py:265:1"
+    },
+    "runbook": null
+  },
+  {
+    "logger": "logger",
+    "level": "debug",
+    "message_template": "\"Registered DocstringYields compatibility shim\"",
+    "structured_keys": [],
+    "file": "src/sitecustomize.py",
+    "lineno": 324,
+    "source_link": {
+      "editor": "vscode://file/src/sitecustomize.py:324:1"
+    },
+    "runbook": null
+  },
+  {
+    "logger": "logger",
+    "level": "debug",
+    "message_template": "\"Docstring size shim installed\"",
+    "structured_keys": [],
+    "file": "src/sitecustomize.py",
+    "lineno": 344,
+    "source_link": {
+      "editor": "vscode://file/src/sitecustomize.py:344:1"
+    },
+    "runbook": null
+  },
+  {
+    "logger": "logger",
+    "level": "debug",
+    "message_template": "\"Docstring.attrs shim installed\"",
+    "structured_keys": [],
+    "file": "src/sitecustomize.py",
+    "lineno": 332,
+    "source_link": {
+      "editor": "vscode://file/src/sitecustomize.py:332:1"
+    },
+    "runbook": null
+  },
+  {
+    "logger": "logger",
+    "level": "debug",
+    "message_template": "\"Docstring already exposes attrs property\"",
+    "structured_keys": [],
+    "file": "src/sitecustomize.py",
+    "lineno": 334,
+    "source_link": {
+      "editor": "vscode://file/src/sitecustomize.py:334:1"
+    },
+    "runbook": null
+  },
+  {
+    "logger": "logger",
+    "level": "debug",
+    "message_template": "\"Docstring yields shim installed (single=%s many=%s)\"",
+    "structured_keys": [],
+    "file": "src/sitecustomize.py",
+    "lineno": 339,
+    "source_link": {
+      "editor": "vscode://file/src/sitecustomize.py:339:1"
+    },
+    "runbook": null
+  },
+  {
+    "logger": "logger",
+    "level": "debug",
+    "message_template": "\"Docstring already exposes yields helpers\"",
+    "structured_keys": [],
+    "file": "src/sitecustomize.py",
+    "lineno": 341,
+    "source_link": {
+      "editor": "vscode://file/src/sitecustomize.py:341:1"
+    },
+    "runbook": null
+  },
+  {
+    "logger": "logger",
     "level": "warning",
     "message_template": "\"BM25 search failed, falling back to empty results: %s\"",
     "structured_keys": [],
     "file": "src/search_api/app.py",
-    "lineno": 312,
+    "lineno": 316,
     "source_link": {
-      "editor": "vscode://file/src/search_api/app.py:312:1"
+      "editor": "vscode://file/src/search_api/app.py:316:1"
     },
     "runbook": null
   }

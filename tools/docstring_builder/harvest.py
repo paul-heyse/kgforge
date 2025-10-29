@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -24,14 +25,48 @@ Object = _GRIFFE_API.object_type
 GriffeLoader = _GRIFFE_API.loader_type
 
 
+_KIND_LOOKUP: dict[str, inspect._ParameterKind] = {
+    "positional_only": inspect._ParameterKind.POSITIONAL_ONLY,
+    "positional_or_keyword": inspect._ParameterKind.POSITIONAL_OR_KEYWORD,
+    "var_positional": inspect._ParameterKind.VAR_POSITIONAL,
+    "variadic_positional": inspect._ParameterKind.VAR_POSITIONAL,
+    "keyword_only": inspect._ParameterKind.KEYWORD_ONLY,
+    "var_keyword": inspect._ParameterKind.VAR_KEYWORD,
+    "variadic_keyword": inspect._ParameterKind.VAR_KEYWORD,
+}
+
+
+def _normalize_parameter_kind(value: object) -> inspect._ParameterKind:
+    """Coerce ``griffe`` parameter kinds into :class:`inspect._ParameterKind`."""
+    if isinstance(value, inspect._ParameterKind):
+        return value
+    name = getattr(value, "name", None)
+    token = name if isinstance(name, str) else getattr(value, "value", None)
+    key = str(token or value).replace("-", "_").lower()
+    return _KIND_LOOKUP.get(key, inspect._ParameterKind.POSITIONAL_OR_KEYWORD)
+
+
 @dataclass(slots=True)
 class ParameterHarvest:
     """Harvested signature information for a single parameter."""
 
     name: str
-    kind: str
+    kind: inspect._ParameterKind
     annotation: str | None
     default: str | None
+
+    def display_name(self) -> str:
+        """Return the formatted name suitable for docstring rendering."""
+        return parameter_display_name(self)
+
+
+def parameter_display_name(parameter: ParameterHarvest) -> str:
+    """Format a harvested parameter for docstring sections."""
+    if parameter.kind is inspect._ParameterKind.VAR_POSITIONAL:
+        return f"*{parameter.name}"
+    if parameter.kind is inspect._ParameterKind.VAR_KEYWORD:
+        return f"**{parameter.name}"
+    return parameter.name
 
 
 @dataclass(slots=True)
@@ -151,7 +186,7 @@ def _iter_parameters(function: Function) -> Iterator[ParameterHarvest]:
     for param in function.parameters:
         yield ParameterHarvest(
             name=param.name,
-            kind=param.kind.value,
+            kind=_normalize_parameter_kind(param.kind),
             annotation=_annotation_to_str(param.annotation),
             default=_default_to_str(param.default),
         )
@@ -298,4 +333,5 @@ __all__ = [
     "SymbolHarvest",
     "harvest_file",
     "iter_target_files",
+    "parameter_display_name",
 ]

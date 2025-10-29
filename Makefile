@@ -1,5 +1,5 @@
 
-.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings docfacts-diff readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json
+.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings docfacts-diff readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json artifacts
 
 VENV := .venv
 PY := $(VENV)/bin/python
@@ -73,8 +73,11 @@ docstrings:
 docfacts-diff:
 	uv run --no-project --with libcst --with griffe python -m tools.docstring_builder.cli --diff-only --all
 
+artifacts:
+	uv run python tools/docs/build_artifacts.py
+
 readmes:
-	$(PY) tools/gen_readmes.py
+        $(PY) tools/gen_readmes.py
 	-which doctoc >/dev/null 2>&1 && doctoc src/$(PKG) || echo "Install doctoc to auto-update TOCs."
 
 html:

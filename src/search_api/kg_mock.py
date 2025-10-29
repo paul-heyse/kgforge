@@ -76,7 +76,8 @@ def detect_query_concepts(query: str) -> set[str]:
     Parameters
     ----------
     query : str
-        Describe ``query``.
+    Describe ``query``.
+
 
 
 
@@ -86,7 +87,7 @@ def detect_query_concepts(query: str) -> set[str]:
     Returns
     -------
     set[str]
-        Describe return value.
+    Describe return value.
     """
     lowered = query.lower()
     hits: set[str] = set()
@@ -107,7 +108,8 @@ def linked_concepts_for_text(text: str) -> list[str]:
     Parameters
     ----------
     text : str
-        Describe ``text``.
+    Describe ``text``.
+
 
 
 
@@ -117,7 +119,7 @@ def linked_concepts_for_text(text: str) -> list[str]:
     Returns
     -------
     list[str]
-        Describe return value.
+    Describe return value.
     """
     lowered = text.lower()
     hits = []
@@ -143,15 +145,16 @@ def kg_boost(
     Parameters
     ----------
     query_concepts : list[str]
-        Describe ``query_concepts``.
+    Describe ``query_concepts``.
     chunk_concepts : list[str]
-        Describe ``chunk_concepts``.
+    Describe ``chunk_concepts``.
     direct : float, optional
-        Describe ``direct``.
-        Defaults to ``0.08``.
+    Describe ``direct``.
+    Defaults to ``0.08``.
     one_hop : float, optional
-        Describe ``one_hop``.
-        Defaults to ``0.04``.
+    Describe ``one_hop``.
+    Defaults to ``0.04``.
+
 
 
 
@@ -161,7 +164,7 @@ def kg_boost(
     Returns
     -------
     float
-        Describe return value.
+    Describe return value.
     """
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

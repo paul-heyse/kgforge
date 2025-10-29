@@ -26,13 +26,13 @@ def __getattr__(name: str) -> object:
     Parameters
     ----------
     name : str
-        TODO: describe ``name``.
+    TODO: describe ``name``.
 
 
     Returns
     -------
     object
-        TODO: describe return value.
+    TODO: describe return value.
     """
     return namespace_getattr(_module, name)
 
@@ -45,6 +45,6 @@ def __dir__() -> list[str]:
     Returns
     -------
     inspect._empty
-        Sorted union of exports and implementation attributes.
+    Sorted union of exports and implementation attributes.
     """
     return namespace_dir(_module, __all__)

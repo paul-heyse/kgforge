@@ -48,15 +48,15 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             Parameters
             ----------
             *args : object, optional, by default ()
-                TODO: describe ``args``.
+            TODO: describe ``args``.
             **kwargs : object, optional, by default {}
-                TODO: describe ``kwargs``.
+            TODO: describe ``kwargs``.
 
 
             Returns
             -------
             _NoopMetric
-                TODO: describe return value.
+            TODO: describe return value.
             """
             return self
 
@@ -70,9 +70,9 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             Parameters
             ----------
             *args : object, optional, by default ()
-                TODO: describe ``args``.
+            TODO: describe ``args``.
             **kwargs : object, optional, by default {}
-                TODO: describe ``kwargs``.
+            TODO: describe ``kwargs``.
             """
             return
 
@@ -86,9 +86,9 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             Parameters
             ----------
             *args : object, optional, by default ()
-                TODO: describe ``args``.
+            TODO: describe ``args``.
             **kwargs : object, optional, by default {}
-                TODO: describe ``kwargs``.
+            TODO: describe ``kwargs``.
             """
             return
 
@@ -102,9 +102,9 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             Parameters
             ----------
             *args : object, optional, by default ()
-                TODO: describe ``args``.
+            TODO: describe ``args``.
             **kwargs : object, optional, by default {}
-                TODO: describe ``kwargs``.
+            TODO: describe ``kwargs``.
             """
             return
 
@@ -118,15 +118,15 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
         Parameters
         ----------
         *args : object, optional, by default ()
-            TODO: describe ``args``.
+        TODO: describe ``args``.
         **kwargs : object, optional, by default {}
-            TODO: describe ``kwargs``.
+        TODO: describe ``kwargs``.
 
 
         Returns
         -------
         _NoopMetric
-            TODO: describe return value.
+        TODO: describe return value.
         """
         return _NoopMetric()
 
