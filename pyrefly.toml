@@ -1,8 +1,10 @@
 project-excludes = [
     "**/tests/fixtures*",
     "**/build/",
+    "docs/_build/**",
+    "site/**",
 ]
-search-path = ["src"]
+search-path = ["src", "."]
 python-version = "3.13.0"
 ignore-missing-imports = [
     "numpy.*",

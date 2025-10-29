@@ -11,7 +11,7 @@ from __future__ import annotations
 import argparse
 import ast
 import sys
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
 from pprint import pformat
 from typing import Any
@@ -283,41 +283,19 @@ def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, Any]:
     >>> _ensure_navmap_structure(...)
     """
     raw_navmap = info.navmap_dict if info.navmap_dict else {}
-    navmap = dict(raw_navmap)
-    exports = list(dict.fromkeys(navmap.get("exports", info.exports)))
+    navmap: dict[str, Any] = dict(raw_navmap)
+    exports = _normalize_exports(navmap.get("exports"), info.exports)
     navmap["exports"] = exports
 
-    sections = navmap.get("sections", [])
-    remaining = [section for section in sections if section.get("id") != "public-api"]
-    navmap["sections"] = [{"id": "public-api", "symbols": exports}, *remaining]
+    section_dicts = _collect_section_dicts(navmap.get("sections"))
+    navmap["sections"] = _build_sections(section_dicts, exports)
 
-    module_meta: dict[str, Any] = dict(navmap.get("module_meta", {}))
-    top_level_meta = {
-        key: navmap.get(key)
-        for key in ("owner", "stability", "since", "deprecated_in")
-        if navmap.get(key) is not None
-    }
-    module_meta.update(top_level_meta)
+    module_meta = _normalized_module_meta(navmap)
     if module_meta:
         navmap["module_meta"] = module_meta
-        for key in ("owner", "stability", "since", "deprecated_in"):
-            if key in navmap:
-                navmap.pop(key, None)
 
-    symbols_meta = dict(navmap.get("symbols", {}))
-    for name in exports:
-        fields = symbols_meta.setdefault(name, {})
-        owner_default = module_meta.get("owner", "@todo-owner") if module_meta else "@todo-owner"
-        stability_default = (
-            module_meta.get("stability", "experimental") if module_meta else "experimental"
-        )
-        since_default = module_meta.get("since", "0.0.0") if module_meta else "0.0.0"
-        fields.setdefault("owner", owner_default)
-        fields.setdefault("stability", stability_default)
-        fields.setdefault("since", since_default)
-        deprecated_default = module_meta.get("deprecated_in") if module_meta else None
-        if "deprecated_in" not in fields and deprecated_default is not None:
-            fields["deprecated_in"] = deprecated_default
+    symbols_meta = _normalized_symbols(navmap.get("symbols"))
+    _apply_symbol_defaults(symbols_meta, exports, module_meta)
     navmap["symbols"] = symbols_meta
 
     return navmap
@@ -345,7 +323,6 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     >>> from tools.navmap.repair_navmaps import repair_module
     >>> result = repair_module(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     path = info.path
     text = path.read_text(encoding="utf-8")
@@ -353,57 +330,25 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
     tree = _load_tree(path)
 
     current_navmap = info.navmap_dict or {}
-    exports = list(dict.fromkeys(current_navmap.get("exports", info.exports)))
-    anchors = set(info.anchors)
+    exports = _normalize_exports(current_navmap.get("exports"), info.exports)
     definition_lines = _definition_lines(tree)
     messages: list[str] = []
-    insertions: list[tuple[int, str]] = []
-    changed = False
 
-    for name in exports:
-        if name not in anchors:
-            line_no = definition_lines.get(name)
-            if not line_no:
-                messages.append(f"{path}: unable to locate definition for '{name}' to add anchor")
-                continue
-            insertions.append((line_no - 1, f"# [nav:anchor {name}]"))
-            messages.append(f"{path}: inserted [nav:anchor {name}] at line {line_no}")
+    insertions, anchor_messages = _collect_anchor_insertions(info, exports, definition_lines)
+    messages.extend(anchor_messages)
 
-    section_ids = {slug for slug in info.sections}
-    if "public-api" not in section_ids:
-        doc_end = _docstring_end(tree) or 0
-        insertion_line = doc_end
-        insertions.append((insertion_line, "# [nav:section public-api]"))
-        messages.append(f"{path}: inserted [nav:section public-api] after line {insertion_line}")
+    section_insertion = _public_api_insertion(info, tree)
+    if section_insertion is not None:
+        insertions.append(section_insertion)
+        messages.append(
+            f"{path}: inserted [nav:section public-api] after line {section_insertion[0]}"
+        )
 
-    if insertions:
-        insertions.sort(key=lambda item: item[0])
-        for offset, (index, content) in enumerate(insertions):
-            lines.insert(index + offset, content)
-        changed = True
+    changed = _apply_insertions(lines, insertions)
 
-    updated_navmap: dict[str, Any] | None = None
-    navmap_span = _navmap_assignment_span(tree)
-    navmap_exists = navmap_span is not None and "__navmap__" in text
-
-    if exports:
-        if navmap_exists:
-            start, end = navmap_span  # type: ignore[misc]
-            updated_navmap = _ensure_navmap_structure(info)
-            navmap_lines = _serialize_navmap(updated_navmap)
-            start_idx = start - 1
-            end_idx = end
-            if lines[start_idx:end_idx] != navmap_lines:
-                lines[start_idx:end_idx] = navmap_lines
-                messages.append(f"{path}: normalized __navmap__ literal")
-                changed = True
-        else:
-            all_end = _all_assignment_end(tree) or 0
-            updated_navmap = _ensure_navmap_structure(info)
-            navmap_lines = [*_serialize_navmap(updated_navmap), ""]
-            lines[all_end:all_end] = navmap_lines
-            messages.append(f"{path}: created __navmap__ stub with defaults")
-            changed = True
+    nav_changed, nav_messages = _sync_navmap_literal(info, tree, text, lines, exports)
+    changed = changed or nav_changed
+    messages.extend(nav_messages)
 
     if changed and apply:
         new_text = "\n".join(lines)
@@ -436,7 +381,6 @@ def repair_all(root: Path, apply: bool) -> list[str]:
     >>> from tools.navmap.repair_navmaps import repair_all
     >>> result = repair_all(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     messages: list[str] = []
     for info in _collect_modules(root):
@@ -502,7 +446,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> from tools.navmap.repair_navmaps import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     args = _parse_args(argv)
     root = args.root.resolve()
@@ -520,3 +463,162 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+def _collect_section_dicts(raw: object) -> list[dict[str, Any]]:
+    """Return section dictionaries extracted from ``raw`` when possible."""
+    if not isinstance(raw, list):
+        return []
+    sections: list[dict[str, Any]] = []
+    for entry in raw:
+        if isinstance(entry, dict):
+            sections.append(entry)
+    return sections
+
+
+def _build_sections(sections: Iterable[dict[str, Any]], exports: list[str]) -> list[dict[str, Any]]:
+    """Return the canonical ``sections`` payload with the public API section first."""
+    remaining = [section for section in sections if section.get("id") != "public-api"]
+    return [{"id": "public-api", "symbols": exports}, *remaining]
+
+
+def _collect_top_level_meta(navmap: Mapping[str, Any]) -> dict[str, Any]:
+    """Return module metadata declared at the root of ``navmap``."""
+    meta: dict[str, Any] = {}
+    for key in ("owner", "stability", "since", "deprecated_in"):
+        value = navmap.get(key)
+        if value is not None:
+            meta[key] = value
+    return meta
+
+
+def _normalized_module_meta(navmap: dict[str, Any]) -> dict[str, Any]:
+    """Return module metadata after merging root-level defaults."""
+    module_meta = _coerce_dict(navmap.get("module_meta"))
+    top_level = _collect_top_level_meta(navmap)
+    module_meta.update(top_level)
+    for key in top_level:
+        navmap.pop(key, None)
+    return module_meta
+
+
+def _normalized_symbols(raw: object) -> dict[str, dict[str, Any]]:
+    """Return symbol metadata dictionaries keyed by symbol name."""
+    if not isinstance(raw, dict):
+        return {}
+    result: dict[str, dict[str, Any]] = {}
+    for name, meta in raw.items():
+        if isinstance(name, str) and isinstance(meta, dict):
+            result[name] = dict(meta)
+    return result
+
+
+def _apply_symbol_defaults(
+    symbols_meta: dict[str, dict[str, Any]],
+    exports: Iterable[str],
+    module_meta: Mapping[str, Any],
+) -> None:
+    """Ensure every exported symbol inherits module-level defaults."""
+    owner_default = module_meta.get("owner", "@todo-owner")
+    stability_default = module_meta.get("stability", "experimental")
+    since_default = module_meta.get("since", "0.0.0")
+    deprecated_default = module_meta.get("deprecated_in")
+
+    for name in exports:
+        fields = symbols_meta.setdefault(name, {})
+        fields.setdefault("owner", owner_default)
+        fields.setdefault("stability", stability_default)
+        fields.setdefault("since", since_default)
+        if deprecated_default is not None:
+            fields.setdefault("deprecated_in", deprecated_default)
+
+
+def _normalize_exports(value: object, fallback: Iterable[str]) -> list[str]:
+    """Return a deduplicated list of exports derived from ``value`` or ``fallback``."""
+    if isinstance(value, Iterable) and not isinstance(value, (str, bytes)):
+        candidates = value
+    else:
+        candidates = fallback
+
+    exports: list[str] = [item for item in candidates if isinstance(item, str)]
+    # ``dict.fromkeys`` preserves order while deduplicating.
+    return list(dict.fromkeys(exports))
+
+
+def _coerce_dict(value: object) -> dict[str, Any]:
+    """Return ``value`` as a shallow ``dict[str, Any]`` when possible."""
+    if isinstance(value, dict):
+        return dict(value)
+    return {}
+
+
+def _collect_anchor_insertions(
+    info: ModuleInfo,
+    exports: Iterable[str],
+    definition_lines: Mapping[str, int],
+) -> tuple[list[tuple[int, str]], list[str]]:
+    """Return anchor insertion edits and messages for missing exports."""
+    anchors = set(info.anchors)
+    insertions: list[tuple[int, str]] = []
+    messages: list[str] = []
+    for name in exports:
+        if name in anchors:
+            continue
+        line_no = definition_lines.get(name)
+        if not line_no:
+            messages.append(f"{info.path}: unable to locate definition for '{name}' to add anchor")
+            continue
+        insertions.append((line_no - 1, f"# [nav:anchor {name}]"))
+        messages.append(f"{info.path}: inserted [nav:anchor {name}] at line {line_no}")
+    return insertions, messages
+
+
+def _public_api_insertion(info: ModuleInfo, tree: ast.Module) -> tuple[int, str] | None:
+    """Return an insertion that ensures the public API section exists."""
+    if "public-api" in set(info.sections):
+        return None
+    doc_end = _docstring_end(tree) or 0
+    return doc_end, "# [nav:section public-api]"
+
+
+def _apply_insertions(lines: list[str], insertions: list[tuple[int, str]]) -> bool:
+    """Apply ``insertions`` to ``lines`` preserving relative order."""
+    if not insertions:
+        return False
+    insertions.sort(key=lambda item: item[0])
+    for offset, (index, content) in enumerate(insertions):
+        lines.insert(index + offset, content)
+    return True
+
+
+def _sync_navmap_literal(
+    info: ModuleInfo,
+    tree: ast.Module,
+    original_text: str,
+    lines: list[str],
+    exports: Sequence[str],
+) -> tuple[bool, list[str]]:
+    """Update the inline ``__navmap__`` literal when necessary."""
+    messages: list[str] = []
+    if not exports:
+        return False, messages
+
+    navmap_span = _navmap_assignment_span(tree)
+    navmap_exists = navmap_span is not None and "__navmap__" in original_text
+    updated_navmap = _ensure_navmap_structure(info)
+    if navmap_exists and navmap_span is not None:
+        start, end = navmap_span  # type: ignore[misc]
+        navmap_lines = _serialize_navmap(updated_navmap)
+        start_idx = start - 1
+        end_idx = end
+        if lines[start_idx:end_idx] != navmap_lines:
+            lines[start_idx:end_idx] = navmap_lines
+            messages.append(f"{info.path}: normalized __navmap__ literal")
+            return True, messages
+        return False, messages
+
+    all_end = _all_assignment_end(tree) or 0
+    navmap_lines = [*_serialize_navmap(updated_navmap), ""]
+    lines[all_end:all_end] = navmap_lines
+    messages.append(f"{info.path}: created __navmap__ stub with defaults")
+    return True, messages
