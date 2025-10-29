@@ -8,6 +8,7 @@
 - Integrated `pydoclint` into the development workflow and pre-commit hooks for parameter/return parity.
 - Introduced `tools/navmap/strip_navmap_sections.py` to purge legacy `NavMap:` blocks.
 - Documented new requirements in `docs/how-to/contributing.md` and `docs/explanations/numpy-docstring-migration.md`.
+- Added `make lint-docs` and corresponding CI coverage to enforce docstring diffs, DocFacts parity, and strict mypy checks.
 
 ### Changed
 - `tools/update_navmaps.py` now validates docstrings instead of injecting `NavMap:` sections.
