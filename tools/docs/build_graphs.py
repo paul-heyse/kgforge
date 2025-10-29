@@ -22,7 +22,7 @@ from collections.abc import Iterator, Mapping, Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
-from tempfile import mkdtemp
+from tempfile import NamedTemporaryFile, mkdtemp
 from types import ModuleType
 from typing import TYPE_CHECKING, cast
 
@@ -364,9 +364,8 @@ def build_pydeps_for_package(
     >>> from tools.docs.build_graphs import build_pydeps_for_package
     >>> build_pydeps_for_package(..., ..., ..., ..., ...)  # doctest: +ELLIPSIS
     """
-    dot_tmp = out_svg.with_suffix(".dot")
-    dot_tmp.parent.mkdir(parents=True, exist_ok=True)
-    dot_target = dot_tmp if dot_tmp.is_absolute() else dot_tmp.resolve()
+    with NamedTemporaryFile(suffix=".dot", delete=False) as dot_file:
+        dot_target = Path(dot_file.name)
     cmd = [
         sys.executable,
         "-m",
@@ -380,21 +379,29 @@ def build_pydeps_for_package(
         str(max_bacon),
         "-T",
         "dot",
+        "--no-output",
     ]
     for pat in excludes:
         cmd += ["-x", pat]
     sh(cmd, cwd=ROOT)
-    fallback_dot = ROOT / f"src_{pkg}.dot"
-    if not dot_target.exists() and fallback_dot.exists():
-        fallback_dot.replace(dot_target)
-    for leftover in ROOT.glob(f"src_{pkg}*.dot"):
-        if leftover.exists():
-            leftover.unlink()
-    # Render to final image via graphviz (dot)
-    out_svg.parent.mkdir(parents=True, exist_ok=True)
-    sh(["dot", f"-T{fmt}", str(dot_target), "-o", str(out_svg)], cwd=ROOT)
-    if dot_target.exists():
-        dot_target.unlink()
+    try:
+        fallback_dot = ROOT / f"src_{pkg}.dot"
+        if not dot_target.exists() and fallback_dot.exists():
+            fallback_dot.replace(dot_target)
+        for leftover in ROOT.glob(f"src_{pkg}*.dot"):
+            if leftover.exists():
+                leftover.unlink()
+        # Render to final image via graphviz (dot)
+        out_svg.parent.mkdir(parents=True, exist_ok=True)
+        with NamedTemporaryFile(suffix=out_svg.suffix, delete=False) as tmp:
+            temp_output = Path(tmp.name)
+        try:
+            sh(["dot", f"-T{fmt}", str(dot_target), "-o", str(temp_output)], cwd=ROOT)
+            temp_output.replace(out_svg)
+        finally:
+            temp_output.unlink(missing_ok=True)
+    finally:
+        dot_target.unlink(missing_ok=True)
 
 
 def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
@@ -676,6 +683,7 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
         str(max_bacon),
         "-T",
         "dot",
+        "--no-output",
     ]
     # optional: limit depth & drop hubs
     noise = os.getenv("GRAPH_NOISE_LEVEL")
@@ -1039,7 +1047,7 @@ def _maybe_restore_from_cache(
 
 def _prepare_staging(pkg: str, fmt: str) -> StagePaths:
     imports_out, uml_out = _final_output_paths(pkg, fmt)
-    staging_dir = Path(mkdtemp(prefix=f"{pkg}-", dir=OUT))
+    staging_dir = Path(mkdtemp(prefix=f"{pkg}-"))
     return StagePaths(
         staging_dir=staging_dir,
         staged_imports=staging_dir / imports_out.name,
