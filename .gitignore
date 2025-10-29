@@ -19,6 +19,8 @@ data/**/*
 __pycache__/
 dist/
 KGForge.egg-info/
+docs/_build/docstrings_manifest.json
+docs/_build/observability_docstrings.json
 
 
 # IDE

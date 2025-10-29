@@ -16,6 +16,9 @@ replace-imports-with-any = [
     "pyserini.search.lucene",
     "libcuvs",
     "faiss",
+    "griffe",
+    "mkdocs_gen_files",
+    "libcst",
 ]
 ignore-missing-imports = []
 ignore-missing-source = false

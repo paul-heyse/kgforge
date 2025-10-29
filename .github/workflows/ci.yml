@@ -183,3 +183,23 @@ jobs:
             && git ls-files --others --exclude-standard \
             && exit 1
           fi
+
+  docstrings-types:
+    name: Docstring Type Safety
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Sync environment
+        run: uv sync --locked
+
+      - name: Check stub drift
+        run: uv run python tools/stubs/drift_check.py
+
+      - name: mypy (docstrings)
+        run: uv run mypy --strict src tools/docstring_builder

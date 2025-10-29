@@ -444,8 +444,8 @@ def _build_parameters_content(
     module_globals: dict[str, Any],
     symbol: SymbolHarvest,
 ) -> list[str]:
-    blocks = _parse_parameters(section) if section else {}
-    harvested = {param.name: param.annotation for param in symbol.parameters}
+    blocks: dict[str, _ParameterBlock] = _parse_parameters(section) if section else {}
+    harvested: dict[str, str | None] = {param.name: param.annotation for param in symbol.parameters}
     lines: list[str] = []
     for parameter in signature.parameters.values():
         if parameter.name in {"self", "cls"}:
@@ -489,7 +489,7 @@ def _build_returns_content(
 ) -> list[str]:
     annotation = hints.get("return", signature.return_annotation)
     annotation_text = _format_type(annotation, module_globals)
-    if annotation_text in {None, "None"}:
+    if annotation_text is None or annotation_text == "None":
         return []
     block = _parse_returns(section) if section else _ReturnBlock(description=[])
     desc_lines = _ensure_description(block.description, "Describe return value.", symbol.qname)
