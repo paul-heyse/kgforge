@@ -12,6 +12,12 @@
 
 set -euo pipefail
 
+# (Codex universal already has uv; this upgrades in-place)
+curl -LsSf https://astral.sh/uv/install.sh | sh  # installs/updates uv in PATH
+
+# Prefer uv-managed Python (avoid picking system Python)
+export UV_MANAGED_PYTHON=true
+
 # -------- pretty prints --------
 is_tty() { [ -t 1 ]; }
 color()  { is_tty && command -v tput >/dev/null && tput setaf "$1" || true; }
