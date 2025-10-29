@@ -287,7 +287,7 @@ class LuceneImpactIndex:
     are typically created by factories or runtime orchestrators documented nearby.
     """
 
-    def __init__(self, index_dir: str) -> None:
+    def __init__(self, index_dir: str, query_encoder: str = "naver/splade-v3-distilbert") -> None:
         """Compute init.
 
         Initialise a new instance with validated parameters. The constructor prepares internal state and coordinates any setup required by the class. Subclasses should call ``super().__init__`` to keep validation and defaults intact.
@@ -296,8 +296,11 @@ class LuceneImpactIndex:
         ----------
         index_dir : str
             Description for ``index_dir``.
+        query_encoder : str
+            Description for ``query_encoder``.
         """
         self.index_dir = index_dir
+        self.query_encoder = query_encoder
         self._searcher: Any | None = None
 
     def _ensure(self) -> None:
@@ -317,7 +320,7 @@ class LuceneImpactIndex:
         except Exception as exc:  # pragma: no cover - defensive for optional dep
             message = "Pyserini not available for SPLADE impact search"
             raise RuntimeError(message) from exc
-        self._searcher = LuceneImpactSearcher(self.index_dir)
+        self._searcher = LuceneImpactSearcher(self.index_dir, query_encoder=self.query_encoder)
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
         """Compute search.
@@ -357,7 +360,11 @@ class LuceneImpactIndex:
 
 
 # [nav:anchor get_splade]
-def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIndex:
+def get_splade(
+    backend: str,
+    index_dir: str,
+    query_encoder: str = "naver/splade-v3-distilbert",
+) -> PureImpactIndex | LuceneImpactIndex:
     """Compute get splade.
 
     Carry out the get splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -368,6 +375,8 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
         Description for ``backend``.
     index_dir : str
         Description for ``index_dir``.
+    query_encoder : str
+        Description for ``query_encoder``.
 
     Returns
     -------
@@ -383,7 +392,7 @@ def get_splade(backend: str, index_dir: str) -> PureImpactIndex | LuceneImpactIn
     """
     if backend == "lucene":
         try:
-            return LuceneImpactIndex(index_dir)
+            return LuceneImpactIndex(index_dir=index_dir, query_encoder=query_encoder)
         except Exception:  # pragma: no cover - fallback to pure-python path
             pass
     return PureImpactIndex(index_dir)
