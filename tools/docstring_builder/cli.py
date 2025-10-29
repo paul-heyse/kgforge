@@ -6,6 +6,7 @@ import argparse
 import dataclasses
 import datetime
 import enum
+import hashlib
 import importlib
 import json
 import logging
@@ -23,7 +24,19 @@ from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.config import BuilderConfig, load_config_from_env
 from tools.docstring_builder.docfacts import DocFact, build_docfacts, write_docfacts
 from tools.docstring_builder.harvest import HarvestResult, harvest_file, iter_target_files
+from tools.docstring_builder.ir import IRDocstring, IR_VERSION, build_ir, validate_ir, write_schema
 from tools.docstring_builder.normalizer import normalize_docstring
+from tools.docstring_builder.plugins import (
+    PluginConfigurationError,
+    PluginManager,
+    load_plugins,
+)
+from tools.docstring_builder.policy import (
+    PolicyConfigurationError,
+    PolicyEngine,
+    PolicyReport,
+    load_policy_settings,
+)
 from tools.docstring_builder.render import render_docstring
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult, build_semantic_schemas
@@ -86,6 +99,8 @@ class FileOutcome:
     changed: bool
     skipped: bool
     message: str | None = None
+    semantics: list[SemanticResult] = dataclasses.field(default_factory=list)
+    ir: list[IRDocstring] = dataclasses.field(default_factory=list)
 
 
 @dataclasses.dataclass(slots=True)
@@ -122,6 +137,53 @@ def _resolve_ignore_patterns(config: BuilderConfig) -> list[str]:
     return patterns
 
 
+def _parse_policy_overrides(values: Sequence[str] | None) -> dict[str, str]:
+    overrides: dict[str, str] = {}
+    if not values:
+        return overrides
+    for raw in values:
+        for chunk in raw.split(","):
+            token = chunk.strip()
+            if not token:
+                continue
+            if "=" not in token:
+                raise PolicyConfigurationError(f"Invalid policy override '{token}'")
+            key, value = token.split("=", 1)
+            overrides[key.strip().lower()] = value.strip()
+    return overrides
+
+
+def _hash_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    digest.update(path.read_bytes())
+    return digest.hexdigest()
+
+
+def _parse_plugin_names(values: Sequence[str] | None) -> list[str]:
+    names: list[str] = []
+    if not values:
+        return names
+    for raw in values:
+        for chunk in raw.split(","):
+            name = chunk.strip()
+            if name:
+                names.append(name)
+    return names
+
+
+def _dependents_for(path: Path) -> set[Path]:
+    dependents: set[Path] = set()
+    if path.name == "__init__.py":
+        for candidate in path.parent.glob("*.py"):
+            if candidate != path and candidate.is_file():
+                dependents.add(candidate.resolve())
+    else:
+        init_file = (path.parent / "__init__.py").resolve()
+        if init_file.exists():
+            dependents.add(init_file)
+    return dependents
+
+
 def _select_files(config: BuilderConfig, args: argparse.Namespace) -> Iterable[Path]:
     if getattr(args, "paths", None):
         selected: list[Path] = []
@@ -150,7 +212,15 @@ def _select_files(config: BuilderConfig, args: argparse.Namespace) -> Iterable[P
     if args.since:
         changed = set(_changed_files_since(args.since))
         files = [path for path in files if str(path.relative_to(REPO_ROOT)) in changed]
-    return [file_path for file_path in files if not _should_ignore(file_path, config)]
+    candidates = [file_path for file_path in files if not _should_ignore(file_path, config)]
+    if getattr(args, "changed_only", False) or args.since or getattr(args, "paths", None):
+        expanded: dict[Path, None] = {candidate.resolve(): None for candidate in candidates}
+        for candidate in list(expanded.keys()):
+            for dependent in _dependents_for(candidate):
+                if not _should_ignore(dependent, config):
+                    expanded.setdefault(dependent, None)
+        candidates = sorted(expanded.keys())
+    return candidates
 
 
 def _matches_patterns(path: Path, patterns: Iterable[str]) -> bool:
@@ -203,7 +273,7 @@ def _assign_command(args: argparse.Namespace) -> None:
     if getattr(args, "flag_diff", False):
         args.diff = True
         args.flag_check = True
-    if hasattr(args, "func"):
+    if getattr(args, "func", None):
         return
 
     for attr, handler in (
@@ -212,19 +282,32 @@ def _assign_command(args: argparse.Namespace) -> None:
         ("flag_check", _command_check),
     ):
         if getattr(args, attr, False):
-            args.func = handler
+            setattr(args, "func", cast(CommandHandler, handler))
             return
 
     legacy_command = _legacy_command_from_flags(args)
     if legacy_command is not None:
-        args.func = LEGACY_COMMAND_HANDLERS[legacy_command]
+        legacy_handler: CommandHandler = LEGACY_COMMAND_HANDLERS[legacy_command]
+        setattr(
+            args,
+            "func",
+            cast(
+                CommandHandler,
+                getattr(sys.modules[__name__], legacy_handler.__name__),
+            ),
+        )
 
 
 def _collect_edits(
-    result: HarvestResult, config: BuilderConfig
-) -> tuple[list[DocstringEdit], list[SemanticResult]]:
+    result: HarvestResult,
+    config: BuilderConfig,
+    plugin_manager: PluginManager | None,
+) -> tuple[list[DocstringEdit], list[SemanticResult], list[IRDocstring]]:
     semantics = build_semantic_schemas(result, config)
+    if plugin_manager is not None:
+        semantics = plugin_manager.apply_transformers(result.filepath, semantics)
     edits: list[DocstringEdit] = []
+    ir_entries: list[IRDocstring] = []
     for entry in semantics:
         text: str
         if config.normalize_sections:
@@ -236,7 +319,12 @@ def _collect_edits(
         else:
             text = render_docstring(entry.schema, config.ownership_marker)
         edits.append(DocstringEdit(qname=entry.symbol.qname, text=text))
-    return edits, semantics
+        ir_entry = build_ir(entry)
+        validate_ir(ir_entry)
+        ir_entries.append(ir_entry)
+    if plugin_manager is not None:
+        edits = plugin_manager.apply_formatters(result.filepath, edits)
+    return edits, semantics, ir_entries
 
 
 def _handle_docfacts(docfacts: list[DocFact], check_mode: bool) -> DocfactsOutcome:
@@ -341,6 +429,7 @@ def _process_file(
     config: BuilderConfig,
     cache: BuilderCache,
     options: ProcessingOptions,
+    plugin_manager: PluginManager | None,
 ) -> FileOutcome:  # noqa: PLR0911
     """Harvest, render, and apply docstrings for a single file."""
     command = options.command
@@ -362,6 +451,8 @@ def _process_file(
         return FileOutcome(ExitStatus.SUCCESS, docfacts, preview, changed, skipped, message)
     try:
         result = harvest_file(file_path, config, REPO_ROOT)
+        if plugin_manager is not None:
+            result = plugin_manager.apply_harvest(file_path, result)
     except ModuleNotFoundError as exc:
         relative = file_path.relative_to(REPO_ROOT)
         message = f"missing dependency: {exc}"
@@ -374,16 +465,34 @@ def _process_file(
         LOGGER.exception("Failed to harvest %s", file_path)
         return FileOutcome(ExitStatus.ERROR, docfacts, preview, changed, skipped, str(exc))
 
-    edits, semantics = _collect_edits(result, config)
+    edits, semantics, ir_entries = _collect_edits(result, config, plugin_manager)
     if command == "harvest":
         docfacts = build_docfacts(semantics)
-        return FileOutcome(ExitStatus.SUCCESS, docfacts, preview, changed, skipped, message)
+        return FileOutcome(
+            ExitStatus.SUCCESS,
+            docfacts,
+            preview,
+            changed,
+            skipped,
+            message,
+            semantics=list(semantics),
+            ir=ir_entries,
+        )
 
     if not semantics:
         if is_update:
             cache.update(file_path, config.config_hash)
         message = "no managed symbols"
-        return FileOutcome(ExitStatus.SUCCESS, docfacts, preview, changed, skipped, message)
+        return FileOutcome(
+            ExitStatus.SUCCESS,
+            docfacts,
+            preview,
+            changed,
+            skipped,
+            message,
+            semantics=list(semantics),
+            ir=ir_entries,
+        )
 
     changed, preview = apply_edits(result, edits, write=is_update)
     status = ExitStatus.SUCCESS
@@ -395,7 +504,16 @@ def _process_file(
     if is_update:
         cache.update(file_path, config.config_hash)
     docfacts = build_docfacts(semantics)
-    return FileOutcome(status, docfacts, preview, changed, skipped, message)
+    return FileOutcome(
+        status,
+        docfacts,
+        preview,
+        changed,
+        skipped,
+        message,
+        semantics=list(semantics),
+        ir=ir_entries,
+    )
 
 
 def _print_failure_summary(payload: Mapping[str, object]) -> None:  # noqa: C901
@@ -473,118 +591,212 @@ def _run(
         missing_patterns=tuple(MISSING_MODULE_PATTERNS),
         skip_docfacts=getattr(args, "skip_docfacts", False),
     )
+    try:
+        plugin_manager = load_plugins(
     for file_path in files_list:
         outcome = _process_file(
             file_path,
             config,
-            cache,
-            options,
+            REPO_ROOT,
+            only=_parse_plugin_names(getattr(args, "only_plugin", None)),
+            disable=_parse_plugin_names(getattr(args, "disable_plugin", None)),
         )
-        status_counts[outcome.status] += 1
-        if outcome.skipped:
-            skipped_count += 1
-        else:
-            processed_count += 1
-        if outcome.changed:
-            changed_count += 1
-        if is_check and outcome.changed and args.diff:
-            sys.stdout.write(outcome.preview or "")
-        if outcome.status is not ExitStatus.SUCCESS:
-            rel = str(file_path.relative_to(REPO_ROOT))
+    except PluginConfigurationError as exc:
+        LOGGER.error("Plugin configuration error: %s", exc)
+        return int(ExitStatus.CONFIG)
+    try:
+        try:
+            cli_policy_overrides = _parse_policy_overrides(getattr(args, "policy_override", None))
+        except PolicyConfigurationError as exc:
+            LOGGER.error("Policy override error: %s", exc)
+            return int(ExitStatus.CONFIG)
+        try:
+            policy_settings = load_policy_settings(REPO_ROOT, cli_overrides=cli_policy_overrides)
+        except PolicyConfigurationError as exc:
+            LOGGER.error("Policy configuration error: %s", exc)
+            return int(ExitStatus.CONFIG)
+        policy_engine = PolicyEngine(policy_settings)
+        all_ir: list[IRDocstring] = []
+        docfacts_checked = False
+
+        for file_path in files_list:
+            outcome = _process_file(
+                file_path,
+                config,
+                cache,
+                options,
+                plugin_manager,
+            )
+            status_counts[outcome.status] += 1
+            if outcome.skipped:
+                skipped_count += 1
+            else:
+                processed_count += 1
+            if outcome.changed:
+                changed_count += 1
+            if is_check and outcome.changed and args.diff:
+                sys.stdout.write(outcome.preview or "")
+            if outcome.status is not ExitStatus.SUCCESS:
+                rel = str(file_path.relative_to(REPO_ROOT))
+                errors.append(
+                    {
+                        "file": rel,
+                        "status": STATUS_LABELS[outcome.status],
+                        "message": outcome.message or "",
+                    }
+                )
+            _record_docfacts(outcome.docfacts, file_path, docfact_entries, docfact_sources)
+            if outcome.semantics:
+                policy_engine.record(outcome.semantics)
+            all_ir.extend(outcome.ir)
+
+        if args.command in {"update", "check"} and not options.skip_docfacts:
+            filtered = _filter_docfacts_for_output(docfact_entries, docfact_sources, config)
+            docfacts_result = _handle_docfacts(filtered, check_mode=is_check)
+            docfacts_checked = True
+            status_counts[docfacts_result.status] += 1
+            if docfacts_result.status is not ExitStatus.SUCCESS:
+                errors.append(
+                    {
+                        "file": "<docfacts>",
+                        "status": STATUS_LABELS[docfacts_result.status],
+                        "message": docfacts_result.message or "",
+                    }
+                )
+        if is_update:
+            cache.write()
+
+        policy_report = policy_engine.finalize()
+        for violation in policy_report.violations:
             errors.append(
                 {
-                    "file": rel,
-                    "status": STATUS_LABELS[outcome.status],
-                    "message": outcome.message or "",
+                    "file": violation.symbol,
+                    "status": violation.action,
+                    "message": violation.message,
                 }
             )
-        _record_docfacts(outcome.docfacts, file_path, docfact_entries, docfact_sources)
+            if violation.fatal:
+                status_counts[ExitStatus.VIOLATION] += 1
 
-    docfacts_checked = False
-    if args.command in {"update", "check"} and not options.skip_docfacts:
-        filtered = _filter_docfacts_for_output(docfact_entries, docfact_sources, config)
-        docfacts_result = _handle_docfacts(filtered, check_mode=is_check)
-        docfacts_checked = True
-        status_counts[docfacts_result.status] += 1
-        if docfacts_result.status is not ExitStatus.SUCCESS:
-            errors.append(
-                {
-                    "file": "<docfacts>",
-                    "status": STATUS_LABELS[docfacts_result.status],
-                    "message": docfacts_result.message or "",
+        duration = time.perf_counter() - start
+        exit_status = max(
+            (status for status, count in status_counts.items() if count), default=ExitStatus.SUCCESS
+        )
+        status_counts.setdefault(ExitStatus.SUCCESS, 0)
+        status_counts_map: dict[str, int] = {
+            STATUS_LABELS[key]: value for key, value in status_counts.items() if value
+        }
+        cache_payload: dict[str, object] = {
+            "path": str(CACHE_PATH),
+            "exists": CACHE_PATH.exists(),
+            "mtime": None,
+        }
+        input_hashes: dict[str, dict[str, object]] = {}
+        for path in files_list:
+            rel = str(path.relative_to(REPO_ROOT))
+            if path.exists():
+                input_hashes[rel] = {
+                    "hash": _hash_file(path),
+                    "mtime": datetime.datetime.fromtimestamp(
+                        path.stat().st_mtime, tz=datetime.UTC
+                    ).isoformat(),
                 }
-            )
-    if is_update:
-        cache.write()
+            else:
+                input_hashes[rel] = {"hash": "", "mtime": None}
 
-    duration = time.perf_counter() - start
-    exit_status = max(
-        (status for status, count in status_counts.items() if count), default=ExitStatus.SUCCESS
-    )
-    status_counts.setdefault(ExitStatus.SUCCESS, 0)
-    status_counts_map: dict[str, int] = {
-        STATUS_LABELS[key]: value for key, value in status_counts.items() if value
-    }
-    cache_payload: dict[str, object] = {
-        "path": str(CACHE_PATH),
-        "exists": CACHE_PATH.exists(),
-        "mtime": None,
-    }
-    manifest_payload: dict[str, object] = {
-        "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
-        "command": args.command,
-        "options": {
-            "module": args.module,
-            "since": args.since,
-            "force": args.force,
-            "changed_only": getattr(args, "changed_only", False),
-            "skip_docfacts": options.skip_docfacts,
-        },
-        "counts": {
-            "considered": len(files_list),
-            "processed": processed_count,
-            "skipped": skipped_count,
-            "changed": changed_count,
-        },
-        "status_counts": status_counts_map,
-        "config_hash": config.config_hash,
-        "docfacts_checked": docfacts_checked,
-        "cache": cache_payload,
-        "processed_files": [str(path.relative_to(REPO_ROOT)) for path in files_list],
-        "duration_seconds": duration,
-    }
-    if CACHE_PATH.exists():
-        cache_payload["mtime"] = datetime.datetime.fromtimestamp(
-            CACHE_PATH.stat().st_mtime, tz=datetime.UTC
-        ).isoformat()
-    MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
-    MANIFEST_PATH.write_text(
-        json.dumps(manifest_payload, indent=2, sort_keys=True), encoding="utf-8"
-    )
+        dependency_map = {
+            str(path.relative_to(REPO_ROOT)): [
+                str(dependent.relative_to(REPO_ROOT)) for dependent in _dependents_for(path)
+            ]
+            for path in files_list
+        }
 
-    if exit_status is not ExitStatus.SUCCESS:
-        observability_payload: dict[str, object] = {
+        manifest_payload: dict[str, object] = {
             "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
-            "summary": {
+            "command": args.command,
+            "options": {
+                "module": args.module,
+                "since": args.since,
+                "force": args.force,
+                "changed_only": getattr(args, "changed_only", False),
+                "skip_docfacts": options.skip_docfacts,
+            },
+            "counts": {
                 "considered": len(files_list),
                 "processed": processed_count,
                 "skipped": skipped_count,
                 "changed": changed_count,
-                "duration_seconds": duration,
-                "status_counts": status_counts_map,
             },
-            "errors": errors[:OBSERVABILITY_MAX_ERRORS],
+            "status_counts": status_counts_map,
+            "config_hash": config.config_hash,
+            "docfacts_checked": docfacts_checked,
+            "cache": cache_payload,
+            "processed_files": [str(path.relative_to(REPO_ROOT)) for path in files_list],
+            "duration_seconds": duration,
+            "inputs": input_hashes,
+            "plugins": {
+                "enabled": plugin_manager.enabled_plugins(),
+                "available": plugin_manager.available,
+                "disabled": plugin_manager.disabled,
+                "skipped": plugin_manager.skipped,
+            },
+            "dependencies": dependency_map,
         }
-        OBSERVABILITY_PATH.parent.mkdir(parents=True, exist_ok=True)
-        OBSERVABILITY_PATH.write_text(
-            json.dumps(observability_payload, indent=2, sort_keys=True),
-            encoding="utf-8",
+        schema_path = REPO_ROOT / "docs" / "_build" / "schema_docstrings.json"
+        write_schema(schema_path)
+        manifest_payload["ir"] = {
+            "version": IR_VERSION,
+            "schema": str(schema_path.relative_to(REPO_ROOT)),
+            "count": len(all_ir),
+            "symbols": [entry.symbol_id for entry in all_ir],
+        }
+        manifest_payload["policy"] = {
+            "coverage": policy_report.coverage,
+            "threshold": policy_report.threshold,
+            "violations": [
+                {
+                    "rule": violation.rule,
+                    "symbol": violation.symbol,
+                    "action": violation.action,
+                    "message": violation.message,
+                }
+                for violation in policy_report.violations
+            ],
+        }
+        if CACHE_PATH.exists():
+            cache_payload["mtime"] = datetime.datetime.fromtimestamp(
+                CACHE_PATH.stat().st_mtime, tz=datetime.UTC
+            ).isoformat()
+        MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
+        MANIFEST_PATH.write_text(
+            json.dumps(manifest_payload, indent=2, sort_keys=True), encoding="utf-8"
         )
-        _print_failure_summary(observability_payload)
-    else:
-        OBSERVABILITY_PATH.unlink(missing_ok=True)
 
-    return int(exit_status)
+        if exit_status is not ExitStatus.SUCCESS:
+            observability_payload: dict[str, object] = {
+                "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
+                "summary": {
+                    "considered": len(files_list),
+                    "processed": processed_count,
+                    "skipped": skipped_count,
+                    "changed": changed_count,
+                    "duration_seconds": duration,
+                    "status_counts": status_counts_map,
+                },
+                "errors": errors[:OBSERVABILITY_MAX_ERRORS],
+            }
+            OBSERVABILITY_PATH.parent.mkdir(parents=True, exist_ok=True)
+            OBSERVABILITY_PATH.write_text(
+                json.dumps(observability_payload, indent=2, sort_keys=True),
+                encoding="utf-8",
+            )
+            _print_failure_summary(observability_payload)
+        else:
+            OBSERVABILITY_PATH.unlink(missing_ok=True)
+
+        return int(exit_status)
+    finally:
+        plugin_manager.finish()
 
 
 def _command_update(args: argparse.Namespace) -> int:
@@ -745,6 +957,27 @@ def build_parser() -> argparse.ArgumentParser:
         "--changed-only",
         action="store_true",
         help="Automatically set --since to the latest merge-base for fast checks",
+    )
+    parser.add_argument(
+        "--only-plugin",
+        action="append",
+        dest="only_plugin",
+        default=[],
+        help="Enable only the specified plugin names (repeat or comma-separate values)",
+    )
+    parser.add_argument(
+        "--disable-plugin",
+        action="append",
+        dest="disable_plugin",
+        default=[],
+        help="Disable the specified plugin names (repeat or comma-separate values)",
+    )
+    parser.add_argument(
+        "--policy",
+        dest="policy_override",
+        action="append",
+        default=[],
+        help="Override policy settings, e.g. coverage=0.95,missing-returns=warn",
     )
     parser.add_argument(
         "--all", action="store_true", help="Process all files, ignoring cache entries"
