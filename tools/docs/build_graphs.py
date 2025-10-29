@@ -22,6 +22,7 @@ from collections.abc import Iterator, Mapping, Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
+from tempfile import mkdtemp
 from types import ModuleType
 from typing import TYPE_CHECKING, cast
 
@@ -123,9 +124,6 @@ OUT = ROOT / "docs" / "_build" / "graphs"
 OUT.mkdir(parents=True, exist_ok=True)
 
 # Temporary workspace for graph builds to avoid clobbering finished outputs.
-STAGING_ROOT = OUT / "_staging"
-STAGING_ROOT.mkdir(parents=True, exist_ok=True)
-
 # Render targets supported by both Graphviz and our docs pipeline.
 SUPPORTED_FORMATS: tuple[str, ...] = ("svg", "png")
 
@@ -393,6 +391,7 @@ def build_pydeps_for_package(
         if leftover.exists():
             leftover.unlink()
     # Render to final image via graphviz (dot)
+    out_svg.parent.mkdir(parents=True, exist_ok=True)
     sh(["dot", f"-T{fmt}", str(dot_target), "-o", str(out_svg)], cwd=ROOT)
     if dot_target.exists():
         dot_target.unlink()
@@ -746,7 +745,13 @@ def analyze_graph(graph: DiGraph, layers: LayerConfig) -> AnalysisResult:
     length_bound = _env_int(CYCLE_LENGTH_ENV, 0)
     edge_budget = _env_int(EDGE_BUDGET_ENV, DEFAULT_EDGE_BUDGET)
 
-    cycles, skipped, scc_summary = _enumerate_cycles(pruned, cycle_limit, length_bound, edge_budget)
+    cycles, skipped, scc_summary = _enumerate_cycles(
+        pruned,
+        cycle_limit,
+        length_bound,
+        edge_budget,
+        graph,
+    )
 
     if skipped:
         centrality = _degree_centrality(pruned)
@@ -1034,9 +1039,7 @@ def _maybe_restore_from_cache(
 
 def _prepare_staging(pkg: str, fmt: str) -> StagePaths:
     imports_out, uml_out = _final_output_paths(pkg, fmt)
-    staging_dir = STAGING_ROOT / pkg
-    shutil.rmtree(staging_dir, ignore_errors=True)
-    staging_dir.mkdir(parents=True, exist_ok=True)
+    staging_dir = Path(mkdtemp(prefix=f"{pkg}-", dir=OUT))
     return StagePaths(
         staging_dir=staging_dir,
         staged_imports=staging_dir / imports_out.name,

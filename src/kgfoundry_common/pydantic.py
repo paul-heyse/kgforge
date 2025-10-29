@@ -6,9 +6,35 @@ from typing import TYPE_CHECKING, ClassVar, Self
 
 __all__ = ["BaseModel"]
 
+__navmap__ = {
+    "exports": ["BaseModel"],
+    "sections": [
+        {
+            "id": "public-api",
+            "symbols": ["BaseModel"],
+        },
+    ],
+    "module_meta": {
+        "owner": "@kgfoundry-common",
+        "stability": "stable",
+        "since": "0.1.0",
+    },
+    "synopsis": "Compatibility shim providing a pydantic BaseModel alias.",
+    "symbols": {
+        "BaseModel": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+    },
+}
+
+# [nav:section public-api]
+
 
 if TYPE_CHECKING:
 
+    # [nav:anchor BaseModel]
     class BaseModel:
         """Structural subset of :class:`pydantic.BaseModel` exposed for mypy."""
 
