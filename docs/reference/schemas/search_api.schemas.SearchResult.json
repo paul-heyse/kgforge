@@ -5,12 +5,12 @@
   "examples": [
     {
       "chunk_id": null,
-      "concepts": [],
+      "concepts": null,
       "doc_id": null,
       "score": null,
       "section": null,
-      "signals": {},
-      "spans": {},
+      "signals": null,
+      "spans": null,
       "title": null
     }
   ],
@@ -20,7 +20,6 @@
       "type": "string"
     },
     "concepts": {
-      "default": [],
       "items": {
         "additionalProperties": {
           "type": "string"
@@ -46,7 +45,6 @@
       "additionalProperties": {
         "type": "number"
       },
-      "default": {},
       "title": "Signals",
       "type": "object"
     },
@@ -54,7 +52,6 @@
       "additionalProperties": {
         "type": "integer"
       },
-      "default": {},
       "title": "Spans",
       "type": "object"
     },

@@ -71,7 +71,6 @@ def toks(text: str) -> list[str]:
     >>> from search_api.bm25_index import toks
     >>> result = toks(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
@@ -143,7 +142,6 @@ class BM25Index:
         >>> from search_api.bm25_index import build_from_duckdb
         >>> result = build_from_duckdb(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         index = cls()
         con = duckdb.connect(db_path)
@@ -276,7 +274,6 @@ class BM25Index:
         >>> from search_api.bm25_index import load
         >>> result = load(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         with open(path, "rb") as handle:
             payload = pickle.load(handle)
@@ -329,7 +326,6 @@ class BM25Index:
         >>> from search_api.bm25_index import search
         >>> result = search(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         if self.N == 0:
             return []
@@ -368,6 +364,5 @@ class BM25Index:
         >>> from search_api.bm25_index import doc
         >>> result = doc(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         return self.docs[index]

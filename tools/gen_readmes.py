@@ -64,6 +64,7 @@ class GriffeObjectLike(Protocol):
     bases: Sequence[BaseLike] | None
     is_package: bool | None
 
+
 from tools.detect_pkg import detect_packages, detect_primary  # noqa: E402
 
 SRC = ROOT / "src"
@@ -91,7 +92,6 @@ def detect_repo() -> tuple[str, str]:
     >>> from tools.gen_readmes import detect_repo
     >>> result = detect_repo()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         remote = subprocess.check_output(
@@ -139,7 +139,6 @@ def git_sha() -> str:
     >>> from tools.gen_readmes import git_sha
     >>> result = git_sha()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
@@ -175,7 +174,6 @@ def gh_url(rel_path: str, start: int, end: int | None) -> str:
     >>> from tools.gen_readmes import gh_url
     >>> result = gh_url(..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     fragment = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel_path}{fragment}"
@@ -196,7 +194,6 @@ def iter_packages() -> list[str]:
     >>> from tools.gen_readmes import iter_packages
     >>> result = iter_packages()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     env_pkgs = os.environ.get("DOCS_PKG")
     if env_pkgs:
@@ -224,7 +221,6 @@ def summarize(node: GriffeObjectLike) -> str:
     >>> from tools.gen_readmes import summarize
     >>> result = summarize(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     doc = node.docstring
     if doc is None or not doc.value:
@@ -262,7 +258,6 @@ def is_public(node: GriffeObjectLike) -> bool:
     >>> from tools.gen_readmes import is_public
     >>> result = is_public(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return not node.name.startswith("_")
 
@@ -289,7 +284,6 @@ def get_open_link(node: GriffeObjectLike, readme_dir: Path) -> str | None:
     >>> from tools.gen_readmes import get_open_link
     >>> result = get_open_link(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     rel_path = node.relative_package_filepath
     if not rel_path:
@@ -324,7 +318,6 @@ def get_view_link(node: GriffeObjectLike) -> str | None:
     >>> from tools.gen_readmes import get_view_link
     >>> result = get_view_link(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     rel_path = node.relative_package_filepath
     if not rel_path:
@@ -360,7 +353,6 @@ def iter_public_members(node: GriffeObjectLike) -> list[GriffeObjectLike]:
     >>> from tools.gen_readmes import iter_public_members
     >>> result = iter_public_members(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     members = node.members
     if not members:
@@ -557,7 +549,6 @@ def parse_config() -> Config:
     >>> from tools.gen_readmes import parse_config
     >>> result = parse_config()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     parser = argparse.ArgumentParser(description="Generate per-package README files.")
     parser.add_argument("--packages", default=os.getenv("DOCS_PKG", ""))
@@ -656,7 +647,6 @@ def badges_for(qname: str) -> Badges:
     >>> from tools.gen_readmes import badges_for
     >>> result = badges_for(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     symbol_meta, defaults = _lookup_nav(qname)
     merged = {**defaults, **symbol_meta}
@@ -703,11 +693,7 @@ def _badge_parts(badge: Badges) -> list[str]:
         ("since", "since"),
         ("deprecated_in", "deprecated"),
     ]
-    parts = [
-        f"`{label}:{value}`"
-        for attr, label in attributes
-        if (value := getattr(badge, attr))
-    ]
+    parts = [f"`{label}:{value}`" for attr, label in attributes if (value := getattr(badge, attr))]
     test_badge = _format_test_badge(badge.tested_by)
     if test_badge:
         parts.append(test_badge)
@@ -756,7 +742,6 @@ def format_badges(qname: str, base_length: int = 0) -> str:
     >>> from tools.gen_readmes import format_badges
     >>> result = format_badges(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     badge = badges_for(qname)
     parts = _badge_parts(badge)
@@ -793,7 +778,6 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
     >>> from tools.gen_readmes import editor_link
     >>> result = editor_link(..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     if editor_mode == "vscode":
         return f"vscode://file/{abs_path}:{lineno}:1"
@@ -863,7 +847,6 @@ def bucket_for(node: GriffeObjectLike) -> str:
     >>> from tools.gen_readmes import bucket_for
     >>> result = bucket_for(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     kind = node.kind.value if node.kind else ""
     if kind in {"module", "package"}:
@@ -899,7 +882,6 @@ def render_line(node: GriffeObjectLike, readme_dir: Path, cfg: Config) -> str | 
     >>> from tools.gen_readmes import render_line
     >>> result = render_line(..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     qname = node.path
     summary = summarize(node)
@@ -955,7 +937,6 @@ def write_if_changed(path: Path, content: str) -> bool:
     >>> from tools.gen_readmes import write_if_changed
     >>> result = write_if_changed(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     digest = hashlib.sha256(content.encode("utf-8")).hexdigest()[:12]
     rendered = content.rstrip() + f"\n<!-- agent:readme v1 sha:{SHA} content:{digest} -->\n"
@@ -989,7 +970,6 @@ def write_readme(node: GriffeObjectLike, cfg: Config) -> bool:
     >>> from tools.gen_readmes import write_readme
     >>> result = write_readme(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"

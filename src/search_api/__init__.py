@@ -5,8 +5,6 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
-from kgfoundry_common.navmap_types import NavMap
-
 # [nav:anchor app]
 # [nav:anchor bm25_index]
 # [nav:anchor faiss_adapter]
@@ -41,7 +39,7 @@ __all__ = [
     "splade_index",
 ]
 
-__navmap__: NavMap = {
+__navmap__ = {
     "title": "search_api",
     "synopsis": "Search service endpoints and retrieval adapters",
     "exports": __all__,

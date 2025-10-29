@@ -70,7 +70,6 @@ def rrf_fuse(
     >>> from search_api.service import rrf_fuse
     >>> result = rrf_fuse(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     # NOTE: implement stable RRF across rankers when ranker outputs are wired
     return []
@@ -99,7 +98,6 @@ def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[st
     >>> from search_api.service import apply_kg_boosts
     >>> result = apply_kg_boosts(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     # NOTE: apply boosts for direct & one-hop concept matches once KG signals exist
     return fused
@@ -130,7 +128,6 @@ def mmr_deduplicate(
     >>> from search_api.service import mmr_deduplicate
     >>> result = mmr_deduplicate(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     # NOTE: add doc-level diversity via MMR when result scoring is available
     return results

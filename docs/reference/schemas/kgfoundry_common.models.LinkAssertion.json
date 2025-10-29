@@ -1,4 +1,9 @@
 {
+  "$defs": {
+    "Id": {
+      "type": "string"
+    }
+  },
   "$id": "https://kgfoundry/schemas/kgfoundry_common.models.LinkAssertion.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "Model the LinkAssertion.\n\nPydantic model defining the structured payload used across the system. Validation ensures inputs\nconform to the declared schema while producing clear error messages. Use this class when\nserialising or parsing data for the surrounding feature.",
@@ -8,7 +13,7 @@
       "concept_id": null,
       "decision": null,
       "evidence_span": {},
-      "features": {},
+      "features": null,
       "id": null,
       "run_id": null,
       "score": null
@@ -16,12 +21,10 @@
   ],
   "properties": {
     "chunk_id": {
-      "title": "Chunk Id",
-      "type": "string"
+      "$ref": "#/$defs/Id"
     },
     "concept_id": {
-      "title": "Concept Id",
-      "type": "string"
+      "$ref": "#/$defs/Id"
     },
     "decision": {
       "enum": [
@@ -48,13 +51,11 @@
       "additionalProperties": {
         "type": "number"
       },
-      "default": {},
       "title": "Features",
       "type": "object"
     },
     "id": {
-      "title": "Id",
-      "type": "string"
+      "$ref": "#/$defs/Id"
     },
     "run_id": {
       "title": "Run Id",

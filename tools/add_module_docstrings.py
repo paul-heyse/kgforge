@@ -34,7 +34,6 @@ def module_name(path: Path) -> str:
     >>> from tools.add_module_docstrings import module_name
     >>> result = module_name(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     rel = path.relative_to(SRC).with_suffix("")
     parts = list(rel.parts)
@@ -63,7 +62,6 @@ def needs_docstring(text: str) -> bool:
     >>> from tools.add_module_docstrings import needs_docstring
     >>> result = needs_docstring(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     try:
         tree = ast.parse(text)
@@ -92,7 +90,6 @@ def insert_docstring(path: Path) -> bool:
     >>> from tools.add_module_docstrings import insert_docstring
     >>> result = insert_docstring(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     text = path.read_text()
     if not needs_docstring(text):

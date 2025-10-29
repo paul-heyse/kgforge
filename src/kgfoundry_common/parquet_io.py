@@ -83,7 +83,6 @@ class ParquetVectorWriter:
         >>> from kgfoundry_common.parquet_io import dense_schema
         >>> result = dense_schema(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         return pa.schema(
             [
@@ -144,7 +143,6 @@ class ParquetVectorWriter:
         >>> from kgfoundry_common.parquet_io import write_dense
         >>> result = write_dense(..., ..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
@@ -187,7 +185,6 @@ class ParquetVectorWriter:
         >>> from kgfoundry_common.parquet_io import splade_schema
         >>> result = splade_schema()
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         return pa.schema(
             [
@@ -233,7 +230,6 @@ class ParquetVectorWriter:
         >>> from kgfoundry_common.parquet_io import write_splade
         >>> result = write_splade(..., ..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
@@ -286,7 +282,6 @@ class ParquetChunkWriter:
         >>> from kgfoundry_common.parquet_io import chunk_schema
         >>> result = chunk_schema()
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         return pa.schema(
             [
@@ -349,7 +344,6 @@ class ParquetChunkWriter:
         >>> from kgfoundry_common.parquet_io import write
         >>> result = write(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(

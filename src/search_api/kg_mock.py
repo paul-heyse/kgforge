@@ -85,7 +85,6 @@ def detect_query_concepts(query: str) -> set[str]:
     >>> from search_api.kg_mock import detect_query_concepts
     >>> result = detect_query_concepts(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     lowered = query.lower()
     hits: set[str] = set()
@@ -116,7 +115,6 @@ def linked_concepts_for_text(text: str) -> list[str]:
     >>> from search_api.kg_mock import linked_concepts_for_text
     >>> result = linked_concepts_for_text(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     lowered = text.lower()
     hits = []
@@ -158,7 +156,6 @@ def kg_boost(
     >>> from search_api.kg_mock import kg_boost
     >>> result = kg_boost(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

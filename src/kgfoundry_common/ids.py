@@ -67,7 +67,6 @@ def urn_doc_from_text(text: str) -> str:
     >>> from kgfoundry_common.ids import urn_doc_from_text
     >>> result = urn_doc_from_text(...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     h = hashlib.sha256(text.encode("utf-8")).digest()[:16]
     b32 = base64.b32encode(h).decode("ascii").strip("=").lower()
@@ -99,6 +98,5 @@ def urn_chunk(doc_hash: str, start: int, end: int) -> str:
     >>> from kgfoundry_common.ids import urn_chunk
     >>> result = urn_chunk(..., ..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     return f"urn:chunk:{doc_hash.split(':')[-1]}:{start}-{end}"

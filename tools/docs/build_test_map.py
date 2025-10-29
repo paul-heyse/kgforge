@@ -247,11 +247,57 @@ def load_public_symbols() -> set[str]:
 
 
 def _collect_import(node: ast.Import, names: set[str]) -> None:
+    """Collect import.
+
+    Parameters
+    ----------
+    node : ast.Import
+        Description.
+    names : set[str]
+        Description.
+
+    Returns
+    -------
+    None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _collect_import(...)
+    """
     for alias in node.names:
         names.add(alias.name)
 
 
 def _collect_import_from(node: ast.ImportFrom, names: set[str]) -> None:
+    """Collect import from.
+
+    Parameters
+    ----------
+    node : ast.ImportFrom
+        Description.
+    names : set[str]
+        Description.
+
+    Returns
+    -------
+    None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _collect_import_from(...)
+    """
     module = node.module or ""
     if module:
         names.add(module)
@@ -262,6 +308,29 @@ def _collect_import_from(node: ast.ImportFrom, names: set[str]) -> None:
 
 
 def _collect_attribute(node: ast.Attribute, names: set[str]) -> None:
+    """Collect attribute.
+
+    Parameters
+    ----------
+    node : ast.Attribute
+        Description.
+    names : set[str]
+        Description.
+
+    Returns
+    -------
+    None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _collect_attribute(...)
+    """
     if isinstance(node.value, ast.Name):
         names.add(f"{node.value.id}.{node.attr}")
 
@@ -285,6 +354,27 @@ def _names_from_ast(tree: ast.AST | None) -> set[str]:
 
 
 def _read_source(path: Path) -> str | None:
+    """Read source.
+
+    Parameters
+    ----------
+    path : Path
+        Description.
+
+    Returns
+    -------
+    str | None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _read_source(...)
+    """
     try:
         return path.read_text(encoding="utf-8")
     except OSError:
@@ -292,6 +382,27 @@ def _read_source(path: Path) -> str | None:
 
 
 def _parse_source(text: str) -> ast.AST | None:
+    """Parse source.
+
+    Parameters
+    ----------
+    text : str
+        Description.
+
+    Returns
+    -------
+    ast.AST | None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _parse_source(...)
+    """
     try:
         return ast.parse(text)
     except SyntaxError:
@@ -299,10 +410,56 @@ def _parse_source(text: str) -> ast.AST | None:
 
 
 def _symbol_tail(symbol: str) -> str:
+    """Symbol tail.
+
+    Parameters
+    ----------
+    symbol : str
+        Description.
+
+    Returns
+    -------
+    str
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _symbol_tail(...)
+    """
     return symbol.rsplit(".", 1)[-1]
 
 
 def _match_reason(symbol: str, dotted_tokens: set[str], ast_tokens: set[str]) -> str | None:
+    """Match reason.
+
+    Parameters
+    ----------
+    symbol : str
+        Description.
+    dotted_tokens : set[str]
+        Description.
+    ast_tokens : set[str]
+        Description.
+
+    Returns
+    -------
+    str | None
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _match_reason(...)
+    """
     top = symbol.split(".", 1)[0]
     tail = _symbol_tail(symbol)
     if symbol in dotted_tokens:
@@ -317,6 +474,29 @@ def _match_reason(symbol: str, dotted_tokens: set[str], ast_tokens: set[str]) ->
 
 
 def _line_hits(text: str, symbol: str) -> list[int]:
+    """Line hits.
+
+    Parameters
+    ----------
+    text : str
+        Description.
+    symbol : str
+        Description.
+
+    Returns
+    -------
+    list[int]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _line_hits(...)
+    """
     tail = _symbol_tail(symbol)
     hits: list[int] = []
     for lineno, raw in enumerate(text.splitlines(), start=1):
@@ -328,10 +508,52 @@ def _line_hits(text: str, symbol: str) -> list[int]:
 
 
 def _context_windows(line_hits: Iterable[int]) -> list[dict[str, int]]:
+    """Context windows.
+
+    Parameters
+    ----------
+    line_hits : Iterable[int]
+        Description.
+
+    Returns
+    -------
+    list[dict[str, int]]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _context_windows(...)
+    """
     return [{"start": max(1, line - WINDOW), "end": line + WINDOW} for line in line_hits]
 
 
 def _relative_repo_path(path: Path) -> str:
+    """Relative repo path.
+
+    Parameters
+    ----------
+    path : Path
+        Description.
+
+    Returns
+    -------
+    str
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _relative_repo_path(...)
+    """
     try:
         return str(path.relative_to(ROOT))
     except ValueError:
@@ -410,6 +632,27 @@ def _normalize_repo_rel(path_like: str) -> str:
 
 
 def _executed_lines(info: Mapping[str, object]) -> set[int]:
+    """Executed lines.
+
+    Parameters
+    ----------
+    info : Mapping[str, object]
+        Description.
+
+    Returns
+    -------
+    set[int]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _executed_lines(...)
+    """
     raw = info.get("executed_lines")
     if not isinstance(raw, list):
         return set()
@@ -417,6 +660,29 @@ def _executed_lines(info: Mapping[str, object]) -> set[int]:
 
 
 def _contexts_for_file(info: Mapping[str, object], rel: str) -> dict[tuple[str, int], set[str]]:
+    """Contexts for file.
+
+    Parameters
+    ----------
+    info : Mapping[str, object]
+        Description.
+    rel : str
+        Description.
+
+    Returns
+    -------
+    dict[tuple[str, int], set[str]]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _contexts_for_file(...)
+    """
     contexts = info.get("contexts")
     if not isinstance(contexts, Mapping):
         return {}

@@ -88,6 +88,7 @@ dependencies = [
     "pyyaml>=6",
     "jsonschema>=4.25.1",
     "pyrefly",
+    "docstring-parser",
     # ============================================================================
     # Testing Framework (if tests are in src/)
     # ============================================================================
@@ -110,6 +111,9 @@ dependencies = [
     # ============================================================================
     "polars",
     "duckdb>=1.4.1",
+    "griffe2md>=1.2.5",
+    "scipy-doctest>=2.0.1",
+    "mkdocs-llmstxt>=0.4.0",
 ]
 
 
@@ -231,6 +235,9 @@ docs = [
     "pydot",
     "networkx",
     "pytest-doctestplus",
+    "griffe2md",
+    "scipy-doctest",
+    "mkdocs-llmstxt",
 ]
 
 [project.scripts]

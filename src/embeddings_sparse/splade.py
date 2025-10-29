@@ -131,7 +131,6 @@ class SPLADEv3Encoder:
         >>> from embeddings_sparse.splade import encode
         >>> result = encode(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
@@ -265,7 +264,6 @@ class PureImpactIndex:
         >>> from embeddings_sparse.splade import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -296,8 +294,8 @@ class LuceneImpactIndex:
         ----------
         index_dir : str
             Description for ``index_dir``.
-        query_encoder : str
-            Description for ``query_encoder``.
+        query_encoder : str | None
+            Optional parameter default ``'naver/splade-v3-distilbert'``. Description for ``query_encoder``.
         """
         self.index_dir = index_dir
         self.query_encoder = query_encoder
@@ -349,7 +347,6 @@ class LuceneImpactIndex:
         >>> from embeddings_sparse.splade import search
         >>> result = search(..., ...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         self._ensure()
         if self._searcher is None:
@@ -375,8 +372,8 @@ def get_splade(
         Description for ``backend``.
     index_dir : str
         Description for ``index_dir``.
-    query_encoder : str
-        Description for ``query_encoder``.
+    query_encoder : str | None
+        Optional parameter default ``'naver/splade-v3-distilbert'``. Description for ``query_encoder``.
 
     Returns
     -------
@@ -388,7 +385,6 @@ def get_splade(
     >>> from embeddings_sparse.splade import get_splade
     >>> result = get_splade(..., ...)
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     if backend == "lucene":
         try:

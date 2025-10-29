@@ -115,7 +115,6 @@ class MockKG:
         >>> from kg_builder.mock_kg import linked_concepts
         >>> result = linked_concepts(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         return sorted(self.chunk2concepts.get(chunk_id, set()))
 
@@ -139,6 +138,5 @@ class MockKG:
         >>> from kg_builder.mock_kg import one_hop
         >>> result = one_hop(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         return sorted(self.neighbors.get(concept_id, set()))

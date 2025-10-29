@@ -59,6 +59,27 @@ class AllDictTemplate:
     __slots__ = ("template",)
 
     def __init__(self, template: NavTree) -> None:
+        """Init  .
+
+        Parameters
+        ----------
+        template : NavTree
+            Description.
+
+        Returns
+        -------
+        None
+            Description.
+
+        Raises
+        ------
+        Exception
+            Description.
+
+        Examples
+        --------
+        >>> __init__(...)
+        """
         self.template = template
 
 
@@ -71,7 +92,9 @@ type NavTree = (
     | AllDictTemplate
     | AllPlaceholder
 )
-type ResolvedNavValue = NavPrimitive | list["ResolvedNavValue"] | dict[str, "ResolvedNavValue"] | set[str]
+type ResolvedNavValue = (
+    NavPrimitive | list["ResolvedNavValue"] | dict[str, "ResolvedNavValue"] | set[str]
+)
 
 PLACEHOLDER_ALL = AllPlaceholder()
 
@@ -114,6 +137,27 @@ def _eval_nav_literal(node: ast.AST) -> NavTree:
 
 @_eval_nav_literal.register
 def _(node: ast.Constant) -> NavTree:
+    """.
+
+    Parameters
+    ----------
+    node : ast.Constant
+        Description.
+
+    Returns
+    -------
+    NavTree
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _(...)
+    """
     value = node.value
     if isinstance(value, (str, int, float, bool)) or value is None:
         return value
@@ -123,6 +167,27 @@ def _(node: ast.Constant) -> NavTree:
 
 @_eval_nav_literal.register
 def _(node: ast.Name) -> NavTree:
+    """.
+
+    Parameters
+    ----------
+    node : ast.Name
+        Description.
+
+    Returns
+    -------
+    NavTree
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _(...)
+    """
     if node.id == "__all__":
         return PLACEHOLDER_ALL
     message = f"Unsupported name in navmap literal: {node.id!r}"
@@ -136,16 +201,79 @@ def _eval_sequence(nodes: Sequence[ast.AST]) -> list[NavTree]:
 
 @_eval_nav_literal.register
 def _(node: ast.List) -> NavTree:
+    """.
+
+    Parameters
+    ----------
+    node : ast.List
+        Description.
+
+    Returns
+    -------
+    NavTree
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _(...)
+    """
     return _eval_sequence(node.elts)
 
 
 @_eval_nav_literal.register
 def _(node: ast.Tuple) -> NavTree:
+    """.
+
+    Parameters
+    ----------
+    node : ast.Tuple
+        Description.
+
+    Returns
+    -------
+    NavTree
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _(...)
+    """
     return _eval_sequence(node.elts)
 
 
 @_eval_nav_literal.register
 def _(node: ast.Set) -> NavTree:
+    """.
+
+    Parameters
+    ----------
+    node : ast.Set
+        Description.
+
+    Returns
+    -------
+    NavTree
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _(...)
+    """
     return {_literal_eval_navmap(elt) for elt in node.elts}
 
 
@@ -163,6 +291,27 @@ def _eval_dict(node: ast.Dict) -> dict[str, NavTree]:
 
 @_eval_nav_literal.register
 def _(node: ast.Dict) -> NavTree:
+    """.
+
+    Parameters
+    ----------
+    node : ast.Dict
+        Description.
+
+    Returns
+    -------
+    NavTree
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _(...)
+    """
     return _eval_dict(node)
 
 
@@ -192,6 +341,27 @@ def _eval_dict_comprehension(node: ast.DictComp) -> AllDictTemplate:
 
 @_eval_nav_literal.register
 def _(node: ast.DictComp) -> NavTree:
+    """.
+
+    Parameters
+    ----------
+    node : ast.DictComp
+        Description.
+
+    Returns
+    -------
+    NavTree
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _(...)
+    """
     return _eval_dict_comprehension(node)
 
 
@@ -213,9 +383,7 @@ def _expand_all_placeholder(exports: Sequence[str]) -> list[ResolvedNavValue]:
     return cast(list[ResolvedNavValue], _dedupe_str_list(exports))
 
 
-def _expand_dict_template(
-    template: NavTree, exports: Sequence[str]
-) -> dict[str, ResolvedNavValue]:
+def _expand_dict_template(template: NavTree, exports: Sequence[str]) -> dict[str, ResolvedNavValue]:
     """Expand ``AllDictTemplate`` placeholders."""
     expanded: dict[str, ResolvedNavValue] = {}
     for name in exports:
@@ -413,6 +581,27 @@ def _extract_all_literal(module: ast.Module) -> list[str]:
 
 
 def _parse_all(py: Path) -> list[str]:
+    """Parse all.
+
+    Parameters
+    ----------
+    py : Path
+        Description.
+
+    Returns
+    -------
+    list[str]
+        Description.
+
+    Raises
+    ------
+    Exception
+        Description.
+
+    Examples
+    --------
+    >>> _parse_all(...)
+    """
     module = _parse_module(py)
     if module is None:
         return []
@@ -588,9 +777,7 @@ def _round_trip_errors(index: NavIndexDict | dict[str, object]) -> list[str]:
             )
         anchors = entry.get("anchors")
         if isinstance(anchors, dict):
-            errors.extend(
-                _round_trip_line_errors(file_path, lines, anchors, ANCHOR_RE, "anchor")
-            )
+            errors.extend(_round_trip_line_errors(file_path, lines, anchors, ANCHOR_RE, "anchor"))
     return errors
 
 
@@ -658,7 +845,6 @@ def main(argv: list[str] | None = None) -> int:
     >>> from tools.navmap.check_navmap import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     errors = _collect_module_errors()
 

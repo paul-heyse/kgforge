@@ -76,7 +76,6 @@ class JsonFormatter(logging.Formatter):
         >>> from kgfoundry_common.logging import format
         >>> result = format(...)
         >>> result  # doctest: +ELLIPSIS
-        ...
         """
         data = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),

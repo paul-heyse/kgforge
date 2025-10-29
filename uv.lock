@@ -1816,6 +1816,20 @@ wheels = [
 ]
 
 [[package]]
+name = "griffe2md"
+version = "1.2.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "griffe" },
+    { name = "jinja2" },
+    { name = "mdformat" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ff/17/fe5fc4d419fa4780e0ded38b624ba8c2e71172e5e320936b71f9dbcf610b/griffe2md-1.2.5.tar.gz", hash = "sha256:e543865be8cf95aef228b42710641da0b21fe1884ed577c670ed3dba9ad6d53c", size = 41771, upload-time = "2025-10-02T19:00:42.699Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b6/cd/7ed82d708c289aa8183795ce2d34d9ac1fb011e0156cf15abacc3c6d6b0b/griffe2md-1.2.5-py3-none-any.whl", hash = "sha256:f993a96a792d6619efd03b9899cbed4583085ff594e86fe96e0f66ef26ba8ddf", size = 29796, upload-time = "2025-10-02T19:00:41.227Z" },
+]
+
+[[package]]
 name = "grimp"
 version = "3.12"
 source = { registry = "https://pypi.org/simple" }
@@ -2531,9 +2545,11 @@ dependencies = [
     { name = "boto3" },
     { name = "certifi" },
     { name = "docling-core" },
+    { name = "docstring-parser" },
     { name = "duckdb" },
     { name = "fastapi" },
     { name = "filelock" },
+    { name = "griffe2md" },
     { name = "hishel" },
     { name = "httpx" },
     { name = "hypothesis" },
@@ -2541,6 +2557,7 @@ dependencies = [
     { name = "jsonschema" },
     { name = "libarchive-c" },
     { name = "lupyne" },
+    { name = "mkdocs-llmstxt" },
     { name = "mypy" },
     { name = "mypy-extensions" },
     { name = "numpy" },
@@ -2569,6 +2586,7 @@ dependencies = [
     { name = "requests" },
     { name = "rich" },
     { name = "ruff" },
+    { name = "scipy-doctest" },
     { name = "sqlalchemy" },
     { name = "tenacity" },
     { name = "tqdm" },
@@ -2593,6 +2611,7 @@ docs = [
     { name = "doq" },
     { name = "graphviz" },
     { name = "griffe" },
+    { name = "griffe2md" },
     { name = "import-linter" },
     { name = "interrogate" },
     { name = "ipykernel" },
@@ -2601,6 +2620,7 @@ docs = [
     { name = "mkdocs" },
     { name = "mkdocs-gen-files" },
     { name = "mkdocs-literate-nav" },
+    { name = "mkdocs-llmstxt" },
     { name = "mkdocs-material" },
     { name = "mkdocs-section-index" },
     { name = "mkdocstrings", extra = ["python"] },
@@ -2621,6 +2641,7 @@ docs = [
     { name = "pylint" },
     { name = "pyment" },
     { name = "pytest-doctestplus" },
+    { name = "scipy-doctest" },
     { name = "sphinx" },
     { name = "sphinx-autoapi" },
     { name = "sphinx-autobuild" },
@@ -2726,6 +2747,7 @@ requires-dist = [
     { name = "docling", marker = "extra == 'gpu'", specifier = ">=2.56.1" },
     { name = "docling-core", specifier = ">=2.48.4" },
     { name = "docling-ibm-models", marker = "extra == 'gpu'", specifier = ">=3.9.1" },
+    { name = "docstring-parser" },
     { name = "doq", marker = "extra == 'docs'" },
     { name = "duckdb", specifier = ">=1.4.1" },
     { name = "easyocr", marker = "extra == 'gpu'", specifier = ">=1.7.2" },
@@ -2736,6 +2758,8 @@ requires-dist = [
     { name = "flashinfer-python", marker = "extra == 'gpu'", specifier = ">=0.4.0" },
     { name = "graphviz", marker = "extra == 'docs'", specifier = ">=0.21" },
     { name = "griffe", marker = "extra == 'docs'" },
+    { name = "griffe2md", specifier = ">=1.2.5" },
+    { name = "griffe2md", marker = "extra == 'docs'" },
     { name = "hishel", specifier = ">=0.1.0" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "hypothesis", specifier = ">=6.141.0" },
@@ -2755,6 +2779,8 @@ requires-dist = [
     { name = "mkdocs", marker = "extra == 'docs'" },
     { name = "mkdocs-gen-files", marker = "extra == 'docs'" },
     { name = "mkdocs-literate-nav", marker = "extra == 'docs'" },
+    { name = "mkdocs-llmstxt", specifier = ">=0.4.0" },
+    { name = "mkdocs-llmstxt", marker = "extra == 'docs'" },
     { name = "mkdocs-material", marker = "extra == 'docs'" },
     { name = "mkdocs-section-index", marker = "extra == 'docs'" },
     { name = "mkdocstrings", extras = ["python"], marker = "extra == 'docs'" },
@@ -2831,6 +2857,8 @@ requires-dist = [
     { name = "rmm-cu13", marker = "extra == 'gpu'", specifier = ">=25.10.0" },
     { name = "ruff", specifier = ">=0.14.2" },
     { name = "safetensors", marker = "extra == 'gpu'", specifier = ">=0.6.2" },
+    { name = "scipy-doctest", specifier = ">=2.0.1" },
+    { name = "scipy-doctest", marker = "extra == 'docs'" },
     { name = "sentence-transformers", marker = "extra == 'gpu'", specifier = ">=5.1.1" },
     { name = "sphinx", marker = "extra == 'docs'", specifier = ">=8.2.3" },
     { name = "sphinx-autoapi", marker = "extra == 'docs'", specifier = ">=3.3.0" },
@@ -3168,6 +3196,19 @@ wheels = [
 ]
 
 [[package]]
+name = "markdownify"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "beautifulsoup4" },
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/83/1b/6f2697b51eaca81f08852fd2734745af15718fea10222a1d40f8a239c4ea/markdownify-1.2.0.tar.gz", hash = "sha256:f6c367c54eb24ee953921804dfe6d6575c5e5b42c643955e7242034435de634c", size = 18771, upload-time = "2025-08-09T17:44:15.302Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6a/e2/7af643acb4cae0741dffffaa7f3f7c9e7ab4046724543ba1777c401d821c/markdownify-1.2.0-py3-none-any.whl", hash = "sha256:48e150a1c4993d4d50f282f725c0111bd9eb25645d41fa2f543708fd44161351", size = 15561, upload-time = "2025-08-09T17:44:14.074Z" },
+]
+
+[[package]]
 name = "marko"
 version = "2.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -3319,6 +3360,31 @@ wheels = [
 ]
 
 [[package]]
+name = "mdformat"
+version = "0.7.22"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "markdown-it-py" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fc/eb/b5cbf2484411af039a3d4aeb53a5160fae25dd8c84af6a4243bc2f3fedb3/mdformat-0.7.22.tar.gz", hash = "sha256:eef84fa8f233d3162734683c2a8a6222227a229b9206872e6139658d99acb1ea", size = 34610, upload-time = "2025-01-30T18:00:51.418Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f2/6f/94a7344f6d634fe3563bea8b33bccedee37f2726f7807e9a58440dc91627/mdformat-0.7.22-py3-none-any.whl", hash = "sha256:61122637c9e1d9be1329054f3fa216559f0d1f722b7919b060a8c2a4ae1850e5", size = 34447, upload-time = "2025-01-30T18:00:48.708Z" },
+]
+
+[[package]]
+name = "mdformat-tables"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "mdformat" },
+    { name = "wcwidth" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/64/fc/995ba209096bdebdeb8893d507c7b32b7e07d9a9f2cdc2ec07529947794b/mdformat_tables-1.0.0.tar.gz", hash = "sha256:a57db1ac17c4a125da794ef45539904bb8a9592e80557d525e1f169c96daa2c8", size = 6106, upload-time = "2024-08-23T23:41:33.413Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2a/37/d78e37d14323da3f607cd1af7daf262cb87fe614a245c15ad03bb03a2706/mdformat_tables-1.0.0-py3-none-any.whl", hash = "sha256:94cd86126141b2adc3b04c08d1441eb1272b36c39146bab078249a41c7240a9a", size = 5104, upload-time = "2024-08-23T23:41:31.863Z" },
+]
+
+[[package]]
 name = "mdit-py-plugins"
 version = "0.5.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3459,6 +3525,21 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f6/5f/99aa379b305cd1c2084d42db3d26f6de0ea9bf2cc1d10ed17f61aff35b9a/mkdocs_literate_nav-0.6.2.tar.gz", hash = "sha256:760e1708aa4be86af81a2b56e82c739d5a8388a0eab1517ecfd8e5aa40810a75", size = 17419, upload-time = "2025-03-18T21:53:09.711Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8a/84/b5b14d2745e4dd1a90115186284e9ee1b4d0863104011ab46abb7355a1c3/mkdocs_literate_nav-0.6.2-py3-none-any.whl", hash = "sha256:0a6489a26ec7598477b56fa112056a5e3a6c15729f0214bea8a4dbc55bd5f630", size = 13261, upload-time = "2025-03-18T21:53:08.1Z" },
+]
+
+[[package]]
+name = "mkdocs-llmstxt"
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "beautifulsoup4" },
+    { name = "markdownify" },
+    { name = "mdformat" },
+    { name = "mdformat-tables" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bc/ed/5790e2b18349e17a61549114690ec6e48f5f673ccf8f4ca396412767ea2a/mkdocs_llmstxt-0.4.0.tar.gz", hash = "sha256:a7e4d20496bc8c55b6773b55c8d69cf552448a9ad38915b6e8c657ae3a46c8b8", size = 32048, upload-time = "2025-10-03T14:08:05.431Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5d/70/8b87783592a81685c0422c076525acbb50d0ec71c16554a17ffa375c9d69/mkdocs_llmstxt-0.4.0-py3-none-any.whl", hash = "sha256:7244bf0ac917c9964030c93e9c3e26c02d2d14a0f66fc113416007125b6da0fc", size = 11463, upload-time = "2025-10-03T14:08:03.569Z" },
 ]
 
 [[package]]
@@ -6491,6 +6572,19 @@ wheels = [
 ]
 
 [[package]]
+name = "scipy-doctest"
+version = "2.0.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fd/9d/5f21f318e37c3516b040fc51e267b6628b2590012c16be5ce2366b3af64b/scipy_doctest-2.0.1.tar.gz", hash = "sha256:0436106ab92a243f6a779c10632530a2937919bf55e9b7fdbaf450827db70f1e", size = 63417, upload-time = "2025-08-08T08:32:12.705Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f5/99/a17f725f45e57efcf5a84494687bba7176e0b5cba7ca0f69161a063fa86d/scipy_doctest-2.0.1-py3-none-any.whl", hash = "sha256:7725b1cb5f4722ab2a77b39f0aadd39726266e682b19e40f96663d7afb2d46b1", size = 65526, upload-time = "2025-08-08T08:32:10.906Z" },
+]
+
+[[package]]
 name = "semchunk"
 version = "2.2.2"
 source = { registry = "https://pypi.org/simple" }
@@ -7849,7 +7943,7 @@ wheels = [
 
 [[package]]
 name = "vllm"
-version = "0.11.1rc5.dev2+gf6d5f5888.cu129"
+version = "0.11.1rc5.dev3+gd2c33c397.cu129"
 source = { registry = "https://wheels.vllm.ai/nightly" }
 dependencies = [
     { name = "aiohttp" },
@@ -7912,8 +8006,8 @@ dependencies = [
     { name = "xgrammar", marker = "platform_machine == 'aarch64' or platform_machine == 'arm64' or platform_machine == 'x86_64'" },
 ]
 wheels = [
-    { url = "https://wheels.vllm.ai/nightly/vllm-0.11.1rc5.dev2%2Bgf6d5f5888.cu129-cp38-abi3-manylinux1_x86_64.whl" },
-    { url = "https://wheels.vllm.ai/nightly/vllm-0.11.1rc5.dev2%2Bgf6d5f5888.cu129-cp38-abi3-manylinux2014_aarch64.whl" },
+    { url = "https://wheels.vllm.ai/nightly/vllm-0.11.1rc5.dev3%2Bgd2c33c397.cu129-cp38-abi3-manylinux1_x86_64.whl" },
+    { url = "https://wheels.vllm.ai/nightly/vllm-0.11.1rc5.dev3%2Bgd2c33c397.cu129-cp38-abi3-manylinux2014_aarch64.whl" },
 ]
 
 [[package]]

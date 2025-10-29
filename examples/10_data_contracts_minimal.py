@@ -1,6 +1,5 @@
-"""Data contracts - schema export smoke.
-
-=======================================
+"""Data contracts - schema export smoke
+====================================
 
 Exercise the minimal data contract schema export.
 

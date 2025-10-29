@@ -1,4 +1,9 @@
 {
+  "$defs": {
+    "Id": {
+      "type": "string"
+    }
+  },
   "$id": "https://kgfoundry/schemas/kgfoundry_common.models.DoctagsAsset.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "Model the DoctagsAsset.\n\nPydantic model defining the structured payload used across the system. Validation ensures inputs\nconform to the declared schema while producing clear error messages. Use this class when\nserialising or parsing data for the surrounding feature.",
@@ -26,8 +31,7 @@
       "title": "Avg Logprob"
     },
     "doc_id": {
-      "title": "Doc Id",
-      "type": "string"
+      "$ref": "#/$defs/Id"
     },
     "doctags_uri": {
       "title": "Doctags Uri",

@@ -58,7 +58,6 @@ def main(
     >>> from tools.make_importlinter import main
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
-    ...
     """
     detected_root = root_dir or Path(__file__).resolve().parents[1]
     if root_package is None:
