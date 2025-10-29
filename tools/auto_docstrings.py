@@ -30,7 +30,9 @@ SRC_ROOT = _legacy.SRC_ROOT
 
 
 def _sync_roots() -> None:
-    """Sync the compatibility shim root paths with the legacy implementation."""
+    """Sync the compatibility shim root paths with the legacy
+    implementation.
+    """
     _legacy.REPO_ROOT = REPO_ROOT
     _legacy.SRC_ROOT = SRC_ROOT
 

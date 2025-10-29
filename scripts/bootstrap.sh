@@ -28,7 +28,8 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${REPO_ROOT}"
 
 # -------- configurable knobs (env overrides allowed) --------
-PYTHON_SPEC="${PYTHON_SPEC:-3.13}"
+REQUIRED_PYTHON_VERSION="${REQUIRED_PYTHON_VERSION:-3.13.9}"
+PYTHON_SPEC="${PYTHON_SPEC:-${REQUIRED_PYTHON_VERSION}}"
 EXTRAS="${EXTRAS:-}"                # Provide comma-separated extras as needed (never include "gpu")
 FROZEN="${FROZEN:-1}"               # 1 = respect uv.lock; 0 = allow relock/updates
 OFFLINE="${OFFLINE:-0}"             # 1 = no network (uses cache / local wheelhouse)
@@ -48,6 +49,23 @@ esac
 need_cmd() { command -v "$1" >/dev/null 2>&1 || { err "Missing required command: $1"; exit 1; }; }
 need_cmd uv
 log "uv $(uv --version || echo "(version unknown)")"
+
+# -------- ensure required Python is installed --------
+ensure_uv_python_version() {
+  local version="${1:-}"
+  if [ -z "${version}" ]; then
+    err "Missing REQUIRED_PYTHON_VERSION"
+    exit 1
+  fi
+  if ! uv python list "${version}" --only-installed | grep -q "${version}"; then
+    log "Installing Python ${version} via uv"
+    uv python install "${version}"
+  else
+    log "uv-managed Python ${version} already installed"
+  fi
+}
+
+ensure_uv_python_version "${REQUIRED_PYTHON_VERSION}"
 
 # Optional: pin Python (writes .python-version) if missing
 if [ ! -f ".python-version" ]; then

@@ -1,0 +1,43 @@
+src.docling
+===========
+
+.. py:module:: src.docling
+
+.. autoapi-nested-parse::
+
+   
+   Overview of docling.
+
+   This module bundles docling logic for the kgfoundry stack. It groups related helpers so downstream
+   packages can import a single cohesive namespace. Refer to the functions and classes below for
+   implementation specifics.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/src/docling/canonicalizer/index
+   /autoapi/src/docling/hybrid/index
+   /autoapi/src/docling/vlm/index
+
+

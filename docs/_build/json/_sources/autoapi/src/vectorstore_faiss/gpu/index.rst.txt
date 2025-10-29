@@ -1,0 +1,324 @@
+src.vectorstore_faiss.gpu
+=========================
+
+.. py:module:: src.vectorstore_faiss.gpu
+
+.. autoapi-nested-parse::
+
+   Overview of gpu.
+
+   This module bundles gpu logic for the kgfoundry stack. It groups related helpers so downstream
+   packages can import a single cohesive namespace. Refer to the functions and classes below for
+   implementation specifics.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:type:: FloatArray
+   :canonical: NDArray[np.float32]
+
+
+.. py:type:: IntArray
+   :canonical: NDArray[np.int64]
+
+
+.. py:type:: StrArray
+   :canonical: NDArray[np.str_]
+
+
+.. py:class:: FaissGpuIndex(factory = 'OPQ64,IVF8192,PQ64', nprobe = 64, gpu = True, cuvs = True)
+
+   
+   Model the FaissGpuIndex.
+
+   Represent the faissgpuindex data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:attribute:: factory
+      :value: 'OPQ64,IVF8192,PQ64'
+
+
+
+   .. py:attribute:: nprobe
+      :value: 64
+
+
+
+   .. py:attribute:: gpu
+      :value: True
+
+
+
+   .. py:attribute:: cuvs
+      :value: True
+
+
+
+   .. py:attribute:: _faiss
+      :type:  Any | None
+      :value: None
+
+
+
+   .. py:attribute:: _res
+      :type:  Any | None
+      :value: None
+
+
+
+   .. py:attribute:: _index
+      :type:  Any | None
+      :value: None
+
+
+
+   .. py:attribute:: _idmap
+      :type:  StrArray | None
+      :value: None
+
+
+
+   .. py:attribute:: _xb
+      :type:  FloatArray | None
+      :value: None
+
+
+
+   .. py:method:: _ensure_resources()
+
+      
+      Compute ensure resources.
+
+      Carry out the ensure resources operation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: train(train_vectors, *, seed = 42)
+
+      
+      Compute train.
+
+      Carry out the train operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param train_vectors: Description for ``train_vectors``.
+      :type train_vectors: src.vectorstore_faiss.gpu.FloatArray
+      :param seed: Optional parameter default ``42``. Description for ``seed``.
+      :type seed: int | None
+
+      .. rubric:: Examples
+
+      >>> from vectorstore_faiss.gpu import train
+      >>> train(...)  # doctest: +ELLIPSIS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: add(keys, vectors)
+
+      
+      Compute add.
+
+      Carry out the add operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param keys: Description for ``keys``.
+      :type keys: List[str]
+      :param vectors: Description for ``vectors``.
+      :type vectors: src.vectorstore_faiss.gpu.FloatArray
+
+      :raises RuntimeError: Raised when validation fails.
+
+      .. rubric:: Examples
+
+      >>> from vectorstore_faiss.gpu import add
+      >>> add(..., ...)  # doctest: +ELLIPSIS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: search(query, k)
+
+      
+      Compute search.
+
+      Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param query: Description for ``query``.
+      :type query: src.vectorstore_faiss.gpu.FloatArray
+      :param k: Description for ``k``.
+      :type k: int
+
+      :returns: *List[Tuple[str, float]]* -- Description of return value.
+
+      :raises RuntimeError: Raised when validation fails.
+
+      .. rubric:: Examples
+
+      >>> from vectorstore_faiss.gpu import search
+      >>> result = search(..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: save(index_uri, idmap_uri = None)
+
+      
+      Compute save.
+
+      Carry out the save operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param index_uri: Description for ``index_uri``.
+      :type index_uri: str
+      :param idmap_uri: Optional parameter default ``None``. Description for ``idmap_uri``.
+      :type idmap_uri: str | None
+
+      :raises RuntimeError: Raised when validation fails.
+
+      .. rubric:: Examples
+
+      >>> from vectorstore_faiss.gpu import save
+      >>> save(...)  # doctest: +ELLIPSIS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: load(index_uri, idmap_uri = None)
+
+      
+      Compute load.
+
+      Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param index_uri: Description for ``index_uri``.
+      :type index_uri: str
+      :param idmap_uri: Optional parameter default ``None``. Description for ``idmap_uri``.
+      :type idmap_uri: str | None
+
+      :raises RuntimeError: Raised when validation fails.
+
+      .. rubric:: Examples
+
+      >>> from vectorstore_faiss.gpu import load
+      >>> load(...)  # doctest: +ELLIPSIS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

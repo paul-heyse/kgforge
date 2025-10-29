@@ -1,14 +1,15 @@
 """Overview of fixture flow.
 
-This module bundles fixture flow logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This module bundles fixture flow logic for the kgfoundry stack. It
+groups related helpers so downstream packages can import a single
+cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Final, cast
+from typing import Final
 
 from prefect import flow, task
 
@@ -55,32 +56,21 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor t_prepare_dirs]
 def _t_prepare_dirs_impl(root: str) -> dict[str, bool]:
-    """Compute t prepare dirs.
+    """Describe  t prepare dirs impl.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the t prepare dirs operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 root : str
-    Description for ``root``.
-    
-    
-    
+    Describe ``root``.
 
 Returns
 -------
 dict[str, bool]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from orchestration.fixture_flow import t_prepare_dirs
->>> result = t_prepare_dirs(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     path = Path(root)
     (path / "parquet" / "dense").mkdir(parents=True, exist_ok=True)
@@ -96,32 +86,21 @@ t_prepare_dirs = task(_t_prepare_dirs_impl)
 
 # [nav:anchor t_write_fixture_chunks]
 def _t_write_fixture_chunks_impl(chunks_root: str) -> tuple[str, int]:
-    """Compute t write fixture chunks.
+    """Describe  t write fixture chunks impl.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the t write fixture chunks operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 chunks_root : str
-    Description for ``chunks_root``.
-    
-    
-    
+    Describe ``chunks_root``.
 
 Returns
 -------
 tuple[str, int]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from orchestration.fixture_flow import t_write_fixture_chunks
->>> result = t_write_fixture_chunks(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     writer = ParquetChunkWriter(chunks_root, model="docling_hybrid", run_id="fixture")
     rows = [
@@ -147,32 +126,21 @@ t_write_fixture_chunks = task(_t_write_fixture_chunks_impl)
 
 # [nav:anchor t_write_fixture_dense]
 def _t_write_fixture_dense_impl(dense_root: str) -> tuple[str, int]:
-    """Compute t write fixture dense.
+    """Describe  t write fixture dense impl.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the t write fixture dense operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 dense_root : str
-    Description for ``dense_root``.
-    
-    
-    
+    Describe ``dense_root``.
 
 Returns
 -------
 tuple[str, int]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from orchestration.fixture_flow import t_write_fixture_dense
->>> result = t_write_fixture_dense(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     writer = ParquetVectorWriter(dense_root)
     vector = [0.0] * 2560
@@ -188,32 +156,21 @@ t_write_fixture_dense = task(_t_write_fixture_dense_impl)
 
 # [nav:anchor t_write_fixture_splade]
 def _t_write_fixture_splade_impl(sparse_root: str) -> tuple[str, int]:
-    """Compute t write fixture splade.
+    """Describe  t write fixture splade impl.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the t write fixture splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 sparse_root : str
-    Description for ``sparse_root``.
-    
-    
-    
+    Describe ``sparse_root``.
 
 Returns
 -------
 tuple[str, int]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from orchestration.fixture_flow import t_write_fixture_splade
->>> result = t_write_fixture_splade(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     writer = ParquetVectorWriter(sparse_root)
     out_root = writer.write_splade(
@@ -236,38 +193,27 @@ def _t_register_in_duckdb_impl(
     dense_info: tuple[str, int],
     sparse_info: tuple[str, int],
 ) -> dict[str, list[str]]:
-    """Compute t register in duckdb.
+    """Describe  t register in duckdb impl.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the t register in duckdb operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 db_path : str
-    Description for ``db_path``.
+    Describe ``db_path``.
 chunks_info : tuple[str, int]
-    Description for ``chunks_info``.
+    Describe ``chunks_info``.
 dense_info : tuple[str, int]
-    Description for ``dense_info``.
+    Describe ``dense_info``.
 sparse_info : tuple[str, int]
-    Description for ``sparse_info``.
-    
-    
-    
+    Describe ``sparse_info``.
 
 Returns
 -------
 dict[str, list[str]]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from orchestration.fixture_flow import t_register_in_duckdb
->>> result = t_register_in_duckdb(..., ..., ..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     registry = DuckDBRegistryHelper(db_path)
     dense_run = registry.new_run("dense_embed", "Qwen3-Embedding-4B", "main", {"dim": 2560})
@@ -314,38 +260,25 @@ t_register_in_duckdb = task(_t_register_in_duckdb_impl)
 def _fixture_pipeline_impl(
     root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb"
 ) -> dict[str, list[str]]:
-    """Compute fixture pipeline.
+    """Describe  fixture pipeline impl.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the fixture pipeline operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 root : str, optional
-    Defaults to ``'/data'``.
-    Description for ``root``.
+    Describe ``root``.
     Defaults to ``'/data'``.
 db_path : str, optional
-    Defaults to ``'/data/catalog/catalog.duckdb'``.
-    Description for ``db_path``.
-    
-    
-    
+    Describe ``db_path``.
     Defaults to ``'/data/catalog/catalog.duckdb'``.
 
 Returns
 -------
 dict[str, list[str]]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from orchestration.fixture_flow import fixture_pipeline
->>> result = fixture_pipeline()
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     t_prepare_dirs(root)
     chunks_info = t_write_fixture_chunks(f"{root}/parquet/chunks")

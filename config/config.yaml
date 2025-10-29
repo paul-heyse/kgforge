@@ -3,7 +3,7 @@ system:
   duckdb_path: /data/catalog/catalog.duckdb
   os: ubuntu-24.04
 runtime:
-  python: '3.13'
+  python: '3.13.9'
   cuda: '13.0'
   torch: '2.9'
   duckdb_min: 1.4.1

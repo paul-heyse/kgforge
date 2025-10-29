@@ -20,6 +20,7 @@ LOGGER = logging.getLogger(__name__)
 
 DEFAULT_CONFIG_PATH = Path("docstring_builder.toml")
 DEFAULT_MARKER = "<!-- auto:docstring-builder v1 -->"
+_CACHE_VERSION = "2025-02-06-indent"
 
 
 @dataclass(slots=True)
@@ -56,6 +57,7 @@ class BuilderConfig:
             "opt_out": sorted(self.package_settings.opt_out),
             "navmap_metadata": self.navmap_metadata,
             "ignore": self.ignore,
+            "builder_cache_version": _CACHE_VERSION,
         }
         blob = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
         return hashlib.sha256(blob).hexdigest()
@@ -127,7 +129,9 @@ def resolve_config_path(start: Path | None = None) -> Path:
 
 
 def load_config_from_env() -> BuilderConfig:
-    """Load configuration using ``DOCSTRING_BUILDER_CONFIG`` override when set."""
+    """Load configuration using ``DOCSTRING_BUILDER_CONFIG`` override when
+    set.
+    """
     env_override = os.environ.get("DOCSTRING_BUILDER_CONFIG")
     config_path = Path(env_override) if env_override else resolve_config_path()
     return load_config(config_path)

@@ -1,0 +1,41 @@
+src.observability
+=================
+
+.. py:module:: src.observability
+
+.. autoapi-nested-parse::
+
+   
+   Overview of observability.
+
+   This module bundles observability logic for the kgfoundry stack. It groups related helpers so
+   downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+   for implementation specifics.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/src/observability/metrics/index
+
+

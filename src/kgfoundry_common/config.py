@@ -1,8 +1,9 @@
 """Overview of config.
 
-This module bundles config logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles config logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -43,37 +44,28 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor load_config]
 def load_config(path: str) -> dict[str, Any]:
-    """Compute load config.
+    """Describe load config.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the load config operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 path : str
-    Description for ``path``.
-    
-    
+    Describe ``path``.
     
 
 Returns
 -------
 dict[str, Any]
-    Description of return value.
-    
-    
+    Describe return value.
     
 
 Raises
 ------
 TypeError
-    Raised when validation fails.
-
-Examples
---------
->>> from kgfoundry_common.config import load_config
->>> result = load_config(...)
->>> result  # doctest: +ELLIPSIS
+    Raised when TODO for TypeError.
 """
     with open(path, encoding="utf-8") as f:
         loaded = yaml.safe_load(f)

@@ -1,0 +1,136 @@
+src.search_api.kg_mock
+======================
+
+.. py:module:: src.search_api.kg_mock
+
+.. autoapi-nested-parse::
+
+   Overview of kg mock.
+
+   This module bundles kg mock logic for the kgfoundry stack. It groups related helpers so downstream
+   packages can import a single cohesive namespace. Refer to the functions and classes below for
+   implementation specifics.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: detect_query_concepts(query)
+
+   
+   Compute detect query concepts.
+
+   Carry out the detect query concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param query: Description for ``query``.
+   :type query: str
+
+   :returns: *collections.abc.Set* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.kg_mock import detect_query_concepts
+   >>> result = detect_query_concepts(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: linked_concepts_for_text(text)
+
+   
+   Compute linked concepts for text.
+
+   Carry out the linked concepts for text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param text: Description for ``text``.
+   :type text: str
+
+   :returns: *List[str]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.kg_mock import linked_concepts_for_text
+   >>> result = linked_concepts_for_text(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: kg_boost(query_concepts, chunk_concepts, direct = 0.08, one_hop = 0.04)
+
+   
+   Compute kg boost.
+
+   Carry out the kg boost operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param query_concepts: Description for ``query_concepts``.
+   :type query_concepts: List[str]
+   :param chunk_concepts: Description for ``chunk_concepts``.
+   :type chunk_concepts: List[str]
+   :param direct: Optional parameter default ``0.08``. Description for ``direct``.
+   :type direct: float | None
+   :param one_hop: Optional parameter default ``0.04``. Description for ``one_hop``.
+   :type one_hop: float | None
+
+   :returns: *float* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.kg_mock import kg_boost
+   >>> result = kg_boost(..., ...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

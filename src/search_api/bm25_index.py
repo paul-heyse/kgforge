@@ -1,8 +1,9 @@
 """Overview of bm25 index.
 
-This module bundles bm25 index logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This module bundles bm25 index logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -52,32 +53,21 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
 # [nav:anchor toks]
 def toks(text: str) -> list[str]:
-    """Compute toks.
+    """Describe toks.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the toks operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 text : str
-    Description for ``text``.
-    
-    
-    
+    Describe ``text``.
 
 Returns
 -------
 list[str]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.bm25_index import toks
->>> result = toks(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
@@ -85,24 +75,29 @@ Examples
 # [nav:anchor BM25Doc]
 @dataclass
 class BM25Doc:
-    """Fixture BM25 document entry.
+    """Describe BM25Doc.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    chunk_id : str
-        Unique chunk identifier.
-    doc_id : str
-        Document identifier associated with the chunk.
-    title : str
-        Title string for the document.
-    section : str
-        Section metadata captured for the chunk.
-    tf : dict[str, float]
-        Term-frequency mapping used when computing BM25 scores.
-    dl : float
-        Document length normalisation term.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+chunk_id : str
+    Describe ``chunk_id``.
+doc_id : str
+    Describe ``doc_id``.
+title : str
+    Describe ``title``.
+section : str
+    Describe ``section``.
+tf : dict[str, float]
+    Describe ``tf``.
+dl : float
+    Describe ``dl``.
+"""
 
     chunk_id: str
     doc_id: str
@@ -114,19 +109,40 @@ class BM25Doc:
 
 # [nav:anchor BM25Index]
 class BM25Index:
-    """Simple BM25 implementation used for fixture data.
+    """Describe BM25Index.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    k1 : float, optional
-        Saturation parameter controlling term frequency scaling. Defaults to ``0.9``.
-    b : float, optional
-        Length normalisation parameter. Defaults to ``0.4``.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+k1 : float, optional
+    Describe ``k1``.
+    Defaults to ``0.9``.
+b : float, optional
+    Describe ``b``.
+    Defaults to ``0.4``.
+"""
 
     def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
+        """Describe   init  .
 
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+k1 : float, optional
+    Describe ``k1``.
+    Defaults to ``0.9``.
+b : float, optional
+    Describe ``b``.
+    Defaults to ``0.4``.
+"""
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -136,32 +152,21 @@ class BM25Index:
 
     @classmethod
     def build_from_duckdb(cls, db_path: str) -> BM25Index:
-        """Compute build from duckdb.
+        """Describe build from duckdb.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the build from duckdb operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 db_path : str
-    Description for ``db_path``.
-    
-    
-    
+    Describe ``db_path``.
 
 Returns
 -------
 BM25Index
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.bm25_index import build_from_duckdb
->>> result = build_from_duckdb(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         index = cls()
         con = duckdb.connect(db_path)
@@ -186,15 +191,16 @@ Examples
         return index
 
     def _build(self, rows: Iterable[tuple[str, str, str, str, str]]) -> None:
-        """Compute build.
+        """Describe  build.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the build operation.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 rows : Iterable[tuple[str, str, str, str, str]]
-    Description for ``rows``.
+    Describe ``rows``.
 """
         self.docs.clear()
         self.df.clear()
@@ -226,8 +232,11 @@ rows : Iterable[tuple[str, str, str, str, str]]
 
     @classmethod
     def from_parquet(cls, path: str, *, k1: float = 0.9, b: float = 0.4) -> BM25Index:
-        """Instantiate an index from a parquet dataset without DuckDB metadata.
+        """Describe from parquet.
+
 <!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
@@ -236,12 +245,8 @@ path : str
 k1 : float, optional
     Describe ``k1``.
     Defaults to ``0.9``.
-    Defaults to ``0.9``.
 b : float, optional
     Describe ``b``.
-    
-    Defaults to ``0.4``.
-    
     Defaults to ``0.4``.
 
 Returns
@@ -268,23 +273,16 @@ BM25Index
         return index
 
     def save(self, path: str) -> None:
-        """Compute save.
+        """Describe save.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the save operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 path : str
-    Description for ``path``.
-    
-    
-    
-
-Examples
---------
->>> from search_api.bm25_index import save
->>> save(...)  # doctest: +ELLIPSIS
+    Describe ``path``.
 """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as handle:
@@ -302,32 +300,21 @@ Examples
 
     @classmethod
     def load(cls, path: str) -> BM25Index:
-        """Compute load.
+        """Describe load.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 path : str
-    Description for ``path``.
-    
-    
-    
+    Describe ``path``.
 
 Returns
 -------
 BM25Index
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.bm25_index import load
->>> result = load(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         with open(path, "rb") as handle:
             payload = pickle.load(handle)
@@ -339,23 +326,21 @@ Examples
         return index
 
     def _idf(self, term: str) -> float:
-        """Compute idf.
+        """Describe  idf.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the idf operation.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 term : str
-    Description for ``term``.
-    
-    
-    
+    Describe ``term``.
 
 Returns
 -------
 float
-    Description of return value.
+    Describe return value.
 """
         df = self.df.get(term, 0)
         if self.N == 0 or df == 0:
@@ -363,36 +348,24 @@ float
         return math.log((self.N - df + 0.5) / (df + 0.5) + 1.0)
 
     def search(self, query: str, k: int = 10) -> list[tuple[str, float]]:
-        """Compute search.
+        """Describe search.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 query : str
-    Description for ``query``.
+    Describe ``query``.
 k : int, optional
-    Defaults to ``10``.
-    Description for ``k``.
-    
-    
-    
+    Describe ``k``.
     Defaults to ``10``.
 
 Returns
 -------
 list[tuple[str, float]]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.bm25_index import search
->>> result = search(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         if self.N == 0:
             return []
@@ -412,31 +385,20 @@ Examples
         return [(self.docs[index].chunk_id, score) for index, score in ranked[:k] if score > 0.0]
 
     def doc(self, index: int) -> BM25Doc:
-        """Compute doc.
+        """Describe doc.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 index : int
-    Description for ``index``.
-    
-    
-    
+    Describe ``index``.
 
 Returns
 -------
 BM25Doc
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from search_api.bm25_index import doc
->>> result = doc(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         return self.docs[index]

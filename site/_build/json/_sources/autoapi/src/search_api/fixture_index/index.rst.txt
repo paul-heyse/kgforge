@@ -1,0 +1,282 @@
+src.search_api.fixture_index
+============================
+
+.. py:module:: src.search_api.fixture_index
+
+.. autoapi-nested-parse::
+
+   Overview of fixture index.
+
+   This module bundles fixture index logic for the kgfoundry stack. It groups related helpers so
+   downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+   for implementation specifics.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: tokenize(text)
+
+   
+   Compute tokenize.
+
+   Carry out the tokenize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param text: Description for ``text``.
+   :type text: str
+
+   :returns: *List[str]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.fixture_index import tokenize
+   >>> result = tokenize(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: FixtureDoc
+
+   
+   Model the FixtureDoc.
+
+   Represent the fixturedoc data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:attribute:: chunk_id
+      :type:  str
+
+
+   .. py:attribute:: doc_id
+      :type:  str
+
+
+   .. py:attribute:: title
+      :type:  str
+
+
+   .. py:attribute:: section
+      :type:  str
+
+
+   .. py:attribute:: text
+      :type:  str
+
+
+.. py:class:: FixtureIndex(root = '/data', db_path = '/data/catalog/catalog.duckdb')
+
+   
+   Model the FixtureIndex.
+
+   Represent the fixtureindex data structure used throughout the project. The class encapsulates
+   behaviour behind a well-defined interface for collaborating components. Instances are typically
+   created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:attribute:: root
+
+
+   .. py:attribute:: db_path
+      :value: '/data/catalog/catalog.duckdb'
+
+
+
+   .. py:attribute:: docs
+      :type:  list[FixtureDoc]
+      :value: []
+
+
+
+   .. py:attribute:: df
+      :type:  dict[str, int]
+
+
+   .. py:attribute:: tf
+      :type:  list[dict[str, int]]
+      :value: []
+
+
+
+   .. py:method:: _load_from_duckdb()
+
+      
+      Compute load from duckdb.
+
+      Carry out the load from duckdb operation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: _build_lex()
+
+      
+      Compute build lex.
+
+      Carry out the build lex operation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: search(query, k = 10)
+
+      
+      Compute search.
+
+      Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param query: Description for ``query``.
+      :type query: str
+      :param k: Optional parameter default ``10``. Description for ``k``.
+      :type k: int | None
+
+      :returns: *List[Tuple[int, float]]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from search_api.fixture_index import search
+      >>> result = search(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: doc(index)
+
+      
+      Compute doc.
+
+      Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param index: Description for ``index``.
+      :type index: int
+
+      :returns: *src.search_api.fixture_index.FixtureDoc* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from search_api.fixture_index import doc
+      >>> result = doc(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

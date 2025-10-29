@@ -1,8 +1,9 @@
 """Overview of errors.
 
-This module bundles errors logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles errors logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -54,11 +55,10 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DownloadError]
 class DownloadError(Exception):
-    """Model the DownloadError.
+    """Describe DownloadError.
 
-Represent the downloaderror data structure used throughout the project. The class encapsulates
-behaviour behind a well-defined interface for collaborating components. Instances are typically
-created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     ...
@@ -66,11 +66,10 @@ created by factories or runtime orchestrators documented nearby.
 
 # [nav:anchor UnsupportedMIMEError]
 class UnsupportedMIMEError(Exception):
-    """Model the UnsupportedMIMEError.
+    """Describe UnsupportedMIMEError.
 
-Represent the unsupportedmimeerror data structure used throughout the project. The class
-encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-are typically created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     ...
@@ -78,11 +77,10 @@ are typically created by factories or runtime orchestrators documented nearby.
 
 # [nav:anchor DoclingError]
 class DoclingError(Exception):
-    """Model the DoclingError.
+    """Describe DoclingError.
 
-Represent the doclingerror data structure used throughout the project. The class encapsulates
-behaviour behind a well-defined interface for collaborating components. Instances are typically
-created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     ...
@@ -90,11 +88,10 @@ created by factories or runtime orchestrators documented nearby.
 
 # [nav:anchor OCRTimeoutError]
 class OCRTimeoutError(Exception):
-    """Model the OCRTimeoutError.
+    """Describe OCRTimeoutError.
 
-Represent the ocrtimeouterror data structure used throughout the project. The class encapsulates
-behaviour behind a well-defined interface for collaborating components. Instances are typically
-created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     ...
@@ -102,11 +99,10 @@ created by factories or runtime orchestrators documented nearby.
 
 # [nav:anchor ChunkingError]
 class ChunkingError(Exception):
-    """Model the ChunkingError.
+    """Describe ChunkingError.
 
-Represent the chunkingerror data structure used throughout the project. The class encapsulates
-behaviour behind a well-defined interface for collaborating components. Instances are typically
-created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     ...
@@ -114,11 +110,10 @@ created by factories or runtime orchestrators documented nearby.
 
 # [nav:anchor EmbeddingError]
 class EmbeddingError(Exception):
-    """Model the EmbeddingError.
+    """Describe EmbeddingError.
 
-Represent the embeddingerror data structure used throughout the project. The class encapsulates
-behaviour behind a well-defined interface for collaborating components. Instances are typically
-created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     ...
@@ -126,11 +121,10 @@ created by factories or runtime orchestrators documented nearby.
 
 # [nav:anchor SpladeOOMError]
 class SpladeOOMError(Exception):
-    """Model the SpladeOOMError.
+    """Describe SpladeOOMError.
 
-Represent the spladeoomerror data structure used throughout the project. The class encapsulates
-behaviour behind a well-defined interface for collaborating components. Instances are typically
-created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     ...
@@ -138,11 +132,10 @@ created by factories or runtime orchestrators documented nearby.
 
 # [nav:anchor IndexBuildError]
 class IndexBuildError(Exception):
-    """Model the IndexBuildError.
+    """Describe IndexBuildError.
 
-Represent the indexbuilderror data structure used throughout the project. The class encapsulates
-behaviour behind a well-defined interface for collaborating components. Instances are typically
-created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     ...
@@ -150,11 +143,10 @@ created by factories or runtime orchestrators documented nearby.
 
 # [nav:anchor OntologyParseError]
 class OntologyParseError(Exception):
-    """Model the OntologyParseError.
+    """Describe OntologyParseError.
 
-Represent the ontologyparseerror data structure used throughout the project. The class
-encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-are typically created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     ...
@@ -162,11 +154,10 @@ are typically created by factories or runtime orchestrators documented nearby.
 
 # [nav:anchor LinkerCalibrationError]
 class LinkerCalibrationError(Exception):
-    """Model the LinkerCalibrationError.
+    """Describe LinkerCalibrationError.
 
-Represent the linkercalibrationerror data structure used throughout the project. The class
-encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-are typically created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     ...
@@ -174,11 +165,10 @@ are typically created by factories or runtime orchestrators documented nearby.
 
 # [nav:anchor Neo4jError]
 class Neo4jError(Exception):
-    """Model the Neo4jError.
+    """Describe Neo4jError.
 
-Represent the neo4jerror data structure used throughout the project. The class encapsulates
-behaviour behind a well-defined interface for collaborating components. Instances are typically
-created by factories or runtime orchestrators documented nearby.
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
 """
 
     ...

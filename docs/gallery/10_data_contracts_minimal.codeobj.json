@@ -1,0 +1,11 @@
+{
+ "pydantic.BaseModel": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "pydantic",
+   "module_short": "pydantic",
+   "name": "BaseModel"
+  }
+ ]
+}

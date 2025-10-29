@@ -1,8 +1,9 @@
 """Overview of catalog.
 
-This module bundles catalog logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles catalog logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -15,16 +16,22 @@ from kgfoundry_common.navmap_types import NavMap
 
 @dataclass
 class Concept:
-    """Lightweight concept metadata record.
+    """Describe Concept.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    id : str
-        Unique identifier for the concept.
-    label : str | None
-        Optional human-readable label associated with the concept.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+id : str
+    Describe ``id``.
+label : str | None, optional
+    Describe ``label``.
+    Defaults to ``None``.
+"""
 
     id: str
     label: str | None = None
@@ -60,79 +67,72 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor OntologyCatalog]
 class OntologyCatalog:
-    """Simple in-memory catalogue for ontology lookups.
+    """Describe OntologyCatalog.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    concepts : list[Concept]
-        Concepts that seed the lookup map.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+concepts : list[Concept]
+    Describe ``concepts``.
+"""
 
     def __init__(self, concepts: list[Concept]) -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+concepts : list[Concept]
+    Describe ``concepts``.
+"""
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
-        """Compute neighbors.
+        """Describe neighbors.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the neighbors operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 concept_id : str
-    Description for ``concept_id``.
+    Describe ``concept_id``.
 depth : int, optional
-    Defaults to ``1``.
-    Description for ``depth``.
-    
-    
-    
+    Describe ``depth``.
     Defaults to ``1``.
 
 Returns
 -------
 set[str]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from ontology.catalog import neighbors
->>> result = neighbors(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return set()
 
     def hydrate(self, concept_id: str) -> dict[str, Any]:
-        """Compute hydrate.
+        """Describe hydrate.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the hydrate operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 concept_id : str
-    Description for ``concept_id``.
-    
-    
-    
+    Describe ``concept_id``.
 
 Returns
 -------
 dict[str, Any]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from ontology.catalog import hydrate
->>> result = hydrate(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         return {}

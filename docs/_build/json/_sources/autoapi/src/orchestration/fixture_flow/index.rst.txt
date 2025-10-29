@@ -1,0 +1,246 @@
+src.orchestration.fixture_flow
+==============================
+
+.. py:module:: src.orchestration.fixture_flow
+
+.. autoapi-nested-parse::
+
+   Overview of fixture flow.
+
+   This module bundles fixture flow logic for the kgfoundry stack. It groups related helpers so
+   downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+   for implementation specifics.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: t_prepare_dirs(root)
+
+   
+   Compute t prepare dirs.
+
+   Carry out the t prepare dirs operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param root: Description for ``root``.
+   :type root: str
+
+   :returns: *collections.abc.Mapping* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from orchestration.fixture_flow import t_prepare_dirs
+   >>> result = t_prepare_dirs(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: t_write_fixture_chunks(chunks_root)
+
+   
+   Compute t write fixture chunks.
+
+   Carry out the t write fixture chunks operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param chunks_root: Description for ``chunks_root``.
+   :type chunks_root: str
+
+   :returns: *Tuple[str, int]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from orchestration.fixture_flow import t_write_fixture_chunks
+   >>> result = t_write_fixture_chunks(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: t_write_fixture_dense(dense_root)
+
+   
+   Compute t write fixture dense.
+
+   Carry out the t write fixture dense operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param dense_root: Description for ``dense_root``.
+   :type dense_root: str
+
+   :returns: *Tuple[str, int]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from orchestration.fixture_flow import t_write_fixture_dense
+   >>> result = t_write_fixture_dense(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: t_write_fixture_splade(sparse_root)
+
+   
+   Compute t write fixture splade.
+
+   Carry out the t write fixture splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param sparse_root: Description for ``sparse_root``.
+   :type sparse_root: str
+
+   :returns: *Tuple[str, int]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from orchestration.fixture_flow import t_write_fixture_splade
+   >>> result = t_write_fixture_splade(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: t_register_in_duckdb(db_path, chunks_info, dense_info, sparse_info)
+
+   
+   Compute t register in duckdb.
+
+   Carry out the t register in duckdb operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param db_path: Description for ``db_path``.
+   :type db_path: str
+   :param chunks_info: Description for ``chunks_info``.
+   :type chunks_info: Tuple[str, int]
+   :param dense_info: Description for ``dense_info``.
+   :type dense_info: Tuple[str, int]
+   :param sparse_info: Description for ``sparse_info``.
+   :type sparse_info: Tuple[str, int]
+
+   :returns: *collections.abc.Mapping* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from orchestration.fixture_flow import t_register_in_duckdb
+   >>> result = t_register_in_duckdb(..., ..., ..., ...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: fixture_pipeline(root = '/data', db_path = '/data/catalog/catalog.duckdb')
+
+   
+   Compute fixture pipeline.
+
+   Carry out the fixture pipeline operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param root: Optional parameter default ``'/data'``. Description for ``root``.
+   :type root: str | None
+   :param db_path: Optional parameter default ``'/data/catalog/catalog.duckdb'``. Description for ``db_path``.
+   :type db_path: str | None
+
+   :returns: *collections.abc.Mapping* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from orchestration.fixture_flow import fixture_pipeline
+   >>> result = fixture_pipeline()
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

@@ -1,0 +1,44 @@
+src.registry
+============
+
+.. py:module:: src.registry
+
+.. autoapi-nested-parse::
+
+   
+   Overview of registry.
+
+   This module bundles registry logic for the kgfoundry stack. It groups related helpers so downstream
+   packages can import a single cohesive namespace. Refer to the functions and classes below for
+   implementation specifics.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/src/registry/api/index
+   /autoapi/src/registry/duckdb_registry/index
+   /autoapi/src/registry/helper/index
+   /autoapi/src/registry/migrate/index
+
+

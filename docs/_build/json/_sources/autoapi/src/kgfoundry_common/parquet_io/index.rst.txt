@@ -1,0 +1,316 @@
+src.kgfoundry_common.parquet_io
+===============================
+
+.. py:module:: src.kgfoundry_common.parquet_io
+
+.. autoapi-nested-parse::
+
+   Overview of parquet io.
+
+   This module bundles parquet io logic for the kgfoundry stack. It groups related helpers so
+   downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+   for implementation specifics.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: ParquetVectorWriter(root)
+
+   
+   Model the ParquetVectorWriter.
+
+   Represent the parquetvectorwriter data structure used throughout the project. The class
+   encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+   are typically created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:method:: dense_schema(dim)
+      :staticmethod:
+
+
+      
+      Compute dense schema.
+
+      Carry out the dense schema operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param dim: Description for ``dim``.
+      :type dim: int
+
+      :returns: *pa.schema* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.parquet_io import dense_schema
+      >>> result = dense_schema(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:attribute:: root
+
+
+   .. py:method:: write_dense(model, run_id, dim, records, shard = 0)
+
+      
+      Compute write dense.
+
+      Carry out the write dense operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param model: Description for ``model``.
+      :type model: str
+      :param run_id: Description for ``run_id``.
+      :type run_id: str
+      :param dim: Description for ``dim``.
+      :type dim: int
+      :param records: Description for ``records``.
+      :type records: collections.abc.Iterable
+      :param shard: Optional parameter default ``0``. Description for ``shard``.
+      :type shard: int | None
+
+      :returns: *str* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.parquet_io import write_dense
+      >>> result = write_dense(..., ..., ..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: splade_schema()
+      :staticmethod:
+
+
+      
+      Compute splade schema.
+
+      Carry out the splade schema operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :returns: *pa.schema* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.parquet_io import splade_schema
+      >>> result = splade_schema()
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: write_splade(model, run_id, records, shard = 0)
+
+      
+      Compute write splade.
+
+      Carry out the write splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param model: Description for ``model``.
+      :type model: str
+      :param run_id: Description for ``run_id``.
+      :type run_id: str
+      :param records: Description for ``records``.
+      :type records: collections.abc.Iterable
+      :param shard: Optional parameter default ``0``. Description for ``shard``.
+      :type shard: int | None
+
+      :returns: *str* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.parquet_io import write_splade
+      >>> result = write_splade(..., ..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: ParquetChunkWriter(root, model = 'docling_hybrid', run_id = 'dev')
+
+   
+   Model the ParquetChunkWriter.
+
+   Represent the parquetchunkwriter data structure used throughout the project. The class
+   encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+   are typically created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:method:: chunk_schema()
+      :staticmethod:
+
+
+      
+      Compute chunk schema.
+
+      Carry out the chunk schema operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :returns: *pa.schema* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.parquet_io import chunk_schema
+      >>> result = chunk_schema()
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:attribute:: root
+
+
+   .. py:method:: write(rows)
+
+      
+      Compute write.
+
+      Carry out the write operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param rows: Description for ``rows``.
+      :type rows: collections.abc.Iterable
+
+      :returns: *str* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from kgfoundry_common.parquet_io import write
+      >>> result = write(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

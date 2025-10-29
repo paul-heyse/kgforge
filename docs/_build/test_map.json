@@ -1,0 +1,10923 @@
+{
+  "embeddings_dense.qwen3.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_type_resolution.py",
+      "lines": [
+        3,
+        186
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 183,
+          "end": 189
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_auto_docstrings.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_auto_docstrings_extended_summaries.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_build_test_map.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_export_schemas_pruning.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_scan_observability_policy.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_schemas_valid.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docs/test_build_graphs.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/docs/test_build_graphs_failures.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/tools/test_build_graphs.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/tools/test_add_module_docstrings.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.splade.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_type_resolution.py",
+      "lines": [
+        3,
+        186
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 183,
+          "end": 189
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_build_test_map.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_scan_observability_policy.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/docs/test_build_graphs_failures.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_make_importlinter.importlib": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        5,
+        9,
+        25
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 22,
+          "end": 28
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        3,
+        13
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 10,
+          "end": 16
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        1,
+        16
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_build_test_map.py",
+      "lines": [
+        5,
+        16,
+        20
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 13,
+          "end": 19
+        },
+        {
+          "start": 17,
+          "end": 23
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        5,
+        51
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 48,
+          "end": 54
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        5,
+        29,
+        35
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 32,
+          "end": 38
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.bm25.PurePythonBM25.search": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        20,
+        21
+      ],
+      "windows": [
+        {
+          "start": 17,
+          "end": 23
+        },
+        {
+          "start": 18,
+          "end": 24
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.helper.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_build_test_map.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_scan_observability_policy.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.duckdb_registry.Doc": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        10
+      ],
+      "windows": [
+        {
+          "start": 7,
+          "end": 13
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "orchestration.fixture_flow.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_build_test_map.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_scan_observability_policy.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.splade_index.SpladeIndex.search": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        20,
+        21
+      ],
+      "windows": [
+        {
+          "start": 17,
+          "end": 23
+        },
+        {
+          "start": 18,
+          "end": 24
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.app.MockKG": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        17
+      ],
+      "windows": [
+        {
+          "start": 14,
+          "end": 20
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_pipeline_artifacts.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_build_test_map.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_scan_observability_policy.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "orchestration.cli.get_bm25": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        15
+      ],
+      "windows": [
+        {
+          "start": 12,
+          "end": 18
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.tools.test_add_module_docstrings.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_scan_observability_policy.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.service.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_scan_observability_policy.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.tools.test_build_graphs.importlib": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        5,
+        9,
+        25
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 22,
+          "end": 28
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        3,
+        13
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 10,
+          "end": 16
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        1,
+        16
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        5,
+        51
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 48,
+          "end": 54
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        5,
+        29,
+        35
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 32,
+          "end": 38
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.bm25.LuceneBM25.search": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        20,
+        21
+      ],
+      "windows": [
+        {
+          "start": 17,
+          "end": 23
+        },
+        {
+          "start": 18,
+          "end": 24
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_client.KGFoundryClient": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        21
+      ],
+      "windows": [
+        {
+          "start": 18,
+          "end": 24
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        6,
+        12
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "docling.vlm.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_imports.test_imports": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        8
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        5
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        11
+      ],
+      "windows": [
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_client.KGFoundryClient": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        21
+      ],
+      "windows": [
+        {
+          "start": 18,
+          "end": 24
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        6,
+        12
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "docling.canonicalizer.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_imports.importlib": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        5,
+        9,
+        25
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 22,
+          "end": 28
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        3,
+        13
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 10,
+          "end": 16
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        1,
+        16
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        5,
+        51
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 48,
+          "end": 54
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        5,
+        29,
+        35
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 32,
+          "end": 38
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_scan_observability.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "linking.linker.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_client.client.KGFoundryClient": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        21
+      ],
+      "windows": [
+        {
+          "start": 18,
+          "end": 24
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        6,
+        12
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.bm25.get_bm25": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        15
+      ],
+      "windows": [
+        {
+          "start": 12,
+          "end": 18
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.test_imports.test_imports": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        8
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        5
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        11
+      ],
+      "windows": [
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.app.search": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        20,
+        21
+      ],
+      "windows": [
+        {
+          "start": 17,
+          "end": 23
+        },
+        {
+          "start": 18,
+          "end": 24
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_registry.apply": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        19
+      ],
+      "windows": [
+        {
+          "start": 16,
+          "end": 22
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        4,
+        9,
+        10
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 7,
+          "end": 13
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.logging.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.api.Doc": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        10
+      ],
+      "windows": [
+        {
+          "start": 7,
+          "end": 13
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "ontology.catalog.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_build_test_map.importlib": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        5,
+        9,
+        25
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 22,
+          "end": 28
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        3,
+        13
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 10,
+          "end": 16
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        1,
+        16
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        5,
+        51
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 48,
+          "end": 54
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        5,
+        29,
+        35
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 32,
+          "end": 38
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_auto_docstrings.importlib": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        5,
+        9,
+        25
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 22,
+          "end": 28
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        1,
+        16
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        5,
+        51
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 48,
+          "end": 54
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        5,
+        29,
+        35
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 32,
+          "end": 38
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.navmap_types.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kg_builder.neo4j_store.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_gen_readmes.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.errors.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_auto_docstrings_extended_summaries.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.parquet_io.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "ontology.loader.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_client.client.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.kg_mock.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.tools.docs.test_build_graphs.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_registry.DuckDBRegistryHelper": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        18
+      ],
+      "windows": [
+        {
+          "start": 15,
+          "end": 21
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        3,
+        11
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.splade.get_splade": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        16
+      ],
+      "windows": [
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_auto_docstrings.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.splade_index.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.splade.LuceneImpactIndex.search": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        20,
+        21
+      ],
+      "windows": [
+        {
+          "start": 17,
+          "end": 23
+        },
+        {
+          "start": 18,
+          "end": 24
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_dense.base.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.base.SparseIndex.search": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        20,
+        21
+      ],
+      "windows": [
+        {
+          "start": 17,
+          "end": 23
+        },
+        {
+          "start": 18,
+          "end": 24
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.mock_servers.openalex_mock.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.app.get_bm25": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        15
+      ],
+      "windows": [
+        {
+          "start": 12,
+          "end": 18
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.bm25_index.BM25Index.search": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        20,
+        21
+      ],
+      "windows": [
+        {
+          "start": 17,
+          "end": 23
+        },
+        {
+          "start": 18,
+          "end": 24
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "orchestration.fixture_flow.DuckDBRegistryHelper": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        18
+      ],
+      "windows": [
+        {
+          "start": 15,
+          "end": 21
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        3,
+        11
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.faiss_adapter.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.schemas.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.test_imports": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        8
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        5
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        11
+      ],
+      "windows": [
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "download.harvester.Doc": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        10
+      ],
+      "windows": [
+        {
+          "start": 7,
+          "end": 13
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.ids.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kg_builder.mock_kg.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "orchestration.flows.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.base.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "observability.metrics.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.fixture_index.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.config.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.tools.test_build_graphs.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.helper.DuckDBRegistryHelper": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        18
+      ],
+      "windows": [
+        {
+          "start": 15,
+          "end": 21
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        3,
+        11
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_client._KGFoundryClient.search": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        20,
+        21
+      ],
+      "windows": [
+        {
+          "start": 17,
+          "end": 23
+        },
+        {
+          "start": 18,
+          "end": 24
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_export_schemas_pruning.importlib": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        5,
+        9,
+        25
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 22,
+          "end": 28
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        1,
+        16
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        5,
+        51
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 48,
+          "end": 54
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        5,
+        29,
+        35
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 32,
+          "end": 38
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "orchestration.cli.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.api.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_imports": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        8
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        5
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_type_resolution.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.fusion.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.app.get_splade": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        16
+      ],
+      "windows": [
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.migrate.apply": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        19
+      ],
+      "windows": [
+        {
+          "start": 16,
+          "end": 22
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        4,
+        9,
+        10
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 7,
+          "end": 13
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "download.cli.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.bm25.annotations": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "orchestration.fixture_flow.Doc": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        10
+      ],
+      "windows": [
+        {
+          "start": 7,
+          "end": 13
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_gen_readmes.importlib": [
+    {
+      "file": "tests/test_imports.py",
+      "lines": [
+        5,
+        9,
+        25
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 22,
+          "end": 28
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        1,
+        16
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        5,
+        51
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 48,
+          "end": 54
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_build_test_map.pytest": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        1,
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        5,
+        7
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_faiss_adapter.py",
+      "lines": [
+        4,
+        6,
+        29
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 26,
+          "end": 32
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        4,
+        6,
+        48
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 45,
+          "end": 51
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_build_test_map.py",
+      "lines": [
+        9,
+        13,
+        36,
+        47
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 10,
+          "end": 16
+        },
+        {
+          "start": 33,
+          "end": 39
+        },
+        {
+          "start": 44,
+          "end": 50
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_scan_observability_policy.py",
+      "lines": [
+        8,
+        12,
+        28
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 9,
+          "end": 15
+        },
+        {
+          "start": 25,
+          "end": 31
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        7,
+        49
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        9,
+        29,
+        43,
+        53
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 40,
+          "end": 46
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        4,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        8,
+        34
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 31,
+          "end": 37
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_bm25_adapter.pytest": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        1,
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        5,
+        7
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        4,
+        6,
+        48
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 45,
+          "end": 51
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_build_test_map.py",
+      "lines": [
+        9,
+        13,
+        36,
+        47
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 10,
+          "end": 16
+        },
+        {
+          "start": 33,
+          "end": 39
+        },
+        {
+          "start": 44,
+          "end": 50
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_scan_observability_policy.py",
+      "lines": [
+        8,
+        12,
+        28
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 9,
+          "end": 15
+        },
+        {
+          "start": 25,
+          "end": 31
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        7,
+        49
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        9,
+        29,
+        43,
+        53
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 40,
+          "end": 46
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        4,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        8,
+        34
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 31,
+          "end": 37
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_gen_readmes.pytest": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        1,
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        5,
+        7
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        4,
+        6,
+        48
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 45,
+          "end": 51
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        7,
+        49
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        9,
+        29,
+        43,
+        53
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 40,
+          "end": 46
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        4,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        8,
+        34
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 31,
+          "end": 37
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_scan_observability_policy.pytest": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        1,
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        5,
+        7
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        4,
+        6,
+        48
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 45,
+          "end": 51
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        7,
+        49
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        9,
+        29,
+        43,
+        53
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 40,
+          "end": 46
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        4,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        8,
+        34
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 31,
+          "end": 37
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_pipeline_artifacts.pytest": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        1,
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        5,
+        7
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        4,
+        6,
+        48
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 45,
+          "end": 51
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        7,
+        49
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        9,
+        29,
+        43,
+        53
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 40,
+          "end": 46
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        4,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        8,
+        34
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 31,
+          "end": 37
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.tools.test_build_graphs.pytest": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        1,
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/typecheck/test_sitecustomize.py",
+      "lines": [
+        5,
+        7
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        7,
+        49
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        9,
+        29,
+        43,
+        53
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 40,
+          "end": 46
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        4,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        8,
+        34
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 31,
+          "end": 37
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.tools.test_add_module_docstrings.pytest": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        1,
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        7,
+        49
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        9,
+        29,
+        43,
+        53
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 40,
+          "end": 46
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        4,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        8,
+        34
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 31,
+          "end": 37
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_auto_docstrings.pytest": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        1,
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        7,
+        49
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        9,
+        29,
+        43,
+        53
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 40,
+          "end": 46
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        4,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        8,
+        34
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 31,
+          "end": 37
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.test_e2e_smoke.pytest": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        1,
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        7,
+        49
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        9,
+        29,
+        43,
+        53
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 40,
+          "end": 46
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        4,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        8,
+        34
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 31,
+          "end": 37
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_type_resolution.pytest": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        1,
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        7,
+        49
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        9,
+        29,
+        43,
+        53
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 40,
+          "end": 46
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        4,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        8,
+        34
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 31,
+          "end": 37
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.tools.docs.test_build_graphs.pytest": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        1,
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        7,
+        49
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        9,
+        29,
+        43,
+        53
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 40,
+          "end": 46
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        4,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.test_e2e_smoke.test_smoke": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        5
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_auto_docstrings_extended_summaries.pytest": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        1,
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        7,
+        49
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        9,
+        29,
+        43,
+        53
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 40,
+          "end": 46
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        4,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_faiss_adapter.pytest": [
+    {
+      "file": "tests/test_e2e_smoke.py",
+      "lines": [
+        1,
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        7,
+        49
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        9,
+        29,
+        43,
+        53
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 40,
+          "end": 46
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        4,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.helper.duckdb": [
+    {
+      "file": "tests/smoke/test_search_api_smoke.py",
+      "lines": [
+        14,
+        23,
+        53
+      ],
+      "windows": [
+        {
+          "start": 11,
+          "end": 17
+        },
+        {
+          "start": 20,
+          "end": 26
+        },
+        {
+          "start": 50,
+          "end": 56
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_faiss_adapter.py",
+      "lines": [
+        6,
+        32,
+        60
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 29,
+          "end": 35
+        },
+        {
+          "start": 57,
+          "end": 63
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        6,
+        28,
+        60,
+        74
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 25,
+          "end": 31
+        },
+        {
+          "start": 57,
+          "end": 63
+        },
+        {
+          "start": 71,
+          "end": 77
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kg_builder.NavMap.title": [
+    {
+      "file": "tests/smoke/test_search_api_smoke.py",
+      "lines": [
+        64,
+        82
+      ],
+      "windows": [
+        {
+          "start": 61,
+          "end": 67
+        },
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.conftest.json": [
+    {
+      "file": "tests/smoke/test_search_api_smoke.py",
+      "lines": [
+        75,
+        77
+      ],
+      "windows": [
+        {
+          "start": 72,
+          "end": 78
+        },
+        {
+          "start": 74,
+          "end": 80
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        6,
+        16
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "vectorstore_faiss.gpu.cast": [
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        1,
+        12
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_type_resolution.py",
+      "lines": [
+        9,
+        29,
+        36
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 26,
+          "end": 32
+        },
+        {
+          "start": 33,
+          "end": 39
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docs/test_build_graphs.py",
+      "lines": [
+        10,
+        33,
+        34
+      ],
+      "windows": [
+        {
+          "start": 7,
+          "end": 13
+        },
+        {
+          "start": 30,
+          "end": 36
+        },
+        {
+          "start": 31,
+          "end": 37
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_client.client.SupportsHttp": [
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        7,
+        12
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_client._KGFoundryClient.base_url": [
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        12
+      ],
+      "windows": [
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_type_resolution.py",
+      "lines": [
+        270,
+        271
+      ],
+      "windows": [
+        {
+          "start": 267,
+          "end": 273
+        },
+        {
+          "start": 268,
+          "end": 274
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.mock_servers.openalex_mock.app": [
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        5,
+        11
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        25,
+        37,
+        39
+      ],
+      "windows": [
+        {
+          "start": 22,
+          "end": 28
+        },
+        {
+          "start": 34,
+          "end": 40
+        },
+        {
+          "start": 36,
+          "end": 42
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "orchestration.cli.app": [
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        5,
+        11
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        25,
+        37,
+        39
+      ],
+      "windows": [
+        {
+          "start": 22,
+          "end": 28
+        },
+        {
+          "start": 34,
+          "end": 40
+        },
+        {
+          "start": 36,
+          "end": 42
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_client.app": [
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        5,
+        11
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        25,
+        37,
+        39
+      ],
+      "windows": [
+        {
+          "start": 22,
+          "end": 28
+        },
+        {
+          "start": 34,
+          "end": 40
+        },
+        {
+          "start": 36,
+          "end": 42
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.mock_servers.unpaywall_mock.app": [
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        5,
+        11
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        25,
+        37,
+        39
+      ],
+      "windows": [
+        {
+          "start": 22,
+          "end": 28
+        },
+        {
+          "start": 34,
+          "end": 40
+        },
+        {
+          "start": 36,
+          "end": 42
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_client.TestClient": [
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        3,
+        11
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        36,
+        39
+      ],
+      "windows": [
+        {
+          "start": 33,
+          "end": 39
+        },
+        {
+          "start": 36,
+          "end": 42
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "download.cli.app": [
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        5,
+        11
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        25,
+        37,
+        39
+      ],
+      "windows": [
+        {
+          "start": 22,
+          "end": 28
+        },
+        {
+          "start": 34,
+          "end": 40
+        },
+        {
+          "start": 36,
+          "end": 42
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.app.app": [
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        5,
+        11
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        25,
+        37,
+        39
+      ],
+      "windows": [
+        {
+          "start": 22,
+          "end": 28
+        },
+        {
+          "start": 34,
+          "end": 40
+        },
+        {
+          "start": 36,
+          "end": 42
+        }
+      ],
+      "reason": "ast_fqn"
+    }
+  ],
+  "search_api.app": [
+    {
+      "file": "tests/unit/test_client.py",
+      "lines": [
+        5,
+        11
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        25,
+        37,
+        39
+      ],
+      "windows": [
+        {
+          "start": 22,
+          "end": 28
+        },
+        {
+          "start": 34,
+          "end": 40
+        },
+        {
+          "start": 36,
+          "end": 42
+        }
+      ],
+      "reason": "dotted"
+    }
+  ],
+  "search_api.faiss_adapter.Path": [
+    {
+      "file": "tests/unit/test_type_resolution.py",
+      "lines": [
+        8,
+        16,
+        160,
+        249
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 13,
+          "end": 19
+        },
+        {
+          "start": 157,
+          "end": 163
+        },
+        {
+          "start": 246,
+          "end": 252
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_auto_docstrings_extended_summaries.py",
+      "lines": [
+        8,
+        12
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        4,
+        6,
+        14
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 11,
+          "end": 17
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_build_test_map.py",
+      "lines": [
+        7,
+        23,
+        36
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 20,
+          "end": 26
+        },
+        {
+          "start": 33,
+          "end": 39
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_scan_observability_policy.py",
+      "lines": [
+        6,
+        13,
+        28
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 10,
+          "end": 16
+        },
+        {
+          "start": 25,
+          "end": 31
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_schemas_valid.py",
+      "lines": [
+        6,
+        12
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/docs/test_build_graphs_failures.py",
+      "lines": [
+        9,
+        14,
+        56,
+        74
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 11,
+          "end": 17
+        },
+        {
+          "start": 53,
+          "end": 59
+        },
+        {
+          "start": 71,
+          "end": 77
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.base.NavMap.deprecated": [
+    {
+      "file": "tests/unit/test_type_resolution.py",
+      "lines": [
+        204
+      ],
+      "windows": [
+        {
+          "start": 201,
+          "end": 207
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.bm25_index.NavMap.deprecated": [
+    {
+      "file": "tests/unit/test_type_resolution.py",
+      "lines": [
+        204
+      ],
+      "windows": [
+        {
+          "start": 201,
+          "end": 207
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_type_resolution.ssl": [
+    {
+      "file": "tests/unit/test_type_resolution.py",
+      "lines": [
+        7,
+        273
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 270,
+          "end": 276
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_type_resolution.HTTPError": [
+    {
+      "file": "tests/unit/test_type_resolution.py",
+      "lines": [
+        10,
+        275
+      ],
+      "windows": [
+        {
+          "start": 7,
+          "end": 13
+        },
+        {
+          "start": 272,
+          "end": 278
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.tools.test_add_module_docstrings.Path": [
+    {
+      "file": "tests/unit/test_type_resolution.py",
+      "lines": [
+        8,
+        16,
+        160,
+        249
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 13,
+          "end": 19
+        },
+        {
+          "start": 157,
+          "end": 163
+        },
+        {
+          "start": 246,
+          "end": 252
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        4,
+        6,
+        14
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 11,
+          "end": 17
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_build_test_map.py",
+      "lines": [
+        7,
+        23,
+        36
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 20,
+          "end": 26
+        },
+        {
+          "start": 33,
+          "end": 39
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_scan_observability_policy.py",
+      "lines": [
+        6,
+        13,
+        28
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 10,
+          "end": 16
+        },
+        {
+          "start": 25,
+          "end": 31
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/docs/test_build_graphs_failures.py",
+      "lines": [
+        9,
+        14,
+        56,
+        74
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 11,
+          "end": 17
+        },
+        {
+          "start": 53,
+          "end": 59
+        },
+        {
+          "start": 71,
+          "end": 77
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_type_resolution.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        4,
+        6,
+        14
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 11,
+          "end": 17
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_build_test_map.py",
+      "lines": [
+        7,
+        23,
+        36
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 20,
+          "end": 26
+        },
+        {
+          "start": 33,
+          "end": 39
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_scan_observability_policy.py",
+      "lines": [
+        6,
+        13,
+        28
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 10,
+          "end": 16
+        },
+        {
+          "start": 25,
+          "end": 31
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.models.LinkAssertion.run_id": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        12,
+        13,
+        14,
+        15
+      ],
+      "windows": [
+        {
+          "start": 9,
+          "end": 15
+        },
+        {
+          "start": 10,
+          "end": 16
+        },
+        {
+          "start": 11,
+          "end": 17
+        },
+        {
+          "start": 12,
+          "end": 18
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.tools.docs.test_build_graphs.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        4,
+        6,
+        14
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 11,
+          "end": 17
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_scan_observability_policy.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        4,
+        6,
+        14
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 11,
+          "end": 17
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.migrate.main": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        12
+      ],
+      "windows": [
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        11,
+        14,
+        17,
+        27
+      ],
+      "windows": [
+        {
+          "start": 8,
+          "end": 14
+        },
+        {
+          "start": 11,
+          "end": 17
+        },
+        {
+          "start": 14,
+          "end": 20
+        },
+        {
+          "start": 24,
+          "end": 30
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.splade_index.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        4,
+        6,
+        14
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 11,
+          "end": 17
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.tools.test_build_graphs.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        4,
+        6,
+        14
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 11,
+          "end": 17
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_bm25_adapter.pathlib": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        4
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_auto_docstrings.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        4,
+        6,
+        14
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 11,
+          "end": 17
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        3,
+        4,
+        7,
+        10
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 7,
+          "end": 13
+        }
+      ],
+      "reason": "dotted"
+    }
+  ],
+  "tests.unit.test_make_importlinter.main": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        12
+      ],
+      "windows": [
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        11,
+        14,
+        17,
+        27
+      ],
+      "windows": [
+        {
+          "start": 8,
+          "end": 14
+        },
+        {
+          "start": 11,
+          "end": 17
+        },
+        {
+          "start": 14,
+          "end": 20
+        },
+        {
+          "start": 24,
+          "end": 30
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_scan_observability.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        4,
+        6,
+        14
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 11,
+          "end": 17
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_build_test_map.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        4,
+        6,
+        14
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 11,
+          "end": 17
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_registry.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        4,
+        6,
+        14
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 7
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 11,
+          "end": 17
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_make_importlinter.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.fixture_index.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_registry.test_registry_two_phase": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        7
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.parquet_io.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_build_test_map.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.bm25_index.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_export_schemas_pruning.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.conftest.pathlib": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_schemas_valid.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_gen_readmes.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "orchestration.fixture_flow.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_faiss_adapter.pathlib": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.migrate.pathlib": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_auto_docstrings_extended_summaries.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        5,
+        70,
+        91
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 67,
+          "end": 73
+        },
+        {
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        7,
+        45
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        },
+        {
+          "start": 42,
+          "end": 48
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_pipeline_artifacts.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_parquet_io.Path": [
+    {
+      "file": "tests/unit/test_registry.py",
+      "lines": [
+        1,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.bm25.Iterable": [
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        2,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.parquet_io.Iterable": [
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        2,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.base.Iterable": [
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        2,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_imports.Iterable": [
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        2,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.splade.Iterable": [
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        2,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_build_test_map.importlib": [
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        1,
+        16
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        5,
+        51
+      ],
+      "windows": [
+        {
+          "start": 2,
+          "end": 8
+        },
+        {
+          "start": 48,
+          "end": 54
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.bm25_index.Iterable": [
+    {
+      "file": "tests/unit/test_imports.py",
+      "lines": [
+        2,
+        6
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 3,
+          "end": 9
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.splade.NavMap": [
+    {
+      "file": "tests/unit/test_gen_readmes.py",
+      "lines": [
+        523
+      ],
+      "windows": [
+        {
+          "start": 520,
+          "end": 526
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.fusion.NavMap.since": [
+    {
+      "file": "tests/unit/test_gen_readmes.py",
+      "lines": [
+        238,
+        397
+      ],
+      "windows": [
+        {
+          "start": 235,
+          "end": 241
+        },
+        {
+          "start": 394,
+          "end": 400
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.tools": [
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        1,
+        6,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.tools": [
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        1,
+        6,
+        7
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_make_importlinter.MODULE_PATH": [
+    {
+      "file": "tests/unit/test_make_importlinter.py",
+      "lines": [
+        6,
+        7
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.faiss_adapter.HAVE_FAISS": [
+    {
+      "file": "tests/unit/test_faiss_adapter.py",
+      "lines": [
+        13,
+        18
+      ],
+      "windows": [
+        {
+          "start": 10,
+          "end": 16
+        },
+        {
+          "start": 15,
+          "end": 21
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_bm25_adapter.most_frequent_token": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        27,
+        50
+      ],
+      "windows": [
+        {
+          "start": 24,
+          "end": 30
+        },
+        {
+          "start": 47,
+          "end": 53
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.app.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "docling.hybrid.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "docling.vlm.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.splade_index.SpladeDoc.section": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        77,
+        82
+      ],
+      "windows": [
+        {
+          "start": 74,
+          "end": 80
+        },
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kg_builder.neo4j_store.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.bm25_index.BM25Doc.section": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        77,
+        82
+      ],
+      "windows": [
+        {
+          "start": 74,
+          "end": 80
+        },
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.bm25.PurePythonBM25.index_dir": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        84
+      ],
+      "windows": [
+        {
+          "start": 81,
+          "end": 87
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.migrate.duckdb": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        6,
+        28,
+        60,
+        74
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 25,
+          "end": 31
+        },
+        {
+          "start": 57,
+          "end": 63
+        },
+        {
+          "start": 71,
+          "end": 77
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kg_builder.mock_kg.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "linking.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.api.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "download.harvester.Doc.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_bm25_adapter.test_bm25_build_and_search_from_fixtures": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        49
+      ],
+      "windows": [
+        {
+          "start": 46,
+          "end": 52
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.fixture_index.FixtureIndex.docs": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        81,
+        85
+      ],
+      "windows": [
+        {
+          "start": 78,
+          "end": 84
+        },
+        {
+          "start": 82,
+          "end": 88
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.splade_index.SpladeDoc.chunk_id": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        59,
+        65,
+        77
+      ],
+      "windows": [
+        {
+          "start": 56,
+          "end": 62
+        },
+        {
+          "start": 62,
+          "end": 68
+        },
+        {
+          "start": 74,
+          "end": 80
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.duckdb_registry.Doc.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.errors.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.splade.PureImpactIndex.index_dir": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        84
+      ],
+      "windows": [
+        {
+          "start": 81,
+          "end": 87
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.models.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.splade_index.SpladeIndex.docs": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        81,
+        85
+      ],
+      "windows": [
+        {
+          "start": 78,
+          "end": 84
+        },
+        {
+          "start": 82,
+          "end": 88
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "ontology.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.conftest.FIXTURES": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        8,
+        9
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 6,
+          "end": 12
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.splade_index.duckdb": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        6,
+        28,
+        60,
+        74
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 25,
+          "end": 31
+        },
+        {
+          "start": 57,
+          "end": 63
+        },
+        {
+          "start": 71,
+          "end": 77
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.helper.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.api.Doc.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.fixture_index.FixtureIndex.df": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        30,
+        34,
+        39
+      ],
+      "windows": [
+        {
+          "start": 27,
+          "end": 33
+        },
+        {
+          "start": 31,
+          "end": 37
+        },
+        {
+          "start": 36,
+          "end": 42
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_client.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.app.PurePythonBM25": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        20,
+        84
+      ],
+      "windows": [
+        {
+          "start": 17,
+          "end": 23
+        },
+        {
+          "start": 81,
+          "end": 87
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "ontology.catalog.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.fixture_index.duckdb": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        6,
+        28,
+        60,
+        74
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 25,
+          "end": 31
+        },
+        {
+          "start": 57,
+          "end": 63
+        },
+        {
+          "start": 71,
+          "end": 77
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "orchestration.cli.NavMap.title": [
+    {
+      "file": "tests/unit/test_bm25_adapter.py",
+      "lines": [
+        82
+      ],
+      "windows": [
+        {
+          "start": 79,
+          "end": 85
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "observability.metrics._NoopMetric.labels": [
+    {
+      "file": "tests/docs/test_scan_observability_policy.py",
+      "lines": [
+        40
+      ],
+      "windows": [
+        {
+          "start": 37,
+          "end": 43
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.app.SearchRequest.filters": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        12,
+        19,
+        61
+      ],
+      "windows": [
+        {
+          "start": 9,
+          "end": 15
+        },
+        {
+          "start": 16,
+          "end": 22
+        },
+        {
+          "start": 58,
+          "end": 64
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.schemas.SearchRequest.filters": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        12,
+        19,
+        61
+      ],
+      "windows": [
+        {
+          "start": 9,
+          "end": 15
+        },
+        {
+          "start": 16,
+          "end": 22
+        },
+        {
+          "start": 58,
+          "end": 64
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.bm25_index.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_build_test_map.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.migrate.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.app.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_scan_observability_policy.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.exceptions.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.mock_servers.run_all.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "linking.calibration.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "vectorstore_faiss.gpu.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.models.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.duckdb_registry.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.conftest.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_export_schemas_pruning.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_build_test_map.annotations": [
+    {
+      "file": "tests/docs/test_docstring_normalizer.py",
+      "lines": [
+        3,
+        102
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        },
+        {
+          "start": 99,
+          "end": 105
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_pipeline_artifacts.json": [
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        6,
+        16
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.logging.json": [
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        6,
+        16
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.duckdb_registry.json": [
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        6,
+        16
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_export_schemas_pruning.json": [
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        6,
+        16
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.helper.json": [
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        6,
+        16
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "orchestration.cli.json": [
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        6,
+        16
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_schemas_valid.json": [
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        6,
+        16
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_client.client.SupportsResponse.json": [
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        6,
+        16
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_build_test_map.json": [
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        6,
+        16
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "observability.metrics._NoopMetric.set": [
+    {
+      "file": "tests/docs/test_docfacts.py",
+      "lines": [
+        26,
+        44
+      ],
+      "windows": [
+        {
+          "start": 23,
+          "end": 29
+        },
+        {
+          "start": 41,
+          "end": 47
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_auto_docstrings_extended_summaries.sys": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        2,
+        12
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_pipeline_artifacts.sys": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        2,
+        12
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_auto_docstrings.sys": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        2,
+        12
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.tools.test_build_graphs.sys": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        2,
+        12
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.fixture_index.FixtureDoc.text": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        12
+      ],
+      "windows": [
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "orchestration.cli.e2e": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        9,
+        12
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_gen_readmes.sys": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        2,
+        12
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.conftest.sys": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        2,
+        12
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.splade_index.SpladeDoc.text": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        12
+      ],
+      "windows": [
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_export_schemas_pruning.sys": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        2,
+        12
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_pipeline_artifacts.subprocess": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        1,
+        11
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.mock_servers.openalex_mock.works": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        10
+      ],
+      "windows": [
+        {
+          "start": 7,
+          "end": 13
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.tools.docs.test_build_graphs.subprocess": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        1,
+        11
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        },
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "download.cli.harvest": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        15
+      ],
+      "windows": [
+        {
+          "start": 12,
+          "end": 18
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "orchestration.cli": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        9,
+        12
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "dotted"
+    }
+  ],
+  "kgfoundry_common.logging.sys": [
+    {
+      "file": "tests/e2e/test_pipeline_skeleton.py",
+      "lines": [
+        2,
+        12
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 5
+        },
+        {
+          "start": 9,
+          "end": 15
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "orchestration.flows": [
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        26
+      ],
+      "windows": [
+        {
+          "start": 23,
+          "end": 29
+        }
+      ],
+      "reason": "dotted"
+    }
+  ],
+  "docling.hybrid": [
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        17
+      ],
+      "windows": [
+        {
+          "start": 14,
+          "end": 20
+        }
+      ],
+      "reason": "dotted"
+    }
+  ],
+  "search_api.app.healthz": [
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        40
+      ],
+      "windows": [
+        {
+          "start": 37,
+          "end": 43
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "ontology.loader": [
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        22
+      ],
+      "windows": [
+        {
+          "start": 19,
+          "end": 25
+        }
+      ],
+      "reason": "dotted"
+    }
+  ],
+  "linking.linker": [
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        23
+      ],
+      "windows": [
+        {
+          "start": 20,
+          "end": 26
+        }
+      ],
+      "reason": "dotted"
+    }
+  ],
+  "kg_builder.neo4j_store": [
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        24
+      ],
+      "windows": [
+        {
+          "start": 21,
+          "end": 27
+        }
+      ],
+      "reason": "dotted"
+    }
+  ],
+  "tests": [
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "dotted"
+    }
+  ],
+  "download.harvester": [
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        15
+      ],
+      "windows": [
+        {
+          "start": 12,
+          "end": 18
+        }
+      ],
+      "reason": "dotted"
+    }
+  ],
+  "docling.vlm": [
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        16
+      ],
+      "windows": [
+        {
+          "start": 13,
+          "end": 19
+        }
+      ],
+      "reason": "dotted"
+    }
+  ],
+  "kgfoundry_common.navmap_types.SymbolMeta.tests": [
+    {
+      "file": "tests/unit/kgfoundry_common/test_skeleton.py",
+      "lines": [
+        1
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 4
+        }
+      ],
+      "reason": "tail"
+    }
+  ]
+}

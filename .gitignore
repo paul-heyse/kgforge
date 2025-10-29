@@ -10,7 +10,6 @@ data/**/*
 *.parquet
 *.faiss
 *.ids
-/.wheelhouse
 
 # envs & build junk
 .venv/
@@ -19,17 +18,8 @@ data/**/*
 .pytest_cache/
 __pycache__/
 dist/
-build/
-.env
-.envrc.local
-site/_build/
 KGForge.egg-info/
-docs/_build/*
-!docs/_build/
-!docs/_build/docfacts.json
-gallery/
-*.dot
-*.svg~
+
 
 # IDE
 .vscode/*

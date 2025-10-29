@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Overview of build navmap.
 
-This module bundles build navmap logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This module bundles build navmap logic for the kgfoundry stack. It
+groups related helpers so downstream packages can import a single
+cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -114,8 +115,9 @@ class NavmapPlaceholderError(NavmapError):
 class AllDictTemplate:
     """Model the AllDictTemplate.
 
-    Represent the alldicttemplate data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
+    Represent the alldicttemplate data structure used throughout the
+    project. The class encapsulates behaviour behind a well-defined
+    interface for collaborating components. Instances are typically
     created by factories or runtime orchestrators documented nearby.
     """
 
@@ -464,9 +466,10 @@ def _replace_placeholders(value: NavTree, exports: Sequence[str]) -> ResolvedNav
 class ModuleInfo:
     """Model the ModuleInfo.
 
-    Represent the moduleinfo data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Represent the moduleinfo data structure used throughout the project.
+    The class encapsulates behaviour behind a well-defined interface for
+    collaborating components. Instances are typically created by
+    factories or runtime orchestrators documented nearby.
     """
 
     module: str
@@ -487,7 +490,9 @@ def _rel(p: Path) -> str:
 
 
 def _git_sha() -> str:
-    """Return the current Git commit hash, falling back to environment overrides."""
+    """Return the current Git commit hash, falling back to environment
+    overrides.
+    """
     if G_SHA:
         return G_SHA
     try:
@@ -597,7 +602,9 @@ def _maybe_extract_exports(node: ast.AST) -> list[str] | None:
 
 
 def _maybe_extract_navmap(node: ast.AST) -> dict[str, NavTree] | None:
-    """Return a literal ``__navmap__`` dictionary when supported constructs are used."""
+    """Return a literal ``__navmap__`` dictionary when supported constructs are
+    used.
+    """
     try:
         literal = _literal_eval_navmap(node)
     except NavmapLiteralError:
@@ -642,7 +649,9 @@ def _process_ann_assign(
 
 
 def _gather_module_literals(module: ast.Module) -> tuple[list[str], dict[str, NavTree] | None]:
-    """Return literal ``__all__`` and ``__navmap__`` values declared in ``module``."""
+    """Return literal ``__all__`` and ``__navmap__`` values declared in
+    ``module``.
+    """
     exports: list[str] = []
     nav_literal: dict[str, NavTree] | None = None
     for node in module.body:
@@ -655,7 +664,9 @@ def _gather_module_literals(module: ast.Module) -> tuple[list[str], dict[str, Na
 
 
 def _dedupe_exports(exports: Sequence[str]) -> list[str]:
-    """Return exports with original ordering preserved and duplicates removed."""
+    """Return exports with original ordering preserved and duplicates
+    removed.
+    """
     return list(dict.fromkeys(exports))
 
 
@@ -921,7 +932,9 @@ def _collect_module_entries(files: Sequence[Path]) -> dict[str, ModuleEntryDict]
 
 
 def _discover_py_files(root: Path = SRC) -> list[Path]:
-    """Return every Python source file under ``root`` sorted lexicographically."""
+    """Return every Python source file under ``root`` sorted
+    lexicographically.
+    """
     return sorted(p for p in root.rglob("*.py") if p.is_file())
 
 

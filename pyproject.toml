@@ -7,7 +7,7 @@ name = "kgfoundry"
 version = "0.1.0"
 description = "kgfoundry"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = "==3.13.9"
 dependencies = [
     # ============================================================================
     # HTTP & Networking
@@ -263,6 +263,7 @@ extend-exclude = [
     "site/**",
     "src/kgfoundry.egg-info/**",
     "kgfoundry.egg-info/**",
+    "faiss/**",
 ]
 
 [tool.ruff.format]

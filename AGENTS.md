@@ -15,7 +15,7 @@
    - Future shell entries auto-refresh whenever `pyproject.toml`, `uv.lock`, or `.env` change.
 
 3. **Manual uv flow (last resort / CI snippets)**
-   - `uv python pin 3.13`
+   - `uv python pin 3.13.9`
    - `uv venv`
    - `uv sync --frozen`
    - `uvx pre-commit install -t pre-commit -t pre-push`
@@ -26,7 +26,7 @@
 
 ### Python Version & Environment
 
-- **Python Version**: 3.13 (pinned)
+- **Python Version**: 3.13.9 (pinned)
 - **Package Manager**: `uv` (fast, deterministic)
 - **Environment**: `.venv/` (never use system Python)
 
@@ -70,7 +70,7 @@
 
 #### Mypy Configuration
 - **Strict mode enabled**
-- **Python version**: 3.13
+- **Python version**: 3.13.9
 - **Key settings**:
   - `disallow_untyped_defs = true` - All functions must have type hints
   - `no_implicit_optional = true` - Explicit Optional[] required
@@ -458,7 +458,7 @@ Keep this managed block so 'openspec update' can refresh the instructions.
    - Future shell entries auto-refresh whenever `pyproject.toml`, `uv.lock`, or `.env` change.
 
 3. **Manual uv flow (last resort / CI snippets)**
-   - `uv python pin 3.13`
+   - `uv python pin 3.13.9`
    - `uv venv`
    - `uv sync --frozen`
    - `uvx pre-commit install -t pre-commit -t pre-push`

@@ -1,0 +1,138 @@
+src.search_api.service
+======================
+
+.. py:module:: src.search_api.service
+
+.. autoapi-nested-parse::
+
+   Overview of service.
+
+   This module bundles service logic for the kgfoundry stack. It groups related helpers so downstream
+   packages can import a single cohesive namespace. Refer to the functions and classes below for
+   implementation specifics.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: rrf_fuse(dense, sparse, k = 60)
+
+   
+   Compute rrf fuse.
+
+   Carry out the rrf fuse operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param dense: Description for ``dense``.
+   :type dense: List[Tuple[str, float]]
+   :param sparse: Description for ``sparse``.
+   :type sparse: List[Tuple[str, float]]
+   :param k: Optional parameter default ``60``. Description for ``k``.
+   :type k: int | None
+
+   :returns: *List[Tuple[str, float]]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.service import rrf_fuse
+   >>> result = rrf_fuse(..., ...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: apply_kg_boosts(fused, query)
+
+   
+   Compute apply kg boosts.
+
+   Carry out the apply kg boosts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param fused: Description for ``fused``.
+   :type fused: List[Tuple[str, float]]
+   :param query: Description for ``query``.
+   :type query: str
+
+   :returns: *List[Tuple[str, float]]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.service import apply_kg_boosts
+   >>> result = apply_kg_boosts(..., ...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: mmr_deduplicate(results, lambda_ = 0.7)
+
+   
+   Compute mmr deduplicate.
+
+   Carry out the mmr deduplicate operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+   :param results: Description for ``results``.
+   :type results: List[Tuple[str, float]]
+   :param lambda_: Optional parameter default ``0.7``. Description for ``lambda_``.
+   :type lambda_: float | None
+
+   :returns: *List[Tuple[str, float]]* -- Description of return value.
+
+   .. rubric:: Examples
+
+   >>> from search_api.service import mmr_deduplicate
+   >>> result = mmr_deduplicate(...)
+   >>> result  # doctest: +ELLIPSIS
+   ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

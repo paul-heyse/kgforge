@@ -1,0 +1,49 @@
+src.search_api
+==============
+
+.. py:module:: src.search_api
+
+.. autoapi-nested-parse::
+
+   
+   Overview of search api.
+
+   This module bundles search api logic for the kgfoundry stack. It groups related helpers so
+   downstream packages can import a single cohesive namespace. Refer to the functions and classes below
+   for implementation specifics.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/src/search_api/app/index
+   /autoapi/src/search_api/bm25_index/index
+   /autoapi/src/search_api/faiss_adapter/index
+   /autoapi/src/search_api/fixture_index/index
+   /autoapi/src/search_api/fusion/index
+   /autoapi/src/search_api/kg_mock/index
+   /autoapi/src/search_api/schemas/index
+   /autoapi/src/search_api/service/index
+   /autoapi/src/search_api/splade_index/index
+
+

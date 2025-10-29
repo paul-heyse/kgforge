@@ -1,8 +1,9 @@
 """Overview of parquet io.
 
-This module bundles parquet io logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This module bundles parquet io logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -55,28 +56,39 @@ ROW_GROUP_SIZE = 4096
 
 # [nav:anchor ParquetVectorWriter]
 class ParquetVectorWriter:
-    """Write dense and SPLADE vectors to partitioned Parquet layouts.
+    """Describe ParquetVectorWriter.
 
-    Parameters
-    ----------
-    root : str
-        Root directory that receives partitioned parquet outputs.
-    """
+<!-- auto:docstring-builder v1 -->
+
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+root : str
+    Describe ``root``.
+"""
 
     @staticmethod
     def dense_schema(dim: int) -> pa.schema:
-        """Build the schema for dense embedding parquet files.
+        """Describe dense schema.
 
-        Parameters
-        ----------
-        dim : int
-            Dimension of the dense vector column.
+<!-- auto:docstring-builder v1 -->
 
-        Returns
-        -------
-        pa.schema
-            Schema describing the dense vector table layout.
-        """
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+dim : int
+    Describe ``dim``.
+    
+
+Returns
+-------
+pyarrow.lib.schema
+    Describe return value.
+"""
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -90,6 +102,17 @@ class ParquetVectorWriter:
         )
 
     def __init__(self, root: str) -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+root : str
+    Describe ``root``.
+"""
         self.root = Path(root)
 
     def write_dense(
@@ -100,34 +123,32 @@ class ParquetVectorWriter:
         records: Iterable[tuple[str, list[float], float]],
         shard: int = 0,
     ) -> str:
-        """Write dense embedding vectors to a partitioned Parquet shard.
+        """Describe write dense.
 
-        Carry out the write dense operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+<!-- auto:docstring-builder v1 -->
 
-        Parameters
-        ----------
-        model : str
-            Description for ``model``.
-        run_id : str
-            Description for ``run_id``.
-        dim : int
-            Description for ``dim``.
-        records : Iterable[tuple[str, list[float], float]]
-            Description for ``records``.
-        shard : int, optional
-            Optional parameter default ``0``. Description for ``shard``.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-        Returns
-        -------
-        str
-            Description of return value.
+Parameters
+----------
+model : str
+    Describe ``model``.
+run_id : str
+    Describe ``run_id``.
+dim : int
+    Describe ``dim``.
+records : Iterable[tuple[str, list[float], float]]
+    Describe ``records``.
+shard : int, optional
+    Describe ``shard``.
+    Defaults to ``0``.
+    
 
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import write_dense
-        >>> result = write_dense(..., ..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Returns
+-------
+str
+    Describe return value.
+"""
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -155,13 +176,17 @@ class ParquetVectorWriter:
 
     @staticmethod
     def splade_schema() -> pa.schema:
-        """Build the schema for SPLADE impact parquet files.
+        """Describe splade schema.
 
-        Returns
-        -------
-        pa.schema
-            Schema describing impact weights stored in parquet.
-        """
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Returns
+-------
+pyarrow.lib.schema
+    Describe return value.
+"""
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -181,32 +206,30 @@ class ParquetVectorWriter:
         records: Iterable[tuple[str, list[int], list[float]]],
         shard: int = 0,
     ) -> str:
-        """Write SPLADE impact vectors to a partitioned Parquet shard.
+        """Describe write splade.
 
-        Carry out the write splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+<!-- auto:docstring-builder v1 -->
 
-        Parameters
-        ----------
-        model : str
-            Description for ``model``.
-        run_id : str
-            Description for ``run_id``.
-        records : Iterable[tuple[str, list[int], list[float]]]
-            Description for ``records``.
-        shard : int, optional
-            Optional parameter default ``0``. Description for ``shard``.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-        Returns
-        -------
-        str
-            Description of return value.
+Parameters
+----------
+model : str
+    Describe ``model``.
+run_id : str
+    Describe ``run_id``.
+records : Iterable[tuple[str, list[int], list[float]]]
+    Describe ``records``.
+shard : int, optional
+    Describe ``shard``.
+    Defaults to ``0``.
+    
 
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import write_splade
-        >>> result = write_splade(..., ..., ...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Returns
+-------
+str
+    Describe return value.
+"""
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -235,27 +258,39 @@ class ParquetVectorWriter:
 
 # [nav:anchor ParquetChunkWriter]
 class ParquetChunkWriter:
-    """Write chunk records and metadata to partitioned Parquet files.
+    """Describe ParquetChunkWriter.
 
-    Parameters
-    ----------
-    root : str
-        Root directory for chunk parquet outputs.
-    model : str, optional
-        Model identifier stored alongside the chunk data. Defaults to ``"docling_hybrid"``.
-    run_id : str, optional
-        Run identifier used to scope partitions. Defaults to ``"dev"``.
-    """
+<!-- auto:docstring-builder v1 -->
+
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+root : str
+    Describe ``root``.
+model : str, optional
+    Describe ``model``.
+    Defaults to ``'docling_hybrid'``.
+run_id : str, optional
+    Describe ``run_id``.
+    Defaults to ``'dev'``.
+"""
 
     @staticmethod
     def chunk_schema() -> pa.schema:
-        """Build the schema describing chunk parquet files.
+        """Describe chunk schema.
 
-        Returns
-        -------
-        pa.schema
-            Schema capturing chunk identifiers and doctags spans.
-        """
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Returns
+-------
+pyarrow.lib.schema
+    Describe return value.
+"""
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -281,30 +316,44 @@ class ParquetChunkWriter:
         )
 
     def __init__(self, root: str, model: str = "docling_hybrid", run_id: str = "dev") -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+root : str
+    Describe ``root``.
+model : str, optional
+    Describe ``model``.
+    Defaults to ``'docling_hybrid'``.
+run_id : str, optional
+    Describe ``run_id``.
+    Defaults to ``'dev'``.
+"""
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
     def write(self, rows: Iterable[dict[str, Any]]) -> str:
-        """Write chunk records to the configured Parquet layout.
+        """Describe write.
 
-        Carry out the write operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+<!-- auto:docstring-builder v1 -->
 
-        Parameters
-        ----------
-        rows : Iterable[dict[str, Any]]
-            Description for ``rows``.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-        Returns
-        -------
-        str
-            Description of return value.
+Parameters
+----------
+rows : Iterable[dict[str, Any]]
+    Describe ``rows``.
+    
 
-        Examples
-        --------
-        >>> from kgfoundry_common.parquet_io import write
-        >>> result = write(...)
-        >>> result  # doctest: +ELLIPSIS
-        """
+Returns
+-------
+str
+    Describe return value.
+"""
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(
             table,

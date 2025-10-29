@@ -4131,7 +4131,7 @@ ontology.loader = &quot;ontology.loader:OntologyLoader&quot;
 <blockquote>
 <p>Keep models lean. Payloads (large text, vectors) live in Parquet files; rows refer to them via IDs.</p>
 </blockquote>
-<pre><code class="language-python"># kgfoundry_common/models.py (Python 3.13, Pydantic v2)
+<pre><code class="language-python"># kgfoundry_common/models.py (Python 3.13.9, Pydantic v2)
 from pydantic import BaseModel, Field, AwareDatetime
 from typing import Optional, List, Dict, Literal
 from dataclasses import dataclass

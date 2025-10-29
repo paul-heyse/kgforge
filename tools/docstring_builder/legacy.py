@@ -452,7 +452,9 @@ def process_file(file_path: Path) -> bool:
 
 
 def _ensure_trailing_blank_lines(file_path: Path) -> None:
-    """Ensure generated docstrings leave a spacer line after the closing quotes."""
+    """Ensure generated docstrings leave a spacer line after the closing
+    quotes.
+    """
     lines = file_path.read_text(encoding="utf-8").splitlines()
     if not lines:
         return

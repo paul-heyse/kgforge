@@ -1024,7 +1024,7 @@ def func1():
 | [`tools/validate_gallery.py`](tools/validate_gallery.py) | Parses `examples/*.py` to ensure docstrings follow the Sphinx-Gallery title, tag, and constraints conventions. Fails early when examples drift. |
 | [`.numpydoc`](.numpydoc) | Global numpydoc validation settings (`GL01`, `SS01`, `ES01`, `RT01`, `PR01`) used by Sphinx during HTML/JSON builds. |
 | [`pyproject.toml`](pyproject.toml) | Configures Ruff (lint/format), Black, pytest, mypy, pydocstyle, and documentation tooling (bundled with project dependencies). |
-| [`mypy.ini`](mypy.ini) | Strict type-check configuration (Python 3.13, `mypy_path=src`, third-party ignores for packages lacking stubs). |
+| [`mypy.ini`](mypy.ini) | Strict type-check configuration (Python 3.13.9, `mypy_path=src`, third-party ignores for packages lacking stubs). |
 | [`tools/doq_templates/numpy/`](tools/doq_templates/numpy/) | Legacy NumPy-style templates kept for one-off skeleton seeding with `doq` when bootstrapping new modules. |
 
 ---
@@ -1714,7 +1714,7 @@ The `.pre-commit-config.yaml` file wires in comprehensive quality checks that ru
 
 5. **Mypy** - `mypy src`
    - Static type checking with strict mode
-   - Python 3.13 target
+   - Python 3.13.9 target
    - `mypy_path = src` for imports
    - Ignores third-party packages without stubs (duckdb, faiss, etc.)
    - Checks: disallow_untyped_defs, no_implicit_optional, warn_unused_ignores, warn_redundant_casts, strict_equality
@@ -2149,7 +2149,7 @@ Because these run on every commit, local commands like `tools/update_docs.sh` ma
 
 - Line length is 100 in both Ruff and Black; docformatter also wraps at 100.
 - Ruff's formatter is authoritative; Black acts as a safety net and should be a no-op.
-- Mypy targets Python 3.13 with strict options; `mypy_path = src` for imports.
+- Mypy targets Python 3.13.9 with strict options; `mypy_path = src` for imports.
 - Ruff formatting uses double quotes and space indentation.
 
 ---
@@ -3285,7 +3285,7 @@ def func1():
 | [`mkdocs.yml`](mkdocs.yml) | MkDocs configuration for Material theme with plugins: search, gen-files (dynamic API pages), mkdocstrings (Python docs), literate-nav, section-index. |
 | [`.pre-commit-config.yaml`](.pre-commit-config.yaml) | Pre-commit hooks: Ruff (imports/lint/format), Black, Mypy, docformatter, pydocstyle, interrogate, navmap-build, navmap-check. |
 | [`pyproject.toml`](pyproject.toml) | Configures Ruff (lint/format), Black, pytest, mypy, pydocstyle, and documentation tooling (bundled with project dependencies). |
-| [`mypy.ini`](mypy.ini) | Strict type-check configuration (Python 3.13, `mypy_path=src`, third-party ignores for packages lacking stubs). |
+| [`mypy.ini`](mypy.ini) | Strict type-check configuration (Python 3.13.9, `mypy_path=src`, third-party ignores for packages lacking stubs). |
 | [`tools/doq_templates/numpy/`](tools/doq_templates/numpy/) | Legacy NumPy-style templates kept for one-off skeleton seeding with `doq` when bootstrapping new modules. |
 
 ---
@@ -3695,7 +3695,7 @@ Because these run on every commit, local commands like `tools/update_docs.sh` ma
 
 - Line length is 100 in both Ruff and Black; docformatter also wraps at 100.
 - Ruff's formatter is authoritative; Black acts as a safety net and should be a no-op.
-- Mypy targets Python 3.13 with strict options; `mypy_path = src` for imports.
+- Mypy targets Python 3.13.9 with strict options; `mypy_path = src` for imports.
 - Ruff formatting uses double quotes and space indentation.
 
 ---

@@ -1,8 +1,9 @@
 """Overview of calibration.
 
-This module bundles calibration logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This module bundles calibration logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -41,32 +42,21 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor isotonic_calibrate]
 def isotonic_calibrate(pairs: list[tuple[float, int]]) -> dict[str, object]:
-    """Compute isotonic calibrate.
+    """Describe isotonic calibrate.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the isotonic calibrate operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 pairs : list[tuple[float, int]]
-    Description for ``pairs``.
-    
-    
-    
+    Describe ``pairs``.
 
 Returns
 -------
 dict[str, object]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from linking.calibration import isotonic_calibrate
->>> result = isotonic_calibrate(...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     # NOTE: fit isotonic regression parameters when calibrator is implemented
     return {"kind": "isotonic", "params": []}

@@ -3,7 +3,7 @@
 
 This repository is the **skeleton** for the single-machine architecture you specified:
 - Ubuntu 24.04 / RTX 5090 / AMD 9950X / 192 GB RAM
-- Python 3.13, PyTorch 2.9 (CUDA 13.0)
+- Python 3.13.9, PyTorch 2.9 (CUDA 13.0)
 - vLLM (pre-release supporting CUDA 13)
 - DuckDB ≥ 1.4.1
 - Docling VLM (Granite-Docling) → DocTags + Docling HybridChunker
@@ -20,7 +20,7 @@ This repository is the **skeleton** for the single-machine architecture you spec
 
 ```bash
 # one-time setup
-uv python pin 3.13            # writes .python-version
+uv python pin 3.13.9          # writes .python-version
 uv venv                       # creates .venv/
 uv sync                       # installs from uv.lock / pyproject
 ```
@@ -50,7 +50,7 @@ uv sync                       # installs from uv.lock / pyproject
 
 ## Python & Tooling
 
-- `pyproject.toml`: Python 3.13; dependencies pinned minimally; heavy libs listed but commented or optional extras.
+- `pyproject.toml`: Python 3.13.9; dependencies pinned minimally; heavy libs listed but commented or optional extras.
 - Pre-commit with ruff/black/mypy; strict typing by default.
 - Package README generation: `python tools/gen_readmes.py` (see
   [Automated Documentation](README-AUTOMATED-DOCUMENTATION.md#readme-generation-toolsgen_readmespy)
@@ -69,14 +69,14 @@ and minimal shims so teams can implement their parts with confidence.
 # kgfoundry (skeleton)
 Single-machine architecture for ontology-grounded hybrid search (dense + sparse + KG) with local registries and indices.
 **Target host:** Ubuntu 24.04 · RTX 5090 (CUDA 13.0) · AMD 9950X (16 cores) · 192 GB RAM  
-**Runtime:** Python 3.13, PyTorch 2.9 (CUDA 13), vLLM pre-release (CUDA 13), DuckDB ≥ 1.4.1
+**Runtime:** Python 3.13.9, PyTorch 2.9 (CUDA 13), vLLM pre-release (CUDA 13), DuckDB ≥ 1.4.1
 This repository is a **skeleton** generated on 2025-10-25. It contains packages, interfaces, configs, and stubs to accelerate
 independent development of each workstream.
 
 <!-- merged from kgfoundry_skeleton (2).zip -->
 This repository is the **skeleton** for the single-machine architecture:
 - Ubuntu 24.04, RTX 5090, AMD 9950X (16c), 192 GB RAM
-- Python 3.13, PyTorch 2.9 (CUDA 13)
+- Python 3.13.9, PyTorch 2.9 (CUDA 13)
 - vLLM prerelease (CUDA 13): Granite-Docling VLM + Qwen3-Embedding-4B (2560-d)
 - Docling HybridChunker for chunking
 - Dense: Qwen3-Embedding-4B (2560)

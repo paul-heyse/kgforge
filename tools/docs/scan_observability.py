@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Overview of scan observability.
 
-This module bundles scan observability logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This module bundles scan observability logic for the kgfoundry stack. It
+groups related helpers so downstream packages can import a single
+cohesive namespace. Refer to the functions and classes below for
+implementation specifics.
 """
 
 from __future__ import annotations
@@ -221,7 +222,9 @@ POLICY_PATH = ROOT / "docs" / "policies" / "observability.yml"
 
 
 def _deep_merge_dicts(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
-    """Return a deep merge of ``override`` into ``base`` without mutating either mapping."""
+    """Return a deep merge of ``override`` into ``base`` without mutating
+    either mapping.
+    """
     merged: dict[str, Any] = {}
     for key, base_value in base.items():
         if key in override:
@@ -272,9 +275,10 @@ def load_policy() -> dict[str, Any]:
 class MetricRow:
     """Model the MetricRow.
 
-    Represent the metricrow data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Represent the metricrow data structure used throughout the project.
+    The class encapsulates behaviour behind a well-defined interface for
+    collaborating components. Instances are typically created by
+    factories or runtime orchestrators documented nearby.
     """
 
     name: str
@@ -292,9 +296,10 @@ class MetricRow:
 class LogRow:
     """Model the LogRow.
 
-    Represent the logrow data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Represent the logrow data structure used throughout the project. The
+    class encapsulates behaviour behind a well-defined interface for
+    collaborating components. Instances are typically created by
+    factories or runtime orchestrators documented nearby.
     """
 
     logger: str | None
@@ -311,9 +316,10 @@ class LogRow:
 class TraceRow:
     """Model the TraceRow.
 
-    Represent the tracerow data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
+    Represent the tracerow data structure used throughout the project.
+    The class encapsulates behaviour behind a well-defined interface for
+    collaborating components. Instances are typically created by
+    factories or runtime orchestrators documented nearby.
     """
 
     span_name: str | None
@@ -340,7 +346,9 @@ _PROM_UNITS = set(DEFAULT_POLICY["metric"]["allowed_units"])
 
 
 def _first_str(node: ast.AST, text: str) -> str | None:
-    """Return the first string literal value found in node's args, else None."""
+    """Return the first string literal value found in node's args, else
+    None.
+    """
     if isinstance(node, ast.Call) and node.args:
         arg0 = node.args[0]
         if isinstance(arg0, ast.Constant) and isinstance(arg0.value, str):

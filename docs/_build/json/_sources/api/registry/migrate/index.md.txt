@@ -1,0 +1,3 @@
+# `registry.migrate`
+
+::: registry.migrate

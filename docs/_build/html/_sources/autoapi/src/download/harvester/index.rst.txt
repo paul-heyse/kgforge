@@ -1,0 +1,238 @@
+src.download.harvester
+======================
+
+.. py:module:: src.download.harvester
+
+.. autoapi-nested-parse::
+
+   Overview of harvester.
+
+   This module bundles harvester logic for the kgfoundry stack. It groups related helpers so downstream
+   packages can import a single cohesive namespace. Refer to the functions and classes below for
+   implementation specifics.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: OpenAccessHarvester(user_agent, contact_email, openalex_base = 'https://api.openalex.org', unpaywall_base = 'https://api.unpaywall.org', pdf_host_base = None, out_dir = '/data/pdfs')
+
+   
+   Model the OpenAccessHarvester.
+
+   Represent the openaccessharvester data structure used throughout the project. The class
+   encapsulates behaviour behind a well-defined interface for collaborating components. Instances
+   are typically created by factories or runtime orchestrators documented nearby.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:attribute:: ua
+
+
+   .. py:attribute:: email
+
+
+   .. py:attribute:: openalex
+      :value: ''
+
+
+
+   .. py:attribute:: unpaywall
+      :value: ''
+
+
+
+   .. py:attribute:: pdf_host
+      :value: ''
+
+
+
+   .. py:attribute:: out_dir
+      :value: '/data/pdfs'
+
+
+
+   .. py:attribute:: session
+
+
+   .. py:method:: search(topic, years, max_works)
+
+      
+      Compute search.
+
+      Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param topic: Description for ``topic``.
+      :type topic: str
+      :param years: Description for ``years``.
+      :type years: str
+      :param max_works: Description for ``max_works``.
+      :type max_works: int
+
+      :returns: *List[dict[str, typing.Any]]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from download.harvester import search
+      >>> result = search(..., ..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: resolve_pdf(work)
+
+      
+      Compute resolve pdf.
+
+      Carry out the resolve pdf operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param work: Description for ``work``.
+      :type work: collections.abc.Mapping
+
+      :returns: *str | None* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from download.harvester import resolve_pdf
+      >>> result = resolve_pdf(...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: download_pdf(url, target_path)
+
+      
+      Compute download pdf.
+
+      Carry out the download pdf operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param url: Description for ``url``.
+      :type url: str
+      :param target_path: Description for ``target_path``.
+      :type target_path: str
+
+      :returns: *str* -- Description of return value.
+
+      :raises DownloadError: Raised when validation fails.
+      :raises UnsupportedMIMEError: Raised when validation fails.
+
+      .. rubric:: Examples
+
+      >>> from download.harvester import download_pdf
+      >>> result = download_pdf(..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: run(topic, years, max_works)
+
+      
+      Compute run.
+
+      Carry out the run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+      :param topic: Description for ``topic``.
+      :type topic: str
+      :param years: Description for ``years``.
+      :type years: str
+      :param max_works: Description for ``max_works``.
+      :type max_works: int
+
+      :returns: *List[src.kgfoundry_common.models.Doc]* -- Description of return value.
+
+      .. rubric:: Examples
+
+      >>> from download.harvester import run
+      >>> result = run(..., ..., ...)
+      >>> result  # doctest: +ELLIPSIS
+      ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

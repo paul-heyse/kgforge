@@ -1,8 +1,9 @@
 """Overview of bm25.
 
-This module bundles bm25 logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles bm25 logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 from __future__ import annotations
@@ -82,18 +83,23 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 # [nav:anchor BM25Doc]
 @dataclass
 class BM25Doc:
-    """Document payload stored in the BM25 index.
+    """Describe BM25Doc.
+
 <!-- auto:docstring-builder v1 -->
 
-    Attributes
-    ----------
-    doc_id : str
-        Identifier that links the document back to upstream storage.
-    length : int
-        Total token count for the combined fields.
-    fields : dict[str, str]
-        Mapping of field name to the raw text that feeds the scorer.
-    """
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+doc_id : str
+    Describe ``doc_id``.
+length : int
+    Describe ``length``.
+fields : dict[str, str]
+    Describe ``fields``.
+"""
 
     doc_id: str
     length: int
@@ -102,23 +108,28 @@ class BM25Doc:
 
 # [nav:anchor PurePythonBM25]
 class PurePythonBM25:
-    """Pure Python BM25 scorer backed by dictionaries.
+    """Describe PurePythonBM25.
+
 <!-- auto:docstring-builder v1 -->
 
-    The implementation pre-computes document frequencies and caches postings on disk,
-    making it suitable for unit tests and small deployments that do not ship Lucene.
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
 
-    Parameters
-    ----------
-    index_dir : str
-        Directory that stores serialized postings and statistics.
-    k1 : float, optional
-        Saturation parameter controlling term frequency scaling. Defaults to ``0.9``.
-    b : float, optional
-        Length normalisation parameter. Defaults to ``0.4``.
-    field_boosts : dict[str, float] | None, optional
-        Per-field weighting overrides applied during scoring. Defaults to ``None``.
-    """
+Parameters
+----------
+index_dir : str
+    Describe ``index_dir``.
+k1 : float, optional
+    Describe ``k1``.
+    Defaults to ``0.9``.
+b : float, optional
+    Describe ``b``.
+    Defaults to ``0.4``.
+field_boosts : dict[str, float] | None, optional
+    Describe ``field_boosts``.
+    Defaults to ``None``.
+"""
 
     def __init__(
         self,
@@ -127,6 +138,26 @@ class PurePythonBM25:
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
     ) -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+index_dir : str
+    Describe ``index_dir``.
+k1 : float, optional
+    Describe ``k1``.
+    Defaults to ``0.9``.
+b : float, optional
+    Describe ``b``.
+    Defaults to ``0.4``.
+field_boosts : dict[str, float] | None, optional
+    Describe ``field_boosts``.
+    Defaults to ``None``.
+"""
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -139,44 +170,35 @@ class PurePythonBM25:
 
     @staticmethod
     def _tokenize(text: str) -> list[str]:
-        """Compute tokenize.
+        """Describe  tokenize.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the tokenize operation.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 text : str
-    Description for ``text``.
-    
-    
-    
+    Describe ``text``.
 
 Returns
 -------
 list[str]
-    Description of return value.
+    Describe return value.
 """
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """Compute build.
+        """Describe build.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 docs_iterable : Iterable[tuple[str, dict[str, str]]]
-    Description for ``docs_iterable``.
-    
-    
-    
-
-Examples
---------
->>> from embeddings_sparse.bm25 import build
->>> build(...)  # doctest: +ELLIPSIS
+    Describe ``docs_iterable``.
 """
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
@@ -225,15 +247,13 @@ Examples
             )
 
     def load(self) -> None:
-        """Compute load.
+        """Describe load.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-Examples
---------
->>> from embeddings_sparse.bm25 import load
->>> load()  # doctest: +ELLIPSIS
+Python's object protocol for this class. Use it to integrate
+with built-in operators, protocols, or runtime behaviours that
+expect instances to participate in the language's data model.
 """
         path = os.path.join(self.index_dir, "pure_bm25.pkl")
         with open(path, "rb") as f:
@@ -248,23 +268,21 @@ Examples
         self.avgdl = data["avgdl"]
 
     def _idf(self, term: str) -> float:
-        """Compute idf.
+        """Describe  idf.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the idf operation.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 term : str
-    Description for ``term``.
-    
-    
-    
+    Describe ``term``.
 
 Returns
 -------
 float
-    Description of return value.
+    Describe return value.
 """
         n_t = self.df.get(term, 0)
         if n_t == 0:
@@ -275,38 +293,26 @@ float
     def search(
         self, query: str, k: int, fields: Mapping[str, str] | None = None
     ) -> list[tuple[str, float]]:
-        """Compute search.
+        """Describe search.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 query : str
-    Description for ``query``.
+    Describe ``query``.
 k : int
-    Description for ``k``.
+    Describe ``k``.
 fields : Mapping[str, str] | None, optional
-    Defaults to ``None``.
-    Description for ``fields``.
-    
-    
-    
+    Describe ``fields``.
     Defaults to ``None``.
 
 Returns
 -------
 list[tuple[str, float]]
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from embeddings_sparse.bm25 import search
->>> result = search(..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
@@ -327,20 +333,31 @@ Examples
 
 # [nav:anchor LuceneBM25]
 class LuceneBM25:
-    """Pyserini-backed BM25 scorer that proxies to Lucene indexes.
+    """Describe LuceneBM25.
+
 <!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    index_dir : str
-        Directory that stores the Pyserini/Lucene index.
-    k1 : float, optional
-        Saturation parameter controlling the BM25 term frequency component. Defaults to ``0.9``.
-    b : float, optional
-        Length normalisation parameter. Defaults to ``0.4``.
-    field_boosts : dict[str, float] | None, optional
-        Optional field-specific boosts forwarded to Pyserini. Defaults to ``None``.
-    """
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+
+Parameters
+----------
+index_dir : str
+    Describe ``index_dir``.
+k1 : float, optional
+    Describe ``k1``.
+    Defaults to ``0.9``.
+b : float, optional
+    Describe ``b``.
+    Defaults to ``0.4``.
+field_boosts : dict[str, float] | None, optional
+    Describe ``field_boosts``.
+    Defaults to ``None``.
+
+Raises
+------
+RuntimeError
+    Raised when TODO for RuntimeError.
+"""
 
     def __init__(
         self,
@@ -349,6 +366,26 @@ class LuceneBM25:
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
     ) -> None:
+        """Describe   init  .
+
+<!-- auto:docstring-builder v1 -->
+
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+index_dir : str
+    Describe ``index_dir``.
+k1 : float, optional
+    Describe ``k1``.
+    Defaults to ``0.9``.
+b : float, optional
+    Describe ``b``.
+    Defaults to ``0.4``.
+field_boosts : dict[str, float] | None, optional
+    Describe ``field_boosts``.
+    Defaults to ``None``.
+"""
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -356,28 +393,21 @@ class LuceneBM25:
         self._searcher: Any | None = None
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """Compute build.
+        """Describe build.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 docs_iterable : Iterable[tuple[str, dict[str, str]]]
-    Description for ``docs_iterable``.
-    
-    
-    
+    Describe ``docs_iterable``.
 
 Raises
 ------
 RuntimeError
-    Raised when validation fails.
-
-Examples
---------
->>> from embeddings_sparse.bm25 import build
->>> build(...)  # doctest: +ELLIPSIS
+Raised when TODO for RuntimeError.
 """
         try:
             from pyserini.index.lucene import LuceneIndexer
@@ -402,10 +432,13 @@ Examples
         indexer.close()
 
     def _ensure_searcher(self) -> None:
-        """Compute ensure searcher.
+        """Describe  ensure searcher.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the ensure searcher operation.
+Python's object protocol for this class. Use it to integrate
+with built-in operators, protocols, or runtime behaviours that
+expect instances to participate in the language's data model.
 """
         if self._searcher is not None:
             return
@@ -417,43 +450,31 @@ Carry out the ensure searcher operation.
     def search(
         self, query: str, k: int, fields: dict[str, str] | None = None
     ) -> list[tuple[str, float]]:
-        """Compute search.
+        """Describe search.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 query : str
-    Description for ``query``.
+    Describe ``query``.
 k : int
-    Description for ``k``.
+    Describe ``k``.
 fields : dict[str, str] | None, optional
-    Defaults to ``None``.
-    Description for ``fields``.
-    
-    
-    
+    Describe ``fields``.
     Defaults to ``None``.
 
 Returns
 -------
 list[tuple[str, float]]
-    Description of return value.
-    
-    
-    
+    Describe return value.
 
 Raises
 ------
 RuntimeError
-    Raised when validation fails.
-
-Examples
---------
->>> from embeddings_sparse.bm25 import search
->>> result = search(..., ...)
->>> result  # doctest: +ELLIPSIS
+Raised when TODO for RuntimeError.
 """
         self._ensure_searcher()
         if self._searcher is None:
@@ -472,46 +493,32 @@ def get_bm25(
     b: float = 0.4,
     field_boosts: dict[str, float] | None = None,
 ) -> PurePythonBM25 | LuceneBM25:
-    """Compute get bm25.
+    """Describe get bm25.
+
 <!-- auto:docstring-builder v1 -->
 
-Carry out the get bm25 operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
 Parameters
 ----------
 backend : str
-    Description for ``backend``.
+    Describe ``backend``.
 index_dir : str
-    Description for ``index_dir``.
+    Describe ``index_dir``.
 k1 : float, optional
-    Defaults to ``0.9``.
-    Description for ``k1``.
+    Describe ``k1``.
     Defaults to ``0.9``.
 b : float, optional
-    Defaults to ``0.4``.
-    Description for ``b``.
+    Describe ``b``.
     Defaults to ``0.4``.
 field_boosts : dict[str, float] | None, optional
-    Defaults to ``None``.
-    Description for ``field_boosts``.
-    
-    
-    
+    Describe ``field_boosts``.
     Defaults to ``None``.
 
 Returns
 -------
 PurePythonBM25 | LuceneBM25
-    Description of return value.
-    
-    
-    
-
-Examples
---------
->>> from embeddings_sparse.bm25 import get_bm25
->>> result = get_bm25(..., ...)
->>> result  # doctest: +ELLIPSIS
+    Describe return value.
 """
     if backend == "lucene":
         try:

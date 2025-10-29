@@ -1,8 +1,9 @@
 """Overview of kgfoundry.
 
-This module bundles kgfoundry logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module bundles kgfoundry logic for the kgfoundry stack. It groups
+related helpers so downstream packages can import a single cohesive
+namespace. Refer to the functions and classes below for implementation
+specifics.
 """
 
 _ALIASES: dict[str, str] = {
@@ -26,20 +27,24 @@ __all__ = sorted(_ALIASES)
 
 
 def _load(name: str) -> object:
-    """Compute load.
+    """Document  load.
 
-    Carry out the load operation.
+<!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    name : str
-        Description for ``name``.
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
-    Returns
-    -------
-    object
-        Description of return value.
-    """
+Parameters
+----------
+name : str
+    Describe ``name``.
+    
+    
+
+Returns
+-------
+object
+    Describe return value.
+"""
     import importlib
     import sys
 
@@ -49,25 +54,22 @@ def _load(name: str) -> object:
 
 
 def __getattr__(name: str) -> object:
-    """Compute getattr.
+    """Document   getattr  .
 
-    Provide a fallback attribute lookup when normal resolution fails. The hook enables dynamic attributes and lazy loading for missing names. Raise ``AttributeError`` to preserve Python's attribute access semantics.
+<!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    name : str
-        Description for ``name``.
+Provide a fallback for unknown attribute lookups. This special method integrates the class with Python's data model so instances behave consistently with the language expectations.
 
-    Returns
-    -------
-    object
-        Description of return value.
+Parameters
+----------
+name : str
+    Describe ``name``.
 
-    Raises
-    ------
-    AttributeError
-        Raised when validation fails.
-    """
+Returns
+-------
+object
+    Describe return value.
+"""
     if name not in _ALIASES:
         message = f"module {__name__!r} has no attribute {name!r}"
         raise AttributeError(message) from None
@@ -75,26 +77,33 @@ def __getattr__(name: str) -> object:
 
 
 def __dir__() -> list[str]:
-    """Return the sorted list of public symbols exposed by the package.
+    """Document   dir  .
 
-    Returns
-    -------
-    list[str]
-        Names exported via ``__all__`` including lazy-loaded aliases.
-    """
+<!-- auto:docstring-builder v1 -->
+
+Expose the attributes reported when ``dir()`` is called on the instance. This special method integrates the class with Python's data model so instances behave consistently with the language expectations.
+
+
+Returns
+-------
+list[str]
+    Describe return value.
+"""
     return sorted(set(__all__))
 
 
 def _ensure_namespace_alias(name: str) -> None:
-    """Compute ensure namespace alias.
+    """Document  ensure namespace alias.
 
-    Carry out the ensure namespace alias operation.
+<!-- auto:docstring-builder v1 -->
 
-    Parameters
-    ----------
-    name : str
-        Description for ``name``.
-    """
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+Parameters
+----------
+name : str
+    Describe ``name``.
+"""
     import sys
 
     if f"{__name__}.{name}" not in sys.modules:

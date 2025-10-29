@@ -12,8 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Protocol, cast
 
 if TYPE_CHECKING:
-    from docstring_parser.common import Docstring
-    from docstring_parser.common import DocstringReturns
+    from docstring_parser.common import Docstring, DocstringReturns
 
     DocstringType = Docstring
     DocstringReturnsType = DocstringReturns
@@ -23,9 +22,31 @@ else:  # pragma: no cover - typing helpers
 
 
 class _DocstringCommonModule(Protocol):
+    """Describe  DocstringCommonModule.
+
+<!-- auto:docstring-builder v1 -->
+
+how instances collaborate with the surrounding package. Highlight
+how the class supports nearby modules to guide readers through the
+codebase.
+
+Parameters
+----------
+*args : inspect._empty
+    Describe ``args``.
+**kwargs : inspect._empty
+    Describe ``kwargs``.
+
+Returns
+-------
+inspect._empty
+    Describe return value.
+"""
+
     Docstring: type[DocstringType]
     DocstringReturns: type[DocstringReturnsType]
     DocstringYields: type[DocstringReturnsType]
+
 
 _doc_common: _DocstringCommonModule | None = None
 
@@ -44,44 +65,42 @@ else:
     ):
 
         class DocstringYields(_doc_common.DocstringReturns):
-            """Compatibility stub for missing ``DocstringYields``.
+            """Describe DocstringYields.
 
-            Parameters
-            ----------
-            args : list[str]
-                Names associated with the yielded values.
-            description : str | None
-                Optional description rendered in the docstring.
-            type_name : str | None
-                Type annotation captured for the yield expression.
-            return_name : str | None, optional
-                Explicit name attached to the yield block.
-            """
-        docstring_returns_class: type[DocstringReturnsType] = _doc_common.DocstringReturns
+<!-- auto:docstring-builder v1 -->
+Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+"""
 
-        def _docstring_yields_init(
-            self: DocstringReturnsType,
-            args: list[str],
-            description: str | None,
-            type_name: str | None,
-            return_name: str | None = None,
-        ) -> None:
-            """Compatibility constructor for missing ``DocstringYields``."""
-
-            docstring_returns_class.__init__(
+            def __init__(
                 self,
                 args: list[str],
                 description: str | None,
                 type_name: str | None,
                 return_name: str | None = None,
             ) -> None:
+                """Initialise the compatibility shim.
+
+                Parameters
+                ----------
+                args : list[str]
+                    Positional argument names from the original signature.
+                description : str | None, optional
+                    Human readable summary for the yield block.
+                type_name : str | None, optional
+                    Name of the yielded type when available.
+                return_name : str | None, optional
+                    Explicit return alias, by default ``None``.
+                """
                 super().__init__(
-                    args=args,
-                    description=description,
-                    type_name=type_name,
-                    is_generator=True,
+                    args,
+                    description,
+                    type_name,
                     return_name=return_name,
+                    is_generator=True,
                 )
+                # Match behaviour expected by downstream tooling that inspects
+                # ``DocstringReturns`` instances for generator blocks.
+                self.is_generator = True
 
         DocstringYields.__module__ = _doc_common.DocstringReturns.__module__
         _doc_common_typing = cast(Any, _doc_common)
@@ -93,11 +112,18 @@ else:
         if not hasattr(_doc_cls, "attrs"):
 
             def _docstring_attrs(self: DocstringType) -> list[object]:
-                """Return documented attributes if parsing supports them.
+                """Describe  docstring attrs.
+
+<!-- auto:docstring-builder v1 -->
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+Returns
+-------
+list
+    TODO: describe return value.
 """
                 return [meta for meta in self.meta if getattr(meta, "args", None) == ["attr"]]
 
-            setattr(_doc_cls, "attrs", property(_docstring_attrs))
+            _doc_cls.attrs = property(_docstring_attrs)
 
         _yield_cls: type[DocstringReturnsType] | None
         if hasattr(_doc_common, "DocstringYields"):
@@ -110,7 +136,14 @@ else:
         if _yield_cls is not None and not hasattr(_doc_cls, "yields"):
 
             def _docstring_yields(self: DocstringType) -> object | None:
-                """Return the first yields section if available.
+                """Describe  docstring yields.
+
+<!-- auto:docstring-builder v1 -->
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+Returns
+-------
+object | None
+    TODO: describe return value.
 """
                 if _yield_cls is None:  # pragma: no cover - defensive guard
                     return None
@@ -119,23 +152,37 @@ else:
                         return meta
                 return None
 
-            setattr(_doc_cls, "yields", property(_docstring_yields))
+            _doc_cls.yields = property(_docstring_yields)
 
         if _yield_cls is not None and not hasattr(_doc_cls, "many_yields"):
 
             def _docstring_many_yields(self: DocstringType) -> list[object]:
-                """Return all yields sections.
+                """Describe  docstring many yields.
+
+<!-- auto:docstring-builder v1 -->
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+Returns
+-------
+list
+    TODO: describe return value.
 """
                 if _yield_cls is None:  # pragma: no cover - defensive guard
                     return []
                 return [meta for meta in self.meta if isinstance(meta, _yield_cls)]
 
-            setattr(_doc_cls, "many_yields", property(_docstring_many_yields))
+            _doc_cls.many_yields = property(_docstring_many_yields)
 
         if not hasattr(_doc_cls, "size"):
 
             def _docstring_size(self: DocstringType) -> int:
-                """Estimate docstring size for style heuristics.
+                """Describe  docstring size.
+
+<!-- auto:docstring-builder v1 -->
+Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+Returns
+-------
+int
+    TODO: describe return value.
 """
                 parts: list[str] = []
                 if self.short_description:
@@ -145,4 +192,4 @@ else:
                 parts.extend(getattr(meta, "description", "") or "" for meta in self.meta)
                 return sum(len(part) for part in parts)
 
-            setattr(_doc_cls, "size", property(_docstring_size))
+            _doc_cls.size = property(_docstring_size)
