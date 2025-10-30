@@ -80,7 +80,7 @@ artifacts:
 	uv run python tools/docs/build_artifacts.py
 
 readmes:
-        $(PY) tools/gen_readmes.py
+	$(PY) tools/gen_readmes.py
 	-which doctoc >/dev/null 2>&1 && doctoc src/$(PKG) || echo "Install doctoc to auto-update TOCs."
 
 html:

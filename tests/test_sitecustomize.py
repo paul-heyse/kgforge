@@ -17,10 +17,10 @@ def _reload_sitecustomize(monkeypatch: pytest.MonkeyPatch, flag: str | None = No
     return importlib.reload(module)
 
 
-@pytest.mark.importorskip("docstring_parser")
 def test_sitecustomize_emits_deprecation_warning(
     monkeypatch: pytest.MonkeyPatch, recwarn: pytest.WarningsRecorder
 ) -> None:
+    pytest.importorskip("docstring_parser")
     module = _reload_sitecustomize(monkeypatch, "1")
     warning = recwarn.pop(DeprecationWarning)
     assert "deprecated" in str(warning.message)
@@ -42,11 +42,11 @@ def test_sitecustomize_handles_missing_docstring_parser(
 
     def fake_import(
         name: str,
-        globals: dict | None = None,
-        locals: dict | None = None,
-        fromlist: tuple | list = (),
+        globals: dict[str, Any] | None = None,
+        locals: dict[str, Any] | None = None,
+        fromlist: tuple[str, ...] | list[str] = (),
         level: int = 0,
-    ) -> Any:
+    ) -> object:
         if name.startswith("docstring_parser"):
             message = "docstring_parser unavailable"
             raise ModuleNotFoundError(message)

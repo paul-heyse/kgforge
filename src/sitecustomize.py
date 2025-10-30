@@ -19,12 +19,12 @@ _FLAG_VALUE = os.environ.get("KGFOUNDRY_DOCSTRINGS_SITECUSTOMIZE", "1").strip().
 ENABLE_SITECUSTOMIZE = _FLAG_VALUE not in {"0", "false", "off", "no"}
 
 if TYPE_CHECKING:  # pragma: no cover - imported solely for typing information
-    from docstring_parser.common import (
-        Docstring,
-        DocstringParam,
-        DocstringReturns,
-        DocstringYields,
-    )
+    from docstring_parser.common import Docstring, DocstringParam, DocstringReturns
+
+    class DocstringYields(DocstringReturns):
+        """Type-checking placeholder for generator metadata entries."""
+
+        ...
 else:  # pragma: no cover - imported lazily when type checking is disabled
     Docstring = Any
     DocstringParam = Any
