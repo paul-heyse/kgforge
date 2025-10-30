@@ -21,6 +21,16 @@ LOGGER = logging.getLogger(__name__)
 DEFAULT_CONFIG_PATH = Path("docstring_builder.toml")
 DEFAULT_MARKER = "<!-- auto:docstring-builder v1 -->"
 _CACHE_VERSION = "2025-02-06-indent"
+_ENV_CONFIG = "KGF_DOCSTRINGS_CONFIG"
+_LEGACY_ENV_CONFIG = "DOCSTRING_BUILDER_CONFIG"
+
+
+@dataclass(slots=True)
+class ConfigSelection:
+    """Selected configuration path and its provenance."""
+
+    path: Path
+    source: str
 
 
 @dataclass(slots=True)
@@ -128,17 +138,56 @@ def resolve_config_path(start: Path | None = None) -> Path:
     return DEFAULT_CONFIG_PATH
 
 
+def _coerce_path(value: str) -> Path:
+    path = Path(value).expanduser()
+    try:
+        return path.resolve(strict=False)
+    except FileNotFoundError:  # pragma: no cover - defensive guard for py<3.11
+        return path
+
+
+def select_config_path(override: str | Path | None = None) -> ConfigSelection:
+    """Determine the configuration path honouring CLI and environment precedence."""
+    if override:
+        path = _coerce_path(str(override))
+        return ConfigSelection(path=path, source="cli")
+
+    env_override = os.environ.get(_ENV_CONFIG)
+    if env_override:
+        path = _coerce_path(env_override)
+        return ConfigSelection(path=path, source=f"env:{_ENV_CONFIG}")
+
+    legacy_override = os.environ.get(_LEGACY_ENV_CONFIG)
+    if legacy_override:
+        path = _coerce_path(legacy_override)
+        return ConfigSelection(path=path, source=f"env:{_LEGACY_ENV_CONFIG}")
+
+    default_path = resolve_config_path()
+    return ConfigSelection(path=default_path, source="default")
+
+
+def load_config_with_selection(
+    override: str | Path | None = None,
+) -> tuple[BuilderConfig, ConfigSelection]:
+    """Load configuration while also returning metadata about the selection."""
+    selection = select_config_path(override)
+    config = load_config(selection.path)
+    return config, selection
+
+
 def load_config_from_env() -> BuilderConfig:
-    """Load configuration using ``DOCSTRING_BUILDER_CONFIG`` override when set."""
-    env_override = os.environ.get("DOCSTRING_BUILDER_CONFIG")
-    config_path = Path(env_override) if env_override else resolve_config_path()
-    return load_config(config_path)
+    """Load configuration using backwards compatible environment precedence."""
+    config, _ = load_config_with_selection(None)
+    return config
 
 
 __all__ = [
     "BuilderConfig",
+    "ConfigSelection",
     "PackageSettings",
     "load_config",
     "load_config_from_env",
+    "load_config_with_selection",
     "resolve_config_path",
+    "select_config_path",
 ]
