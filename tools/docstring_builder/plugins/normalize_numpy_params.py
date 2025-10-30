@@ -15,6 +15,7 @@ class NormalizeNumpyParamsPlugin(TransformerPlugin):
     name = "normalize_numpy_params"
 
     def run(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
+        """Normalise parameter and return descriptions for ``result``."""
         schema = result.schema
         parameters = [self._normalize_parameter(parameter) for parameter in schema.parameters]
         returns = [self._normalize_return(entry) for entry in schema.returns]
@@ -44,4 +45,3 @@ class NormalizeNumpyParamsPlugin(TransformerPlugin):
         if description and description[0].islower():
             description = description[0].upper() + description[1:]
         return replace(entry, description=description)
-
