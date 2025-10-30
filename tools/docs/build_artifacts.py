@@ -17,7 +17,7 @@ STEPS: list[tuple[str, list[str], str]] = [
             "tools.docstring_builder.cli",
             "--all",
             "--ignore-missing",
-            "update",
+            "generate",
         ],
         "[docstrings] synchronized managed docstrings and DocFacts",
     ),

@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import abc
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from importlib import metadata
 from pathlib import Path
-from typing import ClassVar, Iterable, Sequence
+from typing import ClassVar
 
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import HarvestResult
@@ -36,10 +37,12 @@ class BuilderPlugin(abc.ABC):
     stage: ClassVar[str]
 
     def on_start(self, context: PluginContext) -> None:
-        """Hook invoked before any files are processed."""
+        """Execute the setup hook before any files are processed."""
+        del context
 
     def on_finish(self, context: PluginContext) -> None:
-        """Hook invoked after all files are processed."""
+        """Execute the teardown hook after all files are processed."""
+        del context
 
 
 class HarvesterPlugin(BuilderPlugin):
@@ -90,21 +93,18 @@ class PluginManager:
 
     def start(self) -> None:
         """Notify plugins that processing is about to begin."""
-
         context = self._context()
         for plugin in self._iter_plugins():
             plugin.on_start(context)
 
     def finish(self) -> None:
         """Notify plugins that processing has completed."""
-
         context = self._context()
         for plugin in reversed(list(self._iter_plugins())):
             plugin.on_finish(context)
 
     def apply_harvest(self, file_path: Path, result: HarvestResult) -> HarvestResult:
         """Run harvester plugins sequentially."""
-
         context = self._context(file_path)
         updated = result
         for plugin in self.harvesters:
@@ -115,7 +115,6 @@ class PluginManager:
         self, file_path: Path, semantics: Iterable[SemanticResult]
     ) -> list[SemanticResult]:
         """Run transformer plugins sequentially for each semantic entry."""
-
         context = self._context(file_path)
         processed: list[SemanticResult] = []
         for entry in semantics:
@@ -129,7 +128,6 @@ class PluginManager:
         self, file_path: Path, edits: Iterable[DocstringEdit]
     ) -> list[DocstringEdit]:
         """Run formatter plugins sequentially for each docstring edit."""
-
         context = self._context(file_path)
         processed: list[DocstringEdit] = []
         for entry in edits:
@@ -141,7 +139,6 @@ class PluginManager:
 
     def enabled_plugins(self) -> list[str]:
         """Return the names of active plugins in execution order."""
-
         return [plugin.name for plugin in self._iter_plugins()]
 
     def _iter_plugins(self) -> Iterable[BuilderPlugin]:
@@ -191,8 +188,9 @@ def load_plugins(
     builtin: Sequence[type[BuilderPlugin]] | None = None,
 ) -> PluginManager:
     """Discover, filter, and instantiate plugins for the current run."""
-
-    from .normalize_numpy_params import NormalizeNumpyParamsPlugin
+    from tools.docstring_builder.plugins.normalize_numpy_params import (
+        NormalizeNumpyParamsPlugin,
+    )
 
     builtin_types: list[type[BuilderPlugin]] = [NormalizeNumpyParamsPlugin]
     if builtin is not None:
@@ -209,7 +207,8 @@ def load_plugins(
     missing_disable = sorted(name for name in disable_set if name not in discovered)
     if missing_only or missing_disable:
         missing = ", ".join([*missing_only, *missing_disable])
-        raise PluginConfigurationError(f"Unknown plugin(s): {missing}")
+        message = f"Unknown plugin(s): {missing}"
+        raise PluginConfigurationError(message)
 
     harvesters: list[HarvesterPlugin] = []
     transformers: list[TransformerPlugin] = []
@@ -257,4 +256,3 @@ __all__ = [
     "TransformerPlugin",
     "load_plugins",
 ]
-

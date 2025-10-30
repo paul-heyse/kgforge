@@ -21,11 +21,15 @@ from functools import singledispatch
 from pathlib import Path
 from typing import TypedDict, cast
 
+from tools.drift_preview import write_html_diff
+
 REPO = Path(__file__).resolve().parents[2]
 SRC = REPO / "src"
 OUT = REPO / "site" / "_build" / "navmap"
 OUT.mkdir(parents=True, exist_ok=True)
 INDEX_PATH = OUT / "navmap.json"
+DRIFT_DIR = REPO / "docs" / "_build" / "drift"
+NAVMAP_DIFF_PATH = DRIFT_DIR / "navmap.html"
 
 # Link settings
 G_ORG = os.getenv("DOCS_GITHUB_ORG")
@@ -958,8 +962,14 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> NavIndexDict
 
     # Write
     out = json_path or INDEX_PATH
+    previous = out.read_text(encoding="utf-8") if out.exists() else ""
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    payload = json.dumps(data, indent=2)
+    out.write_text(payload, encoding="utf-8")
+    if previous and previous != payload:
+        write_html_diff(previous, payload, NAVMAP_DIFF_PATH, "Navmap drift")
+    else:
+        NAVMAP_DIFF_PATH.unlink(missing_ok=True)
     return data
 
 

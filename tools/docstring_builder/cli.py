@@ -21,10 +21,14 @@ from typing import cast
 import yaml
 from tools.docstring_builder.apply import apply_edits
 from tools.docstring_builder.cache import BuilderCache
-from tools.docstring_builder.config import BuilderConfig, load_config_from_env
+from tools.docstring_builder.config import (
+    BuilderConfig,
+    ConfigSelection,
+    load_config_with_selection,
+)
 from tools.docstring_builder.docfacts import DocFact, build_docfacts, write_docfacts
 from tools.docstring_builder.harvest import HarvestResult, harvest_file, iter_target_files
-from tools.docstring_builder.ir import IRDocstring, IR_VERSION, build_ir, validate_ir, write_schema
+from tools.docstring_builder.ir import IR_VERSION, IRDocstring, build_ir, validate_ir, write_schema
 from tools.docstring_builder.normalizer import normalize_docstring
 from tools.docstring_builder.plugins import (
     PluginConfigurationError,
@@ -34,12 +38,13 @@ from tools.docstring_builder.plugins import (
 from tools.docstring_builder.policy import (
     PolicyConfigurationError,
     PolicyEngine,
-    PolicyReport,
     load_policy_settings,
 )
 from tools.docstring_builder.render import render_docstring
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult, build_semantic_schemas
+from tools.drift_preview import write_html_diff
+from tools.stubs.drift_check import run as run_stub_drift
 
 LOGGER = logging.getLogger("docstring_builder")
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -47,7 +52,13 @@ CACHE_PATH = REPO_ROOT / ".cache" / "docstring_builder.json"
 DOCFACTS_PATH = REPO_ROOT / "docs" / "_build" / "docfacts.json"
 MANIFEST_PATH = REPO_ROOT / "docs" / "_build" / "docstrings_manifest.json"
 OBSERVABILITY_PATH = REPO_ROOT / "docs" / "_build" / "observability_docstrings.json"
+DRIFT_DIR = REPO_ROOT / "docs" / "_build" / "drift"
+DOCFACTS_DIFF_PATH = DRIFT_DIR / "docfacts.html"
+NAVMAP_DIFF_PATH = DRIFT_DIR / "navmap.html"
+SCHEMA_DIFF_PATH = DRIFT_DIR / "schema.html"
 OBSERVABILITY_MAX_ERRORS = 20
+REQUIRED_PYTHON_MAJOR = 3
+REQUIRED_PYTHON_MINOR = 13
 DEFAULT_IGNORE_PATTERNS = [
     "tests/e2e/**",
     "tests/mock_servers/**",
@@ -77,6 +88,15 @@ STATUS_LABELS = {
     ExitStatus.ERROR: "error",
 }
 
+EXIT_SUCCESS = int(ExitStatus.SUCCESS)
+EXIT_VIOLATION = int(ExitStatus.VIOLATION)
+EXIT_CONFIG = int(ExitStatus.CONFIG)
+EXIT_ERROR = int(ExitStatus.ERROR)
+
+
+class InvalidPathError(ValueError):
+    """Raised when a user-supplied path falls outside the allowed workspace."""
+
 
 @dataclasses.dataclass(slots=True)
 class ProcessingOptions:
@@ -99,6 +119,7 @@ class FileOutcome:
     changed: bool
     skipped: bool
     message: str | None = None
+    cache_hit: bool = False
     semantics: list[SemanticResult] = dataclasses.field(default_factory=list)
     ir: list[IRDocstring] = dataclasses.field(default_factory=list)
 
@@ -129,12 +150,50 @@ def _module_to_path(module: str) -> Path | None:
     return file_path
 
 
+def _module_name_from_path(path: Path) -> str:
+    """Derive a dotted module name from ``path`` relative to the repository root."""
+    rel = path.relative_to(REPO_ROOT)
+    parts = rel.with_suffix("").parts
+    if parts and parts[0] in {"src", "tools", "docs"}:
+        parts = parts[1:]
+    return ".".join(parts)
+
+
 def _resolve_ignore_patterns(config: BuilderConfig) -> list[str]:
     patterns = list(DEFAULT_IGNORE_PATTERNS)
     for pattern in config.ignore:
         if pattern not in patterns:
             patterns.append(pattern)
     return patterns
+
+
+def _normalize_input_path(raw: str) -> Path:
+    """Resolve ``raw`` into an absolute path within the repository."""
+    candidate = Path(raw).expanduser()
+    if not candidate.is_absolute():
+        candidate = REPO_ROOT / candidate
+    try:
+        resolved = candidate.resolve(strict=True)
+    except FileNotFoundError as exc:  # pragma: no cover - defensive guard
+        message = f"Path '{raw}' does not exist"
+        raise InvalidPathError(message) from exc
+    try:
+        resolved.relative_to(REPO_ROOT)
+    except ValueError as exc:
+        message = f"Path '{raw}' escapes the repository root"
+        raise InvalidPathError(message) from exc
+    if not resolved.is_file() or resolved.suffix != ".py":
+        message = f"Path '{raw}' must reference a Python source file"
+        raise InvalidPathError(message)
+    return resolved
+
+
+def _load_config(args: argparse.Namespace) -> tuple[BuilderConfig, ConfigSelection]:
+    """Load builder configuration honouring CLI/environment precedence."""
+    override = getattr(args, "config_path", None)
+    config, selection = load_config_with_selection(override)
+    args.config_selection = selection
+    return config, selection
 
 
 def _parse_policy_overrides(values: Sequence[str] | None) -> dict[str, str]:
@@ -147,7 +206,8 @@ def _parse_policy_overrides(values: Sequence[str] | None) -> dict[str, str]:
             if not token:
                 continue
             if "=" not in token:
-                raise PolicyConfigurationError(f"Invalid policy override '{token}'")
+                message = f"Invalid policy override '{token}'"
+                raise PolicyConfigurationError(message)
             key, value = token.split("=", 1)
             overrides[key.strip().lower()] = value.strip()
     return overrides
@@ -184,31 +244,34 @@ def _dependents_for(path: Path) -> set[Path]:
     return dependents
 
 
-def _select_files(config: BuilderConfig, args: argparse.Namespace) -> Iterable[Path]:
+def _select_files(  # noqa: C901
+    config: BuilderConfig, args: argparse.Namespace
+) -> Iterable[Path]:
     if getattr(args, "paths", None):
-        selected: list[Path] = []
-        for raw in args.paths:
-            candidate = Path(raw)
-            if not candidate.is_absolute():
-                candidate = (REPO_ROOT / candidate).resolve()
-            if candidate.suffix != ".py" or not candidate.exists():
-                continue
-            selected.append(candidate)
-        return selected
+        return [_normalize_input_path(raw) for raw in args.paths]
 
-    files = [
-        path for path in iter_target_files(config, REPO_ROOT) if not _should_ignore(path, config)
-    ]
+    files: list[Path] = []
+    for path in iter_target_files(config, REPO_ROOT):
+        try:
+            resolved = path.resolve(strict=True)
+        except FileNotFoundError:  # pragma: no cover - stale glob entry
+            continue
+        try:
+            resolved.relative_to(REPO_ROOT)
+        except ValueError:
+            LOGGER.warning("Ignoring path outside repository: %s", resolved)
+            continue
+        if _should_ignore(resolved, config):
+            continue
+        files.append(resolved)
+
     if args.module:
-        filtered: list[Path] = []
-        for candidate in files:
-            parts = list(candidate.relative_to(REPO_ROOT).with_suffix("").parts)
-            if parts and parts[0] in {"src", "tools", "docs"}:
-                parts = parts[1:]
-            module_name = ".".join(parts)
-            if module_name.startswith(args.module):
-                filtered.append(candidate)
-        files = filtered
+        module_prefix = args.module
+        files = [
+            candidate
+            for candidate in files
+            if _module_name_from_path(candidate).startswith(module_prefix)
+        ]
     if args.since:
         changed = set(_changed_files_since(args.since))
         files = [path for path in files if str(path.relative_to(REPO_ROOT)) in changed]
@@ -273,6 +336,8 @@ def _assign_command(args: argparse.Namespace) -> None:
     if getattr(args, "flag_diff", False):
         args.diff = True
         args.flag_check = True
+    if getattr(args, "subcommand", None) and not hasattr(args, "invoked_subcommand"):
+        args.invoked_subcommand = args.subcommand
     if getattr(args, "func", None):
         return
 
@@ -282,20 +347,18 @@ def _assign_command(args: argparse.Namespace) -> None:
         ("flag_check", _command_check),
     ):
         if getattr(args, attr, False):
-            setattr(args, "func", cast(CommandHandler, handler))
+            args.func = cast(CommandHandler, handler)
+            args.invoked_subcommand = attr.removeprefix("flag_")
             return
 
     legacy_command = _legacy_command_from_flags(args)
     if legacy_command is not None:
         legacy_handler: CommandHandler = LEGACY_COMMAND_HANDLERS[legacy_command]
-        setattr(
-            args,
-            "func",
-            cast(
-                CommandHandler,
-                getattr(sys.modules[__name__], legacy_handler.__name__),
-            ),
+        args.func = cast(
+            CommandHandler,
+            getattr(sys.modules[__name__], legacy_handler.__name__),
         )
+        args.invoked_subcommand = legacy_command
 
 
 def _collect_edits(
@@ -337,11 +400,17 @@ def _handle_docfacts(docfacts: list[DocFact], check_mode: bool) -> DocfactsOutco
             dataclasses.asdict(fact) for fact in sorted(docfacts, key=lambda fact: fact.qname)
         ]
         if existing != current:
-            LOGGER.error("DocFacts drift detected; run update mode to refresh.")
+            before = json.dumps(existing, indent=2, sort_keys=True)
+            after = json.dumps(current, indent=2, sort_keys=True)
+            write_html_diff(before, after, DOCFACTS_DIFF_PATH, "DocFacts drift")
+            diff_rel = DOCFACTS_DIFF_PATH.relative_to(REPO_ROOT)
+            LOGGER.error("DocFacts drift detected; run update mode to refresh (see %s)", diff_rel)
             return DocfactsOutcome(ExitStatus.VIOLATION, "docfacts drift")
+        DOCFACTS_DIFF_PATH.unlink(missing_ok=True)
         return DocfactsOutcome(ExitStatus.SUCCESS)
     ordered = sorted(docfacts, key=lambda fact: fact.qname)
     write_docfacts(DOCFACTS_PATH, ordered)
+    DOCFACTS_DIFF_PATH.unlink(missing_ok=True)
     return DocfactsOutcome(ExitStatus.SUCCESS)
 
 
@@ -424,13 +493,13 @@ def _default_since_revision() -> str | None:
     return None
 
 
-def _process_file(
+def _process_file(  # noqa: C901, PLR0911
     file_path: Path,
     config: BuilderConfig,
     cache: BuilderCache,
     options: ProcessingOptions,
     plugin_manager: PluginManager | None,
-) -> FileOutcome:  # noqa: PLR0911
+) -> FileOutcome:
     """Harvest, render, and apply docstrings for a single file."""
     command = options.command
     is_update = command == "update"
@@ -448,7 +517,15 @@ def _process_file(
         LOGGER.debug("Skipping %s; cache is fresh", file_path)
         skipped = True
         message = "cache fresh"
-        return FileOutcome(ExitStatus.SUCCESS, docfacts, preview, changed, skipped, message)
+        return FileOutcome(
+            ExitStatus.SUCCESS,
+            docfacts,
+            preview,
+            changed,
+            skipped,
+            message,
+            cache_hit=True,
+        )
     try:
         result = harvest_file(file_path, config, REPO_ROOT)
         if plugin_manager is not None:
@@ -458,12 +535,33 @@ def _process_file(
         message = f"missing dependency: {exc}"
         if options.ignore_missing and _matches_patterns(file_path, options.missing_patterns):
             LOGGER.info("Skipping %s due to missing dependency: %s", relative, exc)
-            return FileOutcome(ExitStatus.SUCCESS, docfacts, preview, False, True, message)
+            return FileOutcome(
+                ExitStatus.SUCCESS,
+                docfacts,
+                preview,
+                False,
+                True,
+                message,
+            )
         LOGGER.exception("Failed to harvest %s", relative)
-        return FileOutcome(ExitStatus.CONFIG, docfacts, preview, changed, skipped, message)
+        return FileOutcome(
+            ExitStatus.CONFIG,
+            docfacts,
+            preview,
+            changed,
+            skipped,
+            message,
+        )
     except Exception as exc:  # pragma: no cover - runtime defensive handling
         LOGGER.exception("Failed to harvest %s", file_path)
-        return FileOutcome(ExitStatus.ERROR, docfacts, preview, changed, skipped, str(exc))
+        return FileOutcome(
+            ExitStatus.ERROR,
+            docfacts,
+            preview,
+            changed,
+            skipped,
+            str(exc),
+        )
 
     edits, semantics, ir_entries = _collect_edits(result, config, plugin_manager)
     if command == "harvest":
@@ -570,9 +668,9 @@ def _print_failure_summary(payload: Mapping[str, object]) -> None:  # noqa: C901
         print(line, file=sys.stderr)
 
 
-def _run(
+def _run(  # noqa: C901, PLR0912, PLR0915
     files: Iterable[Path], args: argparse.Namespace, config: BuilderConfig
-) -> int:  # noqa: C901, PLR0915
+) -> int:
     cache = BuilderCache(CACHE_PATH)
     docfact_entries, docfact_sources = _load_docfact_state(config)
     is_update = args.command == "update"
@@ -583,6 +681,8 @@ def _run(
     processed_count = 0
     skipped_count = 0
     changed_count = 0
+    cache_hits = 0
+    cache_misses = 0
     errors: list[dict[str, str]] = []
     options = ProcessingOptions(
         command=args.command or "",
@@ -593,27 +693,24 @@ def _run(
     )
     try:
         plugin_manager = load_plugins(
-    for file_path in files_list:
-        outcome = _process_file(
-            file_path,
             config,
             REPO_ROOT,
             only=_parse_plugin_names(getattr(args, "only_plugin", None)),
             disable=_parse_plugin_names(getattr(args, "disable_plugin", None)),
         )
-    except PluginConfigurationError as exc:
-        LOGGER.error("Plugin configuration error: %s", exc)
+    except PluginConfigurationError:
+        LOGGER.exception("Plugin configuration error")
         return int(ExitStatus.CONFIG)
     try:
         try:
             cli_policy_overrides = _parse_policy_overrides(getattr(args, "policy_override", None))
-        except PolicyConfigurationError as exc:
-            LOGGER.error("Policy override error: %s", exc)
+        except PolicyConfigurationError:
+            LOGGER.exception("Policy override error")
             return int(ExitStatus.CONFIG)
         try:
             policy_settings = load_policy_settings(REPO_ROOT, cli_overrides=cli_policy_overrides)
-        except PolicyConfigurationError as exc:
-            LOGGER.error("Policy configuration error: %s", exc)
+        except PolicyConfigurationError:
+            LOGGER.exception("Policy configuration error")
             return int(ExitStatus.CONFIG)
         policy_engine = PolicyEngine(policy_settings)
         all_ir: list[IRDocstring] = []
@@ -634,6 +731,10 @@ def _run(
                 processed_count += 1
             if outcome.changed:
                 changed_count += 1
+            if outcome.cache_hit:
+                cache_hits += 1
+            else:
+                cache_misses += 1
             if is_check and outcome.changed and args.diff:
                 sys.stdout.write(outcome.preview or "")
             if outcome.status is not ExitStatus.SUCCESS:
@@ -690,6 +791,8 @@ def _run(
             "path": str(CACHE_PATH),
             "exists": CACHE_PATH.exists(),
             "mtime": None,
+            "hits": cache_hits,
+            "misses": cache_misses,
         }
         input_hashes: dict[str, dict[str, object]] = {}
         for path in files_list:
@@ -711,9 +814,11 @@ def _run(
             for path in files_list
         }
 
+        invoked = getattr(args, "invoked_subcommand", getattr(args, "subcommand", args.command))
         manifest_payload: dict[str, object] = {
             "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
             "command": args.command,
+            "subcommand": invoked,
             "options": {
                 "module": args.module,
                 "since": args.since,
@@ -742,8 +847,24 @@ def _run(
             },
             "dependencies": dependency_map,
         }
+        diff_links = {}
+        for label, path in (
+            ("docfacts", DOCFACTS_DIFF_PATH),
+            ("navmap", NAVMAP_DIFF_PATH),
+            ("schema", SCHEMA_DIFF_PATH),
+        ):
+            if path.exists():
+                diff_links[label] = str(path.relative_to(REPO_ROOT))
+        if diff_links:
+            manifest_payload["drift_previews"] = diff_links
         schema_path = REPO_ROOT / "docs" / "_build" / "schema_docstrings.json"
+        previous_schema = schema_path.read_text(encoding="utf-8") if schema_path.exists() else ""
         write_schema(schema_path)
+        current_schema = schema_path.read_text(encoding="utf-8")
+        if previous_schema and previous_schema != current_schema:
+            write_html_diff(previous_schema, current_schema, SCHEMA_DIFF_PATH, "Schema drift")
+        else:
+            SCHEMA_DIFF_PATH.unlink(missing_ok=True)
         manifest_payload["ir"] = {
             "version": IR_VERSION,
             "schema": str(schema_path.relative_to(REPO_ROOT)),
@@ -767,91 +888,158 @@ def _run(
             cache_payload["mtime"] = datetime.datetime.fromtimestamp(
                 CACHE_PATH.stat().st_mtime, tz=datetime.UTC
             ).isoformat()
+        selection = getattr(args, "config_selection", None)
+        if isinstance(selection, ConfigSelection):
+            manifest_payload["config_source"] = {
+                "path": str(selection.path),
+                "source": selection.source,
+            }
         MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
         MANIFEST_PATH.write_text(
             json.dumps(manifest_payload, indent=2, sort_keys=True), encoding="utf-8"
         )
 
-        if exit_status is not ExitStatus.SUCCESS:
-            observability_payload: dict[str, object] = {
-                "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
-                "summary": {
-                    "considered": len(files_list),
-                    "processed": processed_count,
-                    "skipped": skipped_count,
-                    "changed": changed_count,
-                    "duration_seconds": duration,
-                    "status_counts": status_counts_map,
-                },
-                "errors": errors[:OBSERVABILITY_MAX_ERRORS],
+        observability_payload: dict[str, object] = {
+            "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
+            "status": STATUS_LABELS[exit_status],
+            "summary": {
+                "considered": len(files_list),
+                "processed": processed_count,
+                "skipped": skipped_count,
+                "changed": changed_count,
+                "duration_seconds": duration,
+                "status_counts": status_counts_map,
+                "cache_hits": cache_hits,
+                "cache_misses": cache_misses,
+                "subcommand": invoked,
+            },
+            "errors": errors[:OBSERVABILITY_MAX_ERRORS],
+        }
+        if isinstance(selection, ConfigSelection):
+            observability_payload["config"] = {
+                "path": str(selection.path),
+                "source": selection.source,
             }
-            OBSERVABILITY_PATH.parent.mkdir(parents=True, exist_ok=True)
-            OBSERVABILITY_PATH.write_text(
-                json.dumps(observability_payload, indent=2, sort_keys=True),
-                encoding="utf-8",
-            )
+        observability_payload["cache"] = {
+            "path": str(CACHE_PATH),
+            "exists": CACHE_PATH.exists(),
+            "hits": cache_hits,
+            "misses": cache_misses,
+        }
+        if diff_links:
+            observability_payload["drift_previews"] = diff_links
+        OBSERVABILITY_PATH.parent.mkdir(parents=True, exist_ok=True)
+        OBSERVABILITY_PATH.write_text(
+            json.dumps(observability_payload, indent=2, sort_keys=True),
+            encoding="utf-8",
+        )
+        if exit_status is not ExitStatus.SUCCESS:
             _print_failure_summary(observability_payload)
-        else:
-            OBSERVABILITY_PATH.unlink(missing_ok=True)
 
         return int(exit_status)
     finally:
         plugin_manager.finish()
 
 
-def _command_update(args: argparse.Namespace) -> int:
-    config = load_config_from_env()
-    files = _select_files(config, args)
-    args.command = "update"
+def _execute_pipeline(args: argparse.Namespace, subcommand: str, command: str) -> int:
+    config, _ = _load_config(args)
+    try:
+        files = _select_files(config, args)
+    except InvalidPathError:
+        LOGGER.exception("Invalid path supplied to docstring builder")
+        return EXIT_CONFIG
+    args.command = command
+    args.invoked_subcommand = subcommand
     return _run(files, args, config)
+
+
+def _command_generate(args: argparse.Namespace) -> int:
+    return _execute_pipeline(args, "generate", "update")
+
+
+def _command_fix(args: argparse.Namespace) -> int:
+    args.force = True
+    return _execute_pipeline(args, "fix", "update")
+
+
+def _command_update(args: argparse.Namespace) -> int:
+    return _execute_pipeline(args, "update", "update")
 
 
 def _command_check(args: argparse.Namespace) -> int:
-    config = load_config_from_env()
-    files = _select_files(config, args)
-    args.command = "check"
-    return _run(files, args, config)
+    subcommand = getattr(args, "subcommand", None) or "check"
+    return _execute_pipeline(args, subcommand, "check")
+
+
+def _command_diff(args: argparse.Namespace) -> int:
+    args.diff = True
+    return _execute_pipeline(args, "diff", "check")
+
+
+def _command_measure(args: argparse.Namespace) -> int:
+    args.measure = True
+    return _execute_pipeline(args, "measure", "check")
 
 
 def _command_lint(args: argparse.Namespace) -> int:
-    config = load_config_from_env()
-    files = _select_files(config, args)
-    args.command = "check"
     args.skip_docfacts = getattr(args, "skip_docfacts", False)
-    return _run(files, args, config)
+    return _execute_pipeline(args, "lint", "check")
 
 
 def _command_harvest(args: argparse.Namespace) -> int:
-    config = load_config_from_env()
-    files = _select_files(config, args)
-    args.command = "harvest"
     args.force = True
-    return _run(files, args, config)
+    return _execute_pipeline(args, "harvest", "harvest")
 
 
 def _command_list(args: argparse.Namespace) -> int:
-    config = load_config_from_env()
-    files = _select_files(config, args)
+    config, _ = _load_config(args)
+    try:
+        files = _select_files(config, args)
+    except InvalidPathError:
+        LOGGER.exception("Invalid path supplied to docstring builder list")
+        return EXIT_CONFIG
     for file_path in files:
         result = harvest_file(file_path, config, REPO_ROOT)
         for symbol in result.symbols:
             if symbol.owned:
                 print(symbol.qname)
-    return 0
+    return EXIT_SUCCESS
 
 
 def _command_clear_cache(_: argparse.Namespace) -> int:
     """Remove any cached docstring builder metadata."""
     BuilderCache(CACHE_PATH).clear()
-    return 0
+    return EXIT_SUCCESS
 
 
-def _command_doctor(_: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PLR0915
+def _command_schema(args: argparse.Namespace) -> int:
+    """Generate the docstring IR schema to the requested path."""
+    _load_config(args)  # ensure config selection is recorded for manifesting/debugging
+    output = getattr(args, "output", None)
+    if output:
+        target = Path(output)
+        if not target.is_absolute():
+            target = (REPO_ROOT / target).resolve()
+    else:
+        target = REPO_ROOT / "docs" / "_build" / "schema_docstrings.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    write_schema(target)
+    rel = target.relative_to(REPO_ROOT)
+    print(f"Schema written to {rel}")
+    return EXIT_SUCCESS
+
+
+def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PLR0915
     """Run environment and configuration diagnostics."""
+    _, selection = _load_config(args)
+    print(f"[DOCTOR] Active config: {selection.path} ({selection.source})")
     issues: list[str] = []
     try:
-        if sys.version_info[:2] < (3, 13):
-            version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+        current = sys.version_info
+        if current.major < REQUIRED_PYTHON_MAJOR or (
+            current.major == REQUIRED_PYTHON_MAJOR and current.minor < REQUIRED_PYTHON_MINOR
+        ):
+            version = f"{current.major}.{current.minor}.{current.micro}"
             issues.append(f"Python 3.13 or newer required; detected {version}.")
 
         mypy_path = REPO_ROOT / "mypy.ini"
@@ -922,16 +1110,26 @@ def _command_doctor(_: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PLR09
             issues.append(".pre-commit-config.yaml not found; install pre-commit hooks.")
     except Exception:  # pragma: no cover - defensive guard
         LOGGER.exception("Doctor encountered an unexpected error.")
-        return int(ExitStatus.ERROR)
+        return EXIT_ERROR
+
+    drift_status = EXIT_SUCCESS
+    if getattr(args, "stubs", False):
+        print("[DOCTOR] Running stub drift check...")
+        drift_status = run_stub_drift()
+        if drift_status != 0:
+            issues.append("Stub drift detected; see output above.")
 
     if issues:
         print("[DOCTOR] Configuration issues detected:")
         for item in issues:
             print(f"  - {item}")
-        return int(ExitStatus.CONFIG)
+        return EXIT_CONFIG
+
+    if drift_status != 0:
+        return EXIT_CONFIG
 
     print("Docstring builder environment looks good.")
-    return int(ExitStatus.SUCCESS)
+    return EXIT_SUCCESS
 
 
 LEGACY_COMMAND_HANDLERS: dict[str, Callable[[argparse.Namespace], int]] = {
@@ -941,9 +1139,14 @@ LEGACY_COMMAND_HANDLERS: dict[str, Callable[[argparse.Namespace], int]] = {
 }
 
 
-def build_parser() -> argparse.ArgumentParser:
+def build_parser() -> argparse.ArgumentParser:  # noqa: PLR0915
     """Build the top-level argument parser for the docstring builder CLI."""
     parser = argparse.ArgumentParser(prog="docstring-builder")
+    parser.add_argument(
+        "--config",
+        dest="config_path",
+        help="Override the path to docstring_builder.toml",
+    )
     parser.add_argument("--module", help="Restrict to module prefix", default="")
     parser.add_argument("--since", help="Only consider files changed since revision", default="")
     parser.add_argument("--force", action="store_true", help="Ignore cache entries")
@@ -1008,16 +1211,31 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="subcommand")
 
-    update = subparsers.add_parser("update", help="Synchronize docstrings")
-    update.add_argument("paths", nargs="*", help="Optional Python paths to limit processing")
-    update.set_defaults(func=_command_update)
+    def _with_paths(subparser: argparse.ArgumentParser) -> None:
+        subparser.add_argument(
+            "paths",
+            nargs="*",
+            help="Optional Python paths to limit processing",
+        )
+
+    generate = subparsers.add_parser("generate", help="Synchronize managed docstrings and DocFacts")
+    _with_paths(generate)
+    generate.set_defaults(func=_command_generate)
+
+    fix = subparsers.add_parser("fix", help="Apply docstring updates while bypassing the cache")
+    _with_paths(fix)
+    fix.set_defaults(func=_command_fix)
+
+    diff_cmd = subparsers.add_parser("diff", help="Show docstring drift without writing changes")
+    _with_paths(diff_cmd)
+    diff_cmd.set_defaults(func=_command_diff)
 
     check = subparsers.add_parser("check", help="Validate docstrings without writing")
-    check.add_argument("paths", nargs="*", help="Optional Python paths to limit processing")
+    _with_paths(check)
     check.set_defaults(func=_command_check)
 
-    lint = subparsers.add_parser("lint", help="Alias for check with optional docfacts skip")
-    lint.add_argument("paths", nargs="*", help="Optional Python paths to limit processing")
+    lint = subparsers.add_parser("lint", help="Alias for check with optional DocFacts skip")
+    _with_paths(lint)
     lint.add_argument(
         "--no-docfacts",
         dest="skip_docfacts",
@@ -1026,18 +1244,38 @@ def build_parser() -> argparse.ArgumentParser:
     )
     lint.set_defaults(func=_command_lint)
 
-    list_cmd = subparsers.add_parser("list", help="List managed symbols")
-    list_cmd.add_argument("paths", nargs="*", help="Optional Python paths to limit processing")
+    measure = subparsers.add_parser("measure", help="Run validation and emit observability metrics")
+    _with_paths(measure)
+    measure.set_defaults(func=_command_measure)
+
+    schema = subparsers.add_parser("schema", help="Generate the docstring IR schema JSON")
+    schema.add_argument("--output", help="Optional output path for the schema JSON")
+    schema.set_defaults(func=_command_schema)
+
+    doctor = subparsers.add_parser(
+        "doctor", help="Diagnose environment, configuration, and optional stubs"
+    )
+    doctor.add_argument(
+        "--stubs",
+        action="store_true",
+        help="Run the stub drift checker as part of diagnostics",
+    )
+    doctor.set_defaults(func=_command_doctor)
+
+    list_cmd = subparsers.add_parser("list", help="List managed docstring symbols")
+    _with_paths(list_cmd)
     list_cmd.set_defaults(func=_command_list)
 
     clear = subparsers.add_parser("clear-cache", help="Clear the builder cache")
     clear.set_defaults(func=_command_clear_cache)
+
     harvest = subparsers.add_parser("harvest", help="Harvest metadata without applying edits")
-    harvest.add_argument("paths", nargs="*", help="Optional Python paths to limit processing")
+    _with_paths(harvest)
     harvest.set_defaults(func=_command_harvest)
 
-    doctor = subparsers.add_parser("doctor", help="Diagnose environment and configuration")
-    doctor.set_defaults(func=_command_doctor)
+    update = subparsers.add_parser("update", help=argparse.SUPPRESS)
+    _with_paths(update)
+    update.set_defaults(func=_command_update)
 
     return parser
 
