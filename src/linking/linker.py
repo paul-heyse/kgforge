@@ -55,4 +55,3 @@ class Linker:
         Describe return value.
     """
 
-    ...

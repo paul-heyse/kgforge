@@ -71,7 +71,7 @@ def main() -> int:
         "-r",
         "src",
     ]
-    result = subprocess.run(cmd, cwd=repo)
+    result = subprocess.run(cmd, check=False, cwd=repo)
     if result.returncode not in {0, 3}:
         return result.returncode
 

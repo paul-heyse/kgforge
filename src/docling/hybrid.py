@@ -48,4 +48,3 @@ class HybridChunker:
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
     """
 
-    ...

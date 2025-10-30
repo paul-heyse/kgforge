@@ -128,7 +128,7 @@ def _node(spec: NodeSpec) -> SimpleNamespace:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def readme_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, Path]:
     root = tmp_path
     src = root / "src"

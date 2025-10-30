@@ -55,4 +55,3 @@ class Neo4jStore:
         Describe return value.
     """
 
-    ...

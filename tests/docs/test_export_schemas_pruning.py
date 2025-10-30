@@ -34,7 +34,7 @@ def _prepare_environment(monkeypatch: MonkeyPatch, tmp_path: Path) -> tuple[Modu
     monkeypatch.setattr(export_schemas, "OUT", out_dir, raising=False)
     monkeypatch.setattr(export_schemas, "DRIFT_OUT", drift_out, raising=False)
     monkeypatch.setattr(export_schemas, "NAVMAP", tmp_path / "navmap.json", raising=False)
-    monkeypatch.setattr(export_schemas, "_load_navmap", lambda: {}, raising=False)
+    monkeypatch.setattr(export_schemas, "_load_navmap", dict, raising=False)
     monkeypatch.setattr(export_schemas, "_iter_models", lambda: iter(()), raising=False)
 
     return export_schemas, out_dir, drift_out

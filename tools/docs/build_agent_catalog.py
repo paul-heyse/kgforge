@@ -1526,7 +1526,6 @@ def load_catalog(path: Path, *, load_shards: bool = True) -> dict[str, Any]:
 
 def _parse_facet_args(values: Sequence[str]) -> dict[str, str]:
     """Parse CLI facet arguments into a mapping."""
-
     facets: dict[str, str] = {}
     for raw in values:
         if "=" not in raw:
