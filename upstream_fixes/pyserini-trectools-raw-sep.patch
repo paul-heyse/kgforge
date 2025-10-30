@@ -20,5 +20,5 @@ index 1111111..2222222 100644
 +            names=TrecRun.columns,
 +            dtype={'docid': 'str', 'score': 'float'},
 +        )
--- 
+--
 2.34.1

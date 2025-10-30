@@ -47,7 +47,7 @@ class MockKG:
 
     how instances collaborate with the surrounding package. Highlight how the class supports nearby
     modules to guide readers through the codebase.
-    """
+"""
 
     def __init__(self) -> None:
         """Describe   init  .
@@ -57,7 +57,7 @@ class MockKG:
         Python's object protocol for this class. Use it to integrate with built-in operators,
         protocols, or runtime behaviours that expect instances to participate in the language's data
         model.
-        """
+"""
         self.chunk2concepts: dict[str, set[str]] = {}
         self.neighbors: dict[str, set[str]] = {}
 
@@ -74,7 +74,7 @@ class MockKG:
             Describe ``chunk_id``.
         concept_id : str
             Describe ``concept_id``.
-        """
+"""
         self.chunk2concepts.setdefault(chunk_id, set()).add(concept_id)
 
     def add_edge(self, a: str, b: str) -> None:
@@ -90,7 +90,7 @@ class MockKG:
             Describe ``a``.
         b : str
             Describe ``b``.
-        """
+"""
         self.neighbors.setdefault(a, set()).add(b)
         self.neighbors.setdefault(b, set()).add(a)
 
@@ -105,12 +105,13 @@ class MockKG:
         ----------
         chunk_id : str
             Describe ``chunk_id``.
+            
 
         Returns
         -------
         list[str]
             Describe return value.
-        """
+"""
         return sorted(self.chunk2concepts.get(chunk_id, set()))
 
     def one_hop(self, concept_id: str) -> list[str]:
@@ -124,10 +125,11 @@ class MockKG:
         ----------
         concept_id : str
             Describe ``concept_id``.
+            
 
         Returns
         -------
         list[str]
             Describe return value.
-        """
+"""
         return sorted(self.neighbors.get(concept_id, set()))

@@ -6,6 +6,8 @@ from kgfoundry.agent_catalog.mcp import build_parser, main
 
 __all__ = ["build_parser", "main"]
 
+JsonValue = None | bool | int | float | str | list["JsonValue"] | dict[str, "JsonValue"]
+JsonObject = dict[str, JsonValue]
 
 if __name__ == "__main__":  # pragma: no cover - CLI entrypoint
     raise SystemExit(main())

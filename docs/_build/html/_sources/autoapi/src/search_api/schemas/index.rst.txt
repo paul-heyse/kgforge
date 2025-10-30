@@ -25,7 +25,7 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   
+
    Model the SearchRequest.
 
    Pydantic model defining the structured payload used across the system. Validation ensures inputs
@@ -78,7 +78,7 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   
+
    Model the SearchResult.
 
    Pydantic model defining the structured payload used across the system. Validation ensures inputs
@@ -133,6 +133,3 @@ Module Contents
    .. py:attribute:: concepts
       :type:  list[dict[str, str]]
       :value: []
-
-
-

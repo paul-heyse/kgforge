@@ -27,7 +27,7 @@ Module Contents
    Bases: :py:obj:`logging.Formatter`
 
 
-   
+
    Model the JsonFormatter.
 
    Represent the jsonformatter data structure used throughout the project. The class encapsulates
@@ -53,7 +53,7 @@ Module Contents
 
    .. py:method:: format(record)
 
-      
+
       Compute format.
 
       Carry out the format operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -90,7 +90,7 @@ Module Contents
 
 .. py:function:: setup_logging(level = logging.INFO)
 
-   
+
    Compute setup logging.
 
    Carry out the setup logging operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -119,4 +119,3 @@ Module Contents
 
    ..
        !! processed by numpydoc !!
-

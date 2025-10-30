@@ -5,7 +5,7 @@ src.search_api
 
 .. autoapi-nested-parse::
 
-   
+
    Overview of search api.
 
    This module bundles search api logic for the kgfoundry stack. It groups related helpers so
@@ -45,5 +45,3 @@ Submodules
    /autoapi/src/search_api/schemas/index
    /autoapi/src/search_api/service/index
    /autoapi/src/search_api/splade_index/index
-
-

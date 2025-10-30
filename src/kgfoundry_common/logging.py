@@ -74,12 +74,13 @@ class JsonFormatter(logging.Formatter):
     defaults : inspect._empty, optional
         Describe ``defaults``.
         Defaults to ``None``.
+        
 
     Returns
     -------
     inspect._empty
         Describe return value.
-    """
+"""
 
     def format(self, record: logging.LogRecord) -> str:
         """Describe format.
@@ -92,12 +93,13 @@ class JsonFormatter(logging.Formatter):
         ----------
         record : logging.LogRecord
             Describe ``record``.
+            
 
         Returns
         -------
         str
             Describe return value.
-        """
+"""
         data = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
             "level": record.levelname,
@@ -124,7 +126,7 @@ def setup_logging(level: int = logging.INFO) -> None:
     level : int, optional
         Describe ``level``.
         Defaults to ``20``.
-    """
+"""
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())
     logging.basicConfig(level=level, handlers=[handler])

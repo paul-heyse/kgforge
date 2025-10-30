@@ -14,15 +14,7 @@ from pathlib import Path
 
 from kgfoundry.agent_catalog.search import SearchDocument, documents_from_catalog
 
-JsonValue = (
-    None
-    | bool
-    | int
-    | float
-    | str
-    | list["JsonValue"]
-    | dict[str, "JsonValue"]
-)
+JsonValue = None | bool | int | float | str | list["JsonValue"] | dict[str, "JsonValue"]
 JsonObject = dict[str, JsonValue]
 
 CatalogPayload = Mapping[str, JsonValue]
@@ -171,9 +163,7 @@ class _SymbolExtraction:
     lookup: dict[str, str]
 
 
-def _collect_symbol_rows(
-    packages: Sequence[Mapping[str, JsonValue]]
-) -> _SymbolExtraction:
+def _collect_symbol_rows(packages: Sequence[Mapping[str, JsonValue]]) -> _SymbolExtraction:
     """Aggregate module, symbol, anchor, and ranking rows."""
     module_rows: list[ModuleRow] = []
     symbol_rows: list[SymbolRow] = []
@@ -241,7 +231,9 @@ def _collect_symbol_rows(
                 quality = symbol.get("quality")
                 metrics = symbol.get("metrics")
                 change_impact = symbol.get("change_impact")
-                coverage = quality.get("docstring_coverage") if isinstance(quality, Mapping) else None
+                coverage = (
+                    quality.get("docstring_coverage") if isinstance(quality, Mapping) else None
+                )
                 complexity = metrics.get("complexity") if isinstance(metrics, Mapping) else None
                 churn = (
                     change_impact.get("churn_last_n")
@@ -250,9 +242,7 @@ def _collect_symbol_rows(
                 )
                 stability = metrics.get("stability") if isinstance(metrics, Mapping) else None
                 deprecated = 1 if isinstance(metrics, Mapping) and metrics.get("deprecated") else 0
-                ranking_rows.append(
-                    (symbol_id, coverage, complexity, churn, stability, deprecated)
-                )
+                ranking_rows.append((symbol_id, coverage, complexity, churn, stability, deprecated))
     return _SymbolExtraction(module_rows, symbol_rows, anchor_rows, ranking_rows, symbol_lookup)
 
 
@@ -315,7 +305,9 @@ def _build_fts_rows(documents: Sequence[SearchDocument]) -> list[FtsRow]:
     return rows
 
 
-def _write_many(connection: sqlite3.Connection, sql: str, rows: Sequence[tuple[JsonValue, ...]]) -> None:
+def _write_many(
+    connection: sqlite3.Connection, sql: str, rows: Sequence[tuple[JsonValue, ...]]
+) -> None:
     """Execute ``executemany`` when rows are provided."""
     if rows:
         connection.executemany(sql, rows)
@@ -331,7 +323,9 @@ def write_sqlite_catalog(
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists():
         path.unlink()
-    packages = list(packages_override) if packages_override is not None else list(_iter_packages(payload))
+    packages = (
+        list(packages_override) if packages_override is not None else list(_iter_packages(payload))
+    )
     payload_for_docs: dict[str, JsonValue] = dict(payload)
     payload_for_docs["packages"] = list(packages)
     documents = list(documents_from_catalog(payload_for_docs))
@@ -397,9 +391,7 @@ def _load_packages_table(connection: sqlite3.Connection) -> dict[str, JsonObject
     for row in connection.execute("SELECT name, data FROM packages ORDER BY name"):
         package_data = _json_loads(row["data"])
         data: JsonObject = (
-            dict(package_data)
-            if isinstance(package_data, dict)
-            else {"name": row["name"]}
+            dict(package_data) if isinstance(package_data, dict) else {"name": row["name"]}
         )
         data.setdefault("modules", [])
         packages[row["name"]] = data

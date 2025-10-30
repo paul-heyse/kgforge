@@ -68,4 +68,3 @@ openspec validate docstring-builder-hardening --strict
 - [ ] Implementation owner review
 - [ ] CI green; docs/portal artifacts uploaded (coverage, JUnit, docs, portal, schema validation logs)
 - [ ] Feature flag default flipped and compatibility shim timeline documented
-

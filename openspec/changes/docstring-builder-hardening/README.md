@@ -48,5 +48,3 @@ Keep the PR description up to date with:
 - 4-item design note
 - Command outputs for acceptance gates
 - Links to generated artifacts (docs site, Agent Portal, schema validation logs)
-
-

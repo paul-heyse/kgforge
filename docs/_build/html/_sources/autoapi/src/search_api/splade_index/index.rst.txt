@@ -24,7 +24,7 @@ Module Contents
 
 .. py:function:: tok(text)
 
-   
+
    Compute tok.
 
    Carry out the tok operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -60,7 +60,7 @@ Module Contents
 
 .. py:class:: SpladeDoc
 
-   
+
    Model the SpladeDoc.
 
    Represent the spladedoc data structure used throughout the project. The class encapsulates
@@ -102,7 +102,7 @@ Module Contents
 
 .. py:class:: SpladeIndex(db_path, chunks_dataset_root = None, sparse_root = None)
 
-   
+
    Model the SpladeIndex.
 
    Represent the spladeindex data structure used throughout the project. The class encapsulates
@@ -146,7 +146,7 @@ Module Contents
 
    .. py:method:: _load(chunks_root)
 
-      
+
       Compute load.
 
       Carry out the load operation.
@@ -174,7 +174,7 @@ Module Contents
 
    .. py:method:: search(query, k = 10)
 
-      
+
       Compute search.
 
       Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -213,7 +213,7 @@ Module Contents
 
    .. py:method:: doc(index)
 
-      
+
       Compute doc.
 
       Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -246,5 +246,3 @@ Module Contents
 
       ..
           !! processed by numpydoc !!
-
-

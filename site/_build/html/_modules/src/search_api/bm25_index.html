@@ -8,9 +8,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>src.search_api.bm25_index &#8212; kgfoundry  documentation</title>
-  
-  
-  
+
+
+
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
@@ -24,7 +24,7 @@
 
     </style>
   </noscript>
-  
+
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-  
+
   <!-- So that users can add custom icons -->
   <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -60,22 +60,22 @@ window.addEventListener("load", () => mermaid.run());
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
   </head>
-  
-  
+
+
   <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-  
-  
+
+
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
+
   <div id="pst-scroll-pixel-helper"></div>
-  
+
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
-  
+
   <dialog id="pst-search-dialog">
-    
+
 <form class="bd-search d-flex align-items-center"
       action="../../../search.html"
       method="get">
@@ -97,43 +97,43 @@ window.addEventListener("load", () => mermaid.run());
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
 
-  
+
     <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
-  
-  
+
+
   <div class="col-lg-3 navbar-header-items__start">
-    
+
       <div class="navbar-item">
 
-  
-    
-  
+
+
+
 
 <a class="navbar-brand logo" href="../../../index.html">
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
     <p class="title logo__title">kgfoundry  documentation</p>
-  
+
 </a></div>
-    
+
   </div>
-  
+
   <div class="col-lg-9 navbar-header-items">
-    
+
     <div class="me-auto navbar-header-items__center">
-      
+
         <div class="navbar-item">
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
-    
+
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../getting-started.html">
     Getting Started
@@ -175,7 +175,7 @@ window.addEventListener("load", () => mermaid.run());
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../reference/test-matrix.html">
     Test Matrix (symbol → tests)
@@ -352,17 +352,17 @@ window.addEventListener("load", () => mermaid.run());
 
                 </ul>
             </li>
-            
+
   </ul>
 </nav></div>
-      
+
     </div>
-    
-    
+
+
     <div class="navbar-header-items__end">
-      
+
         <div class="navbar-item navbar-persistent--container">
-          
+
 
 <button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
@@ -370,8 +370,8 @@ window.addEventListener("load", () => mermaid.run());
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
 </button>
         </div>
-      
-      
+
+
         <div class="navbar-item">
 
 <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -379,12 +379,12 @@ window.addEventListener("load", () => mermaid.run());
   <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
   <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
 </button></div>
-      
+
     </div>
-    
+
   </div>
-  
-  
+
+
     <div class="navbar-persistent--mobile">
 
 <button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -393,37 +393,37 @@ window.addEventListener("load", () => mermaid.run());
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
 </button>
     </div>
-  
 
-  
+
+
 </div>
 
     </header>
-  
+
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
-      
-      
-      
-        
-      
+
+
+
+
+
       <dialog id="pst-primary-sidebar-modal"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
-        
 
-  
+
+
   <div class="sidebar-header-items sidebar-primary__section">
-    
-    
+
+
       <div class="sidebar-header-items__center">
-        
-          
-          
+
+
+
             <div class="navbar-item">
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
-    
+
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../getting-started.html">
     Getting Started
@@ -635,14 +635,14 @@ window.addEventListener("load", () => mermaid.run());
 
   </ul>
 </nav></div>
-          
-        
+
+
       </div>
-    
-    
-    
+
+
+
       <div class="sidebar-header-items__end">
-        
+
           <div class="navbar-item">
 
 <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -650,12 +650,12 @@ window.addEventListener("load", () => mermaid.run());
   <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
   <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
 </button></div>
-        
+
       </div>
-    
+
   </div>
-  
-  
+
+
   <div class="sidebar-primary-items__end sidebar-primary__section">
       <div class="sidebar-primary-item">
 <div id="ethical-ad-placement"
@@ -668,48 +668,48 @@ window.addEventListener("load", () => mermaid.run());
 
 
       </div>
-      
+
       <main id="main-content" class="bd-main" role="main">
-        
-        
+
+
           <div class="bd-content">
             <div class="bd-article-container">
-              
+
               <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
-  
+
     <div class="header-article-items__start">
-      
+
         <div class="header-article-item">
 
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
-    
+
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    
+
     <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
-    
+
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">src.search_api.bm25_index</span></li>
   </ul>
 </nav>
 </div>
-      
+
     </div>
-  
-  
+
+
 </div>
 </div>
-              
-              
-              
-                
+
+
+
+
 <div id="searchbox"></div>
                 <article class="bd-article">
-                  
+
   <h1>Source code for src.search_api.bm25_index</h1><div class="highlight"><pre>
 <span></span><span class="linenos">  1</span><span class="sd">&quot;&quot;&quot;Overview of bm25 index.</span>
 <span class="linenos">  2</span>
@@ -788,7 +788,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos"> 73</span><span class="sd">    &gt;&gt;&gt; result  # doctest: +ELLIPSIS</span>
 <span class="linenos"> 74</span><span class="sd">    ...</span>
 <span class="linenos"> 75</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos"> 76</span>    
+<span class="linenos"> 76</span>
 <span class="linenos"> 77</span>    <span class="k">return</span> <span class="p">[</span><span class="n">token</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">TOKEN_RE</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)]</span></div>
 
 <span class="linenos"> 78</span>
@@ -855,7 +855,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">116</span><span class="sd">        b : float | None</span>
 <span class="linenos">117</span><span class="sd">            Optional parameter default ``0.4``. Description for ``b``.</span>
 <span class="linenos">118</span><span class="sd">        &quot;&quot;&quot;</span>
-<span class="linenos">119</span>        
+<span class="linenos">119</span>
 <div class="viewcode-block" id="BM25Index.k1">
 <a class="viewcode-back" href="../../../autoapi/src/search_api/bm25_index/index.html#src.search_api.bm25_index.BM25Index.k1">[docs]</a>
 <span class="linenos">120</span>        <span class="bp">self</span><span class="o">.</span><span class="n">k1</span> <span class="o">=</span> <span class="n">k1</span></div>
@@ -906,7 +906,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">147</span><span class="sd">        &gt;&gt;&gt; result  # doctest: +ELLIPSIS</span>
 <span class="linenos">148</span><span class="sd">        ...</span>
 <span class="linenos">149</span><span class="sd">        &quot;&quot;&quot;</span>
-<span class="linenos">150</span>        
+<span class="linenos">150</span>
 <span class="linenos">151</span>        <span class="n">index</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
 <span class="linenos">152</span>        <span class="n">con</span> <span class="o">=</span> <span class="n">duckdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db_path</span><span class="p">)</span>
 <span class="linenos">153</span>        <span class="k">try</span><span class="p">:</span>
@@ -1012,7 +1012,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">244</span><span class="sd">        &gt;&gt;&gt; from search_api.bm25_index import save</span>
 <span class="linenos">245</span><span class="sd">        &gt;&gt;&gt; save(...)  # doctest: +ELLIPSIS</span>
 <span class="linenos">246</span><span class="sd">        &quot;&quot;&quot;</span>
-<span class="linenos">247</span>        
+<span class="linenos">247</span>
 <span class="linenos">248</span>        <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="linenos">249</span>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
 <span class="linenos">250</span>            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
@@ -1053,7 +1053,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">282</span><span class="sd">        &gt;&gt;&gt; result  # doctest: +ELLIPSIS</span>
 <span class="linenos">283</span><span class="sd">        ...</span>
 <span class="linenos">284</span><span class="sd">        &quot;&quot;&quot;</span>
-<span class="linenos">285</span>        
+<span class="linenos">285</span>
 <span class="linenos">286</span>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
 <span class="linenos">287</span>            <span class="n">payload</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
 <span class="linenos">288</span>        <span class="n">index</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">),</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">))</span>
@@ -1113,7 +1113,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">336</span><span class="sd">        &gt;&gt;&gt; result  # doctest: +ELLIPSIS</span>
 <span class="linenos">337</span><span class="sd">        ...</span>
 <span class="linenos">338</span><span class="sd">        &quot;&quot;&quot;</span>
-<span class="linenos">339</span>        
+<span class="linenos">339</span>
 <span class="linenos">340</span>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
 <span class="linenos">341</span>            <span class="k">return</span> <span class="p">[]</span>
 <span class="linenos">342</span>        <span class="n">terms</span> <span class="o">=</span> <span class="n">toks</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
@@ -1156,47 +1156,47 @@ window.addEventListener("load", () => mermaid.run());
 <span class="linenos">376</span><span class="sd">        &gt;&gt;&gt; result  # doctest: +ELLIPSIS</span>
 <span class="linenos">377</span><span class="sd">        ...</span>
 <span class="linenos">378</span><span class="sd">        &quot;&quot;&quot;</span>
-<span class="linenos">379</span>        
+<span class="linenos">379</span>
 <span class="linenos">380</span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">docs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
 </div>
 
 </pre></div>
 
                 </article>
-              
-              
-              
-              
-              
+
+
+
+
+
                 <footer class="prev-next-footer d-print-none">
-                  
+
 <div class="prev-next-area">
 </div>
                 </footer>
-              
+
             </div>
-            
-            
-              
-            
+
+
+
+
           </div>
           <footer class="bd-footer-content">
-            
+
           </footer>
-        
+
       </main>
     </div>
   </div>
-  
+
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
   <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
 <script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
-  
+
     <div class="footer-items__start">
-      
+
         <div class="footer-item">
 
   <p class="sphinx-version">
@@ -1204,21 +1204,21 @@ window.addEventListener("load", () => mermaid.run());
     <br/>
   </p>
 </div>
-      
+
     </div>
-  
-  
-  
+
+
+
     <div class="footer-items__end">
-      
+
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
   Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
-      
+
     </div>
-  
+
 </div>
 
   </footer>

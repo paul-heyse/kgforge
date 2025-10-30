@@ -28,7 +28,7 @@ Module Contents
 
 .. py:class:: DenseVecs
 
-   
+
    Model the DenseVecs.
 
    Represent the densevecs data structure used throughout the project. The class encapsulates
@@ -62,7 +62,7 @@ Module Contents
 
 .. py:class:: FaissAdapter(db_path, factory = 'OPQ64,IVF8192,PQ64', metric = 'ip')
 
-   
+
    Model the FaissAdapter.
 
    Represent the faissadapter data structure used throughout the project. The class encapsulates
@@ -119,7 +119,7 @@ Module Contents
 
    .. py:method:: _load_dense_from_parquet(source)
 
-      
+
       Load dense vectors directly from a parquet dataset.
 
 
@@ -143,7 +143,7 @@ Module Contents
 
    .. py:method:: _load_dense_parquet()
 
-      
+
       Compute load dense parquet.
 
       Carry out the load dense parquet operation.
@@ -172,7 +172,7 @@ Module Contents
 
    .. py:method:: build()
 
-      
+
       Compute build.
 
       Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -202,7 +202,7 @@ Module Contents
 
    .. py:method:: load_or_build(cpu_index_path = None)
 
-      
+
       Compute load or build.
 
       Carry out the load or build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -235,7 +235,7 @@ Module Contents
 
    .. py:method:: search(qvec, k = 10)
 
-      
+
       Compute search.
 
       Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -272,5 +272,3 @@ Module Contents
 
       ..
           !! processed by numpydoc !!
-
-

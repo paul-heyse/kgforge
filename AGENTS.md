@@ -35,8 +35,7 @@
    - Open the relevant spec/proposal under `openspec/` (when applicable).
    - Bootstrap environment and run local checks:
      ```bash
-     uv sync --locked
-     uvx pre-commit run --all-files
+     uv sync 
      ```
 
 2) **Plan (write before code)**
@@ -109,7 +108,7 @@ Read these first when editing configs or debugging local vs CI drift:
 - **Complexity:** cyclomatic ≤ 10, returns ≤ 6, branches ≤ 12; refactor if exceeded.
 - **Rule families emphasized (non‑exhaustive):**
   - Baseline: `F,E4,E7,E9,I,N,UP,SIM,B,RUF,ANN,D,RET,RSE,TRY,EM,G,LOG,ISC,TID,TD,ERA,PGH,C90,PLR`
-  - Extra quality & safety: `W,A,ARG,BLE,DTZ,PTH,PIE,S,PT,T20`  
+  - Extra quality & safety: `W,A,ARG,BLE,DTZ,PTH,PIE,S,PT,T20`
     (builtins shadowing, unused args, bare except, timezone‑aware datetimes, pathlib, security, pytest style, ban prints)
 
 > We standardize on **Ruff** for formatter + linter. Do **not** run Black in parallel (conflicts / duplicate work).

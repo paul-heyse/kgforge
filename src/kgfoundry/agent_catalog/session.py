@@ -6,7 +6,7 @@ The server reports errors using RFC 9457 Problem Details payloads. For example::
         "type": "about:blank",
         "title": "unknown-method",
         "status": 404,
-        "detail": "Unknown method: catalog.invalid"
+        "detail": "Unknown method: catalog.invalid",
     }
 
 This module surfaces those errors via :class:`CatalogSessionError` while providing a
@@ -26,15 +26,7 @@ from threading import Lock
 from types import TracebackType
 from typing import cast
 
-JsonValue = (
-    None
-    | bool
-    | int
-    | float
-    | str
-    | list["JsonValue"]
-    | dict[str, "JsonValue"]
-)
+JsonValue = None | bool | int | float | str | list["JsonValue"] | dict[str, "JsonValue"]
 JsonObject = dict[str, JsonValue]
 
 logger = logging.getLogger(__name__)

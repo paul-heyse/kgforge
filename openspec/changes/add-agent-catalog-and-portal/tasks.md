@@ -210,4 +210,3 @@
 - [ ] `agent_catalog.json` present and valid (or sharded with root index); portal navigable offline.
 - [ ] Links open correct targets for `editor` and `github` modes.
 - [ ] Clients/CLI and stdio server work; performance budgets met; quality targets satisfied; OpenAPI/SDK validated.
-

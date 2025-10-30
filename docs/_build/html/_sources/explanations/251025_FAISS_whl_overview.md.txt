@@ -12,7 +12,7 @@ utils/CuvsFilterConvert.cu.o
 utils/CuvsUtils.cu.o
 ```
 
-> **Key consequence:** In this wheel, **FAISS GPU indexes can dispatch to cuVS kernels** for the families above when you **enable cuVS** at construction/cloning time and the **cuVS/RAPIDS libraries are present** in the process. The runtime loader & resource rules for cuVS remain the same (preload `libcuvs`, `librmm`, logging; use a shared `Resources` handle if calling cuVS directly).  
+> **Key consequence:** In this wheel, **FAISS GPU indexes can dispatch to cuVS kernels** for the families above when you **enable cuVS** at construction/cloning time and the **cuVS/RAPIDS libraries are present** in the process. The runtime loader & resource rules for cuVS remain the same (preload `libcuvs`, `librmm`, logging; use a shared `Resources` handle if calling cuVS directly).
 
 ---
 
@@ -29,7 +29,7 @@ utils/CuvsUtils.cu.o
 | **Binary**        |                    ✅ | ✅ `GpuIndexBinaryFlat`, `GpuIndexBinaryCagra` |                                                    ✅ **Binary‑CAGRA** via **index‑level cuVS** (`GpuIndexBinaryCagra`) |                                       – |
 | **Direct bfKNN**  |                    – |               ✅ `bfKnn(...)` / `knn_gpu(...)` |                                                          ✅ **set `use_cuvs=True`** (guard with `should_use_cuvs(...)`) |        ✅ `cuvs.distance` / brute_force  |
 
-**What changed:** In earlier guidance, IVF‑Flat/IVF‑PQ/CAGRA/Binary‑CAGRA were marked “not via FAISS route”. In **this** wheel, those families **are** cuVS‑enabled inside FAISS when you opt in via the **index configs** or **GPU cloner options** described below (and cuVS libs are present). The bfKNN cuVS path remains available. The cuVS loader & environment remain as documented. 
+**What changed:** In earlier guidance, IVF‑Flat/IVF‑PQ/CAGRA/Binary‑CAGRA were marked “not via FAISS route”. In **this** wheel, those families **are** cuVS‑enabled inside FAISS when you opt in via the **index configs** or **GPU cloner options** described below (and cuVS libs are present). The bfKNN cuVS path remains available. The cuVS loader & environment remain as documented.
 
 ---
 
@@ -44,7 +44,7 @@ from libcuvs import load_library
 load_library()  # loads libcuvs, librmm, rapids_logger; idempotent
 ```
 
-This follows the integration guidance in your loader reference and prevents `OSError: libcuvs_c.so not found` surprises. 
+This follows the integration guidance in your loader reference and prevents `OSError: libcuvs_c.so not found` surprises.
 
 ---
 
@@ -74,11 +74,11 @@ except RuntimeError:
     gpu_index = faiss.index_cpu_to_gpu(res, 0, cpu_index, co)
 ```
 
-* `GpuClonerOptions.use_cuvs` is exposed in this wheel and directs FAISS to build the **cuVS‑backed** GPU index when possible. 
+* `GpuClonerOptions.use_cuvs` is exposed in this wheel and directs FAISS to build the **cuVS‑backed** GPU index when possible.
 * This pattern works uniformly across Flat / IVF‑Flat / IVF‑PQ and also covers **CAGRA** if cloning from `IndexHNSWCagra` to `GpuIndexCagra` is desired. (You can also build `GpuIndexCagra` directly; see 2.3.)
 * Keep your **existing memory tuning** (`setTempMemory`, `setPinnedMemory`) for throughput.
 
-> You can also probe `faiss.should_use_cuvs(...)` before setting the flag; however, the **try/except** is the most robust guard when combining drivers, cards, and dims. 
+> You can also probe `faiss.should_use_cuvs(...)` before setting the flag; however, the **try/except** is the most robust guard when combining drivers, cards, and dims.
 
 ---
 
@@ -106,7 +106,7 @@ gpu_cagra = faiss.GpuIndexCagra(res, d, cagra_cfg)
 # (config class may not be separate in the API; prefer the cloner path if unsure)
 ```
 
-These configs inherit `use_cuvs` through `GpuIndexConfig` in this wheel. Use the cloner option (2.2) when you want one code path that works across all index types. 
+These configs inherit `use_cuvs` through `GpuIndexConfig` in this wheel. Use the cloner option (2.2) when you want one code path that works across all index types.
 
 ---
 
@@ -126,7 +126,7 @@ D, I = knn_gpu(res, xq.astype('float32'), xb.astype('float32'),
                k=10, metric=METRIC_INNER_PRODUCT, use_cuvs=use_cuvs)
 ```
 
-This remains a great baseline even when your main serving index is IVF‑PQ/CAGRA. 
+This remains a great baseline even when your main serving index is IVF‑PQ/CAGRA.
 
 ---
 
@@ -154,7 +154,7 @@ gpu = faiss.index_cpu_to_gpu(res, 0, cpu, co)  # cuVS-backed IVFPQ
 ```
 
 * Keeps your default “best‑in‑class” factory and determinism.
-* The **cloner** chooses the cuVS implementation for the data path compiled in this wheel. 
+* The **cloner** chooses the cuVS implementation for the data path compiled in this wheel.
 
 ### 3.2. **IVF‑Flat** with cuVS
 
@@ -169,7 +169,7 @@ gpu = faiss.index_cpu_to_gpu(res, 0, cpu, co)  # cuVS-backed IVFFlat
 ### 3.3. **Flat (exact)** with cuVS
 
 * **Index route:** `GpuIndexFlat{L2,IP}` with `GpuIndexFlatConfig.use_cuvs = True`.
-* **Direct KNN:** `knn_gpu(..., use_cuvs=True)` (guarded). 
+* **Direct KNN:** `knn_gpu(..., use_cuvs=True)` (guarded).
 
 ### 3.4. **CAGRA** with cuVS
 
@@ -196,16 +196,16 @@ The presence of `utils/CuvsFilterConvert.cu.o` indicates FAISS performs **select
 * Keep using FAISS’ **search parameters** (e.g., `SearchParametersIVF`’s selector).
 * When the index was constructed/cloned with **`use_cuvs=True`**, the FAISS runtime converts the filter to cuVS’ internal format and applies it during list scans.
 
-This is transparent but worth noting for **filtered search** scenarios. (The general cuVS run‑time and loader expectations remain exactly as previously documented.) 
+This is transparent but worth noting for **filtered search** scenarios. (The general cuVS run‑time and loader expectations remain exactly as previously documented.)
 
 ---
 
 ## 5) Operational reminders (unchanged but critical)
 
-* **Preload cuVS** once per process (`libcuvs.load_library()`), so **RMM** and logging are initialized and all `.so` dependencies are resident. 
+* **Preload cuVS** once per process (`libcuvs.load_library()`), so **RMM** and logging are initialized and all `.so` dependencies are resident.
 * Stick to **row‑major `float32`** contiguous arrays for FAISS; normalize vectors for cosine (IP).
 * Keep GPU working set **≤ ~80% VRAM**; pre‑allocate **temp** and **pinned** memory on `StandardGpuResources`.
-* For **cuVS direct** experimentation (IVF‑PQ, IVF‑Flat, CAGRA, HNSW, multi‑GPU), continue to use the Python surfaces under `cuvs.neighbors.*` with a shared `Resources` handle and device arrays, as documented in your cuVS reference. 
+* For **cuVS direct** experimentation (IVF‑PQ, IVF‑Flat, CAGRA, HNSW, multi‑GPU), continue to use the Python surfaces under `cuvs.neighbors.*` with a shared `Resources` handle and device arrays, as documented in your cuVS reference.
 
 ---
 
@@ -225,25 +225,25 @@ cfg = faiss.GpuIndexIVFConfig()
 print("Index should_use_cuvs:", faiss.should_use_cuvs(cfg))  # True → set cfg/co.use_cuvs = True
 ```
 
-* If you skip `should_use_cuvs`, simply **set `use_cuvs=True`** and **catch** a `RuntimeError` on construction; re‑try with `False`. This keeps your code robust across environments while **preferring cuVS** whenever available. 
+* If you skip `should_use_cuvs`, simply **set `use_cuvs=True`** and **catch** a `RuntimeError` on construction; re‑try with `False`. This keeps your code robust across environments while **preferring cuVS** whenever available.
 
 ---
 
 ### Pointers (unchanged)
 
-* **cuVS API & usage** (neighbors, distance, resources, device arrays) — your cuVS reference. 
-* **cuVS loader & environment** (preload order, env vars, system vs wheel libs) — libcuvs loader reference. 
-* **System architecture & defaults** (2560‑d, OPQ64/IVF8192/PQ64, persistence, observability) — high‑level architecture. 
+* **cuVS API & usage** (neighbors, distance, resources, device arrays) — your cuVS reference.
+* **cuVS loader & environment** (preload order, env vars, system vs wheel libs) — libcuvs loader reference.
+* **System architecture & defaults** (2560‑d, OPQ64/IVF8192/PQ64, persistence, observability) — high‑level architecture.
 
 ---
 
 ## 7) Bottom line (what to change in your code)
 
-1. **Call** `load_library()` **once at startup**. 
+1. **Call** `load_library()` **once at startup**.
 2. **When cloning** CPU→GPU, set `co.use_cuvs = True` and **fall back** on error. This now enables cuVS for **Flat**, **IVF‑Flat**, **IVF‑PQ**, **CAGRA**, and **Binary‑CAGRA** in this build.
 3. **When constructing GPU indexes directly**, set `cfg.use_cuvs = True` on the appropriate **`GpuIndex*Config`** (or use the cloner).
-4. For **bfKNN**, pass `use_cuvs=True` (or guard with `should_use_cuvs`). 
-5. Keep the rest of the pipeline (factory string, normalization, memory planning, multi‑GPU strategy, persistence) **unchanged**. 
+4. For **bfKNN**, pass `use_cuvs=True` (or guard with `should_use_cuvs`).
+5. Keep the rest of the pipeline (factory string, normalization, memory planning, multi‑GPU strategy, persistence) **unchanged**.
 
 
 
@@ -258,9 +258,9 @@ print("Index should_use_cuvs:", faiss.should_use_cuvs(cfg))  # True → set cfg/
 
 **cuVS inside FAISS (this wheel)**
 
-* The GPU SWIG layer exports **`use_cuvs` gates on index configs and cloner options** and dynamically links against cuVS/RAPIDS libs. With cuVS libraries **preloaded**, FAISS GPU indexes can route to **cuVS kernels** for **Flat, IVF‑Flat, IVF‑PQ, CAGRA, Binary‑CAGRA**; otherwise FAISS falls back to its own kernels. 
+* The GPU SWIG layer exports **`use_cuvs` gates on index configs and cloner options** and dynamically links against cuVS/RAPIDS libs. With cuVS libraries **preloaded**, FAISS GPU indexes can route to **cuVS kernels** for **Flat, IVF‑Flat, IVF‑PQ, CAGRA, Binary‑CAGRA**; otherwise FAISS falls back to its own kernels.
 
-> **Reminder**: the kernels themselves live in the **cuVS** shared libraries; the FAISS wheel holds **dispatch hooks** and dynamic links. Ensure the cuVS loader is invoked at process start. 
+> **Reminder**: the kernels themselves live in the **cuVS** shared libraries; the FAISS wheel holds **dispatch hooks** and dynamic links. Ensure the cuVS loader is invoked at process start.
 
 ---
 
@@ -277,7 +277,7 @@ print("Index should_use_cuvs:", faiss.should_use_cuvs(cfg))  # True → set cfg/
 | **Binary**        |                    ✅ | ✅ `GpuIndexBinaryFlat`, `GpuIndexBinaryCagra` |                                                      ✅ **Binary‑CAGRA** via index‑level `use_cuvs` |                                       – |
 | **Direct bfKNN**  |                    – |               ✅ `bfKnn(...)` / `knn_gpu(...)` |                                               ✅ **`use_cuvs=True`** (guard with `should_use_cuvs`) |        ✅ `cuvs.distance` / brute_force  |
 
-**Filters & selectors:** your build includes `CuvsFilterConvert.cu.o`; FAISS will convert FAISS selectors/bitsets into cuVS’ filter format automatically when the index was created with `use_cuvs=True`. You keep using standard FAISS search params at the Python layer. 
+**Filters & selectors:** your build includes `CuvsFilterConvert.cu.o`; FAISS will convert FAISS selectors/bitsets into cuVS’ filter format automatically when the index was created with `use_cuvs=True`. You keep using standard FAISS search params at the Python layer.
 
 ---
 
@@ -336,13 +336,13 @@ D, I = faiss.knn_gpu(res, xq.astype('float32'), xb.astype('float32'), 10,
 ```
 
 **C) Direct cuVS ANN (optional)**
-Use cuVS Python APIs for IVF‑Flat/IVF‑PQ/CAGRA/HNSW (especially when you want multi‑GPU `mg.*` variants): `cuvs.neighbors.{ivf_flat, ivf_pq, cagra, hnsw}` with `Resources` handle and device arrays. 
+Use cuVS Python APIs for IVF‑Flat/IVF‑PQ/CAGRA/HNSW (especially when you want multi‑GPU `mg.*` variants): `cuvs.neighbors.{ivf_flat, ivf_pq, cagra, hnsw}` with `Resources` handle and device arrays.
 
 ---
 
 ## 4) “Best‑in‑class” FAISS build on RTX 5090 (cosine, 2560‑d) — **now with cuVS toggles**
 
-**Index choice**: `OPQ64,IVF8192,PQ64` (cosine via L2 normalization + IP). **Train** on up to **10 M** samples (seed=42). **Search** with `nprobe=64`. 
+**Index choice**: `OPQ64,IVF8192,PQ64` (cosine via L2 normalization + IP). **Train** on up to **10 M** samples (seed=42). **Search** with `nprobe=64`.
 
 **GPU clone with cuVS** (preferred path):
 
@@ -369,14 +369,14 @@ except RuntimeError:
 
 **Notes & knobs**
 
-* Precompute lookup tables on GPU if your PQ config benefits (via cloner/options); keep working set ≤ **80%** VRAM; reuse pinned host buffers for larger transfers. 
+* Precompute lookup tables on GPU if your PQ config benefits (via cloner/options); keep working set ≤ **80%** VRAM; reuse pinned host buffers for larger transfers.
 
 ---
 
 ## 5) When to call cuVS directly (and when FAISS+cuVS is enough)
 
 * **Stay inside FAISS** (with `use_cuvs=True`) for: **Flat, IVF‑Flat, IVF‑PQ, CAGRA, Binary‑CAGRA**; you get FAISS’ ergonomics and cuVS performance.
-* **Call cuVS directly** when you need: **multi‑GPU `mg.*`** pipelines, algorithm‑specific parameters not exposed by FAISS’ wrappers, or you want to co‑locate with other RAFT pipelines with explicit stream choreography. 
+* **Call cuVS directly** when you need: **multi‑GPU `mg.*`** pipelines, algorithm‑specific parameters not exposed by FAISS’ wrappers, or you want to co‑locate with other RAFT pipelines with explicit stream choreography.
 
 **Direct IVF‑PQ example (unchanged)** — device arrays + `Resources`:
 
@@ -398,10 +398,10 @@ from pylibraft.common import device_ndarray
 `StandardGpuResources`, `GpuIndexFlat{L2,IP}`, `GpuIndexIVFFlat`, `GpuIndexIVFPQ`, `GpuIndexIVFScalarQuantizer`, `GpuIndexCagra`, `GpuIndexBinaryFlat`, `GpuIndexBinaryCagra`, `index_cpu_to_gpu[_multiple]`, `index_gpu_to_cpu`, `GpuClonerOptions`, `GpuParameterSpace`, `knn_gpu(...)`, `bfKnn(...)`.
 
 **cuVS hooks inside FAISS**
-`GpuClonerOptions.use_cuvs`, `GpuIndex*Config.use_cuvs`, `should_use_cuvs(...)` (for bfKNN probe), `knn_gpu(..., use_cuvs=...)`. 
+`GpuClonerOptions.use_cuvs`, `GpuIndex*Config.use_cuvs`, `should_use_cuvs(...)` (for bfKNN probe), `knn_gpu(..., use_cuvs=...)`.
 
 **cuVS (direct)**
-`cuvs.neighbors.{ivf_flat, ivf_pq, cagra, hnsw, brute_force, mg.*}`, `cuvs.cluster.kmeans`, `cuvs.distance.pairwise_distance`, `cuvs.common.Resources`. 
+`cuvs.neighbors.{ivf_flat, ivf_pq, cagra, hnsw, brute_force, mg.*}`, `cuvs.cluster.kmeans`, `cuvs.distance.pairwise_distance`, `cuvs.common.Resources`.
 
 ---
 
@@ -426,16 +426,16 @@ p = GpuDistanceParams(); p.metric = METRIC_INNER_PRODUCT; p.dims = 2560; p.k = 1
 print("bfKNN should_use_cuvs:", should_use_cuvs(p))  # True => bfKNN will route to cuVS. :contentReference[oaicite:22]{index=22}
 ```
 
-4. **Direct cuVS smoke** (IVF‑PQ or brute‑force) with device arrays + `Resources`. 
+4. **Direct cuVS smoke** (IVF‑PQ or brute‑force) with device arrays + `Resources`.
 
 ---
 
 ## 8) Operational guidance (unchanged principles, cuVS‑aware)
 
-* **Loader order**: preload RAPIDS/cuVS first; then import FAISS. 
-* **Memory**: size `setTempMemory`/`setPinnedMemory` once; keep VRAM headroom ~**20%**; batch adds to avoid OOM; precompute tables where helpful. 
-* **Streams**: cuVS direct calls accept a `Resources` handle (shared stream) and only sync when you call `handle.sync()`. FAISS tends to sync at call boundaries; overlap I/O with compute using pinned buffers. 
-* **Indexes at rest**: save **CPU** index (`.faiss`) + `.ids`; rebuild GPU clones at startup (set `use_cuvs` again when cloning). 
+* **Loader order**: preload RAPIDS/cuVS first; then import FAISS.
+* **Memory**: size `setTempMemory`/`setPinnedMemory` once; keep VRAM headroom ~**20%**; batch adds to avoid OOM; precompute tables where helpful.
+* **Streams**: cuVS direct calls accept a `Resources` handle (shared stream) and only sync when you call `handle.sync()`. FAISS tends to sync at call boundaries; overlap I/O with compute using pinned buffers.
+* **Indexes at rest**: save **CPU** index (`.faiss`) + `.ids`; rebuild GPU clones at startup (set `use_cuvs` again when cloning).
 
 ---
 
@@ -465,7 +465,7 @@ def knn_gpu_auto(res, xq_f32, xb_f32, k=10, metric=faiss.METRIC_INNER_PRODUCT):
                          k, metric=metric, use_cuvs=use)
 ```
 
-**C. Direct cuVS IVF‑PQ (device arrays)** — unchanged. 
+**C. Direct cuVS IVF‑PQ (device arrays)** — unchanged.
 
 ---
 
@@ -473,7 +473,7 @@ def knn_gpu_auto(res, xq_f32, xb_f32, k=10, metric=faiss.METRIC_INNER_PRODUCT):
 
 * **This wheel**: Blackwell‑ready (**`sm_120` + PTX**), CUDA‑13, and **cuVS‑enabled** inside FAISS for **Flat, IVF‑Flat, IVF‑PQ, CAGRA, Binary‑CAGRA**.
 * **Your code**: preload cuVS; set **`use_cuvs=True`** on GPU clones/constructors; guard with try/except; use `should_use_cuvs(...)` for bfKNN.
-* **Architecture & defaults** (factory, training, persistence, multi‑GPU) remain per plan; you simply get **cuVS speed paths** where available without changing the higher‑level design. 
+* **Architecture & defaults** (factory, training, persistence, multi‑GPU) remain per plan; you simply get **cuVS speed paths** where available without changing the higher‑level design.
 
 ---
 
@@ -490,49 +490,49 @@ res = faiss.StandardGpuResources()
 res.setTempMemory(1_200_000_000); res.setPinnedMemory(512_000_000)
 ```
 
-Keep a single `StandardGpuResources` per device for the process lifetime and configure it once. 
+Keep a single `StandardGpuResources` per device for the process lifetime and configure it once.
 
 ### A2. Zero‑copy interop (FAISS ↔ cuVS)
 
-Use RAFT `Resources` and device arrays when calling cuVS directly; prefer pinned host arenas + contiguous `float32` for FAISS inputs to minimize hidden copies. 
+Use RAFT `Resources` and device arrays when calling cuVS directly; prefer pinned host arenas + contiguous `float32` for FAISS inputs to minimize hidden copies.
 
 ### A3. Multi‑GPU: replicas and shards (unchanged)
 
-Use `IndexReplicas` (QPS) or `IndexShards` (capacity). When cloning to multiple GPUs, set `use_cuvs=True` on the cloner options once; FAISS will apply it per device (fallback per GPU on error). 
+Use `IndexReplicas` (QPS) or `IndexShards` (capacity). When cloning to multiple GPUs, set `use_cuvs=True` on the cloner options once; FAISS will apply it per device (fallback per GPU on error).
 
 ### A4. Memory planning & batching
 
-Budget **scratch + PQ tables + codes + ids + batch** ≤ **80%** VRAM. Tune batch add/search sizes empirically; precompute lookup tables where it helps latency. 
+Budget **scratch + PQ tables + codes + ids + batch** ≤ **80%** VRAM. Tune batch add/search sizes empirically; precompute lookup tables where it helps latency.
 
 ### A5. Persistence & registry
 
-Persist **CPU** index (`.faiss`) + **`.ids`**; rebuild GPU clones at service start using `use_cuvs=True`. Record the final **applied** state (`cuvs=true/false`) in your registry’s `faiss_indexes` rows for observability. 
+Persist **CPU** index (`.faiss`) + **`.ids`**; rebuild GPU clones at service start using `use_cuvs=True`. Record the final **applied** state (`cuvs=true/false`) in your registry’s `faiss_indexes` rows for observability.
 
 ### A6. Observability & probes
 
-* Log `{gpu_id, nlist, m, nprobe, k, batch, temp_mem, pinned_mem, use_cuvs}` for each search; expose p50/p95/p99 histograms. 
-* Quick “are the libs loaded?” probe: `list(h._name for h in load_library())`. 
-* Quick “will bfKNN use cuVS?” probe: `should_use_cuvs(GpuDistanceParams(...))`. 
+* Log `{gpu_id, nlist, m, nprobe, k, batch, temp_mem, pinned_mem, use_cuvs}` for each search; expose p50/p95/p99 histograms.
+* Quick “are the libs loaded?” probe: `list(h._name for h in load_library())`.
+* Quick “will bfKNN use cuVS?” probe: `should_use_cuvs(GpuDistanceParams(...))`.
 
 ### A7. Failure taxonomy & fallbacks (GPU paths)
 
-* **Missing libs** → run `load_library()` first (or fix `LD_LIBRARY_PATH`); **resume** with FAISS kernels if cuVS fails to initialize. 
-* **OOM** → halve batch; lower `setTempMemory`; retry twice; then quarantine batch. 
+* **Missing libs** → run `load_library()` first (or fix `LD_LIBRARY_PATH`); **resume** with FAISS kernels if cuVS fails to initialize.
+* **OOM** → halve batch; lower `setTempMemory`; retry twice; then quarantine batch.
 
 ### A8. Direct cuVS catalog (unchanged surfaces)
 
-`cuvs.neighbors.{ivf_flat, ivf_pq, cagra, hnsw, brute_force, mg.*}`, `cuvs.cluster.kmeans`, `cuvs.distance.pairwise_distance`, `cuvs.common.Resources` — consistent `IndexParams`/`SearchParams`/`build`/`extend`/`save`/`load` patterns. 
+`cuvs.neighbors.{ivf_flat, ivf_pq, cagra, hnsw, brute_force, mg.*}`, `cuvs.cluster.kmeans`, `cuvs.distance.pairwise_distance`, `cuvs.common.Resources` — consistent `IndexParams`/`SearchParams`/`build`/`extend`/`save`/`load` patterns.
 
 ### A9. Architecture defaults (for the broader system)
 
-Keep the **2560‑d** embedder, chunking settings, Parquet schemas, DuckDB catalog/migrations, and hybrid retrieval pipeline exactly as specified in your architecture doc; nothing about the cuVS enablement changes those contracts. 
+Keep the **2560‑d** embedder, chunking settings, Parquet schemas, DuckDB catalog/migrations, and hybrid retrieval pipeline exactly as specified in your architecture doc; nothing about the cuVS enablement changes those contracts.
 
 ---
 
 If you’d like, I can also output a **drop‑in `vectorstore_faiss` module** (Python package) that wraps the **train/add/search/persist** flow with **cuVS‑first** cloning and automatic bfKNN fallback, plus a tiny **validator** script that prints library load locations, shows `should_use_cuvs(...)`, and runs a 10k‑vector bfKNN smoke test on the RTX 5090.
 
 
-Below is a **comprehensive, example‑driven reference** that fills in the remaining FAISS and cuVS Python surfaces we hadn’t previously shown with code. It’s organized so an agent can copy/paste snippets and understand shapes, params, edge‑cases, and performance notes. Where relevant, I point to the cuVS and loader docs you provided.   
+Below is a **comprehensive, example‑driven reference** that fills in the remaining FAISS and cuVS Python surfaces we hadn’t previously shown with code. It’s organized so an agent can copy/paste snippets and understand shapes, params, edge‑cases, and performance notes. Where relevant, I point to the cuVS and loader docs you provided.
 
 ---
 
@@ -569,7 +569,7 @@ D, I = idmap.search(xq, k=10)
 **Notes**
 
 * Use `IndexIDMap2` (64‑bit IDs) for large corpora.
-* Persist **CPU** form (see A6) and keep a parallel `.ids` copy if you ever unwrap the map. 
+* Persist **CPU** form (see A6) and keep a parallel `.ids` copy if you ever unwrap the map.
 
 ---
 
@@ -622,7 +622,7 @@ D, I = pre.search(xq, 10)
 
 **Notes**
 
-* For our default blueprint we already use OPQ64; `IndexPreTransform` is the explicit form of that pipeline. Keep cosine/IP consistency: **normalize** before train/add/query. 
+* For our default blueprint we already use OPQ64; `IndexPreTransform` is the explicit form of that pipeline. Keep cosine/IP consistency: **normalize** before train/add/query.
 
 ---
 
@@ -682,7 +682,7 @@ idmap2 = faiss.read_index("/data/faiss/shard_000.idx")         # load CPU index
 
 **Notes**
 
-* Don’t save GPU indexes; reconstruct by cloning the CPU index on startup. Track paths and config in DuckDB (`faiss_indexes`). 
+* Don’t save GPU indexes; reconstruct by cloning the CPU index on startup. Track paths and config in DuckDB (`faiss_indexes`).
 
 ---
 
@@ -728,7 +728,7 @@ D, I = idmap.search(xq, 10, params=sp)
 
 **Notes**
 
-* With cuVS‑backed GPU indexes enabled (`use_cuvs=True` when cloning/constructing), FAISS converts these selectors into cuVS filters under the hood (your build includes the converter). 
+* With cuVS‑backed GPU indexes enabled (`use_cuvs=True` when cloning/constructing), FAISS converts these selectors into cuVS filters under the hood (your build includes the converter).
 
 ---
 
@@ -770,7 +770,7 @@ faiss.omp_set_num_threads(14)  # match your server threads
 
 ## B) FAISS — GPU & multi‑GPU functions (deeper, with cuVS enablement)
 
-> **Reminder**: In your wheel, FAISS GPU indexes can dispatch to **cuVS** for **Flat, IVF‑Flat, IVF‑PQ, CAGRA, Binary‑CAGRA** when you set `use_cuvs=True` on the **GPU cloner** or the **GPU index config**, and the cuVS libraries are preloaded. 
+> **Reminder**: In your wheel, FAISS GPU indexes can dispatch to **cuVS** for **Flat, IVF‑Flat, IVF‑PQ, CAGRA, Binary‑CAGRA** when you set `use_cuvs=True` on the **GPU cloner** or the **GPU index config**, and the cuVS libraries are preloaded.
 
 ### B1) CPU→GPU cloning (single & multi‑GPU)
 
@@ -799,7 +799,7 @@ shards = faiss.IndexShards(d, threaded=True, successive_ids=False)
 
 **Notes**
 
-* Replicas improve QPS; shards expand capacity; wrap both under one logical index in your registry and fan‑out search. 
+* Replicas improve QPS; shards expand capacity; wrap both under one logical index in your registry and fan‑out search.
 
 ---
 
@@ -849,7 +849,7 @@ D, I = faiss.knn_gpu(res, xq.astype('float32'), xb.astype('float32'),
 
 **Notes**
 
-* Your build routes bfKNN to cuVS when possible; otherwise FAISS kernels are used. Preload cuVS so the probe can return True when viable. 
+* Your build routes bfKNN to cuVS when possible; otherwise FAISS kernels are used. Preload cuVS so the probe can return True when viable.
 
 ---
 
@@ -872,13 +872,13 @@ D, I = faiss.knn_gpu(res, xq.astype('float32'), xb.astype('float32'),
 * **`contrib.big_batch_search`** — large‑batch search helpers to pipeline host↔device copies.
 * **`contrib.ondisk`** — on‑disk inverted lists for huge CPU‑side corpora.
 
-Use them to simplify scripts; your production path should still keep **CPU index persisted + GPU clone** at runtime as the source of truth. 
+Use them to simplify scripts; your production path should still keep **CPU index persisted + GPU clone** at runtime as the source of truth.
 
 ---
 
 ## D) cuVS — functions & modules we hadn’t exemplified (now with code)
 
-> cuVS runs **entirely on GPU** with a consistent `build / extend / search / save / load` shape per algorithm. Provide a `Resources` handle to share a stream and avoid implicit syncs; pass **device arrays** for best performance. 
+> cuVS runs **entirely on GPU** with a consistent `build / extend / search / save / load` shape per algorithm. Provide a `Resources` handle to share a stream and avoid implicit syncs; pass **device arrays** for best performance.
 
 ### D1) `neighbors.brute_force` — exact kNN (baseline & QA)
 
@@ -911,7 +911,7 @@ h.sync()
 
 **Notes**
 
-* Good for **ground truth** during tuning and for small datasets. 
+* Good for **ground truth** during tuning and for small datasets.
 
 ---
 
@@ -942,13 +942,13 @@ h.sync()
 
 **Notes**
 
-* Parameter names mirror FAISS concepts: `n_lists`, `n_probes`, metric. 
+* Parameter names mirror FAISS concepts: `n_lists`, `n_probes`, metric.
 
 ---
 
 ### D3) `neighbors.ivf_pq` — IVF with Product Quantization
 
-*(We’d shown build/search before; here’s `extend/save/load` and host output conversion.)* 
+*(We’d shown build/search before; here’s `extend/save/load` and host output conversion.)*
 
 ```python
 from cuvs.neighbors import ivf_pq
@@ -998,7 +998,7 @@ h.sync()
 
 **Notes**
 
-* CAGRA is excellent for tight latency at high recall; memory‑heavier than PQ. Use it for premium tiers. 
+* CAGRA is excellent for tight latency at high recall; memory‑heavier than PQ. Use it for premium tiers.
 
 ---
 
@@ -1016,15 +1016,15 @@ hnsw.save(idx, "/tmp/cuvs_hnsw.idx")
 
 **Notes**
 
-* A familiar graph ANN baseline on GPU. Pick either **CAGRA** (higher perf) or **HNSW** depending on constraints. 
+* A familiar graph ANN baseline on GPU. Pick either **CAGRA** (higher perf) or **HNSW** depending on constraints.
 
 ---
 
 ### D6) Filters, refine, tiered indexes (high‑level patterns)
 
-* **Filters** — apply post‑search restrictions or pre‑filter candidates with `neighbors.filters` utilities (e.g., by ID set). Use them for **policy constraints** or **tenancy**. 
-* **Refine** — re‑score ANN candidates with an exact step (`neighbors.refine`) for **accuracy boosts**. Good when you need Flat re‑ranking on a subset. 
-* **Tiered index** — orchestrate multi‑stage pipelines (e.g., IVF‑PQ → refine) using `neighbors.tiered_index` helpers. 
+* **Filters** — apply post‑search restrictions or pre‑filter candidates with `neighbors.filters` utilities (e.g., by ID set). Use them for **policy constraints** or **tenancy**.
+* **Refine** — re‑score ANN candidates with an exact step (`neighbors.refine`) for **accuracy boosts**. Good when you need Flat re‑ranking on a subset.
+* **Tiered index** — orchestrate multi‑stage pipelines (e.g., IVF‑PQ → refine) using `neighbors.tiered_index` helpers.
 
 *(Function names follow the `build/search/extend/save/load` theme; wire them like the examples above.)*
 
@@ -1042,7 +1042,7 @@ from cuvs.neighbors.mg import ivf_pq as mg_ivfpq
 
 **Notes**
 
-* Requires NCCL. Use this path when one GPU’s memory is insufficient or you need cluster‑like throughput while staying on a single multi‑GPU box. 
+* Requires NCCL. Use this path when one GPU’s memory is insufficient or you need cluster‑like throughput while staying on a single multi‑GPU box.
 
 ---
 
@@ -1055,7 +1055,7 @@ Dx = distance.pairwise_distance(xq, xb, metric="sqeuclidean", resources=h)  # Dx
 
 **Notes**
 
-* Handy for diagnostics, unit tests, or custom scoring layers. 
+* Handy for diagnostics, unit tests, or custom scoring layers.
 
 ---
 
@@ -1071,13 +1071,13 @@ cost = kmeans.cluster_cost(xb, centers, resources=h)
 
 **Notes**
 
-* Use for **custom IVF training** or other clustering tasks; interoperates with device arrays. 
+* Use for **custom IVF training** or other clustering tasks; interoperates with device arrays.
 
 ---
 
 ## E) libcuvs loader — functions & env you’ll use in code
 
-> Preload cuVS and RAPIDS libs **once per process** before any FAISS/cuVS calls to guarantee symbol resolution and allocator setup. 
+> Preload cuVS and RAPIDS libs **once per process** before any FAISS/cuVS calls to guarantee symbol resolution and allocator setup.
 
 ```python
 from libcuvs import load_library
@@ -1088,7 +1088,7 @@ print("Loaded:", [h._name for h in handles])  # libcuvs.so, libcuvs_c.so, librmm
 **Environment knobs** (optional):
 
 * `RAPIDS_LIBCUVS_PREFER_SYSTEM_LIBRARY=true` → prefer system libs over wheel‑bundled copies.
-* HybridSearch’s `_ensure_cuvs_loader_path()` adds all `lib64/` dirs to `LD_LIBRARY_PATH` for child processes (inheritance is useful for workers). 
+* HybridSearch’s `_ensure_cuvs_loader_path()` adds all `lib64/` dirs to `LD_LIBRARY_PATH` for child processes (inheritance is useful for workers).
 
 ---
 
@@ -1129,9 +1129,9 @@ D, I = refiner.search(xq, 10, params=sp)
 
 **Why this works well for you**
 
-* Cosine via normalization + IP (2560‑d per architecture). 
-* cuVS path engaged for IVF‑PQ when available; otherwise FAISS kernels. 
-* Filter converted to cuVS filter internally in your build. 
+* Cosine via normalization + IP (2560‑d per architecture).
+* cuVS path engaged for IVF‑PQ when available; otherwise FAISS kernels.
+* Filter converted to cuVS filter internally in your build.
 
 ---
 
@@ -1149,7 +1149,7 @@ from cuvs.neighbors.mg import ivf_pq as mg_ivfpq
 
 **Notes**
 
-* Reach for multi‑GPU cuVS when a single GPU’s VRAM is the bottleneck. 
+* Reach for multi‑GPU cuVS when a single GPU’s VRAM is the bottleneck.
 
 ---
 
@@ -1158,11 +1158,11 @@ from cuvs.neighbors.mg import ivf_pq as mg_ivfpq
 * **Always normalize** embeddings for cosine/IP.
 * Use **`IndexIDMap2`** to own IDs; **`IndexRefineFlat`** when you need exact re‑ranking.
 * Set knobs with **`ParameterSpace` / `GpuParameterSpace`**.
-* For **filters**, use **`IDSelector*`** + `SearchParametersIVF`; your build converts to cuVS automatically when cuVS is enabled. 
+* For **filters**, use **`IDSelector*`** + `SearchParametersIVF`; your build converts to cuVS automatically when cuVS is enabled.
 * Persist **CPU** index with `write_index`; **re‑clone** to GPU on startup.
-* Preload cuVS (`libcuvs.load_library()`), then set **`use_cuvs=True`** on **cloner/config** for **Flat, IVF‑Flat, IVF‑PQ, CAGRA, Binary‑CAGRA**; guard with try/except or `should_use_cuvs` for **bfKNN**. 
-* For **direct cuVS**: use `build/extend/search/save/load` in `neighbors.{ivf_flat, ivf_pq, cagra, hnsw, brute_force}` with **device arrays** and a shared **`Resources`** handle. 
-* Keep defaults from the architecture doc (2560‑d, `OPQ64,IVF8192,PQ64`, `nprobe=64`, shards ≤10 M vectors). 
+* Preload cuVS (`libcuvs.load_library()`), then set **`use_cuvs=True`** on **cloner/config** for **Flat, IVF‑Flat, IVF‑PQ, CAGRA, Binary‑CAGRA**; guard with try/except or `should_use_cuvs` for **bfKNN**.
+* For **direct cuVS**: use `build/extend/search/save/load` in `neighbors.{ivf_flat, ivf_pq, cagra, hnsw, brute_force}` with **device arrays** and a shared **`Resources`** handle.
+* Keep defaults from the architecture doc (2560‑d, `OPQ64,IVF8192,PQ64`, `nprobe=64`, shards ≤10 M vectors).
 
 ---
 

@@ -5,7 +5,7 @@ src.kgfoundry_common
 
 .. autoapi-nested-parse::
 
-   
+
    Overview of kgfoundry common.
 
    This module bundles kgfoundry common logic for the kgfoundry stack. It groups related helpers so
@@ -43,5 +43,3 @@ Submodules
    /autoapi/src/kgfoundry_common/models/index
    /autoapi/src/kgfoundry_common/navmap_types/index
    /autoapi/src/kgfoundry_common/parquet_io/index
-
-

@@ -22,7 +22,7 @@ Module Contents
 
 .. py:class:: ParquetVectorWriter(root)
 
-   
+
    Model the ParquetVectorWriter.
 
    Represent the parquetvectorwriter data structure used throughout the project. The class
@@ -50,7 +50,7 @@ Module Contents
       :staticmethod:
 
 
-      
+
       Compute dense schema.
 
       Carry out the dense schema operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -90,7 +90,7 @@ Module Contents
 
    .. py:method:: write_dense(model, run_id, dim, records, shard = 0)
 
-      
+
       Compute write dense.
 
       Carry out the write dense operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -137,7 +137,7 @@ Module Contents
       :staticmethod:
 
 
-      
+
       Compute splade schema.
 
       Carry out the splade schema operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -171,7 +171,7 @@ Module Contents
 
    .. py:method:: write_splade(model, run_id, records, shard = 0)
 
-      
+
       Compute write splade.
 
       Carry out the write splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -214,7 +214,7 @@ Module Contents
 
 .. py:class:: ParquetChunkWriter(root, model = 'docling_hybrid', run_id = 'dev')
 
-   
+
    Model the ParquetChunkWriter.
 
    Represent the parquetchunkwriter data structure used throughout the project. The class
@@ -242,7 +242,7 @@ Module Contents
       :staticmethod:
 
 
-      
+
       Compute chunk schema.
 
       Carry out the chunk schema operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -279,7 +279,7 @@ Module Contents
 
    .. py:method:: write(rows)
 
-      
+
       Compute write.
 
       Carry out the write operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -312,5 +312,3 @@ Module Contents
 
       ..
           !! processed by numpydoc !!
-
-

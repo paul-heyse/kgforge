@@ -3,4 +3,3 @@
 ```{include} ../../_build/traces.json
 :literal:
 ```
-

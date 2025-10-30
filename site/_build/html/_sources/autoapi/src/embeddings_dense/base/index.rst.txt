@@ -25,7 +25,7 @@ Module Contents
    Bases: :py:obj:`Protocol`
 
 
-   
+
    Model the DenseEmbeddingModel.
 
    Represent the denseembeddingmodel data structure used throughout the project. The class
@@ -51,7 +51,7 @@ Module Contents
 
    .. py:method:: encode(texts)
 
-      
+
       Compute encode.
 
       Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -84,5 +84,3 @@ Module Contents
 
       ..
           !! processed by numpydoc !!
-
-

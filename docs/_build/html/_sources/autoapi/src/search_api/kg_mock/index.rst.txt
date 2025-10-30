@@ -22,7 +22,7 @@ Module Contents
 
 .. py:function:: detect_query_concepts(query)
 
-   
+
    Compute detect query concepts.
 
    Carry out the detect query concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -58,7 +58,7 @@ Module Contents
 
 .. py:function:: linked_concepts_for_text(text)
 
-   
+
    Compute linked concepts for text.
 
    Carry out the linked concepts for text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -94,7 +94,7 @@ Module Contents
 
 .. py:function:: kg_boost(query_concepts, chunk_concepts, direct = 0.08, one_hop = 0.04)
 
-   
+
    Compute kg boost.
 
    Carry out the kg boost operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -133,4 +133,3 @@ Module Contents
 
    ..
        !! processed by numpydoc !!
-

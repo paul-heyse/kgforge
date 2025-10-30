@@ -76,4 +76,3 @@ The docstring builder CLI SHALL emit structured logs/metrics, route subprocess w
 
 ## RENAMED Requirements
 <!-- None -->
-

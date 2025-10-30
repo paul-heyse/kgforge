@@ -22,7 +22,7 @@ Module Contents
 
 .. py:function:: urn_doc_from_text(text)
 
-   
+
    Compute urn doc from text.
 
    Carry out the urn doc from text operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -58,7 +58,7 @@ Module Contents
 
 .. py:function:: urn_chunk(doc_hash, start, end)
 
-   
+
    Compute urn chunk.
 
    Carry out the urn chunk operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -95,4 +95,3 @@ Module Contents
 
    ..
        !! processed by numpydoc !!
-
