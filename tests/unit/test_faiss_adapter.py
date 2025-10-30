@@ -3,6 +3,17 @@ import pathlib
 import numpy as np
 import pytest
 
+from tests.conftest import HAS_GPU_STACK
+
+# Mark as GPU and skip automatically when the GPU stack is not available.
+pytestmark = [
+    pytest.mark.gpu,
+    pytest.mark.skipif(
+        not HAS_GPU_STACK,
+        reason="GPU stack (extra 'gpu') not installed/available in this environment",
+    ),
+]
+
 duckdb = pytest.importorskip("duckdb")
 
 FIXTURES = pathlib.Path(__file__).resolve().parents[1] / "fixtures"

@@ -9,7 +9,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Final, SupportsInt, cast
 
-from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
+from jsonschema import Draft202012Validator
 from tools.docstring_builder.semantics import SemanticResult
 
 REPO_ROOT: Final = Path(__file__).resolve().parents[2]

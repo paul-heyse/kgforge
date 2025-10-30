@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import jsonschema  # type: ignore[import-untyped]  # third-party package lacks type hints
+import jsonschema
 
 
 def test_all_jsonschemas_are_valid() -> None:

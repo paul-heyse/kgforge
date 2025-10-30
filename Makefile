@@ -1,5 +1,5 @@
 
-.PHONY: bootstrap run api e2e test fmt lint clean migrations mock fixture docstrings docfacts-diff readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json artifacts
+.PHONY: bootstrap run api e2e test test-gpu test-cpu fmt lint lint-gpu-gates clean migrations mock fixture docstrings docfacts-diff readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json artifacts
 
 VENV := .venv
 PY := $(VENV)/bin/python
@@ -32,6 +32,12 @@ e2e:
 test:
 	$(PYTEST) -q
 
+test-gpu:
+	$(PYTEST) -m gpu -q
+
+test-cpu:
+	$(PYTEST) -m "not gpu" -q
+
 fmt:
 	$(VENV)/bin/ruff check --select I --fix $(FMT_TARGETS)
 	$(VENV)/bin/ruff check --fix $(FMT_TARGETS)
@@ -43,6 +49,9 @@ lint:
 	$(VENV)/bin/ruff check $(LINT_TARGETS)
 	$(VENV)/bin/ruff format --check $(FMT_TARGETS)
 	$(VENV)/bin/mypy src
+
+lint-gpu-gates:
+	$(PY) tools/lint/check_gpu_marks.py
 
 lint-docs:
 	uvx pydoclint --style numpy src

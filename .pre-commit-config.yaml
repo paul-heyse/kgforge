@@ -24,6 +24,11 @@ repos:
 
   - repo: local
     hooks:
+      - id: gpu-test-gate
+        name: Ensure GPU tests are gated
+        entry: tools/lint/check_gpu_marks.py
+        language: system
+        files: ^tests/.*\.py$
       - id: docformatter
         name: docformatter
         language: python

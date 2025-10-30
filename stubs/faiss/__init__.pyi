@@ -18,6 +18,13 @@ class VectorIndex(Protocol):
     def add(self, vectors: VectorArray) -> None: ...
     def search(self, vectors: VectorArray, count: int) -> SearchResult: ...
 
+
+class IndexIDMap2(VectorIndex):
+    dimension: int
+
+    def __init__(self, index: VectorIndex) -> None: ...
+    def add_with_ids(self, vectors: VectorArray, ids: npt.NDArray[np.int64]) -> None: ...
+
 class StandardGpuResources:
     """Stub FAISS GPU resource."""
 

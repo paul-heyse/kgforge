@@ -5,8 +5,9 @@ from __future__ import annotations
 import ast
 import fnmatch
 import ssl
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import TypeVar, cast
+from typing import cast
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
@@ -16,24 +17,21 @@ from tools.auto_docstrings import QUALIFIED_NAME_OVERRIDES, normalize_qualified_
 CONF_PATH = Path(__file__).resolve().parents[2] / "docs" / "conf.py"
 
 
-T = TypeVar("T")
-
-
-def _load_conf_symbol(name: str) -> T:
+def _load_conf_symbol(name: str) -> object:
     """Return the literal value assigned to ``name`` inside ``docs/conf.py``."""
     module = ast.parse(CONF_PATH.read_text())
     for node in module.body:
         if isinstance(node, ast.Assign):
             for target in node.targets:
                 if isinstance(target, ast.Name) and target.id == name:
-                    return cast(T, ast.literal_eval(node.value))
+                    return ast.literal_eval(node.value)
         if (
             isinstance(node, ast.AnnAssign)
             and isinstance(node.target, ast.Name)
             and node.target.id == name
             and node.value is not None
         ):
-            return cast(T, ast.literal_eval(node.value))
+            return ast.literal_eval(node.value)
     raise KeyError(name)
 
 
@@ -202,7 +200,7 @@ def test_override_count_exceeds_target(overrides: dict[str, str]) -> None:
 
 def test_autoapi_excludes_legacy_exceptions() -> None:
     """AutoAPI should ignore the deprecated exceptions module."""
-    ignore_patterns = _load_conf_symbol("autoapi_ignore")
+    ignore_patterns = cast(Sequence[str], _load_conf_symbol("autoapi_ignore"))
     assert "*/kgfoundry_common/exceptions.py" in ignore_patterns
     assert any(
         fnmatch.fnmatch("src/kgfoundry_common/exceptions.py", pattern)
@@ -212,21 +210,21 @@ def test_autoapi_excludes_legacy_exceptions() -> None:
 
 def test_intersphinx_mappings_cover_required_projects() -> None:
     """Verify intersphinx configuration includes scientific and http stacks."""
-    mapping = _load_conf_symbol("intersphinx_mapping")
+    mapping = cast(Mapping[str, tuple[str, str] | tuple[str, str | None, str | None]], _load_conf_symbol("intersphinx_mapping"))
     for project in ("scipy", "pandas", "httpx", "pytest"):
         assert project in mapping
 
 
 def test_extlinks_provide_fallback_type_links() -> None:
     """Ensure fallback external links exist for unmapped type references."""
-    links = _load_conf_symbol("extlinks")
+    links = cast(Mapping[str, tuple[str, str]], _load_conf_symbol("extlinks"))
     assert "numpy-type" in links
     assert "pyarrow-type" in links
 
 
 def test_extlinks_render_sample_types() -> None:
     """Verify fallback link templates interpolate sample type names correctly."""
-    links = _load_conf_symbol("extlinks")
+    links = cast(Mapping[str, tuple[str, str]], _load_conf_symbol("extlinks"))
     numpy_template, numpy_label = links["numpy-type"]
     pyarrow_template, pyarrow_label = links["pyarrow-type"]
     assert "numpy.float32" in numpy_template % "numpy.float32"
@@ -244,7 +242,7 @@ def test_override_values_avoid_legacy_exception_targets(overrides: dict[str, str
 
 def test_intersphinx_inventory_report_covers_all_projects() -> None:
     """Every configured intersphinx project should have an audited inventory status."""
-    mapping = _load_conf_symbol("intersphinx_mapping")
+    mapping = cast(Mapping[str, object], _load_conf_symbol("intersphinx_mapping"))
     report_path = (
         Path(__file__).resolve().parents[2]
         / "openspec"
@@ -266,7 +264,10 @@ def test_intersphinx_inventory_report_covers_all_projects() -> None:
 
 def test_intersphinx_inventories_are_fetchable() -> None:
     """Attempt to download each configured intersphinx inventory file."""
-    mapping = _load_conf_symbol("intersphinx_mapping")
+    mapping = cast(
+        Mapping[str, tuple[str, str | None]],
+        _load_conf_symbol("intersphinx_mapping"),
+    )
     for project, (base_url, _) in mapping.items():
         inventory_url = base_url.rstrip("/") + "/objects.inv"
         try:

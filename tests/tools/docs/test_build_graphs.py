@@ -56,7 +56,7 @@ def test_collapse_to_packages_preserves_isolated_nodes(tmp_path: Path) -> None:
 
     collapsed = collapse_to_packages(dot_path)
 
-    assert set(collapsed.nodes) == {"pkg_alpha", "pkg_beta", "pkg_isolated"}
+    assert set(collapsed.nodes()) == {"pkg_alpha", "pkg_beta", "pkg_isolated"}
     assert collapsed.has_edge("pkg_alpha", "pkg_beta")
 
 
@@ -70,7 +70,7 @@ def test_style_and_render_writes_isolated_nodes(tmp_path: Path) -> None:
     g.add_edge("pkg_alpha", "pkg_beta", weight=1)
 
     analysis = {
-        "centrality": dict.fromkeys(g.nodes, 0.0),
+        "centrality": dict.fromkeys(g.nodes(), 0.0),
         "cycles": [],
         "layer_violations": [],
         "cycle_enumeration_skipped": False,
@@ -80,7 +80,7 @@ def test_style_and_render_writes_isolated_nodes(tmp_path: Path) -> None:
     style_and_render(g, {"packages": {}}, analysis, out_svg)
 
     svg = out_svg.read_text(encoding="utf-8")
-    for name in g.nodes:
+    for name in g.nodes():
         assert name in svg
 
 

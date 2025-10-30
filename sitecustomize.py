@@ -10,7 +10,7 @@ from __future__ import annotations
 import logging
 import os
 import warnings
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import TYPE_CHECKING, Any, Protocol, cast
 
 logger = logging.getLogger("kgfoundry.docstring_shim")
@@ -322,24 +322,9 @@ if doc_common is not None and ENABLE_SITECUSTOMIZE:
             type_name: str | None,
             return_name: str | None = None,
         ) -> None:
-            """Describe  init docstring yields.
-
-            <!-- auto:docstring-builder v1 -->
-
-            Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-
-            Parameters
-            ----------
-            args : Sequence
-            Describe `args`.
-            description : str | None, optional
-            Describe `description`.
-            type_name : str | None, optional
-            Describe `type_name`.
-            return_name : str | None, optional, by default None
-            Describe `return_name`.
-            """
-            base_returns.__init__(
+            """Initialise the compatibility ``DocstringYields`` shim."""
+            base_init = cast(Callable[..., None], base_returns.__init__)
+            base_init(
                 self,
                 list(args),
                 description,

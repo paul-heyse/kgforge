@@ -2,21 +2,88 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import logging
 import os
 import pathlib
 import sys
+from collections.abc import Iterable, Mapping
 from typing import Any
 
 import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
+import pytest
+from _pytest.config import Config
 
+from kgfoundry_common.gpu import has_gpu_stack
 from kgfoundry_common.parquet_io import ParquetChunkWriter, ParquetVectorWriter
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 FIXTURES = ROOT / "tests" / "fixtures"
+
+pytest_plugins = ["tests.plugins.pytest_requires"]
+
+
+HAS_GPU_STACK: bool = has_gpu_stack()
+
+
+def _configure_prefect_logging() -> None:
+    """Disable Prefect's rich console handlers to avoid closed-file errors in tests."""
+    try:
+        from prefect.logging.handlers import RichConsoleHandler  # type: ignore[import-not-found]
+    except Exception:  # pragma: no cover - prefect optional
+        return
+
+    logger_names = (
+        "prefect",
+        "prefect.server",
+        "prefect.server.api",
+        "prefect.server.api.server",
+    )
+    for name in logger_names:
+        logger = logging.getLogger(name)
+        for handler in list(logger.handlers):
+            if isinstance(handler, RichConsoleHandler):
+                logger.removeHandler(handler)
+                handler.close()
+    os.environ.setdefault("PREFECT_LOGGING_LEVEL", "WARNING")
+
+
+def pytest_configure(config: Config) -> None:
+    """Expose GPU capability flag on the pytest config object and tune logging."""
+    config._has_gpu_stack = HAS_GPU_STACK
+    _configure_prefect_logging()
+
+
+def require_modules(
+    modules: Iterable[str],
+    *,
+    minversions: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    """
+    Import requested modules or skip tests when unavailable.
+
+    Parameters
+    ----------
+    modules : Iterable[str]
+        Module names to load.
+    minversions : Mapping[str, str], optional
+        Optional minimum versions keyed by module name.
+
+    Returns
+    -------
+    dict[str, Any]
+        Mapping of module names to the imported modules.
+    """
+    minversions = minversions or {}
+    loaded: dict[str, Any] = {}
+    for name in modules:
+        min_version = minversions.get(name)
+        reason = f"Requires {name}{f' >= {min_version}' if min_version else ''}"
+        loaded[name] = pytest.importorskip(name, minversion=min_version, reason=reason)
+    return loaded
 
 
 def _write_table(path: pathlib.Path, schema: pa.Schema, rows: list[dict[str, Any]]) -> None:

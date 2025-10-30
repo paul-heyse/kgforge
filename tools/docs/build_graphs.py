@@ -28,10 +28,10 @@ from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     import networkx as nx_mod
-    import pydot
+    import pydot as pydot_mod
 
-    DiGraph = nx_mod.DiGraph
-    PydotDot = pydot.Dot
+    DiGraph = nx_mod.DiGraph[Any]
+    PydotDot = pydot_mod.Dot
 else:  # pragma: no cover - type-checking aid
     DiGraph = object  # type: ignore[assignment]
     PydotDot = object  # type: ignore[assignment]
@@ -114,8 +114,8 @@ class PackageBuildConfig:
         return list(self.excludes)
 
 
-pydot = _optional_import("pydot")
-nx = _optional_import("networkx")
+pydot: ModuleType | None = _optional_import("pydot")
+nx: ModuleType | None = _optional_import("networkx")
 yaml = _optional_import("yaml")
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -1092,6 +1092,7 @@ def style_and_render(
     if pydot is None:
         message = "pydot is required for rendering graphs"
         raise RuntimeError(message)
+    assert pydot is not None
 
     pkg2layer = _coerce_mapping(layers.get("packages"))
     palette = {
@@ -1112,7 +1113,7 @@ def style_and_render(
             nxt = cyc[(index + 1) % len(cyc)]
             cycle_edges.add((node, nxt))
 
-    dot_graph = cast("PydotDot", pydot.Dot(graph_type="digraph", rankdir="LR"))
+    dot_graph: PydotDot = pydot.Dot(graph_type="digraph", rankdir="LR")
 
     # nodes
     for node in sorted(graph.nodes()):

@@ -2,35 +2,18 @@
 
 
 # --- Python build/packaging artifacts ---
-build/**
-dist/**
 src/**/*.egg-info/**
 
 # --- Caches & transient ---
 **/.ipynb_checkpoints/**
 
-
-# --- Virtual envs & package managers ---
-
-
 # --- Large/local data & artifacts ---
-data/**
-datasets/**
-artifacts/**
 models/**
 vectors/**
 downloads/**
 
-
 # --- Node / frontend (if present) ---
 node_modules/**
-
-# --- Coverage & reports ---
-.coverage
-htmlcov/**
-coverage.xml
-artifacts/**/*.xml
-artifacts/**/*.json
 
 # --- OS / editor cruft ---
 .DS_Store

@@ -81,6 +81,26 @@ To keep the feedback loop tight, enable the optional pre-commit hook named
 mode and honours the `SKIP_DOC_BUILDER_DIFF=1` and
 `DOC_BUILDER_SINCE=<rev>` environment flags.
 
+## GPU-dependent tests
+
+- Guard GPU suites with the shared header emitted by
+  `tools/lint/add_gpu_header.py`. The pre-commit hook `Ensure GPU tests are gated`
+  fails when a test imports `torch`, `vllm`, `faiss`, or other GPU extras without
+  that header.
+- Import individual accelerators via
+  `require_modules(["torch"], minversions={"torch": "2.9"})` to get consistent
+  skip messaging. Use `@pytest.mark.requires("torch>=2.9", "vllm")` when you want
+  declarative gating; the plugin auto-applies the `gpu` marker and skips on
+  CPU-only agents.
+- Semantic index tooling falls back to an in-memory FAISS shim when the GPU
+  stack is missing. Set `KGF_FAISS_MODULE` to choose a specific import target or
+  `KGF_DISABLE_FAISS_FALLBACK=1` to enforce the real dependency in CI.
+- Local helpers: `make test-gpu` runs only GPU suites,
+  `make test-cpu` skips them, and `make lint-gpu-gates` reuses the
+  enforcement check.
+- Cloud runners should export `PYTEST_ADDOPTS="-m 'not gpu'"` so the default
+  workflow omits GPU tests unless explicitly requested.
+
 ## 4. Docstring builder CLI reference
 
 The CLI now exposes explicit subcommands so you can pick the right behaviour

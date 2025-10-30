@@ -8,12 +8,17 @@ implementation specifics.
 from __future__ import annotations
 
 import os
-from typing import Any, Final
+from typing import TYPE_CHECKING, Any, Final, cast
 
 import numpy as np
 from numpy.typing import NDArray
 
 from kgfoundry_common.navmap_types import NavMap
+
+if TYPE_CHECKING:
+    from faiss import IndexIDMap2 as FaissIndexIDMap2
+else:  # pragma: no cover - faiss may be missing at runtime
+    FaissIndexIDMap2 = Any
 
 __all__ = ["FaissGpuIndex", "FloatArray", "IntArray", "StrArray"]
 
@@ -160,7 +165,7 @@ class FaissGpuIndex:
         if self._faiss is None:
             return
         train_mat: FloatArray = np.asarray(train_vectors, dtype=np.float32, order="C")
-        faiss = self._faiss
+        faiss = cast(Any, self._faiss)
         dimension = train_mat.shape[1]
         cpu_index = faiss.index_factory(dimension, self.factory, faiss.METRIC_INNER_PRODUCT)
         faiss.normalize_L2(train_mat)
@@ -216,12 +221,12 @@ class FaissGpuIndex:
             raise RuntimeError(message)
         faiss.normalize_L2(vec_array)
         idmap_array: IntArray = np.asarray(keys, dtype=np.int64)
-        if isinstance(self._index, faiss.IndexIDMap2):
+        if isinstance(self._index, FaissIndexIDMap2):
             self._index.add_with_ids(vec_array, idmap_array)
         elif hasattr(faiss, "IndexIDMap2"):
-            idmap = faiss.IndexIDMap2(self._index)
-            idmap.add_with_ids(vec_array, idmap_array)
-            self._index = idmap
+            index_with_ids = cast(FaissIndexIDMap2, faiss.IndexIDMap2(self._index))
+            index_with_ids.add_with_ids(vec_array, idmap_array)
+            self._index = index_with_ids
         else:
             self._index.add(vec_array)
 

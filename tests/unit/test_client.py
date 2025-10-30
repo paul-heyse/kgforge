@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable, Mapping
 from typing import Any, cast
 
 from fastapi.testclient import TestClient
@@ -15,7 +16,7 @@ class _RecordingHttp(SupportsHttp):
 
     def __init__(self, client: TestClient) -> None:
         self._client = client
-        self.records: list[tuple[str, tuple[Any, ...], dict[str, Any]]] = []
+        self.records: list[tuple[str, tuple[object, ...], dict[str, object]]] = []
 
     def _record(
         self,
@@ -23,31 +24,33 @@ class _RecordingHttp(SupportsHttp):
         url: str,
         args: tuple[object, ...],
         kwargs: dict[str, object],
-    ) -> tuple[str, tuple[Any, ...], dict[str, Any]]:
+    ) -> tuple[str, tuple[object, ...], dict[str, object]]:
         self.records.append((method, args, kwargs))
         return url, args, kwargs
 
     def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
         url, args, kwargs = self._record("GET", url, args, kwargs)
-        response: Response = self._client.get(url, *args, **kwargs)
+        client_get = cast(Callable[..., Response], self._client.get)
+        response = client_get(url, *args, **kwargs)
         return cast(SupportsResponse, response)
 
     def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
         url, args, kwargs = self._record("POST", url, args, kwargs)
-        response: Response = self._client.post(url, *args, **kwargs)
+        client_post = cast(Callable[..., Response], self._client.post)
+        response = client_post(url, *args, **kwargs)
         return cast(SupportsResponse, response)
 
 
 class _StubResponse(SupportsResponse):
-    def __init__(self, payload: dict[str, Any]) -> None:
-        self.payload = payload
+    def __init__(self, payload: Mapping[str, object]) -> None:
+        self.payload: dict[str, object] = dict(payload)
         self.raise_calls = 0
 
     def raise_for_status(self) -> None:
         self.raise_calls += 1
 
     def json(self) -> dict[str, Any]:
-        return self.payload
+        return cast(dict[str, Any], self.payload.copy())
 
 
 class _StubHttp(SupportsHttp):

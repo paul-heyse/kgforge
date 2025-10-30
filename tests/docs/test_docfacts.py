@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from jsonschema import ValidationError  # type: ignore[import-untyped]
+from jsonschema import ValidationError
 from pytest import MonkeyPatch
 from tools.docstring_builder import docfacts as docfacts_module
 from tools.docstring_builder.cli import DOCFACTS_PATH

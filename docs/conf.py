@@ -12,11 +12,12 @@ This file is robust to different repo shapes (``src/<pkg>`` or ``<pkg>`` at root
 import collections
 import importlib
 import inspect
+import json
 import os
 import re
 import subprocess
 import sys
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from types import ModuleType
 from typing import Protocol, cast
@@ -25,23 +26,13 @@ import certifi
 from docutils import nodes
 from docutils.parsers.rst import Directive
 from sphinx.application import Sphinx
+from tools.griffe_utils import resolve_griffe
 
 astroid_builder = importlib.import_module("astroid.builder")
 astroid_manager = importlib.import_module("astroid.manager")
 autoapi_parser = importlib.import_module("autoapi._parser")
-griffe_module = importlib.import_module("griffe")
-griffe_loader_module: ModuleType | None
-try:
-    griffe_loader_module = importlib.import_module("griffe.loader")
-except ModuleNotFoundError:
-    griffe_loader_module = None
 jsonimpl = importlib.import_module("sphinxcontrib.serializinghtml.jsonimpl")
-json_module = jsonimpl.json
-
-default_griffe_loader = griffe_module.GriffeLoader
-GriffeLoader = griffe_loader_module.GriffeLoader if griffe_loader_module else default_griffe_loader
-GriffeModule = griffe_module.Module
-GriffeObject = griffe_module.Object
+json_module = cast(ModuleType, jsonimpl.json)
 
 
 class AutoapiParser(Protocol):
@@ -49,6 +40,31 @@ class AutoapiParser(Protocol):
 
     def parse(self, node: object, /) -> object:
         """Return an AutoAPI document tree for the provided AST node."""
+        ...
+
+
+class GriffeNode(Protocol):
+    """Subset of Griffe objects used for linkcode resolution."""
+
+    filepath: Path | str | None
+    lineno: int | None
+    endlineno: int | None
+    members: Mapping[str, "GriffeNode"] | None
+
+
+class GriffeLoaderInstance(Protocol):
+    """Minimal loader surface required for linkcode."""
+
+    def load(self, module: str) -> GriffeNode:
+        """Return the module graph for ``module``."""
+        ...
+
+
+class GriffeLoaderFactory(Protocol):
+    """Callable factory returning Griffe loader instances."""
+
+    def __call__(self, search_paths: Sequence[str]) -> GriffeLoaderInstance:
+        """Return a loader configured with the provided search paths."""
         ...
 
 # --- Project metadata (override via env if you like)
@@ -363,28 +379,31 @@ sphinx_gallery_conf = {
 }
 
 # Ensure JSON builder can serialize lru_cache wrappers
+json_encoder_cls = cast(type[json.JSONEncoder], getattr(json_module, "JSONEncoder", json.JSONEncoder))
+_json_default = json_encoder_cls.default
 
-_json_default = json_module.JSONEncoder.default
 
-
-def _json_safe_default(self: json_module.JSONEncoder, obj: object) -> object:  # pragma: no cover
+def _json_safe_default(self: json.JSONEncoder, obj: object) -> object:  # pragma: no cover
     if obj.__class__.__name__ == "_lru_cache_wrapper":
         return repr(obj)
     return _json_default(self, obj)
 
 
-json_module.JSONEncoder.default = _json_safe_default
+setattr(json_encoder_cls, "default", _json_safe_default)
+setattr(json.JSONEncoder, "default", _json_safe_default)
 
 # --- Build deep links per symbol without importing your code (use Griffe)
-_loader = GriffeLoader(search_paths=[str(SRC_DIR if SRC_DIR.exists() else ROOT)])
-_MODULE_CACHE: dict[str, GriffeModule | None] = {}
+griffe_api = resolve_griffe()
+loader_factory = cast(GriffeLoaderFactory, griffe_api.loader_type)
+_loader = loader_factory(search_paths=[str(SRC_DIR if SRC_DIR.exists() else ROOT)])
+_MODULE_CACHE: dict[str, GriffeNode | None] = {}
 PKG = _PACKAGES[0]
 
 # Ensure sphinx-gallery backref directory exists to avoid missing-path errors
 (DOCS_DIR / "gen_modules" / "backrefs").mkdir(parents=True, exist_ok=True)
 
 
-def _get_root(module: str | None) -> GriffeModule | None:
+def _get_root(module: str | None) -> GriffeNode | None:
     top = module.split(".", 1)[0] if module else PKG
     if top not in _MODULE_CACHE:
         try:
@@ -394,13 +413,13 @@ def _get_root(module: str | None) -> GriffeModule | None:
     return _MODULE_CACHE[top]
 
 
-def _child_member(node: GriffeObject, name: str) -> GriffeObject | None:
+def _child_member(node: GriffeNode, name: str) -> GriffeNode | None:
     """Return the member named ``name`` from ``node`` when present."""
     members = getattr(node, "members", None)
     if isinstance(members, Mapping):
         child = members.get(name)
-        if isinstance(child, GriffeObject):
-            return child
+        if child is not None:
+            return cast(GriffeNode, child)
     return None
 
 
@@ -409,7 +428,7 @@ def _lookup(module: str | None, fullname: str | None) -> tuple[str, int, int] | 
     root = _get_root(module)
     if root is None:
         return None
-    node: GriffeObject = root
+    node: GriffeNode = root
     if module:
         parts = module.split(".")
         # skip the top-level package name (already in root)
