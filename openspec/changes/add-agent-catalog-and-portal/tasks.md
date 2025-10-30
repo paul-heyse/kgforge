@@ -71,9 +71,9 @@
     - AC:
         - Internal benchmark achieves MRR@10 ≥ target; lexical fallback works when index absent.
 
-- [ ] 3.3 Optional SQLite catalog
-    - [ ] 3.3.1 Define DDL for `catalog.sqlite` (read-only): `symbols`, `calls`, `anchors`, `fts`, `ranking_features`.
-    - [ ] 3.3.2 Export SQLite during generation; loader tries SQLite first, falls back to JSON shards.
+- [x] 3.3 Optional SQLite catalog
+    - [x] 3.3.1 Define DDL for `catalog.sqlite` (read-only): `symbols`, `calls`, `anchors`, `fts`, `ranking_features`.
+    - [x] 3.3.2 Export SQLite during generation; loader tries SQLite first, falls back to JSON shards.
     - AC:
         - Loader uses SQLite when present; fallback works.
 
@@ -97,8 +97,8 @@
     - AC:
         - Type-checked client; helper tests pass.
 
-- [ ] 5.2 TypeScript client
-    - [ ] 5.2.1 Define types and functions matching Python client; publish as local package.
+- [x] 5.2 TypeScript client
+    - [x] 5.2.1 Define types and functions matching Python client; publish as local package.
     - AC:
         - Unit tests pass in Node/Deno; importable by examples.
 
@@ -107,15 +107,15 @@
     - AC:
         - CLI returns expected outputs and exit codes; help docs present.
 
-- [ ] 5.4 Editor-activated stdio session server (no daemon)
-    - [ ] 5.4.1 Implement MCP/JSON-RPC over stdio process `catalogctl-mcp` (or equivalent) spawned by editor/agent; handshake `capabilities`.
-    - [ ] 5.4.2 Maintain warm in-memory cache during session; exit on stdin EOF or explicit shutdown.
+- [x] 5.4 Editor-activated stdio session server (no daemon)
+    - [x] 5.4.1 Implement MCP/JSON-RPC over stdio process `catalogctl-mcp` (or equivalent) spawned by editor/agent; handshake `capabilities`.
+    - [x] 5.4.2 Maintain warm in-memory cache during session; exit on stdin EOF or explicit shutdown.
     - AC:
         - Session queries are faster due to warm cache; process exits cleanly; no TCP ports opened.
 
-- [ ] 5.5 OpenAPI & SDKs
-    - [ ] 5.5.1 Emit OpenAPI 3.2 doc for callable procedures `docs/_build/agent_api_openapi.json`.
-    - [ ] 5.5.2 Generate Python/TS SDKs; errors follow RFC9457 Problem Details.
+- [x] 5.5 OpenAPI & SDKs
+    - [x] 5.5.1 Emit OpenAPI 3.2 doc for callable procedures `docs/_build/agent_api_openapi.json`.
+    - [x] 5.5.2 Generate Python/TS SDKs; errors follow RFC9457 Problem Details.
     - AC:
         - OpenAPI validates; SDKs compile; Problem Details contract verified in tests.
 
@@ -126,21 +126,21 @@
     - AC:
         - Portal loads offline with working links; snapshot test passes.
 
-- [ ] 6.2 Enriched UX
-    - [ ] 6.2.1 Add facets (package, stability, churn, coverage, parity) and breadcrumbs.
-    - [ ] 6.2.2 Inline dependency graphs per module (or link to focused views).
-    - [ ] 6.2.3 Show examples and metrics panels when available; render `agent_hints`; add "Edit here" impact card and "Insert exemplar" buttons.
+- [x] 6.2 Enriched UX
+    - [x] 6.2.1 Add facets (package, stability, churn, coverage, parity) and breadcrumbs.
+    - [x] 6.2.2 Inline dependency graphs per module (or link to focused views).
+    - [x] 6.2.3 Show examples and metrics panels when available; render `agent_hints`; add "Edit here" impact card and "Insert exemplar" buttons.
     - AC:
         - Filters limit results correctly; breadcrumbs reflect hierarchy; graphs render; hints/impact/exemplars visible and actionable.
 
-- [ ] 6.3 Accessibility & responsiveness
-    - [ ] 6.3.1 Add ARIA roles/labels; ensure keyboard navigation; responsive CSS.
-    - [ ] 6.3.2 No-JS fallback for core hierarchy; disable search with guidance if JS off.
+- [x] 6.3 Accessibility & responsiveness
+    - [x] 6.3.1 Add ARIA roles/labels; ensure keyboard navigation; responsive CSS.
+    - [x] 6.3.2 No-JS fallback for core hierarchy; disable search with guidance if JS off.
     - AC:
         - a11y audit passes; tab order functional; layout adapts to narrow screens.
 
-- [ ] 6.4 Tutorials & feedback (local-only)
-    - [ ] 6.4.1 Add tutorials/playbooks section; local feedback form writing to JSON with redaction.
+- [x] 6.4 Tutorials & feedback (local-only)
+    - [x] 6.4.1 Add tutorials/playbooks section; local feedback form writing to JSON with redaction.
     - AC:
         - Tutorial links work; feedback stored locally; PII redaction tested.
 

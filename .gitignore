@@ -22,6 +22,10 @@ KGForge.egg-info/
 docs/_build/docstrings_manifest.json
 docs/_build/observability_docstrings.json
 
+# Node artefacts
+node_modules/
+npm-debug.log*
+
 
 # IDE
 .vscode/*
