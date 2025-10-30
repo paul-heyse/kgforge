@@ -18,7 +18,7 @@ set -Eeuo pipefail
 PY_VER_DEFAULT="${PY_VER_DEFAULT:-3.13.9}"
 PIN_PYTHON="${PIN_PYTHON:-1}"             # 1=uv python pin <ver>
 GENERATE_PATH_MAP="${GENERATE_PATH_MAP:-1}" # 1=create docs/_build/path_map.txt if in container
-USE_LOCK="${USE_LOCK:-auto}"               # auto|yes|no  -> --locked when uv.lock exists (auto)
+USE_LOCK="${USE_LOCK:-no}"                 # yes|no|auto -> --locked only when explicitly requested
 EDITOR_URI_TEMPLATE_DEFAULT='vscode-remote://dev-container+{container_id}{path}:{line}'
 UV_MIN_VERSION="${UV_MIN_VERSION:-0.9.6}"  # Require uv version >= 0.9.6
 EXCLUDE_EXTRAS="${EXCLUDE_EXTRAS:-gpu}"   # comma/space-separated extras to skip during uv sync
@@ -27,7 +27,7 @@ EXCLUDE_EXTRAS="${EXCLUDE_EXTRAS:-gpu}"   # comma/space-separated extras to skip
 # Support a few handy flags so CI or developers can tailor behavior.
 #   --no-pin-python      : do not uv python pin
 #   --no-path-map        : don't generate docs/_build/path_map.txt
-#   --use-lock[=yes|no]  : force use of uv.lock or ignore it
+#   --use-lock[=yes|no|auto] : optionally pass --locked to uv sync
 #   --py 3.13.9          : override Python version
 usage() {
   cat <<'USAGE'

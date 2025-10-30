@@ -7,7 +7,7 @@ name = "kgfoundry"
 version = "0.1.0"
 description = "kgfoundry"
 readme = "README.md"
-requires-python = "==3.13.9"
+requires-python = ">=3.13"
 dependencies = [
     # ============================================================================
     # HTTP & Networking
@@ -491,7 +491,7 @@ gpu = [
     "openai",
     "openai-harmony",
     "openai-whisper",
-    "pyserini",
+    "pyserini>=1.2.0",
     "transformers",
     "sentence-transformers",
     "keybert",
@@ -501,7 +501,7 @@ gpu = [
     "triton",
     "triton-kernels @git+https://github.com/triton-lang/triton.git@v3.5.0#subdirectory=python/triton_kernels",
     "xformers",
-    "vllm",
+    "vllm==0.11.0",
     "faiss==1.12.0 ; python_version >= '3.13' and python_version < '3.14' and platform_system == 'Linux' and platform_machine == 'x86_64'",
     "ray",
 ]
@@ -689,9 +689,9 @@ testpaths = ["tests"]
 
 # Tell uv that vllm should come ONLY from the vllm-nightly index.
 [tool.uv.sources]
-vllm = { index = "vllm-nightly" }
+#vllm = { index = "vllm-nightly" }
 faiss = { index = "wheelhouse" }
-xformers = { index = "wheelhouse" }
+#xformers = { index = "wheelhouse" }
 
 # point torch packages to the *named* PyTorch cu130 index
 torch = [       { index = "pytorch-cu130" } ]
@@ -700,10 +700,10 @@ torchaudio = [  { index = "pytorch-cu130" } ]
 
 
 # Define named indexes uv can use.
-[[tool.uv.index]]
-name = "vllm-nightly"
-url = "https://wheels.vllm.ai/nightly"
-explicit = true          # prevents accidental installs of other deps from here
+#[[tool.uv.index]]
+#name = "vllm-nightly"
+#url = "https://wheels.vllm.ai/nightly"
+#explicit = true          # prevents accidental installs of other deps from here
 
 [[tool.uv.index]]
 name = "pypi"
@@ -724,7 +724,7 @@ explicit = true
 # NEW — define the cu130 index *by name*, then reference it above
 [[tool.uv.index]]
 name = "pytorch-cu130"
-url  = "https://download.pytorch.org/whl/cu130"
+url  = "https://download.pytorch.org/whl/cu129"
 explicit = true
 
 
