@@ -1,46 +1,55 @@
 ## Context
-Phase 1 delivered typed shims, local stubs with drift checks, deterministic docstring builder runs (manifest + policy engine + plugins), and pre-commit enforcement. The builder already captures parameter kinds/display names, but we lack tests and enforcement to keep that metadata authoritative, and several docstring-heavy modules still contain placeholder content. The CLI remains flag-heavy, stub governance isn’t surfaced through `doctor`, observability is minimal, and the workflow is under-documented. Phase 2 combines the tooling enhancements and metadata synchronisation so our docstring pipeline becomes authoritative and easy to operate.
+Phase 1 delivered typed shims, local stubs with drift checks, deterministic docstring builder runs (manifest + policy engine + plugins), pre-commit enforcement, and a modern CLI with subcommands/exit codes/config precedence. The builder captures parameter kinds/display names and emits DocFacts, observability logs, and drift previews.
+
+Phase 2 evolves the system into an authoritative, auditable, and performant pipeline: formal DocFacts schema/versioning with provenance, richer metadata, consolidated drift previews with trend metrics, stronger policy rules, plugin-driven content fidelity, parallel execution with machine-readable outputs, security hardening, and a pragmatic path off `sitecustomize`.
 
 ## Goals / Non-Goals
--- **Goals**
-  1. Validate and enforce harvested metadata within DocFacts while regenerating docstrings for high-impact modules using that authoritative information.
-  2. Restructure the docstring-builder CLI into subcommands with deterministic exit codes and configuration precedence.
-  3. Surface stub governance through the CLI/CI, and improve observability (metrics JSON, HTML drift previews, editor integrations).
-  4. Harden security (path normalisation, avoid unsafe evaluation) and introduce a feature flag + deprecation plan for `sitecustomize` patches.
-  5. Update documentation with a docstring regeneration checklist, plugin/stub guides, policy configuration, observability outputs, and troubleshooting with `doctor`.
+- **Goals**
+  1. Formalize DocFacts (JSON Schema, versioning, provenance) and enrich metadata.
+  2. Strengthen policy gates (examples, summary mood, dataclass/attrs parity) and expose diagnostics via `doctor`.
+  3. Improve performance and outputs (parallel `--jobs`, `--json` result mode, `--baseline` comparisons).
+  4. Enhance observability UX: consolidated docstrings drift HTML and trend metrics; PR-reviewable artifacts.
+  5. Expand plugins for better content fidelity (dataclass/attrs, exception inference, parameter seeders; optional LLM post-processor behind a flag).
+  6. Harden security (path normalization, symlink traversal) and complete the `sitecustomize` deprecation plan with CI coverage.
+  7. Update documentation and editor integrations for a streamlined workflow.
 - **Non-Goals**
   - No changes to navmap/test-map/schema formats—only how we present diffs.
   - No wholesale rewrite of existing docstring content beyond the targeted modules unless required for accuracy.
   - No introduction of external services; observability remains file-based.
 
 ## Decisions
-1. **Metadata authoritative source**: keep `ParameterHarvest` as the source of truth, add regression tests for `kind`/`display_name`, ensure DocFacts and the renderer consume these fields, and fail tests when fidelity regresses.
-2. **Docstring regeneration**: Use the builder to refresh targeted modules; where metadata lacks descriptions, add concise manual text.
-3. **CLI subcommands**: Implement shared runner functions, expose subcommands, enforce exit code constants, and add `--config` precedence.
-4. **Stub governance**: Embed drift checking in `docstring-builder doctor --stubs`, integrate into CI, and optionally provide PEP-561 packages.
-5. **Observability**: Emit JSON metrics, HTML drift previews, and editor shortcuts; provide guidance for reviewers.
-6. **Security & sitecustomize**: Normalise paths, remove unsafe evaluation, add regression tests, introduce `KGFOUNDRY_DOCSTRINGS_SITECUSTOMIZE`, and document the deprecation timeline.
-7. **Documentation**: Expand contributor docs with a regeneration checklist, plugin/stub authoring, policy config, observability outputs, and `doctor` troubleshooting.
+1. **DocFacts schema/versioning**: Create a JSON Schema with a `docfactsVersion` and validate on each run; include provenance (builder version, config hash, commit).
+2. **Metadata enrichment**: Keep `ParameterHarvest` authoritative; ensure renderer uses `display_name` and DocFacts include kinds, defaults, decorators, async/generator flags, ownership, and line spans.
+3. **Docstring regeneration**: Refresh targeted modules; add concise manual descriptions where metadata is insufficient.
+4. **Performance & outputs**: Add `--jobs` for parallel processing, `--json` output for CI, and `--baseline` for stable comparisons; keep stable ordering and deterministic output.
+5. **Policy upgrades**: Implement rules for examples, imperative summaries, and dataclass/attrs parity; expose active exceptions and expiries via `doctor --policy`.
+6. **Plugins**: Ship dataclass/attrs description plugin, stronger exception inference, and parameter-description seeders; gate optional LLM rewriter behind an explicit flag.
+7. **Observability UX**: Add docstrings drift HTML and trend metrics; link previews in the manifest and surface them in CI output.
+8. **Security & sitecustomize**: Normalize/validate paths with explicit diagnostics; add CI leg with `KGFOUNDRY_DOCSTRINGS_SITECUSTOMIZE=0` and document the removal plan.
+9. **Documentation**: Update CONTRIBUTING/AGENTS with the regeneration checklist, plugin/stub guides, policy config, observability outputs, drift previews, and editor tasks.
 
 ## Risks / Mitigations
 - **Docstring churn**: Regeneration might cause large diffs. *Mitigation*: focus on targeted modules, review diffs carefully, keep DocFacts synced.
-- **Metadata regressions**: Missing parameter kinds could slip through without tests. *Mitigation*: add unit tests covering positional-only, keyword-only, varargs, kwargs and wire DocFacts consumers into CI.
-- **CLI complexity**: More subcommands require clear documentation. *Mitigation*: provide concise `--help` output and examples in docs.
+- **Metadata regressions**: Fidelity could slip without tests. *Mitigation*: add unit tests for all parameter kinds and DocFacts parity; CI schema validation.
+- **Parallelism flakiness**: Concurrency could mask ordering or caching bugs. *Mitigation*: stable sort, per-file isolation, deterministic outputs; CI stress runs.
+- **Schema churn**: Schema updates may break consumers. *Mitigation*: version DocFacts; provide drift preview and migration guidance; guard with validation.
 - **Stub drift noise**: Frequent upstream changes may trigger drift alerts. *Mitigation*: keep expected symbol lists scoped to what we use and provide actionable output.
 - **Security hardening regressions**: Strict path checks might break legitimate workflows. *Mitigation*: add regression tests and document expected path patterns.
 - **Sitecustomize toggle failures**: Disabling patches may expose hidden issues. *Mitigation*: run the toggle in CI and fix failures before removing patches.
 
 ## Migration Plan
-1. Add metadata regression tests, ensure DocFacts/renderer leverage existing fields, and wire consumers to fail fast.
-2. Regenerate docstrings for the targeted modules; commit docstrings + DocFacts.
-3. Restructure the CLI, add subcommands, exit codes, and config precedence; migrate drift checker into `doctor`.
-4. Add observability artefacts, editor snippets, and documentation for interpreting them.
-5. Normalize/validate paths, audit for unsafe evaluation, and add regression tests.
-6. Introduce the `sitecustomize` feature flag/warning and add CI coverage with the flag disabled.
-7. Refresh documentation (CONTRIBUTING/AGENTS) with the regeneration checklist, plugin/stub guides, policy config examples, and troubleshooting steps.
-8. Validate via mypy, Ruff, CLI E2E tests, pyrefly, pre-commit, DocFacts consumers, and new CI jobs.
+1. Implement DocFacts schema/versioning + provenance; extend builder output; add schema validation and CI gate.
+2. Add metadata regression tests and renderer parity tests; extend DocFacts tests for enriched fields and idempotence.
+3. Implement performance and outputs (`--jobs`, `--json`, `--baseline`) with deterministic ordering; add E2E tests.
+4. Build docstrings drift HTML and trend metrics; link previews from manifest; update observability.
+5. Implement policy rules and `doctor --policy`; document exceptions and expiries.
+6. Implement plugins (dataclass/attrs, exception inference, parameter seeders); optionally wire LLM rewriter behind a flag.
+7. Security: normalize/validate paths with explicit diagnostics; add symlink traversal tests.
+8. Sitecustomize: add CI matrix leg with shim disabled; document deprecation timeline.
+9. Regenerate targeted modules; commit docstrings + DocFacts; validate via mypy, Ruff, pyrefly, pre-commit, DocFacts consumers, navmap, and CI jobs.
 
 ## Open Questions
-- Do we extend metadata enrichment to return/raise sections in this phase or defer?
-- Should HTML drift previews be generated only on CI, or gated behind a CLI flag for local runs?
-- How long should the `sitecustomize` deprecation window last before we remove the patches entirely?
+- Should signature rendering be enabled by default for public APIs or gated per-package?
+- How to default `--baseline` in local vs CI runs (merge-base vs main vs last successful build)?
+- Scope and guardrails for optional LLM rewriting (strict opt-in, file allowlist, dry-run reports only?).
+- What removal window for `sitecustomize` is acceptable given downstream dependencies?
