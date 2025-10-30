@@ -106,7 +106,7 @@ def _apply_auto_docstring_overrides() -> None:
 
     overrides: dict[str, str] = {}
     overrides.update(auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(auto_docstrings._STANDARD_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
     overrides.update(auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
 
     for name, extended in overrides.items():
@@ -136,7 +136,7 @@ def _build_autoapi_doc_overrides() -> None:
 
     overrides: dict[str, str] = {}
     overrides.update(auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(auto_docstrings._STANDARD_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
     overrides.update(auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
 
     for name, extended in overrides.items():
