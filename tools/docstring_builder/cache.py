@@ -8,7 +8,6 @@ import threading
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-
 logger = logging.getLogger(__name__)
 
 

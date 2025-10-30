@@ -14,7 +14,7 @@ import re
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Any, Final
+from typing import Any, Final, cast
 
 from kgfoundry_common.navmap_types import NavMap
 
@@ -82,22 +82,16 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 # [nav:anchor BM25Doc]
 @dataclass
 class BM25Doc:
-    """Describe BM25Doc.
-
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
+    """Represent a document stored in the in-memory BM25 index.
 
     Parameters
     ----------
     doc_id : str
-    Describe ``doc_id``.
+        Identifier assigned to the document.
     length : int
-    Describe ``length``.
+        Token count for the document.
     fields : dict[str, str]
-    Describe ``fields``.
+        Raw text fields associated with the document.
     """
 
     doc_id: str
@@ -107,27 +101,18 @@ class BM25Doc:
 
 # [nav:anchor PurePythonBM25]
 class PurePythonBM25:
-    """Describe PurePythonBM25.
-
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
+    """Pure Python BM25 implementation backed by simple in-memory data structures.
 
     Parameters
     ----------
     index_dir : str
-    Describe ``index_dir``.
+        Directory used to persist the index when exported.
     k1 : float, optional
-    Describe ``k1``.
-    Defaults to ``0.9``.
+        Term-frequency saturation parameter, by default ``0.9``.
     b : float, optional
-    Describe ``b``.
-    Defaults to ``0.4``.
+        Document length normalisation parameter, by default ``0.4``.
     field_boosts : dict[str, float] | None, optional
-    Describe ``field_boosts``.
-    Defaults to ``None``.
+        Per-field boosts applied when concatenating document text, by default ``None``.
     """
 
     def __init__(
@@ -137,25 +122,18 @@ class PurePythonBM25:
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
     ) -> None:
-        """Describe   init  .
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Initialise the in-memory BM25 index.
 
         Parameters
         ----------
         index_dir : str
-        Describe ``index_dir``.
+            Directory used to persist artefacts when the index is exported.
         k1 : float, optional
-        Describe ``k1``.
-        Defaults to ``0.9``.
+            Term-frequency saturation parameter, by default ``0.9``.
         b : float, optional
-        Describe ``b``.
-        Defaults to ``0.4``.
+            Document length normalisation parameter, by default ``0.4``.
         field_boosts : dict[str, float] | None, optional
-        Describe ``field_boosts``.
-        Defaults to ``None``.
+            Per-field boosts applied when concatenating document text, by default ``None``.
         """
         self.index_dir = index_dir
         self.k1 = k1
@@ -169,41 +147,27 @@ class PurePythonBM25:
 
     @staticmethod
     def _tokenize(text: str) -> list[str]:
-        """Describe  tokenize.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Tokenise text with a simple alphanumeric regex.
 
         Parameters
         ----------
         text : str
-        Describe ``text``.
-
-
-
-
-
-
+            Source text to tokenise.
 
         Returns
         -------
         list[str]
-        Describe return value.
+            Lowercased tokens extracted from the text.
         """
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """Describe build.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Build postings and document statistics for the BM25 index.
 
         Parameters
         ----------
         docs_iterable : Iterable[tuple[str, dict[str, str]]]
-        Describe ``docs_iterable``.
+            Iterable yielding ``(doc_id, fields)`` pairs used to populate the index.
         """
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
@@ -252,14 +216,7 @@ class PurePythonBM25:
             )
 
     def load(self) -> None:
-        """Describe load.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Python's object protocol for this class. Use it to integrate with built-in operators,
-        protocols, or runtime behaviours that expect instances to participate in the language's data
-        model.
-        """
+        """Load an existing BM25 index from disk."""
         path = os.path.join(self.index_dir, "pure_bm25.pkl")
         with open(path, "rb") as f:
             data = pickle.load(f)
@@ -273,27 +230,17 @@ class PurePythonBM25:
         self.avgdl = data["avgdl"]
 
     def _idf(self, term: str) -> float:
-        """Describe  idf.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Compute the inverse document frequency for a given term.
 
         Parameters
         ----------
         term : str
-        Describe ``term``.
-
-
-
-
-
-
+            Term whose IDF score should be calculated.
 
         Returns
         -------
         float
-        Describe return value.
+            Inverse document frequency score for the term.
         """
         n_t = self.df.get(term, 0)
         if n_t == 0:
@@ -304,32 +251,21 @@ class PurePythonBM25:
     def search(
         self, query: str, k: int, fields: Mapping[str, str] | None = None
     ) -> list[tuple[str, float]]:
-        """Describe search.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Score documents stored in the in-memory BM25 index.
 
         Parameters
         ----------
         query : str
-        Describe ``query``.
+            Natural language query.
         k : int
-        Describe ``k``.
-        fields : Mapping[str, str] | None, optional
-        Describe ``fields``.
-        Defaults to ``None``.
-
-
-
-
-
-
+            Number of hits to return.
+        fields : dict[str, str] | None, optional
+            Optional field-specific overrides applied prior to tokenisation.
 
         Returns
         -------
         list[tuple[str, float]]
-        Describe return value.
+            Ranked document identifiers with their BM25 scores.
         """
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
@@ -350,36 +286,23 @@ class PurePythonBM25:
 
 # [nav:anchor LuceneBM25]
 class LuceneBM25:
-    """Describe LuceneBM25.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    """Wrap Pyserini's Lucene BM25 indexer with project defaults.
 
     Parameters
     ----------
     index_dir : str
-    Describe ``index_dir``.
+        Directory where the Lucene index should be stored.
     k1 : float, optional
-    Describe ``k1``.
-    Defaults to ``0.9``.
+        Term-frequency saturation parameter, by default ``0.9``.
     b : float, optional
-    Describe ``b``.
-    Defaults to ``0.4``.
+        Document length normalisation parameter, by default ``0.4``.
     field_boosts : dict[str, float] | None, optional
-    Describe ``field_boosts``.
-    Defaults to ``None``.
-
-
-
-
-
-
+        Per-field boosts applied when concatenating profile text, by default ``None``.
 
     Raises
     ------
     RuntimeError
-    Raised when TODO for RuntimeError.
+        Raised when Pyserini is not installed in the environment.
     """
 
     def __init__(
@@ -389,25 +312,18 @@ class LuceneBM25:
         b: float = 0.4,
         field_boosts: dict[str, float] | None = None,
     ) -> None:
-        """Describe   init  .
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Initialise the Lucene-backed BM25 adapter.
 
         Parameters
         ----------
         index_dir : str
-        Describe ``index_dir``.
+            Directory where the Lucene index should be stored.
         k1 : float, optional
-        Describe ``k1``.
-        Defaults to ``0.9``.
+            Term-frequency saturation parameter, by default ``0.9``.
         b : float, optional
-        Describe ``b``.
-        Defaults to ``0.4``.
+            Document length normalisation parameter, by default ``0.4``.
         field_boosts : dict[str, float] | None, optional
-        Describe ``field_boosts``.
-        Defaults to ``None``.
+            Per-field boosts applied when concatenating document text, by default ``None``.
         """
         self.index_dir = index_dir
         self.k1 = k1
@@ -416,27 +332,17 @@ class LuceneBM25:
         self._searcher: Any | None = None
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """Describe build.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Index documents with Pyserini's Lucene backend.
 
         Parameters
         ----------
         docs_iterable : Iterable[tuple[str, dict[str, str]]]
-        Describe ``docs_iterable``.
-
-
-
-
-
-
+            Iterable yielding ``(doc_id, fields)`` pairs used to populate the index.
 
         Raises
         ------
         RuntimeError
-        Raised when TODO for RuntimeError.
+            Raised when Pyserini or Lucene is unavailable.
         """
         try:
             from pyserini.index.lucene import LuceneIndexer
@@ -444,7 +350,7 @@ class LuceneBM25:
             message = "Pyserini/Lucene not available"
             raise RuntimeError(message) from exc
         os.makedirs(self.index_dir, exist_ok=True)
-        indexer = LuceneIndexer(self.index_dir)
+        indexer = cast(Any, LuceneIndexer(self.index_dir))
         for doc_id, fields in docs_iterable:
             # combine fields with boosts in a "contents" field for simplicity
             title = fields.get("title", "")
@@ -461,62 +367,38 @@ class LuceneBM25:
         indexer.close()
 
     def _ensure_searcher(self) -> None:
-        """Describe  ensure searcher.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Python's object protocol for this class. Use it to integrate with built-in operators,
-        protocols, or runtime behaviours that expect instances to participate in the language's data
-        model.
-        """
+        """Initialise the Lucene searcher if it has not been created yet."""
         if self._searcher is not None:
             return
         from pyserini.search.lucene import LuceneSearcher
 
-        self._searcher = LuceneSearcher(self.index_dir)
-        self._searcher.set_bm25(self.k1, self.b)
+        searcher = cast(Any, LuceneSearcher(self.index_dir))
+        searcher.set_bm25(self.k1, self.b)
+        self._searcher = searcher
 
     def search(
         self, query: str, k: int, fields: dict[str, str] | None = None
     ) -> list[tuple[str, float]]:
-        """Describe search.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Execute a Lucene BM25 search.
 
         Parameters
         ----------
         query : str
-        Describe ``query``.
+            Natural language query.
         k : int
-        Describe ``k``.
+            Number of hits to return.
         fields : dict[str, str] | None, optional
-        Describe ``fields``.
-        Defaults to ``None``.
-
-
-
-
-
-
+            Optional field overrides passed to the Lucene searcher, by default ``None``.
 
         Returns
         -------
         list[tuple[str, float]]
-        Describe return value.
-
-
-
-
-
-
-
+            Ranked document identifiers paired with their BM25 scores.
 
         Raises
         ------
         RuntimeError
-        Raised when TODO for RuntimeError.
+            Raised when the Lucene searcher cannot be initialised.
         """
         self._ensure_searcher()
         if self._searcher is None:
@@ -535,38 +417,25 @@ def get_bm25(
     b: float = 0.4,
     field_boosts: dict[str, float] | None = None,
 ) -> PurePythonBM25 | LuceneBM25:
-    """Describe get bm25.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    """Instantiate a BM25 backend based on the requested implementation.
 
     Parameters
     ----------
     backend : str
-    Describe ``backend``.
+        Either ``"pure"`` or ``"lucene"`` identifying the implementation to use.
     index_dir : str
-    Describe ``index_dir``.
+        Directory where index artefacts are stored.
     k1 : float, optional
-    Describe ``k1``.
-    Defaults to ``0.9``.
+        Term-frequency saturation parameter, by default ``0.9``.
     b : float, optional
-    Describe ``b``.
-    Defaults to ``0.4``.
+        Document length normalisation parameter, by default ``0.4``.
     field_boosts : dict[str, float] | None, optional
-    Describe ``field_boosts``.
-    Defaults to ``None``.
-
-
-
-
-
-
+        Per-field boosts applied when concatenating document text, by default ``None``.
 
     Returns
     -------
     PurePythonBM25 | LuceneBM25
-    Describe return value.
+        Configured BM25 adapter.
     """
     if backend == "lucene":
         try:

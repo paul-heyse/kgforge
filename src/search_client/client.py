@@ -43,224 +43,135 @@ __navmap__: Final[NavMap] = {
 
 
 class SupportsResponse(Protocol):
-    """Describe SupportsResponse.
+    """Protocol describing the minimal HTTP response surface used by the client.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
-
-    Parameters
-    ----------
-    *args : inspect._empty
-    Describe ``args``.
-    **kwargs : inspect._empty
-    Describe ``kwargs``.
-
-
-
-
-
-
-
-    Returns
-    -------
-    inspect._empty
-    Describe return value.
+    Notes
+    -----
+    Implementations are expected to mirror :class:`requests.Response` for the provided
+    methods so callers can work with a small shared interface.
     """
 
     def raise_for_status(self) -> None:
-        """Describe raise for status.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Python's object protocol for this class. Use it to integrate with built-in operators,
-        protocols, or runtime behaviours that expect instances to participate in the language's data
-        model.
-        """
+        """Raise an HTTP error if the response indicates failure."""
 
     def json(self) -> dict[str, Any]:
-        """Describe json.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Return the response payload as JSON.
 
         Returns
         -------
         dict[str, Any]
-        Describe return value.
+            Decoded JSON body returned by the HTTP service.
         """
         ...
 
 
 class SupportsHttp(Protocol):
-    """Describe SupportsHttp.
+    """Protocol describing the HTTP verbs required by :class:`KGFoundryClient`.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
-
-    Parameters
-    ----------
-    *args : inspect._empty
-    Describe ``args``.
-    **kwargs : inspect._empty
-    Describe ``kwargs``.
-
-
-
-
-
-
-
-    Returns
-    -------
-    inspect._empty
-    Describe return value.
+    Notes
+    -----
+    Implementations only need to provide ``get`` and ``post`` methods that mirror the
+    behaviour of :mod:`requests`.
     """
 
     def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
-        """Describe get.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Issue an HTTP ``GET`` request.
 
         Parameters
         ----------
         url : str
-        Describe ``url``.
+            Absolute or relative request URL.
         *args : object
-        Describe ``args``.
+            Positional arguments forwarded to the HTTP implementation.
         **kwargs : object
-        Describe ``kwargs``.
-
-
-
-
-
-
+            Keyword arguments forwarded to the HTTP implementation.
 
         Returns
         -------
         SupportsResponse
-        Describe return value.
+            Response wrapper produced by the HTTP implementation.
         """
         ...
 
     def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
-        """Describe post.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Issue an HTTP ``POST`` request.
 
         Parameters
         ----------
         url : str
-        Describe ``url``.
+            Absolute or relative request URL.
         *args : object
-        Describe ``args``.
+            Positional arguments forwarded to the HTTP implementation.
         **kwargs : object
-        Describe ``kwargs``.
-
-
-
-
-
-
+            Keyword arguments forwarded to the HTTP implementation.
 
         Returns
         -------
         SupportsResponse
-        Describe return value.
+            Response wrapper produced by the HTTP implementation.
         """
         ...
 
 
 class RequestsHttp(SupportsHttp):
-    """Describe RequestsHttp.
+    """HTTP adapter that delegates HTTP verbs to :mod:`requests`.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
-
-    Returns
-    -------
-    inspect._empty
-    Describe return value.
+    Notes
+    -----
+    This thin wrapper exists to make the high-level client easy to test by swapping
+    in alternative transports.
     """
 
     def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
-        """Describe get.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Send a ``GET`` request using :func:`requests.get`.
 
         Parameters
         ----------
         url : str
-        Describe ``url``.
+            Absolute or relative request URL.
         *args : object
-        Describe ``args``.
+            Positional arguments forwarded to :func:`requests.get`.
         **kwargs : object
-        Describe ``kwargs``.
-
-
-
-
-
-
+            Keyword arguments forwarded to :func:`requests.get`.
 
         Returns
         -------
         SupportsResponse
-        Describe return value.
+            Response returned by :mod:`requests`.
         """
-        return requests.get(
-            url,
-            *cast(tuple[Any, ...], args),
-            **cast(dict[str, Any], kwargs),
+        return cast(
+            SupportsResponse,
+            requests.get(
+                url,
+                *cast(tuple[Any, ...], args),
+                **cast(dict[str, Any], kwargs),
+            ),
         )
 
     def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
-        """Describe post.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Send a ``POST`` request using :func:`requests.post`.
 
         Parameters
         ----------
         url : str
-        Describe ``url``.
+            Absolute or relative request URL.
         *args : object
-        Describe ``args``.
+            Positional arguments forwarded to :func:`requests.post`.
         **kwargs : object
-        Describe ``kwargs``.
-
-
-
-
-
-
+            Keyword arguments forwarded to :func:`requests.post`.
 
         Returns
         -------
         SupportsResponse
-        Describe return value.
+            Response returned by :mod:`requests`.
         """
-        return requests.post(
-            url,
-            *cast(tuple[Any, ...], args),
-            **cast(dict[str, Any], kwargs),
+        return cast(
+            SupportsResponse,
+            requests.post(
+                url,
+                *cast(tuple[Any, ...], args),
+                **cast(dict[str, Any], kwargs),
+            ),
         )
 
 
@@ -268,28 +179,18 @@ _DEFAULT_HTTP: Final[SupportsHttp] = RequestsHttp()
 
 
 class KGFoundryClient:
-    """Describe KGFoundryClient.
-
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
+    """High-level client for the kgfoundry Search API.
 
     Parameters
     ----------
     base_url : str, optional
-    Describe ``base_url``.
-    Defaults to ``'http://localhost:8080'``.
+        Base URL for the API, by default ``"http://localhost:8080"``.
     api_key : str | None, optional
-    Describe ``api_key``.
-    Defaults to ``None``.
+        Optional API key used for bearer authentication.
     timeout : float, optional
-    Describe ``timeout``.
-    Defaults to ``30.0``.
+        Timeout applied to HTTP requests in seconds, by default ``30.0``.
     http : SupportsHttp | None, optional
-    Describe ``http``.
-    Defaults to ``None``.
+        Custom HTTP transport. The default transport uses :mod:`requests`.
     """
 
     def __init__(
@@ -299,26 +200,18 @@ class KGFoundryClient:
         timeout: float = 30.0,
         http: SupportsHttp | None = None,
     ) -> None:
-        """Describe   init  .
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Instantiate the client with connection details.
 
         Parameters
         ----------
         base_url : str, optional
-        Describe ``base_url``.
-        Defaults to ``'http://localhost:8080'``.
+            Base URL for the API, by default ``"http://localhost:8080"``.
         api_key : str | None, optional
-        Describe ``api_key``.
-        Defaults to ``None``.
+            Optional API key used for bearer authentication.
         timeout : float, optional
-        Describe ``timeout``.
-        Defaults to ``30.0``.
+            Timeout applied to HTTP requests in seconds, by default ``30.0``.
         http : SupportsHttp | None, optional
-        Describe ``http``.
-        Defaults to ``None``.
+            Custom HTTP transport. The default transport uses :mod:`requests`.
         """
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
@@ -326,16 +219,12 @@ class KGFoundryClient:
         self._http: SupportsHttp = http or _DEFAULT_HTTP
 
     def _headers(self) -> dict[str, str]:
-        """Describe  headers.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Build default headers for authenticated requests.
 
         Returns
         -------
         dict[str, str]
-        Describe return value.
+            Header dictionary including ``Authorization`` when an API key is configured.
         """
         headers = {"Content-Type": "application/json"}
         if self.api_key:
@@ -343,16 +232,17 @@ class KGFoundryClient:
         return headers
 
     def healthz(self) -> dict[str, Any]:
-        """Describe healthz.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Fetch the service health endpoint.
 
         Returns
         -------
         dict[str, Any]
-        Describe return value.
+            JSON payload describing service health.
+
+        Raises
+        ------
+        requests.HTTPError
+            Raised when the API responds with a non-success status code.
         """
         response = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         response.raise_for_status()
@@ -365,36 +255,28 @@ class KGFoundryClient:
         filters: dict[str, Any] | None = None,
         explain: bool = False,
     ) -> dict[str, Any]:
-        """Describe search.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Execute a semantic search request.
 
         Parameters
         ----------
         query : str
-        Describe ``query``.
+            Natural language query string.
         k : int, optional
-        Describe ``k``.
-        Defaults to ``10``.
+            Number of results to return, by default ``10``.
         filters : dict[str, Any] | None, optional
-        Describe ``filters``.
-        Defaults to ``None``.
+            Structured filters applied to the query, by default ``None``.
         explain : bool, optional
-        Describe ``explain``.
-        Defaults to ``False``.
-
-
-
-
-
-
+            When ``True`` return model explanations, by default ``False``.
 
         Returns
         -------
         dict[str, Any]
-        Describe return value.
+            JSON response containing the ranked search results.
+
+        Raises
+        ------
+        requests.HTTPError
+            Raised when the API responds with a non-success status code.
         """
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         response = self._http.post(
@@ -407,30 +289,24 @@ class KGFoundryClient:
         return response.json()
 
     def concepts(self, q: str, limit: int = 50) -> dict[str, Any]:
-        """Describe concepts.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Retrieve graph concepts that match the provided query string.
 
         Parameters
         ----------
         q : str
-        Describe ``q``.
+            Concept search query.
         limit : int, optional
-        Describe ``limit``.
-        Defaults to ``50``.
-
-
-
-
-
-
+            Maximum number of results to return, by default ``50``.
 
         Returns
         -------
         dict[str, Any]
-        Describe return value.
+            JSON response containing matching concepts.
+
+        Raises
+        ------
+        requests.HTTPError
+            Raised when the API responds with a non-success status code.
         """
         response = self._http.post(
             f"{self.base_url}/graph/concepts",

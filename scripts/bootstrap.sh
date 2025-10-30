@@ -12,6 +12,8 @@
 
 set -euo pipefail
 
+pyenv install 3.13.9 && pyenv global 3.13.9
+
 REQUIRED_UV_VERSION="${REQUIRED_UV_VERSION:-0.93.0}"
 REQUIRED_PYTHON_VERSION="${REQUIRED_PYTHON_VERSION:-3.13.9}"
 
