@@ -22,6 +22,7 @@ RUN_PRE_COMMIT="${RUN_PRE_COMMIT:-1}"     # 1=install + run pre-commit on all fi
 GENERATE_PATH_MAP="${GENERATE_PATH_MAP:-1}" # 1=create docs/_build/path_map.txt if in container
 USE_LOCK="${USE_LOCK:-auto}"               # auto|yes|no  -> --locked when uv.lock exists (auto)
 EDITOR_URI_TEMPLATE_DEFAULT='vscode-remote://dev-container+{container_id}{path}:{line}'
+UV_MIN_VERSION="${UV_MIN_VERSION:-0.93.0}"  # Require uv strictly greater than 0.93
 
 # ------------- CLI flags -------------
 # Support a few handy flags so CI or developers can tailor behavior.
@@ -74,6 +75,41 @@ err()  { echo "${RED}✘${RESET} $*" 1>&2; }
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
+version_gt() {
+  local lhs="${1:-}"
+  local rhs="${2:-}"
+  if [ -z "${lhs}" ] || [ -z "${rhs}" ]; then
+    return 1
+  fi
+  if [ "${lhs}" = "${rhs}" ]; then
+    return 1
+  fi
+
+  local IFS='.'
+  local -a lhs_parts=() rhs_parts=()
+  read -r -a lhs_parts <<<"${lhs}"
+  read -r -a rhs_parts <<<"${rhs}"
+
+  local max_len="${#lhs_parts[@]}"
+  if [ "${#rhs_parts[@]}" -gt "${max_len}" ]; then
+    max_len="${#rhs_parts[@]}"
+  fi
+
+  local i=0
+  while [ "${i}" -lt "${max_len}" ]; do
+    local l_part="${lhs_parts[i]:-0}"
+    local r_part="${rhs_parts[i]:-0}"
+    if ((10#${l_part} > 10#${r_part})); then
+      return 0
+    fi
+    if ((10#${l_part} < 10#${r_part})); then
+      return 1
+    fi
+    i=$((i + 1))
+  done
+  return 1
+}
+
 # ------------- Sanity: repo root & OS -------------
 if [ ! -f "pyproject.toml" ]; then
   err "Run this script from the repository root (pyproject.toml not found)."
@@ -85,11 +121,17 @@ REPO_NAME="$(basename "$(pwd)")"
 
 # ------------- Ensure uv is installed -------------
 ensure_uv() {
+  local current_version=""
   if have uv; then
-    ok "uv present: $(uv --version | head -n1)"
-    return 0
+    current_version="$(uv --version 2>/dev/null | head -n1 | grep -oE '[0-9]+(\.[0-9]+)+' | head -n1)"
+    if version_gt "${current_version}" "${UV_MIN_VERSION}"; then
+      ok "uv present: $(uv --version | head -n1)"
+      return 0
+    fi
+    warn "uv version ${current_version:-unknown} detected; upgrading to latest (need > ${UV_MIN_VERSION})."
+  else
+    warn "uv not found; installing user-local uv (no sudo)."
   fi
-  warn "uv not found; installing user-local uv (no sudo)."
   # Official installer from Astral: https://astral.sh/uv/docs/install
   # -sSf: silent + show errors + fail on errors
   curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -98,6 +140,11 @@ ensure_uv() {
     export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$HOME/.local/share/uv/bin:$PATH"
   fi
   have uv || { err "uv still not on PATH after install. Add it to PATH, then re-run."; exit 1; }
+  current_version="$(uv --version 2>/dev/null | head -n1 | grep -oE '[0-9]+(\.[0-9]+)+' | head -n1)"
+  if ! version_gt "${current_version}" "${UV_MIN_VERSION}"; then
+    err "Installed uv version ${current_version:-unknown} does not satisfy requirement (> ${UV_MIN_VERSION})."
+    exit 1
+  fi
   ok "Installed uv: $(uv --version | head -n1)"
 }
 
