@@ -1,601 +1,187 @@
-Run `pyenv install 3.13.9 && pyenv global 3.13.9` before following the steps below.
+# OpenSpec / AGENTS.md — Spec‑Driven Agent Operating Protocol
 
-## Environment Setup (Preferred Order)
+> **Purpose**: This guide teaches humans and AI agents how to use **OpenSpec** to plan, review, implement, and archive changes with **production‑grade predictability**. It specifies exact command sequences, acceptance gates, file formats, and templates so specs remain the source of truth while code stays in lock‑step.
 
-1. **Bootstrap script (default approach)**
-   - Run `bash scripts/bootstrap.sh`.
-   - Mirrors the `.envrc` workflow; supports overrides (`OFFLINE=1`, `USE_WHEELHOUSE=1`, `EXTRAS="gpu"`, `ALLOW_GPU=1`).
+---
 
-2. **direnv (auto-activation)**
-   - **Critial note**: if you do not run `bash scripts/bootstrap.sh`, ensure uv > 0.93 is installed, run "uv python install 3.13.9", and then run "uv python pin 3.13.9"
-   - Install `direnv` (`sudo apt install direnv` or `brew install direnv`) and add the hook for your shell (`eval "$(direnv hook bash)"` or `eval "$(direnv hook zsh)"`).
-   - Ensure `uv` is installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`).
-   - From the repo root run `direnv allow` once. The committed `.envrc` will:
-     - create/sync `.venv/` with `uv sync --frozen`
-     - activate the environment automatically
-     - install pre-commit hooks on first load.
+## Table of contents
+1. [What OpenSpec is (and isn’t)](#what-openspec-is-and-isnt)
+2. [When to create a proposal (decision tree)](#when-to-create-a-proposal-decision-tree)
+3. [Lifecycle & gates: Propose → Implement → Archive](#lifecycle--gates-propose--implement--archive)
+4. [Repository layout & do‑not‑edit zones](#repository-layout--do-not-edit-zones)
+5. [Authoring rules: requirements & scenarios](#authoring-rules-requirements--scenarios)
+6. [Delta operations: ADDED / MODIFIED / REMOVED / RENAMED](#delta-operations-added--modified--removed--renamed)
+7. [Templates (copy/paste)](#templates-copypaste)
+8. [CLI usage: the 20% you’ll run 80% of the time](#cli-usage-the-20-youll-run-80-of-the-time)
+9. [Branching, PRs, and CI integration](#branching-prs-and-ci-integration)
+10. [Data contracts & schema policy](#data-contracts--schema-policy)
+11. [Agent handoff protocol (planning before code)](#agent-handoff-protocol-planning-before-code)
+12. [Troubleshooting & common errors](#troubleshooting--common-errors)
+13. [Governance: reviews, SLAs, and merges](#governance-reviews-slas-and-merges)
+14. [Glossary](#glossary)
 
-3. **Manual uv commands (CI/manual fallback)**
-   - **Critial note**: if you do not run `bash scripts/bootstrap.sh`, ensure uv > 0.93 is installed, run "uv python install 3.13.9", and then run "uv python pin 3.13.9"
-   - `uv venv .venv`
-   - `uv sync --frozen`
-   - `uvx pre-commit install -t pre-commit -t pre-push`
-   - Activate with `. .venv/bin/activate` or run tools via `uv run` / `uvx`.
+---
 
-## Code Quality Standards
+## What OpenSpec is (and isn’t)
 
+**OpenSpec is a change management system** for this repo:
+- It captures **why**, **what**, and **acceptance** *before* code is written.
+- It lets agents generate **deterministic tasks** and **tests** from agreed specs.
+- It keeps long‑lived **capability specs** separate from short‑lived **change proposals**.
 
-### Python Version & Environment
+**OpenSpec isn’t** a replacement for code review or standards. It complements them by making the intent explicit, testable, and archived.
 
-- **Python Version**: 3.13.9 (pinned)
-- **Package Manager**: `uv` (fast, deterministic)
-- **Environment**: `.venv/` (never use system Python)
+---
 
-### Code Formatting & Style
-
-#### Ruff (Primary Tool)
-- **Line length**: 100 characters
-- **Quote style**: Double quotes (`"`)
-- **Indentation**: 4 spaces (no tabs)
-- **Import order**: stdlib → third-party → first-party (auto-sorted)
-- **Trailing commas**: Required for multiline structures
-- **Blank lines**: 2 before top-level definitions, 1 between methods
-
-**Pre-commit hooks**:
-1. `ruff --select I --fix` - Sorts imports
-2. `ruff --fix` - Auto-fixes linting issues
-3. `ruff format` - Formats code
-
-**Key rules enforced**:
-- F (pyflakes) - undefined names, unused imports
-- E4/E7/E9 (pycodestyle) - whitespace, indentation
-- I (isort) - import sorting
-- N (naming) - PEP 8 naming conventions
-- UP (pyupgrade) - modern Python syntax
-- SIM (simplify) - simplification opportunities
-- B (bugbear) - likely bugs
-- ANN (annotations) - type annotations required
-- D (docstrings) - docstring presence and format
-
-**Complexity limits**:
-- Max cyclomatic complexity: 10
-- Max branches per function: 12
-- Max returns per function: 6
-
-#### Black (Safety Net)
-- **Line length**: 100 characters
-- **Target**: py312 format (code runs on py313)
-- Runs after Ruff to catch any formatting drift
-
-### Type Checking
-
-#### Mypy Configuration
-- **Strict mode enabled**
-- **Python version**: 3.13.9
-- **Key settings**:
-  - `disallow_untyped_defs = true` - All functions must have type hints
-  - `no_implicit_optional = true` - Explicit Optional[] required
-  - `warn_unused_ignores = true` - No unnecessary # type: ignore
-  - `warn_redundant_casts = true` - No unnecessary casts
-  - `strict_equality = true` - Strict comparison checking
-
-**Type annotation requirements**:
-- All function parameters must be typed
-- All return types must be specified
-- Use `typing.Any` only when truly unavoidable (and document why)
-- Prefer specific types over general ones (e.g., `list[str]` not `list`)
-
-### Docstring Standards
-
-#### NumPy Style (Required)
-- **Convention**: NumPy docstring format (enforced by pydocstyle and pydoclint)
-- **Coverage requirement**: 90% minimum (enforced by interrogate)
-- **Validation**: numpydoc checks GL01, SS01, ES01, RT01, PR01
-
-#### Docstring Structure
-
-**Module docstrings**:
-```python
-"""Brief module description (one line).
-
-Extended description can span multiple paragraphs. Explain the module's
-purpose, main components, and usage patterns.
-
-Examples
---------
->>> import mymodule
->>> mymodule.do_something()
-```
-
-**Function/Method docstrings**:
-```python
-def function_name(param1: str, param2: int = 5) -> bool:
-    """Brief description in imperative mood.
-
-    Extended description providing context, usage notes, and important
-    details about the function's behavior.
-
-    Parameters
-    ----------
-    param1 : str
-        Description of param1. Note the space after the colon.
-    param2 : int, optional
-        Description of param2, by default 5
-
-    Returns
-    -------
-    bool
-        Description of what is returned.
-
-    Raises
-    ------
-    ValueError
-        When param1 is empty.
-    TypeError
-        When param2 is not an integer.
-
-    See Also
-    --------
-    related_function : Brief description.
-    another_function : Brief description.
-
-    Notes
-    -----
-    Additional notes about implementation, performance characteristics,
-    or important caveats.
-
-    Examples
-    --------
-    >>> function_name("hello", 10)
-    True
-    >>> function_name("world")
-    True
-    """
-```
-
-**Class docstrings**:
-```python
-class MyClass:
-    """Brief class description.
-
-    Extended description of the class purpose and usage.
-
-    Parameters
-    ----------
-    arg1 : str
-        Description of constructor arg1.
-    arg2 : int, optional
-        Description of constructor arg2, by default 10
-
-    Attributes
-    ----------
-    attr1 : str
-        Description of attribute.
-    attr2 : int
-        Description of attribute.
-
-    Methods
-    -------
-    method_name
-        Brief description.
-
-    Examples
-    --------
-    >>> obj = MyClass("value", 20)
-    >>> obj.method_name()
-    """
-```
-
-#### Docstring Requirements
-
-1. **Summary line**: 
-   - Use imperative mood ("Return..." not "Returns...")
-   - One line, under 100 characters
-   - End with period
-
-2. **Parameters section**:
-   - Format: `name : type` or `name : type, optional`
-   - Include default values in description: "by default VALUE"
-   - One blank line before and after section
-
-3. **Returns section**:
-   - Always include for non-None returns
-   - Format: `type` on first line, description below
-   - For multiple returns, list each separately
-
-4. **Raises section**:
-   - Document all exceptions that callers should handle
-   - Format: `ExceptionType` followed by description
-   - Include conditions that trigger the exception
-
-5. **Examples section**:
-   - Always include when possible
-   - Use doctest format (`>>>` prompts)
-   - Examples must be executable (validated by xdoctest)
-
-#### Automated Docstring Generation
-
-When adding new code without docstrings:
-1. Run `make docstrings` - generates NumPy-style skeletons
-2. Fill in descriptions manually
-3. Run `make docstrings` again - formats and validates
-4. Pre-commit hooks enforce coverage and style
-
-### Import Organization
-
-#### Import Order (Enforced by Ruff)
-```python
-# Standard library imports
-import os
-import sys
-from pathlib import Path
-
-# Third-party imports
-import numpy as np
-import pandas as pd
-from pydantic import BaseModel
-
-# First-party imports
-from kgfoundry_common.config import load_config
-from search_api.models import SearchRequest
-```
-
-#### Import Conventions (Enforced)
-- `numpy` → `np`
-- `pandas` → `pd`
-- `matplotlib.pyplot` → `plt`
-- **No relative imports** (use absolute imports from `src/`)
-
-### Naming Conventions
-
-#### Variables & Functions
-- **snake_case**: `my_variable`, `calculate_total()`
-- **Private**: prefix with underscore `_internal_helper()`
-- **Constants**: `UPPER_SNAKE_CASE` at module level
-
-#### Classes & Exceptions
-- **PascalCase**: `MyClass`, `CustomException`
-- **Exceptions**: suffix with `Error` or `Exception`
-
-#### Modules & Packages
-- **snake_case**: `my_module.py`, `my_package/`
-- **Short, descriptive names**: prefer `config.py` over `configuration_manager.py`
-
-### Comments
-
-#### Inline Comments
-```python
-# Use comments to explain WHY, not WHAT
-result = calculate_value(x)  # Avoid: "Calculate value"
-result = calculate_value(x)  # Good: "Cached for performance"
-```
-
-#### Block Comments
-```python
-# Use block comments for complex algorithms or non-obvious logic.
-# Explain the approach and any important context.
-# Keep lines under 100 characters.
-```
-
-#### TODO Comments
-```python
-# TODO(username): Description of what needs to be done
-# FIXME(username): Description of what's broken and needs fixing
-# NOTE(username): Important context or caveat
-```
-
-### Testing Standards
-
-#### Test File Organization
-- Test files mirror `src/` structure in `tests/`
-- Name pattern: `test_<module>.py`
-- Test classes: `Test<ClassName>`
-- Test functions: `test_<function_name>_<scenario>()`
-
-#### Docstring Examples (xdoctest)
-- All `Examples` sections in docstrings are tested
-- Run via `pytest --xdoctest`
-- Use `...` for ellipsis matching
-- Use `# doctest: +SKIP` to skip problematic examples
-
-#### Test Markers
-```python
-@pytest.mark.integration  # Hits real network services
-@pytest.mark.benchmark    # Performance benchmarks
-@pytest.mark.real_vectors # Requires real vector data
-@pytest.mark.scale_vectors # Large dataset tests
-```
-
-### Pre-Commit Hook Execution Order
-
-When you commit, these hooks run automatically in order:
-
-1. **Ruff (imports)** - Sorts imports
-2. **Ruff (lint+fix)** - Auto-fixes linting issues
-3. **Ruff (format)** - Formats code
-4. **Black** - Additional formatting safety net
-5. **Mypy** - Type checking (fails commit if errors)
-6. **docformatter** - Formats docstrings to PEP 257
-7. **pydoclint** - Validates parameter/return parity
-8. **pydocstyle** - Lints docstrings for NumPy convention
-9. **interrogate** - Enforces 90% docstring coverage
-10. **navmap-build** - Regenerates navigation index
-11. **navmap-check** - Validates navigation metadata
-12. **readme-generator** (optional) - Updates package READMEs
-
-**All hooks must pass before commit is allowed.**
-
-### Quick Commands
-
-```bash
-# Format code
-make fmt
-# or manually:
-uvx ruff check --fix && uvx ruff format && black .
-
-# Type check
-uvx mypy --strict src
-
-# Generate/validate docstrings
-make docstrings
-
-# Run tests
-uv run pytest -q
-
-# Run tests with doctests
-uv run pytest -q --xdoctest
-
-# Pre-commit check (before committing)
-pre-commit run --all-files
-
-# Update documentation
-tools/update_docs.sh
-```
-
-### Common Violations & Fixes
-
-| Error | Meaning | Fix |
-|-------|---------|-----|
-| `D100` | Missing module docstring | Add module-level `"""Description."""` |
-| `D103` | Missing function docstring | Add function docstring |
-| `ANN001` | Missing type annotation | Add type hint to parameter |
-| `ANN201` | Missing return type | Add `-> ReturnType` annotation |
-| `F401` | Unused import | Remove import or use `# noqa: F401` if needed for re-export |
-| `E501` | Line too long | Break line (Black handles this) |
-| `C901` | Too complex | Refactor function (reduce branches) |
-
-### File-Specific Exemptions
-
-- **`tests/**`**: Docstrings optional (D100-D104 ignored)
-- **`docs/_build/**`**: Excluded from all checks
-- **`site/**`**: Excluded from all checks
-
-### Editor Integration
-
-**VS Code**:
-- Ruff extension handles formatting on save
-- Mypy extension shows type errors inline
-- Python extension uses `.venv/` automatically
-
-**PyCharm**:
-- Configure external tool for Ruff
-- Enable mypy integration
-- Set Python interpreter to `.venv/bin/python`
-
-### CI/CD Integration
-
-All quality checks run in CI:
-```bash
-# Format check (fail if not formatted)
-uvx ruff format --check src tests
-
-# Lint check (fail if violations exist)
-uvx ruff check src tests
-
-# Type check (fail if type errors exist)
-uvx mypy --strict src
-
-# Run tests
-uv run pytest -q
-
-# Documentation check
-tools/update_docs.sh
-git diff --exit-code docs/ src/  # Fail if docs out of sync
-```
-
-### Best Practices Summary
-
-✅ **Do**:
-- Run `make fmt` before committing
-- Add type hints to all new functions
-- Write docstrings for all public APIs
-- Keep functions small and focused (complexity < 10)
-- Use descriptive variable names
-- Add examples to docstrings
-- Run `pre-commit run --all-files` before pushing
-
-❌ **Don't**:
-- Use `--no-verify` to skip pre-commit hooks
-- Leave TODOs without attribution
-- Use `# type: ignore` without explanation
-- Create functions with >10 complexity
-- Omit type hints (mypy strict mode)
-- Write docstrings in non-NumPy format
-- Commit code with <90% docstring coverage
-
-# OpenSpec Instructions
-
-Instructions for AI coding assistants using OpenSpec for spec-driven development.
-
-## TL;DR Quick Checklist
-
-- Search existing work: `openspec spec list --long`, `openspec list` (use `rg` only for full-text search)
-- Decide scope: new capability vs modify existing capability
-- Pick a unique `change-id`: kebab-case, verb-led (`add-`, `update-`, `remove-`, `refactor-`)
-- Scaffold: `proposal.md`, `tasks.md`, `design.md` (only if needed), and delta specs per affected capability
-- Write deltas: use `## ADDED|MODIFIED|REMOVED|RENAMED Requirements`; include at least one `#### Scenario:` per requirement
-- Validate: `openspec validate [change-id] --strict` and fix issues
-- Request approval: Do not start implementation until proposal is approved
-
-## Three-Stage Workflow
-
-### Stage 1: Creating Changes
-Create proposal when you need to:
-- Add features or functionality
-- Make breaking changes (API, schema)
-- Change architecture or patterns  
-- Optimize performance (changes behavior)
-- Update security patterns
-
-Triggers (examples):
-- "Help me create a change proposal"
-- "Help me plan a change"
-- "Help me create a proposal"
-- "I want to create a spec proposal"
-- "I want to create a spec"
-
-Loose matching guidance:
-- Contains one of: `proposal`, `change`, `spec`
-- With one of: `create`, `plan`, `make`, `start`, `help`
-
-Skip proposal for:
-- Bug fixes (restore intended behavior)
-- Typos, formatting, comments
-- Dependency updates (non-breaking)
-- Configuration changes
-- Tests for existing behavior
-
-**Workflow**
-1. Review `openspec/project.md`, `openspec list`, and `openspec list --specs` to understand current context.
-2. Choose a unique verb-led `change-id` and scaffold `proposal.md`, `tasks.md`, optional `design.md`, and spec deltas under `openspec/changes/<id>/`.
-3. Draft spec deltas using `## ADDED|MODIFIED|REMOVED Requirements` with at least one `#### Scenario:` per requirement.
-4. Run `openspec validate <id> --strict` and resolve any issues before sharing the proposal.
-
-### Stage 2: Implementing Changes
-Track these steps as TODOs and complete them one by one.
-1. **Read proposal.md** - Understand what's being built
-2. **Read design.md** (if exists) - Review technical decisions
-3. **Read tasks.md** - Get implementation checklist
-4. **Implement tasks sequentially** - Complete in order
-5. **Confirm completion** - Ensure every item in `tasks.md` is finished before updating statuses
-6. **Update checklist** - After all work is done, set every task to `- [x]` so the list reflects reality
-7. **Approval gate** - Do not start implementation until the proposal is reviewed and approved
-
-### Stage 3: Archiving Changes
-After deployment, create separate PR to:
-- Move `changes/[name]/` → `changes/archive/YYYY-MM-DD-[name]/`
-- Update `specs/` if capabilities changed
-- Use `openspec archive <change-id> --skip-specs --yes` for tooling-only changes (always pass the change ID explicitly)
-- Run `openspec validate --strict` to confirm the archived change passes checks
-
-## Before Any Task
-
-**Context Checklist:**
-- [ ] Read relevant specs in `specs/[capability]/spec.md`
-- [ ] Check pending changes in `changes/` for conflicts
-- [ ] Read `openspec/project.md` for conventions
-- [ ] Run `openspec list` to see active changes
-- [ ] Run `openspec list --specs` to see existing capabilities
-
-**Before Creating Specs:**
-- Always check if capability already exists
-- Prefer modifying existing specs over creating duplicates
-- Use `openspec show [spec]` to review current state
-- If request is ambiguous, ask 1–2 clarifying questions before scaffolding
-
-### Search Guidance
-- Enumerate specs: `openspec spec list --long` (or `--json` for scripts)
-- Enumerate changes: `openspec list` (or `openspec change list --json` - deprecated but available)
-- Show details:
-  - Spec: `openspec show <spec-id> --type spec` (use `--json` for filters)
-  - Change: `openspec show <change-id> --json --deltas-only`
-- Full-text search (use ripgrep): `rg -n "Requirement:|Scenario:" openspec/specs`
-
-## Quick Start
-
-Daily commands after setup (choose any method above):
-
-```bash
-uvx ruff check --fix && uvx ruff format
-uvx mypy --strict src
-uv run pytest -q
-uv run sphinx-build -b html docs docs/_build/html
-```
-
-### CLI Commands
-
-```bash
-# Essential commands
-openspec list                  # List active changes
-openspec list --specs          # List specifications
-openspec show [item]           # Display change or spec
-openspec validate [item]       # Validate changes or specs
-openspec archive <change-id> [--yes|-y]   # Archive after deployment (add --yes for non-interactive runs)
-
-# Project management
-openspec init [path]           # Initialize OpenSpec
-openspec update [path]         # Update instruction files
-
-# Interactive mode
-openspec show                  # Prompts for selection
-openspec validate              # Bulk validation mode
-
-# Debugging
-openspec show [change] --json --deltas-only
-openspec validate [change] --strict
-```
-
-### Command Flags
-
-- `--json` - Machine-readable output
-- `--type change|spec` - Disambiguate items
-- `--strict` - Comprehensive validation
-- `--no-interactive` - Disable prompts
-- `--skip-specs` - Archive without spec updates
-- `--yes`/`-y` - Skip confirmation prompts (non-interactive archive)
-
-## Directory Structure
-
-```
-openspec/
-├── project.md              # Project conventions
-├── specs/                  # Current truth - what IS built
-│   └── [capability]/       # Single focused capability
-│       ├── spec.md         # Requirements and scenarios
-│       └── design.md       # Technical patterns
-├── changes/                # Proposals - what SHOULD change
-│   ├── [change-name]/
-│   │   ├── proposal.md     # Why, what, impact
-│   │   ├── tasks.md        # Implementation checklist
-│   │   ├── design.md       # Technical decisions (optional; see criteria)
-│   │   └── specs/          # Delta changes
-│   │       └── [capability]/
-│   │           └── spec.md # ADDED/MODIFIED/REMOVED
-│   └── archive/            # Completed changes
-```
-
-## Creating Change Proposals
-
-### Decision Tree
+## When to create a proposal (decision tree)
 
 ```
 New request?
-├─ Bug fix restoring spec behavior? → Fix directly
-├─ Typo/format/comment? → Fix directly  
-├─ New feature/capability? → Create proposal
-├─ Breaking change? → Create proposal
-├─ Architecture change? → Create proposal
-└─ Unclear? → Create proposal (safer)
+├─ Bug fix that restores intended behavior → implement directly (no proposal)
+├─ Typos / comments / formatting only → direct change
+├─ Non‑breaking config / dependency update → direct change
+├─ New capability or behavior → proposal REQUIRED
+├─ Breaking change (API, schema, user‑visible) → proposal REQUIRED
+├─ Cross‑cutting or architecture shift → proposal REQUIRED
+└─ Unclear scope → proposal RECOMMENDED
 ```
 
-### Proposal Structure
+**Rule of thumb**: if a reviewer would ask “what exactly changes and how do we accept it?”, you need a proposal.
 
-1. **Create directory:** `changes/[change-id]/` (kebab-case, verb-led, unique)
+---
 
-2. **Write proposal.md:**
+## Lifecycle & gates: Propose → Implement → Archive
+
+### Stage 1 — **Propose**
+**Goal**: agree on intent and acceptance *before* code.
+
+**Deliverables**
+- `openspec/changes/<change-id>/proposal.md` — why + what + impact
+- `openspec/changes/<change-id>/tasks.md` — implementation checklist (ordered)
+- `openspec/changes/<change-id>/specs/<capability>/spec.md` — **deltas** (ADDED/MODIFIED/REMOVED/RENAMED)
+- `openspec/changes/<change-id>/design.md` — *optional*, include only if cross‑cutting or ambiguous
+
+**Gates (must pass)**
+```bash
+openspec validate <change-id> --strict
+# All delta files have valid operations; every requirement has ≥1 Scenario; no format violations.
+```
+
+> **Do not start coding** until the proposal validates and reviewers approve.
+
+---
+
+### Stage 2 — **Implement**
+**Goal**: code to spec; keep docs and artifacts in sync.
+
+**Agent steps**
+1. Read `proposal.md`, (optional) `design.md`, and `tasks.md`.
+2. Execute tasks in order (check off as you go).
+3. Keep data contracts in sync (see [Data contracts](#data-contracts--schema-policy)).
+4. Run local quality gates (Ruff → pyrefly → mypy → pytest → artifacts).
+
+**Gates**
+```bash
+uv run ruff format && uv run ruff check --fix
+uv run pyrefly check && uv run mypy --config-file mypy.ini
+uv run pytest -q
+make artifacts && git diff --exit-code
+openspec validate <change-id> --strict
+```
+
+---
+
+### Stage 3 — **Archive**
+**Goal**: record what landed and close the loop.
+
+**Actions**
+- Move `openspec/changes/<change-id>/` → `openspec/changes/archive/YYYY-MM-DD-<change-id>/`
+- If a capability changed, ensure the canonical spec under `openspec/specs/**` reflects the final truth
+- Run validation on archived change
+```bash
+openspec archive <change-id> --yes
+openspec validate --strict
+```
+
+---
+
+## Repository layout & do‑not‑edit zones
+
+```
+openspec/
+├── project.md              # Conventions & global rules
+├── specs/                  # Canonical truth (WHAT IS)
+│   └── <capability>/
+│       ├── spec.md         # Requirements & Scenarios (normative)
+│       └── design.md       # Patterns and rationale (optional)
+├── changes/                # Proposals (WHAT SHOULD CHANGE)
+│   ├── <change-id>/
+│   │   ├── proposal.md
+│   │   ├── tasks.md
+│   │   ├── design.md       # optional
+│   │   └── specs/
+│   │       └── <capability>/spec.md   # delta file(s)
+│   └── archive/            # Completed changes (read‑only)
+```
+
+**Do not hand‑edit** archives except via the `openspec archive` flow.
+
+---
+
+## Authoring rules: requirements & scenarios
+
+- **Normative language**: use **SHALL/MUST** for requirements (avoid “should/may” unless non‑normative).
+- **Requirement header**: `### Requirement: <concise name>` — one capability per requirement.
+- **Scenario header**: `#### Scenario: <name>` — **exactly four hashes** and the word “Scenario”.
+- **Scenario body**: bullet list using **WHEN / THEN** (and **GIVEN** if needed). Keep steps minimal and testable.
+- **Acceptance**: every requirement MUST have ≥1 scenario.
+- **IDs**: if you reference IDs, prefer kebab‑case (e.g., `import-catalog-anchors`).
+
+**Good example**
+```markdown
+### Requirement: Import Catalog Anchors
+The system SHALL import anchors for all modules emitted by the Docs pipeline.
+
+#### Scenario: Import success
+- **GIVEN** a valid `agent_catalog.json`
+- **WHEN** the importer runs
+- **THEN** anchors are persisted with package, module, file, and line number
+```
+
+**Anti‑example**
+```markdown
+- Scenario: Import works  # ❌ wrong header format (missing ####)
+- When importer does stuff # ❌ lowercase and vague
+```
+
+---
+
+## Delta operations: ADDED / MODIFIED / REMOVED / RENAMED
+
+Pick the **smallest correct** operation; use one file per capability under the change.
+
+- `## ADDED Requirements` — introduce a new requirement
+- `## MODIFIED Requirements` — change an existing requirement (paste the **entire** updated block)
+- `## REMOVED Requirements` — explicitly remove a requirement (include reason + migration)
+- `## RENAMED Requirements` — rename a requirement (pair with MODIFIED if content changes)
+
+**Common pitfall**: Using MODIFIED to append details without pasting the previous full text. Always paste the entire requirement; partial deltas drop prior details at archive time.
+
+**RENAMED example**
+```markdown
+## RENAMED Requirements
+- FROM: `### Requirement: Login`
+- TO:   `### Requirement: User Authentication`
+```
+
+---
+
+## Templates (copy/paste)
+
+### `changes/<change-id>/proposal.md`
 ```markdown
 ## Why
-[1-2 sentences on problem/opportunity]
+[Problem/opportunity in 1–3 sentences]
 
 ## What Changes
 - [Bullet list of changes]
@@ -603,286 +189,198 @@ New request?
 
 ## Impact
 - Affected specs: [list capabilities]
-- Affected code: [key files/systems]
+- Affected code: [modules, services, schemas]
+- Rollout: [flags, migrations, compatibility]
 ```
 
-3. **Create spec deltas:** `specs/[capability]/spec.md`
-```markdown
-## ADDED Requirements
-### Requirement: New Feature
-The system SHALL provide...
-
-#### Scenario: Success case
-- **WHEN** user performs action
-- **THEN** expected result
-
-## MODIFIED Requirements
-### Requirement: Existing Feature
-[Complete modified requirement]
-
-## REMOVED Requirements
-### Requirement: Old Feature
-**Reason**: [Why removing]
-**Migration**: [How to handle]
-```
-If multiple capabilities are affected, create multiple delta files under `changes/[change-id]/specs/<capability>/spec.md`—one per capability.
-
-4. **Create tasks.md:**
+### `changes/<change-id>/tasks.md`
 ```markdown
 ## 1. Implementation
-- [ ] 1.1 Create database schema
-- [ ] 1.2 Implement API endpoint
-- [ ] 1.3 Add frontend component
-- [ ] 1.4 Write tests
+- [ ] 1.1 ...
+- [ ] 1.2 ...
+
+## 2. Testing
+- [ ] 2.1 Unit
+- [ ] 2.2 Integration
+- [ ] 2.3 Doctests / examples
+
+## 3. Docs & Artifacts
+- [ ] 3.1 Update examples
+- [ ] 3.2 make artifacts
+- [ ] 3.3 Validate OpenSpec
+
+## 4. Rollout
+- [ ] 4.1 Flags / config
+- [ ] 4.2 Metrics / dashboards
 ```
 
-5. **Create design.md when needed:**
-Create `design.md` if any of the following apply; otherwise omit it:
-- Cross-cutting change (multiple services/modules) or a new architectural pattern
-- New external dependency or significant data model changes
-- Security, performance, or migration complexity
-- Ambiguity that benefits from technical decisions before coding
-
-Minimal `design.md` skeleton:
+### `changes/<change-id>/design.md` (optional)
 ```markdown
 ## Context
-[Background, constraints, stakeholders]
+[Background, constraints]
 
-## Goals / Non-Goals
+## Goals / Non‑Goals
 - Goals: [...]
-- Non-Goals: [...]
+- Non‑Goals: [...]
 
 ## Decisions
-- Decision: [What and why]
-- Alternatives considered: [Options + rationale]
+- Decision: [What & why]
+- Alternatives: [Considered, rejected]
 
-## Risks / Trade-offs
+## Risks / Trade‑offs
 - [Risk] → Mitigation
 
-## Migration Plan
-[Steps, rollback]
-
-## Open Questions
-- [...]
+## Migration
+- Steps & rollback
 ```
 
-## Spec File Format
-
-### Critical: Scenario Formatting
-
-**CORRECT** (use #### headers):
+### Delta file `changes/<change-id>/specs/<capability>/spec.md`
 ```markdown
-#### Scenario: User login success
-- **WHEN** valid credentials provided
-- **THEN** return JWT token
+## ADDED Requirements
+### Requirement: <New capability>
+The system SHALL ...
+
+#### Scenario: <Happy path>
+- **WHEN** ...
+- **THEN** ...
+
+## MODIFIED Requirements
+### Requirement: <Existing capability>
+[Full, updated text of the requirement including scenarios]
+
+## REMOVED Requirements
+### Requirement: <Capability>
+**Reason**: [...]
+**Migration**: [...]
 ```
 
-**WRONG** (don't use bullets or bold):
-```markdown
-- **Scenario: User login**  ❌
-**Scenario**: User login     ❌
-### Scenario: User login      ❌
-```
+---
 
-Every requirement MUST have at least one scenario.
-
-### Requirement Wording
-- Use SHALL/MUST for normative requirements (avoid should/may unless intentionally non-normative)
-
-### Delta Operations
-
-- `## ADDED Requirements` - New capabilities
-- `## MODIFIED Requirements` - Changed behavior
-- `## REMOVED Requirements` - Deprecated features
-- `## RENAMED Requirements` - Name changes
-
-Headers matched with `trim(header)` - whitespace ignored.
-
-#### When to use ADDED vs MODIFIED
-- ADDED: Introduces a new capability or sub-capability that can stand alone as a requirement. Prefer ADDED when the change is orthogonal (e.g., adding "Slash Command Configuration") rather than altering the semantics of an existing requirement.
-- MODIFIED: Changes the behavior, scope, or acceptance criteria of an existing requirement. Always paste the full, updated requirement content (header + all scenarios). The archiver will replace the entire requirement with what you provide here; partial deltas will drop previous details.
-- RENAMED: Use when only the name changes. If you also change behavior, use RENAMED (name) plus MODIFIED (content) referencing the new name.
-
-Common pitfall: Using MODIFIED to add a new concern without including the previous text. This causes loss of detail at archive time. If you aren’t explicitly changing the existing requirement, add a new requirement under ADDED instead.
-
-Authoring a MODIFIED requirement correctly:
-1) Locate the existing requirement in `openspec/specs/<capability>/spec.md`.
-2) Copy the entire requirement block (from `### Requirement: ...` through its scenarios).
-3) Paste it under `## MODIFIED Requirements` and edit to reflect the new behavior.
-4) Ensure the header text matches exactly (whitespace-insensitive) and keep at least one `#### Scenario:`.
-
-Example for RENAMED:
-```markdown
-## RENAMED Requirements
-- FROM: `### Requirement: Login`
-- TO: `### Requirement: User Authentication`
-```
-
-## Troubleshooting
-
-### Common Errors
-
-**"Change must have at least one delta"**
-- Check `changes/[name]/specs/` exists with .md files
-- Verify files have operation prefixes (## ADDED Requirements)
-
-**"Requirement must have at least one scenario"**
-- Check scenarios use `#### Scenario:` format (4 hashtags)
-- Don't use bullet points or bold for scenario headers
-
-**Silent scenario parsing failures**
-- Exact format required: `#### Scenario: Name`
-- Debug with: `openspec show [change] --json --deltas-only`
-
-### Validation Tips
+## CLI usage: the 20% you’ll run 80% of the time
 
 ```bash
-# Always use strict mode for comprehensive checks
-openspec validate [change] --strict
-
-# Debug delta parsing
-openspec show [change] --json | jq '.deltas'
-
-# Check specific requirement
-openspec show [spec] --json -r 1
-```
-
-## Happy Path Script
-
-```bash
-# 1) Explore current state
+# List specs & changes
 openspec spec list --long
 openspec list
-# Optional full-text search:
-# rg -n "Requirement:|Scenario:" openspec/specs
-# rg -n "^#|Requirement:" openspec/changes
 
-# 2) Choose change id and scaffold
-CHANGE=add-two-factor-auth
-mkdir -p openspec/changes/$CHANGE/{specs/auth}
-printf "## Why\n...\n\n## What Changes\n- ...\n\n## Impact\n- ...\n" > openspec/changes/$CHANGE/proposal.md
-printf "## 1. Implementation\n- [ ] 1.1 ...\n" > openspec/changes/$CHANGE/tasks.md
+# Show details (human/json)
+openspec show <spec-or-change>
+openspec show <change> --json --deltas-only | jq '.'
 
-# 3) Add deltas (example)
-cat > openspec/changes/$CHANGE/specs/auth/spec.md << 'EOF'
-## ADDED Requirements
-### Requirement: Two-Factor Authentication
-Users MUST provide a second factor during login.
+# Validate (always strict)
+openspec validate <change-id> --strict
 
-#### Scenario: OTP required
-- **WHEN** valid credentials are provided
-- **THEN** an OTP challenge is required
-EOF
-
-# 4) Validate
-openspec validate $CHANGE --strict
+# Archive when done
+openspec archive <change-id> --yes
+openspec validate --strict
 ```
 
-## Multi-Capability Example
-
-```
-openspec/changes/add-2fa-notify/
-├── proposal.md
-├── tasks.md
-└── specs/
-    ├── auth/
-    │   └── spec.md   # ADDED: Two-Factor Authentication
-    └── notifications/
-        └── spec.md   # ADDED: OTP email notification
-```
-
-auth/spec.md
-```markdown
-## ADDED Requirements
-### Requirement: Two-Factor Authentication
-...
-```
-
-notifications/spec.md
-```markdown
-## ADDED Requirements
-### Requirement: OTP Email Notification
-...
-```
-
-## Best Practices
-
-### Simplicity First
-- Default to <100 lines of new code
-- Single-file implementations until proven insufficient
-- Avoid frameworks without clear justification
-- Choose boring, proven patterns
-
-### Complexity Triggers
-Only add complexity with:
-- Performance data showing current solution too slow
-- Concrete scale requirements (>1000 users, >100MB data)
-- Multiple proven use cases requiring abstraction
-
-### Clear References
-- Use `file.ts:42` format for code locations
-- Reference specs as `specs/auth/spec.md`
-- Link related changes and PRs
-
-### Capability Naming
-- Use verb-noun: `user-auth`, `payment-capture`
-- Single purpose per capability
-- 10-minute understandability rule
-- Split if description needs "AND"
-
-### Change ID Naming
-- Use kebab-case, short and descriptive: `add-two-factor-auth`
-- Prefer verb-led prefixes: `add-`, `update-`, `remove-`, `refactor-`
-- Ensure uniqueness; if taken, append `-2`, `-3`, etc.
-
-## Tool Selection Guide
-
-| Task | Tool | Why |
-|------|------|-----|
-| Find files by pattern | Glob | Fast pattern matching |
-| Search code content | Grep | Optimized regex search |
-| Read specific files | Read | Direct file access |
-| Explore unknown scope | Task | Multi-step investigation |
-
-## Error Recovery
-
-### Change Conflicts
-1. Run `openspec list` to see active changes
-2. Check for overlapping specs
-3. Coordinate with change owners
-4. Consider combining proposals
-
-### Validation Failures
-1. Run with `--strict` flag
-2. Check JSON output for details
-3. Verify spec file format
-4. Ensure scenarios properly formatted
-
-### Missing Context
-1. Read project.md first
-2. Check related specs
-3. Review recent archives
-4. Ask for clarification
-
-## Quick Reference
-
-### Stage Indicators
-- `changes/` - Proposed, not yet built
-- `specs/` - Built and deployed
-- `archive/` - Completed changes
-
-### File Purposes
-- `proposal.md` - Why and what
-- `tasks.md` - Implementation steps
-- `design.md` - Technical decisions
-- `spec.md` - Requirements and behavior
-
-### CLI Essentials
+**Full‑text search tips**
 ```bash
-openspec list              # What's in progress?
-openspec show [item]       # View details
-openspec validate --strict # Is it correct?
-openspec archive <change-id> [--yes|-y]  # Mark complete (add --yes for automation)
+# Find requirements & scenarios quickly
+rg -n "^(### Requirement:|#### Scenario:)" openspec
+
+# Show headings only
+rg -n "^#|^## |^### Requirement:|^#### Scenario:" openspec
 ```
 
-Remember: Specs are truth. Changes are proposals. Keep them in sync.
+---
+
+## Branching, PRs, and CI integration
+
+- **Branch name**: `openspec/<change-id>` (e.g., `openspec/add-agent-catalog-stdio-api`)
+- **PR description** must include:
+  - Link to `openspec/changes/<change-id>/proposal.md`
+  - Snapshot of `tasks.md` progress (checked boxes)
+  - Summary of delta operations per capability
+  - CI artifact links (docs, portal, coverage, mypy report)
+- **CI gates** (required to merge):
+  - precommit → lint (Ruff) → types (pyrefly + mypy) → tests → docs
+  - `openspec validate <change-id> --strict` runs in CI and must pass
+- **Artifacts**:
+  - Docs site & Agent Portal uploaded for preview
+  - Coverage and JUnit uploaded for quick triage
+  - (Optional) mypy HTML report uploaded for type issues
+
+---
+
+## Data contracts & schema policy
+
+- **Golden rule**: if data crosses a boundary, declare a **JSON Schema 2020‑12** (OpenAPI 3.1 for HTTP).
+- **Change process**: breaking contract updates require a proposal; non‑breaking may be direct with tests.
+- **Validation**: tests must validate payloads against schemas; PR must link schema diffs for reviewers.
+
+---
+
+## Agent handoff protocol (planning before code)
+
+Every implementation task must begin with a **four‑item design note** in the PR:
+1) **Summary** — one paragraph
+2) **Public API sketch** — typed signatures
+3) **Data/Schema contracts** — what changes and where the schema lives
+4) **Test plan** — how we prove it works (unit, integration, doctest examples)
+
+Agents must paste **command outputs** for: `ruff`, `pyrefly`, `mypy`, `pytest`, and `openspec validate`.
+
+---
+
+## Troubleshooting & common errors
+
+- **“Change must have at least one delta”**  
+  Create `changes/<id>/specs/<capability>/spec.md` with `## ADDED|MODIFIED|REMOVED|RENAMED Requirements`.
+
+- **“Requirement must have at least one scenario”**  
+  Ensure **`#### Scenario:`** headers are used (four `#`), not bullets/bold/`###`.
+
+- **Silent scenario parse failure**  
+  Header must be *exactly* `#### Scenario: <name>` on its own line. Debug with:
+  ```bash
+  openspec show <change-id> --json --deltas-only | jq '.deltas'
+  ```
+
+- **Ambiguous MODIFIED**  
+  Paste the entire requirement block from the canonical spec, then edit. Partial edits drop prior details.
+
+- **Docs/catalog drift**  
+  Run `make artifacts` on a clean tree; commit generated outputs.
+
+---
+
+## Governance: reviews, SLAs, and merges
+
+- **Reviewers**: at least one domain owner + one implementation owner.
+- **SLA**: acknowledge within 1 business day; review within 3. Use “request changes” with concrete edits.
+- **Merges**: require green CI, strict validation, and checked tasks list. Breaking changes require migration notes.
+
+---
+
+## Glossary
+
+- **Capability** — a cohesive feature area described in `openspec/specs/<capability>`
+- **Change** — a proposal under `openspec/changes/<id>` that modifies capabilities
+- **Requirement** — normative statement under a capability (“SHALL/MUST”)
+- **Scenario** — testable acceptance for a requirement (GIVEN/WHEN/THEN)
+- **Delta** — operation in a change: ADDED/MODIFIED/REMOVED/RENAMED
+- **Archive** — finalized change snapshot for audit
+
+---
+
+## Quick start (daily loop)
+
+```bash
+# Context
+openspec spec list --long
+openspec list
+
+# Validate proposal
+openspec validate <change-id> --strict
+
+# Quality gates
+uv run ruff format && uv run ruff check --fix
+uv run pyrefly check && uv run mypy --config-file mypy.ini
+uv run pytest -q
+make artifacts && git diff --exit-code
+
+# Archive when done
+openspec archive <change-id> --yes && openspec validate --strict
+```

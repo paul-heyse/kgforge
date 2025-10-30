@@ -1,494 +1,342 @@
-## Environment Setup (Preferred Order)
+# AGENTS.md — Agent Operating Protocol (AOP)
 
-1. **Bootstrap script (recommended default)**
-   - Execute `bash scripts/bootstrap.sh` from the repository root.
-   - The script mirrors the `.envrc` workflow: pins Python if needed, creates `.venv`, runs `uv sync --frozen`, activates the environment, and installs pre-commit hooks.
-   - Supports overrides such as `OFFLINE=1`, `USE_WHEELHOUSE=1`, or additional extras (GPU installs require `ALLOW_GPU=1`).
+> **Purpose**: This file is the agent-first playbook for building and maintaining this codebase at **best‑in‑class** quality. It specifies *exact commands*, *acceptance gates*, and *fallbacks* so both humans and AI agents can ship production‑grade Python safely and quickly.
 
-2. **direnv (auto-activation)**
-   - **Critial note**: if you do not run `bash scripts/bootstrap.sh`, ensure uv > 0.93 is installed, run "uv python install 3.13.9", and then run "uv python pin 3.13.9"
-   - Install `direnv` for your shell (`sudo apt install direnv` or `brew install direnv`) and hook it via `eval "$(direnv hook bash)"` / `eval "$(direnv hook zsh)"` in your shell rc.
-   - Ensure `uv` is installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`).
-   - From the repo root run `direnv allow` once. The committed `.envrc` will:
-     - create or reuse `.venv/` via `uv venv`
-     - run `uv sync --frozen` (docs tooling ships with the standard lock)
-     - activate the environment for that shell and install pre-commit hooks automatically.
-   - Future shell entries auto-refresh whenever `pyproject.toml`, `uv.lock`, or `.env` change.
+---
 
-3. **Manual uv flow (last resort / CI snippets)**
-   - **Critial note**: if you do not run `bash scripts/bootstrap.sh`, ensure uv > 0.93 is installed, run "uv python install 3.13.9", and then run "uv python pin 3.13.9"
-   - `uv venv`
-   - `uv sync --frozen`
-   - `uvx pre-commit install -t pre-commit -t pre-push`
-   - Activate via `. .venv/bin/activate` or run tools with `uv run` / `uvx`.
+## Table of contents
+1. [Agent Operating Protocol (TL;DR)](#agent-operating-protocol-tldr)
+2. [Environment Setup (Agent‑grade, deterministic)](#environment-setup-agentgrade-deterministic)
+3. [Source‑of‑Truth Index](#source-of-truth-index)
+4. [Code Formatting & Style (Ruff is canonical)](#code-formatting--style-ruff-is-canonical)
+5. [Type Checking (pyrefly sharp, mypy strict)](#type-checking-pyrefly-sharp-mypy-strict)
+6. [Docstrings (NumPy style; enforced; runnable)](#docstrings-numpy-style-enforced-runnable)
+7. [Testing Standards (markers, coverage, GPU hygiene)](#testing-standards-markers-coverage-gpu-hygiene)
+8. [Data Contracts (JSON Schema 2020‑12 / OpenAPI 3.1)](#data-contracts-json-schema-2020-12--openapi-31)
+9. [Link Policy for Remote Editors](#link-policy-for-remote-editors)
+10. [Agent Catalog & STDIO API (session‑scoped, no daemon)](#agent-catalog--stdio-api-sessionscoped-no-daemon)
+11. [Task Playbooks (feature / refactor / bugfix)](#task-playbooks-feature--refactor--bugfix)
+12. [PR Template & Checklist](#pr-template--checklist)
+13. [Quick Commands (copy/paste)](#quick-commands-copypaste)
+14. [Troubleshooting (for Agents)](#troubleshooting-for-agents)
+15. [Security & Compliance Hygiene](#security--compliance-hygiene)
+16. [Repo Layout & Do‑not‑edit Zones](#repo-layout--do-not-edit-zones)
+17. [CI / Pre‑commit parity](#ci--precommit-parity)
+18. [Glossary](#glossary)
 
-## Code Quality Standards
+---
 
+## Agent Operating Protocol (TL;DR)
 
-### Python Version & Environment
+**You are an autonomous Python engineer. Follow this sequence for *every* change:**
 
-- **Python Version**: 3.13.9 (pinned)
-- **Package Manager**: `uv` (fast, deterministic)
-- **Environment**: `.venv/` (never use system Python)
+1) **Load context fast**
+   - Read this file end‑to‑end.
+   - Open the relevant spec/proposal under `openspec/` (when applicable).
+   - Bootstrap environment and run local checks:
+     ```bash
+     uv sync --locked
+     uvx pre-commit run --all-files
+     ```
 
-### Code Formatting & Style
+2) **Plan (write before code)**
+   - Draft a **4‑item design note** for the PR:
+     1. Summary (one paragraph)
+     2. Public API sketch (typed signatures)
+     3. Data/Schema contracts affected (JSON Schema, OpenAPI)
+     4. Test plan (happy paths, edge cases, negative cases)
+   - If data crosses boundaries, confirm schemas (see [Data Contracts](#data-contracts-json-schema-2020-12--openapi-31)).
 
-#### Ruff (Primary Tool)
-- **Line length**: 100 characters
-- **Quote style**: Double quotes (`"`)
-- **Indentation**: 4 spaces (no tabs)
-- **Import order**: stdlib → third-party → first-party (auto-sorted)
-- **Trailing commas**: Required for multiline structures
-- **Blank lines**: 2 before top-level definitions, 1 between methods
+3) **Implement**
+   - Code to the typed API sketch.
+   - Keep functions small; separate I/O from pure logic; prefer composition over inheritance.
 
-**Pre-commit hooks**:
-1. `ruff --select I --fix` - Sorts imports
-2. `ruff --fix` - Auto-fixes linting issues
-3. `ruff format` - Formats code
+4) **Validate quality gates locally**
+   ```bash
+   uv run ruff format && uv run ruff check --fix
+   uv run pyrefly check
+   uv run mypy --config-file mypy.ini
+   uv run pytest -q
+   make artifacts && git diff --exit-code    # docs/nav/catalog/schemas in sync
+   ```
 
-**Key rules enforced**:
-- F (pyflakes) - undefined names, unused imports
-- E4/E7/E9 (pycodestyle) - whitespace, indentation
-- I (isort) - import sorting
-- N (naming) - PEP 8 naming conventions
-- UP (pyupgrade) - modern Python syntax
-- SIM (simplify) - simplification opportunities
-- B (bugbear) - likely bugs
-- ANN (annotations) - type annotations required
-- D (docstrings) - docstring presence and format
+5) **Ship the PR**
+   - PR description = the **4‑item design note** + **checklist outputs** (commands & exit codes).
+   - If behavior changes, include **migration notes** and bump **SemVer** accordingly.
 
-**Complexity limits**:
-- Max cyclomatic complexity: 10
-- Max branches per function: 12
-- Max returns per function: 6
+> If any step fails, **stop and fix** before continuing.
 
-#### Black (Safety Net)
-- **Line length**: 100 characters
-- **Target**: py312 format (code runs on py313)
-- Runs after Ruff to catch any formatting drift
+---
 
-### Type Checking
+## Environment Setup (Agent‑grade, deterministic)
 
-#### Mypy Configuration
-- **Strict mode enabled**
-- **Python version**: 3.13.9
-- **Key settings**:
-  - `disallow_untyped_defs = true` - All functions must have type hints
-  - `no_implicit_optional = true` - Explicit Optional[] required
-  - `warn_unused_ignores = true` - No unnecessary # type: ignore
-  - `warn_redundant_casts = true` - No unnecessary casts
-  - `strict_equality = true` - Strict comparison checking
+- **Canonical manager:** `uv`
+- **Python:** pinned to **3.13.9**
+- **Virtual env:** project‑local `.venv/` only (never system Python)
+- **One‑shot bootstrap (preferred):**
+  ```bash
+  # If scripts/bootstrap.sh exists, use it. Otherwise run the commands below manually.
+  uv python install 3.13.9
+  uv python pin 3.13.9
+  uv sync --locked
+  uv tool install pre-commit
+  pre-commit install
+  ```
+- **Remote container / devcontainer:** follow [Link Policy for Remote Editors](#link-policy-for-remote-editors) so deep links open correctly from generated artifacts.
+- **Do not** duplicate tool configs across files. `mypy.ini` and `pyrefly.toml` are canonical; `pyproject.toml` is canonical for Ruff and packaging.
 
-**Type annotation requirements**:
-- All function parameters must be typed
-- All return types must be specified
-- Use `typing.Any` only when truly unavoidable (and document why)
-- Prefer specific types over general ones (e.g., `list[str]` not `list`)
+---
 
-### Docstring Standards
+## Source‑of‑Truth Index
 
-#### NumPy Style (Required)
-- **Convention**: NumPy docstring format (enforced by pydocstyle and pydoclint)
-- **Coverage requirement**: 90% minimum (enforced by interrogate)
-- **Validation**: numpydoc checks GL01, SS01, ES01, RT01, PR01
+Read these first when editing configs or debugging local vs CI drift:
 
-#### Docstring Structure
+- **Formatting & lint:** `pyproject.toml` → `[tool.ruff]`, `[tool.ruff.lint]`
+- **Types:** `mypy.ini` (single source), `pyrefly.toml` (single source)
+- **Tests:** `pytest.ini` (markers, doctest/xdoctest config)
+- **Docs / Artifacts:** `tools/docs/build_artifacts.py`, `make artifacts`, outputs under `docs/_build/**`, `site/_build/**`
+- **Nav & Catalog:** `tools/navmap/*`, `docs/_build/agent_catalog.json`, `site/_build/agent/` (Agent Portal)
+- **CI:** `.github/workflows/ci.yaml` (job order: precommit → lint → types → tests → docs; OS matrix; caches; artifacts)
+- **Pre‑commit:** `.pre-commit-config.yaml` (runs the same gates locally)
 
-**Module docstrings**:
-```python
-"""Brief module description (one line).
+---
 
-Extended description can span multiple paragraphs. Explain the module's
-purpose, main components, and usage patterns.
+## Code Formatting & Style (Ruff is canonical)
 
-Examples
---------
->>> import mymodule
->>> mymodule.do_something()
+- **Run order:** `uv run ruff format` → `uv run ruff check --fix` (imports auto‑sorted).
+- **Imports:** stdlib → third‑party → first‑party; absolute imports only.
+- **Style guardrails:** 100‑col width, 4‑space indent, double quotes, trailing commas on multiline.
+- **Complexity:** cyclomatic ≤ 10, returns ≤ 6, branches ≤ 12; refactor if exceeded.
+- **Rule families emphasized (non‑exhaustive):**
+  - Baseline: `F,E4,E7,E9,I,N,UP,SIM,B,RUF,ANN,D,RET,RSE,TRY,EM,G,LOG,ISC,TID,TD,ERA,PGH,C90,PLR`
+  - Extra quality & safety: `W,A,ARG,BLE,DTZ,PTH,PIE,S,PT,T20`  
+    (builtins shadowing, unused args, bare except, timezone‑aware datetimes, pathlib, security, pytest style, ban prints)
+
+> We standardize on **Ruff** for formatter + linter. Do **not** run Black in parallel (conflicts / duplicate work).
+
+---
+
+## Type Checking (pyrefly sharp, mypy strict)
+
+- **First‑line check (semantics):**
+  ```bash
+  uv run pyrefly check
+  ```
+- **Soundness (strict baseline):**
+  ```bash
+  uv run mypy --config-file mypy.ini
+  ```
+- **Rules of engagement:**
+  - No untyped **public** APIs.
+  - Prefer **PEP 695** generics and `Protocol`/`TypedDict` over `Any`.
+  - Every `# type: ignore[...]` requires a comment **why** + a ticket reference.
+  - Narrow exceptions; HTTP surfaces return **RFC 9457 Problem Details**.
+
+**“Type‑clean” means both pyrefly **and** mypy pass.**
+
+---
+
+## Docstrings (NumPy style; enforced; runnable)
+
+- **Style:** NumPy docstrings; PEP 257 structure (module/class/function docstrings for all public symbols)
+- **Enforcement:** `pydoclint` parity checks + `interrogate` coverage (≥90%)
+- **Runnability:** Examples in `Examples` must execute (doctest/xdoctest); keep snippets short and copy‑ready
+- **Required sections (public APIs):**
+  - Summary (one line, imperative)
+  - Parameters (name, type, meaning)
+  - Returns / None
+  - Raises (type + condition)
+  - Examples
+  - Notes (performance, side‑effects)
+- **Loop:** code → `make artifacts` (scaffold/validate) → refine docs → `make artifacts` → commit
+
+---
+
+## Testing Standards (markers, coverage, GPU hygiene)
+
+- **Markers:**
+  - `@pytest.mark.integration` — network/services/resources
+  - `@pytest.mark.gpu` — requires GPU libraries
+  - `@pytest.mark.benchmark` — performance, non‑gating
+- **Conventions:**
+  - Parametrize edge cases with `@pytest.mark.parametrize`
+  - No reliance on test order or realtime; use fixed seeds
+  - GPU tests are **skipped by default** in CI unless explicitly enabled
+- **Coverage (local whenever core paths change):**
+  ```bash
+  uv run pytest -q --cov=src --cov-report=xml:coverage.xml --cov-report=html:htmlcov
+  ```
+
+---
+
+## Data Contracts (JSON Schema 2020‑12 / OpenAPI 3.1)
+
+- **Boundary rule:** whenever data crosses a boundary (API, file, queue), define a **JSON Schema 2020‑12**. For HTTP, use **OpenAPI 3.1** (embeds 2020‑12).
+- **Source of truth:** the schema is canonical; models may be generated from it (or emit it) but do not replace it.
+- **Validation:** validate inputs/outputs in tests; version schemas with SemVer and document breaking changes.
+
+---
+
+## Link Policy for Remote Editors
+
+- **Editor mode (preferred for local dev):**
+  - `DOCS_LINK_MODE=editor`
+  - `EDITOR_URI_TEMPLATE="vscode-remote://dev-container+{container_id}{path}:{line}"`
+  - Optional `PATH_MAP` file, lines: `/container/prefix => /editor/workspace/prefix`
+- **GitHub mode (fallback):**
+  - `DOCS_LINK_MODE=github`
+  - `DOCS_GITHUB_ORG`, `DOCS_GITHUB_REPO`, `DOCS_GITHUB_SHA`
+  - Links like: `https://github.com/{org}/{repo}/blob/{sha}/{path}#L{line}`
+- **Agent rule:** use **editor** mode in remote containers for deep linking; use **github** when editor URIs are unavailable.
+
+Example `PATH_MAP`:
+```
+/workspace => /workspaces/kgfoundry
+/app       => /workspaces/kgfoundry
 ```
 
-**Function/Method docstrings**:
-```python
-def function_name(param1: str, param2: int = 5) -> bool:
-    """Brief description in imperative mood.
+---
 
-    Extended description providing context, usage notes, and important
-    details about the function's behavior.
+## Agent Catalog & STDIO API (session‑scoped, no daemon)
 
-    Parameters
-    ----------
-    param1 : str
-        Description of param1. Note the space after the colon.
-    param2 : int, optional
-        Description of param2, by default 5
+- **Artifacts:**
+  - Ground truth: `docs/_build/agent_catalog.json`
+  - Portal: `site/_build/agent/index.html`
+- **Session API (JSON over stdio):**
+  ```json
+  {"id":"1","method":"capabilities","params":{}}
+  {"id":"2","method":"search","params":{"q":"vector store","k":10}}
+  {"id":"3","method":"open_anchor","params":{"symbol_id":"py:kg.index.faiss.build_index","mode":"editor"}}
+  {"id":"4","method":"find_callers","params":{"symbol_id":"py:kg.doc.parse.Parser.parse"}}
+  {"id":"5","method":"find_callees","params":{"symbol_id":"py:kg.index.faiss.build_index"}}
+  ```
+- **Lifecycle:**
+  - Editor spawns: `python -m tools.docs.stdio_api`
+  - First call is `capabilities`; one request at a time (MVP)
+  - Process exits when stdin closes
 
-    Returns
-    -------
-    bool
-        Description of what is returned.
+---
 
-    Raises
-    ------
-    ValueError
-        When param1 is empty.
-    TypeError
-        When param2 is not an integer.
+## Task Playbooks (feature / refactor / bugfix)
 
-    See Also
-    --------
-    related_function : Brief description.
-    another_function : Brief description.
+### A) New Feature
+1. Read the spec/proposal; write the **4‑item design note**.
+2. Define/update **JSON Schema** for any boundary payloads.
+3. Implement **typed** public API; write pure logic first, I/O later.
+4. Add **parametrized tests** (happy paths, edges, negative cases).
+5. Run quality gates (format → lint → pyrefly → mypy → pytest).
+6. `make artifacts` and commit regenerated docs/nav/catalog.
 
-    Notes
-    -----
-    Additional notes about implementation, performance characteristics,
-    or important caveats.
+**Done when:** all gates green; PR includes design note, schemas, and runnable examples.
 
-    Examples
-    --------
-    >>> function_name("hello", 10)
-    True
-    >>> function_name("world")
-    True
-    """
+### B) Safe Refactor (no behavior change)
+1. Prove parity with tests/fixtures **before** changes.
+2. Extract pure functions; reduce complexity; improve names & docs.
+3. Maintain public signatures; add deprecations if needed (warn + doc).
+4. Run full gates; add a “refactor proof” note in the PR (tests proving equivalence).
+
+### C) Bugfix
+1. Reproduce with a failing **parametrized** test.
+2. Fix with smallest diff; explain root cause in PR.
+3. Add a **regression test**.
+4. Run full gates; link issue/ticket in commit.
+
+---
+
+## PR Template & Checklist
+
+**Use this PR template:**
+
+- **Title:** `<area>: <short imperative>`
+- **Summary:** one paragraph describing the change and why.
+- **Public API:** list symbols & **typed** signatures that changed/added.
+- **Data Contracts:** link to JSON Schema/OpenAPI diff (if any).
+- **Test Plan:** commands + what they prove.
+- **Docs:** where examples changed; screenshots/links to artifacts (docs site, portal).
+- **Impact:** migration notes / deprecations.
+
+**Checklist (paste outputs):**
+```
+[ ] uv run ruff format && uv run ruff check --fix
+[ ] uv run pyrefly check
+[ ] uv run mypy --config-file mypy.ini
+[ ] uv run pytest -q
+[ ] make artifacts && git diff --exit-code
 ```
 
-**Class docstrings**:
-```python
-class MyClass:
-    """Brief class description.
+---
 
-    Extended description of the class purpose and usage.
-
-    Parameters
-    ----------
-    arg1 : str
-        Description of constructor arg1.
-    arg2 : int, optional
-        Description of constructor arg2, by default 10
-
-    Attributes
-    ----------
-    attr1 : str
-        Description of attribute.
-    attr2 : int
-        Description of attribute.
-
-    Methods
-    -------
-    method_name
-        Brief description.
-
-    Examples
-    --------
-    >>> obj = MyClass("value", 20)
-    >>> obj.method_name()
-    """
-```
-
-#### Docstring Requirements
-
-1. **Summary line**: 
-   - Use imperative mood ("Return..." not "Returns...")
-   - One line, under 100 characters
-   - End with period
-
-2. **Parameters section**:
-   - Format: `name : type` or `name : type, optional`
-   - Include default values in description: "by default VALUE"
-   - One blank line before and after section
-
-3. **Returns section**:
-   - Always include for non-None returns
-   - Format: `type` on first line, description below
-   - For multiple returns, list each separately
-
-4. **Raises section**:
-   - Document all exceptions that callers should handle
-   - Format: `ExceptionType` followed by description
-   - Include conditions that trigger the exception
-
-5. **Examples section**:
-   - Always include when possible
-   - Use doctest format (`>>>` prompts)
-   - Examples must be executable (validated by xdoctest)
-
-#### Automated Docstring Generation
-
-When adding new code without docstrings:
-1. Run `make artifacts` - scaffolds docstrings and dependent artefacts
-2. Fill in descriptions manually
-3. Run `make artifacts` again - formats and validates
-4. Pre-commit hooks enforce coverage and style
-
-### Documentation artefact workflow
-
-- `make artifacts` is the canonical way to regenerate docstrings, DocFacts, navmaps,
-  observability reports, and exported schemas. It invokes
-  `tools/docs/build_artifacts.py`, which prints a status line for each stage.
-- The underlying docstring builder now understands legacy flags such as
-  `--diff` and `--since` and exposes an `--ignore-missing` option to skip
-  transient imports from `docs/_build/**`.
-
-| Triggered by…                               | What `make artifacts` updates                 |
-| ------------------------------------------- | --------------------------------------------- |
-| API signature or docstring changes          | Managed docstrings + `docs/_build/docfacts.json` |
-| Navigation policy updates                   | `site/_build/navmap/navmap.json` and test maps |
-| Observability rules or coverage annotations | `docs/_build/observability*.json`             |
-| Schema / model tweaks                       | `docs/_build/schema_*.json` plus drift report |
-
-**FAQ**
-
-- _DocFacts still drift after running the target?_ Make sure your working tree is
-  clean and re-run `make artifacts`; the JSON output is deterministic.
-- _Builder raises `ModuleNotFoundError: docs._build...`?_ Use
-  `python -m tools.docstring_builder.cli update --all --ignore-missing` (the
-  command used inside `make artifacts`).
-- _Schema export keeps reporting drift?_ Open `docs/_build/schema_drift.json`
-  to inspect the generated changes and commit the desired snapshot.
-
-### Import Organization
-
-#### Import Order (Enforced by Ruff)
-```python
-# Standard library imports
-import os
-import sys
-from pathlib import Path
-
-# Third-party imports
-import numpy as np
-import pandas as pd
-from pydantic import BaseModel
-
-# First-party imports
-from kgfoundry_common.config import load_config
-from search_api.models import SearchRequest
-```
-
-#### Import Conventions (Enforced)
-- `numpy` → `np`
-- `pandas` → `pd`
-- `matplotlib.pyplot` → `plt`
-- **No relative imports** (use absolute imports from `src/`)
-
-### Naming Conventions
-
-#### Variables & Functions
-- **snake_case**: `my_variable`, `calculate_total()`
-- **Private**: prefix with underscore `_internal_helper()`
-- **Constants**: `UPPER_SNAKE_CASE` at module level
-
-#### Classes & Exceptions
-- **PascalCase**: `MyClass`, `CustomException`
-- **Exceptions**: suffix with `Error` or `Exception`
-
-#### Modules & Packages
-- **snake_case**: `my_module.py`, `my_package/`
-- **Short, descriptive names**: prefer `config.py` over `configuration_manager.py`
-
-### Comments
-
-#### Inline Comments
-```python
-# Use comments to explain WHY, not WHAT
-result = calculate_value(x)  # Avoid: "Calculate value"
-result = calculate_value(x)  # Good: "Cached for performance"
-```
-
-#### Block Comments
-```python
-# Use block comments for complex algorithms or non-obvious logic.
-# Explain the approach and any important context.
-# Keep lines under 100 characters.
-```
-
-#### TODO Comments
-```python
-# TODO(username): Description of what needs to be done
-# FIXME(username): Description of what's broken and needs fixing
-# NOTE(username): Important context or caveat
-```
-
-### Testing Standards
-
-#### Test File Organization
-- Test files mirror `src/` structure in `tests/`
-- Name pattern: `test_<module>.py`
-- Test classes: `Test<ClassName>`
-- Test functions: `test_<function_name>_<scenario>()`
-
-#### Docstring Examples (xdoctest)
-- All `Examples` sections in docstrings are tested
-- Run via `pytest --xdoctest`
-- Use `...` for ellipsis matching
-- Use `# doctest: +SKIP` to skip problematic examples
-
-#### Test Markers
-```python
-@pytest.mark.integration  # Hits real network services
-@pytest.mark.benchmark    # Performance benchmarks
-@pytest.mark.real_vectors # Requires real vector data
-@pytest.mark.scale_vectors # Large dataset tests
-```
-
-### Pre-Commit Hook Execution Order
-
-When you commit, these hooks run automatically in order:
-
-1. **Ruff (imports)** - Sorts imports
-2. **Ruff (lint+fix)** - Auto-fixes linting issues
-3. **Ruff (format)** - Formats code
-4. **Black** - Additional formatting safety net
-5. **Mypy** - Type checking (fails commit if errors)
-6. **docformatter** - Formats docstrings to PEP 257
-7. **pydoclint** - Validates parameter/return parity
-8. **pydocstyle** - Lints docstrings for NumPy convention
-9. **interrogate** - Enforces 90% docstring coverage
-10. **docs-artifacts** - Runs `make artifacts` to regenerate docstrings, navmaps, schemas
-11. **navmap-check** - Validates navigation metadata
-12. **readme-generator** (optional) - Updates package READMEs
-
-**All hooks must pass before commit is allowed.**
-
-### Quick Commands
+## Quick Commands (copy/paste)
 
 ```bash
-# Format code
-make fmt
-# or manually:
-uvx ruff check --fix && uvx ruff format && black .
+# Format & lint
+uv run ruff format && uv run ruff check --fix
 
-# Type check
-uvx mypy --strict src
+# Types (sharp first, then soundness)
+uv run pyrefly check
+uv run mypy --config-file mypy.ini
 
-# Regenerate documentation artefacts
+# Tests (incl. doctests/xdoctest via pytest.ini)
+uv run pytest -q
+
+# Artifacts (docstrings, navmap, schemas, portal)
 make artifacts
+git diff --exit-code
 
-# Run tests
-uv run pytest -q
-
-# Run tests with doctests
-uv run pytest -q --xdoctest
-
-# Pre-commit check (before committing)
-pre-commit run --all-files
-
-# Update documentation
-tools/update_docs.sh
+# All pre-commit hooks
+uvx pre-commit run --all-files
 ```
 
-### Common Violations & Fixes
+---
 
-| Error | Meaning | Fix |
-|-------|---------|-----|
-| `D100` | Missing module docstring | Add module-level `"""Description."""` |
-| `D103` | Missing function docstring | Add function docstring |
-| `ANN001` | Missing type annotation | Add type hint to parameter |
-| `ANN201` | Missing return type | Add `-> ReturnType` annotation |
-| `F401` | Unused import | Remove import or use `# noqa: F401` if needed for re-export |
-| `E501` | Line too long | Break line (Black handles this) |
-| `C901` | Too complex | Refactor function (reduce branches) |
+## Troubleshooting (for Agents)
 
-### File-Specific Exemptions
+- **Ruff vs Black conflicts**: We use **Ruff only**; remove Black changes, re-run Ruff.
+- **Third‑party typing gaps**: prefer small typed facades (`Protocol`, `TypedDict`) or `stubs/` + `mypy_path`, not `Any`.
+- **Docs drift keeps appearing**: run `make artifacts` from a **clean** tree; ensure `docs/_build/**` isn’t ignored; commit regenerated files.
+- **Editor links open wrong path**: verify `PATH_MAP` and `EDITOR_URI_TEMPLATE`; rebuild artifacts.
+- **Slow CI**: check cache restore logs for `uv`, `ruff`, `mypy`. If keys miss, verify `uv.lock` & Python version detection step.
 
-- **`tests/**`**: Docstrings optional (D100-D104 ignored)
-- **`docs/_build/**`**: Excluded from all checks
-- **`site/**`**: Excluded from all checks
+---
 
-### Editor Integration
+## Security & Compliance Hygiene
 
-**VS Code**:
-- Ruff extension handles formatting on save
-- Mypy extension shows type errors inline
-- Python extension uses `.venv/` automatically
+- **Secrets**: never commit `.env` or tokens; redact secrets in logs.
+- **Validation**: sanitize all untrusted inputs at boundaries; validate against schemas.
+- **Dependencies**: run `uv run pip-audit` locally before large upgrades; nightlies may run in CI.
+- **Licenses**: prefer MIT/Apache‑2.0; consult SBOM when adding third‑party libs.
 
-**PyCharm**:
-- Configure external tool for Ruff
-- Enable mypy integration
-- Set Python interpreter to `.venv/bin/python`
+---
 
-### CI/CD Integration
+## Repo Layout & Do‑not‑edit Zones
 
-All quality checks run in CI:
-```bash
-# Format check (fail if not formatted)
-uvx ruff format --check src tests
+- **Source**: `src/**`
+- **Tests**: `tests/**` (mirrors `src`)
+- **Docs & site**: `docs/**`, `site/**`
+- **Generated artifacts**: `docs/_build/**`, `site/_build/**` → **do not hand‑edit**
+- **Stubs**: `stubs/**` for local type shims (referenced by `mypy_path`)
 
-# Lint check (fail if violations exist)
-uvx ruff check src tests
+---
 
-# Type check (fail if type errors exist)
-uvx mypy --strict src
+## CI / Pre‑commit parity
 
-# Run tests
-uv run pytest -q
+- **Job order**: precommit → lint → types → tests → docs
+- **OS matrix**: lint/types on linux + macOS; tests on linux (expand later if needed)
+- **Caches**: `~/.cache/uv`, `~/.cache/ruff`, `.mypy_cache` keyed on OS + Python + lock/config
+- **Artifacts**: docs site, Agent Portal, coverage, JUnit, (optional) mypy HTML are uploaded for each run
+- **Branch protection (recommended)**: require `precommit`, `lint`, `types`, `tests` to merge
 
-# Documentation check
-tools/update_docs.sh
-git diff --exit-code docs/ src/  # Fail if docs out of sync
-```
+---
 
-### Best Practices Summary
+## Glossary
 
-✅ **Do**:
-- Run `make fmt` before committing
-- Add type hints to all new functions
-- Write docstrings for all public APIs
-- Keep functions small and focused (complexity < 10)
-- Use descriptive variable names
-- Add examples to docstrings
-- Run `pre-commit run --all-files` before pushing
+- **Agent Catalog** — machine‑readable index of packages/modules/symbols with stable anchors and links
+- **Agent Portal** — static HTML UI over the catalog with search and deep links
+- **Anchor** — a deep link to source (editor/GitHub), optionally including a line number
+- **PATH_MAP** — rules for translating container paths to editor workspace paths
+- **DocFacts/NavMap** — generated indices that power docs and linking
+- **RFC 9457 Problem Details** — standard JSON error envelope for HTTP APIs
 
-❌ **Don't**:
-- Use `--no-verify` to skip pre-commit hooks
-- Leave TODOs without attribution
-- Use `# type: ignore` without explanation
-- Create functions with >10 complexity
-- Omit type hints (mypy strict mode)
-- Write docstrings in non-NumPy format
-- Commit code with <90% docstring coverage
+---
 
-<!-- OPENSPEC:START -->
-# OpenSpec Instructions
-
-These instructions are for AI assistants working in this project.
-
-Always open `@/openspec/AGENTS.md` when the request:
-- Mentions planning or proposals (words like proposal, spec, change, plan)
-- Introduces new capabilities, breaking changes, architecture shifts, or big performance/security work
-- Sounds ambiguous and you need the authoritative spec before coding
-
-Use `@/openspec/AGENTS.md` to learn:
-- How to create and apply change proposals
-- Spec format and conventions
-- Project structure and guidelines
-
-Keep this managed block so 'openspec update' can refresh the instructions.
-
-<!-- OPENSPEC:END -->
-
-Run `pyenv install 3.13.9 && pyenv global 3.13.9` before following the steps below.
-
-## Environment Setup (Preferred Order)
-
-1. **Bootstrap script (recommended default)**
-   - Execute `bash scripts/bootstrap.sh` from the repository root.
-   - The script mirrors the `.envrc` workflow: pins Python if needed, creates `.venv`, runs `uv sync --frozen`, activates the environment, and installs pre-commit hooks.
-   - Supports overrides such as `OFFLINE=1`, `USE_WHEELHOUSE=1`, or additional extras (GPU installs require `ALLOW_GPU=1`).
-
-2. **direnv (auto-activation)**
-   - Install `direnv` for your shell (`sudo apt install direnv` or `brew install direnv`) and hook it via `eval "$(direnv hook bash)"` / `eval "$(direnv hook zsh)"` in your shell rc.
-   - Ensure `uv` is installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`).
-   - From the repo root run `direnv allow` once. The committed `.envrc` will:
-     - create or reuse `.venv/` via `uv venv`
-     - run `uv sync --frozen` (docs tooling ships with the standard lock)
-     - activate the environment for that shell and install pre-commit hooks automatically.
-   - Future shell entries auto-refresh whenever `pyproject.toml`, `uv.lock`, or `.env` change.
-
-3. **Manual uv flow (last resort / CI snippets)**
-   - `uv python pin 3.13.9`
-   - `uv venv`
-   - `uv sync --frozen`
-   - `uvx pre-commit install -t pre-commit -t pre-push`
-   - Activate via `. .venv/bin/activate` or run tools with `uv run` / `uvx`.
+**This document is the authoritative operating protocol for agents.** If a task conflicts with these rules, prefer the rules — or open a proposal under `openspec/changes/**` to evolve them.
