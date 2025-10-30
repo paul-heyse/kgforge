@@ -18,7 +18,6 @@ class VectorIndex(Protocol):
     def add(self, vectors: VectorArray) -> None: ...
     def search(self, vectors: VectorArray, count: int) -> SearchResult: ...
 
-
 class IndexIDMap2(VectorIndex):
     dimension: int
 

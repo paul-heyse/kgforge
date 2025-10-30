@@ -67,6 +67,7 @@ class GriffeLoaderFactory(Protocol):
         """Return a loader configured with the provided search paths."""
         ...
 
+
 # --- Project metadata (override via env if you like)
 project = os.environ.get("PROJECT_NAME", "kgfoundry")
 author = os.environ.get("PROJECT_AUTHOR", "kgfoundry Maintainers")
@@ -379,7 +380,9 @@ sphinx_gallery_conf = {
 }
 
 # Ensure JSON builder can serialize lru_cache wrappers
-json_encoder_cls = cast(type[json.JSONEncoder], getattr(json_module, "JSONEncoder", json.JSONEncoder))
+json_encoder_cls = cast(
+    type[json.JSONEncoder], getattr(json_module, "JSONEncoder", json.JSONEncoder)
+)
 _json_default = json_encoder_cls.default
 
 
@@ -389,8 +392,9 @@ def _json_safe_default(self: json.JSONEncoder, obj: object) -> object:  # pragma
     return _json_default(self, obj)
 
 
-setattr(json_encoder_cls, "default", _json_safe_default)
-setattr(json.JSONEncoder, "default", _json_safe_default)
+# Override JSONEncoder default to render lru_cache wrappers
+json_encoder_cls.default = _json_safe_default  # type: ignore[assignment]
+json.JSONEncoder.default = _json_safe_default  # type: ignore[assignment]
 
 # --- Build deep links per symbol without importing your code (use Griffe)
 griffe_api = resolve_griffe()

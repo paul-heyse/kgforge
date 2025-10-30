@@ -1,12 +1,13 @@
 import importlib
 import os
+import warnings
 from pathlib import Path
 from typing import cast
 
 import duckdb
-import httpx
 import pytest
 import yaml
+from fastapi.testclient import TestClient
 from tests.conftest import HAS_GPU_STACK
 
 from kgfoundry.embeddings_sparse.bm25 import PurePythonBM25
@@ -88,9 +89,14 @@ def test_fixture_and_api_smoke() -> None:
         ]
         search_app.bm25.build(docs)
 
-    transport = httpx.ASGITransport(app=search_app.app, lifespan="auto")
-    with httpx.Client(transport=transport, base_url="http://testserver") as client:
-        cli = KGFoundryClient(base_url=str(client.base_url), http=cast(SupportsHttp, client))
-        assert cli.healthz()["status"] == "ok"
-        res = cli.search("alignment", k=3)
-        assert "results" in res and isinstance(res["results"], list)
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="You should not use the 'timeout' argument with the TestClient",
+            category=DeprecationWarning,
+        )
+        with TestClient(search_app.app) as client:
+            cli = KGFoundryClient(base_url=str(client.base_url), http=cast(SupportsHttp, client))
+            assert cli.healthz()["status"] == "ok"
+            res = cli.search("alignment", k=3)
+            assert "results" in res and isinstance(res["results"], list)

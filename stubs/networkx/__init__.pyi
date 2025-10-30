@@ -1,30 +1,25 @@
 from __future__ import annotations
 
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Hashable, Iterable, Iterator, Mapping
 from typing import Generic, Literal, TypeVar, overload
 
-NodeT = TypeVar("NodeT")
-
+NodeT = TypeVar("NodeT", bound=Hashable)
 
 class NodeView(Generic[NodeT]):  # noqa: UP046
     def __iter__(self) -> Iterator[NodeT]: ...
-
     @overload
     def __call__(self, data: Literal[False] = False) -> Iterable[NodeT]: ...
-
     @overload
     def __call__(self, data: Literal[True]) -> Iterable[tuple[NodeT, Mapping[str, object]]]: ...
 
-
 class EdgeView(Generic[NodeT]):  # noqa: UP046
     def __iter__(self) -> Iterator[tuple[NodeT, NodeT]]: ...
-
     @overload
     def __call__(self, data: Literal[False] = False) -> Iterable[tuple[NodeT, NodeT]]: ...
-
     @overload
-    def __call__(self, data: Literal[True]) -> Iterable[tuple[NodeT, NodeT, Mapping[str, object]]]: ...
-
+    def __call__(
+        self, data: Literal[True]
+    ) -> Iterable[tuple[NodeT, NodeT, Mapping[str, object]]]: ...
 
 class DiGraph(Generic[NodeT]):  # noqa: UP046
     nodes: NodeView[NodeT]
@@ -37,15 +32,16 @@ class DiGraph(Generic[NodeT]):  # noqa: UP046
     def copy(self) -> DiGraph[NodeT]: ...
     def number_of_edges(self) -> int: ...
     def number_of_nodes(self) -> int: ...
-    def get_edge_data(self, u: NodeT, v: NodeT, default: object | None = ...) -> Mapping[str, object]: ...
+    def get_edge_data(
+        self, u: NodeT, v: NodeT, default: object | None = ...
+    ) -> Mapping[str, object]: ...
     def has_edge(self, u_of_edge: NodeT, v_of_edge: NodeT) -> bool: ...
     def remove_edges_from(self, edges: Iterable[tuple[NodeT, NodeT]]) -> None: ...
 
-
-def simple_cycles(graph: DiGraph[NodeT], length_bound: int | None = None) -> Iterator[list[NodeT]]: ...  # noqa: UP047
-
-
-def strongly_connected_components(graph: DiGraph[NodeT]) -> Iterable[list[NodeT]]: ...  # noqa: UP047
-
-
-def degree_centrality(graph: DiGraph[NodeT]) -> Mapping[NodeT, float]: ...  # noqa: UP047
+def simple_cycles(
+    graph: DiGraph[NodeT], length_bound: int | None = None
+) -> Iterator[list[NodeT]]: ...  
+def strongly_connected_components(
+    graph: DiGraph[NodeT],
+) -> Iterable[list[NodeT]]: ...  
+def degree_centrality(graph: DiGraph[NodeT]) -> Mapping[NodeT, float]: ...  

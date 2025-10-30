@@ -1528,20 +1528,15 @@ def _load_faiss(purpose: str) -> FaissModuleProtocol:
     candidates = (override,) if override else _FAISS_DEFAULT_MODULES
 
     failures: list[str] = []
-    warning_filters = (
-        ("builtin type SwigPyPacked has no __module__ attribute",),
-        ("builtin type SwigPyObject has no __module__ attribute",),
-        ("builtin type swigvarlink has no __module__ attribute",),
-    )
     for module_name in candidates:
         try:
             with warnings.catch_warnings():
-                for pattern in warning_filters:
-                    warnings.filterwarnings(
-                        "ignore",
-                        message=pattern[0],
-                        category=DeprecationWarning,
-                    )
+                warnings.filterwarnings(
+                    "ignore",
+                    message=r"builtin type SwigPy\w* has no __module__ attribute",
+                    category=DeprecationWarning,
+                    module=r"faiss.*",
+                )
                 module = importlib.import_module(module_name)
         except ImportError as exc:  # pragma: no cover - runtime guard
             failures.append(f"{module_name}: {exc}")

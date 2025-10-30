@@ -158,7 +158,6 @@ dependencies = [
     "types-Flask-Cors",
     "types-Flask-Migrate",
     "types-Flask-SocketIO",
-    "types-Flask-SQLAlchemy",
     "types-fpdf2",
     "types-freezegun",
     "types-frozendict",
@@ -306,7 +305,6 @@ dependencies = [
     "types-singledispatch",
     "types-six",
     "types-slumber",
-    "types-SQLAlchemy",
     "types-stdlib-list",
     "types-str2bool",
     "types-stripe",
@@ -567,6 +565,18 @@ select = [
     "PGH",
     "C90",
     "PLR",
+    "W",
+    "A",
+    "ARG",
+    "BLE",
+    "DTZ",
+    "PTH",
+    "PIE",
+    "S",
+    "PT",
+    "T20",
+    "PLW",
+    "PLC",
 ]
 ignore = ["Q", "E203", "D203", "D213", "D205"]
 preview = false
@@ -582,6 +592,14 @@ max-returns = 6
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
+[tool.ruff.lint.flake8-type-checking]
+strict = true
+runtime-evaluated-base-classes = [
+    "pydantic.BaseModel",
+    "pydantic_settings.BaseSettings",
+    "typing.TypedDict",
+]
+
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = [
     "D100",
@@ -594,6 +612,8 @@ convention = "numpy"
     "PLR2004",
     "N806",
     "C401",
+    "S101",
+    "T20",
 ]
 
 [tool.ruff.lint.isort]
@@ -666,22 +686,6 @@ markers = [
     "requires(*mods, modules=None): import-or-skip listed modules and auto-mark GPU suites",
 ]
 testpaths = ["tests"]
-
-[tool.mypy]
-python_version = "3.13"
-disallow_untyped_defs = true
-no_implicit_optional = true
-warn_unused_ignores = true
-warn_redundant_casts = true
-strict_equality = true
-show_error_codes = true
-mypy_path = ["src", "stubs", "tests"]
-explicit_package_bases = true
-
-[[tool.mypy.overrides]]
-module = "conftest"
-follow_imports = "skip"
-ignore_missing_imports = true
 
 # Tell uv that vllm should come ONLY from the vllm-nightly index.
 [tool.uv.sources]
@@ -756,34 +760,3 @@ missing-params-action = "error"
 missing-returns-action = "error"
 require-parameters = true
 require-returns = true
-
-# pyproject.toml
-[tool.pyrefly]
-project-includes = ["src", "tests"]
-project-excludes = ["**/__pycache__/**", "**/.venv/**", "**/.[!/.]*/**"]
-
-# Make inference and checking strict & useful
-infer-with-first-use = true
-untyped-def-behavior = "check-and-infer-return-type"
-permissive-ignores = false
-replace-imports-with-any = [
-    "pyserini.index.lucene",
-    "pyserini.search.lucene",
-    "libcuvs",
-    "faiss",
-    "griffe",
-    "mkdocs_gen_files",
-    "libcst",
-]
-ignore-missing-imports = []
-ignore-missing-source = false
-
-[tool.pyrefly.errors]
-# Opt into powerful optional checks
-implicit-any = true
-implicitly-defined-attribute = true
-implicit-abstract-class = true
-
-# Example: assert_type should fail loudly in library code
-# (you can also enable this only for certain paths via sub-config)
-assert-type = true

@@ -210,7 +210,10 @@ def test_autoapi_excludes_legacy_exceptions() -> None:
 
 def test_intersphinx_mappings_cover_required_projects() -> None:
     """Verify intersphinx configuration includes scientific and http stacks."""
-    mapping = cast(Mapping[str, tuple[str, str] | tuple[str, str | None, str | None]], _load_conf_symbol("intersphinx_mapping"))
+    mapping = cast(
+        Mapping[str, tuple[str, str] | tuple[str, str | None, str | None]],
+        _load_conf_symbol("intersphinx_mapping"),
+    )
     for project in ("scipy", "pandas", "httpx", "pytest"):
         assert project in mapping
 

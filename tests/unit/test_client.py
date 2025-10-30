@@ -31,13 +31,13 @@ class _RecordingHttp(SupportsHttp):
     def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
         url, args, kwargs = self._record("GET", url, args, kwargs)
         client_get = cast(Callable[..., Response], self._client.get)
-        response = client_get(url, *args, **kwargs)
+        response = client_get(url, *args, **cast(dict[str, Any], kwargs))
         return cast(SupportsResponse, response)
 
     def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
         url, args, kwargs = self._record("POST", url, args, kwargs)
         client_post = cast(Callable[..., Response], self._client.post)
-        response = client_post(url, *args, **kwargs)
+        response = client_post(url, *args, **cast(dict[str, Any], kwargs))
         return cast(SupportsResponse, response)
 
 
