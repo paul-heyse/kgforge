@@ -1,4 +1,21 @@
-"""Command line interface for the docstring builder."""
+"""Docstring builder CLI for managing generated docstrings across the repo.
+
+This module wires together the tooling that harvests code metadata, renders
+managed docstrings, and applies or inspects the resulting edits. Subcommands
+cover the full workflow: ``generate`` synchronizes docstrings and DocFacts,
+``fix`` forces writes while bypassing the cache, ``diff`` and ``check`` display
+drift without mutating files, ``lint`` mirrors ``check`` with optional DocFacts
+skips, ``measure`` emits observability metrics, ``schema`` exports the IR
+schema, ``doctor`` performs health checks, ``list`` enumerates managed symbols,
+``clear-cache`` resets builder state, ``harvest`` collects metadata only, and
+``update`` serves project automation.
+
+Usage
+-----
+The CLI is typically invoked through project tooling, for example via ``uv run
+python -m tools.docstring_builder.cli <subcommand>`` or the corresponding Make
+targets when regenerating documentation artifacts.
+"""
 
 from __future__ import annotations
 
@@ -57,7 +74,7 @@ from tools.docstring_builder.semantics import SemanticResult, build_semantic_sch
 from tools.drift_preview import DocstringDriftEntry, write_docstring_drift, write_html_diff
 from tools.stubs.drift_check import run as run_stub_drift
 
-LOGGER = logging.getLogger("docstring_builder")
+LOGGER = logging.getLogger(__name__)
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CACHE_PATH = REPO_ROOT / ".cache" / "docstring_builder.json"
 DOCFACTS_PATH = REPO_ROOT / "docs" / "_build" / "docfacts.json"
@@ -766,7 +783,8 @@ def _print_failure_summary(payload: Mapping[str, object]) -> None:  # noqa: C901
             status = _coerce_str(entry.get("status"), "unknown")
             message = _coerce_str(entry.get("message"), "no additional details")
             lines.append(f"    - {file_name}: {status} ({message})")
-    LOGGER.error("%s", "\n".join(lines))
+    for line in lines:
+        LOGGER.error(line)
 
 
 def _run(  # noqa: C901, PLR0912, PLR0915
@@ -1255,6 +1273,7 @@ def _command_list(args: argparse.Namespace) -> int:
 def _command_clear_cache(_: argparse.Namespace) -> int:
     """Remove any cached docstring builder metadata."""
     BuilderCache(CACHE_PATH).clear()
+    LOGGER.info("Cleared docstring builder cache at %s", CACHE_PATH)
     return EXIT_SUCCESS
 
 
@@ -1271,14 +1290,14 @@ def _command_schema(args: argparse.Namespace) -> int:
     target.parent.mkdir(parents=True, exist_ok=True)
     write_schema(target)
     rel = target.relative_to(REPO_ROOT)
-    print(f"Schema written to {rel}")
+    LOGGER.info("Schema written to %s", rel)
     return EXIT_SUCCESS
 
 
 def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PLR0915
     """Run environment and configuration diagnostics."""
     _, selection = _load_config(args)
-    print(f"[DOCTOR] Active config: {selection.path} ({selection.source})")
+    LOGGER.info("[DOCTOR] Active config: %s (%s)", selection.path, selection.source)
     issues: list[str] = []
     try:
         current = sys.version_info
@@ -1360,21 +1379,21 @@ def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PL
 
     drift_status = EXIT_SUCCESS
     if getattr(args, "stubs", False):
-        print("[DOCTOR] Running stub drift check...")
+        LOGGER.info("[DOCTOR] Running stub drift check...")
         drift_status = run_stub_drift()
         if drift_status != 0:
             issues.append("Stub drift detected; see output above.")
 
     if issues:
-        print("[DOCTOR] Configuration issues detected:")
+        LOGGER.error("[DOCTOR] Configuration issues detected:")
         for item in issues:
-            print(f"  - {item}")
+            LOGGER.error("  - %s", item)
         return EXIT_CONFIG
 
     if drift_status != 0:
         return EXIT_CONFIG
 
-    print("Docstring builder environment looks good.")
+    LOGGER.info("Docstring builder environment looks good.")
     return EXIT_SUCCESS
 
 
