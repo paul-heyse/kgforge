@@ -1,21 +1,14 @@
-"""Compatibility shim exposing the legacy auto-docstring helpers."""
-
-from __future__ import annotations
+"""Compatibility shim exposing legacy docstring generation utilities."""
 
 from pathlib import Path
 
 from tools.docstring_builder import legacy as _legacy
 from tools.docstring_builder.legacy import (
-    _STANDARD_METHOD_EXTENDED_SUMMARIES,
     DEFAULT_MAGIC_METHOD_FALLBACK,
     DEFAULT_PYDANTIC_ARTIFACT_SUMMARY,
     MAGIC_METHOD_EXTENDED_SUMMARIES,
     PYDANTIC_ARTIFACT_SUMMARIES,
     QUALIFIED_NAME_OVERRIDES,
-    _is_magic,
-    _is_pydantic_artifact,
-    _normalize_qualified_name,
-    _required_sections,
     annotation_to_text,
     build_docstring,
     build_examples,
@@ -24,6 +17,35 @@ from tools.docstring_builder.legacy import (
     parameters_for,
     summarize,
 )
+
+STANDARD_METHOD_EXTENDED_SUMMARIES = _legacy._STANDARD_METHOD_EXTENDED_SUMMARIES
+
+
+def is_magic(name: str) -> bool:
+    """Return True when ``name`` refers to a recognised magic method."""
+    return _legacy._is_magic(name)
+
+
+def is_pydantic_artifact(name: str) -> bool:
+    """Return True when ``name`` is associated with Pydantic internals."""
+    return _legacy._is_pydantic_artifact(name)
+
+
+def normalize_qualified_name(name: str) -> str:
+    """Return the canonical qualified name for ``name`` using override mappings."""
+    return _legacy._normalize_qualified_name(name)
+
+
+def required_sections(  # noqa: PLR0913
+    kind: str,
+    parameters: list[_legacy.ParameterInfo],
+    returns: str | None,
+    raises: list[str],
+    name: str,
+    is_public: bool,
+) -> list[str]:
+    """Return the ordered docstring sections required for the provided symbol metadata."""
+    return _legacy._required_sections(kind, parameters, returns, raises, name, is_public)
 
 REPO_ROOT = _legacy.REPO_ROOT
 SRC_ROOT = _legacy.SRC_ROOT
@@ -55,18 +77,18 @@ __all__ = [
     "QUALIFIED_NAME_OVERRIDES",
     "REPO_ROOT",
     "SRC_ROOT",
-    "_STANDARD_METHOD_EXTENDED_SUMMARIES",
-    "_is_magic",
-    "_is_pydantic_artifact",
-    "_normalize_qualified_name",
-    "_required_sections",
+    "STANDARD_METHOD_EXTENDED_SUMMARIES",
     "annotation_to_text",
     "build_docstring",
     "build_examples",
     "detect_raises",
     "extended_summary",
+    "is_magic",
+    "is_pydantic_artifact",
     "module_name_for",
+    "normalize_qualified_name",
     "parameters_for",
     "process_file",
+    "required_sections",
     "summarize",
 ]
