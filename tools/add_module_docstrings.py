@@ -1,8 +1,9 @@
-"""Overview of add module docstrings.
+"""Utilities for inserting placeholder module docstrings into the codebase.
 
-This module bundles add module docstrings logic for the kgfoundry stack. It groups related helpers
-so downstream packages can import a single cohesive namespace. Refer to the functions and classes
-below for implementation specifics.
+The helpers in this module scan the ``src`` tree, derive the dotted module path for
+each file, and inject a minimal docstring when one is missing. This is primarily
+used when bootstrapping new packages so that quality gates requiring docstrings
+pass before more detailed documentation is added.
 """
 
 from __future__ import annotations
@@ -15,25 +16,18 @@ SRC = ROOT / "src"
 
 
 def module_name(path: Path) -> str:
-    """Compute module name.
-
-    Carry out the module name operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Return the dotted module path for ``path`` relative to ``src``.
 
     Parameters
     ----------
-    path : Path
-        Description for ``path``.
+    path
+        Absolute path to a Python file inside the repository ``src`` tree.
 
     Returns
     -------
     str
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.add_module_docstrings import module_name
-    >>> result = module_name(...)
-    >>> result  # doctest: +ELLIPSIS
+        Importable module name with ``__init__`` files collapsed to the package
+        path.
     """
     rel = path.relative_to(SRC).with_suffix("")
     parts = list(rel.parts)
@@ -43,25 +37,20 @@ def module_name(path: Path) -> str:
 
 
 def needs_docstring(text: str) -> bool:
-    """Compute needs docstring.
+    """Return ``True`` when ``text`` parses without a module docstring.
 
-    Carry out the needs docstring operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    The file is parsed with :mod:`ast` so we accurately detect docstrings even
+    when comments or encoding pragmas are present above the module body.
 
     Parameters
     ----------
-    text : str
-        Description for ``text``.
+    text
+        Source code of the module to inspect.
 
     Returns
     -------
     bool
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.add_module_docstrings import needs_docstring
-    >>> result = needs_docstring(...)
-    >>> result  # doctest: +ELLIPSIS
+        ``True`` if the module lacks a top-level docstring, ``False`` otherwise.
     """
     try:
         tree = ast.parse(text)
@@ -71,25 +60,20 @@ def needs_docstring(text: str) -> bool:
 
 
 def insert_docstring(path: Path) -> bool:
-    """Compute insert docstring.
+    """Insert a minimal module docstring into ``path`` when one is missing.
 
-    Carry out the insert docstring operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    The helper respects shebangs and encoding pragmas, inserting the generated
+    docstring immediately afterwards so file metadata stays intact.
 
     Parameters
     ----------
-    path : Path
-        Description for ``path``.
+    path
+        Absolute path to the Python module to update.
 
     Returns
     -------
     bool
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.add_module_docstrings import insert_docstring
-    >>> result = insert_docstring(...)
-    >>> result  # doctest: +ELLIPSIS
+        ``True`` if the file was modified, ``False`` when no change was required.
     """
     text = path.read_text()
     if not needs_docstring(text):
@@ -108,15 +92,7 @@ def insert_docstring(path: Path) -> bool:
 
 
 def main() -> None:
-    """Compute main.
-
-    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Examples
-    --------
-    >>> from tools.add_module_docstrings import main
-    >>> main()  # doctest: +ELLIPSIS
-    """
+    """Walk the source tree and inject docstrings for any bare modules found."""
     for path in SRC.rglob("*.py"):
         insert_docstring(path)
 

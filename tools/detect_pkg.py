@@ -1,9 +1,4 @@
-"""Overview of detect pkg.
-
-This module bundles detect pkg logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
-"""
+"""Determine which kgfoundry packages should be targeted by tooling."""
 
 from __future__ import annotations
 
@@ -15,19 +10,22 @@ SRC = ROOT / "src"
 
 
 def _candidate_names() -> list[str]:
-    """Compute candidate names.
+    """Collect package names discoverable from the repository layout.
 
-    Carry out the candidate names operation.
+    The search considers ``src/<package>/__init__.py`` as well as top-level
+    packages that expose an ``__init__`` file. Utility directories such as
+    ``docs`` and ``tools`` are ignored.
 
     Returns
     -------
-    List[str]
-        Description of return value.
+    list[str]
+        Sorted list of unique package directory names.
 
     Raises
     ------
     SystemExit
-        Raised when validation fails.
+        Raised when no package candidates are found, mirroring the behaviour of
+        the historical shell script this tool replaces.
     """
     names: set[str] = set()
     if SRC.exists():
@@ -44,20 +42,16 @@ def _candidate_names() -> list[str]:
 
 
 def detect_packages() -> list[str]:
-    """Compute detect packages.
+    """Return preferred package names ordered by namespace relevance.
 
-    Carry out the detect packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    Packages containing ``kgfoundry`` bubble to the front, followed by other
+    lowercase candidates. The ordering matches the expectations of scripts that
+    need a deterministic primary package name.
 
     Returns
     -------
-    List[str]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.detect_pkg import detect_packages
-    >>> result = detect_packages()
-    >>> result  # doctest: +ELLIPSIS
+    list[str]
+        Package names ordered by preference.
     """
     candidates = _candidate_names()
     lowers = [c for c in candidates if c.islower()]
@@ -67,20 +61,13 @@ def detect_packages() -> list[str]:
 
 
 def detect_primary() -> str:
-    """Compute detect primary.
-
-    Carry out the detect primary operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Return the first preferred package name.
 
     Returns
     -------
     str
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.detect_pkg import detect_primary
-    >>> result = detect_primary()
-    >>> result  # doctest: +ELLIPSIS
+        The canonical package name used by tooling that only supports a single
+        package.
     """
     packages = detect_packages()
     return packages[0]
