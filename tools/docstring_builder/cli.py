@@ -766,8 +766,7 @@ def _print_failure_summary(payload: Mapping[str, object]) -> None:  # noqa: C901
             status = _coerce_str(entry.get("status"), "unknown")
             message = _coerce_str(entry.get("message"), "no additional details")
             lines.append(f"    - {file_name}: {status} ({message})")
-    for line in lines:
-        print(line, file=sys.stderr)
+    LOGGER.error("%s", "\n".join(lines))
 
 
 def _run(  # noqa: C901, PLR0912, PLR0915
