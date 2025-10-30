@@ -8,6 +8,7 @@
 - [ ] 0.2 Schema draft and sample
     - [ ] 0.2.1 Draft `docs/_build/schema_agent_catalog.json` (first pass) aligning with design.
     - [ ] 0.2.2 Author a small sample catalog JSON that validates against the draft.
+    - [ ] 0.2.3 Encode ordering semantics: use arrays for any ordered data (e.g., `anchors.remap_order`, `exemplars`).
     - AC:
         - `jsonschema` validation passes for sample; schema committed.
 
@@ -39,9 +40,10 @@
 
 - [ ] 2.2 Stable IDs and anchors
     - [ ] 2.2.1 Normalize AST (strip comments/docstrings/whitespace) and compute `symbol_id = sha256(qname + ast_text)`.
-    - [ ] 2.2.2 Record anchors: `start_line`/`end_line` per symbol; implement fuzzy remap resolver.
+    - [ ] 2.2.2 Record anchors: `start_line`/`end_line` per symbol; compute `anchors.cst_fingerprint` (token trigrams).
+    - [ ] 2.2.3 Implement `anchors.remap_order` (array) and fuzzy remap resolver: `[symbol_id, cst_fingerprint, name_arity, nearest_text]`.
     - AC:
-        - IDs stable across runs; fuzzy remap resolves after ±20-line drift in tests.
+        - IDs stable across runs; remap survives ±20-line drift and docstring/formatting churn.
 
 - [ ] 2.3 Quality signals and metrics
     - [ ] 2.3.1 Aggregate mypy status, ruff rules, pydoclint parity, interrogate coverage, doctest status.
@@ -49,7 +51,14 @@
     - AC:
         - Quality/metrics present for sample modules; missing inputs handled gracefully.
 
-## 3. Semantic Index
+- [ ] 2.4 Agent Hints, Change Impact, Exemplars
+    - [ ] 2.4.1 Populate `agent_hints` per module/symbol: `intent_tags`, `safe_ops`, `tests_to_run`, `perf_budgets`, `breaking_change_notes`.
+    - [ ] 2.4.2 Populate `change_impact`: `callers`, `callees`, `tests`, `codeowners`, `churn_last_n`; optionally write as a separate shard for large repos.
+    - [ ] 2.4.3 Populate `exemplars` per symbol with `{title, language, snippet, counter_example?, negative_prompts?, context_notes?}`.
+    - AC:
+        - Fields present in catalog; portal renders them later; clients can query them.
+
+## 3. Semantic Index & SQLite Catalog
 - [ ] 3.1 Embedding and index build
     - [ ] 3.1.1 Choose embedding model (MiniLM or configured); implement encoder; generate vectors for symbols.
     - [ ] 3.1.2 Build FAISS index and sidecar mapping `symbol_id`→row; persist paths in catalog.
@@ -62,9 +71,15 @@
     - AC:
         - Internal benchmark achieves MRR@10 ≥ target; lexical fallback works when index absent.
 
+- [ ] 3.3 Optional SQLite catalog
+    - [ ] 3.3.1 Define DDL for `catalog.sqlite` (read-only): `symbols`, `calls`, `anchors`, `fts`, `ranking_features`.
+    - [ ] 3.3.2 Export SQLite during generation; loader tries SQLite first, falls back to JSON shards.
+    - AC:
+        - Loader uses SQLite when present; fallback works.
+
 ## 4. Catalog Assembly & Validation
 - [ ] 4.1 Compose catalog
-    - [ ] 4.1.1 Assemble `artifacts`, per-package modules, graphs, quality, metrics, anchors, IDs.
+    - [ ] 4.1.1 Assemble `artifacts`, per-package modules, graphs, quality, metrics, anchors (with `cst_fingerprint`/`remap_order`), IDs, hints/impact/exemplars.
     - [ ] 4.1.2 Validate against schema; produce human-readable errors on failure.
     - AC:
         - `docs/_build/agent_catalog.json` validates; top-level pointers resolvable.
@@ -75,7 +90,7 @@
     - AC:
         - Large catalogs produce shards; root references resolve in tests.
 
-## 5. Typed Clients & CLI
+## 5. Typed Clients, CLI, and Stdio Session Server
 - [ ] 5.1 Python client
     - [ ] 5.1.1 Define Pydantic models for catalog; implement shard-aware loader.
     - [ ] 5.1.2 Helpers: `list_packages`, `list_modules`, `get_module`, `find_callers`, `search`.
@@ -87,10 +102,22 @@
     - AC:
         - Unit tests pass in Node/Deno; importable by examples.
 
-- [ ] 5.3 agentctl CLI
-    - [ ] 5.3.1 Implement commands: `list-modules`, `find-callers`, `show-quality`, `search` with exit codes 0/2/3.
+- [ ] 5.3 `catalogctl` CLI (serverless)
+    - [ ] 5.3.1 Implement commands: `capabilities`, `symbol`, `find-callers`, `find-callees`, `search`, `open-anchor`, `change-impact`, `suggest-tests`, `explain-ranking` with exit codes 0/2/3 and JSON/NDJSON output.
     - AC:
         - CLI returns expected outputs and exit codes; help docs present.
+
+- [ ] 5.4 Editor-activated stdio session server (no daemon)
+    - [ ] 5.4.1 Implement MCP/JSON-RPC over stdio process `catalogctl-mcp` (or equivalent) spawned by editor/agent; handshake `capabilities`.
+    - [ ] 5.4.2 Maintain warm in-memory cache during session; exit on stdin EOF or explicit shutdown.
+    - AC:
+        - Session queries are faster due to warm cache; process exits cleanly; no TCP ports opened.
+
+- [ ] 5.5 OpenAPI & SDKs
+    - [ ] 5.5.1 Emit OpenAPI 3.2 doc for callable procedures `docs/_build/agent_api_openapi.json`.
+    - [ ] 5.5.2 Generate Python/TS SDKs; errors follow RFC9457 Problem Details.
+    - AC:
+        - OpenAPI validates; SDKs compile; Problem Details contract verified in tests.
 
 ## 6. Agent Portal
 - [ ] 6.1 MVP rendering
@@ -102,9 +129,9 @@
 - [ ] 6.2 Enriched UX
     - [ ] 6.2.1 Add facets (package, stability, churn, coverage, parity) and breadcrumbs.
     - [ ] 6.2.2 Inline dependency graphs per module (or link to focused views).
-    - [ ] 6.2.3 Show examples and metrics panels when available.
+    - [ ] 6.2.3 Show examples and metrics panels when available; render `agent_hints`; add "Edit here" impact card and "Insert exemplar" buttons.
     - AC:
-        - Filters limit results correctly; breadcrumbs reflect hierarchy; graphs render for sample modules.
+        - Filters limit results correctly; breadcrumbs reflect hierarchy; graphs render; hints/impact/exemplars visible and actionable.
 
 - [ ] 6.3 Accessibility & responsiveness
     - [ ] 6.3.1 Add ARIA roles/labels; ensure keyboard navigation; responsive CSS.
@@ -134,6 +161,13 @@
     - AC:
         - Load tests demonstrate budgets met on representative hardware.
 
+- [ ] 7.4 Docker integration (serverless)
+    - [ ] 7.4.1 Multi-stage Dockerfile builds wheel with `uv build`; install into slim runtime.
+    - [ ] 7.4.2 COPY `catalog_artifacts/` → `/srv/catalog`; set `CATALOG_ROOT=/srv/catalog`.
+    - [ ] 7.4.3 Ensure no daemons/ports; editor/agent calls `catalogctl` or spawns stdio process on demand.
+    - AC:
+        - Container executes CLI/stdio flows with no network exposure.
+
 ## 8. Hosted Mode (Optional)
 - [ ] 8.1 RBAC and audit
     - [ ] 8.1.1 Implement role checks (viewer/contributor/admin) behind feature flag.
@@ -143,7 +177,8 @@
 
 ## 9. Documentation
 - [ ] 9.1 Agent & Human README
-    - [ ] 9.1.1 Expand `docs/agent_portal_readme.md` with schema fields, link modes, client/CLI examples, and portal usage.
+    - [ ] 9.1.1 Expand `docs/agent_portal_readme.md` with schema fields, link modes, client/CLI examples, portal usage.
+    - [ ] 9.1.2 Add CLI reference for `catalogctl` and stdio/MCP usage examples.
     - AC:
         - Docs build cleanly; examples runnable.
 
@@ -153,18 +188,26 @@
 - [ ] 10.2 Link tests
     - [ ] 10.2.1 Resolve a sample of source/page/fjson/editor/GitHub links.
 - [ ] 10.3 Portal tests
-    - [ ] 10.3.1 Snapshot and interaction tests for search, facets, breadcrumbs.
+    - [ ] 10.3.1 Snapshot and interaction tests for search, facets, breadcrumbs, hints/impact/exemplars.
 - [ ] 10.4 Client & CLI tests
-    - [ ] 10.4.1 Python/TS unit tests; CLI exit codes and output contract.
+    - [ ] 10.4.1 Python/TS client unit tests; CLI exit codes and output contract; `catalogctl` parity with stdio methods.
 - [ ] 10.5 Search quality
     - [ ] 10.5.1 Evaluate hybrid search; assert MRR@10 ≥ target on benchmark set.
 - [ ] 10.6 CI integration
-    - [ ] 10.6.1 Add jobs for schema validation, linkcheck, analytics write, and PR annotations summary.
+    - [ ] 10.6.1 Add jobs for schema validation, linkcheck, analytics write, PR annotations.
+- [ ] 10.7 OpenAPI/SDK validation
+    - [ ] 10.7.1 Validate OpenAPI 3.2; compile generated SDKs; Problem Details tests.
+- [ ] 10.8 Stdio server tests
+    - [ ] 10.8.1 Spawn stdio process; handshake `capabilities`; run queries; ensure clean shutdown.
+- [ ] 10.9 Ordering semantics tests
+    - [ ] 10.9.1 Verify arrays used for ordered sequences (e.g., `remap_order`); ensure consumers do not rely on object key order.
+- [ ] 10.10 CST remap tests
+    - [ ] 10.10.1 Verify anchor remap order and CST fingerprint fallback under docstring/formatting churn.
     - AC:
-        - CI fails on catalog/schema/link/quality regressions with clear messages.
+        - CI fails on catalog/schema/link/quality/API regressions with clear messages.
 
 ## 11. Acceptance
 - [ ] `agent_catalog.json` present and valid (or sharded with root index); portal navigable offline.
 - [ ] Links open correct targets for `editor` and `github` modes.
-- [ ] Clients/CLI queries return correct results; performance budgets met; quality targets satisfied.
+- [ ] Clients/CLI and stdio server work; performance budgets met; quality targets satisfied; OpenAPI/SDK validated.
 

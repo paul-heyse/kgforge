@@ -69,6 +69,16 @@ We generate numerous artifacts for documentation consumers: `docs/_build/docfact
    - Budget targets: cold-load portal < 1.5s locally; catalog resolution (first query) < 300ms.
    - Load testing: ensure portal handles large catalogs (e.g., 10k symbols) with responsive search.
 
+11) Machine-first APIs (optional, no scraping)
+   - Editor-activated stdio process (session-scoped, not a daemon): MCP or JSON-RPC over stdio, spawned by the editor/agent. Caches catalog in RAM per session and exits on EOF/idle. No TCP ports; offline-friendly.
+   - On-demand CLI `catalogctl` for one-shot JSON responses; optional `catalogctl-mcp` wrapper that adapts stdio transport to CLI calls.
+   - Provide an OpenAPI 3.2 description for callable procedures; generate Python/TS SDKs. Errors follow RFC9457 Problem Details.
+
+12) Agent Hints, Change Impact, Exemplars
+   - `agent_hints` captures intent tags, safe operations, tests to run, perf budgets, and breaking-change notes; surfaced in portal cards and clients.
+   - `change_impact` aggregates callers, callees, tests covering the symbol, codeowners, and churn. Optionally stored as a separate shard for large repos.
+   - `exemplars` list per symbol with usage snippets, counter-examples, negative prompts, and optional context notes.
+
 ## Implementation details
 Files to add:
 - `tools/docs/build_agent_catalog.py`
@@ -96,6 +106,12 @@ Files to add:
     - Metrics: compute mccabe complexity and LOC per symbol/module; get `last_modified` via `git log -1 --format=%cI` per file; map `codeowners` from CODEOWNERS (optional).
     - Semantic index: concatenate symbol name + docstring + brief context; encode with MiniLM (configurable); write FAISS index and JSON mapping `symbol_id` → row.
 
+  - API/micro-server (optional):
+    - Implement a stdio process (MCP or JSON-RPC over stdio), spawned by the editor/agent. Maintain an in-memory cache of the catalog for the process lifetime; exit on stdin EOF or explicit shutdown request.
+    - Expose methods: `capabilities()`, `find_callers(symbol_id)`, `find_callees(symbol_id)`, `search(q, facets)`, `open_anchor(symbol_id, mode)`, `change_impact(symbol_id)`, `suggest_tests(symbol_id)`, `explain_ranking(doc_id)`.
+    - Provide a CLI parity tool `catalogctl` with equivalent subcommands producing JSON/NDJSON.
+    - Emit an OpenAPI 3.2 doc (`docs/_build/agent_api_openapi.json`) for the callable procedures and code-generate SDKs (Python/TS). Error responses follow RFC9457 (type/title/status/detail/instance).
+
 - `tools/docs/render_agent_portal.py`
   - Inputs: `docs/_build/agent_catalog.json`
   - Render to `site/_build/agent/index.html`:
@@ -106,6 +122,8 @@ Files to add:
      - Inline dependency graphs per module (optional) or links to focused views
     - Accessibility: ARIA roles `banner`, `navigation`, `main`, `search` and labelled controls; keyboard tab order; responsive CSS grid.
     - Search algorithm: lexical search over titles/qnames; if semantic index is available, fetch top-K lexical then rerank by vector similarity with weight α (default 0.6).
+    - Impact cards: for each module/symbol, show callers/callees/tests/owners/churn; "Edit here" reveals impacted files and suggested commit skeletons.
+    - Exemplars: show copy-ready snippets and counter-examples; "Insert exemplar" quick action.
 
 - `tools/docs/build_artifacts.py`
   - Append steps to invoke the two scripts and print status lines on success/failure.
@@ -182,6 +200,16 @@ Files to add:
                 },
                 "docfacts": {"type": "array", "items": {"type": "string"}},
                 "symbol_id": {"type": "string"},
+                "agent_hints": {
+                  "type": "object",
+                  "properties": {
+                    "intent_tags": {"type": "array", "items": {"type": "string"}},
+                    "safe_ops": {"type": "array", "items": {"type": "string"}},
+                    "tests_to_run": {"type": "array", "items": {"type": "string"}},
+                    "perf_budgets": {"type": "object"},
+                    "breaking_change_notes": {"type": "array", "items": {"type": "string"}}
+                  }
+                },
                 "quality": {
                   "type": "object",
                   "properties": {
@@ -207,6 +235,30 @@ Files to add:
                     "calls": {"type": "array", "items": {"type": "string"}}
                   }
                 },
+                "change_impact": {
+                  "type": "object",
+                  "properties": {
+                    "callers": {"type": "array", "items": {"type": "string"}},
+                    "callees": {"type": "array", "items": {"type": "string"}},
+                    "tests": {"type": "array", "items": {"type": "string"}},
+                    "codeowners": {"type": "array", "items": {"type": "string"}},
+                    "churn_last_n": {"type": "integer"}
+                  }
+                },
+                "exemplars": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "title": {"type": "string"},
+                      "language": {"type": "string"},
+                      "snippet": {"type": "string"},
+                      "counter_example": {"type": "string"},
+                      "negative_prompts": {"type": "array", "items": {"type": "string"}},
+                      "context_notes": {"type": "string"}
+                    }
+                  }
+                },
                 "stability": {"type": "string"},
                 "deprecated": {"type": "boolean"}
               }
@@ -228,6 +280,18 @@ Files to add:
 - Root index: `docs/_build/agent_catalog.json`.
 - Shards: `docs/_build/agent_catalog.pkg.<package>.json` and optional `docs/_build/agent_catalog.mod.<module>.json` when a package exceeds 1000 modules.
 - Trigger thresholds: 20MB or >2000 modules overall; package-level shard if package >500 modules.
+
+## Storage layout and loading order
+- Ground truth: JSON shards under `docs/_build/`; optional `catalog.sqlite` (read-only) containing `symbols`, `calls`, `anchors`, `fts`, and `ranking_features`.
+- Load order: try `catalog.sqlite` first for performance; fall back to shards. Controlled by `CATALOG_ROOT` env var.
+
+## Docker integration (non-daemon)
+- Multi-stage Dockerfile with `uv build` to produce a wheel; install into slim runtime image.
+- Copy catalog artifacts into `/srv/catalog`; set `CATALOG_ROOT=/srv/catalog`.
+- No daemon/ports: editors/agents invoke `catalogctl` or spawn the stdio process (`catalogctl-mcp`) on demand.
+
+## Ordering semantics (JSON Schema)
+- JSON objects are unordered; where ordering matters (e.g., `anchors.remap_order`), represent as arrays with explicit sequence.
 
 ## Clients and CLI surface
 - Python client
