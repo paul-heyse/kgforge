@@ -34,8 +34,7 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
 
         <!-- auto:docstring-builder v1 -->
 
-        Describe the data structure and how instances collaborate with the surrounding package.
-        Highlight how the class supports nearby modules to guide readers through the codebase.
+        Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
         """
 
         def labels(self, *args: object, **kwargs: object) -> _NoopMetric:
@@ -48,15 +47,15 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             Parameters
             ----------
             *args : object, optional, by default ()
-            TODO: describe ``args``.
+            Describe `args`.
             **kwargs : object, optional, by default {}
-            TODO: describe ``kwargs``.
+            Describe `kwargs`.
 
 
             Returns
             -------
             _NoopMetric
-            TODO: describe return value.
+            Describe return value.
             """
             return self
 
@@ -70,9 +69,9 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             Parameters
             ----------
             *args : object, optional, by default ()
-            TODO: describe ``args``.
+            Describe `args`.
             **kwargs : object, optional, by default {}
-            TODO: describe ``kwargs``.
+            Describe `kwargs`.
             """
             return
 
@@ -86,9 +85,9 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             Parameters
             ----------
             *args : object, optional, by default ()
-            TODO: describe ``args``.
+            Describe `args`.
             **kwargs : object, optional, by default {}
-            TODO: describe ``kwargs``.
+            Describe `kwargs`.
             """
             return
 
@@ -102,9 +101,9 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             Parameters
             ----------
             *args : object, optional, by default ()
-            TODO: describe ``args``.
+            Describe `args`.
             **kwargs : object, optional, by default {}
-            TODO: describe ``kwargs``.
+            Describe `kwargs`.
             """
             return
 
@@ -118,15 +117,15 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
         Parameters
         ----------
         *args : object, optional, by default ()
-        TODO: describe ``args``.
+        Describe `args`.
         **kwargs : object, optional, by default {}
-        TODO: describe ``kwargs``.
+        Describe `kwargs`.
 
 
         Returns
         -------
         _NoopMetric
-        TODO: describe return value.
+        Describe return value.
         """
         return _NoopMetric()
 

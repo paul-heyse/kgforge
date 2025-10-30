@@ -140,14 +140,8 @@ def auth(authorization: str | None = Header(default=None)) -> None:
     Parameters
     ----------
     authorization : str | None, optional
-    Describe ``authorization``.
-    Defaults to ``Header(None)``.
-
-
-
-
-
-
+        Describe ``authorization``.
+        Defaults to ``Header(None)``.
 
     Raises
     ------
@@ -174,7 +168,7 @@ def healthz() -> dict[str, Any]:
     Returns
     -------
     dict[str, Any]
-    Describe return value.
+        Describe return value.
     """
     return {
         "status": "ok",
@@ -199,20 +193,14 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
     Parameters
     ----------
     lists : list[list[tuple[str, float]]]
-    Describe ``lists``.
+        Describe ``lists``.
     k_rrf : int
-    Describe ``k_rrf``.
-
-
-
-
-
-
+        Describe ``k_rrf``.
 
     Returns
     -------
     dict[str, float]
-    Describe return value.
+        Describe return value.
     """
     scores: dict[str, float] = {}
     for hits in lists:
@@ -237,26 +225,20 @@ def apply_kg_boosts(
     Parameters
     ----------
     cands : dict[str, float]
-    Describe ``cands``.
+        Describe ``cands``.
     query : str
-    Describe ``query``.
+        Describe ``query``.
     direct : float, optional
-    Describe ``direct``.
-    Defaults to ``0.08``.
+        Describe ``direct``.
+        Defaults to ``0.08``.
     one_hop : float, optional
-    Describe ``one_hop``.
-    Defaults to ``0.04``.
-
-
-
-
-
-
+        Describe ``one_hop``.
+        Defaults to ``0.04``.
 
     Returns
     -------
     dict[str, float]
-    Describe return value.
+        Describe return value.
     """
     q_concepts = set()
     for w in query.lower().split():
@@ -288,21 +270,15 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     Parameters
     ----------
     req : SearchRequest
-    Describe ``req``.
+        Describe ``req``.
     _ : None, optional
-    Describe ``_``.
-    Defaults to ``Depends(auth)``.
-
-
-
-
-
-
+        Describe ``_``.
+        Defaults to ``Depends(auth)``.
 
     Returns
     -------
     dict[str, Any]
-    Describe return value.
+        Describe return value.
     """
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
@@ -372,21 +348,15 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     Parameters
     ----------
     body : Mapping[str, Any]
-    Describe ``body``.
+        Describe ``body``.
     _ : None, optional
-    Describe ``_``.
-    Defaults to ``Depends(auth)``.
-
-
-
-
-
-
+        Describe ``_``.
+        Defaults to ``Depends(auth)``.
 
     Returns
     -------
     dict[str, Any]
-    Describe return value.
+        Describe return value.
     """
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring

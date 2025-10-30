@@ -60,31 +60,25 @@ class JsonFormatter(logging.Formatter):
     Parameters
     ----------
     fmt : inspect._empty, optional
-    Describe ``fmt``.
-    Defaults to ``None``.
+        Describe ``fmt``.
+        Defaults to ``None``.
     datefmt : inspect._empty, optional
-    Describe ``datefmt``.
-    Defaults to ``None``.
+        Describe ``datefmt``.
+        Defaults to ``None``.
     style : inspect._empty, optional
-    Describe ``style``.
-    Defaults to ``'%'``.
+        Describe ``style``.
+        Defaults to ``'%'``.
     validate : inspect._empty, optional
-    Describe ``validate``.
-    Defaults to ``True``.
+        Describe ``validate``.
+        Defaults to ``True``.
     defaults : inspect._empty, optional
-    Describe ``defaults``.
-    Defaults to ``None``.
-
-
-
-
-
-
+        Describe ``defaults``.
+        Defaults to ``None``.
 
     Returns
     -------
     inspect._empty
-    Describe return value.
+        Describe return value.
     """
 
     def format(self, record: logging.LogRecord) -> str:
@@ -97,18 +91,12 @@ class JsonFormatter(logging.Formatter):
         Parameters
         ----------
         record : logging.LogRecord
-        Describe ``record``.
-
-
-
-
-
-
+            Describe ``record``.
 
         Returns
         -------
         str
-        Describe return value.
+            Describe return value.
         """
         data = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
@@ -134,8 +122,8 @@ def setup_logging(level: int = logging.INFO) -> None:
     Parameters
     ----------
     level : int, optional
-    Describe ``level``.
-    Defaults to ``20``.
+        Describe ``level``.
+        Defaults to ``20``.
     """
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())

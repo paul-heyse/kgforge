@@ -52,18 +52,14 @@ def load_config(path: str) -> dict[str, Any]:
     Parameters
     ----------
     path : str
-    Describe ``path``.
-
-
-
-
-
-
+        Describe ``path``.
 
     Returns
     -------
     dict[str, Any]
-    Describe return value.
+        Describe return value.
+
+
 
 
 

@@ -27,21 +27,24 @@ class BuilderCache:
         self._entries: dict[str, CacheEntry] = {}
         self._lock = threading.Lock()
         if path.exists():
+            raw_payload = path.read_text(encoding="utf-8")
             try:
-                data = json.loads(path.read_text(encoding="utf-8"))
-                if not isinstance(data, dict):
-                    raise TypeError("Cache contents must be a mapping.")
-                for key, value in data.items():
-                    if not isinstance(value, dict):
-                        raise TypeError("Cache entry values must be mappings.")
+                data = json.loads(raw_payload)
+            except json.JSONDecodeError as exc:
+                self._handle_load_error("Invalid JSON payload", exc)
+                return
+            if not isinstance(data, dict):
+                self._handle_load_error("Cache contents must be a mapping.")
+                return
+            for key, value in data.items():
+                if not isinstance(value, dict):
+                    self._handle_load_error("Cache entry values must be mappings.")
+                    return
+                try:
                     self._entries[key] = CacheEntry(**value)
-            except (json.JSONDecodeError, TypeError) as exc:
-                logger.warning(
-                    "Failed to load builder cache from %s: %s. Resetting cache.",
-                    path,
-                    exc,
-                )
-                self.clear()
+                except TypeError as exc:
+                    self._handle_load_error("Cache entry schema mismatch.", exc)
+                    return
 
     def needs_update(self, file_path: Path, config_hash: str) -> bool:
         """Determine whether a file requires regeneration."""
@@ -75,6 +78,23 @@ class BuilderCache:
             self._entries.clear()
         if self.path.exists():
             self.path.unlink()
+
+    def _handle_load_error(self, reason: str, exc: Exception | None = None) -> None:
+        """Log and reset the cache when persisted data is invalid."""
+        if exc is not None:
+            logger.warning(
+                "Failed to load builder cache from %s. Resetting cache: %s",
+                self.path,
+                reason,
+                exc_info=exc,
+            )
+        else:
+            logger.warning(
+                "Failed to load builder cache from %s. Resetting cache: %s",
+                self.path,
+                reason,
+            )
+        self.clear()
 
 
 __all__ = ["BuilderCache", "CacheEntry"]

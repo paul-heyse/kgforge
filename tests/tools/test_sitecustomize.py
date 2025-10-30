@@ -98,4 +98,3 @@ def test_protocol_objects_are_accessible() -> None:
     assert sitecustomize.DocstringMetaProto
     assert sitecustomize.DocstringAttrProto
     assert sitecustomize.DocstringYieldsProto
-

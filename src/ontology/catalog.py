@@ -26,10 +26,10 @@ class Concept:
     Parameters
     ----------
     id : str
-    Describe ``id``.
+        Describe ``id``.
     label : str | None, optional
-    Describe ``label``.
-    Defaults to ``None``.
+        Describe ``label``.
+        Defaults to ``None``.
     """
 
     id: str
@@ -77,7 +77,7 @@ class OntologyCatalog:
     Parameters
     ----------
     concepts : list[Concept]
-    Describe ``concepts``.
+        Describe ``concepts``.
     """
 
     def __init__(self, concepts: list[Concept]) -> None:
@@ -90,7 +90,7 @@ class OntologyCatalog:
         Parameters
         ----------
         concepts : list[Concept]
-        Describe ``concepts``.
+            Describe ``concepts``.
         """
         self.by_id = {concept.id: concept for concept in concepts}
 
@@ -104,21 +104,15 @@ class OntologyCatalog:
         Parameters
         ----------
         concept_id : str
-        Describe ``concept_id``.
+            Describe ``concept_id``.
         depth : int, optional
-        Describe ``depth``.
-        Defaults to ``1``.
-
-
-
-
-
-
+            Describe ``depth``.
+            Defaults to ``1``.
 
         Returns
         -------
         set[str]
-        Describe return value.
+            Describe return value.
         """
         # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return set()
@@ -133,17 +127,11 @@ class OntologyCatalog:
         Parameters
         ----------
         concept_id : str
-        Describe ``concept_id``.
-
-
-
-
-
-
+            Describe ``concept_id``.
 
         Returns
         -------
         dict[str, Any]
-        Describe return value.
+            Describe return value.
         """
         return {}

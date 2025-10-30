@@ -79,23 +79,17 @@ class SPLADEv3Encoder:
     Parameters
     ----------
     model_id : str, optional
-    Describe ``model_id``.
-    Defaults to ``'naver/splade-v3-distilbert'``.
+        Describe ``model_id``.
+        Defaults to ``'naver/splade-v3-distilbert'``.
     device : str, optional
-    Describe ``device``.
-    Defaults to ``'cuda'``.
+        Describe ``device``.
+        Defaults to ``'cuda'``.
     topk : int, optional
-    Describe ``topk``.
-    Defaults to ``256``.
+        Describe ``topk``.
+        Defaults to ``256``.
     max_seq_len : int, optional
-    Describe ``max_seq_len``.
-    Defaults to ``512``.
-
-
-
-
-
-
+        Describe ``max_seq_len``.
+        Defaults to ``512``.
 
     Raises
     ------
@@ -121,17 +115,17 @@ class SPLADEv3Encoder:
         Parameters
         ----------
         model_id : str, optional
-        Describe ``model_id``.
-        Defaults to ``'naver/splade-v3-distilbert'``.
+            Describe ``model_id``.
+            Defaults to ``'naver/splade-v3-distilbert'``.
         device : str, optional
-        Describe ``device``.
-        Defaults to ``'cuda'``.
+            Describe ``device``.
+            Defaults to ``'cuda'``.
         topk : int, optional
-        Describe ``topk``.
-        Defaults to ``256``.
+            Describe ``topk``.
+            Defaults to ``256``.
         max_seq_len : int, optional
-        Describe ``max_seq_len``.
-        Defaults to ``512``.
+            Describe ``max_seq_len``.
+            Defaults to ``512``.
         """
         self.model_id = model_id
         self.device = device
@@ -148,18 +142,14 @@ class SPLADEv3Encoder:
         Parameters
         ----------
         texts : list[str]
-        Describe ``texts``.
-
-
-
-
-
-
+            Describe ``texts``.
 
         Returns
         -------
         list[tuple[list[int], list[float]]]
-        Describe return value.
+            Describe return value.
+
+
 
 
 
@@ -193,7 +183,7 @@ class PureImpactIndex:
     Parameters
     ----------
     index_dir : str
-    Describe ``index_dir``.
+        Describe ``index_dir``.
     """
 
     def __init__(self, index_dir: str) -> None:
@@ -206,7 +196,7 @@ class PureImpactIndex:
         Parameters
         ----------
         index_dir : str
-        Describe ``index_dir``.
+            Describe ``index_dir``.
         """
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
@@ -224,18 +214,12 @@ class PureImpactIndex:
         Parameters
         ----------
         text : str
-        Describe ``text``.
-
-
-
-
-
-
+            Describe ``text``.
 
         Returns
         -------
         list[str]
-        Describe return value.
+            Describe return value.
         """
         return [token.lower() for token in TOKEN_RE.findall(text)]
 
@@ -249,7 +233,7 @@ class PureImpactIndex:
         Parameters
         ----------
         docs_iterable : Iterable[tuple[str, dict[str, str]]]
-        Describe ``docs_iterable``.
+            Describe ``docs_iterable``.
         """
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
@@ -306,20 +290,14 @@ class PureImpactIndex:
         Parameters
         ----------
         query : str
-        Describe ``query``.
+            Describe ``query``.
         k : int
-        Describe ``k``.
-
-
-
-
-
-
+            Describe ``k``.
 
         Returns
         -------
         list[tuple[str, float]]
-        Describe return value.
+            Describe return value.
         """
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -343,16 +321,10 @@ class LuceneImpactIndex:
     Parameters
     ----------
     index_dir : str
-    Describe ``index_dir``.
+        Describe ``index_dir``.
     query_encoder : str, optional
-    Describe ``query_encoder``.
-    Defaults to ``'naver/splade-v3-distilbert'``.
-
-
-
-
-
-
+        Describe ``query_encoder``.
+        Defaults to ``'naver/splade-v3-distilbert'``.
 
     Raises
     ------
@@ -370,10 +342,10 @@ class LuceneImpactIndex:
         Parameters
         ----------
         index_dir : str
-        Describe ``index_dir``.
+            Describe ``index_dir``.
         query_encoder : str, optional
-        Describe ``query_encoder``.
-        Defaults to ``'naver/splade-v3-distilbert'``.
+            Describe ``query_encoder``.
+            Defaults to ``'naver/splade-v3-distilbert'``.
         """
         self.index_dir = index_dir
         self.query_encoder = query_encoder
@@ -410,20 +382,16 @@ class LuceneImpactIndex:
         Parameters
         ----------
         query : str
-        Describe ``query``.
+            Describe ``query``.
         k : int
-        Describe ``k``.
-
-
-
-
-
-
+            Describe ``k``.
 
         Returns
         -------
         list[tuple[str, float]]
-        Describe return value.
+            Describe return value.
+
+
 
 
 
@@ -460,23 +428,17 @@ def get_splade(
     Parameters
     ----------
     backend : str
-    Describe ``backend``.
+        Describe ``backend``.
     index_dir : str
-    Describe ``index_dir``.
+        Describe ``index_dir``.
     query_encoder : str, optional
-    Describe ``query_encoder``.
-    Defaults to ``'naver/splade-v3-distilbert'``.
-
-
-
-
-
-
+        Describe ``query_encoder``.
+        Defaults to ``'naver/splade-v3-distilbert'``.
 
     Returns
     -------
     PureImpactIndex | LuceneImpactIndex
-    Describe return value.
+        Describe return value.
     """
     if backend == "lucene":
         try:

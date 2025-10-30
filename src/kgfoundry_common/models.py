@@ -77,43 +77,43 @@ class Doc(BaseModel):
     Parameters
     ----------
     id : Id
-    Describe ``id``.
+        Describe ``id``.
     openalex_id : str | None, optional
-    Describe ``openalex_id``.
-    Defaults to ``None``.
+        Describe ``openalex_id``.
+        Defaults to ``None``.
     doi : str | None, optional
-    Describe ``doi``.
-    Defaults to ``None``.
+        Describe ``doi``.
+        Defaults to ``None``.
     arxiv_id : str | None, optional
-    Describe ``arxiv_id``.
-    Defaults to ``None``.
+        Describe ``arxiv_id``.
+        Defaults to ``None``.
     pmcid : str | None, optional
-    Describe ``pmcid``.
-    Defaults to ``None``.
+        Describe ``pmcid``.
+        Defaults to ``None``.
     title : str, optional
-    Describe ``title``.
-    Defaults to ``''``.
+        Describe ``title``.
+        Defaults to ``''``.
     authors : list[str], optional
-    Describe ``authors``.
-    Defaults to ``<factory>``.
+        Describe ``authors``.
+        Defaults to ``<factory>``.
     pub_date : str | None, optional
-    Describe ``pub_date``.
-    Defaults to ``None``.
+        Describe ``pub_date``.
+        Defaults to ``None``.
     license : str | None, optional
-    Describe ``license``.
-    Defaults to ``None``.
+        Describe ``license``.
+        Defaults to ``None``.
     language : str | None, optional
-    Describe ``language``.
-    Defaults to ``'en'``.
+        Describe ``language``.
+        Defaults to ``'en'``.
     pdf_uri : str, optional
-    Describe ``pdf_uri``.
-    Defaults to ``''``.
+        Describe ``pdf_uri``.
+        Defaults to ``''``.
     source : str, optional
-    Describe ``source``.
-    Defaults to ``'unknown'``.
+        Describe ``source``.
+        Defaults to ``'unknown'``.
     content_hash : str | None, optional
-    Describe ``content_hash``.
-    Defaults to ``None``.
+        Describe ``content_hash``.
+        Defaults to ``None``.
     """
 
     id: Id
@@ -143,18 +143,18 @@ class DoctagsAsset(BaseModel):
     Parameters
     ----------
     doc_id : Id
-    Describe ``doc_id``.
+        Describe ``doc_id``.
     doctags_uri : str
-    Describe ``doctags_uri``.
+        Describe ``doctags_uri``.
     pages : int
-    Describe ``pages``.
+        Describe ``pages``.
     vlm_model : str
-    Describe ``vlm_model``.
+        Describe ``vlm_model``.
     vlm_revision : str
-    Describe ``vlm_revision``.
+        Describe ``vlm_revision``.
     avg_logprob : float | None, optional
-    Describe ``avg_logprob``.
-    Defaults to ``None``.
+        Describe ``avg_logprob``.
+        Defaults to ``None``.
     """
 
     doc_id: Id
@@ -177,19 +177,19 @@ class Chunk(BaseModel):
     Parameters
     ----------
     id : Id
-    Describe ``id``.
+        Describe ``id``.
     doc_id : Id
-    Describe ``doc_id``.
+        Describe ``doc_id``.
     section : str | None
-    Describe ``section``.
+        Describe ``section``.
     start_char : int
-    Describe ``start_char``.
+        Describe ``start_char``.
     end_char : int
-    Describe ``end_char``.
+        Describe ``end_char``.
     tokens : int
-    Describe ``tokens``.
+        Describe ``tokens``.
     doctags_span : dict[str, int]
-    Describe ``doctags_span``.
+        Describe ``doctags_span``.
     """
 
     id: Id
@@ -213,23 +213,23 @@ class LinkAssertion(BaseModel):
     Parameters
     ----------
     id : Id
-    Describe ``id``.
+        Describe ``id``.
     chunk_id : Id
-    Describe ``chunk_id``.
+        Describe ``chunk_id``.
     concept_id : Id
-    Describe ``concept_id``.
+        Describe ``concept_id``.
     score : float
-    Describe ``score``.
+        Describe ``score``.
     decision : Literal['link', 'reject', 'uncertain']
-    Describe ``decision``.
+        Describe ``decision``.
     evidence_span : str | None, optional
-    Describe ``evidence_span``.
-    Defaults to ``None``.
+        Describe ``evidence_span``.
+        Defaults to ``None``.
     features : dict[str, float], optional
-    Describe ``features``.
-    Defaults to ``<factory>``.
+        Describe ``features``.
+        Defaults to ``<factory>``.
     run_id : str
-    Describe ``run_id``.
+        Describe ``run_id``.
     """
 
     id: Id

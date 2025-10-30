@@ -19,12 +19,6 @@ if TYPE_CHECKING:
         **data : Any
         Describe ``data``.
 
-
-
-
-
-
-
         Raises
         ------
         NotImplementedError
@@ -44,12 +38,6 @@ if TYPE_CHECKING:
             ----------
             **data : Any
             Describe ``data``.
-
-
-
-
-
-
 
             Raises
             ------
@@ -89,16 +77,12 @@ if TYPE_CHECKING:
             Describe ``by_name``.
             Defaults to ``None``.
 
-
-
-
-
-
-
             Returns
             -------
             Self
             Describe return value.
+
+
 
 
 
@@ -180,12 +164,6 @@ if TYPE_CHECKING:
             Describe ``serialize_as_any``.
             Defaults to ``False``.
 
-
-
-
-
-
-
             Returns
             -------
             dict[str, Any]
@@ -259,12 +237,6 @@ if TYPE_CHECKING:
             serialize_as_any : bool, optional
             Describe ``serialize_as_any``.
             Defaults to ``False``.
-
-
-
-
-
-
 
             Returns
             -------

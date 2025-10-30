@@ -62,17 +62,17 @@ class HarvesterConfig:
     Parameters
     ----------
     openalex_base : str, optional
-    Describe ``openalex_base``.
-    Defaults to ``'https://api.openalex.org'``.
+        Describe ``openalex_base``.
+        Defaults to ``'https://api.openalex.org'``.
     unpaywall_base : str, optional
-    Describe ``unpaywall_base``.
-    Defaults to ``'https://api.unpaywall.org'``.
+        Describe ``unpaywall_base``.
+        Defaults to ``'https://api.unpaywall.org'``.
     pdf_host_base : str | None, optional
-    Describe ``pdf_host_base``.
-    Defaults to ``None``.
+        Describe ``pdf_host_base``.
+        Defaults to ``None``.
     out_dir : str, optional
-    Describe ``out_dir``.
-    Defaults to ``'/data/pdfs'``.
+        Describe ``out_dir``.
+        Defaults to ``'/data/pdfs'``.
     """
 
     openalex_base: str = "https://api.openalex.org"
@@ -92,18 +92,12 @@ class OpenAccessHarvester:
     Parameters
     ----------
     user_agent : str
-    Describe ``user_agent``.
+        Describe ``user_agent``.
     contact_email : str
-    Describe ``contact_email``.
+        Describe ``contact_email``.
     config : HarvesterConfig | None, optional
-    Describe ``config``.
-    Defaults to ``None``.
-
-
-
-
-
-
+        Describe ``config``.
+        Defaults to ``None``.
 
     Raises
     ------
@@ -130,12 +124,12 @@ class OpenAccessHarvester:
         Parameters
         ----------
         user_agent : str
-        Describe ``user_agent``.
+            Describe ``user_agent``.
         contact_email : str
-        Describe ``contact_email``.
+            Describe ``contact_email``.
         config : HarvesterConfig | None, optional
-        Describe ``config``.
-        Defaults to ``None``.
+            Describe ``config``.
+            Defaults to ``None``.
         """
         cfg = config or HarvesterConfig()
         self.ua = user_agent
@@ -158,22 +152,18 @@ class OpenAccessHarvester:
         Parameters
         ----------
         topic : str
-        Describe ``topic``.
+            Describe ``topic``.
         years : str
-        Describe ``years``.
+            Describe ``years``.
         max_works : int
-        Describe ``max_works``.
-
-
-
-
-
-
+            Describe ``max_works``.
 
         Returns
         -------
         list[dict[str, object]]
-        Describe return value.
+            Describe return value.
+
+
 
 
 
@@ -221,18 +211,12 @@ class OpenAccessHarvester:
         Parameters
         ----------
         work : Mapping[str, object]
-        Describe ``work``.
-
-
-
-
-
-
+            Describe ``work``.
 
         Returns
         -------
         str | None
-        Describe return value.
+            Describe return value.
         """
         direct = self._lookup_direct_pdf(work)
         if direct:
@@ -262,18 +246,12 @@ class OpenAccessHarvester:
         Parameters
         ----------
         work : Mapping[str, object]
-        Describe ``work``.
-
-
-
-
-
-
+            Describe ``work``.
 
         Returns
         -------
         str | None
-        Describe return value.
+            Describe return value.
         """
         best = work.get("best_oa_location")
         if isinstance(best, Mapping):
@@ -292,18 +270,12 @@ class OpenAccessHarvester:
         Parameters
         ----------
         locations : object
-        Describe ``locations``.
-
-
-
-
-
-
+            Describe ``locations``.
 
         Returns
         -------
         str | None
-        Describe return value.
+            Describe return value.
         """
         if isinstance(locations, (str, bytes)):
             return None
@@ -326,18 +298,12 @@ class OpenAccessHarvester:
         Parameters
         ----------
         doi : str
-        Describe ``doi``.
-
-
-
-
-
-
+            Describe ``doi``.
 
         Returns
         -------
         str | None
-        Describe return value.
+            Describe return value.
         """
         response = self.session.get(
             f"{self.unpaywall}/v2/{doi}", params={"email": self.email}, timeout=15
@@ -363,18 +329,12 @@ class OpenAccessHarvester:
         Parameters
         ----------
         doi : str
-        Describe ``doi``.
-
-
-
-
-
-
+            Describe ``doi``.
 
         Returns
         -------
         str | None
-        Describe return value.
+            Describe return value.
         """
         if not self.pdf_host:
             return None
@@ -390,20 +350,16 @@ class OpenAccessHarvester:
         Parameters
         ----------
         url : str
-        Describe ``url``.
+            Describe ``url``.
         target_path : str
-        Describe ``target_path``.
-
-
-
-
-
-
+            Describe ``target_path``.
 
         Returns
         -------
         str
-        Describe return value.
+            Describe return value.
+
+
 
 
 
@@ -441,22 +397,16 @@ class OpenAccessHarvester:
         Parameters
         ----------
         topic : str
-        Describe ``topic``.
+            Describe ``topic``.
         years : str
-        Describe ``years``.
+            Describe ``years``.
         max_works : int
-        Describe ``max_works``.
-
-
-
-
-
-
+            Describe ``max_works``.
 
         Returns
         -------
         list[Doc]
-        Describe return value.
+            Describe return value.
         """
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)

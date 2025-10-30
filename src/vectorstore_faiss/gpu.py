@@ -65,23 +65,17 @@ class FaissGpuIndex:
     Parameters
     ----------
     factory : str, optional
-    Describe ``factory``.
-    Defaults to ``'OPQ64,IVF8192,PQ64'``.
+        Describe ``factory``.
+        Defaults to ``'OPQ64,IVF8192,PQ64'``.
     nprobe : int, optional
-    Describe ``nprobe``.
-    Defaults to ``64``.
+        Describe ``nprobe``.
+        Defaults to ``64``.
     gpu : bool, optional
-    Describe ``gpu``.
-    Defaults to ``True``.
+        Describe ``gpu``.
+        Defaults to ``True``.
     cuvs : bool, optional
-    Describe ``cuvs``.
-    Defaults to ``True``.
-
-
-
-
-
-
+        Describe ``cuvs``.
+        Defaults to ``True``.
 
     Raises
     ------
@@ -105,17 +99,17 @@ class FaissGpuIndex:
         Parameters
         ----------
         factory : str, optional
-        Describe ``factory``.
-        Defaults to ``'OPQ64,IVF8192,PQ64'``.
+            Describe ``factory``.
+            Defaults to ``'OPQ64,IVF8192,PQ64'``.
         nprobe : int, optional
-        Describe ``nprobe``.
-        Defaults to ``64``.
+            Describe ``nprobe``.
+            Defaults to ``64``.
         gpu : bool, optional
-        Describe ``gpu``.
-        Defaults to ``True``.
+            Describe ``gpu``.
+            Defaults to ``True``.
         cuvs : bool, optional
-        Describe ``cuvs``.
-        Defaults to ``True``.
+            Describe ``cuvs``.
+            Defaults to ``True``.
         """
         self.factory = factory
         self.nprobe = nprobe
@@ -158,10 +152,10 @@ class FaissGpuIndex:
         Parameters
         ----------
         train_vectors : FloatArray | FloatArrayLike
-        Describe ``train_vectors``.
+            Describe ``train_vectors``.
         seed : int, optional
-        Describe ``seed``.
-        Defaults to ``42``.
+            Describe ``seed``.
+            Defaults to ``42``.
         """
         if self._faiss is None:
             return
@@ -198,15 +192,9 @@ class FaissGpuIndex:
         Parameters
         ----------
         keys : list[str]
-        Describe ``keys``.
+            Describe ``keys``.
         vectors : FloatArray | FloatArrayLike
-        Describe ``vectors``.
-
-
-
-
-
-
+            Describe ``vectors``.
 
         Raises
         ------
@@ -247,20 +235,16 @@ class FaissGpuIndex:
         Parameters
         ----------
         query : FloatArray | FloatArrayLike
-        Describe ``query``.
+            Describe ``query``.
         k : int
-        Describe ``k``.
-
-
-
-
-
-
+            Describe ``k``.
 
         Returns
         -------
         list[tuple[str, float]]
-        Describe return value.
+            Describe return value.
+
+
 
 
 
@@ -301,16 +285,10 @@ class FaissGpuIndex:
         Parameters
         ----------
         index_uri : str
-        Describe ``index_uri``.
+            Describe ``index_uri``.
         idmap_uri : str | None, optional
-        Describe ``idmap_uri``.
-        Defaults to ``None``.
-
-
-
-
-
-
+            Describe ``idmap_uri``.
+            Defaults to ``None``.
 
         Raises
         ------
@@ -338,16 +316,10 @@ class FaissGpuIndex:
         Parameters
         ----------
         index_uri : str
-        Describe ``index_uri``.
+            Describe ``index_uri``.
         idmap_uri : str | None, optional
-        Describe ``idmap_uri``.
-        Defaults to ``None``.
-
-
-
-
-
-
+            Describe ``idmap_uri``.
+            Defaults to ``None``.
 
         Raises
         ------

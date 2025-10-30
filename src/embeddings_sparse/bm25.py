@@ -84,14 +84,16 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 class BM25Doc:
     """Represent a document stored in the in-memory BM25 index.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     doc_id : str
-        Identifier assigned to the document.
+        Describe ``doc_id``.
     length : int
-        Token count for the document.
+        Describe ``length``.
     fields : dict[str, str]
-        Raw text fields associated with the document.
+        Describe ``fields``.
     """
 
     doc_id: str
@@ -103,16 +105,21 @@ class BM25Doc:
 class PurePythonBM25:
     """Pure Python BM25 implementation backed by simple in-memory data structures.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     index_dir : str
-        Directory used to persist the index when exported.
+        Describe ``index_dir``.
     k1 : float, optional
-        Term-frequency saturation parameter, by default ``0.9``.
+        Describe ``k1``.
+        Defaults to ``0.9``.
     b : float, optional
-        Document length normalisation parameter, by default ``0.4``.
+        Describe ``b``.
+        Defaults to ``0.4``.
     field_boosts : dict[str, float] | None, optional
-        Per-field boosts applied when concatenating document text, by default ``None``.
+        Describe ``field_boosts``.
+        Defaults to ``None``.
     """
 
     def __init__(
@@ -124,16 +131,21 @@ class PurePythonBM25:
     ) -> None:
         """Initialise the in-memory BM25 index.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         index_dir : str
-            Directory used to persist artefacts when the index is exported.
+            Describe ``index_dir``.
         k1 : float, optional
-            Term-frequency saturation parameter, by default ``0.9``.
+            Describe ``k1``.
+            Defaults to ``0.9``.
         b : float, optional
-            Document length normalisation parameter, by default ``0.4``.
+            Describe ``b``.
+            Defaults to ``0.4``.
         field_boosts : dict[str, float] | None, optional
-            Per-field boosts applied when concatenating document text, by default ``None``.
+            Describe ``field_boosts``.
+            Defaults to ``None``.
         """
         self.index_dir = index_dir
         self.k1 = k1
@@ -149,10 +161,12 @@ class PurePythonBM25:
     def _tokenize(text: str) -> list[str]:
         """Tokenise text with a simple alphanumeric regex.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         text : str
-            Source text to tokenise.
+            Describe ``text``.
 
         Returns
         -------
@@ -164,10 +178,12 @@ class PurePythonBM25:
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Build postings and document statistics for the BM25 index.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         docs_iterable : Iterable[tuple[str, dict[str, str]]]
-            Iterable yielding ``(doc_id, fields)`` pairs used to populate the index.
+            Describe ``docs_iterable``.
         """
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
@@ -216,7 +232,10 @@ class PurePythonBM25:
             )
 
     def load(self) -> None:
-        """Load an existing BM25 index from disk."""
+        """Load an existing BM25 index from disk.
+
+        <!-- auto:docstring-builder v1 -->
+        """
         path = os.path.join(self.index_dir, "pure_bm25.pkl")
         with open(path, "rb") as f:
             data = pickle.load(f)
@@ -232,10 +251,12 @@ class PurePythonBM25:
     def _idf(self, term: str) -> float:
         """Compute the inverse document frequency for a given term.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         term : str
-            Term whose IDF score should be calculated.
+            Describe ``term``.
 
         Returns
         -------
@@ -253,14 +274,17 @@ class PurePythonBM25:
     ) -> list[tuple[str, float]]:
         """Score documents stored in the in-memory BM25 index.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         query : str
-            Natural language query.
+            Describe ``query``.
         k : int
-            Number of hits to return.
-        fields : dict[str, str] | None, optional
-            Optional field-specific overrides applied prior to tokenisation.
+            Describe ``k``.
+        fields : Mapping[str, str] | None, optional
+            Describe ``fields``.
+            Defaults to ``None``.
 
         Returns
         -------
@@ -288,21 +312,26 @@ class PurePythonBM25:
 class LuceneBM25:
     """Wrap Pyserini's Lucene BM25 indexer with project defaults.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     index_dir : str
-        Directory where the Lucene index should be stored.
+        Describe ``index_dir``.
     k1 : float, optional
-        Term-frequency saturation parameter, by default ``0.9``.
+        Describe ``k1``.
+        Defaults to ``0.9``.
     b : float, optional
-        Document length normalisation parameter, by default ``0.4``.
+        Describe ``b``.
+        Defaults to ``0.4``.
     field_boosts : dict[str, float] | None, optional
-        Per-field boosts applied when concatenating profile text, by default ``None``.
+        Describe ``field_boosts``.
+        Defaults to ``None``.
 
     Raises
     ------
     RuntimeError
-        Raised when Pyserini is not installed in the environment.
+    Raised when Pyserini is not installed in the environment.
     """
 
     def __init__(
@@ -314,16 +343,21 @@ class LuceneBM25:
     ) -> None:
         """Initialise the Lucene-backed BM25 adapter.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         index_dir : str
-            Directory where the Lucene index should be stored.
+            Describe ``index_dir``.
         k1 : float, optional
-            Term-frequency saturation parameter, by default ``0.9``.
+            Describe ``k1``.
+            Defaults to ``0.9``.
         b : float, optional
-            Document length normalisation parameter, by default ``0.4``.
+            Describe ``b``.
+            Defaults to ``0.4``.
         field_boosts : dict[str, float] | None, optional
-            Per-field boosts applied when concatenating document text, by default ``None``.
+            Describe ``field_boosts``.
+            Defaults to ``None``.
         """
         self.index_dir = index_dir
         self.k1 = k1
@@ -334,15 +368,17 @@ class LuceneBM25:
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Index documents with Pyserini's Lucene backend.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         docs_iterable : Iterable[tuple[str, dict[str, str]]]
-            Iterable yielding ``(doc_id, fields)`` pairs used to populate the index.
+            Describe ``docs_iterable``.
 
         Raises
         ------
         RuntimeError
-            Raised when Pyserini or Lucene is unavailable.
+        Raised when Pyserini or Lucene is unavailable.
         """
         try:
             from pyserini.index.lucene import LuceneIndexer
@@ -367,7 +403,10 @@ class LuceneBM25:
         indexer.close()
 
     def _ensure_searcher(self) -> None:
-        """Initialise the Lucene searcher if it has not been created yet."""
+        """Initialise the Lucene searcher if it has not been created yet.
+
+        <!-- auto:docstring-builder v1 -->
+        """
         if self._searcher is not None:
             return
         from pyserini.search.lucene import LuceneSearcher
@@ -381,24 +420,29 @@ class LuceneBM25:
     ) -> list[tuple[str, float]]:
         """Execute a Lucene BM25 search.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         query : str
-            Natural language query.
+            Describe ``query``.
         k : int
-            Number of hits to return.
+            Describe ``k``.
         fields : dict[str, str] | None, optional
-            Optional field overrides passed to the Lucene searcher, by default ``None``.
+            Describe ``fields``.
+            Defaults to ``None``.
 
         Returns
         -------
         list[tuple[str, float]]
             Ranked document identifiers paired with their BM25 scores.
 
+
+
         Raises
         ------
         RuntimeError
-            Raised when the Lucene searcher cannot be initialised.
+        Raised when the Lucene searcher cannot be initialised.
         """
         self._ensure_searcher()
         if self._searcher is None:
@@ -419,18 +463,23 @@ def get_bm25(
 ) -> PurePythonBM25 | LuceneBM25:
     """Instantiate a BM25 backend based on the requested implementation.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     backend : str
-        Either ``"pure"`` or ``"lucene"`` identifying the implementation to use.
+        Describe ``backend``.
     index_dir : str
-        Directory where index artefacts are stored.
+        Describe ``index_dir``.
     k1 : float, optional
-        Term-frequency saturation parameter, by default ``0.9``.
+        Describe ``k1``.
+        Defaults to ``0.9``.
     b : float, optional
-        Document length normalisation parameter, by default ``0.4``.
+        Describe ``b``.
+        Defaults to ``0.4``.
     field_boosts : dict[str, float] | None, optional
-        Per-field boosts applied when concatenating document text, by default ``None``.
+        Describe ``field_boosts``.
+        Defaults to ``None``.
 
     Returns
     -------

@@ -15,13 +15,14 @@ from tools.docs import build_agent_catalog
 
 
 class SupportsSetEnv(Protocol):
-    def setenv(self, name: str, value: str, prepend: str | None = ...) -> None:
+    def setenv(self, name: str, value: str, prepend: str | None = None) -> None:
         """Set an environment variable for the duration of the test."""
 
 
 @pytest.fixture()
 def fake_embedding_backend(monkeypatch: pytest.MonkeyPatch) -> None:
     """Provide a deterministic embedding backend for tests."""
+
     class FakeModel:
         dimension = 6
 
@@ -44,8 +45,6 @@ def fake_embedding_backend(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(build_agent_catalog, "_load_embedding_model", loader)
 
 
-
-
 @pytest.fixture()
 def repo_root() -> Path:
     """Return the repository root path."""
@@ -66,9 +65,7 @@ def test_help_succeeds(fake_embedding_backend: None, repo_root: Path) -> None:
     assert "--output" in result.stdout
 
 
-def test_build_catalog_smoke(
-    fake_embedding_backend: None, tmp_path: Path, repo_root: Path
-) -> None:
+def test_build_catalog_smoke(fake_embedding_backend: None, tmp_path: Path, repo_root: Path) -> None:
     """Building the catalog should produce a JSON document."""
     del fake_embedding_backend
     output_path = tmp_path / "agent_catalog.json"

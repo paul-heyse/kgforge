@@ -136,7 +136,7 @@ class ProcessingOptions:
     ignore_missing: bool
     missing_patterns: tuple[str, ...]
     skip_docfacts: bool
-    baseline: str | None
+    baseline: str | None = None
 
 
 @dataclasses.dataclass(slots=True)
@@ -335,9 +335,7 @@ def _dependents_for(path: Path) -> set[Path]:
     return dependents
 
 
-def _select_files(  # noqa: C901
-    config: BuilderConfig, args: argparse.Namespace
-) -> Iterable[Path]:
+def _select_files(config: BuilderConfig, args: argparse.Namespace) -> Iterable[Path]:  # noqa: C901
     if getattr(args, "paths", None):
         return [_normalize_input_path(raw) for raw in args.paths]
 
@@ -1382,7 +1380,9 @@ def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PL
         LOGGER.info("[DOCTOR] Running stub drift check...")
         drift_status = run_stub_drift()
         if drift_status != 0:
-            issues.append("Stub drift detected; see output above.")
+            message = "Stub drift detected; see output above."
+            print(message)
+            issues.append(message)
 
     if issues:
         LOGGER.error("[DOCTOR] Configuration issues detected:")

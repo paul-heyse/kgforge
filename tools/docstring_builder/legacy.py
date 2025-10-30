@@ -80,26 +80,26 @@ class _SymbolCollector(ast.NodeVisitor):
         return ".".join(part for part in [self.module_name, *self.namespace, name] if part)
 
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
-        self.namespace.append(node.name)
         qname = self._qualify(node.name)
         docstring = ast.get_docstring(node, clean=False)
         self.symbols.append(_CollectedSymbol(qname, node, "class", docstring))
+        self.namespace.append(node.name)
         self.generic_visit(node)
         self.namespace.pop()
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        self.namespace.append(node.name)
         qname = self._qualify(node.name)
         docstring = ast.get_docstring(node, clean=False)
         self.symbols.append(_CollectedSymbol(qname, node, "function", docstring))
+        self.namespace.append(node.name)
         self.generic_visit(node)
         self.namespace.pop()
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        self.namespace.append(node.name)
         qname = self._qualify(node.name)
         docstring = ast.get_docstring(node, clean=False)
         self.symbols.append(_CollectedSymbol(qname, node, "function", docstring))
+        self.namespace.append(node.name)
         self.generic_visit(node)
         self.namespace.pop()
 

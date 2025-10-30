@@ -12,10 +12,21 @@ from tools.docstring_builder.harvest import HarvestResult
 from tools.docstring_builder.schema import DocstringEdit
 
 
-def _escape_docstring(text: str) -> str:
+def _escape_docstring(text: str, indent: str) -> str:
     normalized = text.replace("\r\n", "\n").rstrip("\n")
     escaped = normalized.replace('"""', '\\"""')
-    return f"{escaped}\n"
+    if not escaped:
+        return "\n"
+    lines = escaped.split("\n")
+    if len(lines) == 1:
+        return f"{lines[0]}\n"
+    summary, *rest = lines
+    indented_rest = [
+        f"{indent}{line}" if line else ""  # Preserve blank lines without trailing spaces
+        for line in rest
+    ]
+    joined = "\n".join([summary, *indented_rest])
+    return f"{joined}\n"
 
 
 @dataclass(slots=True)
@@ -40,7 +51,8 @@ class _DocstringTransformer(cst.CSTTransformer):
         edit = self.edits.get(qname)
         if not edit:
             return node
-        desired = _escape_docstring(edit.text)
+        indent_level = max(len(self.namespace), 1)
+        desired = _escape_docstring(edit.text, " " * 4 * indent_level)
         literal = cst.SimpleString(f'"""{desired}"""')
         expr = cst.Expr(value=literal)
         docstring_stmt: cst.BaseStatement = cst.SimpleStatementLine(body=[expr])

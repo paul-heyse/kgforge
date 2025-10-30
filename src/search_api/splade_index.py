@@ -58,18 +58,12 @@ def tok(text: str) -> list[str]:
     Parameters
     ----------
     text : str
-    Describe ``text``.
-
-
-
-
-
-
+        Describe ``text``.
 
     Returns
     -------
     list[str]
-    Describe return value.
+        Describe return value.
     """
     return [token.lower() for token in TOKEN.findall(text or "")]
 
@@ -88,13 +82,13 @@ class SpladeDoc:
     Parameters
     ----------
     chunk_id : str
-    Describe ``chunk_id``.
+        Describe ``chunk_id``.
     doc_id : str
-    Describe ``doc_id``.
+        Describe ``doc_id``.
     section : str
-    Describe ``section``.
+        Describe ``section``.
     text : str
-    Describe ``text``.
+        Describe ``text``.
     """
 
     chunk_id: str
@@ -116,13 +110,13 @@ class SpladeIndex:
     Parameters
     ----------
     db_path : str
-    Describe ``db_path``.
+        Describe ``db_path``.
     chunks_dataset_root : str | None, optional
-    Describe ``chunks_dataset_root``.
-    Defaults to ``None``.
+        Describe ``chunks_dataset_root``.
+        Defaults to ``None``.
     sparse_root : str | None, optional
-    Describe ``sparse_root``.
-    Defaults to ``None``.
+        Describe ``sparse_root``.
+        Defaults to ``None``.
     """
 
     def __init__(
@@ -140,13 +134,13 @@ class SpladeIndex:
         Parameters
         ----------
         db_path : str
-        Describe ``db_path``.
+            Describe ``db_path``.
         chunks_dataset_root : str | None, optional
-        Describe ``chunks_dataset_root``.
-        Defaults to ``None``.
+            Describe ``chunks_dataset_root``.
+            Defaults to ``None``.
         sparse_root : str | None, optional
-        Describe ``sparse_root``.
-        Defaults to ``None``.
+            Describe ``sparse_root``.
+            Defaults to ``None``.
         """
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
@@ -165,7 +159,7 @@ class SpladeIndex:
         Parameters
         ----------
         chunks_root : str | None
-        Describe ``chunks_root``.
+            Describe ``chunks_root``.
         """
         _ = chunks_root  # optional override currently unused
         if not Path(self.db_path).exists():
@@ -207,21 +201,15 @@ class SpladeIndex:
         Parameters
         ----------
         query : str
-        Describe ``query``.
+            Describe ``query``.
         k : int, optional
-        Describe ``k``.
-        Defaults to ``10``.
-
-
-
-
-
-
+            Describe ``k``.
+            Defaults to ``10``.
 
         Returns
         -------
         list[tuple[int, float]]
-        Describe return value.
+            Describe return value.
         """
         if self.N == 0:
             return []
@@ -252,17 +240,11 @@ class SpladeIndex:
         Parameters
         ----------
         index : int
-        Describe ``index``.
-
-
-
-
-
-
+            Describe ``index``.
 
         Returns
         -------
         SpladeDoc
-        Describe return value.
+            Describe return value.
         """
         return self.docs[index]

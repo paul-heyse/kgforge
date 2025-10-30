@@ -14,20 +14,16 @@ def namespace_getattr(module: ModuleType, name: str) -> object:
     Parameters
     ----------
     module : ModuleType
-    Module that receives the attribute lookup.
+        Describe ``module``.
     name : str
-    Attribute requested by import machinery or user code.
-
-
-
-
-
-
+        Describe ``name``.
 
     Returns
     -------
     object
-    Attribute resolved from ``module``.
+        Attribute resolved from ``module``.
+
+
 
 
 
@@ -51,20 +47,14 @@ def namespace_dir(module: ModuleType, exports: Iterable[str]) -> list[str]:
     Parameters
     ----------
     module : ModuleType
-    Module that holds the concrete implementation.
+        Describe ``module``.
     exports : Iterable[str]
-    Symbol names explicitly exported by the proxy module.
-
-
-
-
-
-
+        Describe ``exports``.
 
     Returns
     -------
     list[str]
-    Sorted set of attribute names surfaced to callers.
+        Sorted set of attribute names surfaced to callers.
     """
     candidates = set(exports)
     candidates.update(attr for attr in dir(module) if not attr.startswith("__"))

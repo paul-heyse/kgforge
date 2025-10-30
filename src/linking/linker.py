@@ -52,7 +52,7 @@ class Linker:
     Returns
     -------
     inspect._empty
-    Describe return value.
+        Describe return value.
     """
 
     ...

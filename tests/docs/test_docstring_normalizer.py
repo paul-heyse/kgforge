@@ -37,7 +37,7 @@ class SampleClass:
         Parameters
         ----------
         values : List[int]
-            Values to process.
+            Values to process. Demonstrating list[str] normalization.
 
         Returns
         -------
