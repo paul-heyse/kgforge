@@ -3,8 +3,7 @@
 The helpers in this module scan the ``src`` tree, derive the dotted module path for
 each file, and inject a minimal docstring when one is missing. This is primarily
 used when bootstrapping new packages so that quality gates requiring docstrings
-pass before more detailed documentation is added.
-"""
+pass before more detailed documentation is added."""
 
 from __future__ import annotations
 
