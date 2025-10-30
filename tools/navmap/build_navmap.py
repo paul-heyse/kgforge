@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import ast
 import json
+import logging
 import os
 import re
 import subprocess
@@ -22,6 +23,8 @@ from pathlib import Path
 from typing import TypedDict, cast
 
 from tools.drift_preview import write_html_diff
+
+LOGGER = logging.getLogger(__name__)
 
 REPO = Path(__file__).resolve().parents[2]
 SRC = REPO / "src"
@@ -984,11 +987,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         default=None,
     )
     args = parser.parse_args(argv)
+    logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 
     target = args.write if args.write is not None else None
     build_index(json_path=target)
     destination = target or INDEX_PATH
-    print(f"[navmap] regenerated {destination}")
+    LOGGER.info("[navmap] regenerated %s", destination)
     return 0
 
 
