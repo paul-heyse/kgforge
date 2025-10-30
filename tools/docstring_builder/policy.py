@@ -15,6 +15,7 @@ try:  # Python 3.11+
 except ModuleNotFoundError:  # pragma: no cover - fallback for limited environments
     import tomli as tomllib  # type: ignore[import-not-found, no-redef]
 
+from tools.docstring_builder.plugins.dataclass_fields import collect_dataclass_field_names
 from tools.docstring_builder.semantics import SemanticResult
 
 
@@ -62,6 +63,9 @@ class PolicySettings:
     coverage_action: PolicyAction = PolicyAction.ERROR
     missing_params_action: PolicyAction = PolicyAction.ERROR
     missing_returns_action: PolicyAction = PolicyAction.ERROR
+    missing_examples_action: PolicyAction = PolicyAction.WARN
+    summary_mood_action: PolicyAction = PolicyAction.ERROR
+    dataclass_parity_action: PolicyAction = PolicyAction.ERROR
     exceptions: list[PolicyException] = field(default_factory=list)
 
     def action_for(self, rule: str) -> PolicyAction:
@@ -70,6 +74,9 @@ class PolicySettings:
             "coverage": self.coverage_action,
             "missing-params": self.missing_params_action,
             "missing-returns": self.missing_returns_action,
+            "missing-examples": self.missing_examples_action,
+            "summary-mood": self.summary_mood_action,
+            "dataclass-parity": self.dataclass_parity_action,
         }
         return mapping.get(rule, PolicyAction.ERROR)
 
@@ -151,6 +158,26 @@ def _apply_mapping(settings: PolicySettings, mapping: Mapping[str, Any]) -> None
         settings.missing_returns_action = PolicyAction.parse(str(mapping["missing_returns_action"]))
     if "missing-returns-action" in mapping:
         settings.missing_returns_action = PolicyAction.parse(str(mapping["missing-returns-action"]))
+    if "missing_examples_action" in mapping:
+        settings.missing_examples_action = PolicyAction.parse(
+            str(mapping["missing_examples_action"])
+        )
+    if "missing-examples-action" in mapping:
+        settings.missing_examples_action = PolicyAction.parse(
+            str(mapping["missing-examples-action"])
+        )
+    if "summary_mood_action" in mapping:
+        settings.summary_mood_action = PolicyAction.parse(str(mapping["summary_mood_action"]))
+    if "summary-mood-action" in mapping:
+        settings.summary_mood_action = PolicyAction.parse(str(mapping["summary-mood-action"]))
+    if "dataclass_parity_action" in mapping:
+        settings.dataclass_parity_action = PolicyAction.parse(
+            str(mapping["dataclass_parity_action"])
+        )
+    if "dataclass-parity-action" in mapping:
+        settings.dataclass_parity_action = PolicyAction.parse(
+            str(mapping["dataclass-parity-action"])
+        )
     if "exceptions" in mapping:
         entries = mapping["exceptions"]
         if isinstance(entries, Iterable) and not isinstance(entries, (str, bytes)):
@@ -180,6 +207,22 @@ def _apply_overrides(settings: PolicySettings, overrides: Mapping[str, str]) -> 
             settings.missing_params_action = PolicyAction.parse(value)
         elif key in {"missing-returns", "missing-returns-action", "missing_returns_action"}:
             settings.missing_returns_action = PolicyAction.parse(value)
+        elif key in {
+            "missing-examples",
+            "missing_examples",
+            "missing-examples-action",
+            "missing_examples_action",
+        }:
+            settings.missing_examples_action = PolicyAction.parse(value)
+        elif key in {"summary-mood", "summary_mood", "summary-mood-action", "summary_mood_action"}:
+            settings.summary_mood_action = PolicyAction.parse(value)
+        elif key in {
+            "dataclass-parity",
+            "dataclass_parity",
+            "dataclass-parity-action",
+            "dataclass_parity_action",
+        }:
+            settings.dataclass_parity_action = PolicyAction.parse(value)
         else:
             message = f"Unknown policy override: {key}"
             raise PolicyConfigurationError(message)
@@ -212,6 +255,7 @@ class PolicyEngine:
         self.documented_symbols = 0
         self.violations: list[PolicyViolation] = []
         self._today = _dt.date.today()
+        self._dataclass_field_cache: dict[Path, dict[str, list[str]]] = {}
 
     def record(self, semantics: Iterable[SemanticResult]) -> None:
         """Record docstring semantics and evaluate them against policy rules."""
@@ -231,6 +275,25 @@ class PolicyEngine:
                 detail="return values missing descriptions",
             ):
                 documented = False
+            if self._examples_missing(entry) and self._register_violation(
+                rule="missing-examples",
+                symbol=entry.symbol.qname,
+                detail="docstring lacks Examples section",
+            ):
+                documented = False
+            if self._summary_not_imperative(entry) and self._register_violation(
+                rule="summary-mood",
+                symbol=entry.symbol.qname,
+                detail="summary should use imperative mood",
+            ):
+                documented = False
+            dataclass_detail = self._dataclass_parity_detail(entry)
+            if dataclass_detail and self._register_violation(
+                rule="dataclass-parity",
+                symbol=entry.symbol.qname,
+                detail=dataclass_detail,
+            ):
+                documented = False
             if not self._has_summary(entry):
                 documented = False
             if documented:
@@ -248,10 +311,9 @@ class PolicyEngine:
                 f" ({exception.justification or 'no justification provided'})"
             )
         message = f"{symbol}: {detail}"
-        self.violations.append(
-            PolicyViolation(rule=rule, symbol=symbol, action=action, message=message)
-        )
-        return True
+        violation = PolicyViolation(rule=rule, symbol=symbol, action=action, message=message)
+        self.violations.append(violation)
+        return violation.fatal
 
     def _match_exception(self, symbol: str, rule: str) -> PolicyException | None:
         """Return an exception entry matching ``symbol`` and ``rule`` if present."""
@@ -292,6 +354,68 @@ class PolicyEngine:
             if not description or description.lower().startswith("todo"):
                 return True
         return False
+
+    @staticmethod
+    def _examples_missing(entry: SemanticResult) -> bool:
+        """Return ``True`` when the Examples section is empty or placeholder only."""
+        if not entry.schema.examples:
+            return True
+        return not any(example.strip() for example in entry.schema.examples)
+
+    @staticmethod
+    def _summary_not_imperative(entry: SemanticResult) -> bool:
+        """Return ``True`` when the summary appears non-imperative."""
+        summary = entry.schema.summary.strip()
+        if not summary:
+            return True
+        first = summary.split()[0].lower()
+        if first in {"this", "the"}:
+            return True
+        if first.endswith("s") and len(first) > 3:
+            return True
+        return False
+
+    def _dataclass_parity_detail(self, entry: SemanticResult) -> str | None:
+        """Return a violation detail when dataclass fields and docstrings drift."""
+        if entry.symbol.kind != "class":
+            return None
+        decorators = {decorator.lower() for decorator in entry.symbol.decorators}
+        if not any(
+            decorator in decorators
+            for decorator in (
+                "dataclass",
+                "dataclasses.dataclass",
+                "attr.s",
+                "attr.attrs",
+                "attr.define",
+                "attr.mutable",
+                "attr.frozen",
+                "attrs.define",
+                "attrs.mutable",
+                "attrs.frozen",
+            )
+        ):
+            return None
+        path = entry.symbol.filepath
+        module = entry.symbol.module
+        cache = self._dataclass_field_cache.get(path)
+        if cache is None:
+            cache = collect_dataclass_field_names(path, module)
+            self._dataclass_field_cache[path] = cache
+        actual = cache.get(entry.symbol.qname, [])
+        documented = [parameter.name for parameter in entry.schema.parameters]
+        if not actual:
+            return None
+        missing = [name for name in actual if name not in documented]
+        extra = [name for name in documented if name not in actual]
+        if not missing and not extra:
+            return None
+        details: list[str] = []
+        if missing:
+            details.append(f"missing fields: {', '.join(missing)}")
+        if extra:
+            details.append(f"unexpected parameters: {', '.join(extra)}")
+        return "; ".join(details)
 
     @staticmethod
     def _has_summary(entry: SemanticResult) -> bool:

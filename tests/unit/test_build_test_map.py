@@ -62,6 +62,30 @@ def test_load_symbol_candidates_reads_navmap(tmp_path: Path, monkeypatch: Monkey
     assert "legacy.Gamma" in candidates
 
 
+def test_load_symbol_spans_accepts_end_lineno(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+    """The loader should handle docfacts payloads using ``end_lineno`` keys."""
+    root = tmp_path
+    symbols_path = root / "docs" / "_build" / "symbols.json"
+    symbols_path.parent.mkdir(parents=True, exist_ok=True)
+    symbols_path.write_text(
+        json.dumps(
+            [
+                {
+                    "path": "pkg.module.symbol",
+                    "file": "src/pkg/module.py",
+                    "lineno": 10,
+                    "end_lineno": 14,
+                    "module": "pkg.module",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(build_test_map, "ROOT", root)
+    spans = build_test_map.load_symbol_spans()
+    assert spans["pkg.module.symbol"]["endlineno"] == 14
+
+
 def _normalize_repo_rel(path_like: str) -> str:
     return build_test_map._normalize_repo_rel(path_like)
 
