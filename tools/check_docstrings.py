@@ -1,10 +1,5 @@
 #!/usr/bin/env python
-"""Overview of check docstrings.
-
-This module bundles check docstrings logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
-"""
+"""Docstring quality checks shared by kgfoundry development workflows."""
 
 from __future__ import annotations
 
@@ -24,20 +19,10 @@ TARGETS = [
 
 
 def parse_args() -> argparse.Namespace:
-    """Compute parse args.
+    """Return parsed CLI arguments for the docstring audit helper.
 
-    Carry out the parse args operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Returns
-    -------
-    argparse.Namespace
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.check_docstrings import parse_args
-    >>> result = parse_args()
-    >>> result  # doctest: +ELLIPSIS
+    The parser currently exposes a single flag, ``--no-todo``, which toggles the
+    stricter placeholder validation step executed after Ruff runs.
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -49,25 +34,11 @@ def parse_args() -> argparse.Namespace:
 
 
 def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
-    """Compute iter docstrings.
+    """Yield ``(path, lineno, text)`` tuples for every docstring in ``path``.
 
-    Carry out the iter docstrings operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    path : Path
-        Description for ``path``.
-
-    Returns
-    -------
-    collections.abc.Iterable
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.check_docstrings import iter_docstrings
-    >>> result = iter_docstrings(...)
-    >>> result  # doctest: +ELLIPSIS
+    The generator emits the file path, starting line number, and raw docstring
+    text for module, class, and function definitions, mirroring the locations that
+    Ruff and other documentation tools inspect.
     """
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
@@ -82,20 +53,11 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
 
 
 def check_placeholders() -> int:
-    """Compute check placeholders.
+    """Return ``0`` when no placeholder keywords are found in docstrings.
 
-    Carry out the check placeholders operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Returns
-    -------
-    int
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.check_docstrings import check_placeholders
-    >>> result = check_placeholders()
-    >>> result  # doctest: +ELLIPSIS
+    The function scans every Python file in :data:`TARGETS` and records occurrences
+    of ``TODO``, ``TBD``, or ``FIXME`` inside docstrings. It prints a summary of the
+    offending locations to ``stderr`` and returns ``1`` if any placeholders remain.
     """
     errors: list[str] = []
     keywords = {"TODO", "TBD", "FIXME"}
@@ -117,19 +79,13 @@ def check_placeholders() -> int:
 
 
 def main() -> None:
-    """Compute main.
-
-    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Run Ruff's docstring checks and optional placeholder validation.
 
     Raises
     ------
     SystemExit
-        Raised when validation fails.
-
-    Examples
-    --------
-    >>> from tools.check_docstrings import main
-    >>> main()  # doctest: +ELLIPSIS
+        Raised with the exit status of :func:`check_placeholders` when
+        ``--no-todo`` is provided and placeholder text is detected.
     """
     options = parse_args()
 
