@@ -210,7 +210,7 @@ def test_build_anchors_use_docfacts_end_lineno(tmp_path: Path) -> None:
         textwrap.dedent(
             """
             def example(value: int) -> int:
-                """Return ``value`` unchanged."""
+                '''Return ``value`` unchanged.'''
 
                 return value
             """
