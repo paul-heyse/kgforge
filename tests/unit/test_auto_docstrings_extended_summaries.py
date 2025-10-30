@@ -239,14 +239,14 @@ def test_extended_summary_handles_empty_function_name() -> None:
 
 
 def test_is_pydantic_artifact_detection() -> None:
-    assert auto_docstrings._is_pydantic_artifact("__pydantic_unknown__")
-    assert auto_docstrings._is_pydantic_artifact("model_dump")
-    assert not auto_docstrings._is_pydantic_artifact("not_special")
+    assert auto_docstrings.is_pydantic_artifact("__pydantic_unknown__")
+    assert auto_docstrings.is_pydantic_artifact("model_dump")
+    assert not auto_docstrings.is_pydantic_artifact("not_special")
 
 
 def test_is_magic_detection() -> None:
-    assert auto_docstrings._is_magic("__add__")
-    assert not auto_docstrings._is_magic("regular_name")
+    assert auto_docstrings.is_magic("__add__")
+    assert not auto_docstrings.is_magic("regular_name")
 
 
 @pytest.mark.parametrize(

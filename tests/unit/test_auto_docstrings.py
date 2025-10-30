@@ -19,7 +19,7 @@ auto_docstrings = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = auto_docstrings
 spec.loader.exec_module(auto_docstrings)
 
-_required_sections = auto_docstrings._required_sections
+required_sections = auto_docstrings.required_sections
 annotation_to_text = auto_docstrings.annotation_to_text
 build_docstring = auto_docstrings.build_docstring
 build_examples = auto_docstrings.build_examples
@@ -140,7 +140,7 @@ def process(item: str, limit: int | None = None) -> str:
 
     params = parameters_for(node)
     returns = annotation_to_text(node.returns)
-    markers = _required_sections("function", params, returns, [], node.name, True)
+    markers = required_sections("function", params, returns, [], node.name, True)
 
     assert markers
     for marker in markers:

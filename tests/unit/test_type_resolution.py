@@ -11,7 +11,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
 import pytest
-from tools.auto_docstrings import QUALIFIED_NAME_OVERRIDES, _normalize_qualified_name
+from tools.auto_docstrings import QUALIFIED_NAME_OVERRIDES, normalize_qualified_name
 
 CONF_PATH = Path(__file__).resolve().parents[2] / "docs" / "conf.py"
 
@@ -73,7 +73,7 @@ def overrides_fixture() -> dict[str, str]:
 def test_numpy_scalar_overrides(overrides: dict[str, str], alias: str, canonical: str) -> None:
     """Ensure NumPy scalar aliases resolve to canonical types."""
     assert overrides[alias] == canonical
-    assert _normalize_qualified_name(alias) == canonical
+    assert normalize_qualified_name(alias) == canonical
 
 
 @pytest.mark.parametrize(
@@ -92,7 +92,7 @@ def test_numpy_scalar_overrides(overrides: dict[str, str], alias: str, canonical
 def test_numpy_typing_overrides(overrides: dict[str, str], alias: str, canonical: str) -> None:
     """Ensure ndarray and typing helpers resolve to canonical targets."""
     assert overrides[alias] == canonical
-    assert _normalize_qualified_name(alias) == canonical
+    assert normalize_qualified_name(alias) == canonical
 
 
 @pytest.mark.parametrize(
@@ -185,7 +185,7 @@ def test_custom_project_overrides(overrides: dict[str, str], alias: str, canonic
 
 def test_generic_annotations_collapse_to_base() -> None:
     """Normalisation should drop generic parameters for unresolved types."""
-    result = _normalize_qualified_name("numpy.typing.NDArray[numpy.float32]")
+    result = normalize_qualified_name("numpy.typing.NDArray[numpy.float32]")
     assert result == "numpy.typing.NDArray"
 
 
