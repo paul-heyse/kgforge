@@ -1078,17 +1078,6 @@ class AgentCatalogBuilder:
             return matches[0]
         return None
 
-
-def _docfacts_int(entry: Mapping[str, Any], *names: str) -> int | None:
-    """Return the first integer value found for ``names`` within ``entry``."""
-    for name in names:
-        if not name:
-            continue
-        value = entry.get(name)
-        if isinstance(value, int):
-            return value
-    return None
-
     def _resolve_source_path(self, module_name: str, module_entry: dict[str, Any] | None) -> Path:
         if module_entry:
             file_value = module_entry.get("file")
@@ -1334,6 +1323,17 @@ def _load_embedding_model(model_name: str) -> EmbeddingModelProtocol:
 def _tokenize(text: str) -> list[str]:
     """Return normalized word tokens for the given text."""
     return WORD_RE.findall(text.lower())
+
+
+def _docfacts_int(entry: Mapping[str, Any], *names: str) -> int | None:
+    """Return the first integer value found for ``names`` within ``entry``."""
+    for name in names:
+        if not name:
+            continue
+        value = entry.get(name)
+        if isinstance(value, int):
+            return value
+    return None
 
 
 def _extract_docfacts_text(
