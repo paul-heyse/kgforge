@@ -1,4 +1,21 @@
-"""Command line interface for the docstring builder."""
+"""Docstring builder CLI for managing generated docstrings across the repo.
+
+This module wires together the tooling that harvests code metadata, renders
+managed docstrings, and applies or inspects the resulting edits. Subcommands
+cover the full workflow: ``generate`` synchronizes docstrings and DocFacts,
+``fix`` forces writes while bypassing the cache, ``diff`` and ``check`` display
+drift without mutating files, ``lint`` mirrors ``check`` with optional DocFacts
+skips, ``measure`` emits observability metrics, ``schema`` exports the IR
+schema, ``doctor`` performs health checks, ``list`` enumerates managed symbols,
+``clear-cache`` resets builder state, ``harvest`` collects metadata only, and
+``update`` serves project automation.
+
+Usage
+-----
+The CLI is typically invoked through project tooling, for example via ``uv run
+python -m tools.docstring_builder.cli <subcommand>`` or the corresponding Make
+targets when regenerating documentation artifacts.
+"""
 
 from __future__ import annotations
 
