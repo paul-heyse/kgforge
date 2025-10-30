@@ -59,3 +59,11 @@ def test_parameter_harvest_preserves_signature_kinds(tmp_path: Path) -> None:
     assert "value :" in docstring
     assert "*args :" in docstring
     assert "**kwargs :" in docstring
+
+    signature_doc = render_docstring(
+        semantic.schema,
+        config.ownership_marker,
+        include_signature=True,
+    )
+    assert "Signature" in signature_doc
+    assert "(value /, scale: float, *args: int, *, limit: int = 0, **kwargs: str)" in signature_doc

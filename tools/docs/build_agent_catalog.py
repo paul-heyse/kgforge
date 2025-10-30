@@ -820,11 +820,11 @@ class AgentCatalogBuilder:
             start_line = None
             end_line = None
             if symbol_entry is not None:
-                raw_start = symbol_entry.get("lineno")
-                if isinstance(raw_start, int):
+                raw_start = _docfacts_int(symbol_entry, "lineno")
+                if raw_start is not None:
                     start_line = raw_start
-                raw_end = symbol_entry.get("endlineno")
-                if isinstance(raw_end, int):
+                raw_end = _docfacts_int(symbol_entry, "end_lineno", "endlineno")
+                if raw_end is not None:
                     end_line = raw_end
         fingerprint = self._compute_fingerprint(analyzer, node)
         scope = analyzer.get_scope(qname)
@@ -1065,6 +1065,17 @@ class AgentCatalogBuilder:
         if len(matches) == 1:
             return matches[0]
         return None
+
+
+def _docfacts_int(entry: Mapping[str, Any], *names: str) -> int | None:
+    """Return the first integer value found for ``names`` within ``entry``."""
+    for name in names:
+        if not name:
+            continue
+        value = entry.get(name)
+        if isinstance(value, int):
+            return value
+    return None
 
     def _resolve_source_path(self, module_name: str, module_entry: dict[str, Any] | None) -> Path:
         if module_entry:

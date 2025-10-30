@@ -38,8 +38,35 @@ def _infer_optional(
     return parameter.optional
 
 
-def _describe_parameter(name: str) -> str:
-    return f"TODO: describe ``{name}``."
+def _describe_parameter(name: str, default: str | None, annotation: str | None) -> str:
+    readable = name.replace("_", " ")
+    lower = readable.lower()
+    if annotation and "bool" in annotation.lower():
+        base = f"Indicate whether {lower}."
+    elif name.startswith("is_"):
+        subject = readable.split(" ", 1)[1] if " " in readable else readable[3:]
+        base = f"Indicate whether {subject or lower}."
+    elif name.startswith("has_"):
+        subject = readable.split(" ", 1)[1] if " " in readable else readable[4:]
+        base = f"Indicate whether {subject or lower}."
+    elif name.endswith("_id"):
+        subject = readable[:-3].strip() or "resource"
+        base = f"Identifier for the {subject}."
+    elif name.endswith("_path"):
+        subject = readable[:-5].strip() or "resource"
+        base = f"Filesystem path for the {subject}."
+    elif name.endswith("_url"):
+        subject = readable[:-4].strip() or "resource"
+        base = f"URL for the {subject}."
+    else:
+        base = f"Configure the {lower}."
+    if default and default != "...":
+        base += f" Defaults to ``{default}``."
+    if not base.endswith("."):
+        base += "."
+    if base and not base[0].isupper():
+        base = base[0].upper() + base[1:]
+    return base
 
 
 def _build_parameters(symbol: SymbolHarvest) -> list[ParameterDoc]:
@@ -49,10 +76,11 @@ def _build_parameters(symbol: SymbolHarvest) -> list[ParameterDoc]:
             continue
         annotation = parameter.annotation
         display = parameter_display_name(parameter)
+        description = _describe_parameter(parameter.name, parameter.default, annotation)
         doc = ParameterDoc(
             name=parameter.name,
             annotation=annotation,
-            description=_describe_parameter(parameter.name),
+            description=description,
             optional=False,
             default=parameter.default,
             display_name=display,
@@ -71,31 +99,60 @@ def _build_returns(symbol: SymbolHarvest) -> list[ReturnDoc]:
     return [ReturnDoc(annotation=symbol.return_annotation, description=description, kind=kind)]
 
 
-def _walk_raises(node: ast.AST) -> Iterable[str]:
+def _walk_raises(node: ast.AST) -> Iterable[tuple[str, str | None]]:
     for child in ast.walk(node):
         if isinstance(child, ast.Raise) and child.exc is not None:
-            if isinstance(child.exc, ast.Call):
-                func = child.exc.func
-                if isinstance(func, ast.Name):
-                    yield func.id
-                elif isinstance(func, ast.Attribute):
-                    yield func.attr
-            elif isinstance(child.exc, ast.Name):
-                yield child.exc.id
-            elif isinstance(child.exc, ast.Attribute):
-                yield child.exc.attr
+            exc = child.exc
+            name = _exception_name(exc)
+            if not name:
+                continue
+            reason = _exception_reason(exc)
+            yield name, reason
+
+
+def _exception_name(node: ast.AST) -> str | None:
+    if isinstance(node, ast.Call):
+        return _exception_name(node.func)
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        return node.attr
+    return None
+
+
+def _exception_reason(node: ast.AST) -> str | None:
+    if isinstance(node, ast.Call) and node.args:
+        first = node.args[0]
+        if isinstance(first, ast.Constant) and isinstance(first.value, str):
+            message = first.value.strip()
+            return message if message else None
+        text = _stringify_expression(first)
+        if text:
+            return f"Raised when {text}."
+    return None
+
+
+def _stringify_expression(node: ast.AST) -> str | None:
+    try:
+        return ast.unparse(node)
+    except Exception:  # pragma: no cover - ast.unparse guard
+        return None
 
 
 def _build_raises(node: ast.AST | None) -> list[RaiseDoc]:
     if node is None:
         return []
-    seen: set[str] = set()
+    seen: set[tuple[str, str | None]] = set()
     docs: list[RaiseDoc] = []
-    for exc in _walk_raises(node):
-        if exc in seen:
+    for name, reason in _walk_raises(node):
+        key = (name, reason)
+        if key in seen:
             continue
-        seen.add(exc)
-        docs.append(RaiseDoc(exception=exc, description=f"Raised when TODO for {exc}."))
+        seen.add(key)
+        description = reason or f"Raised when ``{name}`` is triggered."
+        if not description.endswith("."):
+            description += "."
+        docs.append(RaiseDoc(exception=name, description=description))
     return docs
 
 
