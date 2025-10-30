@@ -83,6 +83,19 @@ Files to add:
     4. Assemble catalog dict and validate against in-memory JSON Schema.
     5. Write `docs/_build/agent_catalog.json` and `docs/_build/schema_agent_catalog.json`.
 
+  - Algorithms (detailed):
+    - Graph.imports: parse Python AST (`ast.parse`), collect `Import`/`ImportFrom`, normalize module names, exclude stdlib prefixes (configurable allowlist for inclusion), dedupe.
+    - Graph.calls: walk AST for `Call` nodes; resolve function names within module scope; do not follow dynamic dispatch; tag edges with `"static"` confidence; optional heuristic for attribute calls (e.g., `obj.method`).
+    - Stable IDs: load source, build a minimal AST by removing whitespace/comments/docstrings; hash `qname + ast_text` via SHA256; store as hex.
+    - Quality signals: shell out or import tool APIs to gather:
+      - mypy summary (per-module): `ok|error|unknown`.
+      - ruff rule hits (list unique rule codes for module/symbol if available).
+      - pydoclint parity (boolean).
+      - interrogate docstring coverage percentage (module-level).
+      - doctest outcomes from pytest xdoctest logs (`ok|fail|skip|unknown`).
+    - Metrics: compute mccabe complexity and LOC per symbol/module; get `last_modified` via `git log -1 --format=%cI` per file; map `codeowners` from CODEOWNERS (optional).
+    - Semantic index: concatenate symbol name + docstring + brief context; encode with MiniLM (configurable); write FAISS index and JSON mapping `symbol_id` → row.
+
 - `tools/docs/render_agent_portal.py`
   - Inputs: `docs/_build/agent_catalog.json`
   - Render to `site/_build/agent/index.html`:
@@ -91,6 +104,8 @@ Files to add:
     - Optional section summarizing observability (counts/timings)
      - Faceted filters and breadcrumbs
      - Inline dependency graphs per module (optional) or links to focused views
+    - Accessibility: ARIA roles `banner`, `navigation`, `main`, `search` and labelled controls; keyboard tab order; responsive CSS grid.
+    - Search algorithm: lexical search over titles/qnames; if semantic index is available, fetch top-K lexical then rerank by vector similarity with weight α (default 0.6).
 
 - `tools/docs/build_artifacts.py`
   - Append steps to invoke the two scripts and print status lines on success/failure.
@@ -203,6 +218,48 @@ Files to add:
   }
 }
 ```
+
+## Link policy resolution
+- Inputs: environment (`DOCS_LINK_MODE`, `DOCS_GITHUB_*`), CLI flags (if any), defaults.
+- Precedence: CLI > env > defaults. If `mode=github` missing org/repo/sha, abort with configuration error.
+- Tokens: `{path}`, `{line}`, `{org}`, `{repo}`, `{sha}`.
+
+## Sharding and file layout
+- Root index: `docs/_build/agent_catalog.json`.
+- Shards: `docs/_build/agent_catalog.pkg.<package>.json` and optional `docs/_build/agent_catalog.mod.<module>.json` when a package exceeds 1000 modules.
+- Trigger thresholds: 20MB or >2000 modules overall; package-level shard if package >500 modules.
+
+## Clients and CLI surface
+- Python client
+  - Models: Pydantic classes mirroring schema; loader that transparently resolves shards.
+  - Helpers: `list_packages()`, `list_modules(pkg)`, `get_module(module)`, `find_callers(symbol_id)`, `search(query, facets, k=20)`.
+- TypeScript client
+  - Types and functions equivalent to Python client; deno/node compatible; ESM.
+- agentctl CLI
+  - Commands (exit 0 on success; 2 on config error; 3 on internal):
+    - `list-modules [--package P]` → table (module, page, symbols)
+    - `find-callers --symbol-id SID` → list of qnames
+    - `show-quality --module M` → quality/metrics summary
+    - `search --q "text" [--facet key=val]... [--k 20]` → JSON results
+
+## Analytics schema (abbreviated)
+```json
+{
+  "generated_at": "2025-10-29T12:34:56Z",
+  "portal": { "sessions": 12, "searches": 37, "top_modules": ["kgfoundry.orchestration.flows"] },
+  "errors": { "broken_links": 0 },
+  "version": "1.0"
+}
+```
+
+## Roles (hosted mode)
+- `viewer`: read-only portal access.
+- `contributor`: can submit feedback; toggle facets; no administrative settings.
+- `admin`: manage settings, enable/disable hosted features; view audit logs.
+
+## Performance budgets
+- Portal cold-load < 1.5s on modern laptop; initial search < 300ms; subsequent searches < 150ms.
+- Generation: no-op update reuses cache; shard emission only for changed packages.
 
 ## HTML structure (outline)
 ```html

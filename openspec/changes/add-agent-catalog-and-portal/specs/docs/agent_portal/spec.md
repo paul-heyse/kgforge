@@ -104,6 +104,106 @@ The portal SHALL be accessible with basic keyboard navigation and SHALL render c
 - THEN the portal shows package and module listings with static links
 - AND the search box may be disabled or show guidance
 
+### Requirement: Link Policy Resolution Precedence
+The system SHALL resolve link policy using the precedence: CLI > environment > defaults; GitHub mode requires org/repo/sha.
+
+#### Scenario: CLI overrides env
+- GIVEN `DOCS_LINK_MODE=editor` in env
+- WHEN the CLI requests `--mode github --org X --repo Y --sha Z`
+- THEN the catalog is generated in GitHub mode with those values
+
+#### Scenario: Missing GitHub variables
+- WHEN `mode=github` but `org`/`repo`/`sha` is missing
+- THEN generator exits with configuration error and no catalog is written
+
+
+### Requirement: agentctl CLI Behaviors
+The CLI SHALL implement deterministic commands with stable exit codes.
+
+#### Scenario: list-modules success
+- WHEN `agentctl list-modules --package kgfoundry` runs
+- THEN exit code is 0 and a table of modules is printed
+
+#### Scenario: search returns JSON
+- WHEN `agentctl search --q "vector store" --k 10` runs
+- THEN exit code is 0 and a JSON array of results is returned
+
+#### Scenario: configuration error
+- WHEN required inputs are missing
+- THEN exit code is 2 and an actionable message is printed
+
+
+### Requirement: Analytics JSON
+The system SHALL produce `docs/_build/analytics.json` summarizing portal usage and generation outcomes.
+
+#### Scenario: Analytics present
+- WHEN the portal is generated
+- THEN `analytics.json` exists with `generated_at`, `portal.sessions`, and `errors.broken_links`
+
+
+### Requirement: Sharding Thresholds and Root Index
+The system SHALL shard catalogs when thresholds are exceeded and provide a root index that references shards.
+
+#### Scenario: Sharding by size or count
+- GIVEN catalog size exceeds 20MB or modules > 2000
+- WHEN generation runs
+- THEN per-package shards are written and root index references them
+
+#### Scenario: Transparent resolution
+- WHEN clients load the root index
+- THEN they transparently load referenced shards on demand
+
+
+### Requirement: Roles and Permissions (Hosted Mode)
+Hosted deployments SHALL enforce RBAC with `viewer`, `contributor`, and `admin` roles.
+
+#### Scenario: Role denial
+- WHEN a viewer attempts to access admin features
+- THEN access is denied and logged
+
+
+### Requirement: Performance Budgets
+The portal SHALL meet documented performance budgets on representative hardware.
+
+#### Scenario: Cold-load budget
+- WHEN opening the portal locally with a large catalog
+- THEN first contentful render occurs in < 1.5s
+
+#### Scenario: Search latency
+- WHEN performing a first search
+- THEN results return in < 300ms (subsequent < 150ms)
+
+
+### Requirement: Fuzzy Remap Algorithm for Anchors
+The system SHALL remap anchors using a deterministic fallback order.
+
+#### Scenario: Remap order
+- WHEN resolving a stale anchor
+- THEN the system attempts: (1) match `symbol_id`; (2) name+arity match; (3) nearest-text search; or fails with a clear note
+
+
+### Requirement: Semantic Index Quality Targets
+The system SHALL produce a semantic index that meets minimum quality targets.
+
+#### Scenario: Rerank quality
+- WHEN evaluating on an internal benchmark set
+- THEN hybrid search must achieve MRR@10 ≥ configured target (e.g., 0.65)
+
+
+### Requirement: Stable ID Uniqueness
+Symbol IDs SHALL be stable across runs and collision-resistant.
+
+#### Scenario: Collision detection
+- WHEN generating IDs for all symbols
+- THEN collisions are not observed; any collision triggers a generation error with diagnostics
+
+
+### Requirement: Code Coverage Mapping
+The catalog SHALL optionally map symbols to tests and code coverage when available.
+
+#### Scenario: Coverage present
+- WHEN coverage data is provided
+- THEN the catalog includes coverage summaries per module/symbol and links to failing tests where applicable
 ### Requirement: Symbol Graph and Quality Signals in Catalog
 The catalog SHALL include per-module and per-symbol graph information and quality signals enabling agents to reason about structure and health.
 
