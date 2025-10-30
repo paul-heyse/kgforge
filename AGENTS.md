@@ -35,8 +35,7 @@
    - Open the relevant spec/proposal under `openspec/` (when applicable).
    - Bootstrap environment and run local checks:
      ```bash
-     uv sync --locked
-     uvx pre-commit run --all-files
+     uv sync 
      ```
 
 2) **Plan (write before code)**
