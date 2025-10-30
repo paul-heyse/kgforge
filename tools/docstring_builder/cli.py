@@ -74,7 +74,7 @@ from tools.docstring_builder.semantics import SemanticResult, build_semantic_sch
 from tools.drift_preview import DocstringDriftEntry, write_docstring_drift, write_html_diff
 from tools.stubs.drift_check import run as run_stub_drift
 
-LOGGER = logging.getLogger("docstring_builder")
+LOGGER = logging.getLogger(__name__)
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CACHE_PATH = REPO_ROOT / ".cache" / "docstring_builder.json"
 DOCFACTS_PATH = REPO_ROOT / "docs" / "_build" / "docfacts.json"
@@ -1273,6 +1273,7 @@ def _command_list(args: argparse.Namespace) -> int:
 def _command_clear_cache(_: argparse.Namespace) -> int:
     """Remove any cached docstring builder metadata."""
     BuilderCache(CACHE_PATH).clear()
+    LOGGER.info("Cleared docstring builder cache at %s", CACHE_PATH)
     return EXIT_SUCCESS
 
 
