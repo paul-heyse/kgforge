@@ -5,8 +5,8 @@
 - [x] 1.4 Validate DocFacts against schema in every run; add CI gate failing on invalid/drifted payloads.
 
 ## 2. Metadata Verification & Renderer Parity
-- [ ] 2.1 Add tests guaranteeing `ParameterHarvest` fidelity for positional-only, keyword-only, varargs, kwargs.
-- [ ] 2.2 Assert renderer uses `display_name` and kinds correctly in generated sections.
+- [x] 2.1 Add tests guaranteeing `ParameterHarvest` fidelity for positional-only, keyword-only, varargs, kwargs.
+- [x] 2.2 Assert renderer uses `display_name` and kinds correctly in generated sections.
 - [x] 2.3 Extend DocFacts tests to assert propagation and idempotence of enriched fields.
 - [ ] 2.4 Verify downstream consumers (navmap/README generators) tolerate enriched DocFacts; add failing tests if gaps exist.
 
@@ -26,13 +26,13 @@
 - [ ] 5.3 Improve normalization of multiline defaults and types; add tests.
 
 ## 6. CLI Performance & Machine Outputs
-- [ ] 6.1 Implement `--jobs N` parallel processing with stable ordering and deterministic outputs.
-- [ ] 6.2 Add `--json` output (per-file outcomes, summary) for CI consumption.
+- [x] 6.1 Implement `--jobs N` parallel processing with stable ordering and deterministic outputs.
+- [x] 6.2 Add `--json` output (per-file outcomes, summary) for CI consumption.
 - [ ] 6.3 Add `--baseline <rev>` comparison mode; tests for local and CI defaults.
 
 ## 7. Observability & Drift UX
-- [ ] 7.1 Generate consolidated docstrings drift HTML; link from manifest.
-- [ ] 7.2 Add trend metrics (coverage, violations) to observability JSON.
+- [x] 7.1 Generate consolidated docstrings drift HTML; link from manifest.
+- [x] 7.2 Add trend metrics (coverage, violations) to observability JSON.
 - [ ] 7.3 Provide PR guidance and link previews; add editor tasks/snippets for `generate`, `lint`, `check`, `doctor`, `artifacts`.
 
 ## 8. Security Hardening
