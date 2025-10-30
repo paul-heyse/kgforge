@@ -1,0 +1,208 @@
+{
+  "packages": [
+    "_duckdb",
+    "annotated_doc",
+    "annotated_types",
+    "anyio",
+    "charset_normalizer",
+    "click",
+    "cryptography",
+    "docling",
+    "docstring_parser",
+    "dotenv",
+    "download",
+    "duckdb",
+    "email_validator",
+    "embeddings_dense",
+    "embeddings_sparse",
+    "faiss",
+    "fastapi",
+    "fsspec",
+    "idna",
+    "jnius",
+    "kg_builder",
+    "kgfoundry",
+    "kgfoundry_common",
+    "libcuvs",
+    "libraft",
+    "librmm",
+    "linking",
+    "numpy",
+    "observability",
+    "ontology",
+    "orchestration",
+    "orjson",
+    "packaging",
+    "pluggy",
+    "prefect",
+    "prometheus_client",
+    "pyarrow",
+    "pydantic",
+    "pydantic_core",
+    "pyserini",
+    "pytest",
+    "registry",
+    "requests",
+    "rich",
+    "scipy",
+    "search_api",
+    "search_client",
+    "sitecustomize",
+    "starlette",
+    "threadpoolctl",
+    "tqdm",
+    "typer",
+    "typing_inspection",
+    "urllib3",
+    "uvicorn",
+    "vectorstore_faiss",
+    "yaml"
+  ],
+  "cycles": [],
+  "centrality": {
+    "_duckdb": 0.017857142857142856,
+    "annotated_doc": 0.017857142857142856,
+    "annotated_types": 0.017857142857142856,
+    "anyio": 0.07142857142857142,
+    "charset_normalizer": 0.017857142857142856,
+    "click": 0.03571428571428571,
+    "cryptography": 0.03571428571428571,
+    "docling": 0.03571428571428571,
+    "docstring_parser": 0.017857142857142856,
+    "dotenv": 0.017857142857142856,
+    "download": 0.07142857142857142,
+    "duckdb": 0.05357142857142857,
+    "email_validator": 0.03571428571428571,
+    "embeddings_dense": 0.03571428571428571,
+    "embeddings_sparse": 0.03571428571428571,
+    "faiss": 0.07142857142857142,
+    "fastapi": 0.1607142857142857,
+    "fsspec": 0.03571428571428571,
+    "idna": 0.05357142857142857,
+    "jnius": 0.017857142857142856,
+    "kg_builder": 0.017857142857142856,
+    "kgfoundry": 0.2857142857142857,
+    "kgfoundry_common": 0.19642857142857142,
+    "libcuvs": 0.05357142857142857,
+    "libraft": 0.017857142857142856,
+    "librmm": 0.017857142857142856,
+    "linking": 0.03571428571428571,
+    "numpy": 0.17857142857142855,
+    "observability": 0.05357142857142857,
+    "ontology": 0.017857142857142856,
+    "orchestration": 0.14285714285714285,
+    "orjson": 0.03571428571428571,
+    "packaging": 0.03571428571428571,
+    "pluggy": 0.017857142857142856,
+    "prefect": 0.21428571428571427,
+    "prometheus_client": 0.017857142857142856,
+    "pyarrow": 0.05357142857142857,
+    "pydantic": 0.1607142857142857,
+    "pydantic_core": 0.05357142857142857,
+    "pyserini": 0.08928571428571427,
+    "pytest": 0.017857142857142856,
+    "registry": 0.07142857142857142,
+    "requests": 0.125,
+    "rich": 0.05357142857142857,
+    "scipy": 0.03571428571428571,
+    "search_api": 0.17857142857142855,
+    "search_client": 0.05357142857142857,
+    "sitecustomize": 0.017857142857142856,
+    "starlette": 0.05357142857142857,
+    "threadpoolctl": 0.017857142857142856,
+    "tqdm": 0.017857142857142856,
+    "typer": 0.07142857142857142,
+    "typing_inspection": 0.017857142857142856,
+    "urllib3": 0.05357142857142857,
+    "uvicorn": 0.07142857142857142,
+    "vectorstore_faiss": 0.10714285714285714,
+    "yaml": 0.08928571428571427
+  },
+  "layer_violations": [],
+  "cycle_enumeration_skipped": true,
+  "generated_at": "2025-10-30T14:00:11Z",
+  "scc_summary": [
+    {
+      "members": [
+        "kgfoundry",
+        "orchestration",
+        "search_api"
+      ],
+      "size": 3,
+      "truncated": false,
+      "has_cycle": true
+    },
+    {
+      "members": [
+        "registry"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "duckdb"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "_duckdb"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "prefect"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "fastapi"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "annotated_doc"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "docling"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "download"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "embeddings_dense"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    }
+  ]
+}
