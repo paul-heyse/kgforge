@@ -9,6 +9,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from kgfoundry.agent_catalog.sqlite import load_catalog_from_sqlite, sqlite_candidates
+
 
 class AnchorsModel(BaseModel):
     """Source anchor metadata for a symbol."""
@@ -199,5 +201,9 @@ def load_catalog_payload(path: Path, *, load_shards: bool = True) -> dict[str, A
 
 def load_catalog_model(path: Path, *, load_shards: bool = True) -> AgentCatalogModel:
     """Return a validated catalog model from the JSON artifact."""
+    for candidate in sqlite_candidates(path):
+        if candidate.exists():
+            payload = load_catalog_from_sqlite(candidate)
+            return AgentCatalogModel.model_validate(payload)
     payload = load_catalog_payload(path, load_shards=load_shards)
     return AgentCatalogModel.model_validate(payload)
