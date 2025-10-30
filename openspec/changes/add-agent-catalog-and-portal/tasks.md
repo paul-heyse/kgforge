@@ -59,15 +59,15 @@
         - Fields present in catalog; portal renders them later; clients can query them.
 
 ## 3. Semantic Index & SQLite Catalog
-- [ ] 3.1 Embedding and index build
-    - [ ] 3.1.1 Choose embedding model (MiniLM or configured); implement encoder; generate vectors for symbols.
-    - [ ] 3.1.2 Build FAISS index and sidecar mapping `symbol_id`→row; persist paths in catalog.
+- [x] 3.1 Embedding and index build
+    - [x] 3.1.1 Choose embedding model (MiniLM or configured); implement encoder; generate vectors for symbols.
+    - [x] 3.1.2 Build FAISS index and sidecar mapping `symbol_id`→row; persist paths in catalog.
     - AC:
         - Index build completes; lookup by symbol_id returns vector row.
 
-- [ ] 3.2 Hybrid search API
-    - [ ] 3.2.1 Implement lexical candidate selection then vector rerank with weight α (configurable).
-    - [ ] 3.2.2 Provide CLI function to query top-K with optional facets.
+- [x] 3.2 Hybrid search API
+    - [x] 3.2.1 Implement lexical candidate selection then vector rerank with weight α (configurable).
+    - [x] 3.2.2 Provide CLI function to query top-K with optional facets.
     - AC:
         - Internal benchmark achieves MRR@10 ≥ target; lexical fallback works when index absent.
 
@@ -91,9 +91,9 @@
         - Large catalogs produce shards; root references resolve in tests.
 
 ## 5. Typed Clients, CLI, and Stdio Session Server
-- [ ] 5.1 Python client
-    - [ ] 5.1.1 Define Pydantic models for catalog; implement shard-aware loader.
-    - [ ] 5.1.2 Helpers: `list_packages`, `list_modules`, `get_module`, `find_callers`, `search`.
+- [x] 5.1 Python client
+    - [x] 5.1.1 Define Pydantic models for catalog; implement shard-aware loader.
+    - [x] 5.1.2 Helpers: `list_packages`, `list_modules`, `get_module`, `find_callers`, `search`.
     - AC:
         - Type-checked client; helper tests pass.
 
@@ -102,8 +102,8 @@
     - AC:
         - Unit tests pass in Node/Deno; importable by examples.
 
-- [ ] 5.3 `catalogctl` CLI (serverless)
-    - [ ] 5.3.1 Implement commands: `capabilities`, `symbol`, `find-callers`, `find-callees`, `search`, `open-anchor`, `change-impact`, `suggest-tests`, `explain-ranking` with exit codes 0/2/3 and JSON/NDJSON output.
+- [x] 5.3 `catalogctl` CLI (serverless)
+    - [x] 5.3.1 Implement commands: `capabilities`, `symbol`, `find-callers`, `find-callees`, `search`, `open-anchor`, `change-impact`, `suggest-tests`, `explain-ranking` with exit codes 0/2/3 and JSON/NDJSON output.
     - AC:
         - CLI returns expected outputs and exit codes; help docs present.
 
@@ -120,9 +120,9 @@
         - OpenAPI validates; SDKs compile; Problem Details contract verified in tests.
 
 ## 6. Agent Portal
-- [ ] 6.1 MVP rendering
-    - [ ] 6.1.1 Build `tools/docs/render_agent_portal.py`; output `site/_build/agent/index.html`.
-    - [ ] 6.1.2 Render header, quick links, packages/modules, simple search (lexical), actions.
+- [x] 6.1 MVP rendering
+    - [x] 6.1.1 Build `tools/docs/render_agent_portal.py`; output `site/_build/agent/index.html`.
+    - [x] 6.1.2 Render header, quick links, packages/modules, simple search (lexical), actions.
     - AC:
         - Portal loads offline with working links; snapshot test passes.
 
@@ -150,8 +150,8 @@
     - AC:
         - File written with `generated_at`, counters, and version.
 
-- [ ] 7.2 Orchestrator integration
-    - [ ] 7.2.1 Update `tools/docs/build_artifacts.py` to run catalog then portal; stop on failure.
+- [x] 7.2 Orchestrator integration
+    - [x] 7.2.1 Update `tools/docs/build_artifacts.py` to run catalog then portal; stop on failure.
     - AC:
         - `make artifacts` prints agent steps; exits non-zero on validation failure.
 
@@ -189,8 +189,8 @@
     - [ ] 10.2.1 Resolve a sample of source/page/fjson/editor/GitHub links.
 - [ ] 10.3 Portal tests
     - [ ] 10.3.1 Snapshot and interaction tests for search, facets, breadcrumbs, hints/impact/exemplars.
-- [ ] 10.4 Client & CLI tests
-    - [ ] 10.4.1 Python/TS client unit tests; CLI exit codes and output contract; `catalogctl` parity with stdio methods.
+- [x] 10.4 Client & CLI tests
+    - [x] 10.4.1 Python/TS client unit tests; CLI exit codes and output contract; `catalogctl` parity with stdio methods.
 - [ ] 10.5 Search quality
     - [ ] 10.5.1 Evaluate hybrid search; assert MRR@10 ≥ target on benchmark set.
 - [ ] 10.6 CI integration
