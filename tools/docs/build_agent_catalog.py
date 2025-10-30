@@ -9,18 +9,22 @@ import copy
 import dataclasses
 import datetime as dt
 import hashlib
+import importlib
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 import tokenize
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, TypeVar, cast
+from typing import Any, Protocol, TypeVar, cast
 
 import jsonschema  # type: ignore[import-untyped]
+import numpy as np
+import numpy.typing as npt
 
 
 class CatalogBuildError(RuntimeError):
@@ -82,6 +86,36 @@ class AgentHints:
 
 
 @dataclass
+class SemanticIndexMetadata:
+    """Metadata describing the persisted semantic index artifacts."""
+
+    index: str
+    mapping: str
+    model: str
+    dimension: int
+    count: int
+
+
+@dataclass
+class SearchConfig:
+    """Configuration used for hybrid search against the catalog."""
+
+    alpha: float
+    candidate_pool: int
+    lexical_fields: list[str]
+
+
+@dataclass
+class SearchOptions:
+    """Optional tuning parameters for hybrid search."""
+
+    alpha: float | None = None
+    facets: Mapping[str, str] | None = None
+    candidate_pool: int | None = None
+    model_loader: Callable[[str], EmbeddingModelProtocol] | None = None
+
+
+@dataclass
 class ChangeImpact:
     """Change impact metadata per symbol."""
 
@@ -140,10 +174,113 @@ class AgentCatalog:
     artifacts: dict[str, str]
     packages: list[PackageRecord]
     shards: dict[str, Any] | None = None
+    semantic_index: SemanticIndexMetadata | None = None
+    search: SearchConfig | None = None
+
+
+@dataclass
+class SearchDocument:
+    """Intermediate representation used to build the semantic index."""
+
+    symbol_id: str
+    package: str
+    module: str
+    qname: str
+    kind: str
+    stability: str | None
+    deprecated: bool
+    summary: str | None
+    docstring: str | None
+    anchor_start: int | None
+    anchor_end: int | None
+    text: str
+    tokens: collections.Counter[str]
+    row: int = -1
+
+
+@dataclass
+class SearchResult:
+    """Result record returned by hybrid search."""
+
+    symbol_id: str
+    score: float
+    lexical_score: float
+    vector_score: float
+    package: str
+    module: str
+    qname: str
+    kind: str
+    stability: str | None
+    deprecated: bool
+    summary: str | None
+    docstring: str | None
+    anchor: dict[str, int | None]
+
+
+@dataclass
+class VectorSearchContext:
+    """Data bundle required for computing vector scores."""
+
+    semantic_meta: Mapping[str, Any]
+    mapping_payload: Mapping[str, Any]
+    index_path: Path
+    documents: Sequence[SearchDocument]
+    candidate_limit: int
+    k: int
+    candidate_ids: set[str]
+    row_to_document: Mapping[int, SearchDocument]
 
 
 STD_LIB_MODULES = set(sys.stdlib_module_names)
 TRIGRAM_LENGTH = 3
+WORD_RE = re.compile(r"[A-Za-z0-9_]+")
+type VectorArray = npt.NDArray[np.float32]
+EMBEDDING_MATRIX_RANK = 2
+
+
+class EmbeddingModelProtocol(Protocol):
+    """Protocol describing the embedding model encode interface."""
+
+    def encode(self, sentences: Sequence[str], **_: object) -> VectorArray:
+        """Return embeddings for the provided sentences."""
+
+
+class FaissIndexProtocol(Protocol):
+    """Protocol describing the FAISS index surface used by the builder."""
+
+    def add(self, vectors: VectorArray) -> None:
+        """Add vectors to the index."""
+
+    def search(
+        self, vectors: VectorArray, count: int
+    ) -> tuple[npt.NDArray[np.float32], npt.NDArray[np.int64]]:
+        """Search vectors and return distance/index pairs."""
+
+
+class FaissModuleProtocol(Protocol):
+    """Protocol describing the FAISS module surface used by the builder."""
+
+    def IndexFlatIP(self, dimension: int) -> FaissIndexProtocol:  # noqa: N802
+        """Return an inner-product index for the given dimension."""
+
+    def write_index(self, index: FaissIndexProtocol, path: str) -> None:
+        """Persist an index to the given path."""
+
+    def read_index(self, path: str) -> FaissIndexProtocol:
+        """Load an index from disk."""
+
+    def normalize_L2(self, vectors: VectorArray) -> None:  # noqa: N802
+        """Normalize vectors in-place to unit length."""
+
+
+LEXICAL_FIELDS = [
+    "qname",
+    "module",
+    "package",
+    "summary",
+    "docstring",
+    "agent_hints.intent_tags",
+]
 
 
 class ModuleAnalyzer:
@@ -438,6 +575,51 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         default=Path("site/_build/test_map_summary.json"),
         help="Path to test map summary JSON artifact.",
     )
+    parser.add_argument(
+        "--semantic-dir",
+        type=Path,
+        default=Path("docs/_build/agent_catalog/semantic"),
+        help="Directory for semantic index artifacts.",
+    )
+    parser.add_argument(
+        "--embedding-model",
+        default="sentence-transformers/all-MiniLM-L6-v2",
+        help="SentenceTransformer model name used for embeddings.",
+    )
+    parser.add_argument(
+        "--embedding-batch-size",
+        type=int,
+        default=32,
+        help="Batch size to use when computing embeddings.",
+    )
+    parser.add_argument(
+        "--search-alpha",
+        type=float,
+        default=0.6,
+        help="Hybrid search weight for vector similarity (0-1).",
+    )
+    parser.add_argument(
+        "--search-candidates",
+        type=int,
+        default=50,
+        help="Number of lexical candidates considered before vector rerank.",
+    )
+    parser.add_argument(
+        "--search-query",
+        help="If provided, run hybrid search against an existing catalog instead of building.",
+    )
+    parser.add_argument(
+        "--search-k",
+        type=int,
+        default=10,
+        help="Number of search results to return when --search-query is used.",
+    )
+    parser.add_argument(
+        "--search-facet",
+        action="append",
+        default=[],
+        help="Facet filter expressed as key=value (may be repeated).",
+    )
     return parser.parse_args(argv)
 
 
@@ -458,6 +640,11 @@ class AgentCatalogBuilder:
             "test_map_coverage": cast(Path, args.test_map_coverage),
             "test_map_summary": cast(Path, args.test_map_summary),
         }
+        self.semantic_dir = cast(Path, args.semantic_dir)
+        self.embedding_model = str(args.embedding_model)
+        self.embedding_batch_size = int(args.embedding_batch_size)
+        self.search_alpha = float(args.search_alpha)
+        self.search_candidates = int(args.search_candidates)
         self._symbol_records: dict[str, SymbolRecord] = {}
         self._git_churn_cache: dict[Path, int] = {}
         self._git_modified_cache: dict[Path, str | None] = {}
@@ -474,10 +661,19 @@ class AgentCatalogBuilder:
         generated_at = dt.datetime.now(tz=dt.UTC).isoformat()
         packages = self._collect_packages()
         self._apply_call_graph(packages)
+        semantic_index = self._build_semantic_index(packages)
         artifacts = {
             key: self._relative_string(self._resolve_artifact_path(path))
             for key, path in self.artifact_paths.items()
         }
+        if semantic_index is not None:
+            artifacts["semantic_index"] = semantic_index.index
+            artifacts["semantic_mapping"] = semantic_index.mapping
+        search_config = SearchConfig(
+            alpha=self.search_alpha,
+            candidate_pool=self.search_candidates,
+            lexical_fields=list(LEXICAL_FIELDS),
+        )
         catalog = AgentCatalog(
             version=self.args.version,
             generated_at=generated_at,
@@ -485,6 +681,8 @@ class AgentCatalogBuilder:
             link_policy=dataclasses.asdict(link_policy),
             artifacts=artifacts,
             packages=packages,
+            semantic_index=semantic_index,
+            search=search_config,
         )
         self._maybe_shard(catalog)
         return catalog
@@ -1010,6 +1208,122 @@ class AgentCatalogBuilder:
             record.change_impact.callers = sorted(callers.get(qname, []))
             record.change_impact.callees = sorted(callees.get(qname, []))
 
+    def _collect_search_documents(self, packages: Sequence[PackageRecord]) -> list[SearchDocument]:
+        documents: list[SearchDocument] = []
+        for package in packages:
+            for module in package.modules:
+                for symbol in module.symbols:
+                    document = self._build_search_document(
+                        package=package,
+                        module=module,
+                        symbol=symbol,
+                    )
+                    documents.append(document)
+        return documents
+
+    def _build_search_document(
+        self,
+        *,
+        package: PackageRecord,
+        module: ModuleRecord,
+        symbol: SymbolRecord,
+    ) -> SearchDocument:
+        summary, docstring = _extract_docfacts_text(symbol.docfacts)
+        text_parts = [
+            symbol.qname,
+            module.qualified,
+            package.name,
+            summary,
+            docstring,
+            " ".join(symbol.agent_hints.intent_tags),
+            " ".join(symbol.agent_hints.tests_to_run),
+        ]
+        normalized_text = " ".join(part for part in text_parts if part)
+        tokens = collections.Counter(_tokenize(normalized_text))
+        return SearchDocument(
+            symbol_id=symbol.symbol_id,
+            package=package.name,
+            module=module.qualified,
+            qname=symbol.qname,
+            kind=symbol.kind,
+            stability=symbol.metrics.stability,
+            deprecated=symbol.metrics.deprecated,
+            summary=summary,
+            docstring=docstring,
+            anchor_start=symbol.anchors.start_line,
+            anchor_end=symbol.anchors.end_line,
+            text=normalized_text,
+            tokens=tokens,
+        )
+
+    def _build_semantic_index(
+        self, packages: Sequence[PackageRecord]
+    ) -> SemanticIndexMetadata | None:
+        documents = self._collect_search_documents(packages)
+        if not documents:
+            return None
+        texts = [document.text for document in documents]
+        model = _load_embedding_model(self.embedding_model)
+        try:
+            embeddings = model.encode(
+                texts,
+                batch_size=self.embedding_batch_size,
+                show_progress_bar=False,
+                convert_to_numpy=True,
+                normalize_embeddings=True,
+            )
+        except Exception as exc:  # pragma: no cover - defensive guard
+            message = f"Embedding model failed to encode texts: {exc}"
+            raise CatalogBuildError(message) from exc
+        vectors = np.asarray(embeddings, dtype=np.float32)
+        if vectors.ndim != EMBEDDING_MATRIX_RANK:
+            message = "Embedding model returned an unexpected vector shape"
+            raise CatalogBuildError(message)
+        if vectors.shape[0] != len(documents):
+            message = "Embedding count mismatch between texts and vectors"
+            raise CatalogBuildError(message)
+        if vectors.shape[1] == 0:
+            message = "Embedding vectors must have a positive dimension"
+            raise CatalogBuildError(message)
+        semantic_dir = (self.repo_root / self.semantic_dir).resolve()
+        semantic_dir.mkdir(parents=True, exist_ok=True)
+        faiss_module = _load_faiss("build the semantic index")
+        index = faiss_module.IndexFlatIP(int(vectors.shape[1]))
+        contiguous_vectors = cast(VectorArray, np.ascontiguousarray(vectors))
+        index.add(contiguous_vectors)
+        index_path = semantic_dir / "symbols.faiss"
+        faiss_module.write_index(index, str(index_path))
+        mapping_entries = []
+        for row, document in enumerate(documents):
+            document.row = row
+            mapping_entries.append(
+                {
+                    "symbol_id": document.symbol_id,
+                    "row": row,
+                    "package": document.package,
+                    "module": document.module,
+                    "qname": document.qname,
+                    "kind": document.kind,
+                    "stability": document.stability,
+                    "deprecated": document.deprecated,
+                }
+            )
+        mapping_payload = {
+            "model": self.embedding_model,
+            "dimension": int(vectors.shape[1]),
+            "count": len(documents),
+            "symbols": mapping_entries,
+        }
+        mapping_path = semantic_dir / "symbols.json"
+        mapping_path.write_text(json.dumps(mapping_payload, indent=2), encoding="utf-8")
+        return SemanticIndexMetadata(
+            index=self._relative_string(index_path),
+            mapping=self._relative_string(mapping_path),
+            model=self.embedding_model,
+            dimension=int(vectors.shape[1]),
+            count=len(documents),
+        )
+
     def _maybe_shard(self, catalog: AgentCatalog) -> None:
         total_modules = sum(len(pkg.modules) for pkg in catalog.packages)
         total_symbols = sum(len(mod.symbols) for pkg in catalog.packages for mod in pkg.modules)
@@ -1059,6 +1373,513 @@ class AgentCatalogBuilder:
             raise CatalogBuildError(message)
 
 
+def _load_embedding_model(model_name: str) -> EmbeddingModelProtocol:
+    """Return the configured embedding model, raising on failure."""
+    try:
+        module = importlib.import_module("sentence_transformers")
+    except ImportError as exc:  # pragma: no cover - runtime guard
+        message = "sentence-transformers is required for semantic indexing"
+        raise CatalogBuildError(message) from exc
+    factory = getattr(module, "SentenceTransformer", None)
+    if not callable(factory):  # pragma: no cover - defensive guard
+        message = "sentence-transformers is missing the SentenceTransformer class"
+        raise CatalogBuildError(message)
+    try:
+        model = factory(model_name)
+    except Exception as exc:  # pragma: no cover - defensive guard
+        message = f"Unable to load embedding model '{model_name}'"
+        raise CatalogBuildError(message) from exc
+    return cast(EmbeddingModelProtocol, model)
+
+
+def _load_faiss(purpose: str) -> FaissModuleProtocol:
+    """Import the faiss module or raise a descriptive error."""
+    try:
+        module = importlib.import_module("faiss")
+    except ImportError as exc:  # pragma: no cover - runtime guard
+        message = f"faiss is required to {purpose}"
+        raise CatalogBuildError(message) from exc
+    return cast(FaissModuleProtocol, module)
+
+
+def _tokenize(text: str) -> list[str]:
+    """Return normalized word tokens for the given text."""
+    return WORD_RE.findall(text.lower())
+
+
+def _extract_docfacts_text(
+    docfacts: Mapping[str, Any] | None,
+) -> tuple[str | None, str | None]:
+    """Extract summary and docstring text from docfacts payloads."""
+    if not isinstance(docfacts, Mapping):
+        return None, None
+    summary = _stringify(docfacts.get("summary"))
+    if summary is None:
+        summary = _stringify(docfacts.get("short_summary"))
+    docstring = _stringify(docfacts.get("docstring"))
+    if docstring is None:
+        docstring = _stringify(docfacts.get("description"))
+    return summary, docstring
+
+
+def _stringify(value: object) -> str | None:
+    """Convert nested docfacts data into a normalized string."""
+    if value is None:
+        return None
+    result: str | None
+    if isinstance(value, str):
+        stripped = value.strip()
+        result = stripped or None
+    elif isinstance(value, bool):
+        result = "true" if value else "false"
+    elif isinstance(value, (int, float)):
+        result = str(value)
+    elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        parts = [_stringify(item) for item in value]
+        joined = " ".join(part for part in parts if part)
+        result = joined or None
+    elif isinstance(value, Mapping):
+        parts = [_stringify(item) for item in value.values()]
+        joined = " ".join(part for part in parts if part)
+        result = joined or None
+    else:
+        result = str(value)
+    return result
+
+
+def _iter_symbol_entries(
+    catalog: Mapping[str, Any],
+) -> Iterable[tuple[str, str, Mapping[str, Any]]]:
+    """Yield package, module, and symbol payloads from the catalog."""
+    packages = catalog.get("packages")
+    if not isinstance(packages, list):
+        return
+    for package in packages:
+        if not isinstance(package, Mapping):
+            continue
+        package_name = str(package.get("name", ""))
+        modules = package.get("modules")
+        if not isinstance(modules, list):
+            continue
+        for module in modules:
+            if not isinstance(module, Mapping):
+                continue
+            module_name = str(module.get("qualified") or module.get("name") or "")
+            symbols = module.get("symbols")
+            if not isinstance(symbols, list):
+                continue
+            for symbol in symbols:
+                if isinstance(symbol, Mapping):
+                    yield package_name, module_name, symbol
+
+
+def _extract_agent_hints_payload(symbol: Mapping[str, Any]) -> tuple[list[str], list[str]]:
+    """Return normalized agent hints for a symbol."""
+    intent_tags: list[str] = []
+    tests_to_run: list[str] = []
+    agent_hints = symbol.get("agent_hints")
+    if isinstance(agent_hints, Mapping):
+        raw_tags = agent_hints.get("intent_tags")
+        if isinstance(raw_tags, list):
+            intent_tags = [str(tag) for tag in raw_tags if tag]
+        raw_tests = agent_hints.get("tests_to_run")
+        if isinstance(raw_tests, list):
+            tests_to_run = [str(test) for test in raw_tests if test]
+    return intent_tags, tests_to_run
+
+
+def _extract_anchor_lines(symbol: Mapping[str, Any]) -> tuple[int | None, int | None]:
+    """Return anchor line information for a symbol payload."""
+    anchors = symbol.get("anchors")
+    start_line: int | None = None
+    end_line: int | None = None
+    if isinstance(anchors, Mapping):
+        raw_start = anchors.get("start_line")
+        raw_end = anchors.get("end_line")
+        if isinstance(raw_start, int):
+            start_line = raw_start
+        if isinstance(raw_end, int):
+            end_line = raw_end
+    return start_line, end_line
+
+
+def _build_document_from_payload(
+    package_name: str,
+    module_name: str,
+    symbol: Mapping[str, Any],
+    symbol_id: str,
+    row: int,
+) -> SearchDocument:
+    """Construct a search document from serialized symbol payloads."""
+    docfacts_payload = symbol.get("docfacts")
+    summary, docstring = _extract_docfacts_text(
+        docfacts_payload if isinstance(docfacts_payload, Mapping) else None
+    )
+    intent_tags, tests_to_run = _extract_agent_hints_payload(symbol)
+    qname_value = _stringify(symbol.get("qname")) or symbol_id
+    text_parts = [
+        qname_value,
+        module_name,
+        package_name,
+        summary or "",
+        docstring or "",
+        " ".join(intent_tags),
+        " ".join(tests_to_run),
+    ]
+    normalized_text = " ".join(part for part in text_parts if part)
+    tokens = collections.Counter(_tokenize(normalized_text))
+    start_line, end_line = _extract_anchor_lines(symbol)
+    metrics = symbol.get("metrics")
+    stability = None
+    deprecated = False
+    if isinstance(metrics, Mapping):
+        stability = _stringify(metrics.get("stability"))
+        deprecated = bool(metrics.get("deprecated"))
+    return SearchDocument(
+        symbol_id=symbol_id,
+        package=package_name,
+        module=module_name,
+        qname=qname_value,
+        kind=str(symbol.get("kind", "object")),
+        stability=stability,
+        deprecated=deprecated,
+        summary=summary,
+        docstring=docstring,
+        anchor_start=start_line,
+        anchor_end=end_line,
+        text=normalized_text,
+        tokens=tokens,
+        row=row,
+    )
+
+
+def _documents_from_catalog(
+    catalog: Mapping[str, Any],
+    row_lookup: Mapping[str, int],
+) -> list[SearchDocument]:
+    """Reconstruct search documents from the serialized catalog payload."""
+    documents: list[SearchDocument] = []
+    for package_name, module_name, symbol in _iter_symbol_entries(catalog):
+        symbol_id = symbol.get("symbol_id")
+        if not isinstance(symbol_id, str):
+            continue
+        row = row_lookup.get(symbol_id)
+        if row is None:
+            continue
+        documents.append(
+            _build_document_from_payload(
+                package_name=package_name,
+                module_name=module_name,
+                symbol=symbol,
+                symbol_id=symbol_id,
+                row=row,
+            )
+        )
+    return documents
+
+
+def _document_matches_facets(document: SearchDocument, facets: Mapping[str, str]) -> bool:
+    """Return True when a document satisfies all facet constraints."""
+    for key, value in facets.items():
+        if key == "package" and document.package != value:
+            return False
+        if key == "module" and document.module != value:
+            return False
+        if key == "kind" and document.kind != value:
+            return False
+        if key == "stability" and (document.stability or "") != value:
+            return False
+        if key == "deprecated":
+            parsed = _parse_bool(value)
+            if parsed is not None and document.deprecated != parsed:
+                return False
+    return True
+
+
+def _parse_bool(value: str) -> bool | None:
+    """Parse a boolean facet value."""
+    lowered = value.strip().lower()
+    if lowered in {"1", "true", "yes", "y", "on"}:
+        return True
+    if lowered in {"0", "false", "no", "n", "off"}:
+        return False
+    return None
+
+
+def _parse_facet_args(raw: Iterable[str]) -> dict[str, str]:
+    """Parse CLI facet arguments expressed as key=value strings."""
+    facets: dict[str, str] = {}
+    for value in raw:
+        if "=" not in value:
+            message = f"Invalid facet expression '{value}', expected key=value"
+            raise CatalogBuildError(message)
+        key, raw_val = value.split("=", 1)
+        key = key.strip()
+        if not key:
+            message = f"Facet key cannot be empty in expression '{value}'"
+            raise CatalogBuildError(message)
+        facets[key] = raw_val.strip()
+    return facets
+
+
+def _resolve_semantic_index_metadata(
+    catalog: Mapping[str, Any], repo_root: Path
+) -> tuple[Mapping[str, Any], Path, Path]:
+    """Return semantic metadata and resolved artifact paths."""
+    semantic_meta = catalog.get("semantic_index")
+    if not isinstance(semantic_meta, Mapping):
+        message = "Catalog does not contain semantic index metadata"
+        raise CatalogBuildError(message)
+    index_rel = semantic_meta.get("index")
+    mapping_rel = semantic_meta.get("mapping")
+    if not isinstance(index_rel, str) or not isinstance(mapping_rel, str):
+        message = "Semantic index metadata is missing artifact paths"
+        raise CatalogBuildError(message)
+    index_path = (repo_root / index_rel).resolve()
+    mapping_path = (repo_root / mapping_rel).resolve()
+    if not index_path.exists() or not mapping_path.exists():
+        message = "Semantic index artifacts are missing from disk"
+        raise CatalogBuildError(message)
+    return semantic_meta, index_path, mapping_path
+
+
+def _load_row_lookup(mapping_path: Path) -> tuple[dict[str, int], Mapping[str, Any]]:
+    """Read the semantic mapping payload and return row lookup data."""
+    mapping_payload = json.loads(mapping_path.read_text(encoding="utf-8"))
+    symbols_payload = mapping_payload.get("symbols")
+    if not isinstance(symbols_payload, list):
+        message = "Semantic mapping file does not contain symbols list"
+        raise CatalogBuildError(message)
+    row_lookup: dict[str, int] = {}
+    for entry in symbols_payload:
+        if not isinstance(entry, Mapping):
+            continue
+        symbol_id = entry.get("symbol_id")
+        row = entry.get("row")
+        if isinstance(symbol_id, str) and isinstance(row, int):
+            row_lookup[symbol_id] = row
+    return row_lookup, mapping_payload
+
+
+def _prepare_query_tokens(query: str) -> collections.Counter[str]:
+    """Tokenize the query for lexical scoring."""
+    tokens = collections.Counter(_tokenize(query))
+    if not tokens:
+        tokens = collections.Counter(query.lower().split())
+    return tokens
+
+
+def _resolve_search_parameters(
+    catalog_search: Mapping[str, Any],
+    options: SearchOptions,
+    document_count: int,
+    k: int,
+) -> tuple[float, int]:
+    """Resolve alpha weighting and candidate pool limits."""
+    alpha_value = options.alpha
+    if alpha_value is None:
+        alpha_candidate = catalog_search.get("alpha")
+        if isinstance(alpha_candidate, (int, float)):
+            alpha_value = float(alpha_candidate)
+    if alpha_value is None:
+        alpha_value = 0.6
+    alpha_value = min(max(alpha_value, 0.0), 1.0)
+    candidate_value = options.candidate_pool
+    if candidate_value is None:
+        pool_value = catalog_search.get("candidate_pool")
+        if isinstance(pool_value, int) and pool_value > 0:
+            candidate_value = pool_value
+    if candidate_value is None:
+        candidate_value = document_count
+    candidate_limit = min(max(candidate_value, k), document_count)
+    return alpha_value, candidate_limit
+
+
+def _compute_lexical_scores(
+    query_tokens: collections.Counter[str],
+    documents: Sequence[SearchDocument],
+    query: str,
+) -> dict[str, float]:
+    """Compute lexical scores for each document."""
+    scores: dict[str, float] = {}
+    lowered_query = query.lower()
+    for document in documents:
+        score = 0.0
+        for token, weight in query_tokens.items():
+            token_count = document.tokens.get(token, 0)
+            if token_count:
+                score += float(min(weight, token_count))
+        if score == 0.0 and lowered_query in document.qname.lower():
+            score = 1.0
+        scores[document.symbol_id] = score
+    return scores
+
+
+def _select_lexical_candidates(
+    lexical_scores: Mapping[str, float],
+    documents: Sequence[SearchDocument],
+    candidate_limit: int,
+) -> list[SearchDocument]:
+    """Return the top lexical candidates based on the score map."""
+    sorted_docs = sorted(
+        documents,
+        key=lambda doc: lexical_scores.get(doc.symbol_id, 0.0),
+        reverse=True,
+    )
+    return sorted_docs[:candidate_limit]
+
+
+def _compute_vector_scores(query: str, options: SearchOptions, context: VectorSearchContext) -> dict[str, float]:
+    """Compute vector scores using the FAISS index and query embedding."""
+    faiss_module = _load_faiss("execute hybrid search")
+    try:
+        index = faiss_module.read_index(str(context.index_path))
+    except Exception as exc:  # pragma: no cover - defensive guard
+        message = "Failed to load semantic index"
+        raise CatalogBuildError(message) from exc
+    loader = options.model_loader or _load_embedding_model
+    model_name = (
+        _stringify(context.semantic_meta.get("model"))
+        or _stringify(context.mapping_payload.get("model"))
+        or "sentence-transformers/all-MiniLM-L6-v2"
+    )
+    query_vector = loader(model_name).encode(
+        [query],
+        batch_size=1,
+        show_progress_bar=False,
+        convert_to_numpy=True,
+        normalize_embeddings=True,
+    )
+    vectors = np.asarray(query_vector, dtype=np.float32)
+    if vectors.ndim == 1:
+        vectors = vectors.reshape(1, -1)
+    expected_dim = context.semantic_meta.get("dimension")
+    if isinstance(expected_dim, int) and vectors.shape[1] != expected_dim:
+        message = "Query embedding dimension does not match semantic index"
+        raise CatalogBuildError(message)
+    vector_array = cast(VectorArray, np.ascontiguousarray(vectors))
+    faiss_module.normalize_L2(vector_array)
+    search_count = min(len(context.documents), max(context.candidate_limit, context.k))
+    distances, indices = index.search(vector_array, search_count)
+    scores: dict[str, float] = {}
+    if distances.size and indices.size:
+        for score, row in zip(distances[0], indices[0], strict=False):
+            if row == -1:
+                continue
+            document = context.row_to_document.get(int(row))
+            if document is None:
+                continue
+            scores[document.symbol_id] = float(score)
+            context.candidate_ids.add(document.symbol_id)
+    return scores
+
+
+def _merge_scores(
+    doc_by_id: Mapping[str, SearchDocument],
+    candidate_ids: Iterable[str],
+    lexical_scores: Mapping[str, float],
+    vector_scores: Mapping[str, float],
+    alpha_value: float,
+) -> list[SearchResult]:
+    """Combine lexical and vector scores into ranked results."""
+    ordered_ids = list(dict.fromkeys(candidate_ids))
+    max_lexical = max((lexical_scores.get(symbol_id, 0.0) for symbol_id in ordered_ids), default=0.0)
+    results: list[SearchResult] = []
+    for symbol_id in ordered_ids:
+        document = doc_by_id.get(symbol_id)
+        if document is None:
+            continue
+        lexical_raw = lexical_scores.get(symbol_id, 0.0)
+        lexical_norm = lexical_raw / max_lexical if max_lexical > 0 else 0.0
+        vector_raw = vector_scores.get(symbol_id, -1.0)
+        vector_norm = 0.0
+        if vector_raw > -1.0:
+            vector_norm = max(min((vector_raw + 1.0) / 2.0, 1.0), 0.0)
+        combined = alpha_value * vector_norm + (1.0 - alpha_value) * lexical_norm
+        results.append(
+            SearchResult(
+                symbol_id=symbol_id,
+                score=combined,
+                lexical_score=lexical_norm,
+                vector_score=vector_norm,
+                package=document.package,
+                module=document.module,
+                qname=document.qname,
+                kind=document.kind,
+                stability=document.stability,
+                deprecated=document.deprecated,
+                summary=document.summary,
+                docstring=document.docstring,
+                anchor={"start_line": document.anchor_start, "end_line": document.anchor_end},
+            )
+        )
+    results.sort(
+        key=lambda item: (
+            item.score,
+            item.lexical_score,
+            item.vector_score,
+            item.qname,
+        ),
+        reverse=True,
+    )
+    return results
+
+
+def search_catalog(
+    catalog: Mapping[str, Any],
+    *,
+    repo_root: Path,
+    query: str,
+    k: int = 10,
+    options: SearchOptions | None = None,
+) -> list[SearchResult]:
+    """Execute hybrid lexical/vector search against the catalog."""
+    active_options = options or SearchOptions()
+    trimmed_query = query.strip()
+    if not trimmed_query:
+        message = "Search query must not be empty"
+        raise CatalogBuildError(message)
+    semantic_meta, index_path, mapping_path = _resolve_semantic_index_metadata(catalog, repo_root)
+    row_lookup, mapping_payload = _load_row_lookup(mapping_path)
+    documents = _documents_from_catalog(catalog, row_lookup)
+    facets = active_options.facets or {}
+    if facets:
+        documents = [doc for doc in documents if _document_matches_facets(doc, facets)]
+    if not documents:
+        return []
+    catalog_search = catalog.get("search")
+    search_config = catalog_search if isinstance(catalog_search, Mapping) else {}
+    alpha_value, candidate_limit = _resolve_search_parameters(
+        search_config,
+        active_options,
+        len(documents),
+        k,
+    )
+    query_tokens = _prepare_query_tokens(trimmed_query)
+    lexical_scores = _compute_lexical_scores(query_tokens, documents, trimmed_query)
+    lexical_candidates = _select_lexical_candidates(lexical_scores, documents, candidate_limit)
+    candidate_ids: set[str] = {doc.symbol_id for doc in lexical_candidates}
+    row_to_document = {doc.row: doc for doc in documents}
+    doc_by_id = {doc.symbol_id: doc for doc in documents}
+    vector_context = VectorSearchContext(
+        semantic_meta=semantic_meta,
+        mapping_payload=mapping_payload,
+        index_path=index_path,
+        documents=documents,
+        candidate_limit=candidate_limit,
+        k=k,
+        candidate_ids=candidate_ids,
+        row_to_document=row_to_document,
+    )
+    vector_scores = _compute_vector_scores(
+        trimmed_query,
+        active_options,
+        vector_context,
+    )
+    results = _merge_scores(doc_by_id, candidate_ids, lexical_scores, vector_scores, alpha_value)
+    return results[:k]
+
+
 def load_catalog(path: Path, *, load_shards: bool = True) -> dict[str, Any]:
     """Load a catalog JSON file and expand shards if requested."""
     data = cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
@@ -1088,6 +1909,28 @@ def main(argv: Sequence[str] | None = None) -> int:
     """CLI entrypoint."""
     args = parse_args(argv)
     builder = AgentCatalogBuilder(args)
+    if args.search_query:
+        try:
+            facets = _parse_facet_args(args.search_facet)
+            catalog_path = builder._resolve_artifact_path(args.output)
+            catalog_data = load_catalog(catalog_path, load_shards=True)
+            options = SearchOptions(
+                alpha=float(args.search_alpha),
+                facets=facets,
+                candidate_pool=int(args.search_candidates),
+            )
+            results = search_catalog(
+                catalog_data,
+                repo_root=builder.repo_root,
+                query=args.search_query,
+                k=max(1, int(args.search_k)),
+                options=options,
+            )
+        except CatalogBuildError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        print(json.dumps([dataclasses.asdict(result) for result in results], indent=2))
+        return 0
     try:
         catalog = builder.build()
         builder.write(catalog, args.output, args.schema)

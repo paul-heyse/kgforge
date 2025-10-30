@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import json
 import subprocess
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Protocol
 
+import numpy as np
+import numpy.typing as npt
 import pytest
 from tools.docs import build_agent_catalog
 
@@ -17,13 +20,41 @@ class SupportsSetEnv(Protocol):
 
 
 @pytest.fixture()
+def fake_embedding_backend(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Provide a deterministic embedding backend for tests."""
+    class FakeModel:
+        dimension = 6
+
+        def encode(self, sentences: Sequence[str], **_: object) -> npt.NDArray[np.float32]:
+            vectors: npt.NDArray[np.float32] = np.zeros(
+                (len(sentences), self.dimension), dtype=np.float32
+            )
+            for idx, sentence in enumerate(sentences):
+                seed = sum(ord(char) for char in sentence)
+                for column in range(self.dimension):
+                    vectors[idx, column] = ((seed + (column + 1) * 17) % 101) / 100.0
+                norm = np.linalg.norm(vectors[idx])
+                if norm:
+                    vectors[idx] /= norm
+            return vectors
+
+    def loader(_: str) -> FakeModel:
+        return FakeModel()
+
+    monkeypatch.setattr(build_agent_catalog, "_load_embedding_model", loader)
+
+
+
+
+@pytest.fixture()
 def repo_root() -> Path:
     """Return the repository root path."""
     return Path(__file__).resolve().parents[2]
 
 
-def test_help_succeeds(repo_root: Path) -> None:
+def test_help_succeeds(fake_embedding_backend: None, repo_root: Path) -> None:
     """The CLI help output should render without errors."""
+    del fake_embedding_backend
     script = repo_root / "tools" / "docs" / "build_agent_catalog.py"
     result = subprocess.run(
         ["uv", "run", "python", str(script), "--help"],
@@ -35,8 +66,11 @@ def test_help_succeeds(repo_root: Path) -> None:
     assert "--output" in result.stdout
 
 
-def test_build_catalog_smoke(tmp_path: Path, repo_root: Path) -> None:
+def test_build_catalog_smoke(
+    fake_embedding_backend: None, tmp_path: Path, repo_root: Path
+) -> None:
     """Building the catalog should produce a JSON document."""
+    del fake_embedding_backend
     output_path = tmp_path / "agent_catalog.json"
     shard_dir = tmp_path / "shards"
     args = build_agent_catalog.parse_args(
@@ -53,18 +87,25 @@ def test_build_catalog_smoke(tmp_path: Path, repo_root: Path) -> None:
     builder = build_agent_catalog.AgentCatalogBuilder(args)
     catalog = builder.build()
     assert catalog.packages, "expected at least one package"
+    assert catalog.semantic_index is not None
     builder.write(catalog, args.output, args.schema)
     data = json.loads(output_path.read_text(encoding="utf-8"))
     assert data["link_policy"]["mode"] in {"editor", "github"}
     assert data["packages"], "expected packages in catalog"
+    assert data["semantic_index"]["index"].endswith(".faiss")
+    assert data["artifacts"]["semantic_index"].endswith(".faiss")
+    assert data["search"]["lexical_fields"]
     first_package = data["packages"][0]
     first_module = first_package["modules"][0]
     assert first_module["graph"]["imports"] is not None
     assert first_module["symbols"], "expected symbols for module"
 
 
-def test_sharded_catalog_load(tmp_path: Path, repo_root: Path) -> None:
+def test_sharded_catalog_load(
+    fake_embedding_backend: None, tmp_path: Path, repo_root: Path
+) -> None:
     """When thresholds are low the builder should emit shards that can be loaded."""
+    del fake_embedding_backend
     output_path = tmp_path / "catalog.json"
     shard_dir = tmp_path / "catalog_shards"
     args = build_agent_catalog.parse_args(
@@ -91,8 +132,83 @@ def test_sharded_catalog_load(tmp_path: Path, repo_root: Path) -> None:
     assert loaded["packages"], "expected packages from shard loader"
 
 
-def test_link_policy_cli_precedence(monkeypatch: SupportsSetEnv, repo_root: Path) -> None:
+def test_search_catalog_hybrid(
+    fake_embedding_backend: None, tmp_path: Path, repo_root: Path
+) -> None:
+    """Hybrid search should return ranked results from the semantic index."""
+    del fake_embedding_backend
+    output_path = tmp_path / "catalog.json"
+    args = build_agent_catalog.parse_args(
+        [
+            "--output",
+            str(output_path),
+            "--schema",
+            "docs/_build/schema_agent_catalog.json",
+        ]
+    )
+    args.repo_root = repo_root
+    builder = build_agent_catalog.AgentCatalogBuilder(args)
+    catalog = builder.build()
+    builder.write(catalog, args.output, args.schema)
+    catalog_data = build_agent_catalog.load_catalog(output_path)
+    results = build_agent_catalog.search_catalog(
+        catalog_data,
+        repo_root=repo_root,
+        query="catalog",
+        k=5,
+    )
+    assert results, "expected hybrid search results"
+    assert all(0.0 <= result.score <= 1.0 for result in results)
+    assert any(result.lexical_score > 0.0 or result.vector_score > 0.0 for result in results)
+
+
+def test_cli_search_outputs_json(
+    fake_embedding_backend: None,
+    tmp_path: Path,
+    repo_root: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """The CLI search mode should print JSON payloads."""
+    del fake_embedding_backend
+    output_path = tmp_path / "catalog.json"
+    args = build_agent_catalog.parse_args(
+        [
+            "--output",
+            str(output_path),
+            "--schema",
+            "docs/_build/schema_agent_catalog.json",
+        ]
+    )
+    args.repo_root = repo_root
+    builder = build_agent_catalog.AgentCatalogBuilder(args)
+    catalog = builder.build()
+    builder.write(catalog, args.output, args.schema)
+    exit_code = build_agent_catalog.main(
+        [
+            "--repo-root",
+            str(repo_root),
+            "--output",
+            str(output_path),
+            "--search-query",
+            "catalog",
+            "--search-k",
+            "2",
+        ]
+    )
+    assert exit_code == 0
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert isinstance(payload, list)
+    assert payload, "expected CLI search results"
+    assert len(payload) <= 2
+    assert all("symbol_id" in entry for entry in payload)
+
+
+def test_link_policy_cli_precedence(
+    fake_embedding_backend: None, monkeypatch: SupportsSetEnv, repo_root: Path
+) -> None:
     """CLI link policy options should override environment variables."""
+    del fake_embedding_backend
     monkeypatch.setenv("DOCS_LINK_MODE", "editor")
     monkeypatch.setenv("DOCS_GITHUB_ORG", "env-org")
     monkeypatch.setenv("DOCS_GITHUB_REPO", "env-repo")
