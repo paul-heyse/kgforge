@@ -4,7 +4,16 @@ The documentation tooling layer comprises `docstring_parser` (external library),
 - The docstring builder imports `griffe`, `libcst`, and `mkdocs_gen_files`, none of which ship type stubs. mypy treats their identifiers as runtime values, leading to “invalid type” errors.
 - Nuanced helper logic for harvesting metadata is unannotated and lacks descriptive docstrings, making it hard for new contributors to reason about behaviour.
 
-By focusing on a “Phase 1” hardening effort, we aim to make these modules type-safe and lint-clean without yet tackling CLI compatibility or workflow automation (reserved for later phases).
+By focusing on a “Phase 1” hardening effort, we aim to make these modules type-safe and lint-clean. Since kicking off the project we have already delivered the foundational pieces listed below; the remaining work concentrates on rounding out the CLI, governance, and developer experience.
+
+## Progress to date (snapshot)
+- Local `.pyi` stubs exist for `griffe`, `libcst`, and `mkdocs_gen_files`, and a drift checker runs in CI.
+- The docstring-builder CLI exposes `lint`/`check` with deterministic exit codes; hooks run in pre-commit before docs artefact generation.
+- Policy gates (coverage %, params/returns parity) are enforced via configuration and surfaced in pre-commit.
+- The builder writes a manifest, supports `--changed-only`, and plugins/IR/policy engine infrastructure are in place.
+- Incremental rebuilds and manifest caching are working; plugin architecture and versioned IR ship with schema validation.
+
+The next steps target CLI restructuring, stub governance, observability, security hardening, and updated documentation.
 
 ## Implementation notes (file-level guidance for near term)
 - Stubs and drift checker
@@ -38,24 +47,17 @@ By focusing on a “Phase 1” hardening effort, we aim to make these modules ty
   - On non-zero exit from CLI, write `docs/_build/observability_docstrings.json` with summary counts/timings and top error messages; also print a brief console summary.
 
 ## Goals / Non-Goals
-- **Goals**
-  - G1: Ensure `src/sitecustomize.py` passes mypy strictly by representing docstring monkey patches via Protocols and guarded helper functions.
-  - G2: Provide minimal stub packages so mypy can type-check `tools/docstring_builder` imports without using `Any`.
-  - G3: Annotate docstring builder internals with precise types and thorough docstrings so junior developers can follow the flow.
-  - G4: Introduce a plugin architecture for harvest/transform/format stages with entry-point discovery.
-  - G5: Define a versioned Intermediate Representation (IR) for docstrings and publish a JSON Schema.
-  - G6: Add a policy engine for quality gates (coverage, completeness, exceptions) with CI enforcement.
-  - G7: Implement incremental builds with a content-addressed manifest and change detection.
-  - G8: Improve CLI ergonomics with clear subcommands and deterministic exit codes.
-  - G9: Provide observability (metrics/traces) and an HTML drift preview for PRs.
-  - G10: Establish robust testing (golden snapshots, property, contract, and E2E CLI tests).
-  - G11: Plan deprecation for `sitecustomize` monkey patches with a feature flag and timeline.
+- **Goals (remaining)**
+  - G1: Finish restructuring the CLI into explicit subcommands (`generate`, `lint`, `fix`, `diff`, `check`, `schema`, `doctor`, `measure`) with consistent exit codes and configuration precedence.
+  - G2: Implement ongoing stub governance (drift checks, optional PEP-561 packaging) so third-party API changes surface quickly.
+  - G3: Provide observability artefacts (metrics JSON, HTML drift previews) and developer ergonomics (editor tasks/snippets).
+  - G4: Harden security (path normalisation, avoidance of unsafe evaluation) and validate inputs before processing.
+  - G5: Deliver a deprecation plan for `sitecustomize` monkey patches, ensuring the pipeline works with patches disabled.
+  - G6: Update documentation to cover plugin authoring, stub maintenance, CLI usage, and troubleshooting (`doctor` guide).
 - **Non-Goals**
-  - N1: No CLI changes (legacy flag support handled in later phases).
-  - N2: No docstring regeneration logic changes beyond replacing placeholder docstrings with accurate descriptions.
-  - N3: No modifications to navmap/test-map/schema workflows.
-  - N4: No content rewriting of existing docs unrelated to policy-driven fixes.
-  - N5: No external service dependencies (keep all artifacts local to the repo).
+  - N1: No changes to navmap/test-map/schema formats; only how we regenerate them.
+  - N2: No wholesale rewrite of existing docstring prose beyond policy-driven fixes.
+  - N3: No introduction of external services; keep the pipeline self-contained.
 
 ## Decisions
 1. **Introduce Protocol-based shims**

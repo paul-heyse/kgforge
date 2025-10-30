@@ -1,4 +1,4 @@
-## 0. Near-term Adherence Milestone (next 1–2 weeks)
+## 0. Near-term Adherence Milestone (completed)
 - [x] 0.1 Typed stubs + drift checker in CI
     - [x] 0.1.1 Finalize `.pyi` for `griffe`, `libcst`, `mkdocs_gen_files`.
     - [x] 0.1.2 Implement a runtime vs. stubs drift checker with actionable diff output.
@@ -158,18 +158,23 @@
         - Touching 1 file only rebuilds that file and dependents.
         - Changing config or plugin version invalidates cache.
 
-- [ ] 1.8 Restructure CLI
-    - [ ] 1.8.1 Implement subcommands: `generate`, `lint`, `fix`, `diff`, `check`, `schema`, `doctor`, `measure`.
-    - [ ] 1.8.2 Document exit codes: `0` success, `1` policy/lint failures, `2` config errors, `3` internal errors.
-    - [ ] 1.8.3 Add `--config` and document config precedence.
+- [ ] 1.8 Restructure CLI **(next priority)**
+    - [ ] 1.8.1 Implement subcommands: `generate`, `lint`, `fix`, `diff`, `check`, `schema`, `doctor`, `measure`.  
+      _Guidance:_ refactor the current command handlers into reusable functions (e.g., `run_generate`, `run_check`) in `tools/docstring_builder/cli.py`. Each subcommand should only parse its arguments and call the shared runner.
+    - [ ] 1.8.2 Document exit codes: `0` success, `1` policy/lint failures, `2` config errors, `3` internal errors.  
+      _Define module-level constants (`EXIT_SUCCESS`, etc.) so unit tests can assert on them and to avoid magic numbers._
+    - [ ] 1.8.3 Add `--config` flag and document precedence (CLI > env `KGF_DOCSTRINGS_CONFIG` > default `.toml`).  
+      _Ensure `doctor` prints the active config source for debugging._
     - AC:
         - `generate` produces artifacts; `check` validates IR/schema.
         - `doctor` prints environment/stub status; `measure` reports timings.
 
 - [ ] 1.9 Stub governance and drift checks
-    - [ ] 1.9.1 Implement a drift checker that inspects runtime objects vs. local `.pyi`.
-    - [ ] 1.9.2 Integrate drift check into CI and fail with actionable diff.
-    - [ ] 1.9.3 (Optional) Package stubs as PEP-561 extras; document update steps.
+    - [ ] 1.9.1 Implement a drift checker that inspects runtime objects vs. local `.pyi`.  
+      _Approach:_ compare `expected_symbols = {...}` (pulled from stubs) against `dir(module)` at runtime; show missing/extra members in sorted order.
+    - [ ] 1.9.2 Integrate drift check into CI and fail with actionable diff.  
+      _Hook suggestion:_ expose as `docstring-builder doctor --stubs` once 1.8 lands, then call it from CI.
+    - [ ] 1.9.3 (Optional) Package stubs as PEP-561 extras; document update steps for maintainers.
     - AC:
         - CI reports missing/extra stub members with file/line hints.
 
@@ -201,6 +206,10 @@
     - [ ] 1.13.3 Add troubleshooting and "doctor" guide.
     - AC:
         - Docs build cleanly; examples run end-to-end.
+
+### Suggested sequencing
+- Finish **1.8 Restructure CLI** before tackling observability (1.10), security (1.11), and documentation (1.13) so we have stable command surfaces.
+- Handle **1.9 Stub governance** in parallel once the CLI exposes the new `doctor` entry point; this allows the drift checker to live behind the CLI rather than a standalone script.
 
 ## 2. Validation
 - [ ] 2.1 Run `uv run mypy src/sitecustomize.py tools/docstring_builder` to ensure no type errors remain.
