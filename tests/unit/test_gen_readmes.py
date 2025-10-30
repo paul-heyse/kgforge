@@ -70,11 +70,11 @@ fake_griffe = _FakeGriffeModule()
 fake_griffe.Object = SimpleNamespace
 fake_loader_module = _FakeLoaderModule()
 
-sys.modules.setdefault("griffe", fake_griffe)
-sys.modules.setdefault("griffe.loader", fake_loader_module)
+sys.modules["griffe"] = fake_griffe
+sys.modules["griffe.loader"] = fake_loader_module
 
 fake_detect_pkg = _FakeDetectModule()
-sys.modules.setdefault("detect_pkg", fake_detect_pkg)
+sys.modules["detect_pkg"] = fake_detect_pkg
 
 from tools.griffe_utils import resolve_griffe  # noqa: E402
 

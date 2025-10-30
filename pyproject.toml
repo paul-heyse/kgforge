@@ -444,6 +444,7 @@ dependencies = [
     "mkdocs-llmstxt",
     "jpype1>=1.6.0", 
     "myst-parser",
+    "faiss-cpu",
 ]
 
 

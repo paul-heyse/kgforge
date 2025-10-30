@@ -11444,7 +11444,7 @@
       "deprecated": false
     },
     {
-      "symbol_id": "94407062048575706e650d1f124ef41b5df6ebb913579d906f89d6ff3830d102",
+      "symbol_id": "007e80f327461ccae9671f5d25a151a6b7c083adc82641847b025a73ea2f7fea",
       "row": 1144,
       "package": "tests",
       "module": "tests.unit.test_auto_docstrings",
@@ -11644,7 +11644,7 @@
       "deprecated": false
     },
     {
-      "symbol_id": "2ca8ca0cbc4658127504439ed9333143a1b72e131d007b2effebc40e958b2d4b",
+      "symbol_id": "36c81816a1e4131d63040f7a4f9eaf2693752005d7bdf5ac87f57ab754992415",
       "row": 1164,
       "package": "tests",
       "module": "tests.unit.test_auto_docstrings_extended_summaries",
@@ -11654,7 +11654,7 @@
       "deprecated": false
     },
     {
-      "symbol_id": "bc74480e7ff56088bee44a6194eded0c66e0ddfa346e2ecf6485571985aa12d2",
+      "symbol_id": "96f7fa51e466e9b84176b631f837a5e01fa50f8268f3ff548074fd42e68dbb43",
       "row": 1165,
       "package": "tests",
       "module": "tests.unit.test_auto_docstrings_extended_summaries",
@@ -13114,7 +13114,7 @@
       "deprecated": false
     },
     {
-      "symbol_id": "36e364b8e7c8f58afc362b344de0c6021d526cd822b66dbb086943f491a21ab5",
+      "symbol_id": "aae3ea24e6fdf77a446a599319bc0b39cad4c55d745221438e73bb798a195765",
       "row": 1311,
       "package": "tests",
       "module": "tests.unit.test_type_resolution",
@@ -13154,7 +13154,7 @@
       "deprecated": false
     },
     {
-      "symbol_id": "5965f9c1b4aff8f184c5eded84981e624d5959f562af09057795c0f90733ea6e",
+      "symbol_id": "7313181e579f69dc3e58da1b79e86e5c14188abb47173043884c6cf6c07f0187",
       "row": 1315,
       "package": "tests",
       "module": "tests.unit.test_type_resolution",
@@ -13164,7 +13164,7 @@
       "deprecated": false
     },
     {
-      "symbol_id": "cd0b3785dd2a67c3fd18178fcd0e3b033d8cd7897d981eed6800abe36e8b6696",
+      "symbol_id": "b4fae853e699fd96b1f4316bef86b5ef535fc333bbe6ac17d1ffde2fab364adf",
       "row": 1316,
       "package": "tests",
       "module": "tests.unit.test_type_resolution",

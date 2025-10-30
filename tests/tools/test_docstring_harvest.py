@@ -17,7 +17,7 @@ def _write_module(tmp_path: Path) -> Path:
     file_path.write_text(
         textwrap.dedent(
             """
-            def sample(value, /, scale: float, *args: int, *, limit: int = 0, **kwargs: str) -> int:
+            def sample(value, /, scale: float, *args: int, limit: int = 0, **kwargs: str) -> int:
                 return value
             """
         ).strip()
