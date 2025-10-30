@@ -182,7 +182,7 @@ sync_env() {
     *)    warn "--use-lock must be auto|yes|no (got: ${USE_LOCK}); defaulting to auto"; [ -f uv.lock ] && lock_flag="--locked" ;;
   esac
 
-  local -a sync_cmd=("uv" "sync")
+  local -a sync_cmd=("uv" "sync" "--frozen" "--no-default-groups")
   if [ -n "${lock_flag}" ]; then
     sync_cmd+=("${lock_flag}")
   fi
