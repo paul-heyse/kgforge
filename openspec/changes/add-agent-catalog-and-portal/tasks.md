@@ -1,60 +1,60 @@
 ## 0. Foundations & Scoping
-- [ ] 0.1 Confirm scope and objectives
-    - [ ] 0.1.1 Review proposal/design/spec; sign off on V1 in-scope features.
-    - [ ] 0.1.2 Create example catalog fixture under `tests/fixtures/agent/` for local dev.
+- [x] 0.1 Confirm scope and objectives
+    - [x] 0.1.1 Review proposal/design/spec; sign off on V1 in-scope features.
+    - [x] 0.1.2 Create example catalog fixture under `tests/fixtures/agent/` for local dev.
     - AC:
         - Scope doc updated; fixture checked in and referenced by tests.
 
-- [ ] 0.2 Schema draft and sample
-    - [ ] 0.2.1 Draft `docs/_build/schema_agent_catalog.json` (first pass) aligning with design.
-    - [ ] 0.2.2 Author a small sample catalog JSON that validates against the draft.
-    - [ ] 0.2.3 Encode ordering semantics: use arrays for any ordered data (e.g., `anchors.remap_order`, `exemplars`).
+- [x] 0.2 Schema draft and sample
+    - [x] 0.2.1 Draft `docs/_build/schema_agent_catalog.json` (first pass) aligning with design.
+    - [x] 0.2.2 Author a small sample catalog JSON that validates against the draft.
+    - [x] 0.2.3 Encode ordering semantics: use arrays for any ordered data (e.g., `anchors.remap_order`, `exemplars`).
     - AC:
         - `jsonschema` validation passes for sample; schema committed.
 
 ## 1. Agent Catalog Generator (Core)
-- [ ] 1.1 Scaffolding
-    - [ ] 1.1.1 Create `tools/docs/build_agent_catalog.py` entrypoint and CLI args (mode, org, repo, sha overrides).
-    - [ ] 1.1.2 Implement file discovery and input checks for required artifacts.
+- [x] 1.1 Scaffolding
+    - [x] 1.1.1 Create `tools/docs/build_agent_catalog.py` entrypoint and CLI args (mode, org, repo, sha overrides).
+    - [x] 1.1.2 Implement file discovery and input checks for required artifacts.
     - AC:
         - Running with `--help` shows options; missing inputs produce actionable errors.
 
-- [ ] 1.2 Provenance and link policy
-    - [ ] 1.2.1 Resolve `repo.sha` from `git rev-parse --short HEAD`; compute `generated_at` UTC.
-    - [ ] 1.2.2 Resolve link policy precedence (CLI > env > defaults); validate GitHub variables in github mode.
+- [x] 1.2 Provenance and link policy
+    - [x] 1.2.1 Resolve `repo.sha` from `git rev-parse --short HEAD`; compute `generated_at` UTC.
+    - [x] 1.2.2 Resolve link policy precedence (CLI > env > defaults); validate GitHub variables in github mode.
     - AC:
         - Policy set correctly; github mode fails fast when required env missing.
 
-- [ ] 1.3 Module mapping
-    - [ ] 1.3.1 Load `site/_build/by_module.json` / `site/_build/by_file.json` / `site/_build/symbols.json` and map module → source path, HTML, FJSON.
-    - [ ] 1.3.2 Attach DocFacts symbols per module from `docs/_build/docfacts.json`.
+- [x] 1.3 Module mapping
+    - [x] 1.3.1 Load `site/_build/by_module.json` / `site/_build/by_file.json` / `site/_build/symbols.json` and map module → source path, HTML, FJSON.
+    - [x] 1.3.2 Attach DocFacts symbols per module from `docs/_build/docfacts.json`.
     - AC:
         - ≥95% of modules have correct source/page/fjson paths (spot check).
 
 ## 2. Graphs, IDs, Anchors, Quality
-- [ ] 2.1 Import/call graph extraction
-    - [ ] 2.1.1 Parse AST for `Import`/`ImportFrom` nodes per module; normalize names; exclude stdlib by default.
-    - [ ] 2.1.2 Walk AST calls; resolve function names within module; tag edges with `static` confidence.
+- [x] 2.1 Import/call graph extraction
+    - [x] 2.1.1 Parse AST for `Import`/`ImportFrom` nodes per module; normalize names; exclude stdlib by default.
+    - [x] 2.1.2 Walk AST calls; resolve function names within module; tag edges with `static` confidence.
     - AC:
         - Graph nodes/edges populated for representative modules; unit tests cover import and call detection.
 
-- [ ] 2.2 Stable IDs and anchors
-    - [ ] 2.2.1 Normalize AST (strip comments/docstrings/whitespace) and compute `symbol_id = sha256(qname + ast_text)`.
-    - [ ] 2.2.2 Record anchors: `start_line`/`end_line` per symbol; compute `anchors.cst_fingerprint` (token trigrams).
-    - [ ] 2.2.3 Implement `anchors.remap_order` (array) and fuzzy remap resolver: `[symbol_id, cst_fingerprint, name_arity, nearest_text]`.
+- [x] 2.2 Stable IDs and anchors
+    - [x] 2.2.1 Normalize AST (strip comments/docstrings/whitespace) and compute `symbol_id = sha256(qname + ast_text)`.
+    - [x] 2.2.2 Record anchors: `start_line`/`end_line` per symbol; compute `anchors.cst_fingerprint` (token trigrams).
+    - [x] 2.2.3 Implement `anchors.remap_order` (array) and fuzzy remap resolver: `[symbol_id, cst_fingerprint, name_arity, nearest_text]`.
     - AC:
         - IDs stable across runs; remap survives ±20-line drift and docstring/formatting churn.
 
-- [ ] 2.3 Quality signals and metrics
-    - [ ] 2.3.1 Aggregate mypy status, ruff rules, pydoclint parity, interrogate coverage, doctest status.
-    - [ ] 2.3.2 Compute mccabe complexity, LOC; extract `last_modified` via git; map `codeowners` (if present).
+- [x] 2.3 Quality signals and metrics
+    - [x] 2.3.1 Aggregate mypy status, ruff rules, pydoclint parity, interrogate coverage, doctest status.
+    - [x] 2.3.2 Compute mccabe complexity, LOC; extract `last_modified` via git; map `codeowners` (if present).
     - AC:
         - Quality/metrics present for sample modules; missing inputs handled gracefully.
 
-- [ ] 2.4 Agent Hints, Change Impact, Exemplars
-    - [ ] 2.4.1 Populate `agent_hints` per module/symbol: `intent_tags`, `safe_ops`, `tests_to_run`, `perf_budgets`, `breaking_change_notes`.
-    - [ ] 2.4.2 Populate `change_impact`: `callers`, `callees`, `tests`, `codeowners`, `churn_last_n`; optionally write as a separate shard for large repos.
-    - [ ] 2.4.3 Populate `exemplars` per symbol with `{title, language, snippet, counter_example?, negative_prompts?, context_notes?}`.
+- [x] 2.4 Agent Hints, Change Impact, Exemplars
+    - [x] 2.4.1 Populate `agent_hints` per module/symbol: `intent_tags`, `safe_ops`, `tests_to_run`, `perf_budgets`, `breaking_change_notes`.
+    - [x] 2.4.2 Populate `change_impact`: `callers`, `callees`, `tests`, `codeowners`, `churn_last_n`; optionally write as a separate shard for large repos.
+    - [x] 2.4.3 Populate `exemplars` per symbol with `{title, language, snippet, counter_example?, negative_prompts?, context_notes?}`.
     - AC:
         - Fields present in catalog; portal renders them later; clients can query them.
 
@@ -78,15 +78,15 @@
         - Loader uses SQLite when present; fallback works.
 
 ## 4. Catalog Assembly & Validation
-- [ ] 4.1 Compose catalog
-    - [ ] 4.1.1 Assemble `artifacts`, per-package modules, graphs, quality, metrics, anchors (with `cst_fingerprint`/`remap_order`), IDs, hints/impact/exemplars.
-    - [ ] 4.1.2 Validate against schema; produce human-readable errors on failure.
+- [x] 4.1 Compose catalog
+    - [x] 4.1.1 Assemble `artifacts`, per-package modules, graphs, quality, metrics, anchors (with `cst_fingerprint`/`remap_order`), IDs, hints/impact/exemplars.
+    - [x] 4.1.2 Validate against schema; produce human-readable errors on failure.
     - AC:
         - `docs/_build/agent_catalog.json` validates; top-level pointers resolvable.
 
-- [ ] 4.2 Sharding
-    - [ ] 4.2.1 Implement thresholds (size/modules) and write per-package shards with root index.
-    - [ ] 4.2.2 Add shard loader helper used by clients.
+- [x] 4.2 Sharding
+    - [x] 4.2.1 Implement thresholds (size/modules) and write per-package shards with root index.
+    - [x] 4.2.2 Add shard loader helper used by clients.
     - AC:
         - Large catalogs produce shards; root references resolve in tests.
 
