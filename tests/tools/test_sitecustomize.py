@@ -13,7 +13,7 @@ with warnings.catch_warnings():
         message="Docstring builder runtime shims are deprecated",
         category=DeprecationWarning,
     )
-    from src import sitecustomize
+    import sitecustomize
 
 
 @dataclass(slots=True)
@@ -36,9 +36,9 @@ class _FakeYields(_FakeMeta, sitecustomize.DocstringYieldsProto):
 
 class _Doc:
     def __init__(self, meta: Sequence[sitecustomize.DocstringMetaProto]) -> None:
-        self.meta = list(meta)
-        self.short_description = "short"
-        self.long_description = "long"
+        self.meta: list[sitecustomize.DocstringMetaProto] = list(meta)
+        self.short_description: str | None = "short"
+        self.long_description: str | None = "long"
 
 
 def test_ensure_docstring_attrs_installs_property() -> None:
@@ -95,6 +95,6 @@ def test_ensure_docstring_size_reports_total_length() -> None:
 
 
 def test_protocol_objects_are_accessible() -> None:
-    assert sitecustomize.DocstringMetaProto
-    assert sitecustomize.DocstringAttrProto
-    assert sitecustomize.DocstringYieldsProto
+    assert sitecustomize.DocstringMetaProto is not None
+    assert sitecustomize.DocstringAttrProto is not None
+    assert sitecustomize.DocstringYieldsProto is not None

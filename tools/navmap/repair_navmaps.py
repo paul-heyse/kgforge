@@ -607,7 +607,7 @@ def _sync_navmap_literal(
     navmap_exists = navmap_span is not None and "__navmap__" in original_text
     updated_navmap = _ensure_navmap_structure(info)
     if navmap_exists and navmap_span is not None:
-        start, end = navmap_span  # type: ignore[misc]
+        start, end = navmap_span
         navmap_lines = _serialize_navmap(updated_navmap)
         start_idx = start - 1
         end_idx = end

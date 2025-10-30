@@ -19,12 +19,13 @@ import re
 import subprocess
 import sys
 import tokenize
+import warnings
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol, TypeVar, cast
 
-import jsonschema  # type: ignore[import-untyped]
+import jsonschema
 import numpy as np
 import numpy.typing as npt
 
@@ -1384,7 +1385,7 @@ class AgentCatalogBuilder:
         schema_path = self._resolve_artifact_path(schema)
         schema_data = json.loads(schema_path.read_text(encoding="utf-8"))
         validator = jsonschema.Draft202012Validator(schema_data)
-        errors = sorted(validator.iter_errors(catalog_dict), key=lambda err: err.path)
+        errors = sorted(validator.iter_errors(catalog_dict), key=lambda err: tuple(err.path))
         if errors:
             rendered = "; ".join(
                 f"{'/'.join(map(str, err.path)) or '<root>'}: {err.message}" for err in errors
@@ -1497,19 +1498,73 @@ class _SimpleFaissModule:
 
 _SIMPLE_FAISS_MODULE = _SimpleFaissModule()
 
+_FAISS_ENV_OVERRIDE = "KGF_FAISS_MODULE"
+_FAISS_FALLBACK_FLAG = "KGF_DISABLE_FAISS_FALLBACK"
+_FAISS_DEFAULT_MODULES: tuple[str, ...] = ("faiss", "faiss_cpu")
+
 
 def _load_faiss(purpose: str) -> FaissModuleProtocol:
-    """Import the faiss module or raise a descriptive error."""
-    try:
-        module = importlib.import_module("faiss")
-    except ImportError as exc:  # pragma: no cover - runtime guard
-        logger.warning(
-            "Falling back to simple FAISS module while attempting to %s: %s",
-            purpose,
-            exc,
-        )
-        return cast(FaissModuleProtocol, _SIMPLE_FAISS_MODULE)
-    return cast(FaissModuleProtocol, module)
+    """
+    Import a FAISS module or fall back to the NumPy implementation.
+
+    Parameters
+    ----------
+    purpose : str
+        Text used in log messages to indicate what the caller was attempting.
+
+    Returns
+    -------
+    FaissModuleProtocol
+        The imported FAISS module or a simple in-memory implementation.
+
+    Raises
+    ------
+    CatalogBuildError
+        When no suitable module can be imported and fallbacks are disabled via
+        ``KGF_DISABLE_FAISS_FALLBACK=1``.
+    """
+    override = os.getenv(_FAISS_ENV_OVERRIDE)
+    candidates: tuple[str, ...]
+    candidates = (override,) if override else _FAISS_DEFAULT_MODULES
+
+    failures: list[str] = []
+    warning_filters = (
+        ("builtin type SwigPyPacked has no __module__ attribute",),
+        ("builtin type SwigPyObject has no __module__ attribute",),
+        ("builtin type swigvarlink has no __module__ attribute",),
+    )
+    for module_name in candidates:
+        try:
+            with warnings.catch_warnings():
+                for pattern in warning_filters:
+                    warnings.filterwarnings(
+                        "ignore",
+                        message=pattern[0],
+                        category=DeprecationWarning,
+                    )
+                module = importlib.import_module(module_name)
+        except ImportError as exc:  # pragma: no cover - runtime guard
+            failures.append(f"{module_name}: {exc}")
+            continue
+        if hasattr(module, "IndexFlatIP") and hasattr(module, "write_index"):
+            logger.debug("Using FAISS module '%s' for %s", module_name, purpose)
+            return cast(FaissModuleProtocol, module)
+        failures.append(f"{module_name}: missing required attributes")
+
+    failure_text = "; ".join(failures) if failures else "no candidates attempted"
+    if os.getenv(_FAISS_FALLBACK_FLAG) == "1":
+        message = (
+            "FAISS is required to {purpose} but no compatible module could be imported "
+            f"(attempted: {failure_text})"
+        ).format(purpose=purpose)
+        raise CatalogBuildError(message)
+
+    logger.warning(
+        "Falling back to simple FAISS module while attempting to %s (reasons: %s)",
+        purpose,
+        failure_text,
+    )
+    return cast(FaissModuleProtocol, _SIMPLE_FAISS_MODULE)
 
 
 def _tokenize(text: str) -> list[str]:

@@ -17,7 +17,7 @@ from functools import singledispatch
 from pathlib import Path
 from typing import TypedDict, cast
 
-from packaging.version import InvalidVersion, Version  # type: ignore[import-not-found]
+from packaging.version import InvalidVersion, Version
 
 REPO = Path(__file__).resolve().parents[2]
 SRC = REPO / "src"

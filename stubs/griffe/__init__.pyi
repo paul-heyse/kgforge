@@ -32,6 +32,9 @@ class Object:
     decorators: Iterable[Any] | None
     is_async: bool
     is_generator: bool
+    is_package: bool
+    is_module: bool
+    path: str
 
 class Function(Object):
     parameters: list[Parameter]

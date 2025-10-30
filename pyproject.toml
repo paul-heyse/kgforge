@@ -662,6 +662,8 @@ markers = [
     "scale_vectors: tests that require the large real-vector fixture (enable with --scale-vectors)",
     "integration: marks integration tests that may hit real network services",
     "benchmark: performance benchmarks requiring pytest-benchmark",
+    "gpu: requires the optional 'gpu' stack (extra: gpu) and a CUDA-capable runtime",
+    "requires(*mods, modules=None): import-or-skip listed modules and auto-mark GPU suites",
 ]
 testpaths = ["tests"]
 
@@ -673,6 +675,13 @@ warn_unused_ignores = true
 warn_redundant_casts = true
 strict_equality = true
 show_error_codes = true
+mypy_path = ["src", "stubs", "tests"]
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = "conftest"
+follow_imports = "skip"
+ignore_missing_imports = true
 
 # Tell uv that vllm should come ONLY from the vllm-nightly index.
 [tool.uv.sources]
