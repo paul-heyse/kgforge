@@ -355,5 +355,3 @@ Files to add:
 ## Open Questions
 - Should we also generate a minimal combined search index specifically for the portal?
 - Preferred placement of `agent_portal_readme.md` (under `docs/` vs generated to `site/_build/agent/`)?
-
-

@@ -5,7 +5,7 @@ src.download
 
 .. autoapi-nested-parse::
 
-   
+
    Overview of download.
 
    This module bundles download logic for the kgfoundry stack. It groups related helpers so downstream
@@ -38,5 +38,3 @@ Submodules
 
    /autoapi/src/download/cli/index
    /autoapi/src/download/harvester/index
-
-

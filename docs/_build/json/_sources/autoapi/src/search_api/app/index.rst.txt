@@ -22,7 +22,7 @@ Module Contents
 
 .. py:function:: auth(authorization = Header(default=None))
 
-   
+
    Compute auth.
 
    Carry out the auth operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -56,7 +56,7 @@ Module Contents
 
 .. py:function:: healthz()
 
-   
+
    Compute healthz.
 
    Carry out the healthz operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -89,7 +89,7 @@ Module Contents
 
 .. py:function:: rrf_fuse(lists, k_rrf)
 
-   
+
    Compute rrf fuse.
 
    Carry out the rrf fuse operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -127,7 +127,7 @@ Module Contents
 
 .. py:function:: apply_kg_boosts(cands, query, direct = 0.08, one_hop = 0.04)
 
-   
+
    Compute apply kg boosts.
 
    Carry out the apply kg boosts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -169,7 +169,7 @@ Module Contents
 
 .. py:function:: search(req, _ = Depends(auth))
 
-   
+
    Compute search.
 
    Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -207,7 +207,7 @@ Module Contents
 
 .. py:function:: graph_concepts(body, _ = Depends(auth))
 
-   
+
    Compute graph concepts.
 
    Carry out the graph concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -242,4 +242,3 @@ Module Contents
 
    ..
        !! processed by numpydoc !!
-

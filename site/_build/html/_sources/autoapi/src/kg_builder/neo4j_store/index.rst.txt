@@ -22,7 +22,7 @@ Module Contents
 
 .. py:class:: Neo4jStore
 
-   
+
    Model the Neo4jStore.
 
    Represent the neo4jstore data structure used throughout the project. The class encapsulates
@@ -45,4 +45,3 @@ Module Contents
 
    ..
        !! processed by numpydoc !!
-

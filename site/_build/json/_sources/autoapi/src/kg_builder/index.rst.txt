@@ -5,7 +5,7 @@ src.kg_builder
 
 .. autoapi-nested-parse::
 
-   
+
    Overview of kg builder.
 
    This module bundles kg builder logic for the kgfoundry stack. It groups related helpers so
@@ -38,5 +38,3 @@ Submodules
 
    /autoapi/src/kg_builder/mock_kg/index
    /autoapi/src/kg_builder/neo4j_store/index
-
-

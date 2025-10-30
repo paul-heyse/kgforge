@@ -59,8 +59,7 @@ class DownloadError(Exception):
     <!-- auto:docstring-builder v1 -->
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
-
+"""
 
 
 # [nav:anchor UnsupportedMIMEError]
@@ -70,8 +69,7 @@ class UnsupportedMIMEError(Exception):
     <!-- auto:docstring-builder v1 -->
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
-
+"""
 
 
 # [nav:anchor DoclingError]
@@ -81,8 +79,7 @@ class DoclingError(Exception):
     <!-- auto:docstring-builder v1 -->
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
-
+"""
 
 
 # [nav:anchor OCRTimeoutError]
@@ -92,8 +89,7 @@ class OCRTimeoutError(Exception):
     <!-- auto:docstring-builder v1 -->
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
-
+"""
 
 
 # [nav:anchor ChunkingError]
@@ -103,8 +99,7 @@ class ChunkingError(Exception):
     <!-- auto:docstring-builder v1 -->
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
-
+"""
 
 
 # [nav:anchor EmbeddingError]
@@ -114,8 +109,7 @@ class EmbeddingError(Exception):
     <!-- auto:docstring-builder v1 -->
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
-
+"""
 
 
 # [nav:anchor SpladeOOMError]
@@ -125,8 +119,7 @@ class SpladeOOMError(Exception):
     <!-- auto:docstring-builder v1 -->
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
-
+"""
 
 
 # [nav:anchor IndexBuildError]
@@ -136,8 +129,7 @@ class IndexBuildError(Exception):
     <!-- auto:docstring-builder v1 -->
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
-
+"""
 
 
 # [nav:anchor OntologyParseError]
@@ -147,8 +139,7 @@ class OntologyParseError(Exception):
     <!-- auto:docstring-builder v1 -->
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
-
+"""
 
 
 # [nav:anchor LinkerCalibrationError]
@@ -158,8 +149,7 @@ class LinkerCalibrationError(Exception):
     <!-- auto:docstring-builder v1 -->
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
-
+"""
 
 
 # [nav:anchor Neo4jError]
@@ -169,5 +159,4 @@ class Neo4jError(Exception):
     <!-- auto:docstring-builder v1 -->
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
-
+"""

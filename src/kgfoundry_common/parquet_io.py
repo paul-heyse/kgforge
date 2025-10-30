@@ -67,7 +67,7 @@ class ParquetVectorWriter:
     ----------
     root : str
         Describe ``root``.
-    """
+"""
 
     @staticmethod
     def dense_schema(dim: int) -> pa.schema:
@@ -81,12 +81,13 @@ class ParquetVectorWriter:
         ----------
         dim : int
             Describe ``dim``.
+            
 
         Returns
         -------
         pyarrow.lib.schema
             Describe return value.
-        """
+"""
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -110,7 +111,7 @@ class ParquetVectorWriter:
         ----------
         root : str
             Describe ``root``.
-        """
+"""
         self.root = Path(root)
 
     def write_dense(
@@ -140,12 +141,13 @@ class ParquetVectorWriter:
         shard : int, optional
             Describe ``shard``.
             Defaults to ``0``.
+            
 
         Returns
         -------
         str
             Describe return value.
-        """
+"""
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -183,7 +185,7 @@ class ParquetVectorWriter:
         -------
         pyarrow.lib.schema
             Describe return value.
-        """
+"""
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -220,12 +222,13 @@ class ParquetVectorWriter:
         shard : int, optional
             Describe ``shard``.
             Defaults to ``0``.
+            
 
         Returns
         -------
         str
             Describe return value.
-        """
+"""
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -272,7 +275,7 @@ class ParquetChunkWriter:
     run_id : str, optional
         Describe ``run_id``.
         Defaults to ``'dev'``.
-    """
+"""
 
     @staticmethod
     def chunk_schema() -> pa.schema:
@@ -286,7 +289,7 @@ class ParquetChunkWriter:
         -------
         pyarrow.lib.schema
             Describe return value.
-        """
+"""
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -328,7 +331,7 @@ class ParquetChunkWriter:
         run_id : str, optional
             Describe ``run_id``.
             Defaults to ``'dev'``.
-        """
+"""
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
@@ -343,12 +346,13 @@ class ParquetChunkWriter:
         ----------
         rows : Iterable[dict[str, Any]]
             Describe ``rows``.
+            
 
         Returns
         -------
         str
             Describe return value.
-        """
+"""
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(
             table,

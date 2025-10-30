@@ -5,7 +5,7 @@ src.kgfoundry
 
 .. autoapi-nested-parse::
 
-   
+
    Overview of kgfoundry.
 
    This module bundles kgfoundry logic for the kgfoundry stack. It groups related helpers so downstream
@@ -44,7 +44,7 @@ Package Contents
 
 .. py:function:: _load(name)
 
-   
+
    Compute load.
 
    Carry out the load operation.
@@ -85,7 +85,7 @@ Package Contents
 
 .. py:function:: _ensure_namespace_alias(name)
 
-   
+
    Compute ensure namespace alias.
 
    Carry out the ensure namespace alias operation.
@@ -109,4 +109,3 @@ Package Contents
 
    ..
        !! processed by numpydoc !!
-

@@ -22,7 +22,7 @@ Module Contents
 
 .. py:function:: t_prepare_dirs(root)
 
-   
+
    Compute t prepare dirs.
 
    Carry out the t prepare dirs operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -58,7 +58,7 @@ Module Contents
 
 .. py:function:: t_write_fixture_chunks(chunks_root)
 
-   
+
    Compute t write fixture chunks.
 
    Carry out the t write fixture chunks operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -94,7 +94,7 @@ Module Contents
 
 .. py:function:: t_write_fixture_dense(dense_root)
 
-   
+
    Compute t write fixture dense.
 
    Carry out the t write fixture dense operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -130,7 +130,7 @@ Module Contents
 
 .. py:function:: t_write_fixture_splade(sparse_root)
 
-   
+
    Compute t write fixture splade.
 
    Carry out the t write fixture splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -166,7 +166,7 @@ Module Contents
 
 .. py:function:: t_register_in_duckdb(db_path, chunks_info, dense_info, sparse_info)
 
-   
+
    Compute t register in duckdb.
 
    Carry out the t register in duckdb operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -208,7 +208,7 @@ Module Contents
 
 .. py:function:: fixture_pipeline(root = '/data', db_path = '/data/catalog/catalog.duckdb')
 
-   
+
    Compute fixture pipeline.
 
    Carry out the fixture pipeline operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -243,4 +243,3 @@ Module Contents
 
    ..
        !! processed by numpydoc !!
-

@@ -5,7 +5,7 @@ src.search_client
 
 .. autoapi-nested-parse::
 
-   
+
    Overview of search client.
 
    This module bundles search client logic for the kgfoundry stack. It groups related helpers so
@@ -45,4 +45,3 @@ Package Contents
 ----------------
 
 .. py:data:: KGFoundryClient
-

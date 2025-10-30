@@ -5,7 +5,7 @@ src.orchestration
 
 .. autoapi-nested-parse::
 
-   
+
    Overview of orchestration.
 
    This module bundles orchestration logic for the kgfoundry stack. It groups related helpers so
@@ -39,5 +39,3 @@ Submodules
    /autoapi/src/orchestration/cli/index
    /autoapi/src/orchestration/fixture_flow/index
    /autoapi/src/orchestration/flows/index
-
-

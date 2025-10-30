@@ -22,7 +22,7 @@ Module Contents
 
 .. py:class:: Qwen3Embedder
 
-   
+
    Model the Qwen3Embedder.
 
    Represent the qwen3embedder data structure used throughout the project. The class encapsulates
@@ -45,4 +45,3 @@ Module Contents
 
    ..
        !! processed by numpydoc !!
-

@@ -68,7 +68,7 @@ and minimal shims so teams can implement their parts with confidence.
 <!-- merged from kgfoundry_skeleton (1).zip -->
 # kgfoundry (skeleton)
 Single-machine architecture for ontology-grounded hybrid search (dense + sparse + KG) with local registries and indices.
-**Target host:** Ubuntu 24.04 · RTX 5090 (CUDA 13.0) · AMD 9950X (16 cores) · 192 GB RAM  
+**Target host:** Ubuntu 24.04 · RTX 5090 (CUDA 13.0) · AMD 9950X (16 cores) · 192 GB RAM
 **Runtime:** Python 3.13.9, PyTorch 2.9 (CUDA 13), vLLM pre-release (CUDA 13), DuckDB ≥ 1.4.1
 This repository is a **skeleton** generated on 2025-10-25. It contains packages, interfaces, configs, and stubs to accelerate
 independent development of each workstream.

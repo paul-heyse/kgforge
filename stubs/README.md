@@ -21,4 +21,3 @@ shipping official typings.
 
 Following these guidelines keeps the stub packages maintainable while providing the
 type coverage needed for strict mypy runs.
-

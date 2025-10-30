@@ -406,5 +406,3 @@ The catalog SHALL use semantic versioning and optionally shard by package with a
 #### Scenario: Sharded catalog
 - WHEN the catalog exceeds the shard threshold
 - THEN a root `agent_catalog.json` references per-package shard files and clients resolve them transparently
-
-

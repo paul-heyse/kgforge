@@ -22,7 +22,7 @@ Module Contents
 
 .. py:function:: index_bm25(chunks_parquet = typer.Argument(..., help='Path to Parquet/JSONL with chunks'), backend = typer.Option('lucene', help='lucene|pure'), index_dir = typer.Option('./_indices/bm25', help='Output index directory'))
 
-   
+
    Compute index bm25.
 
    Carry out the index bm25 operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -58,7 +58,7 @@ Module Contents
 
 .. py:function:: index_faiss(dense_vectors = typer.Argument(..., help='Path to dense vectors JSON (skeleton)'), index_path = typer.Option('./_indices/faiss/shard_000.idx', help='Output index (CPU .idx)'))
 
-   
+
    Compute index faiss.
 
    Carry out the index faiss operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -92,7 +92,7 @@ Module Contents
 
 .. py:function:: api(port = 8080)
 
-   
+
    Compute api.
 
    Carry out the api operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -124,7 +124,7 @@ Module Contents
 
 .. py:function:: e2e()
 
-   
+
    Compute e2e.
 
    Carry out the e2e operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -152,4 +152,3 @@ Module Contents
 
    ..
        !! processed by numpydoc !!
-

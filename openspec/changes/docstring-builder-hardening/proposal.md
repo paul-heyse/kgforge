@@ -62,4 +62,3 @@ The docstring builder toolchain has accrued ad-hoc typing, logging, and subproce
 ## Alternatives Considered
 - **Alt A — Incremental lint fixes only:** Rejected because it does not establish typed contracts or shared infrastructure, leaving systemic risk untouched.
 - **Alt B — Full rewrite of docstring builder in Rust:** Rejected for scope/time; incremental hardening within Python meets quality goals while leveraging existing investment.
-

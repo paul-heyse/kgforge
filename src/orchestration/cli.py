@@ -66,13 +66,16 @@ def index_bm25(
     chunks_parquet : str, optional
         Describe ``chunks_parquet``.
         Defaults to ``<typer.models.ArgumentInfo object at 0x7926329556a0>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x73eabc2086e0>``.
     backend : str, optional
         Describe ``backend``.
         Defaults to ``<typer.models.OptionInfo object at 0x79263290b890>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x73ea67fb5a90>``.
     index_dir : str, optional
         Describe ``index_dir``.
         Defaults to ``<typer.models.OptionInfo object at 0x79263290b9d0>``.
-    """
+        Defaults to ``<typer.models.OptionInfo object at 0x73ea67fb5bd0>``.
+"""
     os.makedirs(index_dir, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
@@ -129,10 +132,12 @@ def index_faiss(
     dense_vectors : str, optional
         Describe ``dense_vectors``.
         Defaults to ``<typer.models.ArgumentInfo object at 0x79263290bb10>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x73ea67fb5d10>``.
     index_path : str, optional
         Describe ``index_path``.
         Defaults to ``<typer.models.OptionInfo object at 0x79263290bc50>``.
-    """
+        Defaults to ``<typer.models.OptionInfo object at 0x73ea67fb5e50>``.
+"""
     os.makedirs(os.path.dirname(index_path), exist_ok=True)
     with open(dense_vectors, encoding="utf-8") as fh:
         vecs = json.load(fh)
@@ -164,7 +169,7 @@ def api(port: int = 8080) -> None:
     port : int, optional
         Describe ``port``.
         Defaults to ``8080``.
-    """
+"""
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
@@ -182,7 +187,7 @@ def e2e() -> None:
     ------
     Exit
     Raised when TODO for Exit.
-    """
+"""
     try:
         from orchestration.flows import e2e_flow
     except ModuleNotFoundError as exc:  # pragma: no cover - defensive messaging

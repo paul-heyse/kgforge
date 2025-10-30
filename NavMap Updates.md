@@ -7,11 +7,11 @@ Awesome—here’s a **fully-specified, repo-grounded implementation plan** for 
 
 ## 0) What you already have (baseline)
 
-* **Legacy kill-switch:** `tools/update_navmaps.py` fails if any module docstring still contains a `NavMap:` block; `tools/strip_navmap_sections.py` removes such blocks safely.  
-* **Index builder:** `tools/navmap/build_navmap.py` parses every `src/**.py`, extracts `__all__`, `__navmap__` (if present), and inline markers `# [nav:section id]`, `# [nav:anchor Symbol]`; produces `site/_build/navmap/navmap.json` with `commit`, per-module `exports`, `sections`, `section_lines`, `anchors`, `links.source` (vscode://), `meta` (per-symbol dict), plus optional tags/synopsis/see_also/deps. 
-* **Validator:** `tools/navmap/check_navmap.py` enforces **exports match**, **first section is `public-api`**, **kebab-case section IDs**, **valid Python identifiers**, and **anchor presence** for each section symbol. 
-* **Migrate/repair wrappers:** `migrate_navmaps.py` writes the JSON via `build_index()`, and `repair_navmaps.py` currently just proxies to the checker.  
-* **Orchestration:** Your README documents “Stage 3–5: NavMap Update/Build/Check” as part of `tools/update_docs.sh`. 
+* **Legacy kill-switch:** `tools/update_navmaps.py` fails if any module docstring still contains a `NavMap:` block; `tools/strip_navmap_sections.py` removes such blocks safely.
+* **Index builder:** `tools/navmap/build_navmap.py` parses every `src/**.py`, extracts `__all__`, `__navmap__` (if present), and inline markers `# [nav:section id]`, `# [nav:anchor Symbol]`; produces `site/_build/navmap/navmap.json` with `commit`, per-module `exports`, `sections`, `section_lines`, `anchors`, `links.source` (vscode://), `meta` (per-symbol dict), plus optional tags/synopsis/see_also/deps.
+* **Validator:** `tools/navmap/check_navmap.py` enforces **exports match**, **first section is `public-api`**, **kebab-case section IDs**, **valid Python identifiers**, and **anchor presence** for each section symbol.
+* **Migrate/repair wrappers:** `migrate_navmaps.py` writes the JSON via `build_index()`, and `repair_navmaps.py` currently just proxies to the checker.
+* **Orchestration:** Your README documents “Stage 3–5: NavMap Update/Build/Check” as part of `tools/update_docs.sh`.
 
 That’s a solid spine. Below are the targeted upgrades.
 
@@ -51,7 +51,7 @@ Create **`docs/policies/visibility-policy.md`** (human) and **`docs/policies/vis
 
 ## 2) Extend the JSON schema of `navmap.json` (no breaking changes)
 
-**Today** your builder emits (per module): path, exports, sections, section_lines, anchors, links.source (vscode), meta, tags, synopsis, see_also, deps. 
+**Today** your builder emits (per module): path, exports, sections, section_lines, anchors, links.source (vscode), meta, tags, synopsis, see_also, deps.
 
 **Add** (safe additions, backward-compatible):
 
@@ -147,7 +147,7 @@ data["modules"][info.module] = entry
 
 ## 4) Harden `tools/navmap/check_navmap.py` (strict + friendly)
 
-You already check **exports match**, **first section public-api**, **kebab-case**, **identifier validity**, **anchor presence**. 
+You already check **exports match**, **first section public-api**, **kebab-case**, **identifier validity**, **anchor presence**.
 Add:
 
 * **Owner/Stability required** for every **exported** symbol (`__all__` or `__navmap__["exports"]`):
@@ -228,7 +228,7 @@ Right now `repair_navmaps.py` just reuses `_inspect`. Enhance it so it can **ins
   * If no `sections` or first section ≠ `public-api`, insert `# [nav:section public-api]` at top (after module docstring).
   * If `__navmap__` missing entirely, insert a minimal stub that references `__all__`.
 
-*You already have the AST + rewrite skills in `strip_navmap_sections.py`; reuse that pattern to rewrite doc/inline comments safely.* 
+*You already have the AST + rewrite skills in `strip_navmap_sections.py`; reuse that pattern to rewrite doc/inline comments safely.*
 
 ---
 
@@ -250,8 +250,8 @@ Wire this as a final step inside `check_navmap.py` (so you keep a single entrypo
 
 All tools in `tools/navmap` accept:
 
-* `--root PATH` (default `src/`): subtree to scan. (You already accept `--root` in `repair_navmaps.py`.) 
-* `--json PATH` (default `site/_build/navmap/navmap.json`): where to read/write index. (You already write here.) 
+* `--root PATH` (default `src/`): subtree to scan. (You already accept `--root` in `repair_navmaps.py`.)
+* `--json PATH` (default `site/_build/navmap/navmap.json`): where to read/write index. (You already write here.)
 * `--mode warn|error` (checker): downgrade errors to warnings for local dev if desired.
 * `DOCS_LINK_MODE=editor|github|both` and `DOCS_GITHUB_ORG/REPO/SHA` to control link emission (build step). (Cited above.) ([Visual Studio Code][3])
 
@@ -344,10 +344,10 @@ __navmap__["symbols"]["Foo"]["deprecated_in"] = "0.9.0"
 ## Ready-to-run sequence
 
 1. **Land policy files** in `docs/policies/` and add `packaging` to your project dependencies (for PEP 440 checks).
-2. **Patch `build_navmap.py`** with link-mode + module defaults + schema fields. 
-3. **Patch `check_navmap.py`** with meta-required + PEP 440 + round-trip call. 
-4. **Enhance `repair_navmaps.py`** with anchor/section inserters. 
-5. **Keep `update_navmaps.py`** + **`strip_navmap_sections.py`** early in the pipeline to prevent legacy docstring blocks from creeping back.  
+2. **Patch `build_navmap.py`** with link-mode + module defaults + schema fields.
+3. **Patch `check_navmap.py`** with meta-required + PEP 440 + round-trip call.
+4. **Enhance `repair_navmaps.py`** with anchor/section inserters.
+5. **Keep `update_navmaps.py`** + **`strip_navmap_sections.py`** early in the pipeline to prevent legacy docstring blocks from creeping back.
 6. **Pre-commit & CI**: build → check → round-trip; fail on drift or missing required metadata.
 7. (**Optional**) add a nightly job that prints a navmap “health” summary (missing owners, deprecated symbols remaining after their target version, modules with no `public-api`).
 
