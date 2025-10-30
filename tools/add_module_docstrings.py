@@ -75,7 +75,8 @@ def insert_docstring(path: Path) -> bool:
     bool
         ``True`` if the file was modified, ``False`` when no change was required.
     """
-    text = path.read_text()
+    # Explicitly use UTF-8 so behavior matches the project's encoding assumptions across platforms.
+    text = path.read_text(encoding="utf-8")
     if not needs_docstring(text):
         return False
     name = module_name(path)
@@ -87,7 +88,7 @@ def insert_docstring(path: Path) -> bool:
     if len(lines) > idx and lines[idx].startswith("#") and "coding" in lines[idx]:
         idx += 1
     lines.insert(idx, doc)
-    path.write_text("".join(lines))
+    path.write_text("".join(lines), encoding="utf-8")
     return True
 
 
