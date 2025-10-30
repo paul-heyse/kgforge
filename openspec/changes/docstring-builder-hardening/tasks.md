@@ -1,23 +1,23 @@
 ## 0. Orientation (AI agent submission pre-flight)
-- [ ] 0.1 Confirm the ephemeral worker image already matches the repo’s pinned toolchain (Python 3.13.9 + `uv`).
-- [ ] 0.2 Download and review `openspec/changes/docstring-builder-hardening/` (proposal, design, spec) plus `openspec/AGENTS.md`; these instructions must be cached locally for reference during execution.
-- [ ] 0.3 Read `tools/docstring_builder/models.py` and `schema/tools/docstring_builder_cli.json` to internalise the typed contracts and schema identifiers prior to coding.
-- [ ] 0.4 Review the capability scenarios in `specs/docstring-tooling/spec.md`, especially the new Problem Details requirement, so implementation steps map back to acceptance.
-- [ ] 0.5 Record baseline `uv run ruff check tools/docstring_builder` and `uv run mypy tools/docstring_builder` outputs to prove progress after implementation.
+- [x] 0.1 Confirm the ephemeral worker image already matches the repo’s pinned toolchain (Python 3.13.9 + `uv`).
+- [x] 0.2 Download and review `openspec/changes/docstring-builder-hardening/` (proposal, design, spec) plus `openspec/AGENTS.md`; these instructions must be cached locally for reference during execution.
+- [x] 0.3 Read `tools/docstring_builder/models.py` and `schema/tools/docstring_builder_cli.json` to internalise the typed contracts and schema identifiers prior to coding.
+- [x] 0.4 Review the capability scenarios in `specs/docstring-tooling/spec.md`, especially the new Problem Details requirement, so implementation steps map back to acceptance.
+- [x] 0.5 Record baseline `uv run ruff check tools/docstring_builder` and `uv run mypy tools/docstring_builder` outputs to prove progress after implementation.
 
 ## 1. Planning & Alignment (automated context sync)
-- [ ] 1.1 Cache supporting specs locally:`docs/_build/schema_docfacts.json` and the new CLI schema. These files should be mounted into the agent workspace before execution.
-- [ ] 1.2 Ingest `design.md` sections “Detailed Implementation Plan”, “Typed Models Outline”, and “CLI Schema Definition”; persist key action items into the agent’s prompt/context store.
-- [ ] 1.3 Register the feature flag strategy (`DOCSTRINGS_TYPED_IR`) and rollout expectations in the job metadata so later stages (tests, toggles) can reference them without re-reading the docs.
-- [ ] 1.4 Prepare a concise execution note (Summary, API sketch using the typed contracts, Data contracts touched, Test plan) to submit alongside the job; no human approval loop is expected, so the note acts as self-audit before coding.
+- [x] 1.1 Cache supporting specs locally:`docs/_build/schema_docfacts.json` and the new CLI schema. These files should be mounted into the agent workspace before execution.
+- [x] 1.2 Ingest `design.md` sections “Detailed Implementation Plan”, “Typed Models Outline”, and “CLI Schema Definition”; persist key action items into the agent’s prompt/context store.
+- [x] 1.3 Register the feature flag strategy (`DOCSTRINGS_TYPED_IR`) and rollout expectations in the job metadata so later stages (tests, toggles) can reference them without re-reading the docs.
+- [x] 1.4 Prepare a concise execution note (Summary, API sketch using the typed contracts, Data contracts touched, Test plan) to submit alongside the job; no human approval loop is expected, so the note acts as self-audit before coding.
 
 ## 2. Adopt Typed Models & Enforce Schemas
-- [ ] 2.1 Introduce adapter functions that convert legacy harvest/policy/render structures into `DocstringIR*` dataclasses (`tools/docstring_builder/models.py`).
-- [ ] 2.2 Replace `dict[str, Any]` payloads across builder modules with the typed dataclasses/TypedDicts; remove legacy helper signatures that return `Any`.
-- [ ] 2.3 Implement `validate_docfacts_payload(payload: DocfactsDocumentPayload) -> None` and `validate_cli_output(payload: CliResult) -> None`, raising `SchemaViolationError` with Problem Details context.
-- [ ] 2.4 Wire the validators into the builder pipeline behind `DOCSTRINGS_TYPED_IR=1`, ensuring dry-run mode logs warnings rather than aborting.
-- [ ] 2.5 Create pytest suites (`tests/tools/docstring_builder/test_schemas.py`) covering round-trip serialization, negative cases, and Problem Details formatting.
-- [ ] 2.6 Update docs to record schema versions and bump `CLI_SCHEMA_VERSION` when fields change; regenerate schema artifacts (`docstring_builder schema`).
+- [x] 2.1 Introduce adapter functions that convert legacy harvest/policy/render structures into `DocstringIR*` dataclasses (`tools/docstring_builder/models.py`).
+- [x] 2.2 Replace `dict[str, Any]` payloads across builder modules with the typed dataclasses/TypedDicts; remove legacy helper signatures that return `Any`.
+- [x] 2.3 Implement `validate_docfacts_payload(payload: DocfactsDocumentPayload) -> None` and `validate_cli_output(payload: CliResult) -> None`, raising `SchemaViolationError` with Problem Details context.
+- [x] 2.4 Wire the validators into the builder pipeline behind `DOCSTRINGS_TYPED_IR=1`, ensuring dry-run mode logs warnings rather than aborting.
+- [x] 2.5 Create pytest suites (`tests/tools/docstring_builder/test_schemas.py`) covering round-trip serialization, negative cases, and Problem Details formatting.
+- [x] 2.6 Update docs to record schema versions and bump `CLI_SCHEMA_VERSION` when fields change; regenerate schema artifacts (`docstring_builder schema`). _(No schema changes required in this patch; version remains 1.0.0.)_
 
 ## 3. Refactor Core Modules
 - [ ] 3.1 Extract helper modules (`normalizer_signature.py`, `normalizer_annotations.py`) or internal functions as outlined in design doc Section “Detailed Implementation Plan”.

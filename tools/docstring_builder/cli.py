@@ -57,6 +57,20 @@ from tools.docstring_builder.docfacts import (
 )
 from tools.docstring_builder.harvest import HarvestResult, harvest_file, iter_target_files
 from tools.docstring_builder.ir import IR_VERSION, IRDocstring, build_ir, validate_ir, write_schema
+from tools.docstring_builder.models import (
+    CacheSummary,
+    DocfactsDocumentPayload,
+    DocfactsReport,
+    ErrorReport,
+    FileReport,
+    InputHash,
+    RunStatus,
+    SchemaViolationError,
+    StatusCounts,
+    build_cli_result_skeleton,
+    build_docfacts_document_payload,
+    validate_cli_output,
+)
 from tools.docstring_builder.normalizer import normalize_docstring
 from tools.docstring_builder.plugins import (
     PluginConfigurationError,
@@ -98,6 +112,15 @@ DEFAULT_IGNORE_PATTERNS = [
 ]
 MISSING_MODULE_PATTERNS = ["docs/_build/**"]
 
+
+def _typed_pipeline_enabled() -> bool:
+    value = os.environ.get("DOCSTRINGS_TYPED_IR", "1").strip().lower()
+    return value not in {"", "0", "false", "no", "off"}
+
+
+TYPED_PIPELINE_ENABLED = _typed_pipeline_enabled()
+
+
 CommandHandler = Callable[[argparse.Namespace], int]
 
 
@@ -121,6 +144,42 @@ EXIT_SUCCESS = int(ExitStatus.SUCCESS)
 EXIT_VIOLATION = int(ExitStatus.VIOLATION)
 EXIT_CONFIG = int(ExitStatus.CONFIG)
 EXIT_ERROR = int(ExitStatus.ERROR)
+
+
+_EXIT_TO_RUN_STATUS: dict[ExitStatus, RunStatus] = {
+    ExitStatus.SUCCESS: RunStatus.SUCCESS,
+    ExitStatus.VIOLATION: RunStatus.VIOLATION,
+    ExitStatus.CONFIG: RunStatus.CONFIG,
+    ExitStatus.ERROR: RunStatus.ERROR,
+}
+
+
+def _status_from_exit(status: ExitStatus) -> RunStatus:
+    return _EXIT_TO_RUN_STATUS.get(status, RunStatus.ERROR)
+
+
+def _status_from_label(label: str) -> RunStatus:
+    lowered = label.lower()
+    match lowered:
+        case "success":
+            return RunStatus.SUCCESS
+        case "violation":
+            return RunStatus.VIOLATION
+        case "config":
+            return RunStatus.CONFIG
+        case "error":
+            return RunStatus.ERROR
+        case "warn" | "autofix":
+            return RunStatus.VIOLATION
+        case _:
+            return RunStatus.ERROR
+
+
+def _handle_schema_violation(context: str, exc: SchemaViolationError) -> None:
+    if TYPED_PIPELINE_ENABLED:
+        raise exc
+    log_extra = {"problem": exc.problem} if exc.problem else None
+    LOGGER.warning("%s validation failed: %s", context, exc, extra=log_extra)
 
 
 class InvalidPathError(ValueError):
@@ -498,7 +557,7 @@ def _handle_docfacts(
 ) -> DocfactsOutcome:
     provenance = _build_docfacts_provenance(config)
     document = build_docfacts_document(docfacts, provenance, DOCFACTS_VERSION)
-    payload = document.to_dict()
+    payload = build_docfacts_document_payload(document)
     if check_mode:
         if not DOCFACTS_PATH.exists():
             LOGGER.error("DocFacts missing at %s", DOCFACTS_PATH)
@@ -509,10 +568,10 @@ def _handle_docfacts(
             LOGGER.exception("DocFacts payload at %s is not valid JSON", DOCFACTS_PATH)
             return DocfactsOutcome(ExitStatus.CONFIG, "docfacts invalid json")
         try:
-            validate_docfacts_payload(existing)
-        except Exception:  # pragma: no cover - schema errors are rare but fatal
-            LOGGER.exception("DocFacts schema validation failed")
-            return DocfactsOutcome(ExitStatus.CONFIG, "docfacts schema invalid")
+            validate_docfacts_payload(cast(DocfactsDocumentPayload, existing))
+        except SchemaViolationError as exc:
+            _handle_schema_violation("DocFacts (check)", exc)
+            return DocfactsOutcome(ExitStatus.SUCCESS)
         comparison = json.loads(json.dumps(payload))
         provenance_existing = existing.get("provenance", {}) if isinstance(existing, dict) else {}
         if isinstance(comparison, dict):
@@ -530,7 +589,12 @@ def _handle_docfacts(
             return DocfactsOutcome(ExitStatus.VIOLATION, "docfacts drift")
         DOCFACTS_DIFF_PATH.unlink(missing_ok=True)
         return DocfactsOutcome(ExitStatus.SUCCESS)
-    write_docfacts(DOCFACTS_PATH, document)
+    written_payload = write_docfacts(DOCFACTS_PATH, document, validate=TYPED_PIPELINE_ENABLED)
+    if not TYPED_PIPELINE_ENABLED:
+        try:
+            validate_docfacts_payload(written_payload)
+        except SchemaViolationError as exc:
+            _handle_schema_violation("DocFacts (update)", exc)
     DOCFACTS_DIFF_PATH.unlink(missing_ok=True)
     return DocfactsOutcome(ExitStatus.SUCCESS)
 
@@ -817,8 +881,8 @@ def _run(  # noqa: C901, PLR0912, PLR0915
     changed_count = 0
     cache_hits = 0
     cache_misses = 0
-    errors: list[dict[str, str]] = []
-    json_entries: list[dict[str, object]] = []
+    errors: list[ErrorReport] = []
+    file_reports: list[FileReport] = []
     docstring_diffs: list[DocstringDriftEntry] = []
     options = ProcessingOptions(
         command=args.command or "",
@@ -852,6 +916,7 @@ def _run(  # noqa: C901, PLR0912, PLR0915
         policy_engine = PolicyEngine(policy_settings)
         all_ir: list[IRDocstring] = []
         docfacts_checked = False
+        docfacts_result: DocfactsOutcome | None = None
         docfacts_payload_text: str | None = None
 
         jobs = getattr(args, "jobs", 1) or 1
@@ -929,7 +994,7 @@ def _run(  # noqa: C901, PLR0912, PLR0915
                 errors.append(
                     {
                         "file": rel,
-                        "status": STATUS_LABELS[outcome.status],
+                        "status": _status_from_exit(outcome.status),
                         "message": outcome.message or "",
                     }
                 )
@@ -939,20 +1004,20 @@ def _run(  # noqa: C901, PLR0912, PLR0915
             all_ir.extend(outcome.ir)
             if getattr(args, "json_output", False):
                 rel_path = str(file_path.relative_to(REPO_ROOT))
-                json_entry: dict[str, object] = {
+                file_report: FileReport = {
                     "path": rel_path,
-                    "status": STATUS_LABELS[outcome.status],
+                    "status": _status_from_exit(outcome.status),
                     "changed": outcome.changed,
                     "skipped": outcome.skipped,
-                    "cache_hit": outcome.cache_hit,
+                    "cacheHit": outcome.cache_hit,
                 }
                 if outcome.message:
-                    json_entry["message"] = outcome.message
+                    file_report["message"] = outcome.message
                 if outcome.preview:
-                    json_entry["preview"] = outcome.preview
+                    file_report["preview"] = outcome.preview
                 if options.baseline:
-                    json_entry["baseline"] = options.baseline
-                json_entries.append(json_entry)
+                    file_report["baseline"] = options.baseline
+                file_reports.append(file_report)
             if options.baseline:
                 baseline_text = _read_baseline_version(options.baseline, file_path)
                 if baseline_text is not None:
@@ -981,7 +1046,7 @@ def _run(  # noqa: C901, PLR0912, PLR0915
                 errors.append(
                     {
                         "file": "<docfacts>",
-                        "status": STATUS_LABELS[docfacts_result.status],
+                        "status": _status_from_exit(docfacts_result.status),
                         "message": docfacts_result.message or "",
                     }
                 )
@@ -998,7 +1063,7 @@ def _run(  # noqa: C901, PLR0912, PLR0915
             errors.append(
                 {
                     "file": violation.symbol,
-                    "status": violation.action,
+                    "status": _status_from_label(str(violation.action)),
                     "message": violation.message,
                 }
             )
@@ -1010,17 +1075,23 @@ def _run(  # noqa: C901, PLR0912, PLR0915
             (status for status, count in status_counts.items() if count), default=ExitStatus.SUCCESS
         )
         status_counts.setdefault(ExitStatus.SUCCESS, 0)
+        status_counts_full: StatusCounts = {
+            "success": status_counts.get(ExitStatus.SUCCESS, 0),
+            "violation": status_counts.get(ExitStatus.VIOLATION, 0),
+            "config": status_counts.get(ExitStatus.CONFIG, 0),
+            "error": status_counts.get(ExitStatus.ERROR, 0),
+        }
         status_counts_map: dict[str, int] = {
             STATUS_LABELS[key]: value for key, value in status_counts.items() if value
         }
-        cache_payload: dict[str, object] = {
+        cache_payload: CacheSummary = {
             "path": str(CACHE_PATH),
             "exists": CACHE_PATH.exists(),
             "mtime": None,
             "hits": cache_hits,
             "misses": cache_misses,
         }
-        input_hashes: dict[str, dict[str, object]] = {}
+        input_hashes: dict[str, InputHash] = {}
         for path in files_list:
             rel = str(path.relative_to(REPO_ROOT))
             if path.exists():
@@ -1051,7 +1122,9 @@ def _run(  # noqa: C901, PLR0912, PLR0915
                     "DocFacts baseline drift",
                 )
 
-        invoked = getattr(args, "invoked_subcommand", getattr(args, "subcommand", args.command))
+        invoked = str(
+            getattr(args, "invoked_subcommand", getattr(args, "subcommand", args.command)) or ""
+        )
         manifest_payload: dict[str, object] = {
             "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
             "command": args.command,
@@ -1181,39 +1254,64 @@ def _run(  # noqa: C901, PLR0912, PLR0915
             _print_failure_summary(observability_payload)
 
         if getattr(args, "json_output", False):
-            json_payload: dict[str, object] = {
-                "exit_status": STATUS_LABELS[exit_status],
-                "files": json_entries,
-                "errors": errors,
-                "summary": {
-                    "considered": len(files_list),
-                    "processed": processed_count,
-                    "skipped": skipped_count,
-                    "changed": changed_count,
-                    "status_counts": status_counts_map,
-                    "docfacts_checked": docfacts_checked,
-                    "cache_hits": cache_hits,
-                    "cache_misses": cache_misses,
-                    "duration_seconds": duration,
-                    "subcommand": invoked,
-                },
-                "policy": {
-                    "coverage": policy_report.coverage,
-                    "threshold": policy_report.threshold,
-                    "violations": [
-                        {
-                            "rule": violation.rule,
-                            "symbol": violation.symbol,
-                            "action": violation.action,
-                            "message": violation.message,
-                        }
-                        for violation in policy_report.violations
-                    ],
-                },
+            cli_result = build_cli_result_skeleton(_status_from_exit(exit_status))
+            cli_result["command"] = args.command or ""
+            cli_result["subcommand"] = invoked
+            cli_result["durationSeconds"] = duration
+            cli_result["files"] = file_reports
+            cli_result["errors"] = errors
+            summary = cli_result["summary"]
+            summary["considered"] = len(files_list)
+            summary["processed"] = processed_count
+            summary["skipped"] = skipped_count
+            summary["changed"] = changed_count
+            summary["status_counts"] = status_counts_full
+            summary["docfacts_checked"] = docfacts_checked
+            summary["cache_hits"] = cache_hits
+            summary["cache_misses"] = cache_misses
+            summary["duration_seconds"] = duration
+            summary["subcommand"] = invoked
+            cli_result["policy"] = {
+                "coverage": policy_report.coverage,
+                "threshold": policy_report.threshold,
+                "violations": [
+                    {
+                        "rule": violation.rule,
+                        "symbol": violation.symbol,
+                        "action": str(violation.action),
+                        "message": violation.message,
+                    }
+                    for violation in policy_report.violations
+                ],
             }
+            cli_result["cache"] = cache_payload
+            cli_result["inputs"] = input_hashes
+            cli_result["plugins"] = {
+                "enabled": plugin_manager.enabled_plugins(),
+                "available": plugin_manager.available,
+                "disabled": plugin_manager.disabled,
+                "skipped": plugin_manager.skipped,
+            }
+            docfacts_validated = (
+                docfacts_checked
+                and docfacts_result is not None
+                and docfacts_result.status is ExitStatus.SUCCESS
+            )
+            docfacts_report: DocfactsReport = {
+                "path": str(DOCFACTS_PATH.relative_to(REPO_ROOT)),
+                "version": DOCFACTS_VERSION,
+                "validated": docfacts_validated,
+            }
+            if DOCFACTS_DIFF_PATH.exists():
+                docfacts_report["diff"] = str(DOCFACTS_DIFF_PATH.relative_to(REPO_ROOT))
+            cli_result["docfacts"] = docfacts_report
             if options.baseline:
-                json_payload["baseline"] = options.baseline
-            sys.stdout.write(json.dumps(json_payload, indent=2, sort_keys=True) + "\n")
+                cli_result["baseline"] = options.baseline
+            try:
+                validate_cli_output(cli_result)
+            except SchemaViolationError as exc:
+                _handle_schema_violation("CLI output", exc)
+            sys.stdout.write(json.dumps(cli_result, indent=2, sort_keys=True) + "\n")
 
         return int(exit_status)
     finally:
