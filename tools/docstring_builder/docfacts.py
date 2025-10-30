@@ -5,11 +5,15 @@ from __future__ import annotations
 import json
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from functools import lru_cache
 from pathlib import Path
 from typing import Final, SupportsInt, cast
 
-from jsonschema import Draft202012Validator
+from tools.docstring_builder.models import (
+    DocfactsDocumentLike,
+    DocfactsDocumentPayload,
+    build_docfacts_document_payload,
+    validate_docfacts_payload,
+)
 from tools.docstring_builder.semantics import SemanticResult
 
 REPO_ROOT: Final = Path(__file__).resolve().parents[2]
@@ -264,24 +268,19 @@ def build_docfacts_document(
     )
 
 
-@lru_cache(maxsize=1)
-def _load_validator(schema_path: Path = DOCFACTS_SCHEMA_PATH) -> Draft202012Validator:
-    schema_data = json.loads(schema_path.read_text(encoding="utf-8"))
-    return Draft202012Validator(schema_data)
-
-
-def validate_docfacts_payload(payload: Mapping[str, object]) -> None:
-    """Validate a DocFacts payload against the JSON schema."""
-    validator = _load_validator()
-    validator.validate(payload)
-
-
-def write_docfacts(path: Path, document: DocfactsDocument) -> None:
-    """Persist DocFacts to the provided path as JSON."""
-    payload = document.to_dict()
-    validate_docfacts_payload(payload)
+def write_docfacts(
+    path: Path,
+    document: DocfactsDocument,
+    *,
+    validate: bool = True,
+) -> DocfactsDocumentPayload:
+    """Persist DocFacts to ``path`` returning the typed payload."""
+    payload = build_docfacts_document_payload(cast(DocfactsDocumentLike, document))
+    if validate:
+        validate_docfacts_payload(payload)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    return payload
 
 
 __all__ = [
