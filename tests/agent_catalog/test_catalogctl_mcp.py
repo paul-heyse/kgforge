@@ -75,3 +75,53 @@ def test_catalogctl_mcp_session_round_trip() -> None:
             process.wait(timeout=2)
         except subprocess.TimeoutExpired:  # pragma: no cover - defensive cleanup
             process.kill()
+
+
+def test_catalogctl_mcp_enforces_rbac(tmp_path: Path) -> None:
+    """Hosted mode should forbid viewer roles from invoking admin methods."""
+
+    audit_log = tmp_path / "audit.jsonl"
+    command = [
+        sys.executable,
+        "-m",
+        "tools.agent_catalog.catalogctl_mcp",
+        "--catalog",
+        str(FIXTURE),
+        "--repo-root",
+        str(REPO_ROOT),
+        "--hosted-mode",
+        "--role",
+        "viewer",
+        "--audit-log",
+        str(audit_log),
+    ]
+    process = subprocess.Popen(  # noqa: S603 - trusted interpreter
+        command,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    try:
+        _rpc(process, {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}})
+        denied = _rpc(
+            process,
+            {
+                "jsonrpc": "2.0",
+                "id": 2,
+                "method": "catalog.open_anchor",
+                "params": {"symbol_id": "4b227777d4dd1fc61c6f884f48641d02"},
+            },
+        )
+        assert denied["error"]["status"] == 403
+    finally:
+        if process.stdin:
+            process.stdin.close()
+        process.terminate()
+        try:
+            process.wait(timeout=2)
+        except subprocess.TimeoutExpired:  # pragma: no cover - defensive cleanup
+            process.kill()
+    lines = [json.loads(line) for line in audit_log.read_text(encoding="utf-8").splitlines()]
+    statuses = {entry["status"] for entry in lines}
+    assert "forbidden" in statuses

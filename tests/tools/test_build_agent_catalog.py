@@ -229,6 +229,12 @@ def test_build_anchors_use_docfacts_end_lineno(tmp_path: Path) -> None:
     anchors = builder._build_anchors(qname, analyzer, node, builder._docfacts_index[qname])
     assert anchors.start_line == 1
     assert anchors.end_line == 4
+    assert anchors.remap_order, "expected remap_order entries"
+    remap = anchors.remap_order[0]
+    assert remap["symbol_id"]
+    assert remap["cst_fingerprint"] == anchors.cst_fingerprint
+    assert remap["name_arity"] == 1
+    assert "example" in (remap.get("nearest_text") or "")
 
 
 def test_load_faiss_falls_back_when_missing(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -445,6 +445,10 @@ dependencies = [
     "faiss-cpu",
 ]
 
+[project.scripts]
+catalogctl = "kgfoundry.agent_catalog.cli:main"
+catalogctl-mcp = "kgfoundry.agent_catalog.mcp:main"
+
 
 [project.optional-dependencies]
 gpu = [
