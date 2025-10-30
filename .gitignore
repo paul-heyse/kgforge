@@ -26,4 +26,5 @@ docs/_build/observability_docstrings.json
 # IDE
 .vscode/*
 !.vscode/settings.json
+!.vscode/tasks.json
 .idea/
