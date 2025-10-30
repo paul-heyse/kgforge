@@ -1,4 +1,9 @@
-"""Generate README files that mirror the information published on kgfoundry.dev."""
+"""Render repository documentation into distributable README files.
+
+The script composes package README pages that align with the content hosted on
+kgfoundry.dev by invoking the shared documentation rendering utilities. It ensures
+local packages contain synchronized summaries, badges, and metadata for publishing.
+"""
 
 from __future__ import annotations
 
