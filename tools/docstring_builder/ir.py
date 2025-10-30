@@ -62,7 +62,6 @@ class IRDocstring:
 
 def build_ir(entry: SemanticResult) -> IRDocstring:
     """Convert a :class:`SemanticResult` into an :class:`IRDocstring`."""
-
     symbol = entry.symbol
     schema = entry.schema
     parameters = [
@@ -82,8 +81,7 @@ def build_ir(entry: SemanticResult) -> IRDocstring:
         for ret in schema.returns
     ]
     raises = [
-        IRRaise(exception=exc.exception, description=exc.description)
-        for exc in schema.raises
+        IRRaise(exception=exc.exception, description=exc.description) for exc in schema.raises
     ]
     return IRDocstring(
         symbol_id=symbol.qname,
@@ -102,27 +100,30 @@ def build_ir(entry: SemanticResult) -> IRDocstring:
 
 def validate_ir(ir: IRDocstring) -> None:
     """Validate an :class:`IRDocstring` against simple invariants."""
-
     if ir.ir_version != IR_VERSION:
-        msg = f"Unsupported IR version: {ir.ir_version}"
-        raise ValueError(msg)
+        message = f"Unsupported IR version: {ir.ir_version}"
+        raise ValueError(message)
     if not ir.symbol_id:
-        raise ValueError("IR docstring must include a symbol identifier")
+        message = "IR docstring must include a symbol identifier"
+        raise ValueError(message)
     if ir.kind not in {"function", "method", "class"}:
-        raise ValueError(f"Unsupported symbol kind: {ir.kind}")
+        message = f"Unsupported symbol kind: {ir.kind}"
+        raise ValueError(message)
     for parameter in ir.parameters:
         if not parameter.name:
-            raise ValueError("Parameters must include a name")
+            message = "Parameters must include a name"
+            raise ValueError(message)
         if not parameter.kind:
-            raise ValueError("Parameters must include a kind")
+            message = "Parameters must include a kind"
+            raise ValueError(message)
     for ret in ir.returns:
         if ret.kind not in {"returns", "yields"}:
-            raise ValueError(f"Unsupported return kind: {ret.kind}")
+            message = f"Unsupported return kind: {ret.kind}"
+            raise ValueError(message)
 
 
 def serialize_ir(ir: IRDocstring) -> dict[str, Any]:
     """Convert an :class:`IRDocstring` into a JSON-serialisable dictionary."""
-
     payload = asdict(ir)
     payload["ir_version"] = ir.ir_version
     return payload
@@ -130,7 +131,6 @@ def serialize_ir(ir: IRDocstring) -> dict[str, Any]:
 
 def generate_schema() -> dict[str, Any]:
     """Return the JSON schema describing the docstring IR."""
-
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "$id": "https://kgfoundry.dev/schema/docstrings.json",
@@ -212,21 +212,19 @@ def generate_schema() -> dict[str, Any]:
 
 def write_schema(path: Path) -> None:
     """Write the IR JSON schema to ``path``."""
-
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(generate_schema(), indent=2), encoding="utf-8")
 
 
 __all__ = [
+    "IR_VERSION",
     "IRDocstring",
     "IRParameter",
     "IRRaise",
     "IRReturn",
-    "IR_VERSION",
     "build_ir",
     "generate_schema",
     "serialize_ir",
     "validate_ir",
     "write_schema",
 ]
-

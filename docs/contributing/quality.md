@@ -43,7 +43,7 @@ an error.
 
 | When you change…                                   | Why `make artifacts` matters                         | Notes |
 | -------------------------------------------------- | ---------------------------------------------------- | ----- |
-| Public API signatures or docstrings                | Updates rendered docstrings and `docfacts.json`      | Uses `tools.docstring_builder.cli update --all`
+| Public API signatures or docstrings                | Updates rendered docstrings and `docfacts.json`      | Uses `tools.docstring_builder.cli generate --all`
 | Navigation metadata (`tools/navmap/**`)             | Rebuilds `site/_build/navmap/navmap.json`            | Keeps navmaps/test maps in sync |
 | Observability policies or coverage annotations     | Refreshes observability reports under `docs/_build`  | Fails fast if new lint errors appear |
 | Pydantic models / schema exports                   | Writes JSON schema artefacts and drift reports       | Inspect `docs/_build/schema_drift.json` when it changes |
@@ -54,7 +54,7 @@ an error.
   the regenerated docstrings first. The command writes deterministic JSON; rerun
   it after resolving merge conflicts to realign ownership markers.
 - **`ModuleNotFoundError: docs._build…` during manual runs?** Call
-  `python -m tools.docstring_builder.cli update --all --ignore-missing` or just
+  `python -m tools.docstring_builder.cli generate --all --ignore-missing` or just
   `make artifacts`. The compatibility flag suppresses transient imports from
   generated directories.
 - **`[schemas] drift detected` keeps appearing?** Open
@@ -81,7 +81,62 @@ To keep the feedback loop tight, enable the optional pre-commit hook named
 mode and honours the `SKIP_DOC_BUILDER_DIFF=1` and
 `DOC_BUILDER_SINCE=<rev>` environment flags.
 
-## 4. Rely on CI for final verification
+## 4. Docstring builder CLI reference
+
+The CLI now exposes explicit subcommands so you can pick the right behaviour
+without juggling legacy flags:
+
+- `generate` — synchronise managed docstrings, update DocFacts, and refresh the
+  manifest.
+- `fix` — force a regeneration for files touched since the last merge-base via
+  `--changed-only` (ideal for CI smoke checks).
+- `diff` — report drift without writing changes; pairs nicely with
+  `--changed-only` and the optional pre-commit hook.
+- `check` — validate docstrings and DocFacts without applying edits.
+- `lint` — alias for `check` that skips DocFacts comparisons when you only need
+  policy enforcement.
+- `measure` — run the pipeline and emit metrics even when everything is clean.
+- `schema` — write the JSON schema describing the docstring IR.
+- `doctor` — verify the environment, stub packages, and pre-commit ordering; add
+  `--stubs` to surface drift in vendored typings.
+
+Configuration precedence is now explicit: `--config` overrides
+`KGF_DOCSTRINGS_CONFIG`, which in turn falls back to `docstring_builder.toml`
+discovered relative to the repository root. The `doctor` command prints the
+active configuration source to simplify debugging.
+
+Every run writes metrics to `docs/_build/observability_docstrings.json` and a
+manifest to `docs/_build/docstrings_manifest.json`. When drift is detected the
+CLI also produces HTML previews under `docs/_build/drift/` (for example,
+`docfacts.html`, `navmap.html`, and `schema.html`). Link targets are listed in
+both the manifest and observability payloads so you can jump straight to the
+rendered preview.
+
+VS Code users can trigger common workflows from `.vscode/tasks.json`:
+
+- **Docstrings: Generate** runs the full regeneration with
+  `--ignore-missing`.
+- **Docstrings: Fix changed files** performs a focused regeneration scoped to
+  the current diff.
+- **Docstrings: Watch** relies on `uvx watchfiles` to rerun
+  `docstring-builder check --changed-only --diff` when `src/` or `tools/`
+  modules change.
+
+## 5. Extending the builder
+
+- **Plugin authoring.** New transformers or formatters live in
+  `tools/docstring_builder/plugins/`. Register them via the
+  `kgfoundry.docstrings.plugins` entry point group and implement the typed
+  `Harvester`, `Transformer`, or `Formatter` protocols. The CLI honours
+  `--only-plugin` and `--disable-plugin` so you can test modules in isolation.
+- **Stub maintenance.** Keep vendored typings current by running
+  `python -m tools.docstring_builder.cli doctor --stubs`. The command fails with
+  actionable output when runtime modules diverge from `stubs/`.
+- **Troubleshooting.** `doctor` checks Python version, write permissions for
+  `.cache/` and `docs/_build/`, pre-commit ordering, and optional dependency
+  imports. Pair it with the HTML drift previews for quick triage.
+
+## 6. Rely on CI for final verification
 
 The primary CI workflow now includes a **Docs Artifacts** job that calls
 `make artifacts` and asserts the working tree stays clean. The existing

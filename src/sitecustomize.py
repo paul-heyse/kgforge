@@ -8,10 +8,15 @@ release of :mod:`docstring_parser`.  This module patches the library at import
 from __future__ import annotations
 
 import logging
+import os
+import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, Protocol, cast
 
 logger = logging.getLogger("kgfoundry.docstring_shim")
+
+_FLAG_VALUE = os.environ.get("KGFOUNDRY_DOCSTRINGS_SITECUSTOMIZE", "1").strip().lower()
+ENABLE_SITECUSTOMIZE = _FLAG_VALUE not in {"0", "false", "off", "no"}
 
 if TYPE_CHECKING:  # pragma: no cover - imported solely for typing information
     from docstring_parser.common import (
@@ -248,7 +253,19 @@ except Exception:  # pragma: no cover - the library is optional at runtime
 else:
     doc_common = cast(DocstringCommonModuleProto, _imported_common)
 
-if doc_common is not None:
+if doc_common is not None and not ENABLE_SITECUSTOMIZE:
+    logger.info(
+        "Docstring builder shims disabled via KGFOUNDRY_DOCSTRINGS_SITECUSTOMIZE=%s",
+        _FLAG_VALUE or "0",
+    )
+
+if doc_common is not None and ENABLE_SITECUSTOMIZE:
+    warnings.warn(
+        "Docstring builder runtime shims are deprecated and will be removed; "
+        "set KGFOUNDRY_DOCSTRINGS_SITECUSTOMIZE=0 to opt out early.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     doc_common_local = doc_common
     if not hasattr(doc_common_local, "DocstringYields") and hasattr(
         doc_common_local, "DocstringReturns"
@@ -305,9 +322,8 @@ if doc_common is not None:
         doc_common_local, "DocstringYields", None
     )
 
-    if doc_cls is not None and attr_cls is not None:
-        if ensure_docstring_attrs(doc_cls, attr_cls):
-            logger.debug("Docstring.attrs shim installed")
+    if doc_cls is not None and attr_cls is not None and ensure_docstring_attrs(doc_cls, attr_cls):
+        logger.debug("Docstring.attrs shim installed")
 
     if doc_cls is not None and yields_cls is not None:
         added_yield, added_many = ensure_docstring_yields(doc_cls, yields_cls)
