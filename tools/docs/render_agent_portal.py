@@ -3,16 +3,22 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
+import json
 import statistics
 from collections.abc import Iterable
 from pathlib import Path
+from typing import Final
+
+CacheKey = str
 
 from kgfoundry.agent_catalog.client import AgentCatalogClient
 from kgfoundry.agent_catalog.models import ModuleModel, SymbolModel
 
 DEFAULT_OUTPUT = Path("site/_build/agent/index.html")
 MAX_EXEMPLARS = 2
+MODULE_CARD_VERSION: Final[str] = "1"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -91,6 +97,65 @@ def _collect_module_hints(symbols: Iterable[SymbolModel]) -> dict[str, list[str]
         "tests": sorted(tests),
         "notes": sorted(notes),
     }
+
+
+def _module_cache_key(package: str, module: ModuleModel) -> CacheKey:
+    """Return a stable cache key for ``module`` within ``package``."""
+
+    payload = {
+        "version": MODULE_CARD_VERSION,
+        "package": package,
+        "module": module.model_dump(mode="json"),
+    }
+    serialized = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+
+
+def _cache_directory(output_path: Path) -> Path:
+    """Return the directory used to persist cached module cards."""
+
+    return output_path.parent / ".module_cache"
+
+
+def _render_module_card_cached(
+    package: str,
+    module: ModuleModel,
+    cache_dir: Path,
+    used: set[CacheKey],
+) -> str:
+    """Render ``module`` using a content-addressed HTML cache when available."""
+
+    key = _module_cache_key(package, module)
+    used.add(key)
+    try:
+        cache_dir.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        return _render_module_card(package, module)
+    cache_path = cache_dir / f"{key}.html"
+    try:
+        if cache_path.exists():
+            return cache_path.read_text(encoding="utf-8")
+    except OSError:
+        pass
+    markup = _render_module_card(package, module)
+    try:
+        cache_path.write_text(markup, encoding="utf-8")
+    except OSError:
+        return markup
+    return markup
+
+
+def _prune_cache(cache_dir: Path, used: set[CacheKey]) -> None:
+    """Remove cached cards in ``cache_dir`` that were not ``used``."""
+
+    if not cache_dir.exists():
+        return
+    for cached in cache_dir.glob("*.html"):
+        if cached.stem not in used:
+            try:
+                cached.unlink(missing_ok=True)
+            except OSError:
+                continue
 
 
 def _render_dependency_graph(module: ModuleModel) -> str:
@@ -228,8 +293,16 @@ def _render_module_card(package: str, module: ModuleModel) -> str:
     """
 
 
-def _render_package(package_name: str, modules: list[ModuleModel]) -> str:
-    cards = "\n".join(_render_module_card(package_name, module) for module in modules)
+def _render_package(
+    package_name: str,
+    modules: list[ModuleModel],
+    *,
+    cache_dir: Path,
+    used: set[CacheKey],
+) -> str:
+    cards = "\n".join(
+        _render_module_card_cached(package_name, module, cache_dir, used) for module in modules
+    )
     return (
         f'<section class="package" id="pkg-{html.escape(package_name)}" aria-label="Package {html.escape(package_name)}">'
         f"<h2>{html.escape(package_name)}</h2>"
@@ -345,9 +418,13 @@ def render_portal(client: AgentCatalogClient, output_path: Path) -> None:
     artifacts = client.catalog.artifacts
     quick_links = _render_quick_links(artifacts)
     package_sections = []
+    cache_dir = _cache_directory(output_path)
+    used: set[CacheKey] = set()
     for package in client.list_packages():
         modules = client.list_modules(package.name)
-        package_sections.append(_render_package(package.name, modules))
+        package_sections.append(
+            _render_package(package.name, modules, cache_dir=cache_dir, used=used)
+        )
     packages_markup = "\n".join(package_sections)
     facets_markup = _render_facets(client)
     tutorials_markup = _render_tutorials()
@@ -560,6 +637,7 @@ def render_portal(client: AgentCatalogClient, output_path: Path) -> None:
 """
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(html_output, encoding="utf-8")
+    _prune_cache(cache_dir, used)
 
 
 def main(argv: list[str] | None = None) -> int:
