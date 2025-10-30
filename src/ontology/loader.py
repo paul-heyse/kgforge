@@ -55,4 +55,3 @@ class OntologyLoader:
         Describe return value.
     """
 
-    ...

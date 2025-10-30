@@ -30,7 +30,7 @@ process_file = auto_docstrings.process_file
 detect_raises = auto_docstrings.detect_raises
 
 
-@pytest.fixture()
+@pytest.fixture
 def repo_layout(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     repo = tmp_path / "repo"
     src = repo / "src"

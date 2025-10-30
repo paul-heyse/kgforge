@@ -55,4 +55,3 @@ class Qwen3Embedder:
         Describe return value.
     """
 
-    ...

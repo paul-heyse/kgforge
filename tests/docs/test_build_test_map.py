@@ -10,7 +10,7 @@ import pytest
 from tools.docs import build_test_map
 
 
-@pytest.fixture()
+@pytest.fixture
 def _reload_build_test_map() -> Iterator[None]:
     """Reload the build_test_map module to reset global state."""
     importlib.reload(build_test_map)
