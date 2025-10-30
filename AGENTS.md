@@ -468,6 +468,8 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 <!-- OPENSPEC:END -->
 
+Run `pyenv install 3.13.9 && pyenv global 3.13.9` before following the steps below.
+
 ## Environment Setup (Preferred Order)
 
 1. **Bootstrap script (recommended default)**
