@@ -36,7 +36,7 @@ Module Contents
 
 .. py:class:: FaissGpuIndex(factory = 'OPQ64,IVF8192,PQ64', nprobe = 64, gpu = True, cuvs = True)
 
-   
+
    Model the FaissGpuIndex.
 
    Represent the faissgpuindex data structure used throughout the project. The class encapsulates
@@ -112,7 +112,7 @@ Module Contents
 
    .. py:method:: _ensure_resources()
 
-      
+
       Compute ensure resources.
 
       Carry out the ensure resources operation.
@@ -137,7 +137,7 @@ Module Contents
 
    .. py:method:: train(train_vectors, *, seed = 42)
 
-      
+
       Compute train.
 
       Carry out the train operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -172,7 +172,7 @@ Module Contents
 
    .. py:method:: add(keys, vectors)
 
-      
+
       Compute add.
 
       Carry out the add operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -209,7 +209,7 @@ Module Contents
 
    .. py:method:: search(query, k)
 
-      
+
       Compute search.
 
       Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -250,7 +250,7 @@ Module Contents
 
    .. py:method:: save(index_uri, idmap_uri = None)
 
-      
+
       Compute save.
 
       Carry out the save operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -287,7 +287,7 @@ Module Contents
 
    .. py:method:: load(index_uri, idmap_uri = None)
 
-      
+
       Compute load.
 
       Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -320,5 +320,3 @@ Module Contents
 
       ..
           !! processed by numpydoc !!
-
-

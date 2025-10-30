@@ -31,7 +31,7 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   
+
    Model the Doc.
 
    Pydantic model defining the structured payload used across the system. Validation ensures inputs
@@ -136,7 +136,7 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   
+
    Model the DoctagsAsset.
 
    Pydantic model defining the structured payload used across the system. Validation ensures inputs
@@ -191,7 +191,7 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   
+
    Model the Chunk.
 
    Pydantic model defining the structured payload used across the system. Validation ensures inputs
@@ -248,7 +248,7 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   
+
    Model the LinkAssertion.
 
    Pydantic model defining the structured payload used across the system. Validation ensures inputs
@@ -304,5 +304,3 @@ Module Contents
 
    .. py:attribute:: run_id
       :type:  str
-
-

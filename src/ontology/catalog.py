@@ -30,7 +30,7 @@ class Concept:
     label : str | None, optional
         Describe ``label``.
         Defaults to ``None``.
-    """
+"""
 
     id: str
     label: str | None = None
@@ -78,7 +78,7 @@ class OntologyCatalog:
     ----------
     concepts : list[Concept]
         Describe ``concepts``.
-    """
+"""
 
     def __init__(self, concepts: list[Concept]) -> None:
         """Describe   init  .
@@ -91,7 +91,7 @@ class OntologyCatalog:
         ----------
         concepts : list[Concept]
             Describe ``concepts``.
-        """
+"""
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
@@ -108,12 +108,13 @@ class OntologyCatalog:
         depth : int, optional
             Describe ``depth``.
             Defaults to ``1``.
+            
 
         Returns
         -------
         set[str]
             Describe return value.
-        """
+"""
         # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return set()
 
@@ -128,10 +129,11 @@ class OntologyCatalog:
         ----------
         concept_id : str
             Describe ``concept_id``.
+            
 
         Returns
         -------
         dict[str, Any]
             Describe return value.
-        """
+"""
         return {}

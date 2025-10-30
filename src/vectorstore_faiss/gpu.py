@@ -81,12 +81,13 @@ class FaissGpuIndex:
     cuvs : bool, optional
         Describe ``cuvs``.
         Defaults to ``True``.
+        
 
     Raises
     ------
     RuntimeError
     Raised when TODO for RuntimeError.
-    """
+"""
 
     def __init__(
         self,
@@ -115,7 +116,7 @@ class FaissGpuIndex:
         cuvs : bool, optional
             Describe ``cuvs``.
             Defaults to ``True``.
-        """
+"""
         self.factory = factory
         self.nprobe = nprobe
         self.gpu = gpu
@@ -140,7 +141,7 @@ class FaissGpuIndex:
         Python's object protocol for this class. Use it to integrate with built-in operators,
         protocols, or runtime behaviours that expect instances to participate in the language's data
         model.
-        """
+"""
         if not self._faiss or not self.gpu:
             return
         if self._res is None:
@@ -161,7 +162,7 @@ class FaissGpuIndex:
         seed : int, optional
             Describe ``seed``.
             Defaults to ``42``.
-        """
+"""
         if self._faiss is None:
             return
         train_mat: FloatArray = np.asarray(train_vectors, dtype=np.float32, order="C")
@@ -200,12 +201,13 @@ class FaissGpuIndex:
             Describe ``keys``.
         vectors : FloatArray | FloatArrayLike
             Describe ``vectors``.
+            
 
         Raises
         ------
         RuntimeError
         Raised when TODO for RuntimeError.
-        """
+"""
         vec_array: FloatArray = np.asarray(vectors, dtype=np.float32, order="C")
         if self._faiss is None:
             xb: FloatArray = np.array(vec_array, dtype=np.float32, copy=True)
@@ -243,26 +245,28 @@ class FaissGpuIndex:
             Describe ``query``.
         k : int
             Describe ``k``.
+            
 
         Returns
         -------
         list[tuple[str, float]]
             Describe return value.
-
-
-
-
-
-
-
-
-
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
 
         Raises
         ------
         RuntimeError
         Raised when TODO for RuntimeError.
-        """
+"""
         q: FloatArray = np.asarray(query, dtype=np.float32, order="C")
         q /= np.linalg.norm(q, axis=-1, keepdims=True) + 1e-12
         if self._faiss is None or self._index is None:
@@ -294,12 +298,13 @@ class FaissGpuIndex:
         idmap_uri : str | None, optional
             Describe ``idmap_uri``.
             Defaults to ``None``.
+            
 
         Raises
         ------
         RuntimeError
         Raised when TODO for RuntimeError.
-        """
+"""
         if self._faiss is None or self._index is None:
             if self._xb is not None and self._idmap is not None:
                 np.savez(index_uri, xb=self._xb, ids=self._idmap)
@@ -325,12 +330,13 @@ class FaissGpuIndex:
         idmap_uri : str | None, optional
             Describe ``idmap_uri``.
             Defaults to ``None``.
+            
 
         Raises
         ------
         RuntimeError
         Raised when TODO for RuntimeError.
-        """
+"""
         if self._faiss is None:
             if os.path.exists(index_uri + ".npz"):
                 data = np.load(index_uri + ".npz", allow_pickle=True)

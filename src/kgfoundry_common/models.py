@@ -114,7 +114,7 @@ class Doc(BaseModel):
     content_hash : str | None, optional
         Describe ``content_hash``.
         Defaults to ``None``.
-    """
+"""
 
     id: Id
     openalex_id: str | None = None
@@ -155,7 +155,7 @@ class DoctagsAsset(BaseModel):
     avg_logprob : float | None, optional
         Describe ``avg_logprob``.
         Defaults to ``None``.
-    """
+"""
 
     doc_id: Id
     doctags_uri: str
@@ -190,7 +190,7 @@ class Chunk(BaseModel):
         Describe ``tokens``.
     doctags_span : dict[str, int]
         Describe ``doctags_span``.
-    """
+"""
 
     id: Id
     doc_id: Id
@@ -230,7 +230,7 @@ class LinkAssertion(BaseModel):
         Defaults to ``<factory>``.
     run_id : str
         Describe ``run_id``.
-    """
+"""
 
     id: Id
     chunk_id: Id

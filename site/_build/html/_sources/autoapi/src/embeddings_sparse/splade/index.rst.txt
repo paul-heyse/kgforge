@@ -24,7 +24,7 @@ Module Contents
 
 .. py:class:: SPLADEv3Encoder(model_id = 'naver/splade-v3-distilbert', device = 'cuda', topk = 256, max_seq_len = 512)
 
-   
+
    Model the SPLADEv3Encoder.
 
    Represent the spladev3encoder data structure used throughout the project. The class encapsulates
@@ -75,7 +75,7 @@ Module Contents
 
    .. py:method:: encode(texts)
 
-      
+
       Compute encode.
 
       Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -114,7 +114,7 @@ Module Contents
 
 .. py:class:: PureImpactIndex(index_dir)
 
-   
+
    Model the PureImpactIndex.
 
    Represent the pureimpactindex data structure used throughout the project. The class encapsulates
@@ -158,7 +158,7 @@ Module Contents
       :staticmethod:
 
 
-      
+
       Compute tokenize.
 
       Carry out the tokenize operation.
@@ -188,7 +188,7 @@ Module Contents
 
    .. py:method:: build(docs_iterable)
 
-      
+
       Compute build.
 
       Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -221,7 +221,7 @@ Module Contents
 
    .. py:method:: load()
 
-      
+
       Compute load.
 
       Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -251,7 +251,7 @@ Module Contents
 
    .. py:method:: search(query, k)
 
-      
+
       Compute search.
 
       Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -290,7 +290,7 @@ Module Contents
 
 .. py:class:: LuceneImpactIndex(index_dir)
 
-   
+
    Model the LuceneImpactIndex.
 
    Represent the luceneimpactindex data structure used throughout the project. The class
@@ -325,7 +325,7 @@ Module Contents
 
    .. py:method:: _ensure()
 
-      
+
       Compute ensure.
 
       Carry out the ensure operation.
@@ -352,7 +352,7 @@ Module Contents
 
    .. py:method:: search(query, k)
 
-      
+
       Compute search.
 
       Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -393,7 +393,7 @@ Module Contents
 
 .. py:function:: get_splade(backend, index_dir)
 
-   
+
    Compute get splade.
 
    Carry out the get splade operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -428,4 +428,3 @@ Module Contents
 
    ..
        !! processed by numpydoc !!
-

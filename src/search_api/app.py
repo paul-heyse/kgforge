@@ -142,12 +142,13 @@ def auth(authorization: str | None = Header(default=None)) -> None:
     authorization : str | None, optional
         Describe ``authorization``.
         Defaults to ``Header(None)``.
+        
 
     Raises
     ------
     HTTPException
     Raised when TODO for HTTPException.
-    """
+"""
     if not API_KEYS:
         return  # disabled in skeleton
     if not authorization or not authorization.startswith("Bearer "):
@@ -169,7 +170,7 @@ def healthz() -> dict[str, Any]:
     -------
     dict[str, Any]
         Describe return value.
-    """
+"""
     return {
         "status": "ok",
         "components": {
@@ -196,12 +197,13 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
         Describe ``lists``.
     k_rrf : int
         Describe ``k_rrf``.
+        
 
     Returns
     -------
     dict[str, float]
         Describe return value.
-    """
+"""
     scores: dict[str, float] = {}
     for hits in lists:
         for rank, (doc_id, _score) in enumerate(hits, start=1):
@@ -234,12 +236,13 @@ def apply_kg_boosts(
     one_hop : float, optional
         Describe ``one_hop``.
         Defaults to ``0.04``.
+        
 
     Returns
     -------
     dict[str, float]
         Describe return value.
-    """
+"""
     q_concepts = set()
     for w in query.lower().split():
         if w.startswith("concept"):
@@ -274,12 +277,13 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
     _ : None, optional
         Describe ``_``.
         Defaults to ``Depends(auth)``.
+        
 
     Returns
     -------
     dict[str, Any]
         Describe return value.
-    """
+"""
     # Retrieve from each channel
     # We don't have a query embedder here; fallback to empty or demo vector
     dense_hits: list[tuple[str, float]] = []
@@ -352,12 +356,13 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     _ : None, optional
         Describe ``_``.
         Defaults to ``Depends(auth)``.
+        
 
     Returns
     -------
     dict[str, Any]
         Describe return value.
-    """
+"""
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring
     concepts = [

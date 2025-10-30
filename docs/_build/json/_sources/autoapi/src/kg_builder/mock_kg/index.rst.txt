@@ -22,7 +22,7 @@ Module Contents
 
 .. py:class:: MockKG
 
-   
+
    Model the MockKG.
 
    Represent the mockkg data structure used throughout the project. The class encapsulates
@@ -56,7 +56,7 @@ Module Contents
 
    .. py:method:: add_mention(chunk_id, concept_id)
 
-      
+
       Compute add mention.
 
       Carry out the add mention operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -91,7 +91,7 @@ Module Contents
 
    .. py:method:: add_edge(a, b)
 
-      
+
       Compute add edge.
 
       Carry out the add edge operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -126,7 +126,7 @@ Module Contents
 
    .. py:method:: linked_concepts(chunk_id)
 
-      
+
       Compute linked concepts.
 
       Carry out the linked concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -163,7 +163,7 @@ Module Contents
 
    .. py:method:: one_hop(concept_id)
 
-      
+
       Compute one hop.
 
       Carry out the one hop operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -196,5 +196,3 @@ Module Contents
 
       ..
           !! processed by numpydoc !!
-
-

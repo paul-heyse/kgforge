@@ -46,5 +46,3 @@ Example (abbreviated):
 ## Validation
 - The generator validates the JSON against `schema_agent_catalog.json` each run.
 - CI should fail when the catalog is missing required fields or contains broken links.
-
-

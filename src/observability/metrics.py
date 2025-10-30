@@ -30,26 +30,103 @@ try:
 except Exception:  # pragma: no cover - minimal no-op fallbacks
 
     class _NoopMetric:
-        """No-op metric used when ``prometheus_client`` is unavailable."""
+        """Describe  NoopMetric.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+"""
 
         def labels(self, *args: object, **kwargs: object) -> _NoopMetric:
-            """Ignore label requests and return ``self`` for chaining."""
+            """Describe labels.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+        Parameters
+        ----------
+        *args : object, optional, by default ()
+            Configure the args. Defaults to ``()``.
+        **kwargs : object, optional, by default {}
+            Configure the kwargs. Defaults to ``{}``.
+
+
+        Returns
+        -------
+        _NoopMetric
+            Describe return value.
+"""
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
-            """Ignore observations when instrumentation is disabled."""
+            """Describe observe.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+        Parameters
+        ----------
+        *args : object, optional, by default ()
+            Configure the args. Defaults to ``()``.
+        **kwargs : object, optional, by default {}
+            Configure the kwargs. Defaults to ``{}``.
+"""
             return
 
         def inc(self, *args: object, **kwargs: object) -> None:
-            """Ignore counter increments when instrumentation is disabled."""
+            """Describe inc.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+        Parameters
+        ----------
+        *args : object, optional, by default ()
+            Configure the args. Defaults to ``()``.
+        **kwargs : object, optional, by default {}
+            Configure the kwargs. Defaults to ``{}``.
+"""
             return
 
         def set(self, *args: object, **kwargs: object) -> None:
-            """Ignore gauge updates when instrumentation is disabled."""
+            """Describe set.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+        Parameters
+        ----------
+        *args : object, optional, by default ()
+            Configure the args. Defaults to ``()``.
+        **kwargs : object, optional, by default {}
+            Configure the kwargs. Defaults to ``{}``.
+"""
             return
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:
-        """Return a no-op metric placeholder."""
+        """Describe  make noop metric.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+    Parameters
+    ----------
+    *args : object, optional, by default ()
+        Configure the args. Defaults to ``()``.
+    **kwargs : object, optional, by default {}
+        Configure the kwargs. Defaults to ``{}``.
+
+
+    Returns
+    -------
+    _NoopMetric
+        Describe return value.
+"""
         return _NoopMetric()
 
     Counter = cast(CounterFactory, _make_noop_metric)

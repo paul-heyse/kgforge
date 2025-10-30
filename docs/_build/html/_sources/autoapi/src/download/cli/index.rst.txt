@@ -22,7 +22,7 @@ Module Contents
 
 .. py:function:: harvest(topic, years = '>=2018', max_works = 20000)
 
-   
+
    Compute harvest.
 
    Carry out the harvest operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -55,4 +55,3 @@ Module Contents
 
    ..
        !! processed by numpydoc !!
-

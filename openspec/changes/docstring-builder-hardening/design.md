@@ -185,4 +185,3 @@ Doctests must exercise rendering of this payload and confirm structured logging 
 - Q2: Do we version plugin Protocol separately from DocFacts schema? (Coordinate with tooling stakeholders.)
 - Q3: Can we reuse existing metrics exporters for doc tooling, or do we introduce a new Prometheus namespace? (Requires Ops input.)
 - Q4: Do we need a migration command to auto-fix third-party plugins, or is documentation sufficient? (Assess after stakeholder review.)
-

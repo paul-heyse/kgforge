@@ -326,22 +326,22 @@ Agents must paste **command outputs** for: `ruff`, `pyrefly`, `mypy`, `pytest`, 
 
 ## Troubleshooting & common errors
 
-- **“Change must have at least one delta”**  
+- **“Change must have at least one delta”**
   Create `changes/<id>/specs/<capability>/spec.md` with `## ADDED|MODIFIED|REMOVED|RENAMED Requirements`.
 
-- **“Requirement must have at least one scenario”**  
+- **“Requirement must have at least one scenario”**
   Ensure **`#### Scenario:`** headers are used (four `#`), not bullets/bold/`###`.
 
-- **Silent scenario parse failure**  
+- **Silent scenario parse failure**
   Header must be *exactly* `#### Scenario: <name>` on its own line. Debug with:
   ```bash
   openspec show <change-id> --json --deltas-only | jq '.deltas'
   ```
 
-- **Ambiguous MODIFIED**  
+- **Ambiguous MODIFIED**
   Paste the entire requirement block from the canonical spec, then edit. Partial edits drop prior details.
 
-- **Docs/catalog drift**  
+- **Docs/catalog drift**
   Run `make artifacts` on a clean tree; commit generated outputs.
 
 ---

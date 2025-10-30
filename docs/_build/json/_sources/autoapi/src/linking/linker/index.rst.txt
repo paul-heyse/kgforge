@@ -22,7 +22,7 @@ Module Contents
 
 .. py:class:: Linker
 
-   
+
    Model the Linker.
 
    Represent the linker data structure used throughout the project. The class encapsulates
@@ -45,4 +45,3 @@ Module Contents
 
    ..
        !! processed by numpydoc !!
-

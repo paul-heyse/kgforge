@@ -3,4 +3,3 @@
 ```{include} ../../_build/log_events.json
 :literal:
 ```
-
