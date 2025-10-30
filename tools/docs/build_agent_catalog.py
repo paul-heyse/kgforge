@@ -37,6 +37,7 @@ from kgfoundry.agent_catalog.search import (
     VectorArray,
     load_faiss,
 )
+from kgfoundry.agent_catalog.sqlite import write_sqlite_catalog
 
 
 class CatalogBuildError(RuntimeError):
@@ -388,6 +389,12 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="Catalog JSON output path.",
     )
     parser.add_argument(
+        "--sqlite",
+        type=Path,
+        default=Path("docs/_build/catalog.sqlite"),
+        help="Optional SQLite catalogue output path.",
+    )
+    parser.add_argument(
         "--schema",
         type=Path,
         default=Path("docs/_build/schema_agent_catalog.json"),
@@ -540,6 +547,7 @@ class AgentCatalogBuilder:
         self.embedding_batch_size = int(args.embedding_batch_size)
         self.search_alpha = float(args.search_alpha)
         self.search_candidates = int(args.search_candidates)
+        self.sqlite_path = cast(Path, args.sqlite)
         self._symbol_records: dict[str, SymbolRecord] = {}
         self._git_churn_cache: dict[Path, int] = {}
         self._git_modified_cache: dict[Path, str | None] = {}
@@ -547,6 +555,7 @@ class AgentCatalogBuilder:
         self._docfacts_index: dict[str, dict[str, Any]] = {}
         self._test_map: dict[str, list[dict[str, Any]]] = {}
         self._coverage_map: dict[str, Any] = {}
+        self._packages_snapshot: list[dict[str, Any]] = []
 
     def build(self) -> AgentCatalog:
         """Build the agent catalog."""
@@ -555,6 +564,7 @@ class AgentCatalogBuilder:
         repo_sha = self._resolve_repo_sha()
         generated_at = dt.datetime.now(tz=dt.UTC).isoformat()
         packages = self._collect_packages()
+        self._packages_snapshot = [dataclasses.asdict(pkg) for pkg in packages]
         self._apply_call_graph(packages)
         semantic_index = self._build_semantic_index(packages)
         link_policy_dict = {
@@ -569,6 +579,8 @@ class AgentCatalogBuilder:
         if semantic_index is not None:
             artifacts["semantic_index"] = semantic_index.index
             artifacts["semantic_mapping"] = semantic_index.mapping
+        sqlite_target = self._resolve_artifact_path(self.sqlite_path)
+        artifacts["catalog_sqlite"] = self._relative_string(sqlite_target)
         search_config = catalog_search.SearchConfig(
             alpha=self.search_alpha,
             candidate_pool=self.search_candidates,
@@ -1287,6 +1299,17 @@ def _docfacts_int(entry: Mapping[str, Any], *names: str) -> int | None:
             )
             message = f"Catalog validation failed: {rendered}"
             raise CatalogBuildError(message)
+        sqlite_target = self._resolve_artifact_path(self.sqlite_path)
+        packages_override: list[dict[str, Any]] = []
+        if self._packages_snapshot:
+            packages_override = json.loads(json.dumps(self._packages_snapshot))
+        elif catalog_dict.get("packages"):
+            packages_override = catalog_dict.get("packages", [])
+        write_sqlite_catalog(
+            catalog_dict,
+            sqlite_target,
+            packages_override=packages_override,
+        )
 
 
 def _load_embedding_model(model_name: str) -> EmbeddingModelProtocol:
@@ -1499,6 +1522,24 @@ def load_catalog(path: Path, *, load_shards: bool = True) -> dict[str, Any]:
             packages.append(shard_data)
         data["packages"] = packages
     return data
+
+
+def _parse_facet_args(values: Sequence[str]) -> dict[str, str]:
+    """Parse CLI facet arguments into a mapping."""
+
+    facets: dict[str, str] = {}
+    for raw in values:
+        if "=" not in raw:
+            message = f"Facet must be expressed as key=value: {raw}"
+            raise CatalogBuildError(message)
+        key, value = raw.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+        if not key or not value:
+            message = f"Facet must include both key and value: {raw}"
+            raise CatalogBuildError(message)
+        facets[key] = value
+    return facets
 
 
 def main(argv: Sequence[str] | None = None) -> int:

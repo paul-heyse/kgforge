@@ -12,6 +12,7 @@ from pathlib import Path
 from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.client import AgentCatalogClient, AgentCatalogClientError
 from kgfoundry.agent_catalog.search import SearchOptions
+from kgfoundry.agent_catalog.sqlite import sqlite_candidates
 
 EXIT_CONFIG = 2
 EXIT_INTERNAL = 3
@@ -116,8 +117,9 @@ def _load_client(args: argparse.Namespace) -> AgentCatalogClient:
     """Return an ``AgentCatalogClient`` configured from CLI arguments."""
     catalog_path = args.catalog
     if not catalog_path.exists():
-        message = f"Catalog not found at {catalog_path}"
-        raise AgentCatalogClientError(message)
+        if not any(candidate.exists() for candidate in sqlite_candidates(catalog_path)):
+            message = f"Catalog not found at {catalog_path}"
+            raise AgentCatalogClientError(message)
     repo_root = args.repo_root
     if not repo_root.exists():
         message = f"Repository root does not exist: {repo_root}"

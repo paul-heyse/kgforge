@@ -53,6 +53,11 @@ STEPS: list[tuple[str, list[str], str]] = [
         "[agent] generated docs/_build/agent_catalog.json",
     ),
     (
+        "agent-api",
+        [sys.executable, "tools/docs/build_agent_api.py"],
+        "[agent] generated docs/_build/agent_api_openapi.json",
+    ),
+    (
         "agent-portal",
         [sys.executable, "tools/docs/render_agent_portal.py"],
         "[agent] rendered site/_build/agent/index.html",
@@ -62,11 +67,11 @@ STEPS: list[tuple[str, list[str], str]] = [
 
 def _run_step(name: str, command: list[str], message: str) -> int:
     """Execute a single artefact regeneration step."""
-    result = subprocess.run(command, cwd=REPO_ROOT, check=False)
+    result = subprocess.run(command, cwd=REPO_ROOT, check=False)  # noqa: S603 - commands are static python invocations
     if result.returncode != 0:
-        print(f"[artifacts] {name} failed (exit {result.returncode})", file=sys.stderr)
+        sys.stderr.write(f"[artifacts] {name} failed (exit {result.returncode})\n")
         return result.returncode
-    print(message)
+    sys.stdout.write(f"{message}\n")
     return 0
 
 
@@ -76,7 +81,7 @@ def main() -> int:
         status = _run_step(name, command, message)
         if status != 0:
             return status
-    print("[artifacts] all steps completed successfully")
+    sys.stdout.write("[artifacts] all steps completed successfully\n")
     return 0
 
 
