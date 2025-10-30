@@ -242,6 +242,37 @@ generate_path_map() {
   fi
 }
 
+# ------------- Ensure the project venv is active in this shell -------------
+activate_project_env() {
+  # uv manages a project-local .venv/ directory by default when sync_env runs.
+  # Mirror the important pieces of "source .venv/bin/activate" without relying
+  # on shell-specific activate scripts so the bootstrap process leaves the
+  # current shell primed to use the freshly synced environment.
+  local project_root="$(pwd)"
+  local venv_path="${project_root}/.venv"
+
+  if [ ! -d "${venv_path}" ]; then
+    warn "Expected uv-managed environment at ${venv_path} not found; skipping activation."
+    return 0
+  fi
+
+  # Export VIRTUAL_ENV so downstream tooling (pre-commit, editors, etc.)
+  # recognizes that the project environment is active.
+  export VIRTUAL_ENV="${venv_path}"
+
+  # Prepend the venv bin dir to PATH when it's not already present so `python`
+  # and friends resolve to the project environment by default.
+  case ":${PATH}:" in
+    *":${venv_path}/bin:"*) ;;
+    *) export PATH="${venv_path}/bin:${PATH}" ;;
+  esac
+
+  # Ensure the current shell sees the updated PATH before we call python below.
+  hash -r 2>/dev/null || true
+
+  ok "Activated project environment (${venv_path})"
+}
+
 # ------------- Diagnostics -------------
 print_summary() {
   cat <<EOF
@@ -267,4 +298,5 @@ ensure_uv
 ensure_python "${PY_VER_DEFAULT}"
 sync_env
 generate_path_map
+activate_project_env
 print_summary
