@@ -22,7 +22,7 @@ Module Contents
 
 .. py:function:: rrf_fuse(dense, sparse, k = 60)
 
-   
+
    Compute rrf fuse.
 
    Carry out the rrf fuse operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -62,7 +62,7 @@ Module Contents
 
 .. py:function:: apply_kg_boosts(fused, query)
 
-   
+
    Compute apply kg boosts.
 
    Carry out the apply kg boosts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -100,7 +100,7 @@ Module Contents
 
 .. py:function:: mmr_deduplicate(results, lambda_ = 0.7)
 
-   
+
    Compute mmr deduplicate.
 
    Carry out the mmr deduplicate operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -135,4 +135,3 @@ Module Contents
 
    ..
        !! processed by numpydoc !!
-

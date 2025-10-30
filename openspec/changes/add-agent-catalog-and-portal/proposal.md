@@ -189,5 +189,3 @@ Validation schema will be emitted to `docs/_build/schema_agent_catalog.json` and
 ## Non-Goals
 - No change to how Sphinx/MkDocs build content; we only aggregate and link.
 - No search indexing changes beyond wiring existing indices together on the portal.
-
-

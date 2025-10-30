@@ -22,7 +22,7 @@ Module Contents
 
 .. py:function:: apply(db, migrations_dir)
 
-   
+
    Compute apply.
 
    Carry out the apply operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -58,7 +58,7 @@ Module Contents
 
 .. py:function:: main()
 
-   
+
    Compute main.
 
    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -84,4 +84,3 @@ Module Contents
 
    ..
        !! processed by numpydoc !!
-

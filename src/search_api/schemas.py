@@ -65,7 +65,7 @@ class SearchRequest(BaseModel):
     explain : bool, optional
         Describe ``explain``.
         Defaults to ``False``.
-    """
+"""
 
     query: str = Field(min_length=1)
     k: int = 10
@@ -103,7 +103,7 @@ class SearchResult(BaseModel):
     concepts : list[dict[str, str]], optional
         Describe ``concepts``.
         Defaults to ``<factory>``.
-    """
+"""
 
     doc_id: str
     chunk_id: str

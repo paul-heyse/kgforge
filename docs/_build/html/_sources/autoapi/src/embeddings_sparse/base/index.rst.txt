@@ -25,7 +25,7 @@ Module Contents
    Bases: :py:obj:`Protocol`
 
 
-   
+
    Model the SparseEncoder.
 
    Represent the sparseencoder data structure used throughout the project. The class encapsulates
@@ -55,7 +55,7 @@ Module Contents
 
    .. py:method:: encode(texts)
 
-      
+
       Compute encode.
 
       Carry out the encode operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -95,7 +95,7 @@ Module Contents
    Bases: :py:obj:`Protocol`
 
 
-   
+
    Model the SparseIndex.
 
    Represent the sparseindex data structure used throughout the project. The class encapsulates
@@ -121,7 +121,7 @@ Module Contents
 
    .. py:method:: build(docs_iterable)
 
-      
+
       Compute build.
 
       Carry out the build operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -154,7 +154,7 @@ Module Contents
 
    .. py:method:: search(query, k, fields = None)
 
-      
+
       Compute search.
 
       Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -191,5 +191,3 @@ Module Contents
 
       ..
           !! processed by numpydoc !!
-
-

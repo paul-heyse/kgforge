@@ -12,15 +12,7 @@ from pathlib import Path
 
 from kgfoundry.agent_catalog.client import AgentCatalogClient, AgentCatalogClientError
 
-JsonValue = (
-    None
-    | bool
-    | int
-    | float
-    | str
-    | list["JsonValue"]
-    | dict[str, "JsonValue"]
-)
+JsonValue = None | bool | int | float | str | list["JsonValue"] | dict[str, "JsonValue"]
 JsonObject = dict[str, JsonValue]
 
 DEFAULT_CATALOG = Path("docs/_build/agent_catalog.json")

@@ -4,4 +4,3 @@
 :literal:
 ```
 *(auto-generated via `tools/docs/scan_observability.py`; run before building docs)*
-

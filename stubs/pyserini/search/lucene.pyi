@@ -8,4 +8,3 @@ class LuceneSearcher:
 
 class LuceneImpactSearcher(LuceneSearcher):
     """Stub Lucene impact searcher."""
-

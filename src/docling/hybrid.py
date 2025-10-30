@@ -45,6 +45,11 @@ class HybridChunker:
 
     <!-- auto:docstring-builder v1 -->
 
-    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
 
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+"""

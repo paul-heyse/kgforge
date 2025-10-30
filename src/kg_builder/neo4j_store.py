@@ -53,5 +53,4 @@ class Neo4jStore:
     -------
     inspect._empty
         Describe return value.
-    """
-
+"""

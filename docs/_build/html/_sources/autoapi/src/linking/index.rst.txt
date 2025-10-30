@@ -5,7 +5,7 @@ src.linking
 
 .. autoapi-nested-parse::
 
-   
+
    Overview of linking.
 
    This module bundles linking logic for the kgfoundry stack. It groups related helpers so downstream
@@ -38,5 +38,3 @@ Submodules
 
    /autoapi/src/linking/calibration/index
    /autoapi/src/linking/linker/index
-
-

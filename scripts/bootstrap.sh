@@ -8,9 +8,8 @@
 #   2) Ensures Python 3.13.9 is installed via uv and pinned for this project
 #   3) Creates/uses a project-local .venv (no system Python)
 #   4) Installs deps via `uv sync` (prefers --locked when uv.lock present)
-#   5) Installs and runs pre-commit hooks (optional flags to skip/run)
-#   6) Optionally generates PATH_MAP for editor deep links in remote containers
-#   7) Prints a ready-to-run command summary
+#   5) Optionally generates PATH_MAP for editor deep links in remote containers
+#   6) Prints a ready-to-run command summary
 #
 # Exit on first error, unset var, or failed pipe; propagate failures out of subshells.
 set -Eeuo pipefail
@@ -18,16 +17,15 @@ set -Eeuo pipefail
 # ------------- Config (change defaults here if needed) -------------
 PY_VER_DEFAULT="${PY_VER_DEFAULT:-3.13.9}"
 PIN_PYTHON="${PIN_PYTHON:-1}"             # 1=uv python pin <ver>
-RUN_PRE_COMMIT="${RUN_PRE_COMMIT:-1}"     # 1=install + run pre-commit on all files
 GENERATE_PATH_MAP="${GENERATE_PATH_MAP:-1}" # 1=create docs/_build/path_map.txt if in container
 USE_LOCK="${USE_LOCK:-auto}"               # auto|yes|no  -> --locked when uv.lock exists (auto)
 EDITOR_URI_TEMPLATE_DEFAULT='vscode-remote://dev-container+{container_id}{path}:{line}'
-UV_MIN_VERSION="${UV_MIN_VERSION:-0.93.0}"  # Require uv strictly greater than 0.93
+UV_MIN_VERSION="${UV_MIN_VERSION:-0.9.6}"  # Require uv version >= 0.9.6
+EXCLUDE_EXTRAS="${EXCLUDE_EXTRAS:-gpu}"   # comma/space-separated extras to skip during uv sync
 
 # ------------- CLI flags -------------
 # Support a few handy flags so CI or developers can tailor behavior.
 #   --no-pin-python      : do not uv python pin
-#   --skip-pre-commit    : don't install or run pre-commit hooks
 #   --no-path-map        : don't generate docs/_build/path_map.txt
 #   --use-lock[=yes|no]  : force use of uv.lock or ignore it
 #   --py 3.13.9          : override Python version
@@ -38,7 +36,6 @@ Usage: scripts/bootstrap.sh [options]
 Options:
   --py <x.y.z>         Pin/install this Python version via uv (default: 3.13.9)
   --no-pin-python      Skip `uv python pin`
-  --skip-pre-commit    Do not install/run pre-commit hooks
   --no-path-map        Do not generate docs/_build/path_map.txt
   --use-lock=<auto|yes|no>
   -h, --help           Show this help
@@ -49,7 +46,6 @@ for arg in "$@"; do
   case "$arg" in
     -h|--help) usage; exit 0;;
     --no-pin-python) PIN_PYTHON=0;;
-    --skip-pre-commit) RUN_PRE_COMMIT=0;;
     --no-path-map) GENERATE_PATH_MAP=0;;
     --use-lock=*) USE_LOCK="${arg#*=}";;
     --py) shift; PY_VER_DEFAULT="${1:?--py requires a version like 3.13.9}";;
@@ -110,6 +106,18 @@ version_gt() {
   return 1
 }
 
+version_ge() {
+  local lhs="${1:-}"
+  local rhs="${2:-}"
+  if [ -z "${lhs}" ] || [ -z "${rhs}" ]; then
+    return 1
+  fi
+  if [ "${lhs}" = "${rhs}" ]; then
+    return 0
+  fi
+  version_gt "${lhs}" "${rhs}"
+}
+
 # ------------- Sanity: repo root & OS -------------
 if [ ! -f "pyproject.toml" ]; then
   err "Run this script from the repository root (pyproject.toml not found)."
@@ -124,11 +132,11 @@ ensure_uv() {
   local current_version=""
   if have uv; then
     current_version="$(uv --version 2>/dev/null | head -n1 | grep -oE '[0-9]+(\.[0-9]+)+' | head -n1)"
-    if version_gt "${current_version}" "${UV_MIN_VERSION}"; then
+    if version_ge "${current_version}" "${UV_MIN_VERSION}"; then
       ok "uv present: $(uv --version | head -n1)"
       return 0
     fi
-    warn "uv version ${current_version:-unknown} detected; upgrading to latest (need > ${UV_MIN_VERSION})."
+    warn "uv version ${current_version:-unknown} detected; upgrading to latest (need >= ${UV_MIN_VERSION})."
   else
     warn "uv not found; installing user-local uv (no sudo)."
   fi
@@ -141,8 +149,8 @@ ensure_uv() {
   fi
   have uv || { err "uv still not on PATH after install. Add it to PATH, then re-run."; exit 1; }
   current_version="$(uv --version 2>/dev/null | head -n1 | grep -oE '[0-9]+(\.[0-9]+)+' | head -n1)"
-  if ! version_gt "${current_version}" "${UV_MIN_VERSION}"; then
-    err "Installed uv version ${current_version:-unknown} does not satisfy requirement (> ${UV_MIN_VERSION})."
+  if ! version_ge "${current_version}" "${UV_MIN_VERSION}"; then
+    err "Installed uv version ${current_version:-unknown} does not satisfy requirement (>= ${UV_MIN_VERSION})."
     exit 1
   fi
   ok "Installed uv: $(uv --version | head -n1)"
@@ -174,27 +182,25 @@ sync_env() {
     *)    warn "--use-lock must be auto|yes|no (got: ${USE_LOCK}); defaulting to auto"; [ -f uv.lock ] && lock_flag="--locked" ;;
   esac
 
-  info "Syncing dependencies (uv sync ${lock_flag})…"
-  uv sync ${lock_flag}
-  ok "Environment synced"
-}
+  local -a sync_cmd=("uv" "sync")
+  if [ -n "${lock_flag}" ]; then
+    sync_cmd+=("${lock_flag}")
+  fi
 
-# ------------- Pre-commit hooks -------------
-setup_precommit() {
-  if [ "${RUN_PRE_COMMIT}" != "1" ]; then
-    warn "Skipping pre-commit install (requested)"
-    return 0
+  if [ -n "${EXCLUDE_EXTRAS:-}" ]; then
+    local normalized="${EXCLUDE_EXTRAS//,/ }"
+    local extra=""
+    for extra in ${normalized}; do
+      extra="${extra// /}"
+      if [ -n "${extra}" ]; then
+        sync_cmd+=("--no-extra" "${extra}")
+      fi
+    done
   fi
-  if ! have pre-commit; then
-    info "Installing pre-commit via uv tool…"
-    uv tool install pre-commit
-  fi
-  pre-commit install
-  ok "pre-commit hooks installed"
-  info "Running pre-commit on all files (may take a minute on first run)…"
-  # Use uvx to ensure the same version that installed hooks; exit nonzero if failures.
-  uvx pre-commit run --all-files
-  ok "pre-commit finished"
+
+  info "Syncing dependencies (${sync_cmd[*]})…"
+  "${sync_cmd[@]}"
+  ok "Environment synced"
 }
 
 # ------------- Generate PATH_MAP for remote editors (optional) -------------
@@ -253,8 +259,6 @@ Next steps:
   - Tests       : uv run pytest -q
   - Artifacts   : make artifacts && git diff --exit-code
   - Docs (open) : site/_build/html/index.html  (or Agent Portal at site/_build/agent/index.html)
-
-Tip: re-run hooks anytime with: uvx pre-commit run --all-files
 EOF
 }
 
@@ -262,6 +266,5 @@ EOF
 ensure_uv
 ensure_python "${PY_VER_DEFAULT}"
 sync_env
-setup_precommit
 generate_path_map
 print_summary

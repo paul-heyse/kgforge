@@ -62,12 +62,13 @@ def toks(text: str) -> list[str]:
     ----------
     text : str
         Describe ``text``.
+        
 
     Returns
     -------
     list[str]
         Describe return value.
-    """
+"""
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -96,7 +97,7 @@ class BM25Doc:
         Describe ``tf``.
     dl : float
         Describe ``dl``.
-    """
+"""
 
     chunk_id: str
     doc_id: str
@@ -124,7 +125,7 @@ class BM25Index:
     b : float, optional
         Describe ``b``.
         Defaults to ``0.4``.
-    """
+"""
 
     def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
         """Describe   init  .
@@ -141,7 +142,7 @@ class BM25Index:
         b : float, optional
             Describe ``b``.
             Defaults to ``0.4``.
-        """
+"""
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -161,12 +162,13 @@ class BM25Index:
         ----------
         db_path : str
             Describe ``db_path``.
+            
 
         Returns
         -------
         BM25Index
             Describe return value.
-        """
+"""
         index = cls()
         con = duckdb.connect(db_path)
         try:
@@ -200,7 +202,7 @@ class BM25Index:
         ----------
         rows : Iterable[tuple[str, str, str, str, str]]
             Describe ``rows``.
-        """
+"""
         self.docs.clear()
         self.df.clear()
         dl_sum = 0.0
@@ -247,12 +249,13 @@ class BM25Index:
         b : float, optional
             Describe ``b``.
             Defaults to ``0.4``.
+            
 
         Returns
         -------
         BM25Index
             Describe return value.
-        """
+"""
         index = cls(k1=k1, b=b)
         con = duckdb.connect(database=":memory:")
         try:
@@ -282,7 +285,7 @@ class BM25Index:
         ----------
         path : str
             Describe ``path``.
-        """
+"""
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as handle:
             pickle.dump(
@@ -309,12 +312,13 @@ class BM25Index:
         ----------
         path : str
             Describe ``path``.
+            
 
         Returns
         -------
         BM25Index
             Describe return value.
-        """
+"""
         with open(path, "rb") as handle:
             payload = pickle.load(handle)
         index = cls(payload.get("k1", 0.9), payload.get("b", 0.4))
@@ -335,12 +339,13 @@ class BM25Index:
         ----------
         term : str
             Describe ``term``.
+            
 
         Returns
         -------
         float
             Describe return value.
-        """
+"""
         df = self.df.get(term, 0)
         if self.N == 0 or df == 0:
             return 0.0
@@ -360,12 +365,13 @@ class BM25Index:
         k : int, optional
             Describe ``k``.
             Defaults to ``10``.
+            
 
         Returns
         -------
         list[tuple[str, float]]
             Describe return value.
-        """
+"""
         if self.N == 0:
             return []
         terms = toks(query)
@@ -394,10 +400,11 @@ class BM25Index:
         ----------
         index : int
             Describe ``index``.
+            
 
         Returns
         -------
         BM25Doc
             Describe return value.
-        """
+"""
         return self.docs[index]

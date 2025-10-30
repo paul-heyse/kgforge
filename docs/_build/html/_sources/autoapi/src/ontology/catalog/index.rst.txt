@@ -22,7 +22,7 @@ Module Contents
 
 .. py:class:: OntologyCatalog(concepts)
 
-   
+
    Model the OntologyCatalog.
 
    Represent the ontologycatalog data structure used throughout the project. The class encapsulates
@@ -51,7 +51,7 @@ Module Contents
 
    .. py:method:: neighbors(concept_id, depth = 1)
 
-      
+
       Compute neighbors.
 
       Carry out the neighbors operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -90,7 +90,7 @@ Module Contents
 
    .. py:method:: hydrate(concept_id)
 
-      
+
       Compute hydrate.
 
       Carry out the hydrate operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -123,5 +123,3 @@ Module Contents
 
       ..
           !! processed by numpydoc !!
-
-

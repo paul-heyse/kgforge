@@ -59,12 +59,13 @@ class DenseEmbeddingModel(Protocol):
         Describe ``args``.
     **kwargs : inspect._empty
         Describe ``kwargs``.
+        
 
     Returns
     -------
     inspect._empty
         Describe return value.
-    """
+"""
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]:
         """Describe encode.
@@ -77,10 +78,11 @@ class DenseEmbeddingModel(Protocol):
         ----------
         texts : Sequence[str]
             Describe ``texts``.
+            
 
         Returns
         -------
         NDArray[np.float32]
             Describe return value.
-        """
+"""
         ...

@@ -5,7 +5,7 @@ src.registry
 
 .. autoapi-nested-parse::
 
-   
+
    Overview of registry.
 
    This module bundles registry logic for the kgfoundry stack. It groups related helpers so downstream
@@ -40,5 +40,3 @@ Submodules
    /autoapi/src/registry/duckdb_registry/index
    /autoapi/src/registry/helper/index
    /autoapi/src/registry/migrate/index
-
-

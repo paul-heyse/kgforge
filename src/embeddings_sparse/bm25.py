@@ -94,7 +94,7 @@ class BM25Doc:
         Describe ``length``.
     fields : dict[str, str]
         Describe ``fields``.
-    """
+"""
 
     doc_id: str
     length: int
@@ -120,7 +120,7 @@ class PurePythonBM25:
     field_boosts : dict[str, float] | None, optional
         Describe ``field_boosts``.
         Defaults to ``None``.
-    """
+"""
 
     def __init__(
         self,
@@ -146,7 +146,7 @@ class PurePythonBM25:
         field_boosts : dict[str, float] | None, optional
             Describe ``field_boosts``.
             Defaults to ``None``.
-        """
+"""
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -167,12 +167,13 @@ class PurePythonBM25:
         ----------
         text : str
             Describe ``text``.
+            
 
         Returns
         -------
         list[str]
             Lowercased tokens extracted from the text.
-        """
+"""
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
@@ -184,7 +185,7 @@ class PurePythonBM25:
         ----------
         docs_iterable : Iterable[tuple[str, dict[str, str]]]
             Describe ``docs_iterable``.
-        """
+"""
         os.makedirs(self.index_dir, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
@@ -235,7 +236,7 @@ class PurePythonBM25:
         """Load an existing BM25 index from disk.
 
         <!-- auto:docstring-builder v1 -->
-        """
+"""
         path = os.path.join(self.index_dir, "pure_bm25.pkl")
         with open(path, "rb") as f:
             data = pickle.load(f)
@@ -257,12 +258,13 @@ class PurePythonBM25:
         ----------
         term : str
             Describe ``term``.
+            
 
         Returns
         -------
         float
             Inverse document frequency score for the term.
-        """
+"""
         n_t = self.df.get(term, 0)
         if n_t == 0:
             return 0.0
@@ -285,12 +287,13 @@ class PurePythonBM25:
         fields : Mapping[str, str] | None, optional
             Describe ``fields``.
             Defaults to ``None``.
+            
 
         Returns
         -------
         list[tuple[str, float]]
             Ranked document identifiers with their BM25 scores.
-        """
+"""
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -327,12 +330,13 @@ class LuceneBM25:
     field_boosts : dict[str, float] | None, optional
         Describe ``field_boosts``.
         Defaults to ``None``.
+        
 
     Raises
     ------
     RuntimeError
     Raised when Pyserini is not installed in the environment.
-    """
+"""
 
     def __init__(
         self,
@@ -358,7 +362,7 @@ class LuceneBM25:
         field_boosts : dict[str, float] | None, optional
             Describe ``field_boosts``.
             Defaults to ``None``.
-        """
+"""
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -374,12 +378,13 @@ class LuceneBM25:
         ----------
         docs_iterable : Iterable[tuple[str, dict[str, str]]]
             Describe ``docs_iterable``.
+            
 
         Raises
         ------
         RuntimeError
         Raised when Pyserini or Lucene is unavailable.
-        """
+"""
         try:
             from pyserini.index.lucene import LuceneIndexer
         except Exception as exc:
@@ -406,7 +411,7 @@ class LuceneBM25:
         """Initialise the Lucene searcher if it has not been created yet.
 
         <!-- auto:docstring-builder v1 -->
-        """
+"""
         if self._searcher is not None:
             return
         from pyserini.search.lucene import LuceneSearcher
@@ -431,19 +436,21 @@ class LuceneBM25:
         fields : dict[str, str] | None, optional
             Describe ``fields``.
             Defaults to ``None``.
+            
 
         Returns
         -------
         list[tuple[str, float]]
             Ranked document identifiers paired with their BM25 scores.
-
-
+            
+            
+            
 
         Raises
         ------
         RuntimeError
         Raised when the Lucene searcher cannot be initialised.
-        """
+"""
         self._ensure_searcher()
         if self._searcher is None:
             message = "Lucene searcher not initialized"
@@ -480,12 +487,13 @@ def get_bm25(
     field_boosts : dict[str, float] | None, optional
         Describe ``field_boosts``.
         Defaults to ``None``.
+        
 
     Returns
     -------
     PurePythonBM25 | LuceneBM25
         Configured BM25 adapter.
-    """
+"""
     if backend == "lucene":
         try:
             return LuceneBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)

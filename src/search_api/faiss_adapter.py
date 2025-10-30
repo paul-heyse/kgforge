@@ -93,7 +93,7 @@ class DenseVecs:
         Describe ``ids``.
     mat : VecArray
         Describe ``mat``.
-    """
+"""
 
     ids: list[str]
     mat: VecArray
@@ -115,7 +115,7 @@ class FaissAdapter:
     metric : str, optional
         Describe ``metric``.
         Defaults to ``'ip'``.
-    """
+"""
 
     def __init__(
         self,
@@ -137,7 +137,7 @@ class FaissAdapter:
         metric : str, optional
             Describe ``metric``.
             Defaults to ``'ip'``.
-        """
+"""
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
@@ -154,19 +154,21 @@ class FaissAdapter:
         ----------
         source : Path
             Describe ``source``.
+            
 
         Returns
         -------
         DenseVecs
             Normalised vectors paired with their document identifiers.
-
-
+            
+            
+            
 
         Raises
         ------
         RuntimeError
         Raised when the file does not contain any vector records.
-        """
+"""
         con = duckdb.connect(database=":memory:")
         try:
             rows = con.execute(
@@ -198,14 +200,15 @@ class FaissAdapter:
         -------
         DenseVecs
             Normalised vectors available to the adapter.
-
-
+            
+            
+            
 
         Raises
         ------
         RuntimeError
         Raised when no vectors are available on disk.
-        """
+"""
         candidate = Path(self.db_path)
         if candidate.is_dir() or candidate.suffix == ".parquet":
             return self._load_dense_from_parquet(candidate)
@@ -250,7 +253,7 @@ class FaissAdapter:
         ------
         RuntimeError
         Raised when dense vectors cannot be loaded from disk.
-        """
+"""
         vectors = self._load_dense_parquet()
         self.vecs = vectors
         self.idmap = vectors.ids
@@ -283,7 +286,7 @@ class FaissAdapter:
         cpu_index_path : str | None, optional
             Describe ``cpu_index_path``.
             Defaults to ``None``.
-        """
+"""
         faiss_module = faiss
         if faiss_module is None:
             self.build()
@@ -309,12 +312,13 @@ class FaissAdapter:
         ----------
         cpu_index : object
             Describe ``cpu_index``.
+            
 
         Returns
         -------
         object
             GPU-backed FAISS index when cloning succeeds, otherwise the original CPU index.
-        """
+"""
         faiss_module = faiss
         if faiss_module is None:
             return cpu_index
@@ -344,12 +348,13 @@ class FaissAdapter:
         k : int, optional
             Describe ``k``.
             Defaults to ``10``.
+            
 
         Returns
         -------
         list[list[tuple[str, float]]]
             Ranked matches for each query with document identifiers and similarity scores.
-        """
+"""
         if self.vecs is None and self.index is None:
             return []
         queries = self._prepare_queries(qvec)
@@ -366,12 +371,13 @@ class FaissAdapter:
         ----------
         qvec : VecArray
             Describe ``qvec``.
+            
 
         Returns
         -------
         VecArray
             Two-dimensional, normalised query matrix.
-        """
+"""
         query_arr: VecArray = np.asarray(qvec, dtype=np.float32, order="C")
         if query_arr.ndim == 1:
             query_arr = query_arr[None, :]
@@ -388,19 +394,21 @@ class FaissAdapter:
             Describe ``queries``.
         k : int
             Describe ``k``.
+            
 
         Returns
         -------
         list[list[tuple[str, float]]]
             Ranked matches for each query.
-
-
+            
+            
+            
 
         Raises
         ------
         RuntimeError
         Raised when the FAISS index or identifier mapping has not been loaded.
-        """
+"""
         if self.index is None or self.idmap is None:
             message = "FAISS index or ID mapping not loaded"
             raise RuntimeError(message)
@@ -426,19 +434,21 @@ class FaissAdapter:
             Describe ``queries``.
         k : int
             Describe ``k``.
+            
 
         Returns
         -------
         list[list[tuple[str, float]]]
             Ranked matches for each query.
-
-
+            
+            
+            
 
         Raises
         ------
         RuntimeError
         Raised when dense vectors have not been loaded into memory.
-        """
+"""
         if self.vecs is None:
             message = "Dense vectors not loaded"
             raise RuntimeError(message)

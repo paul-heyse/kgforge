@@ -31,7 +31,7 @@ Module Contents
    Bases: :py:obj:`TypedDict`
 
 
-   
+
    Model the NavSection.
 
    Represent the navsection data structure used throughout the project. The class encapsulates
@@ -72,7 +72,7 @@ Module Contents
    Bases: :py:obj:`TypedDict`
 
 
-   
+
    Model the SymbolMeta.
 
    Represent the symbolmeta data structure used throughout the project. The class encapsulates
@@ -153,7 +153,7 @@ Module Contents
    Bases: :py:obj:`TypedDict`
 
 
-   
+
    Describe module-level metadata surfaced in navigation structures.
 
 
@@ -195,7 +195,7 @@ Module Contents
    Bases: :py:obj:`TypedDict`
 
 
-   
+
    Model the NavMap.
 
    Represent the navmap data structure used throughout the project. The class encapsulates
@@ -265,5 +265,3 @@ Module Contents
 
    .. py:attribute:: module_meta
       :type:  ModuleMeta
-
-

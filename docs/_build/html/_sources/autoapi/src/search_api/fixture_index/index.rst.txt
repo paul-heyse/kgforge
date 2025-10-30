@@ -24,7 +24,7 @@ Module Contents
 
 .. py:function:: tokenize(text)
 
-   
+
    Compute tokenize.
 
    Carry out the tokenize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -60,7 +60,7 @@ Module Contents
 
 .. py:class:: FixtureDoc
 
-   
+
    Model the FixtureDoc.
 
    Represent the fixturedoc data structure used throughout the project. The class encapsulates
@@ -106,7 +106,7 @@ Module Contents
 
 .. py:class:: FixtureIndex(root = '/data', db_path = '/data/catalog/catalog.duckdb')
 
-   
+
    Model the FixtureIndex.
 
    Represent the fixtureindex data structure used throughout the project. The class encapsulates
@@ -156,7 +156,7 @@ Module Contents
 
    .. py:method:: _load_from_duckdb()
 
-      
+
       Compute load from duckdb.
 
       Carry out the load from duckdb operation.
@@ -181,7 +181,7 @@ Module Contents
 
    .. py:method:: _build_lex()
 
-      
+
       Compute build lex.
 
       Carry out the build lex operation.
@@ -206,7 +206,7 @@ Module Contents
 
    .. py:method:: search(query, k = 10)
 
-      
+
       Compute search.
 
       Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -245,7 +245,7 @@ Module Contents
 
    .. py:method:: doc(index)
 
-      
+
       Compute doc.
 
       Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -278,5 +278,3 @@ Module Contents
 
       ..
           !! processed by numpydoc !!
-
-

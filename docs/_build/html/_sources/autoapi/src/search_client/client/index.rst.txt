@@ -22,7 +22,7 @@ Module Contents
 
 .. py:class:: KGFoundryClient(base_url = 'http://localhost:8080', api_key = None, timeout = 30.0, http = None)
 
-   
+
    Model the KGFoundryClient.
 
    Represent the kgfoundryclient data structure used throughout the project. The class encapsulates
@@ -67,7 +67,7 @@ Module Contents
 
    .. py:method:: _headers()
 
-      
+
       Compute headers.
 
       Carry out the headers operation.
@@ -94,7 +94,7 @@ Module Contents
 
    .. py:method:: healthz()
 
-      
+
       Compute healthz.
 
       Carry out the healthz operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -128,7 +128,7 @@ Module Contents
 
    .. py:method:: search(query, k = 10, filters = None, explain = False)
 
-      
+
       Compute search.
 
       Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -171,7 +171,7 @@ Module Contents
 
    .. py:method:: concepts(q, limit = 50)
 
-      
+
       Compute concepts.
 
       Carry out the concepts operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -206,5 +206,3 @@ Module Contents
 
       ..
           !! processed by numpydoc !!
-
-

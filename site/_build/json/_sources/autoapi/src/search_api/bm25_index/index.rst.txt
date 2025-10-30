@@ -24,7 +24,7 @@ Module Contents
 
 .. py:function:: toks(text)
 
-   
+
    Compute toks.
 
    Carry out the toks operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -60,7 +60,7 @@ Module Contents
 
 .. py:class:: BM25Doc
 
-   
+
    Model the BM25Doc.
 
    Represent the bm25doc data structure used throughout the project. The class encapsulates
@@ -110,7 +110,7 @@ Module Contents
 
 .. py:class:: BM25Index(k1 = 0.9, b = 0.4)
 
-   
+
    Model the BM25Index.
 
    Represent the bm25index data structure used throughout the project. The class encapsulates
@@ -168,7 +168,7 @@ Module Contents
       :classmethod:
 
 
-      
+
       Compute build from duckdb.
 
       Carry out the build from duckdb operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -205,7 +205,7 @@ Module Contents
 
    .. py:method:: _build(rows)
 
-      
+
       Compute build.
 
       Carry out the build operation.
@@ -235,7 +235,7 @@ Module Contents
       :classmethod:
 
 
-      
+
       Instantiate an index from a parquet dataset without DuckDB metadata.
 
 
@@ -259,7 +259,7 @@ Module Contents
 
    .. py:method:: save(path)
 
-      
+
       Compute save.
 
       Carry out the save operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -294,7 +294,7 @@ Module Contents
       :classmethod:
 
 
-      
+
       Compute load.
 
       Carry out the load operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -331,7 +331,7 @@ Module Contents
 
    .. py:method:: _idf(term)
 
-      
+
       Compute idf.
 
       Carry out the idf operation.
@@ -361,7 +361,7 @@ Module Contents
 
    .. py:method:: search(query, k = 10)
 
-      
+
       Compute search.
 
       Carry out the search operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -400,7 +400,7 @@ Module Contents
 
    .. py:method:: doc(index)
 
-      
+
       Compute doc.
 
       Carry out the doc operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -433,5 +433,3 @@ Module Contents
 
       ..
           !! processed by numpydoc !!
-
-

@@ -25,7 +25,7 @@ Module Contents
    Bases: :py:obj:`Protocol`
 
 
-   
+
    Model the Registry.
 
    Represent the registry data structure used throughout the project. The class encapsulates
@@ -51,7 +51,7 @@ Module Contents
 
    .. py:method:: begin_dataset(kind, run_id)
 
-      
+
       Compute begin dataset.
 
       Carry out the begin dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -90,7 +90,7 @@ Module Contents
 
    .. py:method:: commit_dataset(dataset_id, parquet_root, rows)
 
-      
+
       Compute commit dataset.
 
       Carry out the commit dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -127,7 +127,7 @@ Module Contents
 
    .. py:method:: rollback_dataset(dataset_id)
 
-      
+
       Compute rollback dataset.
 
       Carry out the rollback dataset operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -160,7 +160,7 @@ Module Contents
 
    .. py:method:: insert_run(purpose, model_id, revision, config)
 
-      
+
       Compute insert run.
 
       Carry out the insert run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -203,7 +203,7 @@ Module Contents
 
    .. py:method:: close_run(run_id, success, notes = None)
 
-      
+
       Compute close run.
 
       Carry out the close run operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -240,7 +240,7 @@ Module Contents
 
    .. py:method:: register_documents(docs)
 
-      
+
       Compute register documents.
 
       Carry out the register documents operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -273,7 +273,7 @@ Module Contents
 
    .. py:method:: register_doctags(assets)
 
-      
+
       Compute register doctags.
 
       Carry out the register doctags operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -306,7 +306,7 @@ Module Contents
 
    .. py:method:: emit_event(event_name, subject_id, payload)
 
-      
+
       Compute emit event.
 
       Carry out the emit event operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -343,7 +343,7 @@ Module Contents
 
    .. py:method:: incident(event, subject_id, error_class, message)
 
-      
+
       Compute incident.
 
       Carry out the incident operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -378,5 +378,3 @@ Module Contents
 
       ..
           !! processed by numpydoc !!
-
-
