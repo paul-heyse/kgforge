@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import json
+import logging
 import threading
 from dataclasses import asdict, dataclass
 from pathlib import Path
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(slots=True)
@@ -24,9 +28,21 @@ class BuilderCache:
         self._entries: dict[str, CacheEntry] = {}
         self._lock = threading.Lock()
         if path.exists():
-            data = json.loads(path.read_text(encoding="utf-8"))
-            for key, value in data.items():
-                self._entries[key] = CacheEntry(**value)
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+                if not isinstance(data, dict):
+                    raise TypeError("Cache contents must be a mapping.")
+                for key, value in data.items():
+                    if not isinstance(value, dict):
+                        raise TypeError("Cache entry values must be mappings.")
+                    self._entries[key] = CacheEntry(**value)
+            except (json.JSONDecodeError, TypeError) as exc:
+                logger.warning(
+                    "Failed to load builder cache from %s: %s. Resetting cache.",
+                    path,
+                    exc,
+                )
+                self.clear()
 
     def needs_update(self, file_path: Path, config_hash: str) -> bool:
         """Determine whether a file requires regeneration."""
