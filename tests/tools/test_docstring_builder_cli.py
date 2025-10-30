@@ -102,8 +102,10 @@ def test_process_file_ignore_missing(monkeypatch: pytest.MonkeyPatch, tmp_path: 
     assert result_error.status == cli.ExitStatus.CONFIG
 
 
-def _make_args(**overrides: object) -> argparse.Namespace:
-    base = {
+def _make_args(
+    **overrides: bool | list[str] | str | None,
+) -> argparse.Namespace:
+    base: dict[str, bool | list[str] | str | None] = {
         "paths": [],
         "module": "",
         "since": "",

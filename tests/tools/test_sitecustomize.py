@@ -2,10 +2,18 @@
 
 from __future__ import annotations
 
+import warnings
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Any, cast
 
-from src import sitecustomize
+with warnings.catch_warnings():
+    warnings.filterwarnings(
+        "ignore",
+        message="Docstring builder runtime shims are deprecated",
+        category=DeprecationWarning,
+    )
+    from src import sitecustomize
 
 
 @dataclass(slots=True)
@@ -40,7 +48,8 @@ def test_ensure_docstring_attrs_installs_property() -> None:
     installed = sitecustomize.ensure_docstring_attrs(_MutableDoc, _FakeAttr)
     assert installed is True
     instance = _MutableDoc([_FakeAttr(description="desc")])
-    assert instance.attrs[0].description == "desc"
+    instance_any = cast(Any, instance)
+    assert instance_any.attrs[0].description == "desc"
 
     installed_again = sitecustomize.ensure_docstring_attrs(_MutableDoc, _FakeAttr)
     assert installed_again is False
@@ -55,13 +64,15 @@ def test_ensure_docstring_yields_installs_helpers() -> None:
     assert added_many is True
 
     empty_doc = _MutableDoc([])
-    assert empty_doc.yields is None
-    assert empty_doc.many_yields == []
+    empty_any = cast(Any, empty_doc)
+    assert empty_any.yields is None
+    assert empty_any.many_yields == []
 
     data = _FakeYields(description="yield")
     populated = _MutableDoc([data])
-    assert populated.yields is data
-    assert populated.many_yields == [data]
+    populated_any = cast(Any, populated)
+    assert populated_any.yields is data
+    assert populated_any.many_yields == [data]
 
     added_yield_again, added_many_again = sitecustomize.ensure_docstring_yields(
         _MutableDoc, _FakeYields
@@ -77,7 +88,8 @@ def test_ensure_docstring_size_reports_total_length() -> None:
     assert sitecustomize.ensure_docstring_size(_MutableDoc) is True
     meta = [_FakeMeta(description="meta"), _FakeMeta(description=None)]
     doc = _MutableDoc(meta)
-    assert doc.size == len("short") + len("long") + len("meta")
+    doc_any = cast(Any, doc)
+    assert doc_any.size == len("short") + len("long") + len("meta")
 
     assert sitecustomize.ensure_docstring_size(_MutableDoc) is False
 
