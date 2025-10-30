@@ -45,17 +45,36 @@ __navmap__: Final[NavMap] = {
 class SupportsResponse(Protocol):
     """Protocol describing the minimal HTTP response surface used by the client.
 
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    *args : inspect._empty
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
+
     Notes
     -----
     Implementations are expected to mirror :class:`requests.Response` for the provided
     methods so callers can work with a small shared interface.
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
     """
 
     def raise_for_status(self) -> None:
-        """Raise an HTTP error if the response indicates failure."""
+        """Raise an HTTP error if the response indicates failure.
+
+        <!-- auto:docstring-builder v1 -->
+        """
 
     def json(self) -> dict[str, Any]:
         """Return the response payload as JSON.
+
+        <!-- auto:docstring-builder v1 -->
 
         Returns
         -------
@@ -68,23 +87,39 @@ class SupportsResponse(Protocol):
 class SupportsHttp(Protocol):
     """Protocol describing the HTTP verbs required by :class:`KGFoundryClient`.
 
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    *args : inspect._empty
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
+
     Notes
     -----
     Implementations only need to provide ``get`` and ``post`` methods that mirror the
     behaviour of :mod:`requests`.
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
     """
 
     def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
         """Issue an HTTP ``GET`` request.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         url : str
-            Absolute or relative request URL.
+            Describe ``url``.
         *args : object
-            Positional arguments forwarded to the HTTP implementation.
+            Describe ``args``.
         **kwargs : object
-            Keyword arguments forwarded to the HTTP implementation.
+            Describe ``kwargs``.
 
         Returns
         -------
@@ -96,14 +131,16 @@ class SupportsHttp(Protocol):
     def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
         """Issue an HTTP ``POST`` request.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         url : str
-            Absolute or relative request URL.
+            Describe ``url``.
         *args : object
-            Positional arguments forwarded to the HTTP implementation.
+            Describe ``args``.
         **kwargs : object
-            Keyword arguments forwarded to the HTTP implementation.
+            Describe ``kwargs``.
 
         Returns
         -------
@@ -116,23 +153,32 @@ class SupportsHttp(Protocol):
 class RequestsHttp(SupportsHttp):
     """HTTP adapter that delegates HTTP verbs to :mod:`requests`.
 
+    <!-- auto:docstring-builder v1 -->
+
     Notes
     -----
     This thin wrapper exists to make the high-level client easy to test by swapping
     in alternative transports.
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
     """
 
     def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
         """Send a ``GET`` request using :func:`requests.get`.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         url : str
-            Absolute or relative request URL.
+            Describe ``url``.
         *args : object
-            Positional arguments forwarded to :func:`requests.get`.
+            Describe ``args``.
         **kwargs : object
-            Keyword arguments forwarded to :func:`requests.get`.
+            Describe ``kwargs``.
 
         Returns
         -------
@@ -151,14 +197,16 @@ class RequestsHttp(SupportsHttp):
     def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
         """Send a ``POST`` request using :func:`requests.post`.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         url : str
-            Absolute or relative request URL.
+            Describe ``url``.
         *args : object
-            Positional arguments forwarded to :func:`requests.post`.
+            Describe ``args``.
         **kwargs : object
-            Keyword arguments forwarded to :func:`requests.post`.
+            Describe ``kwargs``.
 
         Returns
         -------
@@ -181,16 +229,22 @@ _DEFAULT_HTTP: Final[SupportsHttp] = RequestsHttp()
 class KGFoundryClient:
     """High-level client for the kgfoundry Search API.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     base_url : str, optional
-        Base URL for the API, by default ``"http://localhost:8080"``.
+        Describe ``base_url``.
+        Defaults to ``'http://localhost:8080'``.
     api_key : str | None, optional
-        Optional API key used for bearer authentication.
+        Describe ``api_key``.
+        Defaults to ``None``.
     timeout : float, optional
-        Timeout applied to HTTP requests in seconds, by default ``30.0``.
+        Describe ``timeout``.
+        Defaults to ``30.0``.
     http : SupportsHttp | None, optional
-        Custom HTTP transport. The default transport uses :mod:`requests`.
+        Describe ``http``.
+        Defaults to ``None``.
     """
 
     def __init__(
@@ -202,16 +256,22 @@ class KGFoundryClient:
     ) -> None:
         """Instantiate the client with connection details.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         base_url : str, optional
-            Base URL for the API, by default ``"http://localhost:8080"``.
+            Describe ``base_url``.
+            Defaults to ``'http://localhost:8080'``.
         api_key : str | None, optional
-            Optional API key used for bearer authentication.
+            Describe ``api_key``.
+            Defaults to ``None``.
         timeout : float, optional
-            Timeout applied to HTTP requests in seconds, by default ``30.0``.
+            Describe ``timeout``.
+            Defaults to ``30.0``.
         http : SupportsHttp | None, optional
-            Custom HTTP transport. The default transport uses :mod:`requests`.
+            Describe ``http``.
+            Defaults to ``None``.
         """
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
@@ -220,6 +280,8 @@ class KGFoundryClient:
 
     def _headers(self) -> dict[str, str]:
         """Build default headers for authenticated requests.
+
+        <!-- auto:docstring-builder v1 -->
 
         Returns
         -------
@@ -234,15 +296,19 @@ class KGFoundryClient:
     def healthz(self) -> dict[str, Any]:
         """Fetch the service health endpoint.
 
+        <!-- auto:docstring-builder v1 -->
+
         Returns
         -------
         dict[str, Any]
             JSON payload describing service health.
 
+
+
         Raises
         ------
         requests.HTTPError
-            Raised when the API responds with a non-success status code.
+        Raised when the API responds with a non-success status code.
         """
         response = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         response.raise_for_status()
@@ -257,26 +323,33 @@ class KGFoundryClient:
     ) -> dict[str, Any]:
         """Execute a semantic search request.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         query : str
-            Natural language query string.
+            Describe ``query``.
         k : int, optional
-            Number of results to return, by default ``10``.
+            Describe ``k``.
+            Defaults to ``10``.
         filters : dict[str, Any] | None, optional
-            Structured filters applied to the query, by default ``None``.
+            Describe ``filters``.
+            Defaults to ``None``.
         explain : bool, optional
-            When ``True`` return model explanations, by default ``False``.
+            Describe ``explain``.
+            Defaults to ``False``.
 
         Returns
         -------
         dict[str, Any]
             JSON response containing the ranked search results.
 
+
+
         Raises
         ------
         requests.HTTPError
-            Raised when the API responds with a non-success status code.
+        Raised when the API responds with a non-success status code.
         """
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         response = self._http.post(
@@ -291,22 +364,27 @@ class KGFoundryClient:
     def concepts(self, q: str, limit: int = 50) -> dict[str, Any]:
         """Retrieve graph concepts that match the provided query string.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         q : str
-            Concept search query.
+            Describe ``q``.
         limit : int, optional
-            Maximum number of results to return, by default ``50``.
+            Describe ``limit``.
+            Defaults to ``50``.
 
         Returns
         -------
         dict[str, Any]
             JSON response containing matching concepts.
 
+
+
         Raises
         ------
         requests.HTTPError
-            Raised when the API responds with a non-success status code.
+        Raised when the API responds with a non-success status code.
         """
         response = self._http.post(
             f"{self.base_url}/graph/concepts",

@@ -2,43 +2,67 @@
   {
     "logger": "logger",
     "level": "debug",
-    "message_template": "\"docstring_parser.common unavailable; skipping compatibility shim\"",
+    "message_template": "\"Registered attrs property on %%s\"",
     "structured_keys": [],
     "file": "src/sitecustomize.py",
-    "lineno": 265,
+    "lineno": 281,
     "source_link": {
-      "editor": "vscode://file/src/sitecustomize.py:265:1"
+      "editor": "vscode://file/src/sitecustomize.py:281:1"
     },
     "runbook": null
   },
   {
     "logger": "logger",
     "level": "debug",
-    "message_template": "\"Registered DocstringYields compatibility shim\"",
+    "message_template": "\"Registered size property on %%s\"",
     "structured_keys": [],
     "file": "src/sitecustomize.py",
-    "lineno": 324,
+    "lineno": 370,
     "source_link": {
-      "editor": "vscode://file/src/sitecustomize.py:324:1"
+      "editor": "vscode://file/src/sitecustomize.py:370:1"
+    },
+    "runbook": null
+  },
+  {
+    "logger": "logger",
+    "level": "info",
+    "message_template": "\"Docstring builder shims disabled via KGFOUNDRY_DOCSTRINGS_SITECUSTOMIZE=%s\"",
+    "structured_keys": [],
+    "file": "src/sitecustomize.py",
+    "lineno": 384,
+    "source_link": {
+      "editor": "vscode://file/src/sitecustomize.py:384:1"
     },
     "runbook": null
   },
   {
     "logger": "logger",
     "level": "debug",
-    "message_template": "\"Docstring size shim installed\"",
+    "message_template": "\"Docstring attrs already present on %%s\"",
     "structured_keys": [],
     "file": "src/sitecustomize.py",
-    "lineno": 344,
+    "lineno": 267,
     "source_link": {
-      "editor": "vscode://file/src/sitecustomize.py:344:1"
+      "editor": "vscode://file/src/sitecustomize.py:267:1"
     },
     "runbook": null
   },
   {
     "logger": "logger",
     "level": "debug",
-    "message_template": "\"Docstring.attrs shim installed\"",
+    "message_template": "\"Registered yields property on %%s\"",
+    "structured_keys": [],
+    "file": "src/sitecustomize.py",
+    "lineno": 318,
+    "source_link": {
+      "editor": "vscode://file/src/sitecustomize.py:318:1"
+    },
+    "runbook": null
+  },
+  {
+    "logger": "logger",
+    "level": "debug",
+    "message_template": "\"Registered many_yields property on %%s\"",
     "structured_keys": [],
     "file": "src/sitecustomize.py",
     "lineno": 332,
@@ -50,12 +74,60 @@
   {
     "logger": "logger",
     "level": "debug",
-    "message_template": "\"Docstring already exposes attrs property\"",
+    "message_template": "\"Docstring size already present on %%s\"",
     "structured_keys": [],
     "file": "src/sitecustomize.py",
-    "lineno": 334,
+    "lineno": 353,
     "source_link": {
-      "editor": "vscode://file/src/sitecustomize.py:334:1"
+      "editor": "vscode://file/src/sitecustomize.py:353:1"
+    },
+    "runbook": null
+  },
+  {
+    "logger": "logger",
+    "level": "debug",
+    "message_template": "\"docstring_parser.common unavailable; skipping compatibility shim\"",
+    "structured_keys": [],
+    "file": "src/sitecustomize.py",
+    "lineno": 379,
+    "source_link": {
+      "editor": "vscode://file/src/sitecustomize.py:379:1"
+    },
+    "runbook": null
+  },
+  {
+    "logger": "logger",
+    "level": "debug",
+    "message_template": "\"Registered DocstringYields compatibility shim\"",
+    "structured_keys": [],
+    "file": "src/sitecustomize.py",
+    "lineno": 458,
+    "source_link": {
+      "editor": "vscode://file/src/sitecustomize.py:458:1"
+    },
+    "runbook": null
+  },
+  {
+    "logger": "logger",
+    "level": "debug",
+    "message_template": "\"Docstring.attrs shim installed\"",
+    "structured_keys": [],
+    "file": "src/sitecustomize.py",
+    "lineno": 470,
+    "source_link": {
+      "editor": "vscode://file/src/sitecustomize.py:470:1"
+    },
+    "runbook": null
+  },
+  {
+    "logger": "logger",
+    "level": "debug",
+    "message_template": "\"Docstring size shim installed\"",
+    "structured_keys": [],
+    "file": "src/sitecustomize.py",
+    "lineno": 480,
+    "source_link": {
+      "editor": "vscode://file/src/sitecustomize.py:480:1"
     },
     "runbook": null
   },
@@ -65,21 +137,9 @@
     "message_template": "\"Docstring yields shim installed (single=%s many=%s)\"",
     "structured_keys": [],
     "file": "src/sitecustomize.py",
-    "lineno": 339,
+    "lineno": 475,
     "source_link": {
-      "editor": "vscode://file/src/sitecustomize.py:339:1"
-    },
-    "runbook": null
-  },
-  {
-    "logger": "logger",
-    "level": "debug",
-    "message_template": "\"Docstring already exposes yields helpers\"",
-    "structured_keys": [],
-    "file": "src/sitecustomize.py",
-    "lineno": 341,
-    "source_link": {
-      "editor": "vscode://file/src/sitecustomize.py:341:1"
+      "editor": "vscode://file/src/sitecustomize.py:475:1"
     },
     "runbook": null
   },
@@ -89,9 +149,9 @@
     "message_template": "\"BM25 search failed, falling back to empty results: %s\"",
     "structured_keys": [],
     "file": "src/search_api/app.py",
-    "lineno": 316,
+    "lineno": 292,
     "source_link": {
-      "editor": "vscode://file/src/search_api/app.py:316:1"
+      "editor": "vscode://file/src/search_api/app.py:292:1"
     },
     "runbook": null
   }

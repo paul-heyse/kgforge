@@ -22,9 +22,25 @@ if TYPE_CHECKING:  # pragma: no cover - imported solely for typing information
     from docstring_parser.common import Docstring, DocstringParam, DocstringReturns
 
     class DocstringYields(DocstringReturns):
-        """Type-checking placeholder for generator metadata entries."""
+        """Type-checking placeholder for generator metadata entries.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        *args : inspect._empty
+        Describe ``args``.
+        **kwargs : inspect._empty
+        Describe ``kwargs``.
+
+        Returns
+        -------
+        inspect._empty
+        Describe return value.
+        """
 
         ...
+
 else:  # pragma: no cover - imported lazily when type checking is disabled
     Docstring = Any
     DocstringParam = Any
@@ -35,12 +51,26 @@ else:  # pragma: no cover - imported lazily when type checking is disabled
 class DocstringMetaProto(Protocol):
     """Common surface shared by docstring ``meta`` entries.
 
+    <!-- auto:docstring-builder v1 -->
+
     ``docstring_parser`` represents return blocks, attributes, and parameter
     annotations as ``meta`` objects.  Each metadata entry exposes a short
     textual description that may be ``None`` when the source docstring omitted
     additional context.  The concrete subclasses supplied by
     ``docstring_parser`` add extra fields, but they all share this description
     surface which is the only part we need for compatibility.
+
+    Parameters
+    ----------
+    *args : inspect._empty
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
     """
 
     description: str | None
@@ -49,18 +79,49 @@ class DocstringMetaProto(Protocol):
 class DocstringAttrProto(DocstringMetaProto, Protocol):
     """Protocol describing attribute metadata entries.
 
+    <!-- auto:docstring-builder v1 -->
+
     ``docstring_parser`` represents both attributes and parameters using
     :class:`DocstringParam`.  Attribute metadata entries expose their marker and
     attribute name via ``args`` while reusing ``description`` for human readable
     explanations.  We only need the attribute name list to populate the
     ``attrs`` property in the shimmed ``Docstring`` objects.
+
+    Parameters
+    ----------
+    *args : Sequence[str]
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
     """
 
     args: Sequence[str]
 
 
 class DocstringReturnsProto(DocstringMetaProto, Protocol):
-    """Protocol describing return metadata entries."""
+    """Protocol describing return metadata entries.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    args : Sequence[str]
+        Describe ``args``.
+    description : str | None
+        Describe ``description``.
+    type_name : str | None
+        Describe ``type_name``.
+    is_generator : bool
+        Describe ``is_generator``.
+    return_name : str | None, optional
+        Describe ``return_name``.
+        Defaults to ``None``.
+    """
 
     args: Sequence[str]
     type_name: str | None
@@ -76,16 +137,49 @@ class DocstringReturnsProto(DocstringMetaProto, Protocol):
         is_generator: bool,
         return_name: str | None = None,
     ) -> None:
-        """Initialise a return metadata entry."""
+        """Initialise a return metadata entry.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        args : Sequence[str]
+            Describe ``args``.
+        description : str | None
+            Describe ``description``.
+        type_name : str | None
+            Describe ``type_name``.
+        is_generator : bool
+            Describe ``is_generator``.
+        return_name : str | None, optional
+            Describe ``return_name``.
+            Defaults to ``None``.
+        """
 
 
 class DocstringYieldsProto(DocstringReturnsProto, Protocol):
     """Protocol describing generator metadata entries.
 
+    <!-- auto:docstring-builder v1 -->
+
     ``docstring_parser`` treats ``Yields`` sections as a specialisation of
     ``Returns``.  Downstream tools expect a small set of attributes that mark a
     metadata block as representing a generator.  The protocol mirrors those
     attributes so we can annotate our compatibility shim precisely.
+
+    Parameters
+    ----------
+    args : Sequence[str]
+        Describe ``args``.
+    description : str | None
+        Describe ``description``.
+    type_name : str | None
+        Describe ``type_name``.
+    is_generator : bool
+        Describe ``is_generator``.
+    return_name : str | None, optional
+        Describe ``return_name``.
+        Defaults to ``None``.
     """
 
     args: Sequence[str]
@@ -97,10 +191,24 @@ class DocstringYieldsProto(DocstringReturnsProto, Protocol):
 class DocstringProto(Protocol):
     """Protocol describing the subset of :class:`Docstring` we extend.
 
+    <!-- auto:docstring-builder v1 -->
+
     Only a handful of properties are accessed by the compatibility helpers:
     the metadata list and the short/long descriptions.  Limiting the protocol
     to those surfaces keeps mypy satisfied without reimplementing the entire
     third-party type.
+
+    Parameters
+    ----------
+    *args : inspect._empty
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
     """
 
     meta: list[DocstringMetaProto]
@@ -111,9 +219,23 @@ class DocstringProto(Protocol):
 class DocstringCommonModuleProto(Protocol):
     """Runtime module exported by :mod:`docstring_parser.common`.
 
+    <!-- auto:docstring-builder v1 -->
+
     The real module exposes several concrete classes that the shim patches at runtime.  Describing
     the attribute names here allows callers to keep strong typing while still deferring to the
     imported module for the actual implementations.
+
+    Parameters
+    ----------
+    *args : inspect._empty
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
     """
 
     Docstring: type[DocstringProto]
@@ -128,12 +250,14 @@ def ensure_docstring_attrs[DocT: DocstringProto, AttrT: DocstringAttrProto](
 ) -> bool:
     """Install an ``attrs`` property on ``doc_cls`` when absent.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     doc_cls : type[DocT]
-        Docstring class to mutate in place.
+        Describe ``doc_cls``.
     attr_cls : type[AttrT]
-        Metadata type that identifies attribute entries.
+        Describe ``attr_cls``.
 
     Returns
     -------
@@ -164,12 +288,14 @@ def ensure_docstring_yields[DocT: DocstringProto, YieldsT: DocstringYieldsProto]
 ) -> tuple[bool, bool]:
     """Ensure docstring instances expose generator metadata helpers.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     doc_cls : type[DocT]
-        Docstring class to mutate in place.
+        Describe ``doc_cls``.
     yields_cls : type[YieldsT]
-        Metadata type representing ``Yields`` blocks.
+        Describe ``yields_cls``.
 
     Returns
     -------
@@ -212,10 +338,12 @@ def ensure_docstring_yields[DocT: DocstringProto, YieldsT: DocstringYieldsProto]
 def ensure_docstring_size[DocT: DocstringProto](doc_cls: type[DocT]) -> bool:
     """Expose a ``size`` property summarising docstring content length.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     doc_cls : type[DocT]
-        Docstring class to mutate in place.
+        Describe ``doc_cls``.
 
     Returns
     -------
@@ -279,6 +407,23 @@ if doc_common is not None and ENABLE_SITECUSTOMIZE:
             type_name: str | None,
             return_name: str | None = None,
         ) -> None:
+            """Describe  init docstring yields.
+
+            <!-- auto:docstring-builder v1 -->
+
+            Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+
+            Parameters
+            ----------
+            args : Sequence
+            Describe `args`.
+            description : str | None, optional
+            Describe `description`.
+            type_name : str | None, optional
+            Describe `type_name`.
+            return_name : str | None, optional, by default None
+            Describe `return_name`.
+            """
             base_returns.__init__(
                 self,
                 list(args),

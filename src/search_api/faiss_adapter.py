@@ -85,12 +85,14 @@ type FloatArrayLike = NDArray[np.floating[Any]]
 class DenseVecs:
     """Store dense vectors alongside their document identifiers.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     ids : list[str]
-        Identifiers that label each row of the vector matrix.
+        Describe ``ids``.
     mat : VecArray
-        Normalised embedding matrix aligned with ``ids``.
+        Describe ``mat``.
     """
 
     ids: list[str]
@@ -101,14 +103,18 @@ class DenseVecs:
 class FaissAdapter:
     """Manage FAISS vector indexes with optional GPU acceleration.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     db_path : str
-        Root directory where index artefacts are stored.
+        Describe ``db_path``.
     factory : str, optional
-        FAISS index factory string, by default ``'OPQ64,IVF8192,PQ64'``.
+        Describe ``factory``.
+        Defaults to ``'OPQ64,IVF8192,PQ64'``.
     metric : str, optional
-        Similarity metric to optimise, by default ``'ip'``.
+        Describe ``metric``.
+        Defaults to ``'ip'``.
     """
 
     def __init__(
@@ -119,14 +125,18 @@ class FaissAdapter:
     ) -> None:
         """Initialise the adapter with storage paths and FAISS configuration.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         db_path : str
-            Root directory where index artefacts are stored.
+            Describe ``db_path``.
         factory : str, optional
-            FAISS index factory string, by default ``'OPQ64,IVF8192,PQ64'``.
+            Describe ``factory``.
+            Defaults to ``'OPQ64,IVF8192,PQ64'``.
         metric : str, optional
-            Similarity metric to optimise, by default ``'ip'``.
+            Describe ``metric``.
+            Defaults to ``'ip'``.
         """
         self.db_path = db_path
         self.factory = factory
@@ -138,20 +148,24 @@ class FaissAdapter:
     def _load_dense_from_parquet(self, source: Path) -> DenseVecs:
         """Load and normalise dense vectors stored in a Parquet file.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         source : Path
-            Path to the Parquet dataset containing ``chunk_id`` and ``vector`` columns.
+            Describe ``source``.
 
         Returns
         -------
         DenseVecs
             Normalised vectors paired with their document identifiers.
 
+
+
         Raises
         ------
         RuntimeError
-            Raised when the file does not contain any vector records.
+        Raised when the file does not contain any vector records.
         """
         con = duckdb.connect(database=":memory:")
         try:
@@ -178,15 +192,19 @@ class FaissAdapter:
     def _load_dense_parquet(self) -> DenseVecs:
         """Load dense vectors from the adapter's managed Parquet dataset.
 
+        <!-- auto:docstring-builder v1 -->
+
         Returns
         -------
         DenseVecs
             Normalised vectors available to the adapter.
 
+
+
         Raises
         ------
         RuntimeError
-            Raised when no vectors are available on disk.
+        Raised when no vectors are available on disk.
         """
         candidate = Path(self.db_path)
         if candidate.is_dir() or candidate.suffix == ".parquet":
@@ -226,10 +244,12 @@ class FaissAdapter:
     def build(self) -> None:
         """Build or refresh the FAISS index from the persisted vector store.
 
+        <!-- auto:docstring-builder v1 -->
+
         Raises
         ------
         RuntimeError
-            Raised when dense vectors cannot be loaded from disk.
+        Raised when dense vectors cannot be loaded from disk.
         """
         vectors = self._load_dense_parquet()
         self.vecs = vectors
@@ -256,10 +276,13 @@ class FaissAdapter:
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
         """Load an existing index or build one if no cached artefact is present.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         cpu_index_path : str | None, optional
-            Path to a CPU FAISS index that should be promoted to GPU, by default ``None``.
+            Describe ``cpu_index_path``.
+            Defaults to ``None``.
         """
         faiss_module = faiss
         if faiss_module is None:
@@ -280,10 +303,12 @@ class FaissAdapter:
     def _clone_to_gpu(self, cpu_index: object) -> object:
         """Clone a CPU index onto a GPU when GPU support is available.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         cpu_index : object
-            CPU-resident FAISS index.
+            Describe ``cpu_index``.
 
         Returns
         -------
@@ -310,12 +335,15 @@ class FaissAdapter:
     def search(self, qvec: FloatArrayLike, k: int = 10) -> list[list[tuple[str, float]]]:
         """Search the index for nearest neighbours.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         qvec : FloatArrayLike
-            Query vectors shaped as ``(n, dim)`` or ``(dim,)``.
+            Describe ``qvec``.
         k : int, optional
-            Number of neighbours to retrieve, by default ``10``.
+            Describe ``k``.
+            Defaults to ``10``.
 
         Returns
         -------
@@ -332,10 +360,12 @@ class FaissAdapter:
     def _prepare_queries(self, qvec: VecArray) -> VecArray:
         """Normalise query vectors to match FAISS search expectations.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         qvec : VecArray
-            Raw query vectors.
+            Describe ``qvec``.
 
         Returns
         -------
@@ -350,22 +380,26 @@ class FaissAdapter:
     def _search_with_faiss(self, queries: VecArray, k: int) -> list[list[tuple[str, float]]]:
         """Perform a batched search using the GPU-backed FAISS index.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         queries : VecArray
-            Prepared query matrix.
+            Describe ``queries``.
         k : int
-            Number of neighbours to retrieve per query.
+            Describe ``k``.
 
         Returns
         -------
         list[list[tuple[str, float]]]
             Ranked matches for each query.
 
+
+
         Raises
         ------
         RuntimeError
-            Raised when the FAISS index or identifier mapping has not been loaded.
+        Raised when the FAISS index or identifier mapping has not been loaded.
         """
         if self.index is None or self.idmap is None:
             message = "FAISS index or ID mapping not loaded"
@@ -384,22 +418,26 @@ class FaissAdapter:
     def _search_with_cpu(self, queries: VecArray, k: int) -> list[list[tuple[str, float]]]:
         """Perform a batched search using the CPU fallback implementation.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         queries : VecArray
-            Prepared query matrix.
+            Describe ``queries``.
         k : int
-            Number of neighbours to retrieve per query.
+            Describe ``k``.
 
         Returns
         -------
         list[list[tuple[str, float]]]
             Ranked matches for each query.
 
+
+
         Raises
         ------
         RuntimeError
-            Raised when dense vectors have not been loaded into memory.
+        Raised when dense vectors have not been loaded into memory.
         """
         if self.vecs is None:
             message = "Dense vectors not loaded"

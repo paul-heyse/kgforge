@@ -28,8 +28,7 @@ class NavSection(TypedDict):
 
     <!-- auto:docstring-builder v1 -->
 
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
     """
 
     id: str
@@ -43,8 +42,7 @@ class SymbolMeta(TypedDict, total=False):
 
     <!-- auto:docstring-builder v1 -->
 
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
     """
 
     since: str
@@ -68,8 +66,7 @@ class ModuleMeta(TypedDict, total=False):
 
     <!-- auto:docstring-builder v1 -->
 
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
     """
 
     owner: str
@@ -84,8 +81,7 @@ class NavMap(TypedDict, total=False):
 
     <!-- auto:docstring-builder v1 -->
 
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
     """
 
     title: str

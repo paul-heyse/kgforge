@@ -12,7 +12,9 @@ import hashlib
 import importlib
 import io
 import json
+import logging
 import os
+import pickle
 import re
 import subprocess
 import sys
@@ -236,6 +238,7 @@ TRIGRAM_LENGTH = 3
 WORD_RE = re.compile(r"[A-Za-z0-9_]+")
 type VectorArray = npt.NDArray[np.float32]
 EMBEDDING_MATRIX_RANK = 2
+logger = logging.getLogger(__name__)
 
 
 class EmbeddingModelProtocol(Protocol):
@@ -243,6 +246,7 @@ class EmbeddingModelProtocol(Protocol):
 
     def encode(self, sentences: Sequence[str], **_: object) -> VectorArray:
         """Return embeddings for the provided sentences."""
+        ...
 
 
 class FaissIndexProtocol(Protocol):
@@ -250,11 +254,13 @@ class FaissIndexProtocol(Protocol):
 
     def add(self, vectors: VectorArray) -> None:
         """Add vectors to the index."""
+        ...
 
     def search(
         self, vectors: VectorArray, count: int
     ) -> tuple[npt.NDArray[np.float32], npt.NDArray[np.int64]]:
         """Search vectors and return distance/index pairs."""
+        ...
 
 
 class FaissModuleProtocol(Protocol):
@@ -262,15 +268,19 @@ class FaissModuleProtocol(Protocol):
 
     def IndexFlatIP(self, dimension: int) -> FaissIndexProtocol:  # noqa: N802
         """Return an inner-product index for the given dimension."""
+        ...
 
     def write_index(self, index: FaissIndexProtocol, path: str) -> None:
         """Persist an index to the given path."""
+        ...
 
     def read_index(self, path: str) -> FaissIndexProtocol:
         """Load an index from disk."""
+        ...
 
     def normalize_L2(self, vectors: VectorArray) -> None:  # noqa: N802
         """Normalize vectors in-place to unit length."""
+        ...
 
 
 LEXICAL_FIELDS = [
@@ -507,14 +517,14 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--max-modules-per-shard",
         type=int,
-        default=150,
-        help="Maximum number of modules before sharding is enabled.",
+        default=0,
+        help="Maximum number of modules before sharding is enabled (0 disables sharding).",
     )
     parser.add_argument(
         "--max-symbols-per-shard",
         type=int,
-        default=1200,
-        help="Maximum number of symbols before sharding is enabled.",
+        default=0,
+        help="Maximum number of symbols before sharding is enabled (0 disables sharding).",
     )
     parser.add_argument(
         "--link-mode",
@@ -662,6 +672,11 @@ class AgentCatalogBuilder:
         packages = self._collect_packages()
         self._apply_call_graph(packages)
         semantic_index = self._build_semantic_index(packages)
+        link_policy_dict = {
+            key: value
+            for key, value in dataclasses.asdict(link_policy).items()
+            if value is not None
+        }
         artifacts = {
             key: self._relative_string(self._resolve_artifact_path(path))
             for key, path in self.artifact_paths.items()
@@ -678,7 +693,7 @@ class AgentCatalogBuilder:
             version=self.args.version,
             generated_at=generated_at,
             repo={"sha": repo_sha, "root": str(self.repo_root)},
-            link_policy=dataclasses.asdict(link_policy),
+            link_policy=link_policy_dict,
             artifacts=artifacts,
             packages=packages,
             semantic_index=semantic_index,
@@ -751,9 +766,11 @@ class AgentCatalogBuilder:
         symbols_data = cast(
             list[dict[str, Any]], self._load_json(self.artifact_paths["symbols"], [])
         )
-        docfacts_data = cast(
-            list[dict[str, Any]], self._load_json(self.artifact_paths["docfacts"], [])
-        )
+        docfacts_raw = self._load_json(self.artifact_paths["docfacts"], {})
+        if isinstance(docfacts_raw, dict):
+            docfacts_data = cast(list[dict[str, Any]], docfacts_raw.get("entries", []))
+        else:
+            docfacts_data = cast(list[dict[str, Any]], docfacts_raw or [])
         by_module = cast(
             dict[str, list[str]], self._load_json(self.artifact_paths["by_module"], {})
         )
@@ -1289,7 +1306,7 @@ class AgentCatalogBuilder:
         semantic_dir.mkdir(parents=True, exist_ok=True)
         faiss_module = _load_faiss("build the semantic index")
         index = faiss_module.IndexFlatIP(int(vectors.shape[1]))
-        contiguous_vectors = cast(VectorArray, np.ascontiguousarray(vectors))
+        contiguous_vectors: VectorArray = np.ascontiguousarray(vectors)
         index.add(contiguous_vectors)
         index_path = semantic_dir / "symbols.faiss"
         faiss_module.write_index(index, str(index_path))
@@ -1327,10 +1344,13 @@ class AgentCatalogBuilder:
     def _maybe_shard(self, catalog: AgentCatalog) -> None:
         total_modules = sum(len(pkg.modules) for pkg in catalog.packages)
         total_symbols = sum(len(mod.symbols) for pkg in catalog.packages for mod in pkg.modules)
-        if (
-            total_modules <= self.args.max_modules_per_shard
-            and total_symbols <= self.args.max_symbols_per_shard
-        ):
+        module_limit = self.args.max_modules_per_shard or 0
+        symbol_limit = self.args.max_symbols_per_shard or 0
+        if module_limit <= 0:
+            module_limit = float("inf")
+        if symbol_limit <= 0:
+            symbol_limit = float("inf")
+        if total_modules <= module_limit and total_symbols <= symbol_limit:
             catalog.shards = None
             return
         shard_dir = (self.repo_root / self.args.shard_dir).resolve()
@@ -1392,13 +1412,103 @@ def _load_embedding_model(model_name: str) -> EmbeddingModelProtocol:
     return cast(EmbeddingModelProtocol, model)
 
 
+class _SimpleFaissIndex:
+    """Lightweight FAISS-like index used when the real library is unavailable."""
+
+    def __init__(self, dimension: int) -> None:
+        self.dimension = dimension
+        self._vectors: VectorArray = np.empty((0, dimension), dtype=np.float32)
+
+    def add(self, vectors: VectorArray) -> None:
+        array = np.asarray(vectors, dtype=np.float32)
+        if array.ndim != EMBEDDING_MATRIX_RANK or array.shape[1] != self.dimension:
+            message = "Vector dimension does not match index configuration"
+            raise CatalogBuildError(message)
+        if self._vectors.size == 0:
+            self._vectors = np.ascontiguousarray(array)
+        else:
+            self._vectors = np.vstack((self._vectors, np.ascontiguousarray(array)))
+
+    def search(
+        self, vectors: VectorArray, count: int
+    ) -> tuple[npt.NDArray[np.float32], npt.NDArray[np.int64]]:
+        queries = np.asarray(vectors, dtype=np.float32)
+        if queries.ndim != EMBEDDING_MATRIX_RANK or queries.shape[1] != self.dimension:
+            message = "Query vector dimension does not match index configuration"
+            raise CatalogBuildError(message)
+        query_count = queries.shape[0]
+        distances = np.zeros((query_count, count), dtype=np.float32)
+        indices = np.full((query_count, count), -1, dtype=np.int64)
+        if self._vectors.size == 0 or count <= 0:
+            return distances, indices
+        scores = queries @ self._vectors.T
+        top_k = min(count, self._vectors.shape[0])
+        if top_k <= 0:
+            return distances, indices
+        order = np.argsort(-scores, axis=1)
+        top_indices = order[:, :top_k]
+        top_scores = np.take_along_axis(scores, top_indices, axis=1)
+        distances[:, :top_k] = top_scores.astype(np.float32)
+        indices[:, :top_k] = top_indices.astype(np.int64)
+        return distances, indices
+
+
+class _SimpleFaissModule:
+    """Minimal FAISS module shim using NumPy for tests and local runs."""
+
+    IndexFlatIP = _SimpleFaissIndex
+
+    @staticmethod
+    def write_index(index: _SimpleFaissIndex, path: str) -> None:
+        payload = {
+            "dimension": index.dimension,
+            "vectors": index._vectors,
+        }
+        with open(path, "wb") as handle:
+            pickle.dump(payload, handle)
+
+    @staticmethod
+    def read_index(path: str) -> _SimpleFaissIndex:
+        with open(path, "rb") as handle:
+            payload = pickle.load(handle)
+        vectors_payload = payload.get("vectors", [])
+        vectors = np.asarray(vectors_payload, dtype=np.float32)
+        dimension = int(
+            payload.get("dimension")
+            or (vectors.shape[1] if vectors.ndim == EMBEDDING_MATRIX_RANK else 0)
+        )
+        if dimension <= 0:
+            message = "Stored semantic index dimension is invalid"
+            raise CatalogBuildError(message)
+        fallback = _SimpleFaissIndex(dimension)
+        if vectors.size:
+            if vectors.ndim != EMBEDDING_MATRIX_RANK:
+                message = "Stored semantic index vectors have an unexpected shape"
+                raise CatalogBuildError(message)
+            fallback._vectors = np.ascontiguousarray(vectors, dtype=np.float32)
+        return fallback
+
+    @staticmethod
+    def normalize_L2(vectors: VectorArray) -> None:  # noqa: N802
+        norms = np.linalg.norm(vectors, axis=1, keepdims=True)
+        norms[norms == 0] = 1.0
+        vectors /= norms
+
+
+_SIMPLE_FAISS_MODULE = _SimpleFaissModule()
+
+
 def _load_faiss(purpose: str) -> FaissModuleProtocol:
     """Import the faiss module or raise a descriptive error."""
     try:
         module = importlib.import_module("faiss")
     except ImportError as exc:  # pragma: no cover - runtime guard
-        message = f"faiss is required to {purpose}"
-        raise CatalogBuildError(message) from exc
+        logger.warning(
+            "Falling back to simple FAISS module while attempting to %s: %s",
+            purpose,
+            exc,
+        )
+        return cast(FaissModuleProtocol, _SIMPLE_FAISS_MODULE)
     return cast(FaissModuleProtocol, module)
 
 
@@ -1729,7 +1839,9 @@ def _select_lexical_candidates(
     return sorted_docs[:candidate_limit]
 
 
-def _compute_vector_scores(query: str, options: SearchOptions, context: VectorSearchContext) -> dict[str, float]:
+def _compute_vector_scores(
+    query: str, options: SearchOptions, context: VectorSearchContext
+) -> dict[str, float]:
     """Compute vector scores using the FAISS index and query embedding."""
     faiss_module = _load_faiss("execute hybrid search")
     try:
@@ -1757,7 +1869,7 @@ def _compute_vector_scores(query: str, options: SearchOptions, context: VectorSe
     if isinstance(expected_dim, int) and vectors.shape[1] != expected_dim:
         message = "Query embedding dimension does not match semantic index"
         raise CatalogBuildError(message)
-    vector_array = cast(VectorArray, np.ascontiguousarray(vectors))
+    vector_array: VectorArray = np.ascontiguousarray(vectors)
     faiss_module.normalize_L2(vector_array)
     search_count = min(len(context.documents), max(context.candidate_limit, context.k))
     distances, indices = index.search(vector_array, search_count)
@@ -1783,7 +1895,9 @@ def _merge_scores(
 ) -> list[SearchResult]:
     """Combine lexical and vector scores into ranked results."""
     ordered_ids = list(dict.fromkeys(candidate_ids))
-    max_lexical = max((lexical_scores.get(symbol_id, 0.0) for symbol_id in ordered_ids), default=0.0)
+    max_lexical = max(
+        (lexical_scores.get(symbol_id, 0.0) for symbol_id in ordered_ids), default=0.0
+    )
     results: list[SearchResult] = []
     for symbol_id in ordered_ids:
         document = doc_by_id.get(symbol_id)

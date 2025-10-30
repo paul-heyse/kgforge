@@ -13,6 +13,7 @@ import importlib
 import json
 import os
 import re
+import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from types import ModuleType
@@ -1018,14 +1019,17 @@ def main() -> int:
     """Coordinate observability scanning."""
     policy = load_policy()
     if not SRC.exists():
+        sys.exit(0)
         return 0
 
     logs, metrics, traces, lints = _scan_repository(policy)
     runbooks = _load_runbooks(policy)
     _apply_runbooks(logs, runbooks)
     _write_outputs(metrics, logs, traces, lints)
-    return _summarize_exit(metrics, logs, traces, lints)
+    exit_code = _summarize_exit(metrics, logs, traces, lints)
+    sys.exit(exit_code)
+    return exit_code
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

@@ -56,23 +56,17 @@ def rrf_fuse(
     Parameters
     ----------
     dense : list[tuple[str, float]]
-    Describe ``dense``.
+        Describe ``dense``.
     sparse : list[tuple[str, float]]
-    Describe ``sparse``.
+        Describe ``sparse``.
     k : int, optional
-    Describe ``k``.
-    Defaults to ``60``.
-
-
-
-
-
-
+        Describe ``k``.
+        Defaults to ``60``.
 
     Returns
     -------
     list[tuple[str, float]]
-    Describe return value.
+        Describe return value.
     """
     # NOTE: implement stable RRF across rankers when ranker outputs are wired
     return []
@@ -89,20 +83,14 @@ def apply_kg_boosts(fused: list[tuple[str, float]], query: str) -> list[tuple[st
     Parameters
     ----------
     fused : list[tuple[str, float]]
-    Describe ``fused``.
+        Describe ``fused``.
     query : str
-    Describe ``query``.
-
-
-
-
-
-
+        Describe ``query``.
 
     Returns
     -------
     list[tuple[str, float]]
-    Describe return value.
+        Describe return value.
     """
     # NOTE: apply boosts for direct & one-hop concept matches once KG signals exist
     return fused
@@ -121,21 +109,15 @@ def mmr_deduplicate(
     Parameters
     ----------
     results : list[tuple[str, float]]
-    Describe ``results``.
+        Describe ``results``.
     lambda_ : float, optional
-    Describe ``lambda_``.
-    Defaults to ``0.7``.
-
-
-
-
-
-
+        Describe ``lambda_``.
+        Defaults to ``0.7``.
 
     Returns
     -------
     list[tuple[str, float]]
-    Describe return value.
+        Describe return value.
     """
     # NOTE: add doc-level diversity via MMR when result scoring is available
     return results

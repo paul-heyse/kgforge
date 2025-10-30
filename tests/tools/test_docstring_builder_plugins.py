@@ -62,4 +62,3 @@ def test_normalize_numpy_params_plugin(tmp_path: Path) -> None:
         assert return_description.endswith(".")
     finally:
         manager.finish()
-

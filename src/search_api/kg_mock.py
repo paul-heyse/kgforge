@@ -45,8 +45,7 @@ class ConceptMeta(TypedDict):
 
     <!-- auto:docstring-builder v1 -->
 
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
     """
 
     label: str
@@ -76,18 +75,12 @@ def detect_query_concepts(query: str) -> set[str]:
     Parameters
     ----------
     query : str
-    Describe ``query``.
-
-
-
-
-
-
+        Describe ``query``.
 
     Returns
     -------
     set[str]
-    Describe return value.
+        Describe return value.
     """
     lowered = query.lower()
     hits: set[str] = set()
@@ -108,18 +101,12 @@ def linked_concepts_for_text(text: str) -> list[str]:
     Parameters
     ----------
     text : str
-    Describe ``text``.
-
-
-
-
-
-
+        Describe ``text``.
 
     Returns
     -------
     list[str]
-    Describe return value.
+        Describe return value.
     """
     lowered = text.lower()
     hits = []
@@ -145,26 +132,20 @@ def kg_boost(
     Parameters
     ----------
     query_concepts : list[str]
-    Describe ``query_concepts``.
+        Describe ``query_concepts``.
     chunk_concepts : list[str]
-    Describe ``chunk_concepts``.
+        Describe ``chunk_concepts``.
     direct : float, optional
-    Describe ``direct``.
-    Defaults to ``0.08``.
+        Describe ``direct``.
+        Defaults to ``0.08``.
     one_hop : float, optional
-    Describe ``one_hop``.
-    Defaults to ``0.04``.
-
-
-
-
-
-
+        Describe ``one_hop``.
+        Defaults to ``0.04``.
 
     Returns
     -------
     float
-    Describe return value.
+        Describe return value.
     """
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

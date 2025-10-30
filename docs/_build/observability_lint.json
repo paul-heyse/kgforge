@@ -2,34 +2,52 @@
   {
     "severity": "warning",
     "kind": "log",
-    "name": "\"docstring_parser.common unavailable; skipping com",
+    "name": "\"Registered attrs property on %%s\"",
     "rule": "structured_logging",
     "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
     "file": "src/sitecustomize.py",
-    "lineno": 265
+    "lineno": 281
   },
   {
     "severity": "warning",
     "kind": "log",
-    "name": "\"Registered DocstringYields compatibility shim\"",
+    "name": "\"Registered size property on %%s\"",
     "rule": "structured_logging",
     "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
     "file": "src/sitecustomize.py",
-    "lineno": 324
+    "lineno": 370
   },
   {
     "severity": "warning",
     "kind": "log",
-    "name": "\"Docstring size shim installed\"",
+    "name": "\"Docstring builder shims disabled via KGFOUNDRY_DO",
     "rule": "structured_logging",
     "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
     "file": "src/sitecustomize.py",
-    "lineno": 344
+    "lineno": 384
   },
   {
     "severity": "warning",
     "kind": "log",
-    "name": "\"Docstring.attrs shim installed\"",
+    "name": "\"Docstring attrs already present on %%s\"",
+    "rule": "structured_logging",
+    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
+    "file": "src/sitecustomize.py",
+    "lineno": 267
+  },
+  {
+    "severity": "warning",
+    "kind": "log",
+    "name": "\"Registered yields property on %%s\"",
+    "rule": "structured_logging",
+    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
+    "file": "src/sitecustomize.py",
+    "lineno": 318
+  },
+  {
+    "severity": "warning",
+    "kind": "log",
+    "name": "\"Registered many_yields property on %%s\"",
     "rule": "structured_logging",
     "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
     "file": "src/sitecustomize.py",
@@ -38,11 +56,47 @@
   {
     "severity": "warning",
     "kind": "log",
-    "name": "\"Docstring already exposes attrs property\"",
+    "name": "\"Docstring size already present on %%s\"",
     "rule": "structured_logging",
     "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
     "file": "src/sitecustomize.py",
-    "lineno": 334
+    "lineno": 353
+  },
+  {
+    "severity": "warning",
+    "kind": "log",
+    "name": "\"docstring_parser.common unavailable; skipping com",
+    "rule": "structured_logging",
+    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
+    "file": "src/sitecustomize.py",
+    "lineno": 379
+  },
+  {
+    "severity": "warning",
+    "kind": "log",
+    "name": "\"Registered DocstringYields compatibility shim\"",
+    "rule": "structured_logging",
+    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
+    "file": "src/sitecustomize.py",
+    "lineno": 458
+  },
+  {
+    "severity": "warning",
+    "kind": "log",
+    "name": "\"Docstring.attrs shim installed\"",
+    "rule": "structured_logging",
+    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
+    "file": "src/sitecustomize.py",
+    "lineno": 470
+  },
+  {
+    "severity": "warning",
+    "kind": "log",
+    "name": "\"Docstring size shim installed\"",
+    "rule": "structured_logging",
+    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
+    "file": "src/sitecustomize.py",
+    "lineno": 480
   },
   {
     "severity": "warning",
@@ -51,16 +105,7 @@
     "rule": "structured_logging",
     "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
     "file": "src/sitecustomize.py",
-    "lineno": 339
-  },
-  {
-    "severity": "warning",
-    "kind": "log",
-    "name": "\"Docstring already exposes yields helpers\"",
-    "rule": "structured_logging",
-    "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
-    "file": "src/sitecustomize.py",
-    "lineno": 341
+    "lineno": 475
   },
   {
     "severity": "warning",
@@ -69,6 +114,6 @@
     "rule": "structured_logging",
     "message": "Prefer structured logging (key=value/extra=\u2026) over %-format or f-strings.",
     "file": "src/search_api/app.py",
-    "lineno": 316
+    "lineno": 292
   }
 ]

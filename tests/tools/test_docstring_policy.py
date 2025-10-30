@@ -66,14 +66,16 @@ def _make_semantic(
 
 def test_policy_reports_missing_descriptions(tmp_path: Path) -> None:
     engine = PolicyEngine(PolicySettings())
-    engine.record([
-        _make_semantic(
-            tmp_path,
-            summary="TODO fill summary",
-            parameter_description="todo",
-            return_description="todo",
-        )
-    ])
+    engine.record(
+        [
+            _make_semantic(
+                tmp_path,
+                summary="TODO fill summary",
+                parameter_description="todo",
+                return_description="todo",
+            )
+        ]
+    )
     report = engine.finalize()
     rules = {violation.rule for violation in report.violations}
     assert {"missing-params", "missing-returns", "coverage"}.issubset(rules)
@@ -106,4 +108,3 @@ def test_policy_exception_skips_missing_params(tmp_path: Path) -> None:
     report = engine.finalize()
     assert not any(violation.rule == "missing-params" for violation in report.violations)
     assert report.coverage >= report.threshold
-

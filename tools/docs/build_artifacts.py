@@ -25,7 +25,8 @@ STEPS: list[tuple[str, list[str], str]] = [
         "navmap",
         [
             sys.executable,
-            "tools/navmap/build_navmap.py",
+            "-m",
+            "tools.navmap.build_navmap",
             "--write",
             str(REPO_ROOT / "site" / "_build" / "navmap" / "navmap.json"),
         ],
