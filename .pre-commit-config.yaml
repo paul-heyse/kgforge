@@ -1,56 +1,28 @@
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=51200"]
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.2
     hooks:
-      - id: ruff
-        name: ruff (imports)
-        args:
-          - --select
-          - I
-          - --fix
-      - id: ruff
-        name: ruff (lint+fix)
-        args:
-          - --fix
       - id: ruff-format
         name: ruff (format)
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
-    hooks:
-      - id: mypy
-        args: [src]
-        pass_filenames: false
-
-  - repo: local
-    hooks:
-      - id: gpu-test-gate
-        name: Ensure GPU tests are gated
-        entry: tools/lint/check_gpu_marks.py
-        language: system
-        files: ^tests/.*\.py$
-      - id: docformatter
-        name: docformatter
-        language: python
-        entry: python tools/hooks/docformatter.py
-        always_run: true
-        pass_filenames: false
-        additional_dependencies:
-          - docformatter==1.7.5
-      - id: pydoclint
-        name: pydoclint
-        entry: pydoclint --style numpy src
-        language: system
-        pass_filenames: false
-
-  - repo: https://github.com/PyCQA/pydocstyle
-    rev: 6.3.0
-    hooks:
-      - id: pydocstyle
-        always_run: true
-        pass_filenames: false
-        args:
-          - src
+      - id: ruff
+        name: ruff (imports)
+        args: ["--select", "I", "--fix"]
+      - id: ruff
+        name: ruff (lint+fix)
+        args: ["--fix"]
 
   - repo: https://github.com/econchick/interrogate
     rev: 1.5.0
@@ -58,57 +30,65 @@ repos:
       - id: interrogate
         always_run: true
         pass_filenames: false
-        additional_dependencies:
-          - setuptools
-        args:
-          - -i
-          - src
-          - --fail-under
-          - "90"
+        additional_dependencies: [setuptools]
+        args: ["-i", "src", "--fail-under", "90"]
 
   - repo: local
     hooks:
+      - id: pydoclint
+        name: pydoclint (NumPy style)
+        language: system
+        entry: uv run pydoclint --style numpy src
+        pass_filenames: false
+      - id: docformatter
+        name: docformatter
+        language: system
+        entry: uv run python tools/hooks/docformatter.py
+        always_run: true
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: gpu-test-gate
+        name: Ensure GPU tests are gated
+        entry: uv run python tools/lint/check_gpu_marks.py
+        language: system
+        files: ^tests/.*\.py$
       - id: docstring-builder
         name: docstring-builder (check)
-        entry: python -m tools.docstring_builder.cli check
+        entry: uv run python -m tools.docstring_builder.cli check
         language: system
         always_run: true
       - id: docs-artifacts
         name: "docs: regenerate artifacts"
-        entry: make artifacts
+        entry: uv run make artifacts
         language: system
         pass_filenames: false
         always_run: true
       - id: navmap-check
         name: navmap-check
-        entry: python tools/navmap/check_navmap.py
+        entry: uv run python tools/navmap/check_navmap.py
         language: system
         pass_filenames: false
-      - id: pyrefly-check
-        name: pyrefly-check
-        entry: uv run pyrefly check
-        language: system
-        pass_filenames: false
-        always_run: true
       - id: validate-gallery
         name: Validate gallery examples
-        entry: python tools/validate_gallery.py
+        entry: uv run python tools/validate_gallery.py
         language: system
         files: ^examples/.*\.py$
         pass_filenames: false
       - id: docs-doctest
         name: doctest (xdoctest via pytest)
-        entry: bash -lc 'pytest -q --xdoctest --xdoctest-options=ELLIPSIS,IGNORE_WHITESPACE,NORMALIZE_WHITESPACE --xdoctest-modules --xdoctest-glob="examples/*.py" examples'
+        entry: >
+          bash -lc 'uv run pytest -q --xdoctest --xdoctest-options=ELLIPSIS,IGNORE_WHITESPACE,NORMALIZE_WHITESPACE
+          --xdoctest-modules --xdoctest-glob="examples/*.py" examples'
         language: system
         pass_filenames: false
         always_run: true
-      # optional: enable when you want READMEs regenerated automatically
       - id: readme-generator
         name: "readme-generator (changed packages only)"
         entry: bash tools/hooks/run_readme_generator.sh
         language: system
         pass_filenames: false
-      # optional: fast docstring drift detection with skip flag support
       - id: docstring-builder-diff
         name: "docstring-builder (diff, optional)"
         entry: >-
@@ -121,7 +101,22 @@ repos:
           if ! git rev-parse "$SINCE" >/dev/null 2>&1; then
             SINCE=HEAD~1;
           fi;
-          python -m tools.docstring_builder.cli check --diff --since "$SINCE";
+          uv run python -m tools.docstring_builder.cli check --diff --since "$SINCE";
           '
         language: system
         pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: pyrefly-check
+        name: pyrefly-check
+        entry: uv run pyrefly check
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: mypy
+        name: mypy (project env)
+        entry: uv run mypy --config-file mypy.ini
+        language: system
+        pass_filenames: false
+        always_run: true

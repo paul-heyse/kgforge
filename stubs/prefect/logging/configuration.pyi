@@ -1,0 +1,3 @@
+from __future__ import annotations
+
+def setup_logging(*, incremental: bool = ...) -> None: ...

@@ -1,10 +1,13 @@
+project-includes = ["src", "tests"]
 project-excludes = [
     "**/tests/fixtures*",
     "**/build/",
     "docs/_build/**",
     "site/**",
+    "**/.venv/**",
+    "**/__pycache__/**",
 ]
-search-path = ["src", "."]
+search-path = ["src", "stubs", "."]
 python-version = "3.13.9"
 
 # Type-check behavior
@@ -30,3 +33,11 @@ implicit-any = true
 implicitly-defined-attribute = true
 implicit-abstract-class = true
 assert-type = true
+
+# Optional per-path strictness toggles if you need to refine behavior later.
+# [[overrides]]
+# paths = ["src/**"]
+# implicit-any = true
+# [[overrides]]
+# paths = ["tests/**"]
+# assert-type = false

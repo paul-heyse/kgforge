@@ -1,19 +1,21 @@
 from __future__ import annotations
 
 import datetime as dt
+import importlib
 import json
 import logging
 import os
 import pathlib
 import sys
-from collections.abc import Iterable, Mapping
-from typing import Any
+import tempfile
+import warnings
+from collections.abc import Callable, Iterable, Mapping
+from typing import Any, cast
 
 import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
-from _pytest.config import Config
 
 from kgfoundry_common.gpu import has_gpu_stack
 from kgfoundry_common.parquet_io import ParquetChunkWriter, ParquetVectorWriter
@@ -26,15 +28,100 @@ FIXTURES = ROOT / "tests" / "fixtures"
 pytest_plugins = ["tests.plugins.pytest_requires"]
 
 
+warnings.filterwarnings(
+    "ignore",
+    message=r"builtin type SwigPy\w* has no __module__ attribute",
+    category=DeprecationWarning,
+    module=r"faiss.*",
+)
+warnings.filterwarnings(
+    "ignore",
+    message=r"builtin type swigvarlink has no __module__ attribute",
+    category=DeprecationWarning,
+    module=r"faiss.*",
+)
+
+_swig_warning_rules = [
+    "ignore:builtin type SwigPy",
+    "ignore:builtin type swigvarlink",
+]
+current_warnings = os.environ.get("PYTHONWARNINGS")
+if current_warnings:
+    extras = [rule for rule in _swig_warning_rules if rule not in current_warnings]
+    if extras:
+        os.environ["PYTHONWARNINGS"] = ",".join([current_warnings, *extras])
+else:
+    os.environ["PYTHONWARNINGS"] = ",".join(_swig_warning_rules)
+
+
 HAS_GPU_STACK: bool = has_gpu_stack()
+
+
+def _resolve_prefect_logging() -> tuple[Callable[..., None], type[logging.Handler]] | None:
+    try:
+        from prefect.logging.configuration import setup_logging
+    except Exception:  # pragma: no cover - prefect optional
+        return None
+
+    try:
+        handlers_mod = importlib.import_module("prefect.logging.handlers")
+    except Exception:  # pragma: no cover - prefect optional
+        return None
+
+    handler_cls = getattr(
+        handlers_mod,
+        "RichConsoleHandler",
+        getattr(handlers_mod, "PrefectConsoleHandler", None),
+    )
+    if handler_cls is None:
+        return None
+
+    return setup_logging, cast(type[logging.Handler], handler_cls)
 
 
 def _configure_prefect_logging() -> None:
     """Disable Prefect's rich console handlers to avoid closed-file errors in tests."""
-    try:
-        from prefect.logging.handlers import RichConsoleHandler  # type: ignore[import-not-found]
-    except Exception:  # pragma: no cover - prefect optional
+    quiet_config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "null": {
+                "class": "logging.NullHandler",
+            }
+        },
+        "root": {"handlers": ["null"], "level": "WARNING"},
+        "loggers": {
+            "prefect": {"handlers": ["null"], "propagate": False},
+            "prefect.server": {"handlers": ["null"], "propagate": False},
+        },
+    }
+    logging_config_path = pathlib.Path(tempfile.gettempdir()) / "prefect_logging_quiet.json"
+    if not logging_config_path.exists():
+        logging_config_path.write_text(json.dumps(quiet_config), encoding="utf-8")
+    os.environ.setdefault("PREFECT_LOGGING_SETTINGS_PATH", str(logging_config_path))
+    os.environ.setdefault("PREFECT_LOGGING_EXTRA_LOGGERS", "")
+
+    resolution = _resolve_prefect_logging()
+    if resolution is None:
         return
+    setup_logging, rich_handler_type = resolution
+
+    setup_logging(incremental=False)
+
+    if not hasattr(rich_handler_type, "_kgf_emit_patched"):
+        original_emit = rich_handler_type.emit
+
+        def safe_emit(self: logging.Handler, record: logging.LogRecord) -> None:
+            try:
+                original_emit(self, record)
+            except ValueError:
+                logging.getLogger(__name__).debug(
+                    "Suppressed Prefect RichConsoleHandler ValueError during teardown",
+                    exc_info=True,
+                )
+
+        rich_handler_type.emit = safe_emit  # type: ignore[method-assign]
+        cast("Any", rich_handler_type)._kgf_emit_patched = True
 
     logger_names = (
         "prefect",
@@ -45,16 +132,14 @@ def _configure_prefect_logging() -> None:
     for name in logger_names:
         logger = logging.getLogger(name)
         for handler in list(logger.handlers):
-            if isinstance(handler, RichConsoleHandler):
+            if isinstance(handler, rich_handler_type):
                 logger.removeHandler(handler)
                 handler.close()
+        logger.setLevel(logging.ERROR)
     os.environ.setdefault("PREFECT_LOGGING_LEVEL", "WARNING")
 
 
-def pytest_configure(config: Config) -> None:
-    """Expose GPU capability flag on the pytest config object and tune logging."""
-    config._has_gpu_stack = HAS_GPU_STACK
-    _configure_prefect_logging()
+
 
 
 def require_modules(

@@ -2559,7 +2559,6 @@ dependencies = [
     { name = "types-flask-cors" },
     { name = "types-flask-migrate" },
     { name = "types-flask-socketio" },
-    { name = "types-flask-sqlalchemy" },
     { name = "types-fpdf2" },
     { name = "types-freezegun" },
     { name = "types-frozendict" },
@@ -2707,7 +2706,6 @@ dependencies = [
     { name = "types-singledispatch" },
     { name = "types-six" },
     { name = "types-slumber" },
-    { name = "types-sqlalchemy" },
     { name = "types-stdlib-list" },
     { name = "types-str2bool" },
     { name = "types-stripe" },
@@ -3066,7 +3064,6 @@ requires-dist = [
     { name = "types-flask-cors" },
     { name = "types-flask-migrate" },
     { name = "types-flask-socketio" },
-    { name = "types-flask-sqlalchemy" },
     { name = "types-fpdf2" },
     { name = "types-freezegun" },
     { name = "types-frozendict" },
@@ -3214,7 +3211,6 @@ requires-dist = [
     { name = "types-singledispatch" },
     { name = "types-six" },
     { name = "types-slumber" },
-    { name = "types-sqlalchemy" },
     { name = "types-stdlib-list" },
     { name = "types-str2bool" },
     { name = "types-stripe" },
@@ -8503,18 +8499,6 @@ wheels = [
 ]
 
 [[package]]
-name = "types-flask-sqlalchemy"
-version = "2.5.9.4"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "types-sqlalchemy" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/eb/41/e805d6f7730c73aea3ec5bbe744034d36b707cdcd0446f8d221d790b9bcd/types-Flask-SQLAlchemy-2.5.9.4.tar.gz", hash = "sha256:69b4c9880d2431b49c60dde09ce38696d7353bbef255a3a1b50a2f98b2002109", size = 4062, upload-time = "2023-05-10T15:23:29.477Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/8f/15/725badd897a82d0794b07b0d976d1e0621336b4414bfb8ffd118463c3b2c/types_Flask_SQLAlchemy-2.5.9.4-py3-none-any.whl", hash = "sha256:16c3c52d2f44703dec639a71b04c0c909da55329b7bfe3a04adaee945a77477a", size = 4160, upload-time = "2023-05-10T15:23:28.43Z" },
-]
-
-[[package]]
 name = "types-fpdf2"
 version = "2.8.4.20250822"
 source = { registry = "https://pypi.org/simple" }
@@ -9995,15 +9979,6 @@ wheels = [
 ]
 
 [[package]]
-name = "types-sqlalchemy"
-version = "1.4.53.38"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ab/ce/0b7fa93dbc49b328807dedef8006223129e5a9543c74727dd7658eca5a9d/types-SQLAlchemy-1.4.53.38.tar.gz", hash = "sha256:5bb7463537e04e1aa5a3557eb725930df99226dcfd3c9bf93008025bfe5c169e", size = 118888, upload-time = "2023-05-01T15:15:28.572Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/1a/4f/033a839a35ecbc5f71c0d74655d1237e909651aaebe7ceb825ac45cfdb4b/types_SQLAlchemy-1.4.53.38-py3-none-any.whl", hash = "sha256:7e60e74f823931cc9a9e8adb0a4c05e5533e6708b8a266807893a739faf4eaaa", size = 187916, upload-time = "2023-05-01T15:15:26.02Z" },
-]
-
-[[package]]
 name = "types-stdlib-list"
 version = "0.8.3.4"
 source = { registry = "https://pypi.org/simple" }
@@ -10549,7 +10524,7 @@ wheels = [
 
 [[package]]
 name = "vllm"
-version = "0.11.1rc5.dev53+g4e68cc9b6.cu129"
+version = "0.11.1rc5.dev58+g60f76baa6.cu129"
 source = { registry = "https://wheels.vllm.ai/nightly" }
 dependencies = [
     { name = "aiohttp" },
@@ -10612,8 +10587,8 @@ dependencies = [
     { name = "xgrammar", marker = "platform_machine == 'aarch64' or platform_machine == 'arm64' or platform_machine == 'x86_64'" },
 ]
 wheels = [
-    { url = "https://wheels.vllm.ai/nightly/vllm-0.11.1rc5.dev53%2Bg4e68cc9b6.cu129-cp38-abi3-manylinux1_x86_64.whl" },
-    { url = "https://wheels.vllm.ai/nightly/vllm-0.11.1rc5.dev53%2Bg4e68cc9b6.cu129-cp38-abi3-manylinux2014_aarch64.whl" },
+    { url = "https://wheels.vllm.ai/nightly/vllm-0.11.1rc5.dev58%2Bg60f76baa6.cu129-cp38-abi3-manylinux1_x86_64.whl" },
+    { url = "https://wheels.vllm.ai/nightly/vllm-0.11.1rc5.dev58%2Bg60f76baa6.cu129-cp38-abi3-manylinux2014_aarch64.whl" },
 ]
 
 [[package]]

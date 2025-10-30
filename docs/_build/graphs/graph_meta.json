@@ -14,31 +14,41 @@
     "email_validator",
     "embeddings_dense",
     "embeddings_sparse",
+    "faiss",
     "fastapi",
     "fsspec",
     "idna",
+    "jnius",
     "kg_builder",
     "kgfoundry",
     "kgfoundry_common",
+    "libcuvs",
+    "libraft",
+    "librmm",
     "linking",
     "numpy",
     "observability",
     "ontology",
     "orchestration",
     "orjson",
+    "packaging",
     "pluggy",
     "prefect",
     "prometheus_client",
     "pyarrow",
     "pydantic",
     "pydantic_core",
+    "pyserini",
     "pytest",
     "registry",
     "requests",
     "rich",
+    "scipy",
     "search_api",
     "search_client",
     "starlette",
+    "threadpoolctl",
+    "tqdm",
     "typer",
     "typing_inspection",
     "urllib3",
@@ -46,139 +56,105 @@
     "vectorstore_faiss",
     "yaml"
   ],
-  "cycles": [],
+  "cycles": [
+    [
+      "orchestration",
+      "kgfoundry"
+    ],
+    [
+      "search_api",
+      "kgfoundry"
+    ]
+  ],
   "centrality": {
-    "_duckdb": 0.022727272727272728,
-    "annotated_doc": 0.022727272727272728,
-    "annotated_types": 0.022727272727272728,
-    "anyio": 0.09090909090909091,
-    "charset_normalizer": 0.022727272727272728,
-    "click": 0.045454545454545456,
-    "cryptography": 0.045454545454545456,
-    "docling": 0.045454545454545456,
-    "dotenv": 0.022727272727272728,
-    "download": 0.09090909090909091,
-    "duckdb": 0.06818181818181818,
-    "email_validator": 0.045454545454545456,
-    "embeddings_dense": 0.045454545454545456,
-    "embeddings_sparse": 0.022727272727272728,
-    "fastapi": 0.20454545454545456,
-    "fsspec": 0.045454545454545456,
-    "idna": 0.06818181818181818,
-    "kg_builder": 0.022727272727272728,
-    "kgfoundry": 0.36363636363636365,
-    "kgfoundry_common": 0.25,
-    "linking": 0.045454545454545456,
-    "numpy": 0.13636363636363635,
-    "observability": 0.06818181818181818,
-    "ontology": 0.022727272727272728,
-    "orchestration": 0.18181818181818182,
-    "orjson": 0.045454545454545456,
-    "pluggy": 0.022727272727272728,
-    "prefect": 0.25,
-    "prometheus_client": 0.022727272727272728,
-    "pyarrow": 0.06818181818181818,
-    "pydantic": 0.20454545454545456,
-    "pydantic_core": 0.06818181818181818,
-    "pytest": 0.022727272727272728,
-    "registry": 0.09090909090909091,
-    "requests": 0.1590909090909091,
-    "rich": 0.06818181818181818,
-    "search_api": 0.18181818181818182,
-    "search_client": 0.06818181818181818,
-    "starlette": 0.06818181818181818,
-    "typer": 0.09090909090909091,
-    "typing_inspection": 0.022727272727272728,
-    "urllib3": 0.06818181818181818,
-    "uvicorn": 0.09090909090909091,
-    "vectorstore_faiss": 0.11363636363636365,
-    "yaml": 0.11363636363636365
+    "_duckdb": 0.018518518518518517,
+    "annotated_doc": 0.018518518518518517,
+    "annotated_types": 0.018518518518518517,
+    "anyio": 0.07407407407407407,
+    "charset_normalizer": 0.018518518518518517,
+    "click": 0.037037037037037035,
+    "cryptography": 0.037037037037037035,
+    "docling": 0.037037037037037035,
+    "dotenv": 0.018518518518518517,
+    "download": 0.07407407407407407,
+    "duckdb": 0.05555555555555555,
+    "email_validator": 0.037037037037037035,
+    "embeddings_dense": 0.05555555555555555,
+    "embeddings_sparse": 0.05555555555555555,
+    "faiss": 0.07407407407407407,
+    "fastapi": 0.16666666666666666,
+    "fsspec": 0.037037037037037035,
+    "idna": 0.05555555555555555,
+    "jnius": 0.018518518518518517,
+    "kg_builder": 0.037037037037037035,
+    "kgfoundry": 0.2962962962962963,
+    "kgfoundry_common": 0.31481481481481477,
+    "libcuvs": 0.05555555555555555,
+    "libraft": 0.018518518518518517,
+    "librmm": 0.018518518518518517,
+    "linking": 0.037037037037037035,
+    "numpy": 0.18518518518518517,
+    "observability": 0.05555555555555555,
+    "ontology": 0.037037037037037035,
+    "orchestration": 0.16666666666666666,
+    "orjson": 0.037037037037037035,
+    "packaging": 0.037037037037037035,
+    "pluggy": 0.018518518518518517,
+    "prefect": 0.2222222222222222,
+    "prometheus_client": 0.018518518518518517,
+    "pyarrow": 0.05555555555555555,
+    "pydantic": 0.16666666666666666,
+    "pydantic_core": 0.05555555555555555,
+    "pyserini": 0.09259259259259259,
+    "pytest": 0.018518518518518517,
+    "registry": 0.07407407407407407,
+    "requests": 0.12962962962962962,
+    "rich": 0.05555555555555555,
+    "scipy": 0.037037037037037035,
+    "search_api": 0.2037037037037037,
+    "search_client": 0.05555555555555555,
+    "starlette": 0.05555555555555555,
+    "threadpoolctl": 0.018518518518518517,
+    "tqdm": 0.018518518518518517,
+    "typer": 0.07407407407407407,
+    "typing_inspection": 0.018518518518518517,
+    "urllib3": 0.05555555555555555,
+    "uvicorn": 0.07407407407407407,
+    "vectorstore_faiss": 0.1111111111111111,
+    "yaml": 0.09259259259259259
   },
-  "layer_violations": [],
-  "cycle_enumeration_skipped": true,
-  "generated_at": "2025-10-30T15:41:53Z",
-  "scc_summary": [
-    {
-      "members": [
-        "kgfoundry",
-        "orchestration",
-        "search_api"
-      ],
-      "size": 3,
-      "truncated": false,
-      "has_cycle": true
-    },
-    {
-      "members": [
-        "registry"
-      ],
-      "size": 1,
-      "truncated": false,
-      "has_cycle": false
-    },
-    {
-      "members": [
-        "duckdb"
-      ],
-      "size": 1,
-      "truncated": false,
-      "has_cycle": false
-    },
-    {
-      "members": [
-        "_duckdb"
-      ],
-      "size": 1,
-      "truncated": false,
-      "has_cycle": false
-    },
-    {
-      "members": [
-        "prefect"
-      ],
-      "size": 1,
-      "truncated": false,
-      "has_cycle": false
-    },
-    {
-      "members": [
-        "fastapi"
-      ],
-      "size": 1,
-      "truncated": false,
-      "has_cycle": false
-    },
-    {
-      "members": [
-        "annotated_doc"
-      ],
-      "size": 1,
-      "truncated": false,
-      "has_cycle": false
-    },
-    {
-      "members": [
-        "docling"
-      ],
-      "size": 1,
-      "truncated": false,
-      "has_cycle": false
-    },
-    {
-      "members": [
-        "download"
-      ],
-      "size": 1,
-      "truncated": false,
-      "has_cycle": false
-    },
-    {
-      "members": [
-        "embeddings_dense"
-      ],
-      "size": 1,
-      "truncated": false,
-      "has_cycle": false
-    }
-  ]
+  "layer_violations": [
+    [
+      "domain",
+      "infra",
+      "edge:kgfoundry_common->embeddings_dense"
+    ],
+    [
+      "domain",
+      "infra",
+      "edge:kgfoundry_common->embeddings_sparse"
+    ],
+    [
+      "domain",
+      "application",
+      "edge:kgfoundry_common->kg_builder"
+    ],
+    [
+      "domain",
+      "infra",
+      "edge:kgfoundry_common->ontology"
+    ],
+    [
+      "domain",
+      "application",
+      "edge:kgfoundry_common->orchestration"
+    ],
+    [
+      "domain",
+      "interface",
+      "edge:kgfoundry_common->search_api"
+    ]
+  ],
+  "cycle_enumeration_skipped": false,
+  "generated_at": "2025-10-30T16:14:15Z"
 }
