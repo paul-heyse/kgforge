@@ -97,8 +97,27 @@ def apply_edits(
 ) -> tuple[bool, str | None]:
     """Apply docstring edits to the harvested file.
 
-    Returns a tuple of ``(changed, code)`` where ``code`` contains the rendered text when ``write`` is
-    ``False`` for dry-run mode.
+    Parameters
+    ----------
+    result : HarvestResult
+        The harvested module metadata, including the target filepath.
+    edits : Iterable[DocstringEdit]
+        The sequence of docstring edits to apply to the module.
+    write : bool, default True
+        When ``True`` (default), persist the modified module back to disk. When ``False``,
+        skip writing and return the rendered source code for inspection.
+
+    Returns
+    -------
+    tuple[bool, str | None]
+        A tuple ``(changed, code)`` where ``changed`` indicates whether any docstrings were
+        updated. The ``code`` element contains the rendered module when ``write`` is ``False``;
+        otherwise, it is ``None``.
+
+    Raises
+    ------
+    libcst.ParserSyntaxError
+        Raised when the harvested module cannot be parsed by LibCST.
     """
     mapping = {edit.qname: edit for edit in edits}
     if not mapping:
