@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Overview of validate gallery.
-
-This module bundles validate gallery logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
-"""
+"""Validate Sphinx-Gallery examples used throughout the kgfoundry docs."""
 
 from __future__ import annotations
 
@@ -49,82 +44,37 @@ __all__ = [
 
 @dataclass
 class ValidationResult:
-    """Model the ValidationResult.
-
-    Represent the validationresult data structure used throughout the project. The class
-    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-    are typically created by factories or runtime orchestrators documented nearby.
-    """
+    """Accumulate validation errors for a single gallery example file."""
 
     path: Path
     errors: list[str]
 
     def extend(self, messages: Iterable[str]) -> None:
-        """Compute extend.
-
-        Carry out the extend operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-        Parameters
-        ----------
-        messages : collections.abc.Iterable
-            Description for ``messages``.
-
-        Examples
-        --------
-        >>> from tools.validate_gallery import extend
-        >>> extend(...)  # doctest: +ELLIPSIS
-        """
+        """Append ``messages`` to the collected validation ``errors`` list."""
         self.errors.extend(messages)
 
     @property
     def ok(self) -> bool:
-        """Compute ok.
-
-        Carry out the ok operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-        Returns
-        -------
-        bool
-            Description of return value.
-
-        Examples
-        --------
-        >>> from tools.validate_gallery import ok
-        >>> result = ok()
-        >>> result  # doctest: +ELLIPSIS
-        """
+        """Return ``True`` when no validation errors have been recorded."""
         return not self.errors
 
 
 class GalleryValidationError(RuntimeError):
-    """Model the GalleryValidationError.
-
-    Represent the galleryvalidationerror data structure used throughout the project. The class
-    encapsulates behaviour behind a well-defined interface for collaborating components. Instances
-    are typically created by factories or runtime orchestrators documented nearby.
-    """
+    """Raised when parsing or validation cannot proceed for a gallery example."""
 
 
 def validate_title_format(docstring: str) -> tuple[bool, str]:
-    """Compute validate title format.
-
-    Carry out the validate title format operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Validate Sphinx-Gallery title and underline formatting requirements.
 
     Parameters
     ----------
-    docstring : str
-        Description for ``docstring``.
+    docstring
+        Raw module docstring extracted from a gallery example.
 
     Returns
     -------
-    Tuple[bool, str]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.validate_gallery import validate_title_format
-    >>> result = validate_title_format(...)
-    >>> result  # doctest: +ELLIPSIS
+    tuple[bool, str]
+        ``(True, "")`` when the title is well-formed, otherwise ``(False, reason)``.
     """
     lines = [line.rstrip() for line in inspect.cleandoc(docstring).splitlines()]
     while lines and not lines[0].strip():
@@ -154,49 +104,15 @@ def validate_title_format(docstring: str) -> tuple[bool, str]:
 
 
 def check_orphan_directive(docstring: str) -> bool:
-    """Compute check orphan directive.
-
-    Carry out the check orphan directive operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    docstring : str
-        Description for ``docstring``.
-
-    Returns
-    -------
-    bool
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.validate_gallery import check_orphan_directive
-    >>> result = check_orphan_directive(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+    """Return ``True`` when the docstring contains a redundant ``:orphan:`` directive."""
     return ":orphan:" in docstring
 
 
 def check_custom_labels(docstring: str) -> list[str]:
-    """Compute check custom labels.
+    """Return custom anchor labels declared in ``docstring``.
 
-    Carry out the check custom labels operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    docstring : str
-        Description for ``docstring``.
-
-    Returns
-    -------
-    List[str]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.validate_gallery import check_custom_labels
-    >>> result = check_custom_labels(...)
-    >>> result  # doctest: +ELLIPSIS
+    Sphinx-Gallery generates its own anchors; any ``.. _gallery_*:`` labels
+    should be removed to avoid duplicates.
     """
     return CUSTOM_LABEL_PATTERN.findall(docstring)
 
@@ -226,27 +142,21 @@ def _load_docstring(path: Path) -> str | None:
 
 
 def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]:
-    """Compute validate example file.
-
-    Carry out the validate example file operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Validate gallery example formatting and return a list of issues.
 
     Parameters
     ----------
-    file_path : Path
-        Description for ``file_path``.
-    strict : bool | None
-        Optional parameter default ``False``. Description for ``strict``.
+    file_path
+        Path to the Python example file.
+    strict
+        When ``True`` enable extra formatting checks (title punctuation,
+        constraints bullets).
 
     Returns
     -------
-    List[str]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.validate_gallery import validate_example_file
-    >>> result = validate_example_file(...)
-    >>> result  # doctest: +ELLIPSIS
+    list[str]
+        Human-readable validation errors. The list is empty when the example
+        satisfies all rules.
     """
     errors: list[str] = []
     docstring = _load_docstring(file_path)
@@ -289,29 +199,21 @@ def _iter_example_files(examples_dir: Path) -> Iterable[Path]:
 
 
 def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> int:
-    """Compute main.
-
-    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Validate every example in ``examples_dir`` and emit a summary.
 
     Parameters
     ----------
-    examples_dir : Path
-        Description for ``examples_dir``.
-    strict : bool | None
-        Optional parameter default ``False``. Description for ``strict``.
-    verbose : bool | None
-        Optional parameter default ``False``. Description for ``verbose``.
+    examples_dir
+        Directory containing Sphinx-Gallery example modules.
+    strict
+        When ``True`` enable the stricter validation rules.
+    verbose
+        When ``True`` print progress for passing files.
 
     Returns
     -------
     int
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.validate_gallery import main
-    >>> result = main(...)
-    >>> result  # doctest: +ELLIPSIS
+        ``0`` when all files pass, ``1`` when any fail, ``2`` for CLI errors.
     """
     results: list[ValidationResult] = []
     exit_code = 0

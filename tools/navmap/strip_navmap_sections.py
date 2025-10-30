@@ -1,10 +1,5 @@
 #!/usr/bin/env python
-"""Overview of strip navmap sections.
-
-This module bundles strip navmap sections logic for the kgfoundry stack. It groups related helpers
-so downstream packages can import a single cohesive namespace. Refer to the functions and classes
-below for implementation specifics.
-"""
+"""Remove deprecated NavMap metadata from module docstrings."""
 
 from __future__ import annotations
 
@@ -16,25 +11,18 @@ SRC = ROOT / "src"
 
 
 def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
-    """Compute iter module nodes.
-
-    Carry out the iter module nodes operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Parse ``path`` and return the module node plus its docstring expression.
 
     Parameters
     ----------
-    path : Path
-        Description for ``path``.
+    path
+        File to parse. The file must contain valid Python syntax.
 
     Returns
     -------
-    Tuple[ast.Module, ast.Expr | None]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.navmap.strip_navmap_sections import iter_module_nodes
-    >>> result = iter_module_nodes(...)
-    >>> result  # doctest: +ELLIPSIS
+    tuple[ast.Module, ast.Expr | None]
+        The parsed module node paired with the top-level docstring expression or
+        ``None`` when no docstring literal is present.
     """
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
@@ -51,25 +39,19 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
 
 
 def clean_docstring(text: str) -> str:
-    """Compute clean docstring.
-
-    Carry out the clean docstring operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Remove legacy ``NavMap:`` sections while keeping meaningful text.
 
     Parameters
     ----------
-    text : str
-        Description for ``text``.
+    text
+        Original module docstring including the deprecated NavMap annotations.
 
     Returns
     -------
     str
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.navmap.strip_navmap_sections import clean_docstring
-    >>> result = clean_docstring(...)
-    >>> result  # doctest: +ELLIPSIS
+        Trimmed docstring content with empty lines collapsed. A default
+        ``"Module documentation."`` placeholder is returned when the original
+        docstring was entirely composed of NavMap metadata.
     """
     lines: list[str] = []
     for raw in text.splitlines():
@@ -81,25 +63,18 @@ def clean_docstring(text: str) -> str:
 
 
 def rewrite_module(path: Path) -> bool:
-    """Compute rewrite module.
-
-    Carry out the rewrite module operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Rewrite ``path`` in-place when the module docstring encodes NavMap data.
 
     Parameters
     ----------
-    path : Path
-        Description for ``path``.
+    path
+        Module file to update.
 
     Returns
     -------
     bool
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.navmap.strip_navmap_sections import rewrite_module
-    >>> result = rewrite_module(...)
-    >>> result  # doctest: +ELLIPSIS
+        ``True`` if the docstring was replaced with cleaned content, ``False``
+        when no NavMap section was present.
     """
     tree, doc_expr = iter_module_nodes(path)
     if doc_expr is None:
@@ -120,15 +95,7 @@ def rewrite_module(path: Path) -> bool:
 
 
 def main() -> None:
-    """Compute main.
-
-    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Examples
-    --------
-    >>> from tools.navmap.strip_navmap_sections import main
-    >>> main()  # doctest: +ELLIPSIS
-    """
+    """Strip legacy NavMap metadata from modules across the source tree."""
     changed = 0
     for file_path in sorted(SRC.rglob("*.py")):
         if rewrite_module(file_path):

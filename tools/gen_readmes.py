@@ -1,9 +1,4 @@
-"""Overview of gen readmes.
-
-This module bundles gen readmes logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
-"""
+"""Generate README files that mirror the information published on kgfoundry.dev."""
 
 from __future__ import annotations
 
@@ -81,20 +76,11 @@ README_BADGE_INDENT: Final[int] = 4
 
 
 def detect_repo() -> tuple[str, str]:
-    """Compute detect repo.
+    """Return the GitHub ``(owner, repo)`` tuple used for documentation links.
 
-    Carry out the detect repo operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Returns
-    -------
-    Tuple[str, str]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import detect_repo
-    >>> result = detect_repo()
-    >>> result  # doctest: +ELLIPSIS
+    Environment variables ``DOCS_GITHUB_ORG`` and ``DOCS_GITHUB_REPO`` override
+    the detected values so downstream builds can rehost the docs without
+    reconfiguring git remotes.
     """
     try:
         remote = subprocess.check_output(
@@ -128,20 +114,10 @@ def detect_repo() -> tuple[str, str]:
 
 
 def git_sha() -> str:
-    """Compute git sha.
+    """Return the Git revision used when composing GitHub source links.
 
-    Carry out the git sha operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Returns
-    -------
-    str
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import git_sha
-    >>> result = git_sha()
-    >>> result  # doctest: +ELLIPSIS
+    A ``DOCS_GITHUB_SHA`` environment variable can provide the value when the
+    repository is not available locally (for example, in CI artifacts).
     """
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
@@ -154,49 +130,32 @@ SHA = git_sha()
 
 
 def gh_url(rel_path: str, start: int, end: int | None) -> str:
-    """Compute gh url.
-
-    Carry out the gh url operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Return a GitHub ``blob`` URL anchored to the provided line range.
 
     Parameters
     ----------
-    rel_path : str
-        Description for ``rel_path``.
-    start : int
-        Description for ``start``.
-    end : int | None
-        Description for ``end``.
+    rel_path
+        File path relative to the repository root.
+    start
+        1-based starting line number.
+    end
+        Optional inclusive end line number. When omitted the URL anchors to
+        ``start`` only.
 
     Returns
     -------
     str
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import gh_url
-    >>> result = gh_url(..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
+        Fully-qualified GitHub URL pointing at the requested source snippet.
     """
     fragment = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{OWNER}/{REPO}/blob/{SHA}/{rel_path}{fragment}"
 
 
 def iter_packages() -> list[str]:
-    """Compute iter packages.
+    """Return the list of packages documented by default.
 
-    Carry out the iter packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Returns
-    -------
-    List[str]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import iter_packages
-    >>> result = iter_packages()
-    >>> result  # doctest: +ELLIPSIS
+    The helper delegates to :func:`tools.detect_pkg.detect_packages` so CLI
+    overrides and auto-detection share the same semantics.
     """
     env_pkgs = os.environ.get("DOCS_PKG")
     if env_pkgs:
@@ -205,26 +164,7 @@ def iter_packages() -> list[str]:
 
 
 def summarize(node: GriffeObjectLike) -> str:
-    """Compute summarize.
-
-    Carry out the summarize operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    node : typing.Any
-        Description for ``node``.
-
-    Returns
-    -------
-    str
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import summarize
-    >>> result = summarize(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+    """Return the first sentence of ``node``'s docstring, when present."""
     doc = node.docstring
     if doc is None or not doc.value:
         return ""
@@ -242,51 +182,16 @@ def summarize(node: GriffeObjectLike) -> str:
 
 
 def is_public(node: GriffeObjectLike) -> bool:
-    """Compute is public.
-
-    Carry out the is public operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    node : typing.Any
-        Description for ``node``.
-
-    Returns
-    -------
-    bool
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import is_public
-    >>> result = is_public(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+    """Return ``True`` if the symbol name is not private by convention."""
     return not node.name.startswith("_")
 
 
 def get_open_link(node: GriffeObjectLike, readme_dir: Path) -> str | None:
-    """Compute get open link.
+    """Return a local editor link for ``node`` relative to ``readme_dir``.
 
-    Carry out the get open link operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    node : typing.Any
-        Description for ``node``.
-    readme_dir : Path
-        Description for ``readme_dir``.
-
-    Returns
-    -------
-    str | None
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import get_open_link
-    >>> result = get_open_link(..., ...)
-    >>> result  # doctest: +ELLIPSIS
+    The link points to the source file on disk using the ``./path:line:column``
+    format understood by VS Code and other Markdown-aware viewers. ``None`` is
+    returned when the source file is not within the README directory tree.
     """
     rel_path = node.relative_package_filepath
     if not rel_path:
@@ -302,26 +207,7 @@ def get_open_link(node: GriffeObjectLike, readme_dir: Path) -> str | None:
 
 
 def get_view_link(node: GriffeObjectLike) -> str | None:
-    """Compute get view link.
-
-    Carry out the get view link operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    node : typing.Any
-        Description for ``node``.
-
-    Returns
-    -------
-    str | None
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import get_view_link
-    >>> result = get_view_link(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+    """Return a GitHub URL for ``node`` when its path maps inside the repo."""
     rel_path = node.relative_package_filepath
     if not rel_path:
         return None
@@ -337,53 +223,14 @@ def get_view_link(node: GriffeObjectLike) -> str | None:
 
 
 def iter_public_members(node: GriffeObjectLike) -> list[GriffeObjectLike]:
-    """Compute iter public members.
-
-    Carry out the iter public members operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    node : typing.Any
-        Description for ``node``.
-
-    Returns
-    -------
-    collections.abc.Iterable
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import iter_public_members
-    >>> result = iter_public_members(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+    """Return ``node`` members that are public based on their name."""
     members = node.members
     if not members:
         return []
     public = [member for member in members.values() if is_public(member)]
 
     def _member_key(member: GriffeObjectLike) -> str:
-        """Member key.
-
-        Parameters
-        ----------
-        member : GriffeObjectLike
-            Description.
-
-        Returns
-        -------
-        str
-            Description.
-
-        Raises
-        ------
-        Exception
-            Description.
-
-        Examples
-        --------
-        >>> _member_key(...)
-        """
+        """Return the fully qualified path when available, otherwise the name."""
         if member.path:
             return member.path
         return member.name
@@ -392,27 +239,7 @@ def iter_public_members(node: GriffeObjectLike) -> list[GriffeObjectLike]:
 
 
 def _load_json(path: Path) -> dict[str, Any]:
-    """Load json.
-
-    Parameters
-    ----------
-    path : Path
-        Description.
-
-    Returns
-    -------
-    dict[str, Any]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _load_json(...)
-    """
+    """Read ``path`` as JSON, returning an empty dictionary when unavailable."""
     if not path.exists():
         return {}
     try:
@@ -538,21 +365,7 @@ def _module_match_for_symbol(
 
 
 def parse_config() -> Config:
-    """Compute parse config.
-
-    Carry out the parse config operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Returns
-    -------
-    Config
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import parse_config
-    >>> result = parse_config()
-    >>> result  # doctest: +ELLIPSIS
-    """
+    """Parse CLI arguments and environment overrides into a :class:`Config`."""
     parser = argparse.ArgumentParser(description="Generate per-package README files.")
     parser.add_argument("--packages", default=os.getenv("DOCS_PKG", ""))
     parser.add_argument(
@@ -631,25 +444,11 @@ def _lookup_nav(qname: str) -> tuple[dict[str, Any], dict[str, Any]]:
 
 
 def badges_for(qname: str) -> Badges:
-    """Compute badges for.
+    """Return badge metadata for ``qname`` using NavMap and test fixtures.
 
-    Carry out the badges for operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    qname : str
-        Description for ``qname``.
-
-    Returns
-    -------
-    Badges
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import badges_for
-    >>> result = badges_for(...)
-    >>> result  # doctest: +ELLIPSIS
+    Symbol-specific overrides take precedence over module defaults in the NavMap
+    so the resulting :class:`Badges` instance reflects the same precedence rules
+    as the documentation site.
     """
     symbol_meta, defaults = _lookup_nav(qname)
     merged = {**defaults, **symbol_meta}
@@ -724,27 +523,20 @@ def _wrap_badge_parts(parts: Sequence[str]) -> list[str]:
 
 
 def format_badges(qname: str, base_length: int = 0) -> str:
-    """Compute format badges.
-
-    Carry out the format badges operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Render badge metadata as inline Markdown for the README heading.
 
     Parameters
     ----------
-    qname : str
-        Description for ``qname``.
-    base_length : int | None
-        Optional parameter default ``0``. Description for ``base_length``.
+    qname
+        Qualified symbol name used when looking up badges.
+    base_length
+        Length of the text preceding the badges on the line. Used to decide if
+        the badges should wrap.
 
     Returns
     -------
     str
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import format_badges
-    >>> result = format_badges(...)
-    >>> result  # doctest: +ELLIPSIS
+        Badge snippet prefixed with a space or newline when wrapping is required.
     """
     badge = badges_for(qname)
     parts = _badge_parts(badge)
@@ -758,30 +550,7 @@ def format_badges(qname: str, base_length: int = 0) -> str:
 
 
 def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
-    """Compute editor link.
-
-    Carry out the editor link operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    abs_path : Path
-        Description for ``abs_path``.
-    lineno : int
-        Description for ``lineno``.
-    editor_mode : str
-        Description for ``editor_mode``.
-
-    Returns
-    -------
-    str | None
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import editor_link
-    >>> result = editor_link(..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+    """Return an editor-friendly link for ``abs_path`` based on ``editor_mode``."""
     if editor_mode == "vscode":
         return f"vscode://file/{abs_path}:{lineno}:1"
     if editor_mode == "relative":
@@ -794,27 +563,7 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
 
 
 def _is_exception(node: GriffeObjectLike) -> bool:
-    """Is exception.
-
-    Parameters
-    ----------
-    node : Object
-        Description.
-
-    Returns
-    -------
-    bool
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _is_exception(...)
-    """
+    """Return ``True`` when ``node`` represents an exception type."""
     kind = node.kind.value if node.kind else ""
     if kind != "class":
         return False
@@ -831,26 +580,7 @@ KINDS = {"module", "package", "class", "function"}
 
 
 def bucket_for(node: GriffeObjectLike) -> str:
-    """Compute bucket for.
-
-    Carry out the bucket for operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    node : typing.Any
-        Description for ``node``.
-
-    Returns
-    -------
-    str
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import bucket_for
-    >>> result = bucket_for(...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+    """Return the README section name that should contain ``node``."""
     kind = node.kind.value if node.kind else ""
     if kind in {"module", "package"}:
         return "Modules"
@@ -862,29 +592,10 @@ def bucket_for(node: GriffeObjectLike) -> str:
 
 
 def render_line(node: GriffeObjectLike, readme_dir: Path, cfg: Config) -> str | None:
-    """Compute render line.
+    """Render a Markdown bullet for ``node`` including navigation links.
 
-    Carry out the render line operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    node : typing.Any
-        Description for ``node``.
-    readme_dir : Path
-        Description for ``readme_dir``.
-    cfg : Config
-        Description for ``cfg``.
-
-    Returns
-    -------
-    str | None
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import render_line
-    >>> result = render_line(..., ..., ...)
-    >>> result  # doctest: +ELLIPSIS
+    The output includes GitHub links, optional editor URIs, and badges derived
+    from the NavMap, matching the style published on kgfoundry.dev.
     """
     qname = node.path
     summary = summarize(node)
@@ -919,28 +630,7 @@ def render_line(node: GriffeObjectLike, readme_dir: Path, cfg: Config) -> str | 
 
 
 def write_if_changed(path: Path, content: str) -> bool:
-    """Compute write if changed.
-
-    Carry out the write if changed operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    path : Path
-        Description for ``path``.
-    content : str
-        Description for ``content``.
-
-    Returns
-    -------
-    bool
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import write_if_changed
-    >>> result = write_if_changed(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+    """Write ``content`` to ``path`` when the rendered output differs."""
     digest = hashlib.sha256(content.encode("utf-8")).hexdigest()[:12]
     rendered = content.rstrip() + f"\n<!-- agent:readme v1 sha:{SHA} content:{digest} -->\n"
     previous = path.read_text(encoding="utf-8") if path.exists() else ""
@@ -952,28 +642,7 @@ def write_if_changed(path: Path, content: str) -> bool:
 
 
 def write_readme(node: GriffeObjectLike, cfg: Config) -> bool:
-    """Compute write readme.
-
-    Carry out the write readme operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    node : typing.Any
-        Description for ``node``.
-    cfg : Config
-        Description for ``cfg``.
-
-    Returns
-    -------
-    bool
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import write_readme
-    >>> result = write_readme(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+    """Generate or update the README for the package described by ``node``."""
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"
 
@@ -1044,29 +713,7 @@ def _maybe_run_doctoc(readme: Path, cfg: Config) -> None:
 
 
 def _collect_missing_metadata(node: GriffeObjectLike, missing: set[str]) -> None:
-    """Collect missing metadata.
-
-    Parameters
-    ----------
-    node : Object
-        Description.
-    missing : set[str]
-        Description.
-
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _collect_missing_metadata(...)
-    """
+    """Record symbols missing badge metadata under ``node`` into ``missing``."""
     for child in iter_public_members(node):
         kind = child.kind.value if child.kind else ""
         if kind in KINDS:
@@ -1121,19 +768,13 @@ def _report_duration(start: float, changed_any: bool) -> None:
 
 
 def main() -> None:
-    """Compute main.
-
-    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Generate README files for configured packages.
 
     Raises
     ------
     SystemExit
-        Raised when validation fails.
-
-    Examples
-    --------
-    >>> from tools.gen_readmes import main
-    >>> main()  # doctest: +ELLIPSIS
+        Raised with exit code ``2`` when ``--fail-on-metadata-miss`` is enabled
+        and badges are incomplete.
     """
     cfg = parse_config()
     _ensure_packages_selected(cfg.packages)
