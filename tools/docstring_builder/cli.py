@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import cast
 
 import yaml
+from tools.docstring_builder import BUILDER_VERSION
 from tools.docstring_builder.apply import apply_edits
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.config import (
@@ -26,7 +27,15 @@ from tools.docstring_builder.config import (
     ConfigSelection,
     load_config_with_selection,
 )
-from tools.docstring_builder.docfacts import DocFact, build_docfacts, write_docfacts
+from tools.docstring_builder.docfacts import (
+    DOCFACTS_VERSION,
+    DocFact,
+    DocfactsProvenance,
+    build_docfacts,
+    build_docfacts_document,
+    validate_docfacts_payload,
+    write_docfacts,
+)
 from tools.docstring_builder.harvest import HarvestResult, harvest_file, iter_target_files
 from tools.docstring_builder.ir import IR_VERSION, IRDocstring, build_ir, validate_ir, write_schema
 from tools.docstring_builder.normalizer import normalize_docstring
@@ -130,6 +139,41 @@ class DocfactsOutcome:
 
     status: ExitStatus
     message: str | None = None
+
+
+_DEFAULT_PROVENANCE_TIMESTAMP = "1970-01-01T00:00:00Z"
+
+
+def _git_output(arguments: Sequence[str]) -> str | None:
+    """Return stripped stdout for a git command or ``None`` on failure."""
+    result = subprocess.run(arguments, check=False, text=True, capture_output=True)
+    if result.returncode != 0:
+        return None
+    output = result.stdout.strip()
+    return output or None
+
+
+def _resolve_commit_hash() -> str:
+    command = ["git", "-C", str(REPO_ROOT), "rev-parse", "HEAD"]
+    return _git_output(command) or "unknown"
+
+
+def _resolve_commit_timestamp(commit_hash: str) -> str:
+    if not commit_hash or commit_hash == "unknown":
+        return _DEFAULT_PROVENANCE_TIMESTAMP
+    command = ["git", "-C", str(REPO_ROOT), "show", "-s", "--format=%cI", commit_hash]
+    return _git_output(command) or _DEFAULT_PROVENANCE_TIMESTAMP
+
+
+def _build_docfacts_provenance(config: BuilderConfig) -> DocfactsProvenance:
+    commit_hash = _resolve_commit_hash()
+    generated_at = _resolve_commit_timestamp(commit_hash)
+    return DocfactsProvenance(
+        builder_version=BUILDER_VERSION,
+        config_hash=config.config_hash,
+        commit_hash=commit_hash,
+        generated_at=generated_at,
+    )
 
 
 def _module_to_path(module: str) -> Path | None:
@@ -390,26 +434,46 @@ def _collect_edits(
     return edits, semantics, ir_entries
 
 
-def _handle_docfacts(docfacts: list[DocFact], check_mode: bool) -> DocfactsOutcome:
+def _handle_docfacts(
+    docfacts: list[DocFact],
+    config: BuilderConfig,
+    check_mode: bool,
+) -> DocfactsOutcome:
+    provenance = _build_docfacts_provenance(config)
+    document = build_docfacts_document(docfacts, provenance, DOCFACTS_VERSION)
+    payload = document.to_dict()
     if check_mode:
         if not DOCFACTS_PATH.exists():
             LOGGER.error("DocFacts missing at %s", DOCFACTS_PATH)
             return DocfactsOutcome(ExitStatus.CONFIG, "docfacts missing")
-        existing = json.loads(DOCFACTS_PATH.read_text(encoding="utf-8"))
-        current = [
-            dataclasses.asdict(fact) for fact in sorted(docfacts, key=lambda fact: fact.qname)
-        ]
-        if existing != current:
+        try:
+            existing = json.loads(DOCFACTS_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:  # pragma: no cover - defensive guard
+            LOGGER.exception("DocFacts payload at %s is not valid JSON", DOCFACTS_PATH)
+            return DocfactsOutcome(ExitStatus.CONFIG, "docfacts invalid json")
+        try:
+            validate_docfacts_payload(existing)
+        except Exception:  # pragma: no cover - schema errors are rare but fatal
+            LOGGER.exception("DocFacts schema validation failed")
+            return DocfactsOutcome(ExitStatus.CONFIG, "docfacts schema invalid")
+        comparison = json.loads(json.dumps(payload))
+        provenance_existing = existing.get("provenance", {}) if isinstance(existing, dict) else {}
+        if isinstance(comparison, dict):
+            comparison.setdefault("provenance", {})
+            if isinstance(comparison["provenance"], dict):
+                for field in ("commitHash", "generatedAt"):
+                    if field in provenance_existing:
+                        comparison["provenance"][field] = provenance_existing[field]
+        if existing != comparison:
             before = json.dumps(existing, indent=2, sort_keys=True)
-            after = json.dumps(current, indent=2, sort_keys=True)
+            after = json.dumps(comparison, indent=2, sort_keys=True)
             write_html_diff(before, after, DOCFACTS_DIFF_PATH, "DocFacts drift")
             diff_rel = DOCFACTS_DIFF_PATH.relative_to(REPO_ROOT)
             LOGGER.error("DocFacts drift detected; run update mode to refresh (see %s)", diff_rel)
             return DocfactsOutcome(ExitStatus.VIOLATION, "docfacts drift")
         DOCFACTS_DIFF_PATH.unlink(missing_ok=True)
         return DocfactsOutcome(ExitStatus.SUCCESS)
-    ordered = sorted(docfacts, key=lambda fact: fact.qname)
-    write_docfacts(DOCFACTS_PATH, ordered)
+    write_docfacts(DOCFACTS_PATH, document)
     DOCFACTS_DIFF_PATH.unlink(missing_ok=True)
     return DocfactsOutcome(ExitStatus.SUCCESS)
 
@@ -424,20 +488,16 @@ def _load_docfacts_from_disk() -> dict[str, DocFact]:
         LOGGER.warning("DocFacts cache is not valid JSON; ignoring existing data.")
         return {}
     entries: dict[str, DocFact] = {}
-    for item in raw:
-        if not isinstance(item, dict):
-            continue
-        try:
-            fact = DocFact(
-                qname=item["qname"],
-                module=item.get("module", ""),
-                kind=item.get("kind", "function"),
-                parameters=item.get("parameters", []),
-                returns=item.get("returns", []),
-                raises=item.get("raises", []),
-                notes=item.get("notes", []),
-            )
-        except KeyError:
+    payload_items: Iterable[Mapping[str, object]]
+    if isinstance(raw, Mapping):
+        payload_items = [item for item in raw.get("entries", []) if isinstance(item, Mapping)]
+    elif isinstance(raw, list):  # pragma: no cover - legacy fallback
+        payload_items = [item for item in raw if isinstance(item, Mapping)]
+    else:  # pragma: no cover - defensive guard
+        return {}
+    for item in payload_items:
+        fact = DocFact.from_mapping(item)
+        if fact is None:
             continue
         entries[fact.qname] = fact
     return entries
@@ -448,9 +508,15 @@ def _load_docfact_state(config: BuilderConfig) -> tuple[dict[str, DocFact], dict
     entries = _load_docfacts_from_disk()
     sources: dict[str, Path] = {}
     for qname, fact in entries.items():
-        source = _module_to_path(fact.module)
-        if source is not None:
-            sources[qname] = source
+        candidate: Path | None = None
+        if fact.filepath:
+            candidate_path = (REPO_ROOT / fact.filepath).resolve()
+            if candidate_path.exists():
+                candidate = candidate_path
+        if candidate is None:
+            candidate = _module_to_path(fact.module)
+        if candidate is not None:
+            sources[qname] = candidate
     return entries, sources
 
 
@@ -470,7 +536,13 @@ def _filter_docfacts_for_output(
 ) -> list[DocFact]:
     filtered: list[DocFact] = []
     for qname, fact in entries.items():
-        source = sources.get(qname) or _module_to_path(fact.module)
+        source = sources.get(qname)
+        if source is None and fact.filepath:
+            candidate = (REPO_ROOT / fact.filepath).resolve()
+            if candidate.exists():
+                source = candidate
+        if source is None:
+            source = _module_to_path(fact.module)
         if source is not None and _should_ignore(source, config):
             LOGGER.debug("Dropping docfact %s due to ignore rules", qname)
             continue
@@ -753,7 +825,7 @@ def _run(  # noqa: C901, PLR0912, PLR0915
 
         if args.command in {"update", "check"} and not options.skip_docfacts:
             filtered = _filter_docfacts_for_output(docfact_entries, docfact_sources, config)
-            docfacts_result = _handle_docfacts(filtered, check_mode=is_check)
+            docfacts_result = _handle_docfacts(filtered, config, check_mode=is_check)
             docfacts_checked = True
             status_counts[docfacts_result.status] += 1
             if docfacts_result.status is not ExitStatus.SUCCESS:

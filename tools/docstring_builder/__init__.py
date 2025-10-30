@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-__all__ = ["main"]
+BUILDER_VERSION = "2.0.0"
+
+__all__ = ["BUILDER_VERSION", "main"]
 
 
 def main(argv: list[str] | None = None) -> int:

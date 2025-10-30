@@ -1,13 +1,13 @@
 ## 1. DocFacts 2.0 (Schema, Versioning, Richer Metadata)
-- [ ] 1.1 Define `docs/_build/schema_docfacts.json` (JSON Schema) with `docfactsVersion`.
-- [ ] 1.2 Enrich DocFacts: `filepath`, `lineno`, `end_lineno`, `decorators`, `is_async`, `is_generator`, `owned`, and include return/raise descriptions.
-- [ ] 1.3 Add provenance block (builder version, config hash, commit hash, timestamp).
-- [ ] 1.4 Validate DocFacts against schema in every run; add CI gate failing on invalid/drifted payloads.
+- [x] 1.1 Define `docs/_build/schema_docfacts.json` (JSON Schema) with `docfactsVersion`.
+- [x] 1.2 Enrich DocFacts: `filepath`, `lineno`, `end_lineno`, `decorators`, `is_async`, `is_generator`, `owned`, and include return/raise descriptions.
+- [x] 1.3 Add provenance block (builder version, config hash, commit hash, timestamp).
+- [x] 1.4 Validate DocFacts against schema in every run; add CI gate failing on invalid/drifted payloads.
 
 ## 2. Metadata Verification & Renderer Parity
 - [ ] 2.1 Add tests guaranteeing `ParameterHarvest` fidelity for positional-only, keyword-only, varargs, kwargs.
 - [ ] 2.2 Assert renderer uses `display_name` and kinds correctly in generated sections.
-- [ ] 2.3 Extend DocFacts tests to assert propagation and idempotence of enriched fields.
+- [x] 2.3 Extend DocFacts tests to assert propagation and idempotence of enriched fields.
 - [ ] 2.4 Verify downstream consumers (navmap/README generators) tolerate enriched DocFacts; add failing tests if gaps exist.
 
 ## 3. Policy Engine Upgrades
@@ -52,7 +52,7 @@
 ## 11. Docstring Regeneration
 - [ ] 11.1 Run the builder (post-tests) on key modules (`src/docling/canonicalizer.py`, `src/download/harvester.py`, `src/embeddings_sparse/bm25.py`, others as identified).
 - [ ] 11.2 Replace placeholder descriptions with accurate text (builder heuristics + domain knowledge).
-- [ ] 11.3 Regenerate DocFacts; confirm idempotence (second run yields no diff).
+- [x] 11.3 Regenerate DocFacts; confirm idempotence (second run yields no diff).
 - [ ] 11.4 Commit regenerated docstrings + DocFacts together.
 
 ## 12. Validation
