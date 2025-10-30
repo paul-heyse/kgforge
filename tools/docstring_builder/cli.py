@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import dataclasses
 import datetime
 import enum
@@ -10,6 +11,7 @@ import hashlib
 import importlib
 import json
 import logging
+import os
 import subprocess
 import sys
 import time
@@ -52,7 +54,7 @@ from tools.docstring_builder.policy import (
 from tools.docstring_builder.render import render_docstring
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult, build_semantic_schemas
-from tools.drift_preview import write_html_diff
+from tools.drift_preview import DocstringDriftEntry, write_docstring_drift, write_html_diff
 from tools.stubs.drift_check import run as run_stub_drift
 
 LOGGER = logging.getLogger("docstring_builder")
@@ -65,6 +67,7 @@ DRIFT_DIR = REPO_ROOT / "docs" / "_build" / "drift"
 DOCFACTS_DIFF_PATH = DRIFT_DIR / "docfacts.html"
 NAVMAP_DIFF_PATH = DRIFT_DIR / "navmap.html"
 SCHEMA_DIFF_PATH = DRIFT_DIR / "schema.html"
+DOCSTRINGS_DIFF_PATH = DRIFT_DIR / "docstrings.html"
 OBSERVABILITY_MAX_ERRORS = 20
 REQUIRED_PYTHON_MAJOR = 3
 REQUIRED_PYTHON_MINOR = 13
@@ -116,6 +119,7 @@ class ProcessingOptions:
     ignore_missing: bool
     missing_patterns: tuple[str, ...]
     skip_docfacts: bool
+    baseline: str | None
 
 
 @dataclasses.dataclass(slots=True)
@@ -201,6 +205,32 @@ def _module_name_from_path(path: Path) -> str:
     if parts and parts[0] in {"src", "tools", "docs"}:
         parts = parts[1:]
     return ".".join(parts)
+
+
+def _read_baseline_version(baseline: str, path: Path) -> str | None:
+    """Return the file contents for ``path`` from ``baseline`` when available."""
+    if not baseline:
+        return None
+    candidate = Path(baseline)
+    relative = path.relative_to(REPO_ROOT)
+    if candidate.exists():
+        base_path = candidate / relative if candidate.is_dir() else candidate
+        try:
+            return base_path.read_text(encoding="utf-8")
+        except FileNotFoundError:
+            return None
+    command = [
+        "git",
+        "-C",
+        str(REPO_ROOT),
+        "show",
+        f"{baseline}:{relative.as_posix()}",
+    ]
+    result = subprocess.run(command, check=False, text=True, capture_output=True)
+    if result.returncode != 0:
+        LOGGER.debug("Unable to read %s from baseline %s: %s", relative, baseline, result.stderr)
+        return None
+    return result.stdout
 
 
 def _resolve_ignore_patterns(config: BuilderConfig) -> list[str]:
@@ -756,12 +786,15 @@ def _run(  # noqa: C901, PLR0912, PLR0915
     cache_hits = 0
     cache_misses = 0
     errors: list[dict[str, str]] = []
+    json_entries: list[dict[str, object]] = []
+    docstring_diffs: list[DocstringDriftEntry] = []
     options = ProcessingOptions(
         command=args.command or "",
         force=args.force,
         ignore_missing=getattr(args, "ignore_missing", False),
         missing_patterns=tuple(MISSING_MODULE_PATTERNS),
         skip_docfacts=getattr(args, "skip_docfacts", False),
+        baseline=getattr(args, "baseline", "") or None,
     )
     try:
         plugin_manager = load_plugins(
@@ -787,15 +820,60 @@ def _run(  # noqa: C901, PLR0912, PLR0915
         policy_engine = PolicyEngine(policy_settings)
         all_ir: list[IRDocstring] = []
         docfacts_checked = False
+        docfacts_payload_text: str | None = None
 
-        for file_path in files_list:
-            outcome = _process_file(
-                file_path,
-                config,
-                cache,
-                options,
-                plugin_manager,
-            )
+        jobs = getattr(args, "jobs", 1) or 1
+        if jobs <= 0:
+            jobs = max(1, os.cpu_count() or 1)
+
+        def _ordered_outcomes() -> Iterable[tuple[Path, FileOutcome]]:
+            if jobs == 1:
+                for candidate in files_list:
+                    yield (
+                        candidate,
+                        _process_file(
+                            candidate,
+                            config,
+                            cache,
+                            options,
+                            plugin_manager,
+                        ),
+                    )
+                return
+
+            futures: list[tuple[int, Path, concurrent.futures.Future[FileOutcome]]] = []
+            with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as executor:
+                for index, candidate in enumerate(files_list):
+                    future = executor.submit(
+                        _process_file,
+                        candidate,
+                        config,
+                        cache,
+                        options,
+                        plugin_manager,
+                    )
+                    futures.append((index, candidate, future))
+
+                ordered: list[tuple[int, Path, FileOutcome]] = []
+                for index, candidate, future in futures:
+                    try:
+                        outcome = future.result()
+                    except Exception as exc:  # pragma: no cover - defensive guard
+                        LOGGER.exception("Processing failed for %s", candidate)
+                        outcome = FileOutcome(
+                            ExitStatus.ERROR,
+                            [],
+                            None,
+                            False,
+                            False,
+                            str(exc),
+                        )
+                    ordered.append((index, candidate, outcome))
+
+            for _, candidate, outcome in sorted(ordered, key=lambda item: item[0]):
+                yield candidate, outcome
+
+        for file_path, outcome in _ordered_outcomes():
             status_counts[outcome.status] += 1
             if outcome.skipped:
                 skipped_count += 1
@@ -807,7 +885,12 @@ def _run(  # noqa: C901, PLR0912, PLR0915
                 cache_hits += 1
             else:
                 cache_misses += 1
-            if is_check and outcome.changed and args.diff:
+            if (
+                is_check
+                and outcome.changed
+                and args.diff
+                and not getattr(args, "json_output", False)
+            ):
                 sys.stdout.write(outcome.preview or "")
             if outcome.status is not ExitStatus.SUCCESS:
                 rel = str(file_path.relative_to(REPO_ROOT))
@@ -822,6 +905,40 @@ def _run(  # noqa: C901, PLR0912, PLR0915
             if outcome.semantics:
                 policy_engine.record(outcome.semantics)
             all_ir.extend(outcome.ir)
+            if getattr(args, "json_output", False):
+                rel_path = str(file_path.relative_to(REPO_ROOT))
+                json_entry: dict[str, object] = {
+                    "path": rel_path,
+                    "status": STATUS_LABELS[outcome.status],
+                    "changed": outcome.changed,
+                    "skipped": outcome.skipped,
+                    "cache_hit": outcome.cache_hit,
+                }
+                if outcome.message:
+                    json_entry["message"] = outcome.message
+                if outcome.preview:
+                    json_entry["preview"] = outcome.preview
+                if options.baseline:
+                    json_entry["baseline"] = options.baseline
+                json_entries.append(json_entry)
+            if options.baseline:
+                baseline_text = _read_baseline_version(options.baseline, file_path)
+                if baseline_text is not None:
+                    if outcome.preview is not None:
+                        current_text = outcome.preview
+                    else:
+                        try:
+                            current_text = file_path.read_text(encoding="utf-8")
+                        except FileNotFoundError:
+                            current_text = ""
+                    if baseline_text != current_text:
+                        docstring_diffs.append(
+                            DocstringDriftEntry(
+                                path=str(file_path.relative_to(REPO_ROOT)),
+                                before=baseline_text,
+                                after=current_text,
+                            )
+                        )
 
         if args.command in {"update", "check"} and not options.skip_docfacts:
             filtered = _filter_docfacts_for_output(docfact_entries, docfact_sources, config)
@@ -836,6 +953,11 @@ def _run(  # noqa: C901, PLR0912, PLR0915
                         "message": docfacts_result.message or "",
                     }
                 )
+            else:
+                try:
+                    docfacts_payload_text = DOCFACTS_PATH.read_text(encoding="utf-8")
+                except FileNotFoundError:
+                    docfacts_payload_text = None
         if is_update:
             cache.write()
 
@@ -886,6 +1008,17 @@ def _run(  # noqa: C901, PLR0912, PLR0915
             for path in files_list
         }
 
+        write_docstring_drift(docstring_diffs, DOCSTRINGS_DIFF_PATH)
+        if options.baseline and docfacts_payload_text and not DOCFACTS_DIFF_PATH.exists():
+            baseline_docfacts = _read_baseline_version(options.baseline, DOCFACTS_PATH)
+            if baseline_docfacts is not None and baseline_docfacts != docfacts_payload_text:
+                write_html_diff(
+                    baseline_docfacts,
+                    docfacts_payload_text,
+                    DOCFACTS_DIFF_PATH,
+                    "DocFacts baseline drift",
+                )
+
         invoked = getattr(args, "invoked_subcommand", getattr(args, "subcommand", args.command))
         manifest_payload: dict[str, object] = {
             "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
@@ -922,6 +1055,7 @@ def _run(  # noqa: C901, PLR0912, PLR0915
         diff_links = {}
         for label, path in (
             ("docfacts", DOCFACTS_DIFF_PATH),
+            ("docstrings", DOCSTRINGS_DIFF_PATH),
             ("navmap", NAVMAP_DIFF_PATH),
             ("schema", SCHEMA_DIFF_PATH),
         ):
@@ -998,6 +1132,12 @@ def _run(  # noqa: C901, PLR0912, PLR0915
             "hits": cache_hits,
             "misses": cache_misses,
         }
+        observability_payload["policy"] = {
+            "coverage": policy_report.coverage,
+            "threshold": policy_report.threshold,
+            "violations": len(policy_report.violations),
+            "fatal_violations": sum(1 for violation in policy_report.violations if violation.fatal),
+        }
         if diff_links:
             observability_payload["drift_previews"] = diff_links
         OBSERVABILITY_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -1007,6 +1147,41 @@ def _run(  # noqa: C901, PLR0912, PLR0915
         )
         if exit_status is not ExitStatus.SUCCESS:
             _print_failure_summary(observability_payload)
+
+        if getattr(args, "json_output", False):
+            json_payload: dict[str, object] = {
+                "exit_status": STATUS_LABELS[exit_status],
+                "files": json_entries,
+                "errors": errors,
+                "summary": {
+                    "considered": len(files_list),
+                    "processed": processed_count,
+                    "skipped": skipped_count,
+                    "changed": changed_count,
+                    "status_counts": status_counts_map,
+                    "docfacts_checked": docfacts_checked,
+                    "cache_hits": cache_hits,
+                    "cache_misses": cache_misses,
+                    "duration_seconds": duration,
+                    "subcommand": invoked,
+                },
+                "policy": {
+                    "coverage": policy_report.coverage,
+                    "threshold": policy_report.threshold,
+                    "violations": [
+                        {
+                            "rule": violation.rule,
+                            "symbol": violation.symbol,
+                            "action": violation.action,
+                            "message": violation.message,
+                        }
+                        for violation in policy_report.violations
+                    ],
+                },
+            }
+            if options.baseline:
+                json_payload["baseline"] = options.baseline
+            sys.stdout.write(json.dumps(json_payload, indent=2, sort_keys=True) + "\n")
 
         return int(exit_status)
     finally:
@@ -1253,6 +1428,23 @@ def build_parser() -> argparse.ArgumentParser:  # noqa: PLR0915
         action="append",
         default=[],
         help="Override policy settings, e.g. coverage=0.95,missing-returns=warn",
+    )
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=1,
+        help="Number of worker threads to use for processing (default: 1)",
+    )
+    parser.add_argument(
+        "--json",
+        dest="json_output",
+        action="store_true",
+        help="Emit machine-readable results to stdout",
+    )
+    parser.add_argument(
+        "--baseline",
+        help="Reference git revision or path for baseline comparisons",
+        default="",
     )
     parser.add_argument(
         "--all", action="store_true", help="Process all files, ignoring cache entries"
