@@ -1,181 +1,220 @@
 #!/usr/bin/env bash
-# Bootstrap a reproducible dev env (standard deps only) using uv.
-# Works on Linux and macOS (Bash 3.2+ compatible; avoids arrays/process substitution).
+# scripts/bootstrap.sh
+# Purpose: Provision a **deterministic, agent-grade** Python dev environment using uv.
+# Works on Linux and macOS (bash 3.2+). Safe for local machines and remote containers.
 #
-# Behavior:
-# - Creates .venv if missing
-# - Installs project editable with the standard dependency set (no gpu extras)
-# - Respects uv.lock (frozen); optionally offline
-# - Activates .venv for this shell
-# - Installs pre-commit hooks
-# - Provides helpful diagnostics and exits nonzero on failure
+# What it does:
+#   1) Installs uv if missing (user-local)
+#   2) Ensures Python 3.13.9 is installed via uv and pinned for this project
+#   3) Creates/uses a project-local .venv (no system Python)
+#   4) Installs deps via `uv sync` (prefers --locked when uv.lock present)
+#   5) Installs and runs pre-commit hooks (optional flags to skip/run)
+#   6) Optionally generates PATH_MAP for editor deep links in remote containers
+#   7) Prints a ready-to-run command summary
+#
+# Exit on first error, unset var, or failed pipe; propagate failures out of subshells.
+set -Eeuo pipefail
 
-set -euo pipefail
+# ------------- Config (change defaults here if needed) -------------
+PY_VER_DEFAULT="${PY_VER_DEFAULT:-3.13.9}"
+PIN_PYTHON="${PIN_PYTHON:-1}"             # 1=uv python pin <ver>
+RUN_PRE_COMMIT="${RUN_PRE_COMMIT:-1}"     # 1=install + run pre-commit on all files
+GENERATE_PATH_MAP="${GENERATE_PATH_MAP:-1}" # 1=create docs/_build/path_map.txt if in container
+USE_LOCK="${USE_LOCK:-auto}"               # auto|yes|no  -> --locked when uv.lock exists (auto)
+EDITOR_URI_TEMPLATE_DEFAULT='vscode-remote://dev-container+{container_id}{path}:{line}'
 
-pyenv install 3.13.9 && pyenv global 3.13.9
+# ------------- CLI flags -------------
+# Support a few handy flags so CI or developers can tailor behavior.
+#   --no-pin-python      : do not uv python pin
+#   --skip-pre-commit    : don't install or run pre-commit hooks
+#   --no-path-map        : don't generate docs/_build/path_map.txt
+#   --use-lock[=yes|no]  : force use of uv.lock or ignore it
+#   --py 3.13.9          : override Python version
+usage() {
+  cat <<'USAGE'
+Usage: scripts/bootstrap.sh [options]
 
-REQUIRED_UV_VERSION="${REQUIRED_UV_VERSION:-0.93.0}"
-REQUIRED_PYTHON_VERSION="${REQUIRED_PYTHON_VERSION:-3.13.9}"
-
-# Prefer uv-managed Python (avoid picking system Python)
-export UV_MANAGED_PYTHON=true
-
-# -------- pretty prints --------
-is_tty() { [ -t 1 ]; }
-color()  { is_tty && command -v tput >/dev/null && tput setaf "$1" || true; }
-reset()  { is_tty && command -v tput >/dev/null && tput sgr0 || true; }
-log()    { printf "%s%s%s\n" "$(color 4)" "$*" "$(reset)"; }
-ok()     { printf "%s%s%s\n" "$(color 2)" "$*" "$(reset)"; }
-warn()   { printf "%s%s%s\n" "$(color 3)" "WARN: $*" "$(reset)"; }
-err()    { printf "%s%s%s\n" "$(color 1)" "ERROR: $*" "$(reset)"; }
-
-version_ge() {
-  local lhs="${1:-}"
-  local rhs="${2:-}"
-  if [ -z "${lhs}" ] || [ -z "${rhs}" ]; then
-    return 1
-  fi
-  [ "$(printf '%s\n%s\n' "${lhs}" "${rhs}" | sort -V | tail -n1)" = "${lhs}" ]
+Options:
+  --py <x.y.z>         Pin/install this Python version via uv (default: 3.13.9)
+  --no-pin-python      Skip `uv python pin`
+  --skip-pre-commit    Do not install/run pre-commit hooks
+  --no-path-map        Do not generate docs/_build/path_map.txt
+  --use-lock=<auto|yes|no>
+  -h, --help           Show this help
+USAGE
 }
 
-version_gt() {
-  local lhs="${1:-}"
-  local rhs="${2:-}"
-  version_ge "${lhs}" "${rhs}" && [ "${lhs}" != "${rhs}" ]
-}
-
-ensure_uv_installed() {
-  local required_version="${1}"
-  local current_version=""
-  local needs_install=1
-  if command -v uv >/dev/null 2>&1; then
-    current_version="$(uv --version 2>/dev/null | awk '{print $2}')"
-    if [ -n "${current_version}" ] && version_gt "${current_version}" "${required_version}"; then
-      needs_install=0
-    fi
-  fi
-  if [ "${needs_install}" -eq 1 ]; then
-    log "Installing uv (requires version > ${required_version})"
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    hash -r
-  else
-    log "uv ${current_version} already satisfies > ${required_version}"
-  fi
-}
-
-ensure_uv_python_version() {
-  local version="${1:-}"
-  if [ -z "${version}" ]; then
-    err "Missing REQUIRED_PYTHON_VERSION"
-    exit 1
-  fi
-  if uv python list --installed 2>/dev/null | grep -Fq "cpython-${version}"; then
-    log "uv-managed Python ${version} already installed"
-    return
-  fi
-  if uv python list 2>/dev/null | grep -Fq "cpython-${version}"; then
-    log "uv-managed Python ${version} already available to install"
-  fi
-  log "Installing Python ${version} via uv"
-  uv python install "${version}"
-}
-
-need_cmd() { command -v "$1" >/dev/null 2>&1 || { err "Missing required command: $1"; exit 1; }; }
-
-ensure_uv_installed "${REQUIRED_UV_VERSION}"
-need_cmd uv
-log "uv $(uv --version || echo "(version unknown)")"
-ensure_uv_python_version "${REQUIRED_PYTHON_VERSION}"
-
-# -------- repo root detection --------
-# Resolve to repo root even when invoked via symlink
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-cd "${REPO_ROOT}"
-
-# -------- configurable knobs (env overrides allowed) --------
-REQUIRED_PYTHON_VERSION="${REQUIRED_PYTHON_VERSION:-3.13.9}"
-PYTHON_SPEC="${PYTHON_SPEC:-${REQUIRED_PYTHON_VERSION}}"
-EXTRAS="${EXTRAS:-}"                # Provide comma-separated extras as needed (never include "gpu")
-FROZEN="${FROZEN:-1}"               # 1 = respect uv.lock; 0 = allow relock/updates
-OFFLINE="${OFFLINE:-0}"             # 1 = no network (uses cache / local wheelhouse)
-USE_WHEELHOUSE="${USE_WHEELHOUSE:-0}" # 1 = add ./.wheelhouse to candidate wheels
-
-# Hard safety: block gpu extra unless explicitly allowed
-ALLOW_GPU="${ALLOW_GPU:-0}"
-case ",${EXTRAS}," in
-  *,gpu,*) if [ "${ALLOW_GPU}" != "1" ]; then
-              err "The 'gpu' extra is disallowed by default. Set ALLOW_GPU=1 to proceed (not recommended for bootstrap)."
-              exit 2
-            fi
-            ;;
-esac
-
-# Optional: pin Python (writes .python-version) if missing
-if [ ! -f ".python-version" ]; then
-  log "Pinning Python ${PYTHON_SPEC} → .python-version"
-  uv python pin "${PYTHON_SPEC}" || warn "Could not pin Python; proceeding."
-fi
-
-# -------- venv creation --------
-if [ ! -d ".venv" ]; then
-  log "Creating .venv with uv"
-  uv venv
-else
-  log ".venv already exists"
-fi
-
-# -------- compose sync flags --------
-SYNC_FLAGS=()
-[ "${FROZEN}" = "1" ] && SYNC_FLAGS+=(--frozen)
-[ "${OFFLINE}" = "1" ] && SYNC_FLAGS+=(--offline)
-IFS=',' read -r EX1 EX2 EX3 EX4 EX5 <<<"${EXTRAS},,,,"
-for E in "${EX1}" "${EX2}" "${EX3}" "${EX4}" "${EX5}"; do
-  [ -n "${E}" ] && SYNC_FLAGS+=(--extra "${E}")
+for arg in "$@"; do
+  case "$arg" in
+    -h|--help) usage; exit 0;;
+    --no-pin-python) PIN_PYTHON=0;;
+    --skip-pre-commit) RUN_PRE_COMMIT=0;;
+    --no-path-map) GENERATE_PATH_MAP=0;;
+    --use-lock=*) USE_LOCK="${arg#*=}";;
+    --py) shift; PY_VER_DEFAULT="${1:?--py requires a version like 3.13.9}";;
+    --py=*) PY_VER_DEFAULT="${arg#*=}";;
+  esac
 done
 
-# Add local wheelhouse (flat index) if requested
-if [ "${USE_WHEELHOUSE}" = "1" ] && [ -d ".wheelhouse" ]; then
-  export UV_FIND_LINKS="${UV_FIND_LINKS:-./.wheelhouse}"
-  log "Using local wheelhouse: ${UV_FIND_LINKS}"
-fi
-
-# -------- sync env (editable project + extras) --------
-log "Syncing environment: uv sync ${SYNC_FLAGS[*]}"
-uv sync ${SYNC_FLAGS[@]}
-
-# -------- activate venv for this shell --------
-ACTIVATE=".venv/bin/activate"
-if [ -f "${ACTIVATE}" ]; then
-  # shellcheck disable=SC1090
-  . "${ACTIVATE}"
-  ok "Activated .venv for this shell"
-  log "Upgrading pip tooling via uv"
-  uv pip install -U pip certifi
-else
-  warn "Could not auto-activate .venv; use:  . .venv/bin/activate"
-fi
-
-# -------- install pre-commit hooks --------
-if command -v uvx >/dev/null 2>&1; then
-  log "Installing pre-commit hooks"
-  uvx pre-commit install -t pre-commit -t pre-push || warn "pre-commit installation skipped"
-else
-  warn "uvx not found; skipping pre-commit hook install"
-fi
-
-# -------- sanity: packaging & scripts --------
-if grep -qE '^\[project\.scripts\]' pyproject.toml 2>/dev/null; then
-  if ! grep -qE '^\[build-system\]' pyproject.toml 2>/dev/null && \
-     ! grep -qE '^\[tool\.uv\][[:space:]]*$' pyproject.toml 2>/dev/null && \
-     ! grep -qE '^package[[:space:]]*=' pyproject.toml 2>/dev/null; then
-    warn "You defined [project.scripts] but no build backend / tool.uv.package. Consider adding a build backend."
+# ------------- Logging helpers -------------
+# Basic color output (graceful fallback if tput missing/unsupported).
+if command -v tput >/dev/null 2>&1; then
+  if [ -n "${TERM:-}" ] && [ "${TERM}" != "dumb" ]; then
+    BOLD="$(tput bold || true)"; DIM="$(tput dim || true)"; RESET="$(tput sgr0 || true)"
+    GREEN="$(tput setaf 2 || true)"; YELLOW="$(tput setaf 3 || true)"; RED="$(tput setaf 1 || true)"
   fi
 fi
+BOLD="${BOLD:-}"; DIM="${DIM:-}"; RESET="${RESET:-}"
+GREEN="${GREEN:-}"; YELLOW="${YELLOW:-}"; RED="${RED:-}"
 
-# -------- quick tips --------
-ok "Environment ready (standard deps, no gpu). Next steps:"
-echo "  - Lint/format : uvx ruff check --fix && uvx ruff format"
-echo "  - Type-check  : uvx mypy --strict"
-echo "  - Tests       : uv run pytest -q"
-echo "  - Build docs  : uv run sphinx-build -b html docs docs/_build/html"
+info() { echo "${DIM}>>${RESET} $*"; }
+ok()   { echo "${GREEN}✔${RESET} $*"; }
+warn() { echo "${YELLOW}⚠${RESET} $*" 1>&2; }
+err()  { echo "${RED}✘${RESET} $*" 1>&2; }
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+# ------------- Sanity: repo root & OS -------------
+if [ ! -f "pyproject.toml" ]; then
+  err "Run this script from the repository root (pyproject.toml not found)."
+  exit 1
+fi
+
+OS="$(uname -s | tr '[:upper:]' '[:lower:]')"   # linux|darwin|...
+REPO_NAME="$(basename "$(pwd)")"
+
+# ------------- Ensure uv is installed -------------
+ensure_uv() {
+  if have uv; then
+    ok "uv present: $(uv --version | head -n1)"
+    return 0
+  fi
+  warn "uv not found; installing user-local uv (no sudo)."
+  # Official installer from Astral: https://astral.sh/uv/docs/install
+  # -sSf: silent + show errors + fail on errors
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  # Ensure uv is on PATH for this shell (installer prints its target dir).
+  if ! have uv; then
+    export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$HOME/.local/share/uv/bin:$PATH"
+  fi
+  have uv || { err "uv still not on PATH after install. Add it to PATH, then re-run."; exit 1; }
+  ok "Installed uv: $(uv --version | head -n1)"
+}
+
+# ------------- Ensure Python toolchain via uv -------------
+ensure_python() {
+  local ver="${1:?python version required}"
+  if ! uv python list | grep -q "${ver}"; then
+    info "Installing Python ${ver} via uv…"
+    uv python install "${ver}"
+  fi
+  if [ "${PIN_PYTHON}" = "1" ]; then
+    uv python pin "${ver}"
+    ok "Pinned Python ${ver} for this project"
+  else
+    warn "Skipping uv python pin (requested)"
+  fi
+}
+
+# ------------- Sync dependencies -------------
+sync_env() {
+  # Prefer locked resolution when uv.lock exists (or forced by flag).
+  local lock_flag=""
+  case "${USE_LOCK}" in
+    auto) [ -f uv.lock ] && lock_flag="--locked" ;;
+    yes)  lock_flag="--locked" ;;
+    no)   lock_flag="" ;;
+    *)    warn "--use-lock must be auto|yes|no (got: ${USE_LOCK}); defaulting to auto"; [ -f uv.lock ] && lock_flag="--locked" ;;
+  esac
+
+  info "Syncing dependencies (uv sync ${lock_flag})…"
+  uv sync ${lock_flag}
+  ok "Environment synced"
+}
+
+# ------------- Pre-commit hooks -------------
+setup_precommit() {
+  if [ "${RUN_PRE_COMMIT}" != "1" ]; then
+    warn "Skipping pre-commit install (requested)"
+    return 0
+  fi
+  if ! have pre-commit; then
+    info "Installing pre-commit via uv tool…"
+    uv tool install pre-commit
+  fi
+  pre-commit install
+  ok "pre-commit hooks installed"
+  info "Running pre-commit on all files (may take a minute on first run)…"
+  # Use uvx to ensure the same version that installed hooks; exit nonzero if failures.
+  uvx pre-commit run --all-files
+  ok "pre-commit finished"
+}
+
+# ------------- Generate PATH_MAP for remote editors (optional) -------------
+generate_path_map() {
+  if [ "${GENERATE_PATH_MAP}" != "1" ]; then
+    return 0
+  fi
+  mkdir -p docs/_build
+  local pm="docs/_build/path_map.txt"
+  if [ -f "${pm}" ]; then
+    ok "PATH_MAP already exists at ${pm}"
+    return 0
+  fi
+
+  # Heuristic: Dev Containers often mount the repo at /workspaces/<name>;
+  # Codespaces/VS Code Remote use similar layouts. Provide sensible defaults.
+  local container_prefix=""
+  local editor_prefix=""
+  if [ -d "/workspace" ]; then
+    container_prefix="/workspace"
+    editor_prefix="/workspaces/${REPO_NAME}"
+  elif [ -d "/workspaces/${REPO_NAME}" ]; then
+    container_prefix="/workspaces/${REPO_NAME}"
+    editor_prefix="/workspaces/${REPO_NAME}"
+  else
+    # Fallback: map repo root to itself (useful for local shells)
+    container_prefix="$(pwd)"
+    editor_prefix="$(pwd)"
+  fi
+
+  {
+    echo "${container_prefix} => ${editor_prefix}"
+  } > "${pm}"
+
+  ok "Generated ${pm} mapping: ${container_prefix} => ${editor_prefix}"
+  if [ -z "${EDITOR_URI_TEMPLATE:-}" ]; then
+    warn "EDITOR_URI_TEMPLATE not set; using default when generating links."
+    export EDITOR_URI_TEMPLATE="${EDITOR_URI_TEMPLATE_DEFAULT}"
+  fi
+}
+
+# ------------- Diagnostics -------------
+print_summary() {
+  cat <<EOF
+
+${BOLD}Environment ready.${RESET}
+  Python     : $(python -V 2>&1 || true)
+  uv         : $(uv --version 2>/dev/null | head -n1 || echo "n/a")
+  Location   : $(pwd)
+  OS         : ${OS}
+  Venv       : .venv (created by uv)
+
+Next steps:
+  - Lint/format : uv run ruff format && uv run ruff check --fix
+  - Type-check  : uv run pyrefly check && uv run mypy --config-file mypy.ini
+  - Tests       : uv run pytest -q
+  - Artifacts   : make artifacts && git diff --exit-code
+  - Docs (open) : site/_build/html/index.html  (or Agent Portal at site/_build/agent/index.html)
+
+Tip: re-run hooks anytime with: uvx pre-commit run --all-files
+EOF
+}
+
+# ------------- Main flow -------------
+ensure_uv
+ensure_python "${PY_VER_DEFAULT}"
+sync_env
+setup_precommit
+generate_path_map
+print_summary
