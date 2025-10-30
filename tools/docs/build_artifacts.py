@@ -62,6 +62,11 @@ STEPS: list[tuple[str, list[str], str]] = [
         [sys.executable, "tools/docs/render_agent_portal.py"],
         "[agent] rendered site/_build/agent/index.html",
     ),
+    (
+        "agent-analytics",
+        [sys.executable, "tools/docs/build_agent_analytics.py"],
+        "[agent] wrote docs/_build/analytics.json",
+    ),
 ]
 
 
