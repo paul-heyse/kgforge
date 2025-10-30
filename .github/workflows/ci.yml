@@ -398,4 +398,71 @@ PY
             echo "Unexpected untracked files:"
             git ls-files --others --exclude-standard
             exit 1
+
+  agent_catalog_checks:
+    name: Agent Catalog QA
+    runs-on: ubuntu-latest
+    needs: docs_artifacts
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Prep cache keys
+        id: cache-keys
+        run: |
+          echo "py=$(python - <<'PY'"
+import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")
+PY
+)" >> $GITHUB_OUTPUT
+
+      - name: Cache uv
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-py${{ steps.cache-keys.outputs.py }}-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            uv-${{ runner.os }}-py${{ steps.cache-keys.outputs.py }}-
+
+      - name: Sync environment
+        run: uv sync --locked
+
+      - name: Build catalog artifacts
+        run: |
+          uv run python tools/docs/build_agent_catalog.py
+          uv run python tools/docs/build_agent_api.py
+          uv run python tools/docs/build_agent_analytics.py --output docs/_build/analytics.ci.json --repo-root "$(pwd)" --link-sample 50
+
+      - name: Validate catalog schema
+        run: |
+          uv run python -m jsonschema --instance docs/_build/agent_catalog.json --schema docs/_build/schema_agent_catalog.json
+
+      - name: Summarize analytics
+        run: |
+          uv run python - <<'PY'
+from pathlib import Path
+import json
+
+analytics = json.loads(Path("docs/_build/analytics.ci.json").read_text(encoding="utf-8"))
+catalog = analytics["catalog"]
+errors = analytics["errors"]
+print(f"::notice::Agent catalog packages={catalog['packages']} modules={catalog['modules']} symbols={catalog['symbols']}")
+broken = int(errors.get("broken_links", 0))
+if broken:
+    print(f"::error::Detected {broken} broken catalog links")
+    raise SystemExit(1)
+PY
+
+      - name: Upload analytics summary
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-analytics
+          path: docs/_build/analytics.ci.json
+          retention-days: 7
+          if-no-files-found: ignore
           fi

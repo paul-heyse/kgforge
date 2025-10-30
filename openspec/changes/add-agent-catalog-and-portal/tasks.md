@@ -145,8 +145,8 @@
         - Tutorial links work; feedback stored locally; PII redaction tested.
 
 ## 7. Analytics, Orchestrator, Performance
-- [ ] 7.1 Analytics JSON
-    - [ ] 7.1.1 Emit `docs/_build/analytics.json` with usage counters and generation stats.
+- [x] 7.1 Analytics JSON
+    - [x] 7.1.1 Emit `docs/_build/analytics.json` with usage counters and generation stats.
     - AC:
         - File written with `generated_at`, counters, and version.
 
@@ -155,54 +155,54 @@
     - AC:
         - `make artifacts` prints agent steps; exits non-zero on validation failure.
 
-- [ ] 7.3 Performance & caching
-    - [ ] 7.3.1 Implement content-addressed caching for catalog shards and portal sections.
-    - [ ] 7.3.2 Verify budgets: cold-load < 1.5s; first search < 300ms; subsequent < 150ms.
+- [x] 7.3 Performance & caching
+    - [x] 7.3.1 Implement content-addressed caching for catalog shards and portal sections.
+    - [x] 7.3.2 Verify budgets: cold-load < 1.5s; first search < 300ms; subsequent < 150ms.
     - AC:
         - Load tests demonstrate budgets met on representative hardware.
 
-- [ ] 7.4 Docker integration (serverless)
-    - [ ] 7.4.1 Multi-stage Dockerfile builds wheel with `uv build`; install into slim runtime.
-    - [ ] 7.4.2 COPY `catalog_artifacts/` → `/srv/catalog`; set `CATALOG_ROOT=/srv/catalog`.
-    - [ ] 7.4.3 Ensure no daemons/ports; editor/agent calls `catalogctl` or spawns stdio process on demand.
+- [x] 7.4 Docker integration (serverless)
+    - [x] 7.4.1 Multi-stage Dockerfile builds wheel with `uv build`; install into slim runtime.
+    - [x] 7.4.2 COPY `catalog_artifacts/` → `/srv/catalog`; set `CATALOG_ROOT=/srv/catalog`.
+    - [x] 7.4.3 Ensure no daemons/ports; editor/agent calls `catalogctl` or spawns stdio process on demand.
     - AC:
         - Container executes CLI/stdio flows with no network exposure.
 
 ## 8. Hosted Mode (Optional)
-- [ ] 8.1 RBAC and audit
-    - [ ] 8.1.1 Implement role checks (viewer/contributor/admin) behind feature flag.
-    - [ ] 8.1.2 Write audit log entries for sensitive actions (e.g., feedback submissions).
+- [x] 8.1 RBAC and audit
+    - [x] 8.1.1 Implement role checks (viewer/contributor/admin) behind feature flag.
+    - [x] 8.1.2 Write audit log entries for sensitive actions (e.g., feedback submissions).
     - AC:
         - Role denial tested; audit entries recorded.
 
 ## 9. Documentation
-- [ ] 9.1 Agent & Human README
-    - [ ] 9.1.1 Expand `docs/agent_portal_readme.md` with schema fields, link modes, client/CLI examples, portal usage.
-    - [ ] 9.1.2 Add CLI reference for `catalogctl` and stdio/MCP usage examples.
+- [x] 9.1 Agent & Human README
+    - [x] 9.1.1 Expand `docs/agent_portal_readme.md` with schema fields, link modes, client/CLI examples, portal usage.
+    - [x] 9.1.2 Add CLI reference for `catalogctl` and stdio/MCP usage examples.
     - AC:
         - Docs build cleanly; examples runnable.
 
 ## 10. Testing & CI
-- [ ] 10.1 Schema tests
-    - [ ] 10.1.1 Positive/negative validation for catalog; sharding root index test.
-- [ ] 10.2 Link tests
-    - [ ] 10.2.1 Resolve a sample of source/page/fjson/editor/GitHub links.
-- [ ] 10.3 Portal tests
-    - [ ] 10.3.1 Snapshot and interaction tests for search, facets, breadcrumbs, hints/impact/exemplars.
+- [x] 10.1 Schema tests
+    - [x] 10.1.1 Positive/negative validation for catalog; sharding root index test.
+- [x] 10.2 Link tests
+    - [x] 10.2.1 Resolve a sample of source/page/fjson/editor/GitHub links.
+- [x] 10.3 Portal tests
+    - [x] 10.3.1 Snapshot and interaction tests for search, facets, breadcrumbs, hints/impact/exemplars.
 - [x] 10.4 Client & CLI tests
     - [x] 10.4.1 Python/TS client unit tests; CLI exit codes and output contract; `catalogctl` parity with stdio methods.
-- [ ] 10.5 Search quality
-    - [ ] 10.5.1 Evaluate hybrid search; assert MRR@10 ≥ target on benchmark set.
-- [ ] 10.6 CI integration
-    - [ ] 10.6.1 Add jobs for schema validation, linkcheck, analytics write, PR annotations.
-- [ ] 10.7 OpenAPI/SDK validation
-    - [ ] 10.7.1 Validate OpenAPI 3.2; compile generated SDKs; Problem Details tests.
-- [ ] 10.8 Stdio server tests
-    - [ ] 10.8.1 Spawn stdio process; handshake `capabilities`; run queries; ensure clean shutdown.
-- [ ] 10.9 Ordering semantics tests
-    - [ ] 10.9.1 Verify arrays used for ordered sequences (e.g., `remap_order`); ensure consumers do not rely on object key order.
-- [ ] 10.10 CST remap tests
-    - [ ] 10.10.1 Verify anchor remap order and CST fingerprint fallback under docstring/formatting churn.
+- [x] 10.5 Search quality
+    - [x] 10.5.1 Evaluate hybrid search; assert MRR@10 ≥ target on benchmark set.
+- [x] 10.6 CI integration
+    - [x] 10.6.1 Add jobs for schema validation, linkcheck, analytics write, PR annotations.
+- [x] 10.7 OpenAPI/SDK validation
+    - [x] 10.7.1 Validate OpenAPI 3.2; compile generated SDKs; Problem Details tests.
+- [x] 10.8 Stdio server tests
+    - [x] 10.8.1 Spawn stdio process; handshake `capabilities`; run queries; ensure clean shutdown.
+- [x] 10.9 Ordering semantics tests
+    - [x] 10.9.1 Verify arrays used for ordered sequences (e.g., `remap_order`); ensure consumers do not rely on object key order.
+- [x] 10.10 CST remap tests
+    - [x] 10.10.1 Verify anchor remap order and CST fingerprint fallback under docstring/formatting churn.
     - AC:
         - CI fails on catalog/schema/link/quality/API regressions with clear messages.
 
