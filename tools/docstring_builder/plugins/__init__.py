@@ -196,11 +196,17 @@ def load_plugins(
     builtin: Sequence[type[BuilderPlugin]] | None = None,
 ) -> PluginManager:
     """Discover, filter, and instantiate plugins for the current run."""
+    from tools.docstring_builder.plugins.dataclass_fields import DataclassFieldDocPlugin
+    from tools.docstring_builder.plugins.llm_summary import LLMSummaryRewritePlugin
     from tools.docstring_builder.plugins.normalize_numpy_params import (
         NormalizeNumpyParamsPlugin,
     )
 
-    builtin_types: list[type[BuilderPlugin]] = [NormalizeNumpyParamsPlugin]
+    builtin_types: list[type[BuilderPlugin]] = [
+        DataclassFieldDocPlugin,
+        LLMSummaryRewritePlugin,
+        NormalizeNumpyParamsPlugin,
+    ]
     if builtin is not None:
         builtin_types = list(builtin)
 

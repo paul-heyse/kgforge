@@ -53,6 +53,8 @@ class BuilderConfig:
     package_settings: PackageSettings = field(default_factory=PackageSettings)
     navmap_metadata: bool = True
     ignore: list[str] = field(default_factory=list)
+    llm_summary_mode: str = "off"
+    render_signature: bool = False
 
     @property
     def config_hash(self) -> str:
@@ -67,6 +69,8 @@ class BuilderConfig:
             "opt_out": sorted(self.package_settings.opt_out),
             "navmap_metadata": self.navmap_metadata,
             "ignore": self.ignore,
+            "llm_summary_mode": self.llm_summary_mode,
+            "render_signature": self.render_signature,
             "builder_cache_version": _CACHE_VERSION,
         }
         blob = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -113,6 +117,9 @@ def load_config(path: Path | None = None) -> BuilderConfig:
         opt_out={str(item) for item in opt_out},
     )
 
+    llm_summary_mode = str(data.get("llm_summary_mode", "off")).lower()
+    render_signature = bool(data.get("render_signature", False))
+
     config = BuilderConfig(
         include=[str(pattern) for pattern in include],
         exclude=[str(pattern) for pattern in exclude],
@@ -122,6 +129,8 @@ def load_config(path: Path | None = None) -> BuilderConfig:
         package_settings=package_settings,
         navmap_metadata=navmap_metadata,
         ignore=[str(pattern) for pattern in ignore],
+        llm_summary_mode=llm_summary_mode,
+        render_signature=render_signature,
     )
     if path:
         LOGGER.debug("Loaded docstring builder config hash: %s", config.config_hash)
