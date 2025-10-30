@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import abc
+import threading
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from importlib import metadata
@@ -88,27 +89,32 @@ class PluginManager:
     disabled: list[str] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)
 
+    _lock: threading.RLock = field(default_factory=threading.RLock, init=False)
+
     def _context(self, file_path: Path | None = None) -> PluginContext:
         return PluginContext(self.config, self.repo_root, file_path)
 
     def start(self) -> None:
         """Notify plugins that processing is about to begin."""
         context = self._context()
-        for plugin in self._iter_plugins():
-            plugin.on_start(context)
+        with self._lock:
+            for plugin in self._iter_plugins():
+                plugin.on_start(context)
 
     def finish(self) -> None:
         """Notify plugins that processing has completed."""
         context = self._context()
-        for plugin in reversed(list(self._iter_plugins())):
-            plugin.on_finish(context)
+        with self._lock:
+            for plugin in reversed(list(self._iter_plugins())):
+                plugin.on_finish(context)
 
     def apply_harvest(self, file_path: Path, result: HarvestResult) -> HarvestResult:
         """Run harvester plugins sequentially."""
         context = self._context(file_path)
         updated = result
-        for plugin in self.harvesters:
-            updated = plugin.run(context, updated)
+        with self._lock:
+            for plugin in self.harvesters:
+                updated = plugin.run(context, updated)
         return updated
 
     def apply_transformers(
@@ -119,8 +125,9 @@ class PluginManager:
         processed: list[SemanticResult] = []
         for entry in semantics:
             updated = entry
-            for plugin in self.transformers:
-                updated = plugin.run(context, updated)
+            with self._lock:
+                for plugin in self.transformers:
+                    updated = plugin.run(context, updated)
             processed.append(updated)
         return processed
 
@@ -132,8 +139,9 @@ class PluginManager:
         processed: list[DocstringEdit] = []
         for entry in edits:
             updated = entry
-            for plugin in self.formatters:
-                updated = plugin.run(context, updated)
+            with self._lock:
+                for plugin in self.formatters:
+                    updated = plugin.run(context, updated)
             processed.append(updated)
         return processed
 
