@@ -19,7 +19,7 @@ import sys
 from collections.abc import Callable, Mapping
 from pathlib import Path
 from types import ModuleType
-from typing import TYPE_CHECKING, cast
+from typing import Protocol, cast
 
 import certifi
 from docutils import nodes
@@ -43,10 +43,13 @@ GriffeLoader = griffe_loader_module.GriffeLoader if griffe_loader_module else de
 GriffeModule = griffe_module.Module
 GriffeObject = griffe_module.Object
 
-if TYPE_CHECKING:
-    from autoapi._parser import Parser as AutoapiParser
-else:
-    AutoapiParser = object  # type: ignore[misc, assignment]
+
+class AutoapiParser(Protocol):
+    """Partial protocol for AutoAPI parser implementations."""
+
+    def parse(self, node: object, /) -> object:
+        """Return an AutoAPI document tree for the provided AST node."""
+        ...
 
 # --- Project metadata (override via env if you like)
 project = os.environ.get("PROJECT_NAME", "kgfoundry")

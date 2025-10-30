@@ -1,0 +1,188 @@
+{
+  "packages": [
+    "_duckdb",
+    "annotated_doc",
+    "annotated_types",
+    "anyio",
+    "charset_normalizer",
+    "click",
+    "cryptography",
+    "docling",
+    "docstring_parser",
+    "dotenv",
+    "download",
+    "duckdb",
+    "email_validator",
+    "embeddings_dense",
+    "embeddings_sparse",
+    "fastapi",
+    "fsspec",
+    "idna",
+    "kg_builder",
+    "kgfoundry",
+    "kgfoundry_common",
+    "linking",
+    "numpy",
+    "observability",
+    "ontology",
+    "orchestration",
+    "orjson",
+    "pluggy",
+    "prefect",
+    "prometheus_client",
+    "pyarrow",
+    "pydantic",
+    "pydantic_core",
+    "pytest",
+    "registry",
+    "requests",
+    "rich",
+    "search_api",
+    "search_client",
+    "sitecustomize",
+    "starlette",
+    "typer",
+    "typing_inspection",
+    "urllib3",
+    "uvicorn",
+    "vectorstore_faiss",
+    "yaml"
+  ],
+  "cycles": [],
+  "centrality": {
+    "_duckdb": 0.021739130434782608,
+    "annotated_doc": 0.021739130434782608,
+    "annotated_types": 0.021739130434782608,
+    "anyio": 0.08695652173913043,
+    "charset_normalizer": 0.021739130434782608,
+    "click": 0.043478260869565216,
+    "cryptography": 0.043478260869565216,
+    "docling": 0.043478260869565216,
+    "docstring_parser": 0.021739130434782608,
+    "dotenv": 0.021739130434782608,
+    "download": 0.08695652173913043,
+    "duckdb": 0.06521739130434782,
+    "email_validator": 0.043478260869565216,
+    "embeddings_dense": 0.043478260869565216,
+    "embeddings_sparse": 0.021739130434782608,
+    "fastapi": 0.19565217391304346,
+    "fsspec": 0.043478260869565216,
+    "idna": 0.06521739130434782,
+    "kg_builder": 0.021739130434782608,
+    "kgfoundry": 0.34782608695652173,
+    "kgfoundry_common": 0.2391304347826087,
+    "linking": 0.043478260869565216,
+    "numpy": 0.13043478260869565,
+    "observability": 0.06521739130434782,
+    "ontology": 0.021739130434782608,
+    "orchestration": 0.17391304347826086,
+    "orjson": 0.043478260869565216,
+    "pluggy": 0.021739130434782608,
+    "prefect": 0.2391304347826087,
+    "prometheus_client": 0.021739130434782608,
+    "pyarrow": 0.06521739130434782,
+    "pydantic": 0.19565217391304346,
+    "pydantic_core": 0.06521739130434782,
+    "pytest": 0.021739130434782608,
+    "registry": 0.08695652173913043,
+    "requests": 0.15217391304347827,
+    "rich": 0.06521739130434782,
+    "search_api": 0.17391304347826086,
+    "search_client": 0.06521739130434782,
+    "sitecustomize": 0.021739130434782608,
+    "starlette": 0.06521739130434782,
+    "typer": 0.08695652173913043,
+    "typing_inspection": 0.021739130434782608,
+    "urllib3": 0.06521739130434782,
+    "uvicorn": 0.08695652173913043,
+    "vectorstore_faiss": 0.10869565217391304,
+    "yaml": 0.10869565217391304
+  },
+  "layer_violations": [],
+  "cycle_enumeration_skipped": true,
+  "generated_at": "2025-10-30T14:25:51Z",
+  "scc_summary": [
+    {
+      "members": [
+        "kgfoundry",
+        "orchestration",
+        "search_api"
+      ],
+      "size": 3,
+      "truncated": false,
+      "has_cycle": true
+    },
+    {
+      "members": [
+        "registry"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "duckdb"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "_duckdb"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "prefect"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "fastapi"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "annotated_doc"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "docling"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "download"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    },
+    {
+      "members": [
+        "embeddings_dense"
+      ],
+      "size": 1,
+      "truncated": false,
+      "has_cycle": false
+    }
+  ]
+}

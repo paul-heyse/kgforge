@@ -126,46 +126,12 @@ class DocstringReturnsProto(DocstringMetaProto, Protocol):
     args: Sequence[str]
     type_name: str | None
     is_generator: bool
-    return_name: str | None
-
-    def __init__(
-        self,
-        args: Sequence[str],
-        description: str | None,
-        type_name: str | None,
-        *,
-        is_generator: bool,
-        return_name: str | None = None,
-    ) -> None:
-        """Initialise a return metadata entry.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        args : Sequence[str]
-            Describe ``args``.
-        description : str | None
-            Describe ``description``.
-        type_name : str | None
-            Describe ``type_name``.
-        is_generator : bool
-            Describe ``is_generator``.
-        return_name : str | None, optional
-            Describe ``return_name``.
-            Defaults to ``None``.
-        """
 
 
 class DocstringYieldsProto(DocstringReturnsProto, Protocol):
     """Protocol describing generator metadata entries.
 
     <!-- auto:docstring-builder v1 -->
-
-    ``docstring_parser`` treats ``Yields`` sections as a specialisation of
-    ``Returns``.  Downstream tools expect a small set of attributes that mark a
-    metadata block as representing a generator.  The protocol mirrors those
-    attributes so we can annotate our compatibility shim precisely.
 
     Parameters
     ----------
@@ -177,38 +143,26 @@ class DocstringYieldsProto(DocstringReturnsProto, Protocol):
         Describe ``type_name``.
     is_generator : bool
         Describe ``is_generator``.
-    return_name : str | None, optional
+    return_name : str | None
         Describe ``return_name``.
-        Defaults to ``None``.
     """
 
-    args: Sequence[str]
-    type_name: str | None
-    is_generator: bool
     return_name: str | None
 
 
 class DocstringProto(Protocol):
-    """Protocol describing the subset of :class:`Docstring` we extend.
+    """Protocol describing :class:`docstring_parser.common.Docstring`.
 
     <!-- auto:docstring-builder v1 -->
 
-    Only a handful of properties are accessed by the compatibility helpers:
-    the metadata list and the short/long descriptions.  Limiting the protocol
-    to those surfaces keeps mypy satisfied without reimplementing the entire
-    third-party type.
-
     Parameters
     ----------
-    *args : inspect._empty
-        Describe ``args``.
-    **kwargs : inspect._empty
-        Describe ``kwargs``.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    meta : Sequence[DocstringMetaProto]
+        Describe ``meta``.
+    short_description : str | None
+        Describe ``short_description``.
+    long_description : str | None
+        Describe ``long_description``.
     """
 
     meta: list[DocstringMetaProto]
@@ -217,144 +171,105 @@ class DocstringProto(Protocol):
 
 
 class DocstringCommonModuleProto(Protocol):
-    """Runtime module exported by :mod:`docstring_parser.common`.
+    """Protocol describing the ``docstring_parser.common`` module surface.
 
     <!-- auto:docstring-builder v1 -->
 
-    The real module exposes several concrete classes that the shim patches at runtime.  Describing
-    the attribute names here allows callers to keep strong typing while still deferring to the
-    imported module for the actual implementations.
-
     Parameters
     ----------
-    *args : inspect._empty
-        Describe ``args``.
-    **kwargs : inspect._empty
-        Describe ``kwargs``.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    Docstring : DocstringProto
+        Describe ``Docstring``.
+    DocstringAttr : DocstringAttrProto
+        Describe ``DocstringAttr``.
+    DocstringParam : DocstringAttrProto
+        Describe ``DocstringParam``.
+    DocstringReturns : DocstringReturnsProto
+        Describe ``DocstringReturns``.
     """
 
     Docstring: type[DocstringProto]
-    DocstringAttr: type[DocstringAttrProto]
-    DocstringParam: type[DocstringAttrProto]
+    DocstringAttr: type[DocstringAttrProto] | None
+    DocstringParam: type[DocstringAttrProto] | None
     DocstringReturns: type[DocstringReturnsProto]
-    DocstringYields: type[DocstringYieldsProto]
+    DocstringYields: type[DocstringYieldsProto] | None
 
 
-def ensure_docstring_attrs[DocT: DocstringProto, AttrT: DocstringAttrProto](
-    doc_cls: type[DocT], attr_cls: type[AttrT]
+def _get_attr_name(entry: DocstringAttrProto) -> str | None:
+    """Return the attribute identifier embedded in a metadata entry."""
+    if not entry.args:
+        return None
+    if len(entry.args) == 1:
+        return entry.args[0]
+    if entry.args[0] == "attribute":
+        return entry.args[1]
+    return entry.args[0]
+
+
+def ensure_docstring_attrs(
+    doc_cls: type[DocstringProto], attr_cls: type[DocstringAttrProto]
 ) -> bool:
-    """Install an ``attrs`` property on ``doc_cls`` when absent.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    doc_cls : type[DocT]
-        Describe ``doc_cls``.
-    attr_cls : type[AttrT]
-        Describe ``attr_cls``.
-
-    Returns
-    -------
-    bool
-        ``True`` if the property was added, otherwise ``False``.
-    """
+    """Install an ``attrs`` property on ``Docstring`` when absent."""
     if hasattr(doc_cls, "attrs"):
-        logger.debug("Docstring attrs already present on %%s", doc_cls)
         return False
 
-    def _attrs(self: DocT) -> list[AttrT]:
-        collected: list[AttrT] = []
-        for entry in self.meta:
-            if isinstance(entry, attr_cls):
-                args = list(entry.args)
-                if args and args[0].lower() == "attribute":
-                    collected.append(entry)
-        return collected
+    def _attrs(self: DocstringProto) -> list[DocstringAttrProto]:
+        """Return attribute metadata entries collected from Docstring meta."""
+        return [
+            entry
+            for entry in self.meta
+            if isinstance(entry, attr_cls) and _get_attr_name(entry) is not None
+        ]
 
     doc_cls_any = cast(Any, doc_cls)
     doc_cls_any.attrs = property(_attrs)
-    logger.debug("Registered attrs property on %%s", doc_cls)
+    logger.debug("Registered attrs property on %s", doc_cls)
     return True
 
 
-def ensure_docstring_yields[DocT: DocstringProto, YieldsT: DocstringYieldsProto](
-    doc_cls: type[DocT], yields_cls: type[YieldsT]
+def ensure_docstring_yields(
+    doc_cls: type[DocstringProto], yields_cls: type[DocstringYieldsProto]
 ) -> tuple[bool, bool]:
-    """Ensure docstring instances expose generator metadata helpers.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    doc_cls : type[DocT]
-        Describe ``doc_cls``.
-    yields_cls : type[YieldsT]
-        Describe ``yields_cls``.
-
-    Returns
-    -------
-    tuple[bool, bool]
-        Flags indicating whether ``yields`` and ``many_yields`` were installed.
-    """
+    """Install ``yields`` and ``many_yields`` helpers on ``Docstring``."""
     added_single = False
     added_many = False
 
     if not hasattr(doc_cls, "yields"):
 
-        def _yield(self: DocT) -> YieldsT | None:
+        def _yield_entry(self: DocstringProto) -> DocstringYieldsProto | None:
+            """Return the first generator metadata entry, if any."""
             for entry in self.meta:
                 if isinstance(entry, yields_cls):
                     return entry
             return None
 
         doc_cls_any = cast(Any, doc_cls)
-        doc_cls_any.yields = property(_yield)
+        doc_cls_any.yields = property(_yield_entry)
         added_single = True
-        logger.debug("Registered yields property on %%s", doc_cls)
 
     if not hasattr(doc_cls, "many_yields"):
 
-        def _yield_many(self: DocT) -> list[YieldsT]:
-            matches: list[YieldsT] = []
-            for entry in self.meta:
-                if isinstance(entry, yields_cls):
-                    matches.append(entry)
-            return matches
+        def _many(self: DocstringProto) -> list[DocstringYieldsProto]:
+            """Return all generator metadata entries in the docstring."""
+            return [entry for entry in self.meta if isinstance(entry, yields_cls)]
 
         doc_cls_any = cast(Any, doc_cls)
-        doc_cls_any.many_yields = property(_yield_many)
+        doc_cls_any.many_yields = property(_many)
         added_many = True
-        logger.debug("Registered many_yields property on %%s", doc_cls)
 
+    if added_single:
+        logger.debug("Registered yields property on %s", doc_cls)
+    if added_many:
+        logger.debug("Registered many_yields property on %s", doc_cls)
     return added_single, added_many
 
 
-def ensure_docstring_size[DocT: DocstringProto](doc_cls: type[DocT]) -> bool:
-    """Expose a ``size`` property summarising docstring content length.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    doc_cls : type[DocT]
-        Describe ``doc_cls``.
-
-    Returns
-    -------
-    bool
-        ``True`` if the property was added, otherwise ``False``.
-    """
+def ensure_docstring_size(doc_cls: type[DocstringProto]) -> bool:
+    """Install a ``size`` property mirroring ``Docstring.total_size`` semantics."""
     if hasattr(doc_cls, "size"):
-        logger.debug("Docstring size already present on %%s", doc_cls)
         return False
 
-    def _size(self: DocT) -> int:
+    def _size(self: DocstringProto) -> int:
+        """Return the total length of rendered docstring components."""
         blocks: list[str] = []
         if self.short_description:
             blocks.append(self.short_description)
@@ -368,7 +283,7 @@ def ensure_docstring_size[DocT: DocstringProto](doc_cls: type[DocT]) -> bool:
 
     doc_cls_any = cast(Any, doc_cls)
     doc_cls_any.size = property(_size)
-    logger.debug("Registered size property on %%s", doc_cls)
+    logger.debug("Registered size property on %s", doc_cls)
     return True
 
 

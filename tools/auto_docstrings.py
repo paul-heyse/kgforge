@@ -47,6 +47,7 @@ def required_sections(  # noqa: PLR0913
     """Return the ordered docstring sections required for the provided symbol metadata."""
     return _legacy._required_sections(kind, parameters, returns, raises, name, is_public)
 
+
 REPO_ROOT = _legacy.REPO_ROOT
 SRC_ROOT = _legacy.SRC_ROOT
 
