@@ -5,15 +5,20 @@ import dataclasses
 from pathlib import Path
 
 import pytest
+import yaml
 from tools.docstring_builder import cli
 from tools.docstring_builder.cache import BuilderCache
-from tools.docstring_builder.config import BuilderConfig
+from tools.docstring_builder.config import BuilderConfig, ConfigSelection
+from tools.docstring_builder.harvest import HarvestResult, SymbolHarvest
+from tools.docstring_builder.ir import IRDocstring
+from tools.docstring_builder.schema import DocstringSchema
+from tools.docstring_builder.semantics import SemanticResult
 
 
 def test_main_translates_legacy_diff(monkeypatch: pytest.MonkeyPatch) -> None:
     calls: list[str] = []
 
-    def fake_check(args: argparse.Namespace) -> int:
+    def fake_check(_args: argparse.Namespace) -> int:
         calls.append("check")
         return 0
 
@@ -28,6 +33,7 @@ def test_main_translates_legacy_diff(monkeypatch: pytest.MonkeyPatch) -> None:
     [
         ("generate", "_command_generate"),
         ("fix", "_command_fix"),
+        ("fmt", "_command_fmt"),
         ("diff", "_command_diff"),
         ("check", "_command_check"),
         ("lint", "_command_lint"),
@@ -44,7 +50,7 @@ def test_main_dispatches_subcommands(
 ) -> None:
     calls: list[str] = []
 
-    def fake_handler(args: argparse.Namespace) -> int:
+    def fake_handler(_args: argparse.Namespace) -> int:
         calls.append(subcommand)
         return 0
 
@@ -66,7 +72,7 @@ def test_process_file_ignore_missing(monkeypatch: pytest.MonkeyPatch, tmp_path: 
 
     module_name = "docs._build.example"
 
-    def fake_harvest(path: Path, _config: BuilderConfig, _root: Path) -> object:
+    def fake_harvest(_path: Path, _config: BuilderConfig, _root: Path) -> object:
         raise ModuleNotFoundError(module_name)
 
     monkeypatch.setattr(cli, "harvest_file", fake_harvest)
@@ -168,15 +174,100 @@ def test_doctor_invokes_stub_drift(
             }
         ]
     }
-    import yaml
-
     (tmp_path / ".pre-commit-config.yaml").write_text(yaml.safe_dump(precommit), encoding="utf-8")
 
     monkeypatch.setattr(cli, "REPO_ROOT", tmp_path)
     monkeypatch.setattr(cli, "run_stub_drift", lambda: 1)
-    monkeypatch.setattr(cli.importlib, "import_module", lambda name: object())
+    monkeypatch.setattr(cli.importlib, "import_module", lambda _name: object())
 
     exit_code = cli.main(["doctor", "--stubs"])
     output = capsys.readouterr().out
     assert exit_code == cli.EXIT_CONFIG
     assert "stub drift" in output.lower()
+
+
+def test_collect_edits_format_only_skips_render(monkeypatch: pytest.MonkeyPatch) -> None:
+    symbol = SymbolHarvest(
+        qname="pkg.module.fn",
+        module="pkg.module",
+        kind="function",
+        parameters=[],
+        return_annotation=None,
+        docstring=None,
+        owned=True,
+        filepath=Path("pkg/module.py"),
+        lineno=1,
+        end_lineno=2,
+        col_offset=0,
+        decorators=[],
+        is_async=False,
+        is_generator=False,
+    )
+    schema = DocstringSchema(summary="Describe fn.")
+    semantic = SemanticResult(symbol=symbol, schema=schema)
+    config = BuilderConfig()
+    config.normalize_sections = True
+    result = HarvestResult(module="pkg.module", filepath=symbol.filepath, symbols=[symbol])
+
+    monkeypatch.setattr(cli, "build_semantic_schemas", lambda *_: [semantic])
+    monkeypatch.setattr(cli, "normalize_docstring", lambda *_: None)
+
+    render_called = False
+
+    def _render(*_: object, **__: object) -> str:
+        nonlocal render_called
+        render_called = True
+        return "rendered"
+
+    monkeypatch.setattr(cli, "render_docstring", _render)
+    ir_entry = IRDocstring(
+        symbol_id=symbol.qname,
+        module=symbol.module,
+        kind=symbol.kind,
+        source_path=str(symbol.filepath),
+        lineno=symbol.lineno,
+    )
+    monkeypatch.setattr(cli, "build_ir", lambda _entry: ir_entry)
+    monkeypatch.setattr(cli, "validate_ir", lambda _: None)
+
+    edits, semantics, ir_entries = cli._collect_edits(
+        result,
+        config,
+        plugin_manager=None,
+        format_only=True,
+    )
+
+    assert edits == []
+    assert semantics == [semantic]
+    assert ir_entries == [ir_entry]
+    assert render_called is False
+
+
+def test_fmt_subcommand_enables_normalization(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    config = BuilderConfig()
+    selection = ConfigSelection(path=tmp_path / "docstring_builder.toml", source="default")
+    monkeypatch.setattr(cli, "_load_config", lambda _args: (config, selection))
+    monkeypatch.setattr(cli, "_select_files", lambda _config, _args: [])
+
+    captured: dict[str, object] = {}
+
+    def _run(files: list[Path], args: argparse.Namespace, active_config: BuilderConfig) -> int:
+        captured["files"] = files
+        captured["args"] = args
+        captured["config"] = active_config
+        return 0
+
+    monkeypatch.setattr(cli, "_run", _run)
+
+    exit_code = cli.main(["fmt"])
+
+    assert exit_code == 0
+    assert captured["files"] == []
+    assert isinstance(captured["config"], BuilderConfig)
+    assert captured["config"].normalize_sections is True
+    args = captured["args"]
+    assert isinstance(args, argparse.Namespace)
+    assert args.command == "fmt"
+    assert getattr(args, "skip_docfacts", False) is True

@@ -188,9 +188,18 @@ def load_symbol_spans() -> dict[str, dict[str, Any]]:
         f = r.get("file")
         ln = r.get("lineno")
         en = r.get("endlineno")
+        if en is None and isinstance(r, Mapping):
+            candidate = r.get("end_lineno")
+            if isinstance(candidate, int):
+                en = candidate
         mod = r.get("module") or ".".join((p or "").split(".")[:-1])
         if isinstance(p, str) and isinstance(f, str) and isinstance(ln, int):
-            out[p] = {"file": f, "lineno": ln, "endlineno": en or ln, "module": mod}
+            out[p] = {
+                "file": f,
+                "lineno": ln,
+                "endlineno": en or ln,
+                "module": mod,
+            }
     return out
 
 
@@ -806,7 +815,11 @@ def attach_coverage(
     for sym, meta in symbol_spans.items():
         f = meta.get("file")
         ln = int(meta.get("lineno") or 0)
-        en = int(meta.get("endlineno") or ln)
+        end_line = meta.get("endlineno")
+        if end_line is None:
+            candidate = meta.get("end_lineno")
+            end_line = candidate if isinstance(candidate, int) else None
+        en = int(end_line or ln)
         rel = f if isinstance(f, str) else None
         hits: list[int] = []
         if rel and rel in executed:

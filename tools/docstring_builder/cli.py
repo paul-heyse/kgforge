@@ -454,6 +454,8 @@ def _collect_edits(
     result: HarvestResult,
     config: BuilderConfig,
     plugin_manager: PluginManager | None,
+    *,
+    format_only: bool = False,
 ) -> tuple[list[DocstringEdit], list[SemanticResult], list[IRDocstring]]:
     semantics = build_semantic_schemas(result, config)
     if plugin_manager is not None:
@@ -461,19 +463,29 @@ def _collect_edits(
     edits: list[DocstringEdit] = []
     ir_entries: list[IRDocstring] = []
     for entry in semantics:
-        text: str
+        ir_entry = build_ir(entry)
+        validate_ir(ir_entry)
+        ir_entries.append(ir_entry)
+        text: str | None
         if config.normalize_sections:
             normalized = normalize_docstring(entry.symbol, config.ownership_marker)
             if normalized is not None:
                 text = normalized
+            elif format_only:
+                continue
             else:
-                text = render_docstring(entry.schema, config.ownership_marker)
+                text = render_docstring(
+                    entry.schema,
+                    config.ownership_marker,
+                    include_signature=config.render_signature,
+                )
         else:
-            text = render_docstring(entry.schema, config.ownership_marker)
+            text = render_docstring(
+                entry.schema,
+                config.ownership_marker,
+                include_signature=config.render_signature,
+            )
         edits.append(DocstringEdit(qname=entry.symbol.qname, text=text))
-        ir_entry = build_ir(entry)
-        validate_ir(ir_entry)
-        ir_entries.append(ir_entry)
     if plugin_manager is not None:
         edits = plugin_manager.apply_formatters(result.filepath, edits)
     return edits, semantics, ir_entries
@@ -619,7 +631,7 @@ def _process_file(  # noqa: C901, PLR0911
 ) -> FileOutcome:
     """Harvest, render, and apply docstrings for a single file."""
     command = options.command
-    is_update = command == "update"
+    is_update = command in {"update", "fmt"}
     is_check = command == "check"
     docfacts: list[DocFact] = []
     preview: str | None = None
@@ -680,7 +692,12 @@ def _process_file(  # noqa: C901, PLR0911
             str(exc),
         )
 
-    edits, semantics, ir_entries = _collect_edits(result, config, plugin_manager)
+    edits, semantics, ir_entries = _collect_edits(
+        result,
+        config,
+        plugin_manager,
+        format_only=command == "fmt",
+    )
     if command == "harvest":
         docfacts = build_docfacts(semantics)
         return FileOutcome(
@@ -1205,6 +1222,12 @@ def _run(  # noqa: C901, PLR0912, PLR0915
 
 def _execute_pipeline(args: argparse.Namespace, subcommand: str, command: str) -> int:
     config, _ = _load_config(args)
+    if getattr(args, "llm_summary", False):
+        config.llm_summary_mode = "apply"
+    elif getattr(args, "llm_dry_run", False):
+        config.llm_summary_mode = "dry-run"
+    if subcommand == "fmt":
+        config.normalize_sections = True
     try:
         files = _select_files(config, args)
     except InvalidPathError:
@@ -1222,6 +1245,11 @@ def _command_generate(args: argparse.Namespace) -> int:
 def _command_fix(args: argparse.Namespace) -> int:
     args.force = True
     return _execute_pipeline(args, "fix", "update")
+
+
+def _command_fmt(args: argparse.Namespace) -> int:
+    args.skip_docfacts = True
+    return _execute_pipeline(args, "fmt", "fmt")
 
 
 def _command_update(args: argparse.Namespace) -> int:
@@ -1371,6 +1399,31 @@ def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PL
                 issues.append("Add 'pyrefly-check' to pre-commit to validate dependency typing.")
         else:
             issues.append(".pre-commit-config.yaml not found; install pre-commit hooks.")
+        try:
+            policy_settings = load_policy_settings(REPO_ROOT)
+        except PolicyConfigurationError as exc:
+            issues.append(f"Unable to load policy settings: {exc}.")
+        else:
+            LOGGER.info(
+                "[DOCTOR] Policy actions: coverage=%s, missing-params=%s, missing-returns=%s, "
+                "missing-examples=%s, summary-mood=%s, dataclass-parity=%s",
+                policy_settings.coverage_action.value,
+                policy_settings.missing_params_action.value,
+                policy_settings.missing_returns_action.value,
+                policy_settings.missing_examples_action.value,
+                policy_settings.summary_mood_action.value,
+                policy_settings.dataclass_parity_action.value,
+            )
+            if policy_settings.exceptions:
+                LOGGER.info("[DOCTOR] Policy exceptions: %s", len(policy_settings.exceptions))
+                for exception in policy_settings.exceptions:
+                    LOGGER.info(
+                        "[DOCTOR]   %s (%s) expires %s: %s",
+                        exception.symbol,
+                        exception.rule,
+                        exception.expires_on.isoformat(),
+                        exception.justification or "no justification provided",
+                    )
     except Exception:  # pragma: no cover - defensive guard
         LOGGER.exception("Doctor encountered an unexpected error.")
         return EXIT_ERROR
@@ -1440,6 +1493,19 @@ def build_parser() -> argparse.ArgumentParser:  # noqa: PLR0915
         default=[],
         help="Disable the specified plugin names (repeat or comma-separate values)",
     )
+    llm_group = parser.add_mutually_exclusive_group()
+    llm_group.add_argument(
+        "--llm-summary",
+        action="store_true",
+        dest="llm_summary",
+        help="Rewrite summaries into imperative mood using the LLM plugin.",
+    )
+    llm_group.add_argument(
+        "--llm-dry-run",
+        action="store_true",
+        dest="llm_dry_run",
+        help="Preview LLM summary rewrites without mutating files.",
+    )
     parser.add_argument(
         "--policy",
         dest="policy_override",
@@ -1507,6 +1573,12 @@ def build_parser() -> argparse.ArgumentParser:  # noqa: PLR0915
     fix = subparsers.add_parser("fix", help="Apply docstring updates while bypassing the cache")
     _with_paths(fix)
     fix.set_defaults(func=_command_fix)
+
+    fmt = subparsers.add_parser(
+        "fmt", help="Normalize existing docstring sections without regenerating content"
+    )
+    _with_paths(fmt)
+    fmt.set_defaults(func=_command_fmt)
 
     diff_cmd = subparsers.add_parser("diff", help="Show docstring drift without writing changes")
     _with_paths(diff_cmd)

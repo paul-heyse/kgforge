@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import textwrap
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Protocol
@@ -198,6 +199,36 @@ def test_cli_search_outputs_json(
     assert isinstance(payload, list)
     assert payload, "expected CLI search results"
     assert len(payload) <= 2
+
+
+def test_build_anchors_use_docfacts_end_lineno(tmp_path: Path) -> None:
+    """DocFacts ``end_lineno`` metadata should populate anchor ranges."""
+
+    module_path = tmp_path / "pkg" / "module.py"
+    module_path.parent.mkdir(parents=True, exist_ok=True)
+    module_path.write_text(
+        textwrap.dedent(
+            """
+            def example(value: int) -> int:
+                """Return ``value`` unchanged."""
+
+                return value
+            """
+        ).strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    module_name = "pkg.module"
+    qname = f"{module_name}.example"
+    args = build_agent_catalog.parse_args([])
+    args.repo_root = tmp_path
+    builder = build_agent_catalog.AgentCatalogBuilder(args)
+    builder._docfacts_index = {qname: {"qname": qname, "lineno": 1, "end_lineno": 4}}
+    analyzer = build_agent_catalog.ModuleAnalyzer(module_name, module_path)
+    node = analyzer.get_node(qname)
+    anchors = builder._build_anchors(qname, analyzer, node, builder._docfacts_index[qname])
+    assert anchors.start_line == 1
+    assert anchors.end_line == 4
 
 
 def test_load_faiss_falls_back_when_missing(monkeypatch: pytest.MonkeyPatch) -> None:

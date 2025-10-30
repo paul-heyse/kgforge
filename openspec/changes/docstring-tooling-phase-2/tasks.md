@@ -8,21 +8,21 @@
 - [x] 2.1 Add tests guaranteeing `ParameterHarvest` fidelity for positional-only, keyword-only, varargs, kwargs.
 - [x] 2.2 Assert renderer uses `display_name` and kinds correctly in generated sections.
 - [x] 2.3 Extend DocFacts tests to assert propagation and idempotence of enriched fields.
-- [ ] 2.4 Verify downstream consumers (navmap/README generators) tolerate enriched DocFacts; add failing tests if gaps exist.
+- [x] 2.4 Verify downstream consumers (navmap/README generators) tolerate enriched DocFacts; add failing tests if gaps exist.
 
 ## 3. Policy Engine Upgrades
-- [ ] 3.1 Implement rules: missing examples, non‑imperative summaries, dataclass/attrs field parity.
-- [ ] 3.2 Add `doctor --policy` summary (active rules, exceptions, expiries).
-- [ ] 3.3 Unit/E2E tests for new rules and exceptions.
+- [x] 3.1 Implement rules: missing examples, non‑imperative summaries, dataclass/attrs field parity.
+- [x] 3.2 Add `doctor --policy` summary (active rules, exceptions, expiries).
+- [x] 3.3 Unit/E2E tests for new rules and exceptions.
 
 ## 4. Plugins for Higher-Fidelity Content
-- [ ] 4.1 Dataclass/attrs plugin: derive parameter descriptions from field metadata/defaults.
-- [ ] 4.2 Enhance AST exception inference; add parameter-description seeders (names/defaults aware).
-- [ ] 4.3 Optional LLM-assisted summary rewriter behind opt-in flag; dry-run mode and tests.
+- [x] 4.1 Dataclass/attrs plugin: derive parameter descriptions from field metadata/defaults.
+- [x] 4.2 Enhance AST exception inference; add parameter-description seeders (names/defaults aware).
+- [x] 4.3 Optional LLM-assisted summary rewriter behind opt-in flag; dry-run mode and tests.
 
 ## 5. Rendering & Formatting Improvements
-- [ ] 5.1 Add optional “Signature” line (pos-only/kw-only/*args/**kwargs) gated by config.
-- [ ] 5.2 Introduce `fmt` subcommand to normalize spacing/sections without regeneration.
+- [x] 5.1 Add optional “Signature” line (pos-only/kw-only/*args/**kwargs) gated by config.
+- [x] 5.2 Introduce `fmt` subcommand to normalize spacing/sections without regeneration.
 - [ ] 5.3 Improve normalization of multiline defaults and types; add tests.
 
 ## 6. CLI Performance & Machine Outputs
