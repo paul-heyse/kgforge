@@ -201,6 +201,72 @@ Symbol IDs SHALL be stable across runs and collision-resistant.
 ### Requirement: Code Coverage Mapping
 The catalog SHALL optionally map symbols to tests and code coverage when available.
 
+### Requirement: Editor-Activated Stdio API (Optional, No Daemon)
+The system SHALL expose an optional, file-backed stdio process (MCP or JSON-RPC over stdio) over the catalog; it SHALL be spawned by the editor/agent per session and SHALL terminate at session end.
+
+#### Scenario: Spawn and handshake
+- WHEN the editor spawns the stdio process
+- THEN the process responds to a `capabilities` call and loads the catalog into memory
+
+#### Scenario: Query methods
+- WHEN invoking `find_callers(symbol_id)`, `find_callees(symbol_id)`, `search(q)`, `open_anchor(symbol_id, mode)`, `change_impact(symbol_id)`, `explain_ranking(doc_id)`
+- THEN results are returned from the in-memory catalog; repeated calls are faster due to warm cache
+
+#### Scenario: Session termination
+- WHEN stdin closes or an explicit shutdown request is sent
+- THEN the process exits with code 0 and releases resources; no TCP ports are opened during its lifetime
+
+
+### Requirement: OpenAPI 3.2 and SDKs
+The system SHALL publish an OpenAPI 3.2 description for the API façade and generate Python/TS SDKs; errors SHALL follow RFC9457 Problem Details.
+
+#### Scenario: Spec present
+- WHEN the server is built
+- THEN `docs/_build/agent_api_openapi.json` exists and validates against OpenAPI 3.2
+
+#### Scenario: Problem Details
+- WHEN an error occurs (e.g., missing symbol)
+- THEN the response contains `type`, `title`, `status`, and `detail`
+
+
+### Requirement: Agent Hints
+The catalog SHALL include `agent_hints` per module/symbol with intent tags, safe operations, tests to run, performance budgets, and breaking-change notes; the portal SHALL render these on cards.
+
+#### Scenario: Hints rendered
+- WHEN a symbol has `agent_hints`
+- THEN the portal shows tags, the safe-ops checklist, and tests-to-run actions
+
+
+### Requirement: Change Impact Shard
+The catalog SHALL include (or reference) `change_impact` data per module/symbol; the portal SHALL provide an “Edit here” panel summarizing impact.
+
+#### Scenario: Impact card
+- WHEN opening a module page
+- THEN the portal shows impacted files, tests to run, owners to ping, and suggested commit skeletons
+
+
+### Requirement: Exemplars
+The catalog SHALL include `exemplars` per symbol with copy-ready snippets, counter-examples, and negative prompts; the portal SHALL expose “Insert exemplar” actions.
+
+#### Scenario: Insert exemplar
+- WHEN viewing a symbol with exemplars
+- THEN a button copies a selected exemplar snippet to the clipboard
+
+
+### Requirement: CST Fingerprint and Remap Order
+Anchors SHALL include an explicit `remap_order` array; CST token-trigram fingerprinting SHALL be used before nearest-text fallbacks.
+
+#### Scenario: Docstring/formatting churn
+- WHEN only docstrings/formatting change
+- THEN anchors remap using `symbol_id` or CST fingerprint without manual intervention
+
+
+### Requirement: Ordering Semantics
+Ordered data SHALL be represented as arrays; property order SHALL NOT be relied upon.
+
+#### Scenario: Schema compliance
+- WHEN validating catalog objects
+- THEN arrays are used for ordered sequences (e.g., `remap_order`, `exemplars`), and validators do not assume object key order
 #### Scenario: Coverage present
 - WHEN coverage data is provided
 - THEN the catalog includes coverage summaries per module/symbol and links to failing tests where applicable

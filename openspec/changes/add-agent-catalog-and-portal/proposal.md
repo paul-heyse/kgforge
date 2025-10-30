@@ -46,6 +46,25 @@ Agents need one stable entry point to discover and navigate all documentation ar
   - Optional hosted mode with RBAC and audit logs; privacy guardrails for user data in feedback.
   - Content-addressed shards for large catalogs; caching strategies for fast portal loads.
 
+- Machine-first APIs (no scraping)
+  - Editor-activated stdio micro-server (session-scoped, not a daemon): spawned by the editor/agent on demand, communicating over stdio (MCP or JSON-RPC over stdio), caching the catalog in RAM for the session, and exiting on EOF. No ports, no background service.
+  - On-demand CLI `catalogctl` for pure serverless calls; optional `catalogctl-mcp` adapter to speak MCP over stdio.
+  - OpenAPI 3.2 spec for the callable procedures (facade) and generated Python/TS SDKs; errors follow RFC9457 Problem Details.
+
+- Actionable Agent Hints
+  - Extend catalog entries with `agent_hints`: `intent_tags` (e.g., "refactor-hotspot"), `safe_ops` (allowed refactors), `tests_to_run`, `perf_budgets`, and `breaking_change_notes`.
+  - Render on Portal cards and expose via clients and micro-server.
+
+- Change-impact surfaces (PR autopilot)
+  - Provide a `change_impact` shard summarizing callers/callees, covering tests, codeowners, and churn for each symbol/module.
+  - Portal "Edit here" button shows impacted files, tests to run, owners to ping, and example commit messages.
+
+- Evidence-backed navigation (exemplars)
+  - Add `exemplars[*]` per symbol: copy-ready usage snippets, counter-examples, and negative prompts. Portal exposes "Insert exemplar" actions.
+
+- Robustness to code drift (beyond AST)
+  - Persist CST token-trigram fingerprints per symbol; add `anchors.remap_order` to document the matching order: `[symbol_id, cst_fingerprint, name_arity, nearest_text]`.
+
 ## Technical architecture details (summary)
 - Symbol graph extraction
   - Imports: build per-module import graph from Sphinx indices and Python AST; normalize aliases; exclude stdlib by default.
@@ -78,6 +97,24 @@ Agents need one stable entry point to discover and navigate all documentation ar
 
 - Analytics and governance
   - `docs/_build/analytics.json`: anonymized portal usage counters; CI PR annotations summarizing coverage/parity/high-churn deltas.
+
+- Micro-server and SDKs
+  - Editor-activated stdio process (MCP/JSON-RPC over stdio). Spawned per session; warm cache; exits when the session ends. No TCP ports; works in locked-down containers.
+  - CLI `catalogctl` mirrors the same callable API for single-shot usage; MCP wrapper `catalogctl-mcp` optional.
+  - OpenAPI 3.2 document (`docs/_build/agent_api_openapi.json`) for the callable procedures; RFC9457 errors; code-generate SDKs for Python/TS.
+
+- Storage layout & Docker
+  - Ground truth: JSON shards; optional `catalog.sqlite` (read-only) with `symbols`, `calls`, `anchors`, `fts`, and `ranking_features` tables for fast queries.
+  - In containers, set `CATALOG_ROOT=/srv/catalog`; CLI loads SQLite first, falls back to shards.
+  - Multi-stage Dockerfile with `uv build` to produce the wheel; install into slim runtime image; no daemons; ENTRYPOINT stays shell/runner.
+
+- Agent Hints / Change Impact / Exemplars
+  - `agent_hints`: `intent_tags` (list[str]), `safe_ops` (list[str]), `tests_to_run` (list[str]), `perf_budgets` (object), `breaking_change_notes` (list[str]).
+  - `change_impact`: `callers`, `callees`, `tests`, `codeowners`, `churn_last_n` (ints) per symbol/module; optional separate shard.
+  - `exemplars`: list of objects `{title, language, snippet, counter_example?, negative_prompts?, context_notes?}`.
+
+- Ordering semantics (JSON Schema)
+  - Property order is not guaranteed; any ordered data (e.g., `remap_order`) is represented as arrays with explicit order.
 
 
 ## JSON: Agent Catalog format (overview)
