@@ -784,7 +784,7 @@ def _print_failure_summary(payload: Mapping[str, object]) -> None:  # noqa: C901
             message = _coerce_str(entry.get("message"), "no additional details")
             lines.append(f"    - {file_name}: {status} ({message})")
     for line in lines:
-        print(line, file=sys.stderr)
+        LOGGER.error(line)
 
 
 def _run(  # noqa: C901, PLR0912, PLR0915
@@ -1289,14 +1289,14 @@ def _command_schema(args: argparse.Namespace) -> int:
     target.parent.mkdir(parents=True, exist_ok=True)
     write_schema(target)
     rel = target.relative_to(REPO_ROOT)
-    print(f"Schema written to {rel}")
+    LOGGER.info("Schema written to %s", rel)
     return EXIT_SUCCESS
 
 
 def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PLR0915
     """Run environment and configuration diagnostics."""
     _, selection = _load_config(args)
-    print(f"[DOCTOR] Active config: {selection.path} ({selection.source})")
+    LOGGER.info("[DOCTOR] Active config: %s (%s)", selection.path, selection.source)
     issues: list[str] = []
     try:
         current = sys.version_info
@@ -1378,21 +1378,21 @@ def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PL
 
     drift_status = EXIT_SUCCESS
     if getattr(args, "stubs", False):
-        print("[DOCTOR] Running stub drift check...")
+        LOGGER.info("[DOCTOR] Running stub drift check...")
         drift_status = run_stub_drift()
         if drift_status != 0:
             issues.append("Stub drift detected; see output above.")
 
     if issues:
-        print("[DOCTOR] Configuration issues detected:")
+        LOGGER.error("[DOCTOR] Configuration issues detected:")
         for item in issues:
-            print(f"  - {item}")
+            LOGGER.error("  - %s", item)
         return EXIT_CONFIG
 
     if drift_status != 0:
         return EXIT_CONFIG
 
-    print("Docstring builder environment looks good.")
+    LOGGER.info("Docstring builder environment looks good.")
     return EXIT_SUCCESS
 
 
