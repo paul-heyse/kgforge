@@ -1,10 +1,5 @@
 #!/usr/bin/env python
-"""Overview of migrate navmaps.
-
-This module bundles migrate navmaps logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
-"""
+"""Regenerate the navigation map JSON consumed by the documentation site."""
 
 from __future__ import annotations
 
@@ -21,27 +16,22 @@ DEFAULT_OUTPUT: Final[Path] = (
 
 
 def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> NavIndexDict:
-    """Compute migrate navmaps.
-
-    Carry out the migrate navmaps operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Rebuild the navigation map JSON file from the current source tree.
 
     Parameters
     ----------
-    output : Path | None
-        Optional parameter default ``None``. Description for ``output``.
-    pretty : bool | None
-        Optional parameter default ``True``. Description for ``pretty``.
+    output
+        Destination path for the generated JSON document. When ``None`` the
+        navmap is only returned to the caller.
+    pretty
+        When ``True`` the JSON is emitted with indentation suitable for code
+        reviews; otherwise a compact representation is written.
 
     Returns
     -------
-    collections.abc.Mapping
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.navmap.migrate_navmaps import migrate_navmaps
-    >>> result = migrate_navmaps()
-    >>> result  # doctest: +ELLIPSIS
+    NavIndexDict
+        Structured navigation metadata emitted by
+        :func:`tools.navmap.build_navmap.build_index`.
     """
     index = build_index()
     if output:
@@ -52,20 +42,7 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> NavIndex
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    """Compute parse args.
-
-    Carry out the parse args operation.
-
-    Parameters
-    ----------
-    argv : List[str] | None
-        Description for ``argv``.
-
-    Returns
-    -------
-    argparse.Namespace
-        Description of return value.
-    """
+    """Parse CLI arguments for the navmap migration utility."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--output",
@@ -82,25 +59,17 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Compute main.
-
-    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """CLI entry point for regenerating the navmap JSON asset.
 
     Parameters
     ----------
-    argv : List[str] | None
-        Optional parameter default ``None``. Description for ``argv``.
+    argv
+        Optional argument vector, primarily used by tests.
 
     Returns
     -------
     int
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.navmap.migrate_navmaps import main
-    >>> result = main()
-    >>> result  # doctest: +ELLIPSIS
+        ``0`` on success so the helper integrates cleanly with shell pipelines.
     """
     args = _parse_args(argv)
     migrate_navmaps(args.output, pretty=not args.compact)
