@@ -32,19 +32,21 @@ against security regressions.
   - **Performance regressions:** Benchmarks and budgets recorded in Phase 2; telemetry monitored during rollout.
 
 ## Acceptance
-- **Phase 0 baseline:** Recorded outputs for `uv run ruff format && uv run ruff check src`, `uv run pyrefly check --show-suppressed`, `uv run mypy --config-file mypy.ini`, `uv run pytest -q --maxfail=1`, doctest coverage snapshot, `python tools/check_imports.py`, `uv run pip-audit --strict`, `openspec validate src-hardening-phases-0-2`, and docstring coverage metrics; four-item design note maps requirements to planned tests.
+- **Phase 0 baseline:** Recorded outputs for `uv run ruff format && uv run ruff check src`, `uv run pyrefly check src --show-suppressed`, `uv run mypy --config-file mypy.ini src`, `uv run pytest -q --maxfail=1`, doctest/xdoctest snapshot, docstring coverage report (≥90%), `python tools/check_imports.py`, `uv run pip-audit --strict`, `openspec validate src-hardening-phases-0-2`, and telemetry dashboard links; four-item design note maps requirements to planned tests.
 - **Phase 2 delivery:**
-  - Public APIs are fully typed with PEP 257/NumPy docstrings; Problem Details samples committed and referenced.
-  - JSON Schema 2020-12/OpenAPI 3.2 artefacts validate against meta-schemas and Spectral; round-trip tests prove parity.
-  - Pytest suites include parametrized happy/edge/failure/retry/injection scenarios; doctest/xdoctest runs clean.
-  - pyrefly + mypy report zero diagnostics for targeted modules; no unexplained `# type: ignore`.
-  - Structured logs, metrics, and traces emit correlation IDs; settings flow through typed env configuration; async boundaries document timeout/cancellation behaviour.
-  - Security guardrails: no unsafe `pickle`/`eval`, inputs validated, `pip-audit --strict` clean, secret scan clean, path traversal prevented.
-  - Modularity enforced via updated import-linter contracts; functions refactored to single responsibility; idempotency tests demonstrate retry semantics.
-  - Performance benchmarks meet documented budgets or have approved mitigations.
+  - Public APIs are fully typed with PEP 257/NumPy docstrings; docstring coverage ≥90%; Problem Details samples and curated exception taxonomy committed per surface; `raise ... from err` enforced.
+  - JSON Schema 2020-12/OpenAPI 3.2 artefacts serve as source of truth with examples/versioning notes; schema example files published; Spectral + meta-schema validation clean; round-trip tests green.
+  - Pytest suites include parametrized happy/edge/failure/retry/injection/error-path cases and doctest/xdoctest runs; scenario↔test mapping documented.
+  - No untyped public APIs; third-party integrations covered by protocols/stubs; pyrefly/mypy report zero diagnostics with no unexplained `# type: ignore`.
+  - Structured logs, metrics, and traces emit correlation IDs; module loggers expose `NullHandler`; failing paths unit-tested to emit log + counter + span; no prints in libraries.
+  - Typed settings fail fast: missing env vars raise `SettingsError` + Problem Details payload; tests cover this behaviour.
+  - Async context propagation verified via tests; no blocking calls in async code (thread pools used where required).
+  - Security guardrails: unsafe `pickle`/`eval` removed; YAML `safe_load` enforced; tests cover path traversal, SQL injection, unsafe YAML; `pip-audit --strict` and secret scan clean.
+  - Import-linter contracts enforce package layering; high-complexity functions refactored; idempotency tests for registry/catalog writes pass.
+  - Performance benchmarks run with seeded fixtures, `time.monotonic()` timing, and budgets tracked; deviations documented.
 - **Phase 3 rollout:**
-  - Full quality, packaging, and docs gates rerun post-refactor (`pip wheel .`, clean `pip install .[faiss,duckdb,splade,gpu]`, `make artifacts && git diff --exit-code`, updated Agent Portal examples).
-  - CHANGELOG uses SemVer language, deprecations carry warnings + migration paths, and docs cross-link schemas/examples.
-  - Telemetry dashboards confirm failing scenarios emit log + metric + trace with correlation IDs and respect budgets.
-  - Feature flags flip only after staging burn-in; rollback steps documented; execution note archives command outputs, telemetry snapshots, benchmark baselines, and residual risks.
+  - Full quality, packaging, and docs gates rerun (`pip wheel .`, clean extras install, metadata validation, `make artifacts && git diff --exit-code`, Agent Portal deep-link checks, docstring coverage) before flag flips.
+  - CHANGELOG uses SemVer language; deprecations warn once with removal version; docs cross-link schemas/examples and Agent Portal links verified.
+  - Telemetry dashboards show failing scenarios emit log + metric + trace with correlation IDs and respect budgets; evidence captured.
+  - Feature flags flip only after staging burn-in; rollback steps documented; execution note archives command outputs, telemetry snapshots, benchmarks, metadata validation, doc coverage, and residual risks.
 

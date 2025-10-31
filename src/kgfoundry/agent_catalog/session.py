@@ -53,7 +53,7 @@ class CatalogSession:
     repo_root : Path | None, optional
         Describe ``repo_root``.
         Defaults to ``None``.
-"""
+    """
 
     def __init__(
         self,
@@ -81,7 +81,7 @@ class CatalogSession:
         repo_root : Path | NoneType, optional
             Configure the repo root. Defaults to ``None``.
             Defaults to ``None``.
-"""
+        """
         command_sequence = command or self._default_command()
         self._command = [str(part) for part in command_sequence]
         if catalog is not None:
@@ -102,7 +102,7 @@ class CatalogSession:
         -------
         list[str]
             Describe return value.
-"""
+        """
         return [
             sys.executable,
             "-m",
@@ -118,7 +118,7 @@ class CatalogSession:
         -------
         str
             Describe return value.
-"""
+        """
         if self._process is None or self._process.poll() is not None:
             with with_fields(
                 logger, operation="session_spawn", status="started", command=" ".join(self._command)
@@ -154,7 +154,7 @@ class CatalogSession:
             Describe ``process``.
         payload : dict[str, object]
             Describe ``payload``.
-"""
+        """
         stdin = process.stdin
         if stdin is None:
             message = "catalogctl-mcp stdin is unavailable"
@@ -176,7 +176,7 @@ class CatalogSession:
         -------
         dict[str, object]
             Describe return value.
-"""
+        """
         stdout = process.stdout
         if stdout is None:
             message = "catalogctl-mcp stdout is unavailable"
@@ -219,7 +219,7 @@ class CatalogSession:
         -------
         int | str
             Describe return value.
-"""
+        """
         if isinstance(value, (str, int)):
             return value
         message = f"Invalid JSON-RPC ID: expected string or number, got {type(value).__name__}"
@@ -242,7 +242,7 @@ class CatalogSession:
         -------
         int
             Describe return value.
-"""
+        """
         if isinstance(value, int):
             if _MIN_STATUS_CODE <= value <= _MAX_STATUS_CODE:
                 return value
@@ -284,7 +284,7 @@ class CatalogSession:
         -------
         object
             Describe return value.
-"""
+        """
         with with_fields(
             logger, operation="jsonrpc_request", method=method, status="started"
         ) as log_adapter:
@@ -357,7 +357,7 @@ class CatalogSession:
         -------
         dict[str, object]
             Describe return value.
-"""
+        """
         result = self._send_request("initialize")
         # result is JsonValue, narrow to JsonObject (dict)
         if isinstance(result, dict):
@@ -390,7 +390,7 @@ class CatalogSession:
         -------
         list[dict[str, object]]
             Describe return value.
-"""
+        """
         # Build params dict - facets dict[str, str] is compatible with JsonValue
         facets_dict: dict[str, str] = facets or {}
         params: JsonObject = {
@@ -417,7 +417,7 @@ class CatalogSession:
         -------
         dict[str, object]
             Describe return value.
-"""
+        """
         result = self._send_request("catalog.symbol", {"symbol_id": symbol_id})
         # result is JsonValue, narrow to JsonObject (dict)
         if isinstance(result, dict):
@@ -438,7 +438,7 @@ class CatalogSession:
         -------
         list[str]
             Describe return value.
-"""
+        """
         result = self._send_request("catalog.find_callers", {"symbol_id": symbol_id})
         if isinstance(result, list):
             return [str(entry) for entry in result]
@@ -458,7 +458,7 @@ class CatalogSession:
         -------
         list[str]
             Describe return value.
-"""
+        """
         result = self._send_request("catalog.find_callees", {"symbol_id": symbol_id})
         if isinstance(result, list):
             return [str(entry) for entry in result]
@@ -478,7 +478,7 @@ class CatalogSession:
         -------
         dict[str, object]
             Describe return value.
-"""
+        """
         result = self._send_request("catalog.change_impact", {"symbol_id": symbol_id})
         # result is JsonValue, narrow to JsonObject (dict)
         if isinstance(result, dict):
@@ -499,7 +499,7 @@ class CatalogSession:
         -------
         list[dict[str, object]]
             Describe return value.
-"""
+        """
         result = self._send_request("catalog.suggest_tests", {"symbol_id": symbol_id})
         if isinstance(result, list):
             return [cast(JsonObject, entry) for entry in result]
@@ -519,7 +519,7 @@ class CatalogSession:
         -------
         dict[str, str]
             Describe return value.
-"""
+        """
         result = self._send_request("catalog.open_anchor", {"symbol_id": symbol_id})
         if isinstance(result, dict):
             return {str(key): str(value) for key, value in result.items()}
@@ -539,7 +539,7 @@ class CatalogSession:
         -------
         list[str]
             Describe return value.
-"""
+        """
         result = self._send_request("catalog.list_modules", {"package": package})
         if isinstance(result, list):
             return [str(entry) for entry in result]
@@ -549,7 +549,7 @@ class CatalogSession:
         """Request a graceful shutdown of the underlying process.
 
         <!-- auto:docstring-builder v1 -->
-"""
+        """
         with with_fields(logger, operation="session_shutdown", status="started") as log_adapter:
             try:
                 self._send_request("session.shutdown")
@@ -565,7 +565,7 @@ class CatalogSession:
         """Terminate the session process if it is running.
 
         <!-- auto:docstring-builder v1 -->
-"""
+        """
         process = self._process
         if process is None:
             return
@@ -588,7 +588,7 @@ class CatalogSession:
         -------
         CatalogSession
             Describe return value.
-"""
+        """
         self._ensure_process()
         return self
 
@@ -610,7 +610,7 @@ class CatalogSession:
             Describe ``exc``.
         tb : traceback | NoneType
             Describe ``tb``.
-"""
+        """
         _ = exc_type, exc, tb
         self.close()
 

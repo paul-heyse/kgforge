@@ -59,7 +59,7 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k_rrf: int = 60) -> dict[st
     -------
     dict[str, float]
         Describe return value.
-"""
+    """
     agg: dict[str, float] = {}
     for ranked in rankers:
         for r, (key, _score) in enumerate(ranked, start=1):

@@ -248,9 +248,11 @@ def _legacy_to_document(payload: Mapping[str, Any]) -> AgentAnalyticsDocument:
         catalog=metrics,
         portal=PortalAnalytics(sessions=sessions),
         errors=AnalyticsErrors(
-            broken_links=int(error_section.get("broken_links", len(broken_links)))
-            if isinstance(error_section, Mapping)
-            else len(broken_links),
+            broken_links=(
+                int(error_section.get("broken_links", len(broken_links)))
+                if isinstance(error_section, Mapping)
+                else len(broken_links)
+            ),
             details=broken_links,
         ),
     )

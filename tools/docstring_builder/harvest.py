@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
 import libcst as cst
+
 from tools.docstring_builder.config import BuilderConfig
 from tools.griffe_utils import resolve_griffe
 

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -22,6 +22,7 @@ def _pythonpath_env() -> dict[str, str]:
         "PROMETHEUS_DISABLE_CREATED_SERIES": "True",
     }
     return env
+
 
 from tools._shared.logging import get_logger, with_fields
 from tools._shared.proc import ToolExecutionError, run_tool

@@ -110,7 +110,7 @@ class JsonFormatter(logging.Formatter):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def format(self, record: logging.LogRecord) -> str:
         """Format log record as JSON.
@@ -126,7 +126,7 @@ class JsonFormatter(logging.Formatter):
         -------
         str
             JSON-encoded log entry.
-"""
+        """
         # Log data is JSON-serializable - use JsonValue instead of Any
         data: dict[str, JsonValue] = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
@@ -220,7 +220,7 @@ class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]  # pyrefly
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def process(self, msg: str, kwargs: Any) -> tuple[str, Any]:  # noqa: ANN401
         """Process log message and inject structured fields.
@@ -238,7 +238,7 @@ class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]  # pyrefly
         -------
         tuple[str, Any]
             Processed message and kwargs with injected fields.
-"""
+        """
         if not isinstance(kwargs, dict):
             return msg, kwargs
 
@@ -273,7 +273,7 @@ class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]  # pyrefly
             Extra dict to populate.
         kwargs : dict[str, Any]
             Keyword arguments containing log level.
-"""
+        """
         if "operation" not in extra:
             extra["operation"] = "unknown"
         if "status" not in extra:
@@ -310,7 +310,7 @@ def get_logger(name: str) -> LoggerAdapter:
     >>> from kgfoundry_common.logging import get_logger
     >>> logger = get_logger(__name__)
     >>> logger.info("Operation complete", extra={"operation": "index_build", "status": "success"})
-"""
+    """
     logger = logging.getLogger(name)
 
     # Add NullHandler if no handlers exist (prevents duplicate handlers in libraries)
@@ -339,7 +339,7 @@ def setup_logging(level: int = logging.INFO) -> None:
     >>> from kgfoundry_common.logging import setup_logging
     >>> import logging
     >>> setup_logging(level=logging.DEBUG)
-"""
+    """
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())
     logging.basicConfig(level=level, handlers=[handler], force=True)
@@ -375,7 +375,7 @@ def set_correlation_id(correlation_id: str | None) -> None:
       IDs between different threads/async tasks.
     - **Cancellation**: If an async task is cancelled, the correlation ID
       context is automatically cleaned up.
-"""
+    """
     _correlation_id.set(correlation_id)
 
 
@@ -394,7 +394,7 @@ def get_correlation_id() -> str | None:
     >>> from kgfoundry_common.logging import set_correlation_id, get_correlation_id
     >>> set_correlation_id("req-123")
     >>> assert get_correlation_id() == "req-123"
-"""
+    """
     return _correlation_id.get()
 
 
@@ -419,7 +419,7 @@ class CorrelationContext:
     >>> with CorrelationContext(correlation_id="req-123"):
     ...     logger.info("Request started")  # correlation_id="req-123" auto-injected
     >>> # Correlation ID is automatically cleared when context exits
-"""
+    """
 
     def __init__(self, correlation_id: str | None) -> None:
         """Initialize correlation context.
@@ -430,7 +430,7 @@ class CorrelationContext:
         ----------
         correlation_id : str | NoneType
             Correlation ID to set in context (or None to clear).
-"""
+        """
         self.correlation_id = correlation_id
         self._token: contextvars.Token[str | None] | None = None
 
@@ -443,7 +443,7 @@ class CorrelationContext:
         -------
         CorrelationContext
             Self for use as context manager.
-"""
+        """
         self._token = _correlation_id.set(self.correlation_id)
         return self
 
@@ -460,7 +460,7 @@ class CorrelationContext:
             Exception value (if any).
         exc_tb : Any
             Exception traceback (if any).
-"""
+        """
         if self._token is not None:
             _correlation_id.reset(self._token)
 
@@ -514,7 +514,7 @@ def with_fields(
     -------
     LoggerAdapter
         Describe return value.
-"""
+    """
     # Extract underlying logger if already wrapped
     base_logger = logger.logger if isinstance(logger, LoggerAdapter) else logger
 

@@ -6,6 +6,7 @@ import importlib
 import importlib.util
 import os
 from collections.abc import Iterable
+from typing import Callable, cast
 
 GPU_CORE_MODULES: tuple[str, ...] = (
     "torch",
@@ -35,7 +36,7 @@ def _modules_available(modules: Iterable[str]) -> bool:
     -------
     bool
         Describe return value.
-"""
+    """
     return all(importlib.util.find_spec(module) is not None for module in modules)
 
 
@@ -55,7 +56,7 @@ def has_gpu_stack(*, allow_without_cuda_env: str = "ALLOW_GPU_TESTS_WITHOUT_CUDA
     -------
     bool
         True when the GPU stack is available or the override environment variable is set.
-"""
+    """
     if not _modules_available(GPU_CORE_MODULES):
         return False
     if os.getenv(allow_without_cuda_env) == "1":
@@ -67,7 +68,8 @@ def has_gpu_stack(*, allow_without_cuda_env: str = "ALLOW_GPU_TESTS_WITHOUT_CUDA
     cuda_module = getattr(torch_module, "cuda", None)
     if cuda_module is None:
         return False
-    is_available = getattr(cuda_module, "is_available", None)
-    if not callable(is_available):
+    is_available_attr = getattr(cuda_module, "is_available", None)
+    if not callable(is_available_attr):
         return False
+    is_available: Callable[[], bool] = cast(Callable[[], bool], is_available_attr)
     return bool(is_available())

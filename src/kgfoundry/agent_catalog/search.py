@@ -51,7 +51,7 @@ class EmbeddingModelProtocol(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def encode(self, sentences: Sequence[str], **_: object) -> VectorArray:
         """Return embeddings for the provided sentences.
@@ -69,7 +69,7 @@ class EmbeddingModelProtocol(Protocol):
         -------
         tuple[int, ...] | np.float32
             Describe return value.
-"""
+        """
         ...
 
 
@@ -97,7 +97,7 @@ class SearchConfig:
         Describe ``candidate_pool``.
     lexical_fields : list[str]
         Describe ``lexical_fields``.
-"""
+    """
 
     alpha: float
     candidate_pool: int
@@ -130,7 +130,7 @@ class SearchOptions:
     batch_size : int | NoneType, optional
         Describe ``batch_size``.
         Defaults to ``None``.
-"""
+    """
 
     alpha: float | None = None
     facets: Mapping[str, str] | None = None
@@ -177,7 +177,7 @@ class SearchDocument:
     row : int, optional
         Describe ``row``.
         Defaults to ``-1``.
-"""
+    """
 
     symbol_id: str
     package: str
@@ -229,7 +229,7 @@ class SearchResult:
         Describe ``docstring``.
     anchor : dict[str, int | NoneType]
         Describe ``anchor``.
-"""
+    """
 
     symbol_id: str
     score: float
@@ -270,7 +270,7 @@ class VectorSearchContext:
         Describe ``candidate_ids``.
     row_to_document : int | SearchDocument
         Describe ``row_to_document``.
-"""
+    """
 
     semantic_meta: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
     mapping_payload: Mapping[
@@ -298,7 +298,7 @@ class _SimpleFaissIndex(FaissIndexProtocol):
     ----------
     dimension : int
         Describe ``dimension``.
-"""
+    """
 
     def __init__(self, dimension: int) -> None:
         """Document   init  .
@@ -313,7 +313,7 @@ class _SimpleFaissIndex(FaissIndexProtocol):
         ----------
         dimension : int
             Configure the dimension.
-"""
+        """
         self.dimension = dimension
         self._vectors: VectorArray = np.empty((0, dimension), dtype=np.float32)
 
@@ -335,7 +335,7 @@ class _SimpleFaissIndex(FaissIndexProtocol):
         ------
         AgentCatalogSearchError
             Raised when message.
-"""
+        """
         array = np.asarray(vectors, dtype=np.float32)
         if array.ndim != EMBEDDING_MATRIX_RANK or array.shape[1] != self.dimension:
             message = "Vector dimension does not match index configuration"
@@ -354,7 +354,7 @@ class _SimpleFaissIndex(FaissIndexProtocol):
         ----------
         vectors : tuple[int, ...] | np.float32
             Describe ``vectors``.
-"""
+        """
         # Simple flat index doesn't require training
 
     def add_with_ids(self, vectors: VectorArray, ids: IndexArray) -> None:  # noqa: ARG002
@@ -368,7 +368,7 @@ class _SimpleFaissIndex(FaissIndexProtocol):
             Describe ``vectors``.
         ids : tuple[int, ...] | np.int64
             Describe ``ids``.
-"""
+        """
         # Simple index doesn't support ID mapping, fall back to regular add
         self.add(vectors)
 
@@ -399,7 +399,7 @@ class _SimpleFaissIndex(FaissIndexProtocol):
         ------
         AgentCatalogSearchError
             Raised when message.
-"""
+        """
         queries = np.asarray(vectors, dtype=np.float32)
         if queries.ndim != EMBEDDING_MATRIX_RANK or queries.shape[1] != self.dimension:
             message = "Query vector dimension does not match index configuration"
@@ -436,7 +436,7 @@ class _SimpleFaissModule:
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     # FAISS metric constants
     METRIC_INNER_PRODUCT: int = 1
@@ -457,7 +457,7 @@ class _SimpleFaissModule:
         -------
         FaissIndexProtocol
             Flat index instance.
-"""
+        """
         return cast(FaissIndexProtocol, _SimpleFaissIndex(dimension))
 
     @staticmethod
@@ -482,7 +482,7 @@ class _SimpleFaissModule:
         -------
         FaissIndexProtocol
             Flat index instance.
-"""
+        """
         # Simple implementation ignores factory_string and always returns flat index
         return cast(FaissIndexProtocol, _SimpleFaissIndex(dimension))
 
@@ -503,7 +503,7 @@ class _SimpleFaissModule:
         -------
         FaissIndexProtocol
             Index with ID mapping (same instance in simple implementation).
-"""
+        """
         # Simple implementation doesn't support ID mapping, return as-is
         return index
 
@@ -519,7 +519,7 @@ class _SimpleFaissModule:
             Index instance to save.
         path : str
             File path for the persisted index.
-"""
+        """
         if not isinstance(index, _SimpleFaissIndex):
             message = f"Simple module can only write _SimpleFaissIndex instances, got {type(index)}"
             raise AgentCatalogSearchError(message)
@@ -545,7 +545,7 @@ class _SimpleFaissModule:
         -------
         FaissIndexProtocol
             Loaded index instance.
-"""
+        """
         with Path(path).open("rb") as handle:
             payload_raw: object = pickle.load(handle)  # noqa: S301 - local trusted artifact
         if not isinstance(payload_raw, dict):
@@ -581,7 +581,7 @@ class _SimpleFaissModule:
         ----------
         vectors : tuple[int, ...] | np.float32
             Array to normalize (modified in-place).
-"""
+        """
         norms = np.linalg.norm(vectors, axis=1, keepdims=True)  # type: ignore[misc]
         norms[norms == 0] = 1.0  # type: ignore[misc]
         vectors /= norms  # type: ignore[misc]
@@ -597,7 +597,7 @@ def _simple_faiss_module() -> FaissModuleProtocol:
     -------
     FaissModuleProtocol
         Describe return value.
-"""
+    """
     return cast(FaissModuleProtocol, _SimpleFaissModule())
 
 
@@ -615,7 +615,7 @@ def load_faiss(purpose: str) -> FaissModuleProtocol:
     -------
     FaissModuleProtocol
         Describe return value.
-"""
+    """
     override = os.getenv(_FAISS_ENV_OVERRIDE)
     candidates: tuple[str, ...] = (override,) if override else _FAISS_DEFAULT_MODULES
     failures: list[str] = []
@@ -683,7 +683,7 @@ def _tokenize(text: str) -> list[str]:
     -------
     list[str]
         Describe return value.
-"""
+    """
     return WORD_PATTERN.findall(text.lower())  # type: ignore[misc]
 
 
@@ -701,7 +701,7 @@ def _stringify(value: object) -> str | None:
     -------
     str | NoneType
         Describe return value.
-"""
+    """
     if value is None:
         return None
     return str(value)
@@ -727,7 +727,7 @@ def _extract_agent_hints_payload(
     -------
     tuple[list[str], list[str]]
         Describe return value.
-"""
+    """
     intent_tags: list[str] = []
     tests_to_run: list[str] = []
     agent_hints = symbol.get("agent_hints")
@@ -761,7 +761,7 @@ def _extract_docfacts_text(
     -------
     tuple[str | NoneType, str | NoneType]
         Describe return value.
-"""
+    """
     summary = None
     docstring = None
     if isinstance(docfacts, Mapping):
@@ -792,7 +792,7 @@ def _extract_anchor_lines(
     -------
     tuple[int | NoneType, int | NoneType]
         Describe return value.
-"""
+    """
     anchors = symbol.get("anchors")
     start_line: int | None = None
     end_line: int | None = None
@@ -834,7 +834,7 @@ def build_document_from_payload(
     -------
     SearchDocument
         Describe return value.
-"""
+    """
     docfacts_payload = symbol.get("docfacts")
     summary, docstring = _extract_docfacts_text(
         docfacts_payload if isinstance(docfacts_payload, Mapping) else None  # type: ignore[arg-type]
@@ -897,7 +897,7 @@ def iter_symbol_entries(
     -------
     tuple[str, str, str | str | int | float | bool | NoneType | list[object] | dict[str, object]]
         Describe return value.
-"""
+    """
     packages = catalog.get("packages")
     entries: list[
         tuple[
@@ -947,7 +947,7 @@ def documents_from_catalog(
     -------
     list[SearchDocument]
         Describe return value.
-"""
+    """
     documents: list[SearchDocument] = []
     for package_name, module_name, symbol in iter_symbol_entries(catalog):
         symbol_id = symbol.get("symbol_id")
@@ -982,7 +982,7 @@ def parse_bool(value: str) -> bool | None:
     -------
     bool | NoneType
         Describe return value.
-"""
+    """
     lowered = value.strip().lower()
     if lowered in {"1", "true", "yes", "on"}:
         return True
@@ -1007,7 +1007,7 @@ def document_matches_facets(document: SearchDocument, facets: Mapping[str, str])
     -------
     bool
         Describe return value.
-"""
+    """
     for key, value in facets.items():
         if key == "package" and document.package != value:
             return False
@@ -1038,7 +1038,7 @@ def prepare_query_tokens(query: str) -> collections.Counter[str]:
     -------
     str
         Describe return value.
-"""
+    """
     tokens = collections.Counter(_tokenize(query))
     if not tokens:
         tokens = collections.Counter(query.lower().split())
@@ -1070,7 +1070,7 @@ def resolve_search_parameters(
     -------
     tuple[float, int]
         Describe return value.
-"""
+    """
     alpha_value = options.alpha
     if alpha_value is None:
         alpha_candidate = catalog_search.get("alpha")
@@ -1113,7 +1113,7 @@ def compute_lexical_scores(
     -------
     dict[str, float]
         Describe return value.
-"""
+    """
     scores: dict[str, float] = {}
     lowered_query = query.lower()
     for document in documents:
@@ -1150,7 +1150,7 @@ def select_lexical_candidates(
     -------
     list[SearchDocument]
         Describe return value.
-"""
+    """
 
     def _get_score(doc: SearchDocument) -> float:
         return lexical_scores.get(doc.symbol_id, 0.0)
@@ -1187,7 +1187,7 @@ def _resolve_semantic_index_metadata(
     -------
     tuple[str | str | int | float | bool | NoneType | list[object] | dict[str, object], Path, Path] | NoneType
         Describe return value.
-"""
+    """
     semantic_meta = catalog.get("semantic_index")
     if not isinstance(semantic_meta, Mapping):
         return None
@@ -1238,7 +1238,7 @@ def _load_row_lookup(
     -------
     tuple[dict[str, int], str | str | int | float | bool | NoneType | list[object] | dict[str, object]]
         Describe return value.
-"""
+    """
     mapping_payload_raw = json.loads(mapping_path.read_text(encoding="utf-8"))  # type: ignore[misc]
     if not isinstance(mapping_payload_raw, dict):  # type: ignore[misc]
         message = "Semantic mapping file does not contain valid JSON object"
@@ -1279,7 +1279,7 @@ def _load_sentence_transformer(model_name: str) -> EmbeddingModelProtocol:
     -------
     EmbeddingModelProtocol
         Describe return value.
-"""
+    """
     try:
         module = importlib.import_module("sentence_transformers")
     except ImportError as exc:  # pragma: no cover - runtime guard
@@ -1318,7 +1318,7 @@ def _resolve_embedding_model(
     -------
     tuple[str, EmbeddingModelProtocol]
         Describe return value.
-"""
+    """
     model_name_raw = options.embedding_model or _stringify(semantic_meta.get("model"))
     model_name: str | None = model_name_raw
     if not model_name:
@@ -1358,7 +1358,7 @@ def _encode_query(
     -------
     tuple[int, ...] | np.float32
         Describe return value.
-"""
+    """
     try:
         encoded = model.encode(
             [query],
@@ -1395,7 +1395,7 @@ def _scores_from_index(
     -------
     dict[str, float]
         Describe return value.
-"""
+    """
     vector_scores: dict[str, float] = {}
     for idx, distance_row in enumerate(distances):  # type: ignore[misc]
         for rank, score in enumerate(distance_row):  # type: ignore[misc]
@@ -1431,7 +1431,7 @@ def compute_vector_scores(
     -------
     dict[str, float]
         Describe return value.
-"""
+    """
     _, model = _resolve_embedding_model(options, context.semantic_meta)  # type: ignore[arg-type]
     batch_size = options.batch_size or 32
     query_vector = _encode_query(model, query, batch_size=batch_size)
@@ -1469,7 +1469,7 @@ def merge_scores(
     -------
     list[SearchResult]
         Describe return value.
-"""
+    """
     results: list[SearchResult] = []
     max_lexical = max(lexical_scores.get(symbol_id, 0.0) for symbol_id in candidate_ids) or 1.0
     for symbol_id in candidate_ids:
@@ -1539,7 +1539,7 @@ def _prepare_search_documents(
     -------
     tuple[list[SearchDocument], tuple[str | str | int | float | bool | NoneType | list[object] | dict[str, object], Path, Path] | NoneType, str | str | int | float | bool | NoneType | list[object] | dict[str, object] | NoneType]
         Filtered documents, semantic metadata info (if available), and mapping payload.
-"""
+    """
     semantic_meta_info = _resolve_semantic_index_metadata(catalog, repo_root)
     row_lookup: dict[str, int] | None = None
     mapping_payload: (
@@ -1577,7 +1577,7 @@ def _perform_lexical_search(
     -------
     tuple[dict[str, float], set[str], dict[str, SearchDocument]]
         Lexical scores, candidate symbol IDs, and document lookup map.
-"""
+    """
     query_tokens = prepare_query_tokens(query)
     lexical_scores = compute_lexical_scores(query_tokens, documents, query)
     lexical_candidates = select_lexical_candidates(lexical_scores, documents, candidate_limit)
@@ -1606,7 +1606,7 @@ class VectorSearchParams:
         Describe ``k``.
     candidate_ids : set[str]
         Describe ``candidate_ids``.
-"""
+    """
 
     semantic_meta_info: tuple[
         Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]], Path, Path
@@ -1642,7 +1642,7 @@ def _perform_vector_search(
     -------
     tuple[dict[str, float], float]
         Vector similarity scores and alpha blending value.
-"""
+    """
     semantic_meta, index_path, _ = params.semantic_meta_info
     row_to_document = {doc.row: doc for doc in params.documents if doc.row >= 0}
     context = VectorSearchContext(
@@ -1678,7 +1678,7 @@ class SearchRequest:
     k : int, optional
         Describe ``k``.
         Defaults to ``10``.
-"""
+    """
 
     repo_root: Path
     query: str
@@ -1718,7 +1718,7 @@ def search_catalog(
     ------
     AgentCatalogSearchError
         Raised when search fails due to invalid input, missing artifacts, or model errors.
-"""
+    """
     active_metrics = metrics or MetricsProvider.default()
     active_options = options or SearchOptions()
     trimmed_query = request.query.strip()

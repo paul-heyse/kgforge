@@ -52,4 +52,4 @@ class HybridChunker:
     -------
     inspect._empty
         Describe return value.
-"""
+    """

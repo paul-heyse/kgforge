@@ -81,7 +81,7 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k_rrf: int = 60) -> dict[st
     >>> fused = rrf_fuse([dense, sparse], k_rrf=60)
     >>> "doc1" in fused and "doc2" in fused
     True
-"""
+    """
     with with_fields(logger, operation="rrf_fuse", k_rrf=k_rrf, num_rankers=len(rankers)):
         scores: dict[str, float] = {}
         for ranked in rankers:
@@ -138,7 +138,7 @@ def apply_kg_boosts(
     >>> boosted = apply_kg_boosts(cands, "test query", kg_concepts={"doc1": {"C:42"}})
     >>> boosted["doc1"] > cands["doc1"]
     True
-"""
+    """
     with with_fields(logger, operation="apply_kg_boosts", query=query[:50]):
         if kg_concepts is None:
             logger.debug("No KG concepts provided, skipping boosts")
@@ -205,7 +205,7 @@ def mmr_deduplicate(
     >>> deduped = mmr_deduplicate(results)
     >>> len(deduped) <= len(results)
     True
-"""
+    """
     with with_fields(logger, operation="mmr_deduplicate", lambda_mmr=lambda_mmr):
         # Simple deduplication (full MMR requires document embeddings)
         seen: set[str] = set()
@@ -270,7 +270,7 @@ def search_service(
     >>> response = search_service(results)
     >>> response["total"] == len(results)
     True
-"""
+    """
     active_metrics = metrics or MetricsProvider.default()
     start_time = time.time()
 

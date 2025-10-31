@@ -64,7 +64,7 @@ def tok(text: str) -> list[str]:
     -------
     list[str]
         Describe return value.
-"""
+    """
     # re.findall returns list[str] when pattern has no groups
     matches: list[str] = TOKEN.findall(text or "")
     return [token.lower() for token in matches]
@@ -91,7 +91,7 @@ class SpladeDoc:
         Describe ``section``.
     text : str
         Describe ``text``.
-"""
+    """
 
     chunk_id: str
     doc_id: str
@@ -119,7 +119,7 @@ class SpladeIndex:
     sparse_root : str | None, optional
         Describe ``sparse_root``.
         Defaults to ``None``.
-"""
+    """
 
     def __init__(
         self,
@@ -143,7 +143,7 @@ class SpladeIndex:
         sparse_root : str | NoneType, optional
             Describe ``sparse_root``.
             Defaults to ``None``.
-"""
+        """
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -162,7 +162,7 @@ class SpladeIndex:
         ----------
         chunks_root : str | NoneType
             Describe ``chunks_root``.
-"""
+        """
         _ = chunks_root  # optional override currently unused
         if not Path(self.db_path).exists():
             return
@@ -229,7 +229,7 @@ class SpladeIndex:
         -------
         list[tuple[int, float]]
             Describe return value.
-"""
+        """
         if self.N == 0:
             return []
         terms = tok(query)
@@ -270,5 +270,5 @@ class SpladeIndex:
         -------
         SpladeDoc
             Describe return value.
-"""
+        """
         return self.docs[index]

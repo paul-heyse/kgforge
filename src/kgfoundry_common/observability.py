@@ -17,18 +17,19 @@ Examples
 from __future__ import annotations
 
 import time
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Final, Protocol
+from typing import TYPE_CHECKING, Final, Protocol, cast
 
 from kgfoundry_common.logging import get_logger
 from kgfoundry_common.navmap_types import NavMap
 
-if TYPE_CHECKING:
-    from collections.abc import Iterator
-
 __all__ = [
     "MetricsProvider",
+    "MetricsRegistry",
+    "get_metrics_registry",
     "observe_duration",
+    "record_operation",
     "start_span",
 ]
 
@@ -60,30 +61,76 @@ __navmap__: Final[NavMap] = {
 
 logger = get_logger(__name__)
 
-# Prometheus client is optional (may not be installed)
 if TYPE_CHECKING:
-    from prometheus_client import Counter, Histogram
-    from prometheus_client.registry import CollectorRegistry
+    from prometheus_client.metrics import Counter as PromCounterType
+    from prometheus_client.metrics import Histogram as PromHistogramType
+    from prometheus_client.registry import CollectorRegistry as PromCollectorRegistryType
+    CollectorRegistryType = PromCollectorRegistryType
 else:
-    CollectorRegistry = object
-    Counter = object
-    Histogram = object
+    PromCounterType = PromHistogramType = PromCollectorRegistryType = object
+    CollectorRegistryType = object  # type: ignore[assignment]
+
+_RuntimeCounter: object | None = None
+_RuntimeHistogram: object | None = None
+_RuntimeCollectorRegistry: object | None = None
 
 try:
-    from prometheus_client import Counter, Histogram
-    from prometheus_client.registry import CollectorRegistry
+    from prometheus_client import Counter as _RuntimeCounter
+    from prometheus_client import Histogram as _RuntimeHistogram
+    from prometheus_client.registry import CollectorRegistry as _RuntimeCollectorRegistry
 
     HAVE_PROMETHEUS = True
-    _PROMETHEUS_VERSION: str | None = None
+    _PROMETHEUS_VERSION: str | None
     try:
         import prometheus_client
 
         _PROMETHEUS_VERSION = getattr(prometheus_client, "__version__", None)
     except Exception as exc:  # noqa: BLE001
         logger.debug("Could not detect Prometheus version: %s", exc)
+        _PROMETHEUS_VERSION = None
 except ImportError:
     HAVE_PROMETHEUS = False
     _PROMETHEUS_VERSION = None
+    _RuntimeCounter = None
+    _RuntimeHistogram = None
+    _RuntimeCollectorRegistry = None
+
+
+class _StubCollectorRegistry:
+    """Stub collector registry used when Prometheus is unavailable."""
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        self._args = args
+        self._kwargs = kwargs
+
+
+class _StubCounter:
+    """Stub counter used when Prometheus is unavailable."""
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        self._args = args
+        self._kwargs = kwargs
+
+    def labels(self, **kwargs: object) -> _StubCounter:
+        return self
+
+    def inc(self, *args: object, **kwargs: object) -> None:
+        return None
+
+
+class _StubHistogram:
+    """Stub histogram used when Prometheus is unavailable."""
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        self._args = args
+        self._kwargs = kwargs
+
+    def labels(self, **kwargs: object) -> _StubHistogram:
+        return self
+
+    def observe(self, *args: object, **kwargs: object) -> None:
+        return None
+
 
 # OpenTelemetry is optional (may not be installed)
 try:
@@ -112,7 +159,7 @@ class CounterLike(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def labels(self, **kwargs: object) -> CounterLike:
         """Return labeled counter instance.
@@ -128,7 +175,7 @@ class CounterLike(Protocol):
         -------
         CounterLike
             Describe return value.
-"""
+        """
         ...
 
     def inc(self, *args: object, **kwargs: object) -> None:
@@ -142,7 +189,7 @@ class CounterLike(Protocol):
             Describe ``args``.
         **kwargs : object
             Describe ``kwargs``.
-"""
+        """
         ...
 
 
@@ -162,7 +209,7 @@ class HistogramLike(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def labels(self, **kwargs: object) -> HistogramLike:
         """Return labeled histogram instance.
@@ -178,7 +225,7 @@ class HistogramLike(Protocol):
         -------
         HistogramLike
             Describe return value.
-"""
+        """
         ...
 
     def observe(self, *args: object, **kwargs: object) -> None:
@@ -192,7 +239,7 @@ class HistogramLike(Protocol):
             Describe ``args``.
         **kwargs : object
             Describe ``kwargs``.
-"""
+        """
         ...
 
 
@@ -212,7 +259,7 @@ class GaugeLike(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def labels(self, **kwargs: object) -> GaugeLike:
         """Return labeled gauge instance.
@@ -228,7 +275,7 @@ class GaugeLike(Protocol):
         -------
         GaugeLike
             Describe return value.
-"""
+        """
         ...
 
     def set(self, value: float) -> None:
@@ -240,133 +287,52 @@ class GaugeLike(Protocol):
         ----------
         value : float
             Describe ``value``.
-"""
+        """
         ...
 
 
-# Stub implementations that satisfy type checkers
-class _StubCounter:
-    """Stub counter for when prometheus_client is unavailable.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
-"""
-
-    def labels(self, **kwargs: object) -> _StubCounter:  # noqa: ARG002
-        """Return self for chaining.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        **kwargs : object
-            Describe ``kwargs``.
-
-        Returns
-        -------
-        _StubCounter
-            Describe return value.
-"""
-        return self
-
-    def inc(self, value: float = 1.0) -> None:
-        """No-op increment.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        value : float, optional
-            Describe ``value``.
-            Defaults to ``1.0``.
-"""
-
-
-class _StubHistogram:
-    """Stub histogram for when prometheus_client is unavailable.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
-"""
-
-    def labels(self, **kwargs: object) -> _StubHistogram:  # noqa: ARG002
-        """Return self for chaining.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        **kwargs : object
-            Describe ``kwargs``.
-
-        Returns
-        -------
-        _StubHistogram
-            Describe return value.
-"""
-        return self
-
-    def observe(self, value: float) -> None:
-        """No-op observe.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        value : float
-            Describe ``value``.
-"""
-
-
+# Stub gauge for compatibility (unchanged behavior when Prometheus missing)
 class _StubGauge:
-    """Stub gauge for when prometheus_client is unavailable.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
-"""
+    """Stub gauge for when prometheus_client is unavailable."""
 
     def labels(self, **kwargs: object) -> _StubGauge:  # noqa: ARG002
-        """Return self for chaining.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        **kwargs : object
-            Describe ``kwargs``.
-
-        Returns
-        -------
-        _StubGauge
-            Describe return value.
-"""
         return self
 
-    def set(self, value: float) -> None:
-        """No-op set.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        value : float
-            Describe ``value``.
-"""
+    def set(self, value: float) -> None:  # noqa: ARG002
+        return None
 
 
 _DEFAULT_PROVIDERS: dict[type[MetricsProvider], MetricsProvider] = {}
+
+
+def _build_counter(
+    name: str,
+    documentation: str,
+    labelnames: list[str],
+    registry: CollectorRegistryType | None,
+) -> CounterLike | _StubCounter:
+    if not HAVE_PROMETHEUS or _RuntimeCounter is None:
+        return _StubCounter()
+    runtime_counter = cast(type[PromCounterType], _RuntimeCounter)
+    prom_registry: PromCollectorRegistryType | None
+    prom_registry = cast(PromCollectorRegistryType | None, registry)
+    counter = runtime_counter(name, documentation, labelnames, registry=prom_registry)
+    return cast(CounterLike, counter)
+
+
+def _build_histogram(
+    name: str,
+    documentation: str,
+    labelnames: list[str],
+    registry: CollectorRegistryType | None,
+) -> HistogramLike | _StubHistogram:
+    if not HAVE_PROMETHEUS or _RuntimeHistogram is None:
+        return _StubHistogram()
+    runtime_histogram = cast(type[PromHistogramType], _RuntimeHistogram)
+    prom_registry: PromCollectorRegistryType | None
+    prom_registry = cast(PromCollectorRegistryType | None, registry)
+    histogram = runtime_histogram(name, documentation, labelnames, registry=prom_registry)
+    return cast(HistogramLike, histogram)
 
 
 class MetricsProvider:
@@ -391,12 +357,12 @@ class MetricsProvider:
     >>> metrics.operation_duration_seconds.labels(component="search", operation="query").observe(
     ...     0.123
     ... )
-"""
+    """
 
     runs_total: CounterLike | _StubCounter
     operation_duration_seconds: HistogramLike | _StubHistogram
 
-    def __init__(self, registry: CollectorRegistry | None = None) -> None:
+    def __init__(self, registry: CollectorRegistryType | None = None) -> None:
         """Initialize metrics provider.
 
         <!-- auto:docstring-builder v1 -->
@@ -407,7 +373,7 @@ class MetricsProvider:
             Prometheus registry (defaults to default registry if Prometheus available).
             If None and Prometheus unavailable, stub metrics are used.
             Defaults to ``None``.
-"""
+        """
         if not HAVE_PROMETHEUS:
             logger.debug("Prometheus not available; using stub metrics")
             self.runs_total = _StubCounter()
@@ -415,24 +381,27 @@ class MetricsProvider:
             return
 
         if registry is None:
+            if _RuntimeCollectorRegistry is None:
+                msg = "Prometheus registry is unavailable despite HAVE_PROMETHEUS=True"
+                raise RuntimeError(msg)
             from prometheus_client import REGISTRY  # noqa: PLC0415
 
             registry = REGISTRY
 
         # Type narrowing: HAVE_PROMETHEUS is True, so Counter/Histogram are imported
         # Prometheus Counter/Histogram match Protocol interface (labels() returns self, inc/observe methods exist)
-        self.runs_total = Counter(  # type: ignore[assignment]  # Prometheus Counter matches Protocol interface
+        self.runs_total = _build_counter(
             "kgfoundry_runs_total",
             "Total number of operations",
             ["component", "status"],
-            registry=registry,
+            registry,
         )
 
-        self.operation_duration_seconds = Histogram(  # type: ignore[assignment]  # Prometheus Histogram matches Protocol interface
+        self.operation_duration_seconds = _build_histogram(
             "kgfoundry_operation_duration_seconds",
             "Operation duration in seconds",
             ["component", "operation", "status"],
-            registry=registry,
+            registry,
         )
 
     @classmethod
@@ -450,7 +419,7 @@ class MetricsProvider:
         --------
         >>> metrics = MetricsProvider.default()
         >>> metrics.runs_total.labels(component="search", status="success").inc()
-"""
+        """
         provider = _DEFAULT_PROVIDERS.get(cls)
         if provider is None:
             provider = cls()
@@ -473,7 +442,7 @@ class _DurationObserver:
         Describe ``operation``.
     start_time : float
         Describe ``start_time``.
-"""
+    """
 
     def __init__(
         self,
@@ -496,7 +465,7 @@ class _DurationObserver:
             Operation name (e.g., "query", "index").
         start_time : float
             Start time from `time.monotonic()`.
-"""
+        """
         self.metrics = metrics
         self.component = component
         self.operation = operation
@@ -507,14 +476,14 @@ class _DurationObserver:
         """Mark operation as successful.
 
         <!-- auto:docstring-builder v1 -->
-"""
+        """
         self.status = "success"
 
     def error(self) -> None:
         """Mark operation as failed.
 
         <!-- auto:docstring-builder v1 -->
-"""
+        """
         self.status = "error"
 
     def __enter__(self) -> _DurationObserver:
@@ -526,7 +495,7 @@ class _DurationObserver:
         -------
         _DurationObserver
             Describe return value.
-"""
+        """
         return self
 
     def __exit__(
@@ -544,7 +513,7 @@ class _DurationObserver:
             Describe ``exc``.
         tb : object
             Describe ``tb``.
-"""
+        """
         duration = time.monotonic() - self.start_time
 
         # Update status if exception occurred
@@ -610,10 +579,117 @@ def observe_duration(
     -------
     Iterator[_DurationObserver]
         Describe return value.
-"""
+    """
     start_time = time.monotonic()
     observer = _DurationObserver(metrics, component, operation, start_time)
     yield observer
+
+
+class MetricsRegistry:
+    """Prometheus-style registry for high-level request metrics."""
+
+    requests_total: CounterLike | _StubCounter
+    request_errors_total: CounterLike | _StubCounter
+    request_duration_seconds: HistogramLike | _StubHistogram
+
+    def __init__(
+        self,
+        *,
+        namespace: str = "kgfoundry",
+        registry: CollectorRegistryType | None = None,
+    ) -> None:
+        if HAVE_PROMETHEUS:
+            if registry is None:
+                if _RuntimeCollectorRegistry is None:
+                    msg = "Prometheus registry construction failed"
+                    raise RuntimeError(msg)
+                registry = _RuntimeCollectorRegistry()
+        else:
+            if registry is None:
+                registry = _StubCollectorRegistry()
+
+        metric_prefix = namespace.replace("-", "_")
+        labels_counter = ["operation", "status"]
+        labels_hist = ["operation"]
+
+        self._registry = registry
+        self.requests_total = _build_counter(
+            f"{metric_prefix}_requests_total",
+            "Total number of operations processed",
+            labels_counter,
+            registry,
+        )
+        self.request_errors_total = _build_counter(
+            f"{metric_prefix}_request_errors_total",
+            "Total number of failed operations",
+            labels_counter,
+            registry,
+        )
+        self.request_duration_seconds = _build_histogram(
+            f"{metric_prefix}_request_duration_seconds",
+            "Operation duration in seconds",
+            labels_hist,
+            registry,
+        )
+
+    @property
+    def registry(self) -> CollectorRegistryType | None:
+        """Return the underlying Prometheus registry when available."""
+        return self._registry
+
+
+_METRICS_REGISTRY: MetricsRegistry | None = None
+
+
+def get_metrics_registry() -> MetricsRegistry:
+    """Return the process-wide metrics registry singleton."""
+    global _METRICS_REGISTRY
+    if _METRICS_REGISTRY is None:
+        _METRICS_REGISTRY = MetricsRegistry()
+    return _METRICS_REGISTRY
+
+
+@contextmanager
+def record_operation(
+    metrics: MetricsRegistry | None = None,
+    operation: str = "unknown",
+    status: str = "success",
+) -> Iterator[None]:
+    """Record request counters and durations around an operation."""
+    registry = metrics or get_metrics_registry()
+    start_time = time.monotonic()
+    error_status = "error"
+
+    try:
+        yield
+    except Exception:
+        registry.requests_total.labels(operation=operation, status=error_status).inc()
+        registry.request_errors_total.labels(operation=operation, status=error_status).inc()
+        duration = time.monotonic() - start_time
+        registry.request_duration_seconds.labels(operation=operation).observe(duration)
+
+        logger.warning(
+            "Operation failed",
+            extra={
+                "operation": operation,
+                "status": error_status,
+                "duration_ms": duration * 1000,
+            },
+        )
+        raise
+    else:
+        duration = time.monotonic() - start_time
+        registry.requests_total.labels(operation=operation, status=status).inc()
+        registry.request_duration_seconds.labels(operation=operation).observe(duration)
+
+        logger.info(
+            "Operation completed",
+            extra={
+                "operation": operation,
+                "status": status,
+                "duration_ms": duration * 1000,
+            },
+        )
 
 
 @contextmanager
@@ -652,7 +728,7 @@ def start_span(
     -------
     Iterator[None]
         Describe return value.
-"""
+    """
     if not HAVE_OPENTELEMETRY or trace is None:
         yield
         return

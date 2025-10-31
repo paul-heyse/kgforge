@@ -64,7 +64,7 @@ def __getattr__(name: str) -> object:
     ------
     AttributeError
         Raised when message.
-"""
+    """
     if name not in _ALIASES:
         message = f"module {__name__!r} has no attribute {name!r}"
         raise AttributeError(message) from None
@@ -86,7 +86,7 @@ def __dir__() -> list[str]:
     -------
     list[str]
         Describe return value.
-"""
+    """
     return sorted(set(__all__))
 
 

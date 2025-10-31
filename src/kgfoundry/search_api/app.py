@@ -48,7 +48,7 @@ def __getattr__(name: str) -> object:
     -------
     object
         Describe return value.
-"""
+    """
     return namespace_getattr(_module, name)
 
 
@@ -61,5 +61,5 @@ def __dir__() -> list[str]:
     -------
     inspect._empty
         Sorted union of exports and implementation attributes.
-"""
+    """
     return namespace_dir(_module, __all__)

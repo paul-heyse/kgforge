@@ -7,7 +7,7 @@ from kgfoundry_common.errors.
 
 from __future__ import annotations
 
-from kgfoundry_common.errors import (
+from kgfoundry_common.errors.exceptions import (
     ChunkingError,
     DoclingError,
     DownloadError,

@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import cast
 
 import libcst as cst
+
 from tools.docstring_builder.harvest import HarvestResult
 from tools.docstring_builder.schema import DocstringEdit
 

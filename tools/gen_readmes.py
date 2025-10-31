@@ -448,7 +448,7 @@ def _lookup_nav(qname: str) -> tuple[dict[str, Any], dict[str, Any]]:
     if not isinstance(modules, Mapping):
         return {}, {}
 
-    symbol = qname.split(".")[-1]
+    symbol = qname.rsplit(".", maxsplit=1)[-1]
     best_defaults: dict[str, Any] = {}
     for module_id, module in modules.items():
         if not isinstance(module_id, str) or not isinstance(module, Mapping):
@@ -476,7 +476,7 @@ def badges_for(qname: str) -> Badges:
     merged = {**defaults, **symbol_meta}
     tests: list[dict[str, Any]] = []
     if isinstance(TEST_MAP, dict):
-        recorded = TEST_MAP.get(qname) or TEST_MAP.get(qname.split(".")[-1])
+        recorded = TEST_MAP.get(qname) or TEST_MAP.get(qname.rsplit(".", maxsplit=1)[-1])
         if isinstance(recorded, list):
             tests = [entry for entry in recorded if isinstance(entry, dict)][:3]
     return Badges(

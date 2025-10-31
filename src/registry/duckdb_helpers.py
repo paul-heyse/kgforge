@@ -53,7 +53,7 @@ def _format_sql(sql: str) -> str:
     -------
     str
         Describe return value.
-"""
+    """
     compact = " ".join(sql.split())
     if len(compact) <= MAX_SQL_PREVIEW_CHARS:
         return compact
@@ -78,7 +78,7 @@ def _truncate_value(value: object) -> object:
     -------
     object
         Describe return value.
-"""
+    """
     if isinstance(value, str) and len(value) > MAX_SQL_PREVIEW_CHARS:
         return value[:MAX_SQL_PREVIEW_CHARS] + "…"
     return value
@@ -102,7 +102,7 @@ def _format_params(params: Params) -> object:
     -------
     object
         Describe return value.
-"""
+    """
     if params is None:
         return {}
     if isinstance(params, Mapping):
@@ -130,7 +130,7 @@ def _ensure_parameterized(sql: str, *, require_parameterized: bool) -> None:
     ------
     RegistryError
         Raised when error_message.
-"""
+    """
     if not require_parameterized:
         return
     if "?" in sql or ":" in sql or "$" in sql:
@@ -157,7 +157,7 @@ def _set_timeout(conn: DuckDBPyConnection, timeout_s: float) -> None:
         Configure the conn.
     timeout_s : float
         Configure the timeout s.
-"""
+    """
     if timeout_s <= 0:
         return
     timeout_ms = int(timeout_s * 1000)
@@ -189,7 +189,7 @@ def connect(
     -------
     DuckDBPyConnection
         Describe return value.
-"""
+    """
     conn = duckdb.connect(str(db_path), read_only=read_only)
     effective_pragmas: dict[str, object] = {"threads": DEFAULT_THREADS}
     if pragmas:
@@ -245,7 +245,7 @@ def execute(  # noqa: PLR0913
     -------
     DuckDBPyRelation
         Describe return value.
-"""
+    """
     require_flag = params is not None if require_parameterized is None else require_parameterized
     _ensure_parameterized(sql, require_parameterized=require_flag)
 
@@ -333,7 +333,7 @@ def fetch_all(
     -------
     list[tuple[Any, ...]]
         Describe return value.
-"""
+    """
     relation = execute(
         conn,
         sql,
@@ -386,7 +386,7 @@ def fetch_one(
     -------
     tuple[Any, ...] | NoneType
         Describe return value.
-"""
+    """
     relation = execute(
         conn,
         sql,
@@ -423,7 +423,7 @@ def validate_identifier(
     -------
     str
         Describe return value.
-"""
+    """
     allowed_set = set(allowed)
     if identifier in allowed_set:
         return identifier

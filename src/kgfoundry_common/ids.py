@@ -63,7 +63,7 @@ def urn_doc_from_text(text: str) -> str:
     -------
     str
         Describe return value.
-"""
+    """
     h = hashlib.sha256(text.encode("utf-8")).digest()[:16]
     b32 = base64.b32encode(h).decode("ascii").strip("=").lower()
     return f"urn:doc:sha256:{b32}"
@@ -90,5 +90,5 @@ def urn_chunk(doc_hash: str, start: int, end: int) -> str:
     -------
     str
         Describe return value.
-"""
-    return f"urn:chunk:{doc_hash.split(':')[-1]}:{start}-{end}"
+    """
+    return f"urn:chunk:{doc_hash.rsplit(':', maxsplit=1)[-1]}:{start}-{end}"

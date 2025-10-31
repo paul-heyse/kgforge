@@ -23,6 +23,7 @@ dependencies = [
     # Data Processing & Storage
     # ============================================================================
     "pyarrow>=21.0.0",
+    "pyarrow-stubs>=13.0.0",
     "numpy>=2.2.6",
     "jsonlines>=4.0.0",
     "libarchive-c>=5.3",
@@ -63,6 +64,7 @@ dependencies = [
     "prometheus-client>=0.23.1",
     "tenacity>=9.1.2",
     "pybreaker",
+    "msgspec>=0.19.0",
     # ============================================================================
     # CLI & User Experience
     # ============================================================================
@@ -426,7 +428,6 @@ dependencies = [
     "pydoclint>=0.4.0", # enforce numpy-style parameter/return parity
     "pydocstyle", # PEP-257 lint
     "docformatter", # format docstrings
-    "import-linter", # enforce layered architecture
     "mkdocs",
     "mkdocs-material",
     "mkdocstrings[python]",
@@ -445,6 +446,7 @@ dependencies = [
     "faiss-cpu",
     "pytest-asyncio>=1.2.0",
     "pip-audit>=2.9.0",
+    "pytestarch>=4.0.1",
 ]
 
 [project.scripts]

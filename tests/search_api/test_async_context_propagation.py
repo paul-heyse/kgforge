@@ -59,7 +59,7 @@ async def test_async_context_invariant_parallel_tasks():
         set_correlation_id(correlation_id)
         await asyncio.sleep(0.01)  # Simulate async work
         logger = get_logger(__name__)
-        logger.info(f"Task {task_id} executed", extra={"operation": "task", "status": "success"})
+        logger.info("Task %s executed", task_id, extra={"operation": "task", "status": "success"})
         # Verify correlation ID is still correct after async work
         retrieved_id = get_correlation_id()
         return task_id, retrieved_id or ""
@@ -144,7 +144,8 @@ async def test_multiple_concurrent_requests():
         await asyncio.sleep(0.01)
         logger = get_logger(__name__)
         logger.info(
-            f"Request {request_num} processed",
+            "Request %s processed",
+            request_num,
             extra={"operation": "request", "status": "success"},
         )
         return request_num, get_correlation_id() or ""

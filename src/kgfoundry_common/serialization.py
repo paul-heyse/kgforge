@@ -84,7 +84,7 @@ def _load_schema_cached(schema_path: Path) -> dict[str, object]:
         If schema file does not exist.
     SchemaValidationError
         If schema is invalid JSON or fails schema validation.
-"""
+    """
     if not schema_path.exists():
         msg = f"Schema file not found: {schema_path}"
         raise FileNotFoundError(msg)
@@ -148,7 +148,7 @@ def validate_payload(payload: Mapping[str, object], schema_path: Path) -> None:
     ...     validate_payload({"k1": 0.9}, schema)
     ...     validate_payload({"k1": "invalid"}, schema)  # doctest: +SKIP
     SchemaValidationError: Schema validation failed
-"""
+    """
     schema_obj = _load_schema_cached(schema_path)
     try:
         jsonschema.validate(instance=payload, schema=schema_obj)
@@ -182,7 +182,7 @@ def compute_checksum(data: bytes) -> str:
     True
     >>> checksum.startswith("9")
     True
-"""
+    """
     return hashlib.sha256(data).hexdigest()
 
 
@@ -208,7 +208,7 @@ def verify_checksum(data: bytes, expected: str) -> None:
     >>> verify_checksum(b"test", compute_checksum(b"test"))
     >>> verify_checksum(b"wrong", compute_checksum(b"test"))  # doctest: +SKIP
     SerializationError: Checksum mismatch
-"""
+    """
     actual = compute_checksum(data)
     if actual != expected:
         msg = f"Checksum mismatch: expected {expected[:16]}..., got {actual[:16]}..."
@@ -273,7 +273,7 @@ def serialize_json(
     ...     checksum = serialize_json(data, schema, output)
     ...     assert len(checksum) == 64
     ...     assert output.exists()
-"""
+    """
     try:
         # Validate payload against schema (uses cached schema loader)
         if isinstance(obj, Mapping):
@@ -373,7 +373,7 @@ def deserialize_json(  # noqa: C901, PLR0912
     ...     data_path.write_text('{"k1": 0.9}')
     ...     loaded = deserialize_json(data_path, schema)
     ...     assert loaded == {"k1": 0.9}
-"""
+    """
     try:
         # Verify checksum if requested
         if verify_checksum_file:

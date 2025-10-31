@@ -105,7 +105,7 @@ class BM25Doc:
         Describe ``length``.
     fields : dict[str, str]
         Describe ``fields``.
-"""
+    """
 
     doc_id: str
     length: int
@@ -131,7 +131,7 @@ class PurePythonBM25:
     field_boosts : dict[str, float] | None, optional
         Describe ``field_boosts``.
         Defaults to ``None``.
-"""
+    """
 
     def __init__(
         self,
@@ -157,7 +157,7 @@ class PurePythonBM25:
         field_boosts : dict[str, float] | NoneType, optional
             Describe ``field_boosts``.
             Defaults to ``None``.
-"""
+        """
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -183,7 +183,7 @@ class PurePythonBM25:
         -------
         list[str]
             Lowercased tokens extracted from the text.
-"""
+        """
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
@@ -195,7 +195,7 @@ class PurePythonBM25:
         ----------
         docs_iterable : tuple[str, dict[str, str]]
             Describe ``docs_iterable``.
-"""
+        """
         Path(self.index_dir).mkdir(parents=True, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
@@ -264,7 +264,7 @@ class PurePythonBM25:
             If deserialization, schema validation, or checksum verification fails.
         FileNotFoundError
             If metadata or schema file is missing.
-"""
+        """
         metadata_path = Path(self.index_dir) / "pure_bm25.json"
         schema_path = (
             Path(__file__).parent.parent.parent / "schema" / "models" / "bm25_metadata.v1.json"
@@ -376,7 +376,7 @@ class PurePythonBM25:
         -------
         float
             Inverse document frequency score for the term.
-"""
+        """
         n_t = self.df.get(term, 0)
         if n_t == 0:
             return 0.0
@@ -407,7 +407,7 @@ class PurePythonBM25:
         -------
         list[tuple[str, float]]
             Ranked document identifiers with their BM25 scores.
-"""
+        """
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -449,7 +449,7 @@ class LuceneBM25:
     ------
     RuntimeError
     Raised when Pyserini is not installed in the environment.
-"""
+    """
 
     def __init__(
         self,
@@ -475,7 +475,7 @@ class LuceneBM25:
         field_boosts : dict[str, float] | NoneType, optional
             Describe ``field_boosts``.
             Defaults to ``None``.
-"""
+        """
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -496,7 +496,7 @@ class LuceneBM25:
         ------
         RuntimeError
         Raised when Pyserini or Lucene is unavailable.
-"""
+        """
         try:
             from pyserini.index.lucene import LuceneIndexer  # noqa: PLC0415
         except Exception as exc:
@@ -524,7 +524,7 @@ class LuceneBM25:
         """Initialise the Lucene searcher if it has not been created yet.
 
         <!-- auto:docstring-builder v1 -->
-"""
+        """
         if self._searcher is not None:
             return
         from pyserini.search.lucene import LuceneSearcher  # noqa: PLC0415
@@ -562,7 +562,7 @@ class LuceneBM25:
         ------
         RuntimeError
         Raised when the Lucene searcher cannot be initialised.
-"""
+        """
         self._ensure_searcher()
         if self._searcher is None:
             message = "Lucene searcher not initialized"
@@ -604,7 +604,7 @@ def get_bm25(
     -------
     PurePythonBM25 | LuceneBM25
         Configured BM25 adapter.
-"""
+    """
     if backend == "lucene":
         try:
             return LuceneBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)

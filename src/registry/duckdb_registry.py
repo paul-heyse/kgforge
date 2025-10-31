@@ -54,7 +54,7 @@ class DuckDBRegistry:
     ----------
     db_path : str
         Describe ``db_path``.
-"""
+    """
 
     def __init__(self, db_path: str) -> None:
         """Initialize the registry with a DuckDB database path.
@@ -65,7 +65,7 @@ class DuckDBRegistry:
         ----------
         db_path : str
             Describe ``db_path``.
-"""
+        """
         self.db_path = db_path
         self.con = duckdb_helpers.connect(db_path, read_only=False)
 
@@ -85,7 +85,7 @@ class DuckDBRegistry:
         -------
         str
             Describe return value.
-"""
+        """
         dataset_id = str(uuid.uuid4())
         duckdb_helpers.execute(
             self.con,
@@ -112,7 +112,7 @@ class DuckDBRegistry:
             Describe ``parquet_root``.
         rows : int
             Describe ``rows``.
-"""
+        """
         del rows
         duckdb_helpers.execute(
             self.con,
@@ -130,7 +130,7 @@ class DuckDBRegistry:
         ----------
         dataset_id : str
             Describe ``dataset_id``.
-"""
+        """
         duckdb_helpers.execute(
             self.con,
             "DELETE FROM datasets WHERE dataset_id=?",
@@ -164,7 +164,7 @@ class DuckDBRegistry:
         -------
         str
             Describe return value.
-"""
+        """
         run_id = str(uuid.uuid4())
         duckdb_helpers.execute(
             self.con,
@@ -192,7 +192,7 @@ class DuckDBRegistry:
         notes : str | NoneType, optional
             Describe ``notes``.
             Defaults to ``None``.
-"""
+        """
         _ = success  # placeholder until success flag/notes are persisted
         _ = notes
         duckdb_helpers.execute(
@@ -211,7 +211,7 @@ class DuckDBRegistry:
         ----------
         docs : list[Doc]
             Describe ``docs``.
-"""
+        """
         for doc in docs:
             duckdb_helpers.execute(
                 self.con,
@@ -248,7 +248,7 @@ class DuckDBRegistry:
         ----------
         assets : list[DoctagsAsset]
             Describe ``assets``.
-"""
+        """
         for asset in assets:
             duckdb_helpers.execute(
                 self.con,
@@ -281,7 +281,7 @@ class DuckDBRegistry:
             Describe ``subject_id``.
         payload : str | object
             Describe ``payload``.
-"""
+        """
         duckdb_helpers.execute(
             self.con,
             (
@@ -308,7 +308,7 @@ class DuckDBRegistry:
             Describe ``error_class``.
         message : str
             Describe ``message``.
-"""
+        """
         duckdb_helpers.execute(
             self.con,
             (

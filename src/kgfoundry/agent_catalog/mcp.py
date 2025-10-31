@@ -56,7 +56,7 @@ class RequestContext:
         Describe ``correlation_id``.
     request_id : object | NoneType
         Describe ``request_id``.
-"""
+    """
 
     correlation_id: str
     request_id: JsonValue | None
@@ -78,7 +78,7 @@ class CatalogSessionServerError(RuntimeError):
     code : int, optional
         Describe ``code``.
         Defaults to ``-32603``.
-"""
+    """
 
     def __init__(self, status: int, title: str, detail: str, *, code: int = -32603) -> None:
         """Document   init  .
@@ -100,7 +100,7 @@ class CatalogSessionServerError(RuntimeError):
         code : int, optional
             Configure the code. Defaults to ``-32603``.
             Defaults to ``-32603``.
-"""
+        """
         super().__init__(detail)
         self.status = status
         self.title = title
@@ -122,7 +122,7 @@ class CatalogSessionServerError(RuntimeError):
         -------
         dict[str, object]
             Describe return value.
-"""
+        """
         problem: JsonObject = {
             "type": "https://kgfoundry.dev/problems/catalogctl-mcp",
             "title": self.title,
@@ -159,7 +159,7 @@ class CatalogSessionServer:
     metrics : MetricsProvider | None, optional
         Describe ``metrics``.
         Defaults to ``None``.
-"""
+    """
 
     def __init__(
         self,
@@ -188,7 +188,7 @@ class CatalogSessionServer:
         metrics : MetricsProvider | NoneType, optional
             Configure the metrics. Defaults to ``None``.
             Defaults to ``None``.
-"""
+        """
         self.client = client
         self._shutdown = False
         self._access = access
@@ -226,7 +226,7 @@ class CatalogSessionServer:
         ----------
         payload : dict[str, object]
             Configure the payload.
-"""
+        """
         sys.stdout.write(json.dumps(payload, ensure_ascii=False) + "\n")
         sys.stdout.flush()
 
@@ -243,7 +243,7 @@ class CatalogSessionServer:
         ----------
         payload : dict[str, object]
             Configure the payload.
-"""
+        """
         self._write(payload)
 
     def _coerce_params(self, raw: object) -> JsonObject:
@@ -260,7 +260,7 @@ class CatalogSessionServer:
         -------
         dict[str, object]
             Describe return value.
-"""
+        """
         if raw is None:
             return {}
         if isinstance(raw, dict):
@@ -304,7 +304,7 @@ class CatalogSessionServer:
             Raised when 404.
         CatalogSessionServerError
             Raised when 403.
-"""
+        """
         if not isinstance(method_raw, str):
             raise CatalogSessionServerError(
                 400,
@@ -401,7 +401,7 @@ class CatalogSessionServer:
             Identifier for the request.
         error : CatalogSessionServerError
             Configure the error.
-"""
+        """
         logger.debug(
             "JSON-RPC error %s: %s",
             error.status,
@@ -425,7 +425,7 @@ class CatalogSessionServer:
         -------
         int
             Describe return value.
-"""
+        """
         stdin: TextIO = sys.stdin
         for raw_line in stdin:
             message_line = raw_line.strip()
@@ -489,7 +489,7 @@ class CatalogSessionServer:
         -------
         object
             Describe return value.
-"""
+        """
         commands = sorted(name for name in self._methods if name.startswith("catalog."))
         procedures = cast(list[JsonValue], list(commands))
         capabilities: JsonObject = {"procedures": cast(JsonValue, procedures)}
@@ -516,7 +516,7 @@ class CatalogSessionServer:
         -------
         object
             Describe return value.
-"""
+        """
         packages = [pkg.name for pkg in self.client.list_packages()]
         return cast(JsonValue, packages)
 
@@ -545,7 +545,7 @@ class CatalogSessionServer:
         ------
         CatalogSessionServerError
             Raised when 404.
-"""
+        """
         symbol_id = str(params.get("symbol_id"))
         symbol = self.client.get_symbol(symbol_id)
         if symbol is None:
@@ -573,7 +573,7 @@ class CatalogSessionServer:
         -------
         object
             Describe return value.
-"""
+        """
         symbol_id = str(params.get("symbol_id"))
         callers = self.client.find_callers(symbol_id)
         return cast(JsonValue, callers)
@@ -598,7 +598,7 @@ class CatalogSessionServer:
         -------
         object
             Describe return value.
-"""
+        """
         symbol_id = str(params.get("symbol_id"))
         callees = self.client.find_callees(symbol_id)
         return cast(JsonValue, callees)
@@ -623,7 +623,7 @@ class CatalogSessionServer:
         -------
         object
             Describe return value.
-"""
+        """
         symbol_id = str(params.get("symbol_id"))
         impact_raw = cast(
             dict[str, JsonValue],
@@ -651,7 +651,7 @@ class CatalogSessionServer:
         -------
         object
             Describe return value.
-"""
+        """
         symbol_id = str(params.get("symbol_id"))
         tests_raw: list[JsonValue] = []
         for test_entry in self.client.suggest_tests(symbol_id):
@@ -681,7 +681,7 @@ class CatalogSessionServer:
         -------
         object
             Describe return value.
-"""
+        """
         symbol_id = str(params.get("symbol_id"))
         anchor_raw = cast(JsonObject, self.client.open_anchor(symbol_id))
         return cast(JsonValue, anchor_raw)
@@ -700,7 +700,7 @@ class CatalogSessionServer:
         -------
         int
             Describe return value.
-"""
+        """
         if isinstance(raw_k, bool):
             message = "k must be an integer"
             raise CatalogSessionServerError(
@@ -751,7 +751,7 @@ class CatalogSessionServer:
         -------
         dict[str, str]
             Describe return value.
-"""
+        """
         if raw_facets is None:
             return {}
         if not isinstance(raw_facets, dict):
@@ -800,7 +800,7 @@ class CatalogSessionServer:
         ------
         CatalogSessionServerError
             Raised when 400.
-"""
+        """
         raw_query = params.get("query", "")
         if not isinstance(raw_query, str):
             message = "Query must be a string"
@@ -864,7 +864,7 @@ class CatalogSessionServer:
         -------
         object
             Describe return value.
-"""
+        """
         package = str(params.get("package"))
         modules = [module.qualified for module in self.client.list_modules(package)]
         return cast(JsonValue, modules)
@@ -884,7 +884,7 @@ class CatalogSessionServer:
             Configure the  params.
         _context : RequestContext
             Configure the  context.
-"""
+        """
         self._shutdown = True
 
     def _handle_exit(self, _params: JsonObject, _context: RequestContext) -> None:
@@ -902,7 +902,7 @@ class CatalogSessionServer:
             Configure the  params.
         _context : RequestContext
             Configure the  context.
-"""
+        """
         self._shutdown = True
 
 
@@ -929,7 +929,7 @@ def _resolve_role(value: str) -> Role:
     ------
     ValueError
         Raised when message.
-"""
+    """
     try:
         return Role(value)
     except ValueError as exc:
@@ -947,7 +947,7 @@ def build_parser() -> argparse.ArgumentParser:
     -------
     argparse.ArgumentParser
         Describe return value.
-"""
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--catalog",
@@ -998,7 +998,7 @@ def main(argv: list[str] | None = None) -> int:
     -------
     int
         Describe return value.
-"""
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
     catalog_path = cast(Path, args.catalog)

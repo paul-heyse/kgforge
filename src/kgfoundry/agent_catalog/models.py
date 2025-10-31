@@ -32,7 +32,7 @@ class AnchorsModel(BaseModel):
     remap_order : list[dict[str, object]], optional
         Describe ``remap_order``.
         Defaults to ``<factory>``.
-"""
+    """
 
     start_line: int | None = None
     end_line: int | None = None
@@ -62,7 +62,7 @@ class QualityModel(BaseModel):
     doctest_status : str | NoneType, optional
         Describe ``doctest_status``.
         Defaults to ``None``.
-"""
+    """
 
     mypy_status: str | None = None
     ruff_rules: list[str] = Field(default_factory=list)
@@ -96,7 +96,7 @@ class MetricsModel(BaseModel):
     deprecated : bool | NoneType, optional
         Describe ``deprecated``.
         Defaults to ``None``.
-"""
+    """
 
     complexity: float | None = None
     loc: int | None = None
@@ -128,7 +128,7 @@ class AgentHintsModel(BaseModel):
     breaking_change_notes : list[str], optional
         Describe ``breaking_change_notes``.
         Defaults to ``<factory>``.
-"""
+    """
 
     intent_tags: list[str] = Field(default_factory=list)
     safe_ops: list[str] = Field(default_factory=list)
@@ -159,7 +159,7 @@ class ChangeImpactModel(BaseModel):
     churn_last_n : int | NoneType, optional
         Describe ``churn_last_n``.
         Defaults to ``None``.
-"""
+    """
 
     callers: list[str] = Field(default_factory=list)
     callees: list[str] = Field(default_factory=list)
@@ -197,7 +197,7 @@ class SymbolModel(BaseModel):
     exemplars : list[dict[str, object]], optional
         Describe ``exemplars``.
         Defaults to ``<factory>``.
-"""
+    """
 
     qname: str
     kind: str
@@ -228,7 +228,7 @@ class ModuleGraphModel(BaseModel):
     calls : list[dict[str, object]], optional
         Describe ``calls``.
         Defaults to ``<factory>``.
-"""
+    """
 
     imports: list[str] = Field(default_factory=list)
     calls: list[dict[str, JsonValue]] = Field(default_factory=list)
@@ -257,7 +257,7 @@ class ModuleModel(BaseModel):
         Defaults to ``<factory>``.
     graph : ModuleGraphModel
         Describe ``graph``.
-"""
+    """
 
     name: str
     qualified: str
@@ -284,7 +284,7 @@ class PackageModel(BaseModel):
     modules : list[ModuleModel], optional
         Describe ``modules``.
         Defaults to ``<factory>``.
-"""
+    """
 
     name: str
     modules: list[ModuleModel] = Field(default_factory=list)
@@ -310,7 +310,7 @@ class SemanticIndexModel(BaseModel):
     count : int | NoneType, optional
         Describe ``count``.
         Defaults to ``None``.
-"""
+    """
 
     index: str
     mapping: str
@@ -333,7 +333,7 @@ class ShardEntryModel(BaseModel):
     modules : int | NoneType, optional
         Describe ``modules``.
         Defaults to ``None``.
-"""
+    """
 
     name: str
     path: str
@@ -352,7 +352,7 @@ class ShardsModel(BaseModel):
     packages : list[ShardEntryModel], optional
         Describe ``packages``.
         Defaults to ``<factory>``.
-"""
+    """
 
     index: str
     packages: list[ShardEntryModel] = Field(default_factory=list)
@@ -387,7 +387,7 @@ class AgentCatalogModel(BaseModel):
     search : dict[str, object] | NoneType, optional
         Describe ``search``.
         Defaults to ``None``.
-"""
+    """
 
     version: str
     generated_at: str
@@ -412,7 +412,7 @@ class AgentCatalogModel(BaseModel):
         -------
         SymbolModel
             Describe return value.
-"""
+        """
         for package in self.packages:
             for module in package.modules:
                 yield from module.symbols
@@ -431,7 +431,7 @@ class AgentCatalogModel(BaseModel):
         -------
         SymbolModel | NoneType
             Describe return value.
-"""
+        """
         for symbol in self.iter_symbols():
             if symbol.symbol_id == symbol_id:
                 return symbol
@@ -451,7 +451,7 @@ class AgentCatalogModel(BaseModel):
         -------
         ModuleModel | NoneType
             Describe return value.
-"""
+        """
         for package in self.packages:
             for module in package.modules:
                 if module.qualified == qualified:
@@ -476,7 +476,7 @@ def load_catalog_payload(path: Path, *, load_shards: bool = True) -> dict[str, J
     -------
     dict[str, object]
         Describe return value.
-"""
+    """
     payload_raw: object = json.loads(path.read_text(encoding="utf-8"))
     # json.loads returns object (JsonValue at runtime), narrow to dict
     if not isinstance(payload_raw, dict):
@@ -537,7 +537,7 @@ def load_catalog_model(path: Path, *, load_shards: bool = True) -> AgentCatalogM
     -------
     AgentCatalogModel
         Describe return value.
-"""
+    """
 
     # Helper to isolate Pydantic's Any expression from model_validate
     # The class type itself contains Any, so we wrap the call to isolate it

@@ -46,7 +46,7 @@ def _sqlite_connection(path: Path) -> Iterator[sqlite3.Connection]:
     -------
     sqlite3.Connection
         Describe return value.
-"""
+    """
     connection = sqlite3.connect(str(path))
     try:
         connection.execute("PRAGMA foreign_keys = ON")
@@ -132,7 +132,7 @@ def _json_dumps(value: JsonValue) -> str:
     -------
     str
         Describe return value.
-"""
+    """
     return json.dumps(value, ensure_ascii=False, sort_keys=True)
 
 
@@ -150,7 +150,7 @@ def _json_loads(value: str | None) -> JsonValue:
     -------
     NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
         Describe return value.
-"""
+    """
     if value is None:
         return None
     return json.loads(value)
@@ -170,7 +170,7 @@ def _stringify(value: JsonValue) -> str | None:
     -------
     str | NoneType
         Describe return value.
-"""
+    """
     if value is None:
         return None
     return str(value)
@@ -194,7 +194,7 @@ def _iter_packages(payload: CatalogPayload) -> Sequence[Mapping[str, JsonValue]]
     -------
     str | NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
         Describe return value.
-"""
+    """
     packages = payload.get("packages")
     if isinstance(packages, Sequence):
         return packages  # type: ignore[return-value]
@@ -219,7 +219,7 @@ def _iter_modules(package: Mapping[str, JsonValue]) -> Sequence[Mapping[str, Jso
     -------
     str | NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
         Describe return value.
-"""
+    """
     modules = package.get("modules")
     if isinstance(modules, Sequence):
         return modules  # type: ignore[return-value]
@@ -240,7 +240,7 @@ def _build_metadata_rows(payload: CatalogPayload) -> list[tuple[str, str]]:
     -------
     list[tuple[str, str]]
         Describe return value.
-"""
+    """
     return [
         ("version", _json_dumps(payload.get("version"))),
         ("generated_at", _json_dumps(payload.get("generated_at"))),
@@ -271,7 +271,7 @@ class _SymbolExtraction:
         Describe ``ranking``.
     lookup : dict[str, str]
         Describe ``lookup``.
-"""
+    """
 
     modules: list[ModuleRow]
     symbols: list[SymbolRow]
@@ -294,7 +294,7 @@ def _collect_symbol_rows(packages: Sequence[Mapping[str, JsonValue]]) -> _Symbol
     -------
     _SymbolExtraction
         Describe return value.
-"""
+    """
     module_rows: list[ModuleRow] = []
     symbol_rows: list[SymbolRow] = []
     anchor_rows: list[AnchorRow] = []
@@ -395,7 +395,7 @@ def _collect_call_rows(
     -------
     list[tuple[str | NoneType, str | NoneType, str, str | NoneType, str | NoneType]]
         Describe return value.
-"""
+    """
     rows: list[CallRow] = []
     for package in packages:
         for module in _iter_modules(package):
@@ -438,7 +438,7 @@ def _build_package_rows(packages: Sequence[Mapping[str, JsonValue]]) -> list[tup
     -------
     list[tuple[str, str]]
         Describe return value.
-"""
+    """
     rows: list[tuple[str, str]] = []
     for package in packages:
         name = _stringify(package.get("name")) or ""
@@ -460,7 +460,7 @@ def _build_fts_rows(documents: Sequence[SearchDocument]) -> list[FtsRow]:
     -------
     list[tuple[str, str, str, str, str]]
         Describe return value.
-"""
+    """
     rows: list[FtsRow] = []
     for document in documents:
         text = " ".join(part for part in (document.summary, document.docstring) if part)
@@ -491,7 +491,7 @@ def _write_many(
         Describe ``sql``.
     rows : tuple[NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue], ...]
         Describe ``rows``.
-"""
+    """
     if rows:
         connection.executemany(sql, rows)
 
@@ -515,7 +515,7 @@ def write_sqlite_catalog(
     packages_override : str | NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue] | NoneType, optional
         Describe ``packages_override``.
         Defaults to ``None``.
-"""
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists():
         path.unlink()
@@ -587,7 +587,7 @@ def _fetch_metadata(connection: sqlite3.Connection) -> JsonObject:
     -------
     dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]
         Describe return value.
-"""
+    """
     return {
         row["key"]: _json_loads(row["value"])
         for row in connection.execute("SELECT key, value FROM metadata")
@@ -608,7 +608,7 @@ def _load_packages_table(connection: sqlite3.Connection) -> dict[str, JsonObject
     -------
     dict[str, dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]]
         Describe return value.
-"""
+    """
     packages: dict[str, JsonObject] = {}
     for row in connection.execute("SELECT name, data FROM packages ORDER BY name"):
         package_data = _json_loads(row["data"])
@@ -639,7 +639,7 @@ def _load_modules_table(
     -------
     dict[str, dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]]
         Describe return value.
-"""
+    """
     modules: dict[str, JsonObject] = {}
     for row in connection.execute(
         "SELECT qualified, package, data FROM modules ORDER BY qualified"
@@ -673,7 +673,7 @@ def _load_anchor_table(connection: sqlite3.Connection) -> dict[str, JsonObject]:
     -------
     dict[str, dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]]
         Describe return value.
-"""
+    """
     anchors: dict[str, JsonObject] = {}
     for row in connection.execute("SELECT * FROM anchors"):
         anchors[row["symbol_id"]] = {
@@ -699,7 +699,7 @@ def _load_ranking_table(connection: sqlite3.Connection) -> dict[str, JsonObject]
     -------
     dict[str, dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]]
         Describe return value.
-"""
+    """
     ranking: dict[str, JsonObject] = {}
     for row in connection.execute("SELECT * FROM ranking_features"):
         ranking[row["symbol_id"]] = {
@@ -726,7 +726,7 @@ def _load_call_graph(connection: sqlite3.Connection) -> CallGraph:
     -------
     tuple[str | set[str], str | set[str]]
         Describe return value.
-"""
+    """
     callers: dict[str, set[str]] = defaultdict(set)
     callees: dict[str, set[str]] = defaultdict(set)
     for row in connection.execute(
@@ -764,7 +764,7 @@ def _attach_symbols_to_modules(
         Describe ``ranking``.
     call_graph : tuple[str | set[str], str | set[str]]
         Describe ``call_graph``.
-"""
+    """
     callers, callees = call_graph
     for row in connection.execute(
         "SELECT symbol_id, package, module, qname, kind, data FROM symbols"
@@ -812,7 +812,7 @@ def load_catalog_from_sqlite(path: Path) -> JsonObject:
     -------
     dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]
         Describe return value.
-"""
+    """
     with _sqlite_connection(path) as connection:
         metadata = _fetch_metadata(connection)
         packages = _load_packages_table(connection)
@@ -848,7 +848,7 @@ def sqlite_candidates(json_path: Path) -> Iterable[Path]:
     -------
     Path
         Describe return value.
-"""
+    """
     if json_path.suffix == ".sqlite":
         yield json_path
         return

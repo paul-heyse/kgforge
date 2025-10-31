@@ -38,7 +38,7 @@ class ErrorCode(str, Enum):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     # Download & Ingestion (1xx)
     DOWNLOAD_FAILED = "download-failed"
@@ -89,7 +89,7 @@ class ErrorCode(str, Enum):
         -------
         str
             Describe return value.
-"""
+        """
         return self.value
 
 
@@ -112,5 +112,5 @@ def get_type_uri(code: ErrorCode) -> str:
     --------
     >>> get_type_uri(ErrorCode.DOWNLOAD_FAILED)
     'https://kgfoundry.dev/problems/download-failed'
-"""
+    """
     return f"{BASE_TYPE_URI}/{code.value}"

@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 import vectorstore_faiss as _module
-from kgfoundry._namespace_proxy import namespace_dir, namespace_getattr
+from kgfoundry._namespace_proxy import (
+    namespace_attach,
+    namespace_dir,
+    namespace_exports,
+    namespace_getattr,
+)
 
-__all__ = list(getattr(_module, "__all__", []))
-if not __all__:
-    __all__ = [name for name in dir(_module) if not name.startswith("_")]
-for _name in __all__:
-    globals()[_name] = getattr(_module, _name)
+__all__ = namespace_exports(_module)
+namespace_attach(_module, globals(), __all__)
 
 __doc__ = _module.__doc__
 if hasattr(_module, "__path__"):
@@ -33,7 +35,7 @@ def __getattr__(name: str) -> object:
     -------
     object
         Describe return value.
-"""
+    """
     return namespace_getattr(_module, name)
 
 
@@ -46,5 +48,5 @@ def __dir__() -> list[str]:
     -------
     inspect._empty
         Sorted union of exports and implementation attributes.
-"""
+    """
     return namespace_dir(_module, __all__)

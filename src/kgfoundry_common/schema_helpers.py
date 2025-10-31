@@ -65,7 +65,7 @@ def load_schema(schema_path: Path) -> dict[str, JsonValue]:
     >>> from pathlib import Path
     >>> schema = load_schema(Path("schema/models/doc.v1.json"))
     >>> assert "$schema" in schema
-"""
+    """
     if not schema_path.exists():
         msg = f"Schema file not found: {schema_path}"
         raise FileNotFoundError(msg)
@@ -113,7 +113,7 @@ def validate_model_against_schema(
     >>> schema = {"type": "object", "properties": {"id": {"type": "string"}}}
     >>> doc = Doc(id="urn:doc:test")
     >>> validate_model_against_schema(doc, schema)
-"""
+    """
     try:
         # Convert model to dict (using model_dump with mode='json' for JSON-compatible types)
         # model_dump returns dict[str, object], cast to JsonValue since it's JSON-serializable
@@ -174,7 +174,7 @@ def assert_model_roundtrip(
     >>> example = Path("schema/examples/models/doc.v1.json")
     >>> schema = Path("schema/models/doc.v1.json")
     >>> assert_model_roundtrip(Doc, example, schema_path=schema)
-"""
+    """
     if not example_path.exists():
         msg = f"Example file not found: {example_path}"
         raise FileNotFoundError(msg)

@@ -8,7 +8,6 @@ using the canonical utilities in :mod:`kgfoundry_common.serialization`.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from functools import lru_cache
 from pathlib import Path
 
 from kgfoundry_common.serialization import validate_payload
@@ -17,8 +16,9 @@ SCHEMA_ROOT = Path(__file__).resolve().parents[2] / "schema" / "tools"
 
 __all__ = ["get_schema_path", "validate_tools_payload"]
 
+_SCHEMA_CACHE: dict[str, Path] = {}
 
-@lru_cache(maxsize=32)
+
 def get_schema_path(name: str) -> Path:
     """Return the absolute path for a tooling schema.
 
@@ -41,6 +41,10 @@ def get_schema_path(name: str) -> Path:
     if not candidate.exists():
         msg = f"Tooling schema not found: {candidate}"
         raise FileNotFoundError(msg)
+    cached = _SCHEMA_CACHE.get(name)
+    if cached is not None:
+        return cached
+    _SCHEMA_CACHE[name] = candidate
     return candidate
 
 

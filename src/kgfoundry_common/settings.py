@@ -192,7 +192,7 @@ class SearchConfig(BaseSettings):
         Environment variable: `SEARCH_API_VALIDATE`.
         Defaults to False.
         Defaults to ``False``.
-"""
+    """
 
     model_config = SettingsConfigDict(env_prefix="KGFOUNDRY_SEARCH_", extra="forbid")
 
@@ -323,7 +323,7 @@ class ObservabilityConfig(BaseSettings):
         Environment variable: `KGFOUNDRY_METRICS_PORT`.
         Defaults to 9090.
         Defaults to ``9090``.
-"""
+    """
 
     model_config = SettingsConfigDict(env_prefix="KGFOUNDRY_", extra="forbid")
 
@@ -445,7 +445,7 @@ class SparseEmbeddingConfig(BaseSettings):
         Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_SPLADE_QUERY_ENCODER`.
         Defaults to 'naver/splade-v3-distilbert'.
         Defaults to ``'naver/splade-v3-distilbert'``.
-"""
+    """
 
     model_config = SettingsConfigDict(env_prefix="KGFOUNDRY_SPARSE_EMBEDDING_", extra="forbid")
 
@@ -571,7 +571,7 @@ class FaissConfig(BaseSettings):
         Environment variable: `KGFOUNDRY_FAISS_INDEX_PATH`.
         Defaults to './_indices/faiss/shard_000.idx'.
         Defaults to ``'./_indices/faiss/shard_000.idx'``.
-"""
+    """
 
     model_config = SettingsConfigDict(env_prefix="KGFOUNDRY_FAISS_", extra="forbid")
 
@@ -646,7 +646,7 @@ class RuntimeSettings(BaseSettings):
     - All nested models use `extra="forbid"` to prevent unknown fields
     - Settings are validated at instantiation time (fail-fast)
     - Configuration can be overridden via environment variables or `.env` files
-"""
+    """
 
     model_config = SettingsConfigDict(
         env_prefix="KGFOUNDRY_",
@@ -687,7 +687,7 @@ class RuntimeSettings(BaseSettings):
         ------
         SettingsError
             If validation fails (missing required fields, invalid types, etc.).
-"""
+        """
         try:
             super().__init__(**overrides)  # type: ignore[arg-type]  # BaseSettings.__init__ accepts Any kwargs, mypy can't infer overloads
         except Exception as exc:
@@ -749,7 +749,7 @@ def load_settings(**overrides: object) -> KgFoundrySettings:
     >>> # Missing required env var raises SettingsError
     >>> # settings = load_settings()  # doctest: +SKIP
     >>> # SettingsError: Configuration validation failed
-"""
+    """
     try:
         return RuntimeSettings(**overrides)
     except SettingsError:

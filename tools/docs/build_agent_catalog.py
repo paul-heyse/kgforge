@@ -742,7 +742,7 @@ class AgentCatalogBuilder:
         calls.sort(key=lambda entry: (entry["caller"], entry["callee"]))
         graph = {"imports": module_imports, "calls": calls}
         return ModuleRecord(
-            name=module_name.split(".")[-1],
+            name=module_name.rsplit(".", maxsplit=1)[-1],
             qualified=module_name,
             source={"path": self._relative_string(source_path)},
             pages={

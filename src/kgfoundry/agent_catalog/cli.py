@@ -40,7 +40,7 @@ def _should_use_typed_envelope() -> bool:
     -------
     bool
         Describe return value.
-"""
+    """
     return os.getenv("AGENT_SEARCH_TYPED", "0").lower() in {"1", "true", "yes"}
 
 
@@ -50,7 +50,7 @@ class CLIEnvelope(TypedDict, total=False):
     &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    """
 
     schemaVersion: str
     schemaId: str
@@ -72,7 +72,7 @@ class CatalogctlError(RuntimeError):
     &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    """
 
 
 def _parse_facets(raw: list[str]) -> dict[str, str]:
@@ -98,7 +98,7 @@ def _parse_facets(raw: list[str]) -> dict[str, str]:
     ------
     CatalogctlError
         If any facet expression is malformed or uses an invalid key.
-"""
+    """
     facets: dict[str, str] = {}
     for value in raw:
         if "=" not in value:
@@ -126,7 +126,7 @@ def _render_json(payload: object) -> None:
     ----------
     payload : object
         Describe ``payload``.
-"""
+    """
     json.dump(payload, fp=sys.stdout, indent=2, ensure_ascii=False)
     sys.stdout.write("\n")
 
@@ -143,7 +143,7 @@ def _render_error(message: str, problem: dict[str, JsonValue] | None = None) -> 
     problem : dict[str, object] | NoneType, optional
         RFC 9457 Problem Details payload to include in JSON output.
         Defaults to ``None``.
-"""
+    """
     if problem is not None:
         error_payload = {"message": message, "problem": problem}
         json.dump(error_payload, fp=sys.stderr, indent=2, ensure_ascii=False)
@@ -166,7 +166,7 @@ def _search_result_to_dict(result: SearchResult) -> dict[str, JsonValue]:
     -------
     dict[str, object]
         Describe return value.
-"""
+    """
     return {
         "symbol_id": result.symbol_id,
         "score": result.score,
@@ -223,7 +223,7 @@ def _build_cli_envelope(  # noqa: PLR0913
     -------
     CLIEnvelope
         Typed envelope ready for JSON serialization.
-"""
+    """
     envelope: CLIEnvelope = {
         "schemaVersion": "1.0.0",
         "schemaId": "https://kgfoundry.dev/schema/cli-envelope.json",
@@ -252,7 +252,7 @@ def build_parser() -> argparse.ArgumentParser:
     -------
     argparse.ArgumentParser
         Describe return value.
-"""
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--catalog",
@@ -336,7 +336,7 @@ def _raise_unknown_command_error(command: str) -> None:
     ----------
     command : str
         Describe ``command``.
-"""
+    """
     message = f"Unknown command: {command}"
     raise CatalogctlError(message)
 
@@ -355,7 +355,7 @@ def _load_client(args: argparse.Namespace) -> AgentCatalogClient:
     -------
     AgentCatalogClient
         Describe return value.
-"""
+    """
     catalog_path: Path = args.catalog
     if not catalog_path.exists() and not any(
         candidate.exists() for candidate in sqlite_candidates(catalog_path)
@@ -383,7 +383,7 @@ def _determine_output_format(args: argparse.Namespace) -> tuple[bool, bool]:
     -------
     tuple[bool, bool]
         (use_envelope, use_legacy) flags indicating output format.
-"""
+    """
     legacy_json: bool = args.legacy_json
     if legacy_json:
         return False, True
@@ -405,7 +405,7 @@ def _cmd_capabilities(client: AgentCatalogClient, _: argparse.Namespace) -> None
         Describe ``client``.
     _ : argparse.Namespace
         Describe ``_``.
-"""
+    """
     packages = [pkg.name for pkg in client.list_packages()]
     _render_json(packages)
 
@@ -421,7 +421,7 @@ def _cmd_symbol(client: AgentCatalogClient, args: argparse.Namespace) -> None:
         Describe ``client``.
     args : argparse.Namespace
         Describe ``args``.
-"""
+    """
     symbol_id: str = args.symbol_id
     symbol = client.get_symbol(symbol_id)
     if symbol is None:
@@ -442,7 +442,7 @@ def _cmd_find_callers(client: AgentCatalogClient, args: argparse.Namespace) -> N
         Describe ``client``.
     args : argparse.Namespace
         Describe ``args``.
-"""
+    """
     symbol_id: str = args.symbol_id
     _render_json(client.find_callers(symbol_id))
 
@@ -458,7 +458,7 @@ def _cmd_find_callees(client: AgentCatalogClient, args: argparse.Namespace) -> N
         Describe ``client``.
     args : argparse.Namespace
         Describe ``args``.
-"""
+    """
     symbol_id: str = args.symbol_id
     _render_json(client.find_callees(symbol_id))
 
@@ -474,7 +474,7 @@ def _cmd_change_impact(client: AgentCatalogClient, args: argparse.Namespace) -> 
         Describe ``client``.
     args : argparse.Namespace
         Describe ``args``.
-"""
+    """
     symbol_id: str = args.symbol_id
     # model_dump returns dict[str, object], cast to JsonValue since it's JSON-serializable
     _render_json(cast(dict[str, JsonValue], client.change_impact(symbol_id).model_dump()))
@@ -491,7 +491,7 @@ def _cmd_suggest_tests(client: AgentCatalogClient, args: argparse.Namespace) -> 
         Describe ``client``.
     args : argparse.Namespace
         Describe ``args``.
-"""
+    """
     symbol_id: str = args.symbol_id
     # suggest_tests already returns list[dict[str, JsonValue]], no cast needed
     _render_json(client.suggest_tests(symbol_id))
@@ -508,7 +508,7 @@ def _cmd_open_anchor(client: AgentCatalogClient, args: argparse.Namespace) -> No
         Describe ``client``.
     args : argparse.Namespace
         Describe ``args``.
-"""
+    """
     symbol_id: str = args.symbol_id
     _render_json(client.open_anchor(symbol_id))
 
@@ -524,7 +524,7 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
         Describe ``client``.
     args : argparse.Namespace
         Describe ``args``.
-"""
+    """
     use_envelope, _use_legacy = _determine_output_format(args)
     correlation_id = str(uuid.uuid4())
     set_correlation_id(correlation_id)
@@ -634,7 +634,7 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
         Describe ``client``.
     args : argparse.Namespace
         Describe ``args``.
-"""
+    """
     use_envelope, _use_legacy = _determine_output_format(args)
     correlation_id = str(uuid.uuid4())
     set_correlation_id(correlation_id)
@@ -721,7 +721,7 @@ def _cmd_list_modules(client: AgentCatalogClient, args: argparse.Namespace) -> N
         Describe ``client``.
     args : argparse.Namespace
         Describe ``args``.
-"""
+    """
     package: str = args.package
     modules = client.list_modules(package)
     _render_json([module.qualified for module in modules])
@@ -756,7 +756,7 @@ def main(argv: list[str] | None = None) -> int:
     -------
     int
         Describe return value.
-"""
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
     use_envelope, _use_legacy = _determine_output_format(args)
