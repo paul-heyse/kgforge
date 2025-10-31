@@ -26,7 +26,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from tools._shared.logging import get_logger
 from tools.griffe_utils import resolve_griffe  # noqa: E402
+
+LOGGER = get_logger(__name__)
 
 _griffe_api = resolve_griffe()
 _griffe_module = _griffe_api.package
@@ -682,11 +685,11 @@ def write_readme(node: GriffeObjectLike, cfg: Config) -> bool:
 
     content = "".join(lines).rstrip() + "\n"
     if cfg.dry_run:
-        print(f"[dry-run] would write {readme}")
+        LOGGER.info("[dry-run] would write %s", readme)
         return False
     changed = write_if_changed(readme, content)
     if changed:
-        print(f"Wrote {readme}")
+        LOGGER.info("Wrote %s", readme)
         _maybe_run_doctoc(readme, cfg)
     return changed
 
@@ -697,7 +700,7 @@ def _maybe_run_doctoc(readme: Path, cfg: Config) -> None:
         return
     doctoc = shutil.which("doctoc")
     if not doctoc:
-        print(f"Info: doctoc not installed; skipping TOC update for {readme}")
+        LOGGER.info("Info: doctoc not installed; skipping TOC update for %s", readme)
         return
     result = subprocess.run(
         [doctoc, str(readme)],
@@ -707,14 +710,11 @@ def _maybe_run_doctoc(readme: Path, cfg: Config) -> None:
     )
     if cfg.verbose:
         if result.stdout.strip():
-            print(result.stdout.strip())
+            LOGGER.info("%s", result.stdout.strip())
         if result.stderr.strip():
-            print(result.stderr.strip(), file=sys.stderr)
+            LOGGER.warning("%s", result.stderr.strip())
     if result.returncode != 0:
-        print(
-            f"Warning: doctoc exited with code {result.returncode} for {readme}",
-            file=sys.stderr,
-        )
+        LOGGER.warning("Warning: doctoc exited with code %d for %s", result.returncode, readme)
 
 
 def _collect_missing_metadata(node: GriffeObjectLike, missing: set[str]) -> None:
@@ -741,9 +741,11 @@ def _ensure_packages_selected(packages: Sequence[str]) -> None:
 def _warn_missing_inputs() -> None:
     """Emit warnings when auxiliary metadata files are missing."""
     if not NAVMAP_PATH.exists():
-        print(f"Warning: NavMap not found at {NAVMAP_PATH}; badges will be empty")
+        LOGGER.warning("Warning: NavMap not found at %s; badges will be empty", NAVMAP_PATH)
     if not TESTMAP_PATH.exists():
-        print(f"Warning: Test map not found at {TESTMAP_PATH}; tested-by badges will be empty")
+        LOGGER.warning(
+            "Warning: Test map not found at %s; tested-by badges will be empty", TESTMAP_PATH
+        )
 
 
 def _process_module(module: GriffeObjectLike, cfg: Config, missing_meta: set[str]) -> bool:
@@ -769,7 +771,7 @@ def _process_module(module: GriffeObjectLike, cfg: Config, missing_meta: set[str
 def _report_duration(start: float, changed_any: bool) -> None:
     """Print a timing summary when verbose mode is enabled."""
     duration = time.time() - start
-    print(f"completed in {duration:.2f}s; changed={changed_any}")
+    LOGGER.info("completed in %.2fs; changed=%s", duration, changed_any)
 
 
 def main() -> None:
@@ -795,9 +797,9 @@ def main() -> None:
         changed_any |= _process_module(module, cfg, missing_meta)
 
     if cfg.fail_on_metadata_miss and missing_meta:
-        print(
-            "ERROR: Missing owner/stability for public symbols:\n  - "
-            + "\n  - ".join(sorted(missing_meta))
+        LOGGER.error(
+            "ERROR: Missing owner/stability for public symbols:\n  - %s",
+            "\n  - ".join(sorted(missing_meta)),
         )
         raise SystemExit(2)
 

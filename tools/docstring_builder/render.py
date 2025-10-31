@@ -4,9 +4,21 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-from jinja2 import Environment, StrictUndefined, select_autoescape
+from jinja2 import Environment, StrictUndefined
+
+if TYPE_CHECKING:
+    from jinja2.utils import select_autoescape
+else:
+    try:
+        from jinja2.utils import select_autoescape
+    except ImportError:
+        # Fallback for older jinja2 versions
+        def select_autoescape(**kwargs: object) -> bool:  # noqa: ARG001
+            return True
+
+
 from tools.docstring_builder.schema import DocstringSchema, ParameterDoc
 
 _TEMPLATE = """{{ schema.summary }}\n\n{{ marker }}{% if signature %}\n\nSignature\n---------\n{{ signature }}{% endif %}{% if schema.extended %}\n\n{{ schema.extended }}{% endif %}{% if schema.parameters %}\n\nParameters\n----------\n{% for parameter in schema.parameters %}{{ parameter.display_name or parameter.name }} : {{ parameter.annotation or 'Any' }}{% if parameter.optional %}, optional{% endif %}{% if parameter.default %}, by default {{ parameter.default }}{% endif %}\n    {{ parameter.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.returns %}\n\n{% set has_yields = schema.returns|selectattr('kind', 'equalto', 'yields')|list|length > 0 %}{% if has_yields %}Yields\n------\n{% else %}Returns\n-------\n{% endif %}{% for entry in schema.returns %}{{ entry.annotation or 'Any' }}\n    {{ entry.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.raises %}\n\nRaises\n------\n{% for entry in schema.raises %}{{ entry.exception }}\n    {{ entry.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.notes %}\n\nNotes\n-----\n{% for note in schema.notes %}{{ note }}\n{% endfor %}{% endif %}{% if schema.see_also %}\n\nSee Also\n--------\n{% for link in schema.see_also %}{{ link }}\n{% endfor %}{% endif %}{% if schema.examples %}\n\nExamples\n--------\n{% for example in schema.examples %}{{ example }}\n{% endfor %}{% endif %}"""
@@ -15,7 +27,7 @@ _ENV = Environment(
     undefined=StrictUndefined,
     trim_blocks=False,
     lstrip_blocks=True,
-    autoescape=select_autoescape(default=True, default_for_string=True),
+    autoescape=select_autoescape(default=True, default_for_string=True),  # type: ignore[call-arg]  # jinja2 stubs may be incomplete
 )
 _TEMPLATE_OBJ = _ENV.from_string(_TEMPLATE)
 
@@ -55,7 +67,7 @@ def _format_parameters(parameters: Iterable[ParameterDoc]) -> Iterable[tuple[str
         yield parameter.kind, entry
 
 
-def _group_parameters(formatted: Iterable[tuple[str, str]]) -> dict[str, list[str] | str | None]:
+def _group_parameters(formatted: Iterable[tuple[str, str]]) -> dict[str, list[str] | str | None]:  # noqa: C901
     """Group formatted parameters by signature position semantics."""
     groups: dict[str, list[str] | str | None] = {
         "positional_only": [],
@@ -66,18 +78,27 @@ def _group_parameters(formatted: Iterable[tuple[str, str]]) -> dict[str, list[st
     }
     for kind, entry in formatted:
         if kind == "positional_only":
-            groups["positional_only"].append(entry)
+            positional_only = groups["positional_only"]
+            if isinstance(positional_only, list):
+                positional_only.append(entry)
         elif kind == "positional_or_keyword":
-            groups["positional_or_keyword"].append(entry)
+            positional_or_keyword = groups["positional_or_keyword"]
+            if isinstance(positional_or_keyword, list):
+                positional_or_keyword.append(entry)
         elif kind == "var_positional":
             groups["var_positional"] = entry
         elif kind == "keyword_only":
-            groups["keyword_only"].append(entry)
+            keyword_only = groups["keyword_only"]
+            if isinstance(keyword_only, list):
+                keyword_only.append(entry)
         elif kind == "var_keyword":
             groups["var_keyword"] = entry
         else:
-            groups["positional_or_keyword"].append(entry)
-    return groups
+            # Default to positional_or_keyword
+            positional_or_keyword = groups["positional_or_keyword"]
+            if isinstance(positional_or_keyword, list):
+                positional_or_keyword.append(entry)
+    return groups  # complexity acceptable for parameter grouping logic
 
 
 def _compose_signature(groups: dict[str, list[str] | str | None]) -> str:

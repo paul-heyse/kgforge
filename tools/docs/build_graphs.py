@@ -14,7 +14,6 @@ import importlib
 import json
 import os
 import shutil
-import subprocess
 import sys
 import time
 import warnings
@@ -25,6 +24,10 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile, mkdtemp
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, cast
+
+from tools._shared.logging import get_logger, with_fields
+from tools._shared.proc import ToolExecutionError, ToolRunResult, run_tool
+from tools.docs.errors import GraphBuildError
 
 if TYPE_CHECKING:
     import networkx as nx_mod
@@ -43,25 +46,16 @@ def _optional_import(name: str) -> ModuleType | None:
     Parameters
     ----------
     name : str
-        Description.
+        Module name to import.
 
     Returns
     -------
     ModuleType | None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _optional_import(...)
+        Imported module or None if import fails.
     """
     try:
         return importlib.import_module(name)
-    except Exception:
+    except ImportError:
         return None
 
 
@@ -241,60 +235,77 @@ def parse_args() -> argparse.Namespace:
 # --------------------------------------------------------------------------------------
 
 
-def sh(
-    cmd: list[str], cwd: Path | None = None, check: bool = True
-) -> subprocess.CompletedProcess[str]:
-    """Compute sh.
+LOGGER = get_logger(__name__)
 
-    Carry out the sh operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+
+def sh(
+    cmd: list[str], cwd: Path | None = None, check: bool = True, timeout: float = 30.0
+) -> ToolRunResult:
+    """Run a subprocess command using secure run_tool wrapper.
 
     Parameters
     ----------
-    cmd : List[str]
-        Description for ``cmd``.
+    cmd : list[str]
+        Command to execute.
     cwd : Path | None
-        Optional parameter default ``None``. Description for ``cwd``.
-    check : bool | None
-        Optional parameter default ``True``. Description for ``check``.
+        Working directory for the command.
+    check : bool
+        If True, raise on non-zero exit code.
+    timeout : float
+        Timeout in seconds (default 30.0 for graphviz commands).
 
     Returns
     -------
-    subprocess.CompletedProcess[str]
-        Description of return value.
+    ToolRunResult
+        Completed process result.
 
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import sh
-    >>> result = sh(...)
-    >>> result  # doctest: +ELLIPSIS
+    Raises
+    ------
+    GraphBuildError
+        If command fails and check is True.
     """
-    return subprocess.run(
-        cmd, check=check, cwd=str(cwd) if cwd else None, text=True, capture_output=False
-    )
+    log_adapter = with_fields(LOGGER, command=cmd, cwd=str(cwd) if cwd else None)
+    try:
+        result = run_tool(cmd, timeout=timeout, cwd=cwd)
+    except ToolExecutionError as exc:
+        if check:
+            log_adapter.exception("Subprocess command failed")
+            message = f"Command '{cmd[0]}' failed"
+            raise GraphBuildError(message) from exc
+        # Return a ToolRunResult-like object for non-check mode
+        return ToolRunResult(
+            command=tuple(cmd),
+            returncode=1,
+            stdout="",
+            stderr=str(exc),
+            duration_seconds=0.0,
+            timed_out=False,
+        )
+    if check and result.returncode != 0:
+        log_adapter.error("Command returned non-zero exit code: %s", result.returncode)
+        message = f"Command '{cmd[0]}' returned exit code {result.returncode}"
+        raise GraphBuildError(message)
+    return result
 
 
 def ensure_bin(name: str) -> None:
-    """Compute ensure bin.
-
-    Carry out the ensure bin operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Ensure executable is available on PATH.
 
     Parameters
     ----------
     name : str
-        Description for ``name``.
+        Executable name to check.
 
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import ensure_bin
-    >>> ensure_bin(...)  # doctest: +ELLIPSIS
+    Raises
+    ------
+    GraphBuildError
+        If executable is not found.
     """
     if not shutil.which(name):
-        print(f"[graphs] Missing required executable on PATH: {name}", file=sys.stderr)
-        print(
-            "[graphs] Run 'uv sync --frozen' (or './scripts/bootstrap.sh') to install it.",
-            file=sys.stderr,
-        )
-        sys.exit(2)
+        logger = get_logger(__name__)
+        logger.error("Missing required executable on PATH: %s", name)
+        message = f"Missing required executable on PATH: {name}"
+        raise GraphBuildError(message)
 
 
 def find_top_packages() -> list[str]:
@@ -327,7 +338,7 @@ def _rel(p: Path) -> str:
     """Return ``p`` relative to the repository root when possible."""
     try:
         return str(p.relative_to(ROOT))
-    except Exception:
+    except ValueError:
         return str(p)
 
 
@@ -1092,7 +1103,6 @@ def style_and_render(
     if pydot is None:
         message = "pydot is required for rendering graphs"
         raise RuntimeError(message)
-    assert pydot is not None
 
     pkg2layer = _coerce_mapping(layers.get("packages"))
     palette = {
@@ -1209,7 +1219,7 @@ def enforce_policy(
     if fail_layers and new_violations:
         errs.append(f"{len(new_violations)} layer violation edge(s) not allowlisted")
     if errs:
-        print("[graphs] policy violations:", "; ".join(errs))
+        LOGGER.error("Policy violations: %s", "; ".join(errs))
         sys.exit(2)
 
 
@@ -1375,7 +1385,7 @@ def _maybe_restore_from_cache(
         shutil.copy2(cache_uml, uml_out)
         if verbose:
             snippet = tree_hash[:7]
-            print(f"[graphs] cache hit: {pkg}@{snippet}")
+            LOGGER.info("Cache hit: %s@%s", pkg, snippet)
         return CacheContext(True, tree_hash, bucket)
 
     return CacheContext(False, tree_hash, bucket)
@@ -1455,13 +1465,15 @@ def _build_artifacts(
     pydeps_ok = True
     try:
         build_pydeps_for_package(pkg, stage.staged_imports, excludes, max_bacon, fmt)
-    except Exception:
+    except (GraphBuildError, RuntimeError, OSError) as exc:
+        LOGGER.warning("pydeps build failed for %s: %s", pkg, exc)
         pydeps_ok = False
 
     pyrev_ok = True
     try:
         build_pyreverse_for_package(pkg, stage.staging_dir, fmt)
-    except Exception:
+    except (GraphBuildError, RuntimeError, OSError) as exc:
+        LOGGER.warning("pyreverse build failed for %s: %s", pkg, exc)
         pyrev_ok = False
 
     return pydeps_ok, pyrev_ok
@@ -1494,7 +1506,8 @@ def _promote_outputs(stage: StagePaths) -> bool:
     try:
         stage.staged_imports.replace(stage.final_imports)
         stage.staged_uml.replace(stage.final_uml)
-    except Exception:
+    except (OSError, shutil.Error) as exc:
+        LOGGER.warning("Failed to promote outputs: %s", exc)
         return False
     return True
 
@@ -1533,14 +1546,14 @@ def _update_cache(pkg: str, cache_ctx: CacheContext, stage: StagePaths, verbose:
     try:
         shutil.copy2(stage.final_imports, cache_ctx.bucket / stage.final_imports.name)
         shutil.copy2(stage.final_uml, cache_ctx.bucket / stage.final_uml.name)
-    except Exception:
+    except (OSError, shutil.Error) as exc:
         if verbose:
             snippet = cache_ctx.tree_hash[:7]
-            print(f"[graphs] warning: failed to update cache for {pkg}@{snippet}")
+            LOGGER.warning("Failed to update cache for %s@%s: %s", pkg, snippet, exc)
         return
     if verbose:
         snippet = cache_ctx.tree_hash[:7]
-        print(f"[graphs] cached: {pkg}@{snippet}")
+        LOGGER.info("Cached: %s@%s", pkg, snippet)
 
 
 def build_one_package(pkg: str, config: PackageBuildConfig) -> tuple[str, bool, bool, bool]:
@@ -1630,14 +1643,13 @@ def _validate_runtime_dependencies() -> None:
     if yaml is None:
         missing.append("pyyaml")
     if missing:
-        print(
-            f"[graphs] Missing Python packages: {', '.join(missing)}. Install them in the docs env.",
-            file=sys.stderr,
+        LOGGER.error(
+            "Missing Python packages: %s. Install them in the docs env.", ", ".join(missing)
         )
         sys.exit(2)
 
     if not shutil.which("dot"):
-        print("[graphs] graphviz 'dot' not found on PATH. Install graphviz.", file=sys.stderr)
+        LOGGER.error("graphviz 'dot' not found on PATH. Install graphviz.")
         sys.exit(2)
 
     ensure_bin("pydeps")
@@ -1730,8 +1742,8 @@ def _log_configuration(
     """
     if not verbose:
         return
-    print(f"[graphs] packages={list(packages)}")
-    print(f"[graphs] cache_dir={cache_dir} use_cache={use_cache}")
+    LOGGER.info("packages=%s", list(packages))
+    LOGGER.info("cache_dir=%s use_cache=%s", cache_dir, use_cache)
 
 
 def _build_per_package_graphs(
@@ -1781,7 +1793,7 @@ def _build_per_package_graphs(
             if config.verbose:
                 source = "cache" if used_cache else "built"
                 status = f"pydeps={'ok' if pydeps_ok else 'FAIL'}; pyreverse={'ok' if pyrev_ok else 'FAIL'}"
-                print(f"[graphs] {pkg}: {source}; {status}")
+                LOGGER.info("%s: %s; %s", pkg, source, status)
     return results
 
 
@@ -1818,11 +1830,11 @@ def _report_package_failures(results: Sequence[tuple[str, bool, bool, bool]]) ->
         if not pyrev_ok:
             parts.append("pyreverse")
         lines.append(f" - {pkg}: {', '.join(parts)} failed")
-    print("\n".join(lines), file=sys.stderr)
+    LOGGER.error("Package failures:\n%s", "\n".join(lines))
     sys.exit(3)
 
 
-def _build_global_graph(fmt: str, excludes: list[str], max_bacon: int) -> DiGraph:
+def _build_global_graph(_fmt: str, excludes: list[str], max_bacon: int) -> DiGraph:
     """Build global graph.
 
     Parameters
@@ -2050,11 +2062,11 @@ def _log_run_summary(
     built = sum(1 for _, used_cache, _, _ in results if not used_cache)
     cached = sum(1 for _, used_cache, _, _ in results if used_cache)
     if use_cache:
-        print(
-            f"[graphs] cache summary: per-package built={built} cached={cached}; cache_dir={cache_dir}"
+        LOGGER.info(
+            "cache summary: per-package built=%d cached=%d; cache_dir=%s", built, cached, cache_dir
         )
     if verbose:
-        print(f"[graphs] done in {duration_s:.2f}s; outputs in {OUT}")
+        LOGGER.info("done in %.2fs; outputs in %s", duration_s, OUT)
 
 
 # --------------------------------------------------------------------------------------
@@ -2098,8 +2110,8 @@ def main() -> None:
 
     try:
         global_graph = _build_global_graph(args.format, excludes, args.max_bacon)
-    except Exception as exc:  # pragma: no cover - defensive guard
-        print(f"[graphs] building global graph failed: {exc}", file=sys.stderr)
+    except (GraphBuildError, RuntimeError, OSError):  # pragma: no cover - defensive guard
+        LOGGER.exception("Building global graph failed")
         sys.exit(2)
 
     layers = _load_layers_config(args.layers)

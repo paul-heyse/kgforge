@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import argparse
 import importlib
-import sys
 from collections.abc import Iterable
 from dataclasses import dataclass
+
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
 
 
 @dataclass(slots=True)
@@ -109,15 +112,15 @@ def run() -> int:
     for spec in MODULE_SPECS:
         result = _inspect_module(spec)
         if result.error:
-            print(f"[ERROR] {spec.name}: {result.error}", file=sys.stderr)
+            LOGGER.error("[ERROR] %s: %s", spec.name, result.error)
         else:
-            print(f"[INFO] {spec.name}")
-            print(_format_section("missing", result.missing))
-            print(_format_section("unexpected", result.unexpected))
+            LOGGER.info("[INFO] %s", spec.name)
+            LOGGER.info(_format_section("missing", result.missing))
+            LOGGER.info(_format_section("unexpected", result.unexpected))
         if result.has_drift:
             failures.append(result)
     if failures:
-        print("\nStub drift detected:", file=sys.stderr)
+        LOGGER.error("Stub drift detected:")
         for failure in failures:
             parts = []
             if failure.missing:
@@ -127,7 +130,7 @@ def run() -> int:
             if failure.error:
                 parts.append(f"error: {failure.error}")
             detail = "; ".join(parts)
-            print(f"  - {failure.module}: {detail}", file=sys.stderr)
+            LOGGER.error("  - %s: %s", failure.module, detail)
         return 1
     return 0
 

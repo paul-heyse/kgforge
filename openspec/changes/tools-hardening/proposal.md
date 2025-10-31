@@ -4,9 +4,11 @@ The `tools/` suite powers DocFacts generation, docs/navmap builds, gallery valid
 ## What Changes
 - [x] **ADDED**: Shared typed infrastructure under `tools/_shared/` for logging, subprocess management, Problem Details envelopes, and schema helpers.
 - [x] **ADDED**: JSON Schemas for CLI/doc outputs (`schema/tools/docstring_builder_cli.json`, `schema/tools/doc_analytics.json`, `schema/tools/navmap_document.json`, etc.) with version constants and validation utilities.
+- [x] **ADDED**: Versioned base CLI envelope schema (`schema/tools/cli_envelope.json`); all tooling CLIs gain `--json` that emits this envelope with embedded Problem Details on failure.
 - [x] **MODIFIED**: Docstring builder pipeline to adopt `tools/docstring_builder/models.py` dataclasses/TypedDicts, refactored modules (`normalizer_*`, `policy`, `render`), plugin Protocols, CLI JSON emission, and Prometheus-compatible observability.
 - [x] **MODIFIED**: Documentation pipelines (`tools/docs/build_agent_catalog.py`, `build_graphs.py`, `build_test_map.py`, `export_schemas.py`, `render_agent_portal.py`) to use typed adapters, secure subprocess wrappers, structured logging, and targeted exception taxonomy.
 - [x] **MODIFIED**: Navmap utilities and CLI scripts to replace prints with structured logs, adopt typed models, validate outputs against schemas, and expose Problem Details on failure.
+- [x] **MODIFIED**: Unify tooling logging by delegating `tools/_shared/logging.py` to `src/kgfoundry_common/logging.py` (JSON formatter + correlation IDs) for consistent structured logs.
 - [ ] **REMOVED**: Legacy compatibility shims and blind exception handlers once typed pipeline is default (tracked in rollout plan).
 - [ ] **RENAMED**: _None._
 - [ ] **BREAKING**: Public CLI surface remains compatible; machine-readable JSON now wrapped in a versioned envelope (flagged in docs / changelog).
@@ -18,14 +20,16 @@ The `tools/` suite powers DocFacts generation, docs/navmap builds, gallery valid
   - `tools/docstring_builder/` modules (normalizer, policy, render, cli, plugins, observability)
   - `tools/docs/` generators (`build_agent_catalog.py`, `build_graphs.py`, `build_test_map.py`, `render_agent_portal.py`, `export_schemas.py`, etc.)
   - `tools/navmap/` scripts and supporting CLIs
-  - JSON Schema additions under `schema/tools/`
+  - JSON Schema additions under `schema/tools/` (including `cli_envelope.json`)
 - **Rollout:** Feature flag `DOCSTRINGS_TYPED_IR` governs docstring pipeline migration; CLI wrappers gain `--legacy-json` for one release cycle. Observability metrics deployed alongside to monitor failures. Compatibility shims logged and scheduled for removal after metrics show stabilization.
 - **Risks:** Widespread refactor across tooling; mitigated via phased tasks, schema validation, regression suites, and Prometheus counters/structured logs capturing failures. Potential third-party plugin breakage addressed via compatibility shim and documentation updates.
 
 ## Acceptance
 - All quality gates pass (`ruff`, `pyrefly`, `mypy`, `pytest`, `make artifacts`, `openspec validate`).
+- Import-linter and dependency audit gates pass (`python tools/check_imports.py`, `uv run pip-audit --strict`).
 - CLI/JSON outputs validate against new schemas with round-trip tests and published examples.
 - Structured logging replaces every `print`; subprocess invocations go through `_shared.proc.run_tool` or documented safe wrappers.
+- CLIs support `--json` and emit the base envelope (`schema/tools/cli_envelope.json`) with Problem Details on failure.
 - Docstring builder, docs generators, and navmap utilities emit Problem Details envelopes on failure and expose Prometheus metrics.
 - Compatibility flag telemetry shows zero regressions before flipping the typed pipeline to default.
 

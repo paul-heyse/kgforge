@@ -19,16 +19,21 @@ from typing import Final
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from kgfoundry_common.errors import ConfigurationError
+from kgfoundry_common.errors import SettingsError
+from kgfoundry_common.logging import get_logger
 from kgfoundry_common.navmap_types import NavMap
 
 __all__ = [
     "FaissConfig",
+    "KgFoundrySettings",
     "ObservabilityConfig",
     "RuntimeSettings",
     "SearchConfig",
     "SparseEmbeddingConfig",
+    "load_settings",
 ]
+
+logger = get_logger(__name__)
 
 __navmap__: Final[NavMap] = {
     "title": "kgfoundry_common.settings",
@@ -235,7 +240,7 @@ class RuntimeSettings(BaseSettings):
     """Runtime configuration with typed nested models and fail-fast validation.
 
     This class loads configuration from environment variables with type validation.
-    Missing required fields raise ConfigurationError with Problem Details metadata.
+    Missing required fields raise SettingsError with Problem Details metadata.
 
     Environment Variables
     ---------------------
@@ -265,7 +270,7 @@ class RuntimeSettings(BaseSettings):
 
     Raises
     ------
-    ConfigurationError
+    SettingsError
         If required environment variables are missing or invalid.
         The error includes Problem Details metadata for structured error handling.
 
@@ -285,36 +290,109 @@ class RuntimeSettings(BaseSettings):
 
     search: SearchConfig = Field(
         default_factory=SearchConfig, description="Search service configuration"
-    )  # type: ignore[misc]  # default_factory returns Any
+    )
     observability: ObservabilityConfig = Field(
         default_factory=ObservabilityConfig, description="Observability configuration"
-    )  # type: ignore[misc]  # default_factory returns Any
+    )
     sparse_embedding: SparseEmbeddingConfig = Field(
         default_factory=SparseEmbeddingConfig,
         description="Sparse embedding configuration",
-    )  # type: ignore[misc]  # default_factory returns Any
-    faiss: FaissConfig = Field(default_factory=FaissConfig, description="FAISS index configuration")  # type: ignore[misc]  # default_factory returns Any
+    )
+    faiss: FaissConfig = Field(default_factory=FaissConfig, description="FAISS index configuration")
 
-    def __init__(self, **kwargs: object) -> None:  # type: ignore[misc]  # BaseSettings accepts Any
-        """Initialize settings with fail-fast validation.
+    def __init__(self, **overrides: object) -> None:
+        """Initialize settings with fail-fast validation from environment variables.
+
+        This constructor loads from environment variables (via pydantic_settings)
+        and accepts optional keyword arguments for programmatic overrides. For
+        public API usage, prefer `load_settings()` which provides better error
+        handling.
 
         Parameters
         ----------
-        **kwargs : object
-            Override values (typically from environment variables).
+        **overrides : object
+            Optional keyword arguments to override default or environment values.
+            Keys must match field names (e.g., `search`, `observability`).
 
         Raises
         ------
-        ConfigurationError
+        SettingsError
             If validation fails (missing required fields, invalid types, etc.).
         """
         try:
-            super().__init__(**kwargs)  # type: ignore[misc]  # BaseSettings accepts Any
+            super().__init__(**overrides)  # type: ignore[call-overload, misc]  # BaseSettings.__init__ accepts Any kwargs, mypy can't infer overloads
         except Exception as exc:
-            # Convert Pydantic validation errors to ConfigurationError with Problem Details
+            # Convert Pydantic validation errors to SettingsError with Problem Details
             msg = f"Configuration validation failed: {exc}"
-            raise ConfigurationError(
+            logger.exception(
+                "Settings validation failed",
+                extra={"error": str(exc), "error_type": type(exc).__name__},
+            )
+            raise SettingsError(
                 msg,
                 cause=exc,
                 context={"validation_error": str(exc)},
             ) from exc
+
+
+# Type alias for backward compatibility
+KgFoundrySettings = RuntimeSettings
+
+
+def load_settings(**overrides: object) -> KgFoundrySettings:
+    """Load settings from environment variables with optional overrides.
+
+    This function loads settings from environment variables (via pydantic_settings)
+    and allows programmatic overrides via keyword arguments. All overrides are
+    validated against the settings schema.
+
+    Parameters
+    ----------
+    **overrides : object
+        Optional keyword arguments to override default or environment values.
+        Keys must match field names in RuntimeSettings (e.g., `search`, `observability`).
+
+    Returns
+    -------
+    KgFoundrySettings
+        Validated settings instance.
+
+    Raises
+    ------
+    SettingsError
+        If required environment variables are missing or validation fails.
+        The error includes Problem Details metadata for structured error handling.
+
+    Examples
+    --------
+    >>> import os
+    >>> os.environ.pop("KGFOUNDRY_SEARCH_API_URL", None)
+    >>> # Load from environment only
+    >>> settings = load_settings()
+    >>> assert settings.search.api_url is None
+    >>>
+    >>> # Override specific values
+    >>> settings = load_settings(search={"api_url": "http://localhost:8000"})
+    >>> assert settings.search.api_url == "http://localhost:8000"
+    >>>
+    >>> # Missing required env var raises SettingsError
+    >>> # settings = load_settings()  # doctest: +SKIP
+    >>> # SettingsError: Configuration validation failed
+    """
+    try:
+        return RuntimeSettings(**overrides)  # type: ignore[call-overload, misc]  # BaseSettings.__init__ accepts Any kwargs, mypy can't infer overloads
+    except SettingsError:
+        # Re-raise SettingsError as-is
+        raise
+    except Exception as exc:
+        # Convert any other validation errors to SettingsError
+        msg = f"Failed to load settings: {exc}"
+        logger.exception(
+            "Settings loading failed",
+            extra={"error": str(exc), "error_type": type(exc).__name__},
+        )
+        raise SettingsError(
+            msg,
+            cause=exc,
+            context={"validation_error": str(exc)},
+        ) from exc

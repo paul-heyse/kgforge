@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kgfoundry.dev/schema/cli-envelope.json",
+  "title": "BaseCLIEnvelope",
+  "description": "Versioned base envelope emitted by all tooling CLIs when invoked with --json. Includes Problem Details payload on failure.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "schemaId",
+    "generatedAt",
+    "status",
+    "command",
+    "subcommand",
+    "durationSeconds"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "description": "Semantic version of this schema.",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "schemaId": {
+      "description": "Canonical identifier for this schema.",
+      "type": "string",
+      "const": "https://kgfoundry.dev/schema/cli-envelope.json"
+    },
+    "generatedAt": {
+      "description": "ISO 8601 timestamp (UTC) for when the payload was generated.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "description": "Overall status of the CLI invocation.",
+      "$ref": "#/$defs/RunStatus"
+    },
+    "command": {
+      "description": "Top-level command executed (e.g., 'build_agent_catalog', 'build_graphs').",
+      "type": "string"
+    },
+    "subcommand": {
+      "description": "Specific subcommand invoked by the user (may be empty string for commands without subcommands).",
+      "type": "string"
+    },
+    "durationSeconds": {
+      "description": "Total runtime for the CLI invocation in seconds.",
+      "type": "number",
+      "minimum": 0
+    },
+    "files": {
+      "description": "Array of per-file processing results (may be empty if operation is not file-oriented).",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/FileResult"
+      },
+      "default": []
+    },
+    "errors": {
+      "description": "Array of error entries (populated when status is not 'success').",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ErrorEntry"
+      },
+      "default": []
+    },
+    "problem": {
+      "description": "RFC 9457 Problem Details object (present when status is 'error' or 'violation').",
+      "$ref": "#/$defs/ProblemDetails"
+    }
+  },
+  "$defs": {
+    "RunStatus": {
+      "description": "Overall status of the CLI run.",
+      "type": "string",
+      "enum": ["success", "violation", "config", "error"]
+    },
+    "FileResult": {
+      "description": "Result for a single file processed by the CLI.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "status"],
+      "properties": {
+        "path": {
+          "description": "Relative or absolute path to the file.",
+          "type": "string"
+        },
+        "status": {
+          "description": "Processing status for this file.",
+          "type": "string",
+          "enum": ["success", "skipped", "error", "violation"]
+        },
+        "message": {
+          "description": "Optional human-readable message about this file.",
+          "type": "string"
+        },
+        "problem": {
+          "description": "RFC 9457 Problem Details object (present if status is 'error' or 'violation').",
+          "$ref": "#/$defs/ProblemDetails"
+        }
+      }
+    },
+    "ErrorEntry": {
+      "description": "Error entry with optional file context and Problem Details.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "message"],
+      "properties": {
+        "file": {
+          "description": "Optional file path associated with this error.",
+          "type": "string"
+        },
+        "status": {
+          "description": "Error status.",
+          "type": "string",
+          "enum": ["error", "violation", "config"]
+        },
+        "message": {
+          "description": "Human-readable error message.",
+          "type": "string"
+        },
+        "problem": {
+          "description": "RFC 9457 Problem Details object.",
+          "$ref": "#/$defs/ProblemDetails"
+        }
+      }
+    },
+    "ProblemDetails": {
+      "description": "RFC 9457 Problem Details object.",
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["type", "title", "status", "detail", "instance"],
+      "properties": {
+        "type": {
+          "description": "Type URI identifying the problem.",
+          "type": "string",
+          "format": "uri"
+        },
+        "title": {
+          "description": "Short summary of the problem.",
+          "type": "string"
+        },
+        "status": {
+          "description": "HTTP status code (or equivalent for non-HTTP contexts).",
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 599
+        },
+        "detail": {
+          "description": "Human-readable explanation of the problem.",
+          "type": "string"
+        },
+        "instance": {
+          "description": "URI reference identifying the specific occurrence.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

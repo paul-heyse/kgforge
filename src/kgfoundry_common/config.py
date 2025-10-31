@@ -1,19 +1,26 @@
-"""Overview of config.
+"""Configuration helpers shared across kgfoundry.
 
-This module bundles config logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module provides YAML configuration loading and type aliases for JSON values
+used across configuration modules. Type aliases are imported from problem_details
+for consistency.
 """
 
 from __future__ import annotations
 
-from typing import Any, Final
+from pathlib import Path
+from typing import TYPE_CHECKING, Final
 
 import yaml
 
 from kgfoundry_common.navmap_types import NavMap
 
-__all__ = ["load_config"]
+# Import JSON type aliases from problem_details for consistency
+from kgfoundry_common.problem_details import JsonPrimitive, JsonValue
+
+if TYPE_CHECKING:
+    from typing import Any
+
+__all__ = ["JsonPrimitive", "JsonValue", "load_config"]
 
 __navmap__: Final[NavMap] = {
     "title": "kgfoundry_common.config",
@@ -32,6 +39,16 @@ __navmap__: Final[NavMap] = {
         "since": "0.1.0",
     },
     "symbols": {
+        "JsonPrimitive": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+        "JsonValue": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
         "load_config": {
             "owner": "@kgfoundry-common",
             "stability": "stable",
@@ -76,12 +93,12 @@ def load_config(path: str) -> dict[str, Any]:
     TypeError
     Raised when TODO for TypeError.
     """
-    with open(path, encoding="utf-8") as f:
-        loaded = yaml.safe_load(f)
+    with Path(path).open(encoding="utf-8") as f:
+        loaded: object = yaml.safe_load(f)
     if not isinstance(loaded, dict):
         message = f"Configuration at {path} must decode to a mapping"
         raise TypeError(message)
-    validated: dict[str, Any] = {}
+    validated: dict[str, object] = {}
     for key, value in loaded.items():
         if not isinstance(key, str):
             message = f"Configuration keys must be strings; received {key!r}"

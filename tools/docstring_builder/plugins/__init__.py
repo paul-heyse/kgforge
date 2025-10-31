@@ -78,7 +78,7 @@ class PluginManager:
         updated = result
         with self._lock:
             for plugin in self.harvesters:
-                updated = _invoke_apply(plugin, context, updated)
+                updated = cast(HarvestResult, _invoke_apply(plugin, context, updated))
         return updated
 
     def apply_transformers(
@@ -91,7 +91,7 @@ class PluginManager:
             updated = entry
             with self._lock:
                 for plugin in self.transformers:
-                    updated = _invoke_apply(plugin, context, updated)
+                    updated = cast(SemanticResult, _invoke_apply(plugin, context, updated))
             processed.append(updated)
         return processed
 
@@ -105,7 +105,7 @@ class PluginManager:
             updated = entry
             with self._lock:
                 for plugin in self.formatters:
-                    updated = _invoke_apply(plugin, context, updated)
+                    updated = cast(DocstringEdit, _invoke_apply(plugin, context, updated))
             processed.append(updated)
         return processed
 
@@ -123,13 +123,15 @@ def _invoke_apply(
     plugin: DocstringBuilderPlugin,
     context: PluginContext,
     payload: HarvestResult | SemanticResult | DocstringEdit,
-) -> HarvestResult | SemanticResult | DocstringEdit:
+) -> (
+    HarvestResult | SemanticResult | DocstringEdit
+):  # pyrefly: ignore[bad-return]  # all paths return or raise
     try:
         result = plugin.apply(
             context,
-            cast(HarvestResult | SemanticResult | DocstringEdit, payload),
+            cast(HarvestResult | SemanticResult | DocstringEdit, payload),  # type: ignore[redundant-cast]  # cast needed for type narrowing
         )
-        return cast(HarvestResult | SemanticResult | DocstringEdit, result)
+        return cast(HarvestResult | SemanticResult | DocstringEdit, result)  # type: ignore[redundant-cast]  # cast needed for type narrowing
     except DocstringBuilderError:
         raise
     except Exception as exc:  # pragma: no cover - defensive guard
@@ -139,7 +141,7 @@ def _invoke_apply(
 
 def _instantiate_plugin(candidate: object) -> DocstringBuilderPlugin:
     if isinstance(candidate, LegacyPluginAdapter):
-        return candidate
+        return candidate  # type: ignore[return-value]  # LegacyPluginAdapter structurally implements DocstringBuilderPlugin
     if isinstance(candidate, type):
         instance = candidate()
         return _ensure_plugin_instance(instance)
@@ -158,12 +160,12 @@ def _ensure_plugin_instance(obj: object) -> DocstringBuilderPlugin:
         message = f"Plugin {name!r} declares invalid stage {stage!r}"
         raise PluginConfigurationError(message)
     if isinstance(obj, DocstringBuilderPlugin):  # pragma: no cover - runtime check
-        return cast(DocstringBuilderPlugin, obj)
+        return cast(DocstringBuilderPlugin, obj)  # type: ignore[redundant-cast]  # cast needed for type narrowing
     if hasattr(obj, "apply"):
         return cast(DocstringBuilderPlugin, obj)
     if hasattr(obj, "run"):
         legacy = cast(LegacyPluginProtocol, obj)
-        return LegacyPluginAdapter(legacy)
+        return LegacyPluginAdapter(legacy)  # type: ignore[return-value]  # LegacyPluginAdapter structurally implements DocstringBuilderPlugin
     message = f"Plugin {name!r} must define apply() or run()"
     raise PluginConfigurationError(message)
 
@@ -176,7 +178,7 @@ def _register_plugin(manager: PluginManager, plugin: DocstringBuilderPlugin) -> 
         manager.transformers.append(cast(TransformerPlugin, plugin))
     elif stage == "formatter":
         manager.formatters.append(cast(FormatterPlugin, plugin))
-    else:  # pragma: no cover - stage already validated earlier
+    else:  # pragma: no cover - stage already validated earlier  # type: ignore[unreachable]  # defensive check
         message = f"Unsupported plugin stage: {stage!r}"
         raise PluginConfigurationError(message)
 
@@ -211,7 +213,7 @@ def load_plugins(
 
     discovered: dict[str, object] = {}
     for plugin_type in builtin_types:
-        name = getattr(plugin_type, "name", plugin_type.__name__)
+        name = getattr(plugin_type, "name", getattr(plugin_type, "__name__", "unknown"))
         discovered[name] = plugin_type
 
     for candidate in _load_entry_points():

@@ -18,6 +18,9 @@ from pathlib import Path
 from typing import TypedDict, cast
 
 from packaging.version import InvalidVersion, Version
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
 
 REPO = Path(__file__).resolve().parents[2]
 SRC = REPO / "src"
@@ -849,25 +852,25 @@ def main(argv: list[str] | None = None) -> int:
     errors = _collect_module_errors()
 
     if errors:
-        print("\n".join(errors))
+        LOGGER.error("\n".join(errors))
         return 1
 
     # Round-trip check: compare freshly built JSON to inline markers
     try:
         # Local import to avoid creating a hard dependency in module scope
         from tools.navmap.build_navmap import build_index
-    except Exception as e:  # pragma: no cover
-        print(f"navmap check: unable to import build_navmap for round-trip ({e})", file=sys.stderr)
+    except Exception:  # pragma: no cover
+        LOGGER.exception("navmap check: unable to import build_navmap for round-trip")
         return 1
 
     index = build_index(json_path=INDEX)  # also refreshes file on disk
     rt_errs = _round_trip_errors(cast(dict[str, object], index))
 
     if rt_errs:
-        print("\n".join(rt_errs))
+        LOGGER.error("\n".join(rt_errs))
         return 1
 
-    print("navmap check: OK")
+    LOGGER.info("navmap check: OK")
     return 0
 
 

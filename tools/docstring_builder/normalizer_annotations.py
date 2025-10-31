@@ -47,7 +47,7 @@ def _format_simple_type(annotation: object) -> str | None:
         return "None"
     if isinstance(annotation, str):
         return annotation
-    if annotation in {int, float, bool, str}:
+    if isinstance(annotation, type) and annotation in {int, float, bool, str}:
         return annotation.__name__
     return None
 
@@ -64,12 +64,12 @@ def _format_union_type(
     args = get_args(annotation)
     if origin is tuple and args and args[-1] is ...:
         tail_args = tuple(args[:-1])
-        inner = [format_annotation(arg, module_globals) or "Any" for arg in tail_args]
-        formatted = "tuple[" + ", ".join(inner) + ", ...]"
+        inner_list = [format_annotation(arg, module_globals) or "Any" for arg in tail_args]
+        formatted = "tuple[" + ", ".join(inner_list) + ", ...]"
     elif origin in {list, set, dict, tuple}:
         parts = [format_annotation(arg, module_globals) or "Any" for arg in args]
-        inner = ", ".join(parts)
-        formatted = f"{origin.__name__}[{inner}]"
+        inner_str = ", ".join(parts)
+        formatted = f"{origin.__name__}[{inner_str}]"
     elif origin is Annotated:
         base, *_ = args
         formatted = format_annotation(base, module_globals)
@@ -128,7 +128,9 @@ def _format_collection_type(
         inner = format_annotation(args[0], module_globals) or "Any"
         return f"tuple[{inner}, ...]"
     if not args:
-        return origin.__name__
+        if isinstance(origin, type):
+            return origin.__name__
+        return None
     parts = [format_annotation(arg, module_globals) or "Any" for arg in args]
     inner = ", ".join(parts)
     return f"{origin.__name__}[{inner}]"
@@ -167,7 +169,7 @@ def _format_module_attribute(
     if module_name is None or qualname is None:
         return None
     if module_name in {"builtins", "typing", "collections.abc"}:
-        return qualname
+        return qualname  # type: ignore[return-value]  # qualname is str | None, but we checked above
     module_alias = _module_alias(module_name, module_globals)
     if module_alias:
         return f"{module_alias}.{qualname}"

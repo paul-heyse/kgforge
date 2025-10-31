@@ -13,6 +13,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Final
 
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
+
 TITLE_MAX_LENGTH = 79
 UNDERLINE_TOLERANCE = 1
 MIN_LINES_WITH_UNDERLINE: Final[int] = 2
@@ -223,21 +227,18 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
         results.append(result)
         if result.ok:
             if verbose:
-                print(f"✔ {path}")
+                LOGGER.info("✔ %s", path)
             continue
         exit_code = 1
         for message in result.errors:
-            print(f"✖ {path}: {message}", file=sys.stderr)
+            LOGGER.error("✖ %s: %s", path, message)
 
     if exit_code == 0 and verbose:
-        print("All gallery examples passed validation.")
+        LOGGER.info("All gallery examples passed validation.")
     elif exit_code != 0:
         total = sum(len(result.errors) for result in results if not result.ok)
         failing = sum(1 for result in results if not result.ok)
-        print(
-            f"Found {total} issue(s) across {failing} file(s).",
-            file=sys.stderr,
-        )
+        LOGGER.error("Found %d issue(s) across %d file(s).", total, failing)
     return exit_code
 
 
@@ -274,11 +275,11 @@ def _run_from_cli(argv: list[str]) -> int:
     """Entry point used by ``if __name__ == '__main__'`` guard."""
     args = _parse_args(argv)
     if args.fix:
-        print("Automatic fixing is not implemented yet.", file=sys.stderr)
+        LOGGER.warning("Automatic fixing is not implemented yet.")
         return 2
     examples_dir = args.examples_dir.resolve()
     if not examples_dir.exists():
-        print(f"Examples directory not found: {examples_dir}", file=sys.stderr)
+        LOGGER.error("Examples directory not found: %s", examples_dir)
         return 2
     return main(examples_dir, strict=args.strict, verbose=args.verbose)
 

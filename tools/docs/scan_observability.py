@@ -19,6 +19,10 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
+
 
 def _optional_import(name: str) -> ModuleType | None:
     """Import module if available.
@@ -1003,14 +1007,20 @@ def _summarize_exit(
     error_count = sum(1 for item in lints if item.get("severity") == "error")
     warning_count = sum(1 for item in lints if item.get("severity") == "warning")
     if fail and error_count:
-        print(
-            f"[obs] {error_count} error(s), {warning_count} warning(s) — failing (OBS_FAIL_ON_LINT=1)"
+        LOGGER.error(
+            "[obs] %d error(s), %d warning(s) — failing (OBS_FAIL_ON_LINT=1)",
+            error_count,
+            warning_count,
         )
         return 2
 
-    print(
-        f"[obs] metrics={len(metrics)} logs={len(logs)} traces={len(traces)}; "
-        f"lint errors={error_count} warnings={warning_count}"
+    LOGGER.info(
+        "[obs] metrics=%d logs=%d traces=%d; lint errors=%d warnings=%d",
+        len(metrics),
+        len(logs),
+        len(traces),
+        error_count,
+        warning_count,
     )
     return 0
 

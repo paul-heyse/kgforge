@@ -19,6 +19,8 @@ This change delivers typed contracts, secure subprocess orchestration, structure
    uv run ruff check tools
    uv run pyrefly check tools
    uv run mypy tools
+   python tools/check_imports.py
+   uv run pip-audit --strict
    ```
 5. Familiarize yourself with generated artifacts by running the existing pipelines (optional but recommended):
    ```bash
@@ -29,6 +31,8 @@ This change delivers typed contracts, secure subprocess orchestration, structure
 ## Deliverables Snapshot
 - Typed APIs replace `dict[str, Any]` payloads across builders and docs pipelines.
 - Shared logging/proc utilities enforce structured logs, Problem Details, and subprocess hygiene.
+- Versioned base CLI envelope schema adopted across tools (`schema/tools/cli_envelope.json`) with `--json` support.
+- Logging unified via `kgfoundry_common.logging` for consistent JSON formatting and correlation IDs.
 - JSON Schemas for CLI/doc artifacts validated in tests (`schema/tools/*.json`).
 - Refactored docstring builder modules, docs generators, and navmap utilities with clear error taxonomy.
 - New pytest suites covering schema round-trips, CLI failure modes, plugin regression cases.
@@ -38,9 +42,42 @@ This change delivers typed contracts, secure subprocess orchestration, structure
 uv run ruff format && uv run ruff check --fix
 uv run pyrefly check && uv run mypy --config-file mypy.ini
 uv run pytest -q tests/tools
+python tools/check_imports.py
+uv run pip-audit --strict
 make artifacts && git diff --exit-code
 openspec validate tools-hardening --strict
 ```
+
+## Junior playbook: implementing a migration
+
+Follow these steps for each target file listed in `tasks.md` Appendix A.
+
+1) Prepare
+- Create a feature branch and run the baseline diagnostics above.
+- Open the target file and identify locations of `subprocess.run` and `print(...)`.
+
+2) Replace subprocess usage
+- Import `run_tool` from `tools._shared.proc`.
+- Swap `subprocess.run([...])` with `run_tool([...], timeout=<default>)`.
+- Check `result.returncode`; on non-zero and `check=True` cases, raise the module’s typed error.
+
+3) Replace prints with structured logs
+- Import `get_logger, with_fields` from `tools._shared.logging`.
+- Initialize `logger = get_logger(__name__)`.
+- Log with `logger.info/warning/error` and attach `extra` fields via `with_fields`.
+
+4) Add optional `--json` (for CLIs)
+- Add an argparse flag `--json` (boolean).
+- On completion, build the base envelope (see design.md Base CLI Envelope) and validate it against `schema/tools/cli_envelope.json`.
+- Write the JSON to stdout; return a non-zero exit code on failure.
+
+5) Tests
+- Add/extend tests under `tests/tools/**` as per `tasks.md` Appendix A test list.
+
+6) Verify
+- Re-run Acceptance Gates. If drift is introduced, fix and repeat.
+
+See `tasks.md` Appendix A for file-by-file checklists and code references.
 
 ## Questions & Support
 - Schema changes → coordinate with documentation tooling owners.

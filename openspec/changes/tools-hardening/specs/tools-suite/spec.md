@@ -12,6 +12,11 @@ The shared tooling infrastructure SHALL provide structured logging, Problem Deta
 - **WHEN** it calls `run_tool`
 - **THEN** the executable path is absolute, environment is sanitized, a timeout is enforced, and failures yield a Problem Details payload
 
+#### Scenario: All subprocess calls route via `run_tool`
+- **GIVEN** any tooling module under `tools/`
+- **WHEN** it needs to invoke a subprocess
+- **THEN** the call goes through `tools._shared.proc.run_tool` with a timeout and sanitized environment
+
 ### Requirement: Docstring Builder Typed Pipeline
 The docstring builder SHALL operate on typed models, enforce schema validation, and expose observability metrics while maintaining compatibility flags for rollout.
 
@@ -58,6 +63,11 @@ All tooling CLIs SHALL expose structured observability, table-driven tests, and 
 - **GIVEN** any tooling CLI encounters an error
 - **WHEN** it exits non-zero
 - **THEN** it writes Problem Details JSON (when machine mode enabled), logs a structured error with correlation ID, and records Prometheus metrics
+
+#### Scenario: CLI emits base envelope schema
+- **GIVEN** any tooling CLI runs with `--json`
+- **WHEN** it completes (success or failure)
+- **THEN** the output validates against `schema/tools/cli_envelope.json` and includes a Problem Details payload on failure
 
 #### Scenario: Tests cover edge and failure cases
 - **GIVEN** the pytest suite under `tests/tools`

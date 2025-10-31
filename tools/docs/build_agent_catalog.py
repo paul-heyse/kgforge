@@ -12,10 +12,8 @@ import hashlib
 import importlib
 import io
 import json
-import logging
 import os
 import re
-import subprocess
 import sys
 import tokenize
 from collections.abc import Iterable, Mapping, Sequence
@@ -25,6 +23,9 @@ from typing import Any, TypeVar, cast
 
 import jsonschema
 import numpy as np
+from tools._shared.logging import get_logger, with_fields
+from tools._shared.proc import ToolExecutionError, run_tool
+from tools.docs.errors import CatalogBuildError
 
 from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.search import (
@@ -38,10 +39,6 @@ from kgfoundry.agent_catalog.search import (
     load_faiss,
 )
 from kgfoundry.agent_catalog.sqlite import write_sqlite_catalog
-
-
-class CatalogBuildError(RuntimeError):
-    """Raised when the catalog build fails."""
 
 
 @dataclass
@@ -176,7 +173,7 @@ STD_LIB_MODULES = set(sys.stdlib_module_names)
 TRIGRAM_LENGTH = 3
 WORD_RE = re.compile(r"[A-Za-z0-9_]+")
 EMBEDDING_MATRIX_RANK = 2
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class ModuleAnalyzer:
@@ -646,17 +643,21 @@ class AgentCatalogBuilder:
     def _resolve_repo_sha(self) -> str:
         if self.args.repo_sha:
             return cast(str, self.args.repo_sha)
+        log_adapter = with_fields(logger, command=["git", "rev-parse", "--short", "HEAD"])
         try:
-            result: subprocess.CompletedProcess[str] = subprocess.run(
+            result = run_tool(
                 ["git", "rev-parse", "--short", "HEAD"],
-                check=True,
-                capture_output=True,
-                text=True,
+                timeout=10.0,
                 cwd=self.repo_root,
             )
-        except subprocess.CalledProcessError as exc:
+        except ToolExecutionError as exc:
+            log_adapter.exception("Failed to resolve repository SHA")
             message = "Unable to resolve repository SHA"
             raise CatalogBuildError(message) from exc
+        if result.returncode != 0:
+            log_adapter.error("Git returned non-zero exit code: %s", result.returncode)
+            message = "Unable to resolve repository SHA"
+            raise CatalogBuildError(message)
         return result.stdout.strip()
 
     def _collect_packages(self) -> list[PackageRecord]:
@@ -756,7 +757,7 @@ class AgentCatalogBuilder:
     def _build_symbol_record(
         self,
         *,
-        module_name: str,
+        module_name: str,  # noqa: ARG002
         qname: str,
         analyzer: ModuleAnalyzer,
         symbol_entry: dict[str, Any] | None,
@@ -858,7 +859,7 @@ class AgentCatalogBuilder:
             remap_order=remap,
         )
 
-    def _compute_symbol_id(self, qname: str, analyzer: ModuleAnalyzer, node: ast.AST | None) -> str:
+    def _compute_symbol_id(self, qname: str, analyzer: ModuleAnalyzer, node: ast.AST | None) -> str:  # noqa: ARG002
         if node is None:
             return hashlib.sha256(qname.encode()).hexdigest()
         normalized = _normalize_ast(node)
@@ -989,15 +990,18 @@ class AgentCatalogBuilder:
         if not path.exists():
             self._git_churn_cache[path] = 0
             return 0
+        log_adapter = with_fields(logger, command=["git", "log"], file=str(path))
         try:
-            result = subprocess.run(
+            result = run_tool(
                 ["git", "log", "--follow", "--pretty=%h", "-n", "30", str(path)],
-                check=True,
-                capture_output=True,
-                text=True,
+                timeout=10.0,
                 cwd=self.repo_root,
             )
-        except subprocess.CalledProcessError:
+        except ToolExecutionError:
+            log_adapter.debug("Git churn lookup failed for %s", path)
+            self._git_churn_cache[path] = 0
+            return 0
+        if result.returncode != 0:
             self._git_churn_cache[path] = 0
             return 0
         churn = len([line for line in result.stdout.splitlines() if line.strip()])
@@ -1011,15 +1015,18 @@ class AgentCatalogBuilder:
         if not path.exists():
             self._git_modified_cache[path] = None
             return None
+        log_adapter = with_fields(logger, command=["git", "log"], file=str(path))
         try:
-            result = subprocess.run(
+            result = run_tool(
                 ["git", "log", "-1", "--format=%cI", str(path)],
-                check=True,
-                capture_output=True,
-                text=True,
+                timeout=10.0,
                 cwd=self.repo_root,
             )
-        except subprocess.CalledProcessError:
+        except ToolExecutionError:
+            log_adapter.debug("Git last-modified lookup failed for %s", path)
+            self._git_modified_cache[path] = None
+            return None
+        if result.returncode != 0:
             self._git_modified_cache[path] = None
             return None
         value = result.stdout.strip() or None
@@ -1563,15 +1570,20 @@ def main(argv: Sequence[str] | None = None) -> int:
                 options=options,
             )
         except CatalogBuildError as exc:
-            print(f"error: {exc}", file=sys.stderr)
+            logger.exception("Catalog build failed")
+            sys.stderr.write(f"error: {exc}\n")
             return 1
-        print(json.dumps([dataclasses.asdict(result) for result in results], indent=2))
+        logger.info("Search results: %d", len(results))
+        sys.stdout.write(
+            json.dumps([dataclasses.asdict(result) for result in results], indent=2) + "\n"
+        )
         return 0
     try:
         catalog = builder.build()
         builder.write(catalog, args.output, args.schema)
     except CatalogBuildError as exc:
-        print(f"error: {exc}", file=sys.stderr)
+        logger.exception("Catalog build failed")
+        sys.stderr.write(f"error: {exc}\n")
         return 1
     return 0
 

@@ -42,12 +42,13 @@ class ErrorCode(str, Enum):
     EMBEDDING_ERROR = "embedding-error"
     INDEX_BUILD_ERROR = "index-build-error"
     SPLADE_OOM = "splade-oom"
-    VECTOR_SEARCH_ERROR = "vector-search-error"
+    RETRY_EXHAUSTED = "retry-exhausted"
 
     # Search & Retrieval (4xx)
     SEARCH_INDEX_MISSING = "search-index-missing"
     SEARCH_QUERY_INVALID = "search-query-invalid"
     SEARCH_TIMEOUT = "search-timeout"
+    VECTOR_SEARCH_ERROR = "vector-search-error"
 
     # Configuration & Runtime (5xx)
     CONFIGURATION_ERROR = "configuration-error"

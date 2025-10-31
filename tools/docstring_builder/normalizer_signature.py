@@ -6,7 +6,7 @@ import importlib
 import inspect
 from collections.abc import Callable, Mapping
 from types import ModuleType
-from typing import Any
+from typing import cast
 
 from tools.docstring_builder.harvest import SymbolHarvest
 from tools.docstring_builder.models import (
@@ -17,7 +17,7 @@ from tools.docstring_builder.models import (
 __all__ = ["load_module_globals", "resolve_callable", "signature_and_hints"]
 
 
-def load_module_globals(module_name: str) -> Mapping[str, Any]:
+def load_module_globals(module_name: str) -> Mapping[str, object]:
     """Return the globals dictionary for ``module_name``.
 
     Parameters
@@ -43,7 +43,7 @@ def load_module_globals(module_name: str) -> Mapping[str, Any]:
     return module.__dict__
 
 
-def resolve_callable(symbol: SymbolHarvest) -> Callable[..., Any]:
+def resolve_callable(symbol: SymbolHarvest) -> Callable[..., object]:
     """Return the callable referenced by ``symbol``.
 
     Parameters
@@ -70,7 +70,7 @@ def resolve_callable(symbol: SymbolHarvest) -> Callable[..., Any]:
     module_parts = symbol.module.split(".")
     qname_parts = symbol.qname.split(".")
     attr_parts = qname_parts[len(module_parts) :]
-    obj: Any = module
+    obj: object = module
     for attr in attr_parts:
         try:
             obj = getattr(obj, attr)
@@ -81,12 +81,13 @@ def resolve_callable(symbol: SymbolHarvest) -> Callable[..., Any]:
     if not callable(obj):
         message = f"Resolved object for {symbol.qname} is not callable"
         raise SignatureIntrospectionError(message)
-    return obj
+    # Type narrowing: obj is callable at runtime
+    return cast(Callable[..., object], obj)
 
 
 def signature_and_hints(
-    obj: Callable[..., Any], module_globals: Mapping[str, Any] | ModuleType | None
-) -> tuple[inspect.Signature, dict[str, Any]]:
+    obj: Callable[..., object], module_globals: Mapping[str, object] | ModuleType | None
+) -> tuple[inspect.Signature, dict[str, object]]:
     """Return the signature and evaluated type hints for ``obj``.
 
     Parameters
@@ -108,14 +109,15 @@ def signature_and_hints(
         message = f"Unable to inspect signature for {obj!r}"
         raise SignatureIntrospectionError(message) from exc
 
-    globalns: dict[str, Any] = {}
+    globalns: dict[str, object] = {}
     if isinstance(module_globals, ModuleType):
         globalns.update(module_globals.__dict__)
     elif isinstance(module_globals, Mapping):
         globalns.update(module_globals)
 
     try:
-        hints = inspect.get_annotations(obj, globalns=globalns, eval_str=True)
+        hints_raw = inspect.get_annotations(obj, globals=globalns, eval_str=True)
+        hints: dict[str, object] = dict(hints_raw)
     except (NameError, TypeError, AttributeError, SyntaxError):
         hints = {}
     return signature, hints

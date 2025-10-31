@@ -4,19 +4,20 @@ from __future__ import annotations
 
 import hashlib
 import json
-import logging
 import os
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import cast
 
 try:  # Python 3.11+
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover - fallback for environments without tomllib
     import tomli as tomllib  # type: ignore[import-not-found, no-redef]
 
-LOGGER = logging.getLogger(__name__)
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
 
 DEFAULT_CONFIG_PATH = Path("docstring_builder.toml")
 DEFAULT_MARKER = "<!-- auto:docstring-builder v1 -->"
@@ -77,7 +78,7 @@ class BuilderConfig:
         return hashlib.sha256(blob).hexdigest()
 
 
-def _load_toml(path: Path) -> dict[str, Any]:
+def _load_toml(path: Path) -> dict[str, object]:
     if not path.exists():
         LOGGER.debug("docstring_builder config missing at %s", path)
         return {}
@@ -109,8 +110,18 @@ def load_config(path: Path | None = None) -> BuilderConfig:
     normalize_sections = bool(data.get("normalize_sections", False))
     navmap_metadata = bool(data.get("navmap_metadata", True))
 
-    package_section = data.get("packages", {}) or {}
-    summary_verbs = package_section.get("summary_verbs", {}) or {}
+    package_section_raw = data.get("packages", {}) or {}
+    package_section = (
+        cast(Mapping[str, object], package_section_raw)
+        if isinstance(package_section_raw, Mapping)
+        else {}
+    )
+    summary_verbs_raw = package_section.get("summary_verbs", {}) or {}
+    summary_verbs = (
+        cast(Mapping[str, object], summary_verbs_raw)
+        if isinstance(summary_verbs_raw, Mapping)
+        else {}
+    )
     opt_out = set(_as_list(package_section.get("opt_out")))
     package_settings = PackageSettings(
         summary_verbs={str(key): str(value) for key, value in summary_verbs.items()},

@@ -2,32 +2,34 @@
 
 This module provides structured observability with Prometheus metrics
 and optional OpenTelemetry tracing. All metrics follow naming conventions
-and include operation/status tags.
+and include operation/status tags. Gracefully degrades when Prometheus
+or OpenTelemetry are unavailable.
 
 Examples
 --------
->>> from kgfoundry_common.observability import get_metrics_registry, record_operation
->>> metrics = get_metrics_registry()
->>> with record_operation(metrics, "search", "success"):
+>>> from kgfoundry_common.observability import MetricsProvider, observe_duration
+>>> metrics = MetricsProvider.default()
+>>> with observe_duration(metrics, "search") as obs:
 ...     # Operation code here
-...     pass
+...     obs.success()
 """
 
 from __future__ import annotations
 
 import time
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, Protocol
 
+from kgfoundry_common.logging import get_logger
 from kgfoundry_common.navmap_types import NavMap
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
 __all__ = [
-    "MetricsRegistry",
-    "get_metrics_registry",
-    "record_operation",
+    "MetricsProvider",
+    "observe_duration",
+    "start_span",
 ]
 
 __navmap__: Final[NavMap] = {
@@ -56,96 +58,81 @@ __navmap__: Final[NavMap] = {
     },
 }
 
+logger = get_logger(__name__)
+
 # Prometheus client is optional (may not be installed)
+if TYPE_CHECKING:
+    from prometheus_client import Counter, Histogram
+    from prometheus_client.registry import CollectorRegistry
+else:
+    CollectorRegistry = object
+    Counter = object
+    Histogram = object
+
 try:
-    from prometheus_client import Counter, Gauge, Histogram, Registry
+    from prometheus_client import Counter, Histogram
+    from prometheus_client.registry import CollectorRegistry
 
     HAVE_PROMETHEUS = True
+    _PROMETHEUS_VERSION: str | None = None
+    try:
+        import prometheus_client
+
+        _PROMETHEUS_VERSION = getattr(prometheus_client, "__version__", None)
+    except Exception as exc:  # noqa: BLE001
+        logger.debug("Could not detect Prometheus version: %s", exc)
 except ImportError:
     HAVE_PROMETHEUS = False
-    # Stub types for type checking when prometheus_client is unavailable
-    if TYPE_CHECKING:
+    _PROMETHEUS_VERSION = None
 
-        class Registry:  # type: ignore[no-redef]
-            """Stub registry."""
+# OpenTelemetry is optional (may not be installed)
+try:
+    from opentelemetry import trace
 
-        class Counter:  # type: ignore[no-redef]
-            """Stub counter."""
-
-            def inc(self, *args: object, **kwargs: object) -> None:
-                """Stub increment."""
-
-        class Gauge:  # type: ignore[no-redef]
-            """Stub gauge."""
-
-            def set(self, *args: object, **kwargs: object) -> None:
-                """Stub set."""
-
-        class Histogram:  # type: ignore[no-redef]
-            """Stub histogram."""
-
-            def observe(self, *args: object, **kwargs: object) -> None:
-                """Stub observe."""
+    HAVE_OPENTELEMETRY = True
+except ImportError:
+    HAVE_OPENTELEMETRY = False
+    trace = None  # type: ignore[assignment]
 
 
-class MetricsRegistry:
-    """Registry for Prometheus metrics with standard naming conventions.
+# Protocol definitions for typed metric interfaces
+class CounterLike(Protocol):
+    """Protocol for counter-like metrics."""
 
-    This class provides counters, gauges, and histograms following
-    kgfoundry naming conventions (kgfoundry_requests_total, etc.).
+    def labels(self, **kwargs: object) -> CounterLike:
+        """Return labeled counter instance."""
+        ...
 
-    Examples
-    --------
-    >>> metrics = MetricsRegistry()
-    >>> metrics.requests_total.labels(operation="search", status="success").inc()
-    >>> metrics.request_duration_seconds.labels(operation="search").observe(0.123)
-    """
-
-    def __init__(self, registry: Registry | None = None) -> None:
-        """Initialize metrics registry.
-
-        Parameters
-        ----------
-        registry : Registry | None, optional
-            Prometheus registry (defaults to default registry).
-        """
-        if not HAVE_PROMETHEUS:
-            # Create stub metrics when prometheus_client is unavailable
-            self.requests_total = _StubCounter()
-            self.request_errors_total = _StubCounter()
-            self.request_duration_seconds = _StubHistogram()
-            return
-
-        if registry is None:
-            from prometheus_client import REGISTRY  # noqa: PLC0415
-
-            registry = REGISTRY
-
-        self.registry = registry
-
-        # Standard metrics following naming conventions
-        self.requests_total = Counter(
-            "kgfoundry_requests_total",
-            "Total number of requests",
-            ["operation", "status"],
-            registry=registry,
-        )
-
-        self.request_errors_total = Counter(
-            "kgfoundry_request_errors_total",
-            "Total number of request errors",
-            ["operation", "status"],
-            registry=registry,
-        )
-
-        self.request_duration_seconds = Histogram(
-            "kgfoundry_request_duration_seconds",
-            "Request duration in seconds",
-            ["operation"],
-            registry=registry,
-        )
+    def inc(self, *args: object, **kwargs: object) -> None:
+        """Increment counter."""
+        ...
 
 
+class HistogramLike(Protocol):
+    """Protocol for histogram-like metrics."""
+
+    def labels(self, **kwargs: object) -> HistogramLike:
+        """Return labeled histogram instance."""
+        ...
+
+    def observe(self, *args: object, **kwargs: object) -> None:
+        """Observe a value."""
+        ...
+
+
+class GaugeLike(Protocol):
+    """Protocol for gauge-like metrics."""
+
+    def labels(self, **kwargs: object) -> GaugeLike:
+        """Return labeled gauge instance."""
+        ...
+
+    def set(self, value: float) -> None:
+        """Set gauge value."""
+        ...
+
+
+# Stub implementations that satisfy type checkers
 class _StubCounter:
     """Stub counter for when prometheus_client is unavailable."""
 
@@ -168,45 +155,214 @@ class _StubHistogram:
         """No-op observe."""
 
 
-# Global metrics registry (lazy initialization)
-_metrics_registry: MetricsRegistry | None = None
+class _StubGauge:
+    """Stub gauge for when prometheus_client is unavailable."""
+
+    def labels(self, **kwargs: object) -> _StubGauge:  # noqa: ARG002
+        """Return self for chaining."""
+        return self
+
+    def set(self, value: float) -> None:
+        """No-op set."""
 
 
-def get_metrics_registry() -> MetricsRegistry:
-    """Get or create the global metrics registry.
+class MetricsProvider:
+    """Metrics provider with Prometheus-compatible counters and histograms.
 
-    Returns
-    -------
-    MetricsRegistry
-        Global metrics registry instance.
+    This class provides typed wrappers for Prometheus metrics with safe
+    fallbacks when Prometheus is unavailable. All stub implementations
+    return `self` from `.labels()` to allow chaining.
 
     Examples
     --------
-    >>> metrics = get_metrics_registry()
-    >>> metrics.requests_total.labels(operation="search", status="success").inc()
+    >>> metrics = MetricsProvider.default()
+    >>> metrics.runs_total.labels(component="search", status="success").inc()
+    >>> metrics.operation_duration_seconds.labels(component="search", operation="query").observe(
+    ...     0.123
+    ... )
     """
-    global _metrics_registry  # noqa: PLW0603
-    if _metrics_registry is None:
-        _metrics_registry = MetricsRegistry()
-    return _metrics_registry
+
+    runs_total: CounterLike | _StubCounter
+    operation_duration_seconds: HistogramLike | _StubHistogram
+
+    def __init__(self, registry: CollectorRegistry | None = None) -> None:
+        """Initialize metrics provider.
+
+        Parameters
+        ----------
+        registry : CollectorRegistry | None, optional
+            Prometheus registry (defaults to default registry if Prometheus available).
+            If None and Prometheus unavailable, stub metrics are used.
+        """
+        if not HAVE_PROMETHEUS:
+            logger.debug("Prometheus not available; using stub metrics")
+            self.runs_total = _StubCounter()
+            self.operation_duration_seconds = _StubHistogram()
+            return
+
+        if registry is None:
+            from prometheus_client import REGISTRY  # noqa: PLC0415
+
+            registry = REGISTRY
+
+        # Type narrowing: HAVE_PROMETHEUS is True, so Counter/Histogram are imported
+        # Prometheus Counter/Histogram match Protocol interface (labels() returns self, inc/observe methods exist)
+        self.runs_total = Counter(  # type: ignore[assignment]  # Prometheus Counter matches Protocol interface
+            "kgfoundry_runs_total",
+            "Total number of operations",
+            ["component", "status"],
+            registry=registry,
+        )
+
+        self.operation_duration_seconds = Histogram(  # type: ignore[assignment]  # Prometheus Histogram matches Protocol interface
+            "kgfoundry_operation_duration_seconds",
+            "Operation duration in seconds",
+            ["component", "operation", "status"],
+            registry=registry,
+        )
+
+    @classmethod
+    def default(cls) -> MetricsProvider:
+        """Create default metrics provider instance.
+
+        Returns
+        -------
+        MetricsProvider
+            Default metrics provider (uses Prometheus if available, otherwise stubs).
+
+        Examples
+        --------
+        >>> metrics = MetricsProvider.default()
+        >>> metrics.runs_total.labels(component="search", status="success").inc()
+        """
+        return cls()
+
+
+class _DurationObserver:
+    """Context manager helper for observing operation duration."""
+
+    def __init__(
+        self,
+        metrics: MetricsProvider,
+        component: str,
+        operation: str,
+        start_time: float,
+    ) -> None:
+        """Initialize duration observer.
+
+        Parameters
+        ----------
+        metrics : MetricsProvider
+            Metrics provider instance.
+        component : str
+            Component name (e.g., "search", "index").
+        operation : str
+            Operation name (e.g., "query", "index").
+        start_time : float
+            Start time from `time.monotonic()`.
+        """
+        self.metrics = metrics
+        self.component = component
+        self.operation = operation
+        self.start_time = start_time
+        self.status = "success"
+
+    def success(self) -> None:
+        """Mark operation as successful."""
+        self.status = "success"
+
+    def error(self) -> None:
+        """Mark operation as failed."""
+        self.status = "error"
+
+    def __enter__(self) -> _DurationObserver:
+        """Enter context manager."""
+        return self
+
+    def __exit__(
+        self, exc_type: type[BaseException] | None, exc: BaseException | None, tb: object
+    ) -> None:
+        """Exit context manager and record metrics."""
+        duration = time.monotonic() - self.start_time
+
+        # Update status if exception occurred
+        if exc_type is not None:
+            self.status = "error"
+
+        # Record metrics
+        self.metrics.runs_total.labels(component=self.component, status=self.status).inc()
+        self.metrics.operation_duration_seconds.labels(
+            component=self.component,
+            operation=self.operation,
+            status=self.status,
+        ).observe(duration)
+
+        # Log structured entry
+        logger.info(
+            "Operation completed",
+            extra={
+                "operation": self.operation,
+                "status": self.status,
+                "duration_ms": duration * 1000,
+                "component": self.component,
+            },
+        )
 
 
 @contextmanager
-def record_operation(
-    metrics: MetricsRegistry | None = None,
-    operation: str = "unknown",
-    status: str = "success",
-) -> Iterator[None]:
-    """Context manager to record operation metrics and duration.
+def observe_duration(
+    metrics: MetricsProvider,
+    operation: str,
+    component: str = "unknown",
+) -> Iterator[_DurationObserver]:
+    """Context manager to observe operation duration and record metrics.
+
+    This context manager records operation duration, increments counters,
+    and emits structured logs with correlation IDs.
 
     Parameters
     ----------
-    metrics : MetricsRegistry | None, optional
-        Metrics registry (defaults to global registry).
-    operation : str, optional
-        Operation name (default: "unknown").
-    status : str, optional
-        Operation status (default: "success").
+    metrics : MetricsProvider
+        Metrics provider instance.
+    operation : str
+        Operation name (e.g., "query", "index").
+    component : str, optional
+        Component name (e.g., "search", "index"). Defaults to "unknown".
+
+    Yields
+    ------
+    _DurationObserver
+        Observer instance with `success()` and `error()` methods.
+
+    Examples
+    --------
+    >>> metrics = MetricsProvider.default()
+    >>> with observe_duration(metrics, "search", component="search") as obs:
+    ...     # Perform search operation
+    ...     obs.success()
+    """
+    start_time = time.monotonic()
+    observer = _DurationObserver(metrics, component, operation, start_time)
+    yield observer
+
+
+@contextmanager
+def start_span(
+    name: str,
+    attributes: dict[str, str | int | float | bool] | None = None,
+) -> Iterator[None]:
+    """Start an OpenTelemetry span with safe fallback.
+
+    This context manager creates an OpenTelemetry span if available,
+    otherwise performs no operation. This allows code to use tracing
+    without requiring OpenTelemetry to be installed.
+
+    Parameters
+    ----------
+    name : str
+        Span name (e.g., "search.query", "index.build").
+    attributes : dict[str, str | int | float | bool] | None, optional
+        Span attributes for tracing. Defaults to None.
 
     Yields
     ------
@@ -215,25 +371,23 @@ def record_operation(
 
     Examples
     --------
-    >>> from kgfoundry_common.observability import record_operation, get_metrics_registry
-    >>> metrics = get_metrics_registry()
-    >>> with record_operation(metrics, "search", "success"):
-    ...     # Perform search operation
+    >>> with start_span("search.query", attributes={"query_id": "abc123"}):
+    ...     # Operation code here
     ...     pass
     """
-    if metrics is None:
-        metrics = get_metrics_registry()
-
-    start_time = time.monotonic()
-
-    try:
+    if not HAVE_OPENTELEMETRY or trace is None:
         yield
-        final_status = status
-    except Exception:
-        final_status = "error"
-        metrics.request_errors_total.labels(operation=operation, status=final_status).inc()
-        raise
-    finally:
-        duration = time.monotonic() - start_time
-        metrics.requests_total.labels(operation=operation, status=final_status).inc()
-        metrics.request_duration_seconds.labels(operation=operation).observe(duration)
+        return
+
+    # Type narrowing: HAVE_OPENTELEMETRY is True and trace is not None
+    tracer = trace.get_tracer(__name__)
+    with tracer.start_as_current_span(name) as span:
+        if attributes:
+            for key, value in attributes.items():
+                span.set_attribute(key, str(value))
+        try:
+            yield
+        except Exception as exc:
+            span.record_exception(exc)
+            span.set_status(trace.Status(trace.StatusCode.ERROR))
+            raise

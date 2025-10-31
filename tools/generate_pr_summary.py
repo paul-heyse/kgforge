@@ -16,6 +16,10 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
+
 
 def generate_summary() -> str:
     """Generate PR summary markdown.
@@ -113,7 +117,7 @@ def main() -> int:
     """
     summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
     if not summary_file:
-        print("Warning: GITHUB_STEP_SUMMARY not set, writing to stdout", file=os.sys.stderr)
+        LOGGER.warning("GITHUB_STEP_SUMMARY not set, writing to stdout")
         output = os.sys.stdout
     else:
         output = Path(summary_file).open("w", encoding="utf-8")
@@ -123,8 +127,8 @@ def main() -> int:
         output.write(summary)
         output.write("\n")
         return 0
-    except (OSError, ValueError) as exc:
-        print(f"Error generating summary: {exc}", file=os.sys.stderr)
+    except (OSError, ValueError):
+        LOGGER.exception("Error generating summary")
         return 1
     finally:
         if summary_file and output != os.sys.stdout:

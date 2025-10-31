@@ -8,7 +8,10 @@ import json
 from pathlib import Path
 from typing import Final
 
+from tools._shared.logging import get_logger
 from tools.navmap.build_navmap import NavIndexDict, build_index
+
+LOGGER = get_logger(__name__)
 
 DEFAULT_OUTPUT: Final[Path] = (
     Path(__file__).resolve().parents[2] / "site" / "_build" / "navmap.json"
@@ -73,7 +76,7 @@ def main(argv: list[str] | None = None) -> int:
     """
     args = _parse_args(argv)
     migrate_navmaps(args.output, pretty=not args.compact)
-    print(f"Wrote navmap index to {args.output}")
+    LOGGER.info("Wrote navmap index to %s", args.output)
     return 0
 
 

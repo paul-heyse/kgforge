@@ -6,6 +6,10 @@ from __future__ import annotations
 import pathlib
 import re
 
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
+
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 TESTS_ROOT = REPO_ROOT / "tests"
 
@@ -93,9 +97,9 @@ def main() -> int:
         updated = insert_header(text)
         if updated != text:
             resolved.write_text(updated, encoding="utf-8")
-            print(f"[gpu-header] updated {resolved.relative_to(REPO_ROOT)}")
+            LOGGER.info("[gpu-header] updated %s", resolved.relative_to(REPO_ROOT))
             changed += 1
-    print(f"[gpu-header] completed, modified {changed} files.")
+    LOGGER.info("[gpu-header] completed, modified %d files.", changed)
     return 0
 
 

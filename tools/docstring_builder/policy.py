@@ -8,7 +8,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 try:  # Python 3.11+
     import tomllib
@@ -123,7 +123,7 @@ _ACTION_KEY_ALIASES: Mapping[str, str] = {
 _MIN_SUMMARY_WORD_LENGTH = 3
 
 
-def _read_pyproject_policy(repo_root: Path) -> Mapping[str, Any]:
+def _read_pyproject_policy(repo_root: Path) -> Mapping[str, object]:
     pyproject = repo_root / "pyproject.toml"
     if not pyproject.exists():
         return {}
@@ -135,7 +135,7 @@ def _read_pyproject_policy(repo_root: Path) -> Mapping[str, Any]:
     return policy if isinstance(policy, Mapping) else {}
 
 
-def _parse_exceptions(entries: Iterable[Mapping[str, Any]]) -> list[PolicyException]:
+def _parse_exceptions(entries: Iterable[Mapping[str, object]]) -> list[PolicyException]:
     parsed: list[PolicyException] = []
     for entry in entries:
         symbol = str(entry.get("symbol", "")).strip()
@@ -165,11 +165,11 @@ def _normalized_key(key: str) -> str:
     return key.strip().replace("-", "_").lower()
 
 
-def _apply_mapping(settings: PolicySettings, mapping: Mapping[str, Any]) -> None:
+def _apply_mapping(settings: PolicySettings, mapping: Mapping[str, object]) -> None:
     for raw_key, value in sorted(mapping.items(), key=lambda item: str(item[0])):
         key = _normalized_key(str(raw_key))
         if key == "coverage_threshold":
-            settings.coverage_threshold = float(value)
+            settings.coverage_threshold = float(str(value))
             continue
         if key in {"coverage_action", "coverage"}:
             settings.coverage_action = PolicyAction.parse(str(value))
@@ -180,7 +180,7 @@ def _apply_mapping(settings: PolicySettings, mapping: Mapping[str, Any]) -> None
             continue
         if key == "exceptions":
             if isinstance(value, Iterable) and not isinstance(value, (str, bytes)):
-                settings.exceptions = _parse_exceptions(cast(Iterable[Mapping[str, Any]], value))
+                settings.exceptions = _parse_exceptions(cast(Iterable[Mapping[str, object]], value))
                 continue
             message = "Policy exceptions must be an iterable of mappings"
             raise PolicyConfigurationError(message)

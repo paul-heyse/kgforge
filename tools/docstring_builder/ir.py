@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Literal
+from typing import Literal
 
 from tools.docstring_builder.semantics import SemanticResult
 
@@ -122,14 +122,14 @@ def validate_ir(ir: IRDocstring) -> None:
             raise ValueError(message)
 
 
-def serialize_ir(ir: IRDocstring) -> dict[str, Any]:
+def serialize_ir(ir: IRDocstring) -> dict[str, object]:
     """Convert an :class:`IRDocstring` into a JSON-serialisable dictionary."""
     payload = asdict(ir)
     payload["ir_version"] = ir.ir_version
     return payload
 
 
-def generate_schema() -> dict[str, Any]:
+def generate_schema() -> dict[str, object]:
     """Return the JSON schema describing the docstring IR."""
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
