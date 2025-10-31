@@ -1,15 +1,19 @@
-"""Logging helpers shared across tooling packages.
+"""Structured logging helpers for the ``tools`` package.
 
-This module delegates to kgfoundry_common.logging for structured logging with
-correlation IDs and JSON formatting. Libraries remain handler-agnostic; CLIs
-configure handlers via setup_logging().
+This module delegates to :mod:`kgfoundry_common.logging` so every script in the
+``tools`` namespace can emit structured, correlation-aware logs without
+duplicating setup code. The helpers exported here intentionally avoid
+configuring handlers; callers should configure handlers at the application
+boundary.
 
 Examples
 --------
 >>> from tools._shared.logging import get_logger, with_fields
 >>> logger = get_logger(__name__)
->>> logger.info("Operation started", extra={"operation": "build", "status": "started"})
->>> # Use with_fields for structured context
+>>> logger.info(
+...     "Operation started",
+...     extra={"operation": "build", "status": "started"},
+... )
 >>> adapter = with_fields(logger, correlation_id="req-123", operation="build")
 >>> adapter.info("Processing files", extra={"file_count": 10})
 """
@@ -29,7 +33,7 @@ from kgfoundry_common.logging import (
 __all__ = ["LogValue", "StructuredLoggerAdapter", "get_logger", "with_fields"]
 
 # Type alias for log values (same as Any, but more explicit)
-LogValue = Any
+type LogValue = Any
 
 
 def get_logger(name: str) -> LoggerAdapter:
