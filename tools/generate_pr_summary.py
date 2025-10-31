@@ -16,10 +16,11 @@ Examples
 from __future__ import annotations
 
 import os
-from collections.abc import Iterable, Sequence
+import sys
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
+from typing import Final, Literal
 
 from tools._shared.logging import get_logger
 
@@ -61,13 +62,13 @@ class ArtifactSnapshot:
     codemod_log: bool
 
 
-STATUS_ICONS: dict[StatusLiteral, str] = {
+STATUS_ICONS: Final[Mapping[StatusLiteral, str]] = {
     "pass": "✅",
     "fail": "❌",
     "skip": "⚪",
 }
 
-DEFAULT_CHECKS: tuple[CheckStatus, ...] = (
+DEFAULT_CHECKS: Final[tuple[CheckStatus, ...]] = (
     CheckStatus("Ruff format & lint", "pass"),
     CheckStatus("pyrefly check", "pass"),
     CheckStatus("mypy strict", "pass"),
@@ -226,7 +227,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "GITHUB_STEP_SUMMARY not set, writing to stdout",
         extra={"operation": "generate_pr_summary"},
     )
-    os.sys.stdout.write(f"{summary}\n")
+    sys.stdout.write(f"{summary}\n")
     return 0
 
 
