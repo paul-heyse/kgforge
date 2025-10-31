@@ -67,7 +67,9 @@ def _format_parameters(parameters: Iterable[ParameterDoc]) -> Iterable[tuple[str
         yield parameter.kind, entry
 
 
-def _group_parameters(formatted: Iterable[tuple[str, str]]) -> dict[str, list[str] | str | None]:  # noqa: C901
+def _group_parameters(
+    formatted: Iterable[tuple[str, str]],
+) -> dict[str, list[str] | str | None]:
     """Group formatted parameters by signature position semantics."""
     groups: dict[str, list[str] | str | None] = {
         "positional_only": [],

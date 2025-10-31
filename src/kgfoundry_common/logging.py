@@ -171,7 +171,9 @@ class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]  # pyrefly
     >>> # Correlation ID is automatically injected from context
     """
 
-    def process(self, msg: str, kwargs: Any) -> tuple[str, Any]:  # noqa: ANN401  # LoggerAdapter uses Any
+    def process(
+        self, msg: str, kwargs: Any
+    ) -> tuple[str, Any]:  # LoggerAdapter uses Any
         """Process log message and inject structured fields.
 
         Parameters

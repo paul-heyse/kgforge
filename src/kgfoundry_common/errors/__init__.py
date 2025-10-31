@@ -19,6 +19,8 @@ from typing import Final
 
 from kgfoundry_common.errors.codes import BASE_TYPE_URI, ErrorCode, get_type_uri
 from kgfoundry_common.errors.exceptions import (
+    AgentCatalogSearchError,
+    CatalogSessionError,
     ChunkingError,
     ConfigurationError,
     DeserializationError,
@@ -54,6 +56,7 @@ except ImportError:
     pass  # FastAPI not available
 
 __all__ = [
+    "AgentCatalogSearchError",
     "BASE_TYPE_URI",
     "ChunkingError",
     "ConfigurationError",

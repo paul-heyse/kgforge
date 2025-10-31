@@ -127,11 +127,14 @@ class AgentCatalogClient:
     ) -> list[catalog_search.SearchResult]:
         """Execute hybrid search against the catalog."""
         options = catalog_search.SearchOptions(facets=facets)
-        return catalog_search.search_catalog(
-            self._catalog.model_dump(),
+        request = catalog_search.SearchRequest(
             repo_root=self.repo_root,
             query=query,
             k=k,
+        )
+        return catalog_search.search_catalog(
+            self._catalog.model_dump(),
+            request=request,
             options=options,
         )
 

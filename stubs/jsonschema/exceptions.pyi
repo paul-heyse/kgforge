@@ -5,10 +5,12 @@ from collections.abc import Sequence
 
 class _Error(Exception):
     """Base class for jsonschema errors."""
+
     message: str
 
 class ValidationError(_Error):
     """Exception raised when validation fails."""
+
     absolute_path: deque[object]
     absolute_schema_path: deque[object]
     path: Sequence[object]
@@ -16,5 +18,5 @@ class ValidationError(_Error):
 
 class SchemaError(_Error):
     """Exception raised when schema is invalid."""
-    message: str
 
+    message: str

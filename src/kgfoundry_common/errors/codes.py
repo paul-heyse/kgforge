@@ -49,11 +49,13 @@ class ErrorCode(str, Enum):
     SEARCH_QUERY_INVALID = "search-query-invalid"
     SEARCH_TIMEOUT = "search-timeout"
     VECTOR_SEARCH_ERROR = "vector-search-error"
+    AGENT_CATALOG_SEARCH_ERROR = "agent-catalog-search-error"
 
     # Configuration & Runtime (5xx)
     CONFIGURATION_ERROR = "configuration-error"
     RUNTIME_ERROR = "runtime-error"
     RESOURCE_UNAVAILABLE = "resource-unavailable"
+    SESSION_ERROR = "session-error"
 
     # Knowledge Graph & Ontology (6xx)
     ONTOLOGY_PARSE_ERROR = "ontology-parse-error"

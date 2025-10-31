@@ -5,7 +5,6 @@ from __future__ import annotations
 import collections
 import importlib
 import json
-import logging
 import os
 import pickle
 import re
@@ -14,22 +13,22 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
-from typing import Any, Protocol, cast
+from typing import Protocol, cast
 
 import numpy as np
 import numpy.typing as npt
 
-from kgfoundry.search_api.types import (
+from kgfoundry_common.errors import AgentCatalogSearchError
+from kgfoundry_common.logging import get_logger, with_fields
+from kgfoundry_common.observability import MetricsProvider, observe_duration
+from search_api.types import (
     FaissIndexProtocol,
     FaissModuleProtocol,
+    IndexArray,
     VectorArray,
 )
 
-logger = logging.getLogger(__name__)
-
-
-class CatalogSearchError(RuntimeError):
-    """Raised when a catalog search or index operation fails."""
+logger = get_logger(__name__)
 
 
 EMBEDDING_MATRIX_RANK = 2
@@ -118,8 +117,10 @@ class SearchResult:
 class VectorSearchContext:
     """Data bundle required for computing vector scores."""
 
-    semantic_meta: Mapping[str, Any]
-    mapping_payload: Mapping[str, Any]
+    semantic_meta: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
+    mapping_payload: Mapping[
+        str, str | int | float | bool | None | list[object] | dict[str, object]
+    ]
     index_path: Path
     documents: Sequence[SearchDocument]
     candidate_limit: int
@@ -133,7 +134,7 @@ _FAISS_FALLBACK_FLAG = "KGF_DISABLE_FAISS_FALLBACK"
 _FAISS_DEFAULT_MODULES: tuple[str, ...] = ("faiss", "faiss_cpu")
 
 
-class _SimpleFaissIndex:
+class _SimpleFaissIndex(FaissIndexProtocol):
     """Lightweight FAISS-like index used when the real library is unavailable."""
 
     def __init__(self, dimension: int) -> None:
@@ -144,11 +145,20 @@ class _SimpleFaissIndex:
         array = np.asarray(vectors, dtype=np.float32)
         if array.ndim != EMBEDDING_MATRIX_RANK or array.shape[1] != self.dimension:
             message = "Vector dimension does not match index configuration"
-            raise CatalogSearchError(message)
+            raise AgentCatalogSearchError(message)
         if self._vectors.size == 0:
             self._vectors = np.ascontiguousarray(array)
         else:
             self._vectors = np.vstack((self._vectors, np.ascontiguousarray(array)))
+
+    def train(self, vectors: VectorArray) -> None:
+        """Train the index (no-op for simple flat index)."""
+        # Simple flat index doesn't require training
+
+    def add_with_ids(self, vectors: VectorArray, ids: IndexArray) -> None:  # noqa: ARG002
+        """Add vectors with explicit IDs (not supported by simple index)."""
+        # Simple index doesn't support ID mapping, fall back to regular add
+        self.add(vectors)
 
     def search(
         self, vectors: VectorArray, k: int
@@ -156,25 +166,25 @@ class _SimpleFaissIndex:
         queries = np.asarray(vectors, dtype=np.float32)
         if queries.ndim != EMBEDDING_MATRIX_RANK or queries.shape[1] != self.dimension:
             message = "Query vector dimension does not match index configuration"
-            raise CatalogSearchError(message)
+            raise AgentCatalogSearchError(message)
         query_count = queries.shape[0]
         distances = np.zeros((query_count, k), dtype=np.float32)
         indices = -np.ones((query_count, k), dtype=np.int64)
         if self._vectors.size == 0:
             return distances, indices
-        similarity = np.matmul(queries, self._vectors.T)
-        if similarity.ndim != EMBEDDING_MATRIX_RANK:
+        similarity = np.matmul(queries, self._vectors.T)  # type: ignore[misc]
+        if similarity.ndim != EMBEDDING_MATRIX_RANK:  # type: ignore[misc]
             message = "Unexpected similarity matrix shape"
-            raise CatalogSearchError(message)
-        top_k = min(k, similarity.shape[1])
-        order = np.argpartition(similarity, -top_k, axis=1)
-        top_indices = order[:, -top_k:]
-        top_scores = np.take_along_axis(similarity, top_indices, axis=1)
-        sorted_order = np.argsort(top_scores, axis=1)[:, ::-1]
-        distances[:, :top_k] = np.take_along_axis(top_scores, sorted_order, axis=1).astype(
+            raise AgentCatalogSearchError(message)
+        top_k = min(k, similarity.shape[1])  # type: ignore[misc]
+        order = np.argpartition(similarity, -top_k, axis=1)  # type: ignore[misc]
+        top_indices = order[:, -top_k:]  # type: ignore[misc,index]
+        top_scores = np.take_along_axis(similarity, top_indices, axis=1)  # type: ignore[misc]
+        sorted_order = np.argsort(top_scores, axis=1)[:, ::-1]  # type: ignore[misc]
+        distances[:, :top_k] = np.take_along_axis(top_scores, sorted_order, axis=1).astype(  # type: ignore[misc]
             np.float32
         )
-        indices[:, :top_k] = np.take_along_axis(top_indices, sorted_order, axis=1).astype(np.int64)
+        indices[:, :top_k] = np.take_along_axis(top_indices, sorted_order, axis=1).astype(np.int64)  # type: ignore[misc]
         return distances, indices
 
 
@@ -187,8 +197,6 @@ class _SimpleFaissModule:
     # FAISS metric constants
     METRIC_INNER_PRODUCT: int = 1
     METRIC_L2: int = 0
-
-    IndexFlatIP = _SimpleFaissIndex
 
     @staticmethod
     def IndexFlatIP(dimension: int) -> FaissIndexProtocol:  # noqa: N802
@@ -204,10 +212,10 @@ class _SimpleFaissModule:
         FaissIndexProtocol
             Flat index instance.
         """
-        return _SimpleFaissIndex(dimension)
+        return cast(FaissIndexProtocol, _SimpleFaissIndex(dimension))
 
     @staticmethod
-    def index_factory(dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
+    def index_factory(dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:  # noqa: ARG004
         """Create an index from a factory string.
 
         For the simple implementation, factory strings are ignored and a flat index
@@ -220,7 +228,7 @@ class _SimpleFaissModule:
         factory_string : str
             Factory description (ignored in simple implementation).
         metric : int
-            Metric type (METRIC_INNER_PRODUCT or METRIC_L2).
+            Metric type (METRIC_INNER_PRODUCT or METRIC_L2) (ignored in simple implementation).
 
         Returns
         -------
@@ -228,7 +236,7 @@ class _SimpleFaissModule:
             Flat index instance.
         """
         # Simple implementation ignores factory_string and always returns flat index
-        return _SimpleFaissIndex(dimension)
+        return cast(FaissIndexProtocol, _SimpleFaissIndex(dimension))
 
     @staticmethod
     def IndexIDMap2(index: FaissIndexProtocol) -> FaissIndexProtocol:  # noqa: N802
@@ -262,7 +270,7 @@ class _SimpleFaissModule:
         """
         if not isinstance(index, _SimpleFaissIndex):
             message = f"Simple module can only write _SimpleFaissIndex instances, got {type(index)}"
-            raise CatalogSearchError(message)
+            raise AgentCatalogSearchError(message)
         payload = {
             "dimension": index.dimension,
             "vectors": index._vectors,
@@ -285,23 +293,29 @@ class _SimpleFaissModule:
             Loaded index instance.
         """
         with Path(path).open("rb") as handle:
-            payload = pickle.load(handle)  # noqa: S301 - local trusted artifact
+            payload_raw: object = pickle.load(handle)  # noqa: S301 - local trusted artifact
+        if not isinstance(payload_raw, dict):
+            message = "Stored semantic index has invalid payload format"
+            raise AgentCatalogSearchError(message)
+        payload: dict[str, object] = payload_raw
         vectors_payload = payload.get("vectors", [])
         vectors = np.asarray(vectors_payload, dtype=np.float32)
-        dimension = int(
-            payload.get("dimension")
-            or (vectors.shape[1] if vectors.ndim == EMBEDDING_MATRIX_RANK else 0)
-        )
+        dimension_raw = payload.get("dimension")
+        dimension: int
+        if isinstance(dimension_raw, (int, float)):
+            dimension = int(dimension_raw)
+        else:
+            dimension = int(vectors.shape[1]) if vectors.ndim == EMBEDDING_MATRIX_RANK else 0
         if dimension <= 0:
             message = "Stored semantic index dimension is invalid"
-            raise CatalogSearchError(message)
+            raise AgentCatalogSearchError(message)
         fallback = _SimpleFaissIndex(dimension)
         if vectors.size:
             if vectors.ndim != EMBEDDING_MATRIX_RANK:
                 message = "Stored semantic index vectors have an unexpected shape"
-                raise CatalogSearchError(message)
+                raise AgentCatalogSearchError(message)
             fallback._vectors = np.ascontiguousarray(vectors, dtype=np.float32)
-        return fallback
+        return cast(FaissIndexProtocol, fallback)
 
     @staticmethod
     def normalize_L2(vectors: VectorArray) -> None:  # noqa: N802
@@ -312,15 +326,15 @@ class _SimpleFaissModule:
         vectors : VectorArray
             Array to normalize (modified in-place).
         """
-        norms = np.linalg.norm(vectors, axis=1, keepdims=True)
-        norms[norms == 0] = 1.0
-        vectors /= norms
+        norms = np.linalg.norm(vectors, axis=1, keepdims=True)  # type: ignore[misc]
+        norms[norms == 0] = 1.0  # type: ignore[misc]
+        vectors /= norms  # type: ignore[misc]
 
 
-@cache
+@cache  # type: ignore[misc]
 def _simple_faiss_module() -> FaissModuleProtocol:
     """Return a cached NumPy-based FAISS shim for local usage."""
-    return _SimpleFaissModule()
+    return cast(FaissModuleProtocol, _SimpleFaissModule())
 
 
 def load_faiss(purpose: str) -> FaissModuleProtocol:
@@ -342,8 +356,18 @@ def load_faiss(purpose: str) -> FaissModuleProtocol:
             failures.append(f"{module_name}: {exc}")
             continue
         if hasattr(module, "IndexFlatIP") and hasattr(module, "write_index"):
-            logger.debug("Using FAISS module '%s' for %s", module_name, purpose)
-            return module  # type: ignore[return-value]
+            logger.debug(
+                "Using FAISS module '%s' for %s",
+                module_name,
+                purpose,
+                extra={
+                    "operation": "load_faiss",
+                    "status": "success",
+                    "module_name": module_name,
+                    "purpose": purpose,
+                },
+            )
+            return cast(FaissModuleProtocol, module)
         failures.append(f"{module_name}: missing required attributes")
 
     failure_text = "; ".join(failures) if failures else "no candidates attempted"
@@ -352,19 +376,25 @@ def load_faiss(purpose: str) -> FaissModuleProtocol:
             "FAISS is required to {purpose} but no compatible module could be imported "
             f"(attempted: {failure_text})"
         ).format(purpose=purpose)
-        raise CatalogSearchError(message)
+        raise AgentCatalogSearchError(message, context={"purpose": purpose, "failures": failures})
 
     logger.warning(
         "Falling back to simple FAISS module while attempting to %s (reasons: %s)",
         purpose,
         failure_text,
+        extra={
+            "operation": "load_faiss",
+            "status": "warning",
+            "purpose": purpose,
+            "failures": failures,
+        },
     )
     return _simple_faiss_module()
 
 
 def _tokenize(text: str) -> list[str]:
     """Return normalized word tokens for the given text."""
-    return WORD_PATTERN.findall(text.lower())
+    return WORD_PATTERN.findall(text.lower())  # type: ignore[misc]
 
 
 def _stringify(value: object) -> str | None:
@@ -374,7 +404,9 @@ def _stringify(value: object) -> str | None:
     return str(value)
 
 
-def _extract_agent_hints_payload(symbol: Mapping[str, Any]) -> tuple[list[str], list[str]]:
+def _extract_agent_hints_payload(
+    symbol: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+) -> tuple[list[str], list[str]]:
     intent_tags: list[str] = []
     tests_to_run: list[str] = []
     agent_hints = symbol.get("agent_hints")
@@ -389,7 +421,7 @@ def _extract_agent_hints_payload(symbol: Mapping[str, Any]) -> tuple[list[str], 
 
 
 def _extract_docfacts_text(
-    docfacts: Mapping[str, Any] | None,
+    docfacts: Mapping[str, str | int | float | bool | None] | None,
 ) -> tuple[str | None, str | None]:
     summary = None
     docstring = None
@@ -401,7 +433,9 @@ def _extract_docfacts_text(
     return summary, docstring
 
 
-def _extract_anchor_lines(symbol: Mapping[str, Any]) -> tuple[int | None, int | None]:
+def _extract_anchor_lines(
+    symbol: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+) -> tuple[int | None, int | None]:
     anchors = symbol.get("anchors")
     start_line: int | None = None
     end_line: int | None = None
@@ -418,14 +452,14 @@ def _extract_anchor_lines(symbol: Mapping[str, Any]) -> tuple[int | None, int | 
 def build_document_from_payload(
     package_name: str,
     module_name: str,
-    symbol: Mapping[str, Any],
+    symbol: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
     symbol_id: str,
     row: int,
 ) -> SearchDocument:
     """Create a ``SearchDocument`` from the raw symbol payload."""
     docfacts_payload = symbol.get("docfacts")
     summary, docstring = _extract_docfacts_text(
-        docfacts_payload if isinstance(docfacts_payload, Mapping) else None
+        docfacts_payload if isinstance(docfacts_payload, Mapping) else None  # type: ignore[arg-type]
     )
     intent_tags, tests_to_run = _extract_agent_hints_payload(symbol)
     qname_value = _stringify(symbol.get("qname")) or symbol_id
@@ -465,10 +499,22 @@ def build_document_from_payload(
     )
 
 
-def iter_symbol_entries(catalog: Mapping[str, Any]) -> Sequence[tuple[str, str, Mapping[str, Any]]]:
+def iter_symbol_entries(
+    catalog: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+) -> Sequence[
+    tuple[
+        str, str, Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
+    ]
+]:
     """Yield ``(package, module, symbol)`` triples from the catalog payload."""
     packages = catalog.get("packages")
-    entries: list[tuple[str, str, Mapping[str, Any]]] = []
+    entries: list[
+        tuple[
+            str,
+            str,
+            Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+        ]
+    ] = []
     if isinstance(packages, list):
         for package in packages:
             if not isinstance(package, Mapping):
@@ -491,7 +537,7 @@ def iter_symbol_entries(catalog: Mapping[str, Any]) -> Sequence[tuple[str, str, 
 
 
 def documents_from_catalog(
-    catalog: Mapping[str, Any],
+    catalog: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
     row_lookup: Mapping[str, int] | None = None,
 ) -> list[SearchDocument]:
     """Return search documents extracted from the catalog payload."""
@@ -552,7 +598,7 @@ def prepare_query_tokens(query: str) -> collections.Counter[str]:
 
 
 def resolve_search_parameters(
-    catalog_search: Mapping[str, Any],
+    catalog_search: Mapping[str, str | int | float | bool | None],
     options: SearchOptions,
     document_count: int,
     k: int,
@@ -604,17 +650,27 @@ def select_lexical_candidates(
     candidate_limit: int,
 ) -> list[SearchDocument]:
     """Return the highest-scoring lexical candidates."""
+
+    def _get_score(doc: SearchDocument) -> float:
+        return lexical_scores.get(doc.symbol_id, 0.0)
+
     sorted_docs = sorted(
         documents,
-        key=lambda doc: lexical_scores.get(doc.symbol_id, 0.0),
+        key=_get_score,
         reverse=True,
     )
     return sorted_docs[:candidate_limit]
 
 
 def _resolve_semantic_index_metadata(
-    catalog: Mapping[str, Any], repo_root: Path
-) -> tuple[Mapping[str, Any], Path, Path] | None:
+    catalog: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+    repo_root: Path,
+) -> (
+    tuple[
+        Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]], Path, Path
+    ]
+    | None
+):
     """Return semantic index metadata when available, verifying artifacts."""
     semantic_meta = catalog.get("semantic_index")
     if not isinstance(semantic_meta, Mapping):
@@ -623,22 +679,52 @@ def _resolve_semantic_index_metadata(
     mapping_rel = semantic_meta.get("mapping")
     if not isinstance(index_rel, str) or not isinstance(mapping_rel, str):
         message = "Semantic index metadata is missing artifact paths"
-        raise CatalogSearchError(message)
-    index_path = (repo_root / index_rel).resolve()
-    mapping_path = (repo_root / mapping_rel).resolve()
+        raise AgentCatalogSearchError(message)
+    index_path = (repo_root / index_rel).resolve(strict=True)
+    mapping_path = (repo_root / mapping_rel).resolve(strict=True)
+    # Validate paths stay under repo_root to prevent directory traversal
+    try:
+        index_path.relative_to(repo_root.resolve(strict=True))
+        mapping_path.relative_to(repo_root.resolve(strict=True))
+    except ValueError as exc:
+        message = "Semantic index artifact paths must be under repo_root"
+        raise AgentCatalogSearchError(message, cause=exc) from exc
     if not index_path.exists() or not mapping_path.exists():
         message = "Semantic index artifacts are missing from disk"
-        raise CatalogSearchError(message)
-    return semantic_meta, index_path, mapping_path
+        raise AgentCatalogSearchError(
+            message, context={"index_path": str(index_path), "mapping_path": str(mapping_path)}
+        )
+    # Type cast for return - semantic_meta is validated as Mapping above
+    semantic_meta_typed: Mapping[
+        str, str | int | float | bool | None | list[object] | dict[str, object]
+    ] = cast(
+        Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+        semantic_meta,
+    )
+    return semantic_meta_typed, index_path, mapping_path
 
 
-def _load_row_lookup(mapping_path: Path) -> tuple[dict[str, int], Mapping[str, Any]]:
+def _load_row_lookup(
+    mapping_path: Path,
+) -> tuple[
+    dict[str, int], Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
+]:
     """Return the row lookup mapping and raw payload from ``mapping_path``."""
-    mapping_payload = json.loads(mapping_path.read_text(encoding="utf-8"))
+    mapping_payload_raw = json.loads(mapping_path.read_text(encoding="utf-8"))  # type: ignore[misc]
+    if not isinstance(mapping_payload_raw, dict):  # type: ignore[misc]
+        message = "Semantic mapping file does not contain valid JSON object"
+        raise AgentCatalogSearchError(message)
+    # Cast to expected type - JSON can have broader types
+    mapping_payload: Mapping[
+        str, str | int | float | bool | None | list[object] | dict[str, object]
+    ] = cast(
+        Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+        mapping_payload_raw,
+    )
     symbols_payload = mapping_payload.get("symbols")
     if not isinstance(symbols_payload, list):
         message = "Semantic mapping file does not contain symbols list"
-        raise CatalogSearchError(message)
+        raise AgentCatalogSearchError(message)
     row_lookup: dict[str, int] = {}
     for entry in symbols_payload:
         if not isinstance(entry, Mapping):
@@ -651,38 +737,44 @@ def _load_row_lookup(mapping_path: Path) -> tuple[dict[str, int], Mapping[str, A
 
 
 def _load_sentence_transformer(model_name: str) -> EmbeddingModelProtocol:
-    """Instantiate a sentence-transformers model, raising ``CatalogSearchError``."""
+    """Instantiate a sentence-transformers model, raising ``AgentCatalogSearchError``."""
     try:
         module = importlib.import_module("sentence_transformers")
     except ImportError as exc:  # pragma: no cover - runtime guard
         message = "sentence-transformers is required for semantic search"
-        raise CatalogSearchError(message) from exc
-    factory = getattr(module, "SentenceTransformer", None)
+        raise AgentCatalogSearchError(message, cause=exc) from exc
+    factory_raw = getattr(module, "SentenceTransformer", None)  # type: ignore[misc]
+    factory: Callable[[str], object] | None = factory_raw
     if not callable(factory):  # pragma: no cover - defensive guard
         message = "sentence-transformers is missing the SentenceTransformer class"
-        raise CatalogSearchError(message)
+        raise AgentCatalogSearchError(message)
     try:
         model = factory(model_name)
     except Exception as exc:  # pragma: no cover - defensive guard
         message = f"Unable to load embedding model '{model_name}'"
-        raise CatalogSearchError(message) from exc
+        raise AgentCatalogSearchError(
+            message, cause=exc, context={"model_name": model_name}
+        ) from exc
     return cast(EmbeddingModelProtocol, model)
 
 
 def _resolve_embedding_model(
-    options: SearchOptions, semantic_meta: Mapping[str, Any]
+    options: SearchOptions, semantic_meta: Mapping[str, str | int | float | bool | None]
 ) -> tuple[str, EmbeddingModelProtocol]:
     """Return the embedding model name and instance used for vector search."""
-    model_name = options.embedding_model or _stringify(semantic_meta.get("model"))
+    model_name_raw = options.embedding_model or _stringify(semantic_meta.get("model"))
+    model_name: str | None = model_name_raw
     if not model_name:
         message = "Semantic index metadata does not include the embedding model name"
-        raise CatalogSearchError(message)
+        raise AgentCatalogSearchError(message)
     loader = options.model_loader or _load_sentence_transformer
     try:
         model = loader(model_name)
     except Exception as exc:  # pragma: no cover - defensive guard
         message = f"Unable to load embedding model '{model_name}'"
-        raise CatalogSearchError(message) from exc
+        raise AgentCatalogSearchError(
+            message, cause=exc, context={"model_name": model_name}
+        ) from exc
     return model_name, model
 
 
@@ -703,7 +795,7 @@ def _encode_query(
         )
     except Exception as exc:  # pragma: no cover - defensive guard
         message = f"Embedding model failed to encode query: {exc}"
-        raise CatalogSearchError(message) from exc
+        raise AgentCatalogSearchError(message, cause=exc) from exc
     return np.asarray(encoded, dtype=np.float32)
 
 
@@ -714,15 +806,15 @@ def _scores_from_index(
 ) -> dict[str, float]:
     """Map FAISS search outputs to candidate symbol scores."""
     vector_scores: dict[str, float] = {}
-    for idx, distance_row in enumerate(distances):
-        for rank, score in enumerate(distance_row):
-            row_index = int(indices[idx, rank])
+    for idx, distance_row in enumerate(distances):  # type: ignore[misc]
+        for rank, score in enumerate(distance_row):  # type: ignore[misc]
+            row_index = int(indices[idx, rank])  # type: ignore[misc]
             if row_index < 0:
                 continue
             document = context.row_to_document.get(row_index)
             if document is None or document.symbol_id not in context.candidate_ids:
                 continue
-            vector_scores[document.symbol_id] = float(score)
+            vector_scores[document.symbol_id] = float(score)  # type: ignore[misc]
     return vector_scores
 
 
@@ -732,7 +824,7 @@ def compute_vector_scores(
     context: VectorSearchContext,
 ) -> dict[str, float]:
     """Return vector similarity scores for ``query`` and the candidate set."""
-    _, model = _resolve_embedding_model(options, context.semantic_meta)
+    _, model = _resolve_embedding_model(options, context.semantic_meta)  # type: ignore[arg-type]
     batch_size = options.batch_size or 32
     query_vector = _encode_query(model, query, batch_size=batch_size)
     faiss_module = load_faiss("perform semantic search")
@@ -789,78 +881,232 @@ def merge_scores(
     return results
 
 
-def search_catalog(
-    catalog: Mapping[str, Any],
-    *,
+def _prepare_search_documents(
+    catalog: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
     repo_root: Path,
-    query: str,
-    k: int = 10,
-    options: SearchOptions | None = None,
-) -> list[SearchResult]:
-    """Execute hybrid lexical/vector search against the catalog."""
-    active_options = options or SearchOptions()
-    trimmed_query = query.strip()
-    if not trimmed_query:
-        message = "Search query must not be empty"
-        raise CatalogSearchError(message)
+    facets: Mapping[str, str],
+) -> tuple[
+    list[SearchDocument],
+    tuple[
+        Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]], Path, Path
+    ]
+    | None,
+    Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]] | None,
+]:
+    """Prepare and filter documents from catalog.
 
+    Returns
+    -------
+    tuple[list[SearchDocument], semantic_meta_info, mapping_payload]
+        Filtered documents, semantic metadata info (if available), and mapping payload.
+    """
     semantic_meta_info = _resolve_semantic_index_metadata(catalog, repo_root)
     row_lookup: dict[str, int] | None = None
-    mapping_payload: Mapping[str, Any] | None = None
+    mapping_payload: (
+        Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]] | None
+    ) = None
     if semantic_meta_info is not None:
         _, _, mapping_path = semantic_meta_info
         row_lookup, mapping_payload = _load_row_lookup(mapping_path)
 
     documents = documents_from_catalog(catalog, row_lookup=row_lookup)
-    facets = active_options.facets or {}
     if facets:
         documents = [doc for doc in documents if document_matches_facets(doc, facets)]
-    if not documents:
-        return []
+    return documents, semantic_meta_info, mapping_payload
 
-    catalog_search = catalog.get("search")
-    search_config = catalog_search if isinstance(catalog_search, Mapping) else {}
-    alpha_value, candidate_limit = resolve_search_parameters(
-        search_config,
-        active_options,
-        len(documents),
-        k,
-    )
 
-    query_tokens = prepare_query_tokens(trimmed_query)
-    lexical_scores = compute_lexical_scores(query_tokens, documents, trimmed_query)
+def _perform_lexical_search(
+    query: str,
+    documents: list[SearchDocument],
+    candidate_limit: int,
+) -> tuple[dict[str, float], set[str], dict[str, SearchDocument]]:
+    """Perform lexical search and return scores, candidate IDs, and document lookup.
+
+    Returns
+    -------
+    tuple[lexical_scores, candidate_ids, doc_by_id]
+        Lexical scores, candidate symbol IDs, and document lookup map.
+    """
+    query_tokens = prepare_query_tokens(query)
+    lexical_scores = compute_lexical_scores(query_tokens, documents, query)
     lexical_candidates = select_lexical_candidates(lexical_scores, documents, candidate_limit)
     candidate_ids: set[str] = {doc.symbol_id for doc in lexical_candidates}
-    if not candidate_ids:
-        return []
-
     doc_by_id = {doc.symbol_id: doc for doc in documents}
-    vector_scores: dict[str, float] = {}
-    if semantic_meta_info is not None and mapping_payload is not None:
-        semantic_meta, index_path, _ = semantic_meta_info
-        row_to_document = {doc.row: doc for doc in documents if doc.row >= 0}
-        context = VectorSearchContext(
-            semantic_meta=semantic_meta,
-            mapping_payload=mapping_payload,
-            index_path=index_path,
-            documents=documents,
-            candidate_limit=candidate_limit,
-            k=k,
-            candidate_ids=candidate_ids,
-            row_to_document=row_to_document,
-        )
-        try:
-            vector_scores = compute_vector_scores(
-                trimmed_query,
-                active_options,
-                context,
-            )
-        except CatalogSearchError as error:
-            logger.warning("Vector search unavailable, falling back to lexical: %s", error)
-            vector_scores = {}
-            alpha_value = 0.0
-    else:
-        alpha_value = 0.0
+    return lexical_scores, candidate_ids, doc_by_id
 
-    results = merge_scores(doc_by_id, candidate_ids, lexical_scores, vector_scores, alpha_value)
-    return results[:k]
+
+@dataclass(slots=True)
+class VectorSearchParams:
+    """Parameters for vector search operation."""
+
+    semantic_meta_info: tuple[
+        Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]], Path, Path
+    ]
+    mapping_payload: Mapping[
+        str, str | int | float | bool | None | list[object] | dict[str, object]
+    ]
+    documents: list[SearchDocument]
+    candidate_limit: int
+    k: int
+    candidate_ids: set[str]
+
+
+def _perform_vector_search(
+    query: str,
+    options: SearchOptions,
+    params: VectorSearchParams,
+) -> tuple[dict[str, float], float]:
+    """Perform vector search and return scores and alpha value.
+
+    Returns
+    -------
+    tuple[vector_scores, alpha_value]
+        Vector similarity scores and alpha blending value.
+    """
+    semantic_meta, index_path, _ = params.semantic_meta_info
+    row_to_document = {doc.row: doc for doc in params.documents if doc.row >= 0}
+    context = VectorSearchContext(
+        semantic_meta=semantic_meta,
+        mapping_payload=params.mapping_payload,
+        index_path=index_path,
+        documents=params.documents,
+        candidate_limit=params.candidate_limit,
+        k=params.k,
+        candidate_ids=params.candidate_ids,
+        row_to_document=row_to_document,
+    )
+    try:
+        vector_scores = compute_vector_scores(query, options, context)
+    except AgentCatalogSearchError:
+        return {}, 0.0
+    else:
+        return vector_scores, 0.0
+
+
+@dataclass(slots=True)
+class SearchRequest:
+    """Request parameters for catalog search."""
+
+    repo_root: Path
+    query: str
+    k: int = 10
+
+
+def search_catalog(
+    catalog: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+    *,
+    request: SearchRequest,
+    options: SearchOptions | None = None,
+    metrics: MetricsProvider | None = None,
+) -> list[SearchResult]:
+    """Execute hybrid lexical/vector search against the catalog.
+
+    Parameters
+    ----------
+    catalog : Mapping
+        Catalog payload containing packages, modules, symbols, and optional semantic_index metadata.
+    request : SearchRequest
+        Search request containing repo_root, query, and k parameters.
+    options : SearchOptions | None, optional
+        Optional search parameters (alpha, facets, embedding_model, etc.). Defaults to None.
+    metrics : MetricsProvider | None, optional
+        Metrics provider for recording search duration and counts. Defaults to None (uses default).
+
+    Returns
+    -------
+    list[SearchResult]
+        Ranked search results with combined lexical/vector scores.
+
+    Raises
+    ------
+    AgentCatalogSearchError
+        Raised when search fails due to invalid input, missing artifacts, or model errors.
+    """
+    active_metrics = metrics or MetricsProvider.default()
+    active_options = options or SearchOptions()
+    trimmed_query = request.query.strip()
+    k = request.k
+    if not trimmed_query:
+        message = "Search query must not be empty"
+        raise AgentCatalogSearchError(message, context={"query": request.query})
+
+    with (
+        with_fields(
+            logger,
+            operation="search_catalog",
+            status="started",
+            k=k,
+            query_length=len(trimmed_query),
+        ) as log_adapter,
+        observe_duration(active_metrics, "search", component="agent_catalog") as obs,
+    ):
+        try:
+            facets = active_options.facets or {}
+            documents, semantic_meta_info, mapping_payload = _prepare_search_documents(
+                catalog, request.repo_root, facets
+            )
+            if not documents:
+                log_adapter.info(
+                    "Search completed with no documents matching facets",
+                    extra={"status": "success", "result_count": 0},
+                )
+                obs.success()
+                return []
+            catalog_search = catalog.get("search")
+            search_config: Mapping[str, str | int | float | bool | None] = (
+                cast(Mapping[str, str | int | float | bool | None], catalog_search)
+                if isinstance(catalog_search, Mapping)
+                else {}
+            )
+            alpha_value, candidate_limit = resolve_search_parameters(
+                search_config, active_options, len(documents), k
+            )
+
+            lexical_scores, candidate_ids, doc_by_id = _perform_lexical_search(
+                trimmed_query, documents, candidate_limit
+            )
+            if not candidate_ids:
+                log_adapter.info(
+                    "Search completed with no lexical candidates",
+                    extra={"status": "success", "result_count": 0},
+                )
+                obs.success()
+                return []
+            vector_scores: dict[str, float] = {}
+            if semantic_meta_info is not None and mapping_payload is not None:
+                params = VectorSearchParams(
+                    semantic_meta_info=semantic_meta_info,
+                    mapping_payload=mapping_payload,
+                    documents=documents,
+                    candidate_limit=candidate_limit,
+                    k=k,
+                    candidate_ids=candidate_ids,
+                )
+                vector_scores, alpha_value = _perform_vector_search(
+                    trimmed_query, active_options, params
+                )
+            else:
+                alpha_value = 0.0
+
+            results = merge_scores(
+                doc_by_id, candidate_ids, lexical_scores, vector_scores, alpha_value
+            )
+            final_results = results[:k]
+            obs.success()
+            log_adapter.info(
+                "Search completed successfully",
+                extra={
+                    "status": "success",
+                    "result_count": len(final_results),
+                    "alpha": alpha_value,
+                },
+            )
+        except AgentCatalogSearchError:
+            obs.error()
+            raise
+        except Exception as exc:
+            obs.error()
+            message = f"Unexpected error during catalog search: {exc}"
+            raise AgentCatalogSearchError(message, cause=exc) from exc
+        else:
+            return final_results

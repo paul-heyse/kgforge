@@ -13,7 +13,6 @@ class _TemporaryFileWrapper:
     def __enter__(self) -> _TemporaryFileWrapper: ...
     def __exit__(self, *args: object) -> None: ...
 
-
 def NamedTemporaryFile(  # noqa: N802  # Matches stdlib API
     mode: str = "w+b",
     buffering: int = -1,

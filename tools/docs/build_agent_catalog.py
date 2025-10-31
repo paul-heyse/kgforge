@@ -859,7 +859,9 @@ class AgentCatalogBuilder:
             remap_order=remap,
         )
 
-    def _compute_symbol_id(self, qname: str, analyzer: ModuleAnalyzer, node: ast.AST | None) -> str:  # noqa: ARG002
+    def _compute_symbol_id(
+        self, qname: str, analyzer: ModuleAnalyzer, node: ast.AST | None
+    ) -> str:
         if node is None:
             return hashlib.sha256(qname.encode()).hexdigest()
         normalized = _normalize_ast(node)

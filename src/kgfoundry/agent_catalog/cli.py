@@ -11,7 +11,7 @@ from pathlib import Path
 
 from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.client import AgentCatalogClient, AgentCatalogClientError
-from kgfoundry.agent_catalog.search import SearchOptions
+from kgfoundry.agent_catalog.search import SearchOptions, SearchRequest
 from kgfoundry.agent_catalog.sqlite import sqlite_candidates
 
 CommandHandler = Callable[[AgentCatalogClient, argparse.Namespace], None]
@@ -172,11 +172,14 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     except CatalogctlError as exc:
         raise CatalogctlError(str(exc)) from exc
     options = SearchOptions(facets=facets)
-    results = catalog_search.search_catalog(
-        client.catalog.model_dump(),
+    request = SearchRequest(
         repo_root=client.repo_root,
         query=args.query,
         k=max(1, args.k),
+    )
+    results = catalog_search.search_catalog(
+        client.catalog.model_dump(),
+        request=request,
         options=options,
     )
     _render_json([asdict(result) for result in results])
@@ -185,11 +188,14 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
 def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render hybrid search results with detailed scoring metadata."""
     options = SearchOptions(candidate_pool=max(10, args.k))
-    results = catalog_search.search_catalog(
-        client.catalog.model_dump(),
+    request = SearchRequest(
         repo_root=client.repo_root,
         query=args.query,
         k=max(1, args.k),
+    )
+    results = catalog_search.search_catalog(
+        client.catalog.model_dump(),
+        request=request,
         options=options,
     )
     _render_json([asdict(result) for result in results])

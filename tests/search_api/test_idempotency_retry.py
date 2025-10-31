@@ -168,12 +168,12 @@ class TestRetrySemantics:
         # Verify docstring includes retry guidance
         docstring = search.__doc__
         assert docstring is not None
-        assert "retry" in docstring.lower() or "Retry" in docstring, (
-            "Search endpoint docstring should include retry guidance"
-        )
-        assert "exponential backoff" in docstring.lower() or "backoff" in docstring.lower(), (
-            "Search endpoint docstring should include backoff guidance"
-        )
+        assert (
+            "retry" in docstring.lower() or "Retry" in docstring
+        ), "Search endpoint docstring should include retry guidance"
+        assert (
+            "exponential backoff" in docstring.lower() or "backoff" in docstring.lower()
+        ), "Search endpoint docstring should include backoff guidance"
 
     def test_index_commands_retry_guidance(self) -> None:
         """Index build commands include retry guidance in docstrings."""
@@ -186,12 +186,12 @@ class TestRetrySemantics:
         assert bm25_doc is not None
         assert faiss_doc is not None
 
-        assert "retries" in bm25_doc.lower() or "Retries" in bm25_doc, (
-            "index_bm25 docstring should include retry guidance"
-        )
-        assert "retries" in faiss_doc.lower() or "Retries" in faiss_doc, (
-            "index_faiss docstring should include retry guidance"
-        )
+        assert (
+            "retries" in bm25_doc.lower() or "Retries" in bm25_doc
+        ), "index_bm25 docstring should include retry guidance"
+        assert (
+            "retries" in faiss_doc.lower() or "Retries" in faiss_doc
+        ), "index_faiss docstring should include retry guidance"
 
 
 class TestConvergence:
@@ -211,6 +211,6 @@ class TestConvergence:
             results.append([r["chunk_id"] for r in data["results"]])
 
         # All results should be identical (convergence)
-        assert all(r == results[0] for r in results), (
-            "Repeated searches should converge to identical results"
-        )
+        assert all(
+            r == results[0] for r in results
+        ), "Repeated searches should converge to identical results"

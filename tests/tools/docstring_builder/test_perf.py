@@ -68,9 +68,9 @@ def test_observability_overhead() -> None:
 
     # Overhead should be < 10ms per operation
     per_operation_overhead = (overhead_duration - baseline_duration) / 1000
-    assert per_operation_overhead < 0.01, (
-        f"Observability overhead {per_operation_overhead * 1000:.3f}ms per operation exceeds 10ms"
-    )
+    assert (
+        per_operation_overhead < 0.01
+    ), f"Observability overhead {per_operation_overhead * 1000:.3f}ms per operation exceeds 10ms"
 
 
 @pytest.mark.benchmark
