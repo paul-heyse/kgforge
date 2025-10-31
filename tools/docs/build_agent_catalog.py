@@ -347,7 +347,8 @@ class _CallCollector(ast.NodeVisitor):
             return self.import_aliases[name]
         return None
 
-    def _attribute_chain(self, node: ast.Attribute) -> list[str]:
+    @staticmethod
+    def _attribute_chain(node: ast.Attribute) -> list[str]:
         chain: list[str] = []
         current: ast.AST = node
         while isinstance(current, ast.Attribute):
@@ -859,7 +860,8 @@ class AgentCatalogBuilder:
             remap_order=remap,
         )
 
-    def _compute_symbol_id(self, qname: str, node: ast.AST | None) -> str:
+    @staticmethod
+    def _compute_symbol_id(qname: str, node: ast.AST | None) -> str:
         if node is None:
             return hashlib.sha256(qname.encode()).hexdigest()
         normalized = _normalize_ast(node)
@@ -899,7 +901,8 @@ class AgentCatalogBuilder:
         ]
         return "|".join(trigrams)
 
-    def _normalize_token(self, token: tokenize.TokenInfo) -> str | None:
+    @staticmethod
+    def _normalize_token(token: tokenize.TokenInfo) -> str | None:
         if token.type in {tokenize.NAME, tokenize.OP}:
             return token.string
         if token.type == tokenize.NUMBER:
@@ -908,7 +911,8 @@ class AgentCatalogBuilder:
             return "STRING"
         return None
 
-    def _compute_name_arity(self, node: ast.AST | None, scope: tuple[str, ...]) -> int:
+    @staticmethod
+    def _compute_name_arity(node: ast.AST | None, scope: tuple[str, ...]) -> int:
         if node is None:
             return 0
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -923,7 +927,8 @@ class AgentCatalogBuilder:
             return max(total, 0)
         return 0
 
-    def _nearest_text(self, analyzer: ModuleAnalyzer, node: ast.AST | None) -> str | None:
+    @staticmethod
+    def _nearest_text(analyzer: ModuleAnalyzer, node: ast.AST | None) -> str | None:
         if node is None:
             return None
         segment = analyzer.get_source_segment(node)
@@ -935,7 +940,8 @@ class AgentCatalogBuilder:
                 return stripped
         return None
 
-    def _compute_complexity(self, node: ast.AST | None) -> float | None:
+    @staticmethod
+    def _compute_complexity(node: ast.AST | None) -> float | None:
         if node is None:
             return None
         complexity = 1
@@ -958,12 +964,14 @@ class AgentCatalogBuilder:
                 complexity += 1
         return float(complexity)
 
-    def _compute_loc(self, anchors: Anchors) -> int | None:
+    @staticmethod
+    def _compute_loc(anchors: Anchors) -> int | None:
         if anchors.start_line is None or anchors.end_line is None:
             return None
         return max(anchors.end_line - anchors.start_line + 1, 0)
 
-    def _normalize_tests(self, tests: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    @staticmethod
+    def _normalize_tests(tests: list[dict[str, Any]]) -> list[dict[str, Any]]:
         normalized: list[dict[str, Any]] = []
         for test in tests:
             normalized.append(
@@ -1040,7 +1048,8 @@ class AgentCatalogBuilder:
         except FileNotFoundError:
             return default
 
-    def _index_modules(self, symbols_data: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    @staticmethod
+    def _index_modules(symbols_data: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
         modules: dict[str, dict[str, Any]] = {}
         for entry in symbols_data:
             if entry.get("kind") == "module":
@@ -1049,7 +1058,8 @@ class AgentCatalogBuilder:
                     modules[str(canonical)] = entry
         return modules
 
-    def _index_symbols(self, symbols_data: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    @staticmethod
+    def _index_symbols(symbols_data: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
         index: dict[str, dict[str, Any]] = {}
         for entry in symbols_data:
             canonical = entry.get("canonical_path") or entry.get("path")
@@ -1057,7 +1067,8 @@ class AgentCatalogBuilder:
                 index[str(canonical)] = entry
         return index
 
-    def _index_docfacts(self, docfacts_data: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    @staticmethod
+    def _index_docfacts(docfacts_data: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
         index: dict[str, dict[str, Any]] = {}
         for entry in docfacts_data:
             qname = entry.get("qname")
@@ -1065,7 +1076,8 @@ class AgentCatalogBuilder:
                 index[str(qname)] = entry
         return index
 
-    def _lookup_symbol(self, qname: str, index: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
+    @staticmethod
+    def _lookup_symbol(qname: str, index: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
         if qname in index:
             return index[qname]
         tail = qname.split(".", 1)[-1]
@@ -1074,8 +1086,9 @@ class AgentCatalogBuilder:
             return matches[0]
         return None
 
+    @staticmethod
     def _lookup_docfacts(
-        self, qname: str, index: dict[str, dict[str, Any]]
+        qname: str, index: dict[str, dict[str, Any]]
     ) -> dict[str, Any] | None:
         if qname in index:
             return index[qname]
@@ -1142,8 +1155,8 @@ class AgentCatalogBuilder:
                     documents.append(document)
         return documents
 
+    @staticmethod
     def _build_search_document(
-        self,
         *,
         package: PackageRecord,
         module: ModuleRecord,
