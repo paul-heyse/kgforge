@@ -11,11 +11,37 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from os import environ
 from pathlib import Path
+from typing import cast
 
 from kgfoundry.agent_catalog.search import SearchDocument, documents_from_catalog
 
 JsonValue = None | bool | int | float | str | list["JsonValue"] | dict[str, "JsonValue"]
 JsonObject = dict[str, JsonValue]
+
+SearchPayloadValue = str | int | float | bool | None | list[object] | dict[str, object]
+SearchPayload = Mapping[str, SearchPayloadValue]
+
+
+def _to_json_object(mapping: Mapping[str, JsonValue]) -> JsonObject:
+    """Create a JSON object copy from ``mapping``."""
+    return {key: value for key, value in mapping.items()}
+
+
+def _to_search_payload(value: JsonValue) -> SearchPayloadValue:
+    """Convert ``value`` into a search payload compatible structure."""
+    if isinstance(value, list):
+        return [cast(object, _to_search_payload(item)) for item in value]
+    if isinstance(value, dict):
+        return {key: cast(object, _to_search_payload(item)) for key, item in value.items()}
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    raise TypeError(f"Unsupported JsonValue type: {type(value)!r}")
+
+
+PackagePayload = Mapping[str, JsonValue]
+ModulePayload = Mapping[str, JsonValue]
+SymbolPayload = Mapping[str, JsonValue]
+CallEdgePayload = Mapping[str, JsonValue]
 
 CatalogPayload = Mapping[str, JsonValue]
 
@@ -50,7 +76,6 @@ def _sqlite_connection(path: Path) -> Iterator[sqlite3.Connection]:
     connection = sqlite3.connect(str(path))
     try:
         connection.execute("PRAGMA foreign_keys = ON")
-        connection.row_factory = sqlite3.Row
         yield connection
     finally:  # pragma: no cover - defensive close
         connection.close()
@@ -153,7 +178,7 @@ def _json_loads(value: str | None) -> JsonValue:
     """
     if value is None:
         return None
-    return json.loads(value)
+    return cast(JsonValue, json.loads(value))
 
 
 def _stringify(value: JsonValue) -> str | None:
@@ -173,57 +198,62 @@ def _stringify(value: JsonValue) -> str | None:
     """
     if value is None:
         return None
-    return str(value)
+    if isinstance(value, str):
+        return value
+    if isinstance(value, (int, float, bool)):
+        return str(value)
+    return _json_dumps(value)
 
 
-def _iter_packages(payload: CatalogPayload) -> Sequence[Mapping[str, JsonValue]]:
-    """Document  iter packages.
-
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
-
-    Parameters
-    ----------
-    payload : str | NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
-        Configure the payload.
-
-    Returns
-    -------
-    str | NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
-        Describe return value.
-    """
+def _iter_packages(payload: CatalogPayload) -> list[PackagePayload]:
+    """Return package payload mappings extracted from ``payload``."""
     packages = payload.get("packages")
-    if isinstance(packages, Sequence):
-        return packages  # type: ignore[return-value]
-    return []
+    if not isinstance(packages, Sequence):
+        return []
+    typed_packages: list[PackagePayload] = []
+    for item in packages:
+        if isinstance(item, Mapping):
+            typed_packages.append(cast(PackagePayload, item))
+    return typed_packages
 
 
-def _iter_modules(package: Mapping[str, JsonValue]) -> Sequence[Mapping[str, JsonValue]]:
-    """Document  iter modules.
-
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
-
-    Parameters
-    ----------
-    package : str | NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
-        Configure the package.
-
-    Returns
-    -------
-    str | NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
-        Describe return value.
-    """
+def _iter_modules(package: PackagePayload) -> list[ModulePayload]:
+    """Return module payloads for ``package``."""
     modules = package.get("modules")
-    if isinstance(modules, Sequence):
-        return modules  # type: ignore[return-value]
-    return []
+    if not isinstance(modules, Sequence):
+        return []
+    typed_modules: list[ModulePayload] = []
+    for module in modules:
+        if isinstance(module, Mapping):
+            typed_modules.append(cast(ModulePayload, module))
+    return typed_modules
+
+
+def _iter_symbols(module: ModulePayload) -> list[SymbolPayload]:
+    """Return typed symbol payloads from ``module``."""
+    symbols = module.get("symbols")
+    if not isinstance(symbols, Sequence):
+        return []
+    typed_symbols: list[SymbolPayload] = []
+    for symbol in symbols:
+        if isinstance(symbol, Mapping):
+            typed_symbols.append(cast(SymbolPayload, symbol))
+    return typed_symbols
+
+
+def _iter_call_edges(module: ModulePayload) -> list[CallEdgePayload]:
+    """Return typed call edges from a module graph."""
+    graph = module.get("graph")
+    if not isinstance(graph, Mapping):
+        return []
+    calls = graph.get("calls")
+    if not isinstance(calls, Sequence):
+        return []
+    typed_calls: list[CallEdgePayload] = []
+    for edge in calls:
+        if isinstance(edge, Mapping):
+            typed_calls.append(cast(CallEdgePayload, edge))
+    return typed_calls
 
 
 def _build_metadata_rows(payload: CatalogPayload) -> list[tuple[str, str]]:
@@ -280,7 +310,7 @@ class _SymbolExtraction:
     lookup: dict[str, str]
 
 
-def _collect_symbol_rows(packages: Sequence[Mapping[str, JsonValue]]) -> _SymbolExtraction:
+def _collect_symbol_rows(packages: Sequence[PackagePayload]) -> _SymbolExtraction:
     """Aggregate module, symbol, anchor, and ranking rows.
 
     <!-- auto:docstring-builder v1 -->
@@ -313,12 +343,7 @@ def _collect_symbol_rows(packages: Sequence[Mapping[str, JsonValue]]) -> _Symbol
                 "graph": module.get("graph"),
             }
             module_rows.append((qualified, package_name, _json_dumps(module_payload)))
-            symbols = module.get("symbols")
-            if not isinstance(symbols, Sequence):
-                continue
-            for symbol in symbols:
-                if not isinstance(symbol, Mapping):
-                    continue
+            for symbol in _iter_symbols(module):
                 symbol_id = _stringify(symbol.get("symbol_id")) or ""
                 qname_value = _stringify(symbol.get("qname")) or symbol_id
                 if qname_value:
@@ -377,7 +402,7 @@ def _collect_symbol_rows(packages: Sequence[Mapping[str, JsonValue]]) -> _Symbol
 
 
 def _collect_call_rows(
-    packages: Sequence[Mapping[str, JsonValue]],
+    packages: Sequence[PackagePayload],
     symbol_lookup: Mapping[str, str],
 ) -> list[CallRow]:
     """Return call graph rows using symbol identifiers where available.
@@ -399,15 +424,7 @@ def _collect_call_rows(
     rows: list[CallRow] = []
     for package in packages:
         for module in _iter_modules(package):
-            graph = module.get("graph")
-            if not isinstance(graph, Mapping):
-                continue
-            calls = graph.get("calls")
-            if not isinstance(calls, Sequence):
-                continue
-            for edge in calls:
-                if not isinstance(edge, Mapping):
-                    continue
+            for edge in _iter_call_edges(module):
                 caller_qname = _stringify(edge.get("caller"))
                 callee_qname = _stringify(edge.get("callee"))
                 if not callee_qname:
@@ -424,7 +441,7 @@ def _collect_call_rows(
     return rows
 
 
-def _build_package_rows(packages: Sequence[Mapping[str, JsonValue]]) -> list[tuple[str, str]]:
+def _build_package_rows(packages: Sequence[PackagePayload]) -> list[tuple[str, str]]:
     """Return serialized package rows.
 
     <!-- auto:docstring-builder v1 -->
@@ -519,12 +536,17 @@ def write_sqlite_catalog(
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists():
         path.unlink()
-    packages = (
-        list(packages_override) if packages_override is not None else list(_iter_packages(payload))
-    )
-    payload_for_docs: dict[str, JsonValue] = dict(payload)
-    payload_for_docs["packages"] = list(packages)
-    documents = list(documents_from_catalog(payload_for_docs))
+    if packages_override is not None:
+        packages = _coerce_packages(packages_override)
+    else:
+        packages = _iter_packages(payload)
+    payload_for_docs: JsonObject = dict(payload)
+    payload_for_docs["packages"] = [dict(pkg) for pkg in packages]
+    payload_for_docs_obj: dict[str, SearchPayloadValue] = {
+        key: _to_search_payload(value) for key, value in payload_for_docs.items()
+    }
+    search_payload = cast(SearchPayload, payload_for_docs_obj)
+    documents = list(documents_from_catalog(search_payload))
     metadata_rows = _build_metadata_rows(payload)
     symbol_rows = _collect_symbol_rows(packages)
     fts_rows = _build_fts_rows(documents)
@@ -588,10 +610,13 @@ def _fetch_metadata(connection: sqlite3.Connection) -> JsonObject:
     dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]
         Describe return value.
     """
-    return {
-        row["key"]: _json_loads(row["value"])
-        for row in connection.execute("SELECT key, value FROM metadata")
-    }
+    result: JsonObject = {}
+    rows = cast(
+        list[tuple[str, str]], connection.execute("SELECT key, value FROM metadata").fetchall()
+    )
+    for key, value_str in rows:
+        result[key] = _json_loads(value_str)
+    return result
 
 
 def _load_packages_table(connection: sqlite3.Connection) -> dict[str, JsonObject]:
@@ -610,13 +635,21 @@ def _load_packages_table(connection: sqlite3.Connection) -> dict[str, JsonObject
         Describe return value.
     """
     packages: dict[str, JsonObject] = {}
-    for row in connection.execute("SELECT name, data FROM packages ORDER BY name"):
-        package_data = _json_loads(row["data"])
-        data: JsonObject = (
-            dict(package_data) if isinstance(package_data, dict) else {"name": row["name"]}
-        )
-        data.setdefault("modules", [])
-        packages[row["name"]] = data
+    rows = cast(
+        list[tuple[str, str]],
+        connection.execute("SELECT name, data FROM packages ORDER BY name").fetchall(),
+    )
+    for package_name, data_raw in rows:
+        package_data = _json_loads(data_raw)
+        if isinstance(package_data, dict):
+            data = _to_json_object(cast(Mapping[str, JsonValue], package_data))
+        else:
+            data = {"name": package_name}
+        modules_list = [
+            _to_json_object(module) for module in _iter_modules(cast(PackagePayload, data))
+        ]
+        data["modules"] = cast(JsonValue, modules_list)
+        packages[package_name] = data
     return packages
 
 
@@ -641,21 +674,32 @@ def _load_modules_table(
         Describe return value.
     """
     modules: dict[str, JsonObject] = {}
-    for row in connection.execute(
-        "SELECT qualified, package, data FROM modules ORDER BY qualified"
-    ):
-        module_data = _json_loads(row["data"])
+    rows = cast(
+        list[tuple[str, str, str]],
+        connection.execute(
+            "SELECT qualified, package, data FROM modules ORDER BY qualified"
+        ).fetchall(),
+    )
+    for qualified, package_name, data_raw in rows:
+        module_data = _json_loads(data_raw)
         if isinstance(module_data, dict):
-            data = dict(module_data)
+            data = _to_json_object(cast(Mapping[str, JsonValue], module_data))
         else:
-            data = {"qualified": row["qualified"]}
-        data.setdefault("symbols", [])
-        modules[row["qualified"]] = data
-        package_entry = packages.get(row["package"])
+            data = {"qualified": qualified}
+        symbols_list = [
+            _to_json_object(symbol) for symbol in _iter_symbols(cast(ModulePayload, data))
+        ]
+        data["symbols"] = cast(JsonValue, symbols_list)
+        modules[qualified] = data
+        package_entry = packages.get(package_name)
         if package_entry is not None:
-            module_list = package_entry.setdefault("modules", [])
-            if isinstance(module_list, list):
-                module_list.append(data)
+            module_list_value = package_entry.get("modules")
+            if isinstance(module_list_value, list):
+                module_list = cast(list[JsonObject], module_list_value)
+            else:
+                module_list = []
+                package_entry["modules"] = cast(JsonValue, module_list)
+            module_list.append(data)
     return modules
 
 
@@ -675,12 +719,18 @@ def _load_anchor_table(connection: sqlite3.Connection) -> dict[str, JsonObject]:
         Describe return value.
     """
     anchors: dict[str, JsonObject] = {}
-    for row in connection.execute("SELECT * FROM anchors"):
-        anchors[row["symbol_id"]] = {
-            "start_line": row["start_line"],
-            "end_line": row["end_line"],
-            "cst_fingerprint": row["cst_fingerprint"],
-            "remap_order": _json_loads(row["remap_order"]),
+    rows = cast(
+        list[tuple[str, int | None, int | None, str | None, str | None]],
+        connection.execute(
+            "SELECT symbol_id, start_line, end_line, cst_fingerprint, remap_order FROM anchors"
+        ).fetchall(),
+    )
+    for symbol_id, start_raw, end_raw, fingerprint_raw, remap_raw in rows:
+        anchors[symbol_id] = {
+            "start_line": start_raw,
+            "end_line": end_raw,
+            "cst_fingerprint": fingerprint_raw,
+            "remap_order": _json_loads(remap_raw),
         }
     return anchors
 
@@ -701,13 +751,19 @@ def _load_ranking_table(connection: sqlite3.Connection) -> dict[str, JsonObject]
         Describe return value.
     """
     ranking: dict[str, JsonObject] = {}
-    for row in connection.execute("SELECT * FROM ranking_features"):
-        ranking[row["symbol_id"]] = {
-            "docstring_coverage": row["coverage"],
-            "complexity": row["complexity"],
-            "churn_last_n": row["churn"],
-            "stability": row["stability"],
-            "deprecated": bool(row["deprecated"]),
+    rows = cast(
+        list[tuple[str, float | None, float | None, int | None, str | None, int]],
+        connection.execute(
+            "SELECT symbol_id, coverage, complexity, churn, stability, deprecated FROM ranking_features"
+        ).fetchall(),
+    )
+    for symbol_id, coverage_raw, complexity_raw, churn_raw, stability_raw, deprecated_raw in rows:
+        ranking[symbol_id] = {
+            "docstring_coverage": coverage_raw,
+            "complexity": complexity_raw,
+            "churn_last_n": churn_raw,
+            "stability": stability_raw,
+            "deprecated": bool(deprecated_raw),
         }
     return ranking
 
@@ -729,11 +785,14 @@ def _load_call_graph(connection: sqlite3.Connection) -> CallGraph:
     """
     callers: dict[str, set[str]] = defaultdict(set)
     callees: dict[str, set[str]] = defaultdict(set)
-    for row in connection.execute(
-        "SELECT caller_symbol_id, callee_symbol_id, callee_qname FROM calls"
-    ):
-        caller = row["caller_symbol_id"]
-        callee = row["callee_symbol_id"] or row["callee_qname"]
+    rows = cast(
+        list[tuple[str | None, str | None, str]],
+        connection.execute(
+            "SELECT caller_symbol_id, callee_symbol_id, callee_qname FROM calls"
+        ).fetchall(),
+    )
+    for caller, callee_id, callee_qname in rows:
+        callee = callee_id or callee_qname
         if caller:
             callees[caller].add(callee)
         if callee and caller:
@@ -766,53 +825,56 @@ def _attach_symbols_to_modules(
         Describe ``call_graph``.
     """
     callers, callees = call_graph
-    for row in connection.execute(
-        "SELECT symbol_id, package, module, qname, kind, data FROM symbols"
-    ):
-        symbol_data = _json_loads(row["data"])
+    rows = cast(
+        list[tuple[str, str, str, str, str, str]],
+        connection.execute(
+            "SELECT symbol_id, package, module, qname, kind, data FROM symbols"
+        ).fetchall(),
+    )
+    for symbol_id, _package_name, module_name, _qname, _kind, data_raw in rows:
+        symbol_data = _json_loads(data_raw)
         if not isinstance(symbol_data, dict):
             continue
-        symbol_id = row["symbol_id"]
-        symbol_payload = dict(symbol_data)
-        symbol_payload.setdefault("anchors", anchors.get(symbol_id, {}))
+        symbol_payload = _to_json_object(cast(Mapping[str, JsonValue], symbol_data))
+        if "anchors" not in symbol_payload:
+            symbol_payload["anchors"] = anchors.get(symbol_id, {})
         ranking_entry = ranking.get(symbol_id, {})
         metrics = symbol_payload.get("metrics")
         if not isinstance(metrics, dict):
             metrics = {}
-        metrics.setdefault("complexity", ranking_entry.get("complexity"))
-        metrics.setdefault("stability", ranking_entry.get("stability"))
-        metrics.setdefault("deprecated", ranking_entry.get("deprecated"))
+        if "complexity" not in metrics:
+            metrics["complexity"] = ranking_entry.get("complexity")
+        if "stability" not in metrics:
+            metrics["stability"] = ranking_entry.get("stability")
+        if "deprecated" not in metrics:
+            metrics["deprecated"] = ranking_entry.get("deprecated")
         symbol_payload["metrics"] = metrics
         change_impact = symbol_payload.get("change_impact")
         if not isinstance(change_impact, dict):
             change_impact = {}
-        change_impact.setdefault("callers", sorted(callers.get(symbol_id, [])))
-        change_impact.setdefault("callees", sorted(callees.get(symbol_id, [])))
-        change_impact.setdefault("churn_last_n", ranking_entry.get("churn_last_n"))
+        if "callers" not in change_impact:
+            callers_list = sorted(callers.get(symbol_id, []))
+            change_impact["callers"] = cast(JsonValue, callers_list)
+        if "callees" not in change_impact:
+            callees_list = sorted(callees.get(symbol_id, []))
+            change_impact["callees"] = cast(JsonValue, callees_list)
+        if "churn_last_n" not in change_impact:
+            change_impact["churn_last_n"] = ranking_entry.get("churn_last_n")
         symbol_payload["change_impact"] = change_impact
-        module_entry = modules.get(row["module"])
+        module_entry = modules.get(module_name)
         if module_entry is None:
             continue
-        symbols = module_entry.setdefault("symbols", [])
-        if isinstance(symbols, list):
-            symbols.append(symbol_payload)
+        symbols_value = module_entry.get("symbols")
+        if isinstance(symbols_value, list):
+            symbol_list = cast(list[JsonObject], symbols_value)
+        else:
+            symbol_list = []
+            module_entry["symbols"] = cast(JsonValue, symbol_list)
+        symbol_list.append(symbol_payload)
 
 
 def load_catalog_from_sqlite(path: Path) -> JsonObject:
-    """Load a catalogue payload from ``path`` and materialise as dictionaries.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    path : Path
-        Describe ``path``.
-
-    Returns
-    -------
-    dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]
-        Describe return value.
-    """
+    """Load a catalogue payload from ``path`` as JSON-compatible dictionaries."""
     with _sqlite_connection(path) as connection:
         metadata = _fetch_metadata(connection)
         packages = _load_packages_table(connection)
@@ -835,33 +897,20 @@ def load_catalog_from_sqlite(path: Path) -> JsonObject:
 
 
 def sqlite_candidates(json_path: Path) -> Iterable[Path]:
-    """Yield plausible SQLite catalogue locations for ``json_path``.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    json_path : Path
-        Describe ``json_path``.
-
-    Returns
-    -------
-    Path
-        Describe return value.
-    """
+    """Yield plausible SQLite catalogue locations for ``json_path``."""
     if json_path.suffix == ".sqlite":
         yield json_path
         return
     try:
         env_value = environ.get("CATALOG_ROOT")
-    except OSError:  # pragma: no cover - restricted environments may block env access
+    except OSError:  # pragma: no cover
         env_value = None
     if env_value:
         env_path = Path(env_value)
         yield env_path / "catalog.sqlite"
     catalog_root = Path(json_path.parent)
-    for raw in (json_path.with_suffix(".sqlite"), catalog_root / "catalog.sqlite"):
-        yield Path(raw)
+    for candidate in (json_path.with_suffix(".sqlite"), catalog_root / "catalog.sqlite"):
+        yield Path(candidate)
 
 
 __all__ = [
@@ -869,3 +918,11 @@ __all__ = [
     "sqlite_candidates",
     "write_sqlite_catalog",
 ]
+
+
+def _coerce_packages(packages: Sequence[Mapping[str, JsonValue]]) -> list[PackagePayload]:
+    """Return a list of package payloads from ``packages``."""
+    result: list[PackagePayload] = []
+    for package in packages:
+        result.append(package)
+    return result

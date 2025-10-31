@@ -28,8 +28,17 @@ from tempfile import (
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, cast
 
-from tools._shared.logging import get_logger, with_fields
-from tools._shared.proc import ToolExecutionError, ToolRunResult, run_tool
+from tools import (
+    ToolExecutionError,
+    ToolRunResult,
+    get_logger,
+    resolve_path,
+    run_tool,
+    with_fields,
+)
+from tools import (
+    ValidationError as SharedValidationError,
+)
 from tools.docs.errors import GraphBuildError
 
 if TYPE_CHECKING:
@@ -69,6 +78,17 @@ DEFAULT_EDGE_BUDGET = 50_000
 EDGE_COMPONENTS = 2
 SCC_SUMMARY_LIMIT = 10
 SCC_MEMBER_PREVIEW = 20
+LAYER_PALETTE: dict[str, str] = {
+    "domain": "#2f855a",
+    "application": "#3182ce",
+    "interface": "#805ad5",
+    "infra": "#dd6b20",
+}
+DEFAULT_LAYER_COLOR = "#718096"
+DEFAULT_EDGE_COLOR = "#a0aec0"
+CYCLE_EDGE_COLOR = "#e53e3e"
+EDGE_HIGHLIGHT_WIDTH = "2.5"
+EDGE_NORMAL_WIDTH = "1.2"
 
 LayerConfig = Mapping[str, object]
 AnalysisResult = dict[str, object]
@@ -109,6 +129,15 @@ class PackageBuildConfig:
     def excludes_list(self) -> list[str]:
         """Return a mutable copy of the package exclusion patterns."""
         return list(self.excludes)
+
+
+@dataclass(frozen=True)
+class CycleConfig:
+    """Configuration values governing cycle enumeration bounds."""
+
+    limit: int
+    length_bound: int
+    edge_budget: int
 
 
 pydot: ModuleType | None = _optional_import("pydot")
@@ -607,6 +636,78 @@ def _env_int(name: str, default: int) -> int:
         return default
 
 
+def _cycle_config() -> CycleConfig:
+    """Return cycle enumeration configuration derived from the environment."""
+    return CycleConfig(
+        limit=_env_int(CYCLE_LIMIT_ENV, 0),
+        length_bound=_env_int(CYCLE_LENGTH_ENV, 0),
+        edge_budget=_env_int(EDGE_BUDGET_ENV, DEFAULT_EDGE_BUDGET),
+    )
+
+
+def _centrality_threshold(centrality: Mapping[str, float], fraction: float) -> float:
+    """Return the value at ``fraction`` of the sorted centrality scores."""
+    values = sorted(centrality.values())
+    if not values:
+        return 0.0
+    index = min(len(values) - 1, int(fraction * len(values)))
+    return values[index]
+
+
+def _extract_cycle_edges(cycles: CycleList) -> set[tuple[str, str]]:
+    """Return directed edges participating in enumerated cycles."""
+    edges: set[tuple[str, str]] = set()
+    for cycle in cycles:
+        for idx, node in enumerate(cycle):
+            next_node = cycle[(idx + 1) % len(cycle)]
+            edges.add((node, next_node))
+    return edges
+
+
+def _add_graph_nodes(
+    dot_graph: PydotDot,
+    graph: DiGraph,
+    pkg2layer: Mapping[str, str],
+    centrality: Mapping[str, float],
+    threshold: float,
+) -> None:
+    """Populate ``dot_graph`` with styled nodes extracted from ``graph``."""
+    for node in sorted(graph.nodes()):
+        layer = pkg2layer.get(node, "unknown")
+        color = LAYER_PALETTE.get(layer, DEFAULT_LAYER_COLOR)
+        penwidth = (
+            EDGE_HIGHLIGHT_WIDTH if centrality.get(node, 0.0) >= threshold else EDGE_NORMAL_WIDTH
+        )
+        dot_graph.add_node(
+            pydot.Node(
+                node,
+                color=color,
+                penwidth=penwidth,
+                style="bold",
+                fontcolor="#1a202c",
+            )
+        )
+
+
+def _add_graph_edges(
+    dot_graph: PydotDot,
+    graph: DiGraph,
+    pkg2layer: Mapping[str, str],
+    cycle_edges: set[tuple[str, str]],
+) -> None:
+    """Populate ``dot_graph`` with styled edges extracted from ``graph``."""
+    for src, dst, _ in graph.edges(data=True):
+        layer_u = pkg2layer.get(src, "unknown")
+        layer_v = pkg2layer.get(dst, "unknown")
+        in_cycle = (src, dst) in cycle_edges
+        edge_color = CYCLE_EDGE_COLOR if in_cycle else DEFAULT_EDGE_COLOR
+        penwidth = EDGE_HIGHLIGHT_WIDTH if in_cycle else EDGE_NORMAL_WIDTH
+        label = f"{layer_u}→{layer_v}" if layer_u != layer_v else ""
+        dot_graph.add_edge(
+            pydot.Edge(src, dst, color=edge_color, penwidth=penwidth, fontsize="8", label=label)
+        )
+
+
 def _rank_map(order: Sequence[str]) -> dict[str, int]:
     """Rank map.
 
@@ -1045,16 +1146,13 @@ def analyze_graph(graph: DiGraph, layers: LayerConfig) -> AnalysisResult:
     rank = _rank_map(order)
 
     pruned = _prune_outward_edges(graph, pkg2layer, rank, allow_outward)
-
-    cycle_limit = _env_int(CYCLE_LIMIT_ENV, 0)
-    length_bound = _env_int(CYCLE_LENGTH_ENV, 0)
-    edge_budget = _env_int(EDGE_BUDGET_ENV, DEFAULT_EDGE_BUDGET)
+    cycle_config = _cycle_config()
 
     cycles, skipped, scc_summary = _enumerate_cycles(
         pruned,
-        cycle_limit,
-        length_bound,
-        edge_budget,
+        cycle_config.limit,
+        cycle_config.length_bound,
+        cycle_config.edge_budget,
         graph,
     )
 
@@ -1108,48 +1206,16 @@ def style_and_render(
         raise RuntimeError(message)
 
     pkg2layer = _coerce_mapping(layers.get("packages"))
-    palette = {
-        "domain": "#2f855a",
-        "application": "#3182ce",
-        "interface": "#805ad5",
-        "infra": "#dd6b20",
-    }
-
     centrality = cast(dict[str, float], analysis.get("centrality", {}))
-    values = list(centrality.values())
-    q80 = sorted(values)[int(0.80 * len(values))] if values else 0.0
-
-    cycles = cast(CycleList, analysis.get("cycles", []))
-    cycle_edges: set[tuple[str, str]] = set()
-    for cyc in cycles:
-        for index, node in enumerate(cyc):
-            nxt = cyc[(index + 1) % len(cyc)]
-            cycle_edges.add((node, nxt))
+    threshold = _centrality_threshold(centrality, 0.80)
+    cycle_edges = _extract_cycle_edges(cast(CycleList, analysis.get("cycles", [])))
 
     dot_graph: PydotDot = pydot.Dot(graph_type="digraph", rankdir="LR")
+    _add_graph_nodes(dot_graph, graph, pkg2layer, centrality, threshold)
+    _add_graph_edges(dot_graph, graph, pkg2layer, cycle_edges)
 
-    # nodes
-    for node in sorted(graph.nodes()):
-        layer = pkg2layer.get(node, "unknown")
-        color = palette.get(layer, "#718096")
-        width = 2.5 if centrality.get(node, 0.0) >= q80 else 1.2
-        dot_graph.add_node(
-            pydot.Node(node, color=color, penwidth=str(width), style="bold", fontcolor="#1a202c")
-        )
-
-    # edges
-    for src, dst, _ in graph.edges(data=True):
-        layer_u = pkg2layer.get(src, "unknown")
-        layer_v = pkg2layer.get(dst, "unknown")
-        edge_color = "#e53e3e" if (src, dst) in cycle_edges else "#a0aec0"
-        penw = "2.5" if (src, dst) in cycle_edges else "1.2"
-        label = f"{layer_u}→{layer_v}" if layer_u != layer_v else ""
-        dot_graph.add_edge(
-            pydot.Edge(src, dst, color=edge_color, penwidth=penw, fontsize="8", label=label)
-        )
-
-    dot_any = cast(Any, dot_graph)
-    payload = dot_any.create_svg() if fmt == "svg" else dot_any.create_png()
+    renderer = cast(Any, dot_graph)
+    payload = renderer.create_svg() if fmt == "svg" else renderer.create_png()
     out_svg.write_bytes(payload)
 
 
@@ -1708,7 +1774,10 @@ def _prepare_cache(args: argparse.Namespace) -> tuple[Path, bool]:
     --------
     >>> _prepare_cache(...)
     """
-    cache_dir = Path(args.cache_dir)
+    cache_dir = resolve_path(args.cache_dir, strict=False)
+    if cache_dir.exists() and not cache_dir.is_dir():
+        message = f"Cache directory '{cache_dir}' must be a directory"
+        raise SharedValidationError(message)
     cache_dir.mkdir(parents=True, exist_ok=True)
     return cache_dir, not args.no_cache
 
@@ -1894,12 +1963,23 @@ def _load_layers_config(path: str) -> LayerConfig:
     --------
     >>> _load_layers_config(...)
     """
-    file_path = Path(path)
-    if yaml is None or not file_path.exists():
+    file_path = resolve_path(path, strict=False)
+    if yaml is None:
         return {"order": [], "packages": {}, "rules": {}}
-    data = yaml.safe_load(file_path.read_text())
+    if not file_path.exists():
+        message = f"Layers config '{file_path}' does not exist"
+        raise SharedValidationError(message)
+    if not file_path.is_file():
+        message = f"Layers config '{file_path}' must be a file"
+        raise SharedValidationError(message)
+    try:
+        data = yaml.safe_load(file_path.read_text())
+    except yaml.YAMLError as exc:  # type: ignore[attr-defined]
+        message = f"Layers config '{file_path}' is not valid YAML"
+        raise SharedValidationError(message) from exc
     if not isinstance(data, Mapping):
-        return {"order": [], "packages": {}, "rules": {}}
+        message = f"Layers config '{file_path}' must contain a mapping"
+        raise SharedValidationError(message)
     return cast(LayerConfig, data)
 
 
@@ -1925,12 +2005,21 @@ def _load_allowlist(path: str) -> dict[str, object]:
     --------
     >>> _load_allowlist(...)
     """
-    file_path = Path(path)
+    file_path = resolve_path(path, strict=False)
     if not file_path.exists():
-        return {"cycles": [], "edges": []}
-    data = json.loads(file_path.read_text())
+        message = f"Allowlist '{file_path}' does not exist"
+        raise SharedValidationError(message)
+    if not file_path.is_file():
+        message = f"Allowlist '{file_path}' must be a file"
+        raise SharedValidationError(message)
+    try:
+        data = json.loads(file_path.read_text())
+    except json.JSONDecodeError as exc:  # pragma: no cover - malformed JSON
+        message = f"Allowlist '{file_path}' is not valid JSON"
+        raise SharedValidationError(message) from exc
     if not isinstance(data, dict):
-        return {"cycles": [], "edges": []}
+        message = f"Allowlist '{file_path}' must contain a JSON object"
+        raise SharedValidationError(message)
     return data
 
 
@@ -2093,39 +2182,39 @@ def main() -> None:
 
     packages = _resolve_packages(args)
     excludes = args.exclude or ["tests/.*", "site/.*"]
-    cache_dir, use_cache = _prepare_cache(args)
-
-    config = PackageBuildConfig(
-        fmt=args.format,
-        excludes=tuple(excludes),
-        max_bacon=args.max_bacon,
-        cache_dir=cache_dir,
-        use_cache=use_cache,
-        verbose=args.verbose,
-    )
-
-    _log_configuration(args.verbose, packages, cache_dir, use_cache)
-
-    start = time.time()
-    results = _build_per_package_graphs(packages, config, args.max_workers)
-
-    _report_package_failures(results)
 
     try:
-        global_graph = _build_global_graph(args.format, excludes, args.max_bacon)
-    except (GraphBuildError, RuntimeError, OSError):  # pragma: no cover - defensive guard
-        LOGGER.exception("Building global graph failed")
-        sys.exit(2)
+        cache_dir, use_cache = _prepare_cache(args)
+        _log_configuration(args.verbose, packages, cache_dir, use_cache)
+        config = PackageBuildConfig(
+            fmt=args.format,
+            excludes=tuple(excludes),
+            max_bacon=args.max_bacon,
+            cache_dir=cache_dir,
+            use_cache=use_cache,
+            verbose=args.verbose,
+        )
+        start = time.monotonic()
+        results = _build_per_package_graphs(packages, config, args.max_workers)
+        _report_package_failures(results)
 
-    layers = _load_layers_config(args.layers)
-    allow = _load_allowlist(args.allowlist)
+        try:
+            global_graph = _build_global_graph(args.format, excludes, args.max_bacon)
+        except (GraphBuildError, RuntimeError, OSError):  # pragma: no cover - defensive guard
+            LOGGER.exception("Building global graph failed")
+            sys.exit(2)
+
+        layers = _load_layers_config(args.layers)
+        allow = _load_allowlist(args.allowlist)
+    except SharedValidationError:
+        LOGGER.exception("Input validation failed")
+        sys.exit(4)
+    duration = time.monotonic() - start
 
     analysis = analyze_graph(global_graph, layers)
     _write_global_artifacts(global_graph, layers, args.format, analysis)
 
     enforce_policy(analysis, allow, args.fail_on_cycles, args.fail_on_layer_violations)
-
-    duration = time.time() - start
     _log_run_summary(use_cache, cache_dir, results, duration, args.verbose)
 
 

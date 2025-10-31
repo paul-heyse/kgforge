@@ -124,6 +124,14 @@ class ToolRuntimeSettings(BaseSettings):
         ),
         description="Glob patterns for executables allowed to run via tools._shared.proc",
     )
+    metrics_enabled: bool = Field(
+        default=True,
+        description="Enable Prometheus metrics emitted by tools._shared.metrics",
+    )
+    tracing_enabled: bool = Field(
+        default=True,
+        description="Enable OpenTelemetry spans emitted by tools._shared.metrics",
+    )
 
     @field_validator("exec_allowlist", mode="before")
     @classmethod

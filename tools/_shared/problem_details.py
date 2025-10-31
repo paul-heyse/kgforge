@@ -21,15 +21,21 @@ Examples
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
+from pathlib import Path
 
 __all__ = [
     "JsonPrimitive",
     "JsonValue",
     "ProblemDetailsDict",
     "build_problem_details",
+    "build_tool_problem_details",
     "problem_from_exception",
     "render_problem",
+    "tool_disallowed_problem_details",
+    "tool_failure_problem_details",
+    "tool_missing_problem_details",
+    "tool_timeout_problem_details",
 ]
 
 # Type aliases for JSON values (RFC 7159 compatible)
@@ -97,6 +103,115 @@ def build_problem_details(  # noqa: PLR0913
         for key, value in extensions.items():
             payload[key] = value
     return payload
+
+
+def build_tool_problem_details(  # noqa: PLR0913
+    *,
+    category: str,
+    command: Sequence[str],
+    status: int,
+    title: str,
+    detail: str,
+    instance_suffix: str,
+    extensions: Mapping[str, JsonValue] | None = None,
+) -> ProblemDetailsDict:
+    """Return a Problem Details payload describing a tooling subprocess failure."""
+    command_list = list(command)
+    tool_name = Path(command_list[0]).name if command_list else "<unknown>"
+    merged_extensions: dict[str, JsonValue] = {"command": command_list}
+    if extensions:
+        merged_extensions.update(dict(extensions))
+    return build_problem_details(
+        type=f"https://kgfoundry.dev/problems/{category}",
+        title=title,
+        status=status,
+        detail=detail,
+        instance=f"urn:tool:{tool_name}:{instance_suffix}",
+        extensions=merged_extensions,
+    )
+
+
+def tool_timeout_problem_details(
+    command: Sequence[str],
+    *,
+    timeout: float | None,
+) -> ProblemDetailsDict:
+    """Return Problem Details describing a tooling timeout."""
+    detail = (
+        f"Command '{command[0]}' timed out after {timeout} seconds"
+        if command and timeout is not None
+        else (f"Command '{command[0]}' timed out" if command else "Command timed out")
+    )
+    extensions: dict[str, JsonValue] = {}
+    if timeout is not None:
+        extensions["timeout"] = timeout
+    return build_tool_problem_details(
+        category="tool-timeout",
+        command=command,
+        status=504,
+        title="Tool execution timed out",
+        detail=detail,
+        instance_suffix="timeout",
+        extensions=extensions,
+    )
+
+
+def tool_missing_problem_details(
+    command: Sequence[str],
+    *,
+    executable: str,
+    detail: str,
+) -> ProblemDetailsDict:
+    """Return Problem Details describing a missing executable."""
+    return build_tool_problem_details(
+        category="tool-missing",
+        command=command or [executable],
+        status=500,
+        title="Executable not found",
+        detail=detail,
+        instance_suffix="missing",
+    )
+
+
+def tool_disallowed_problem_details(
+    command: Sequence[str],
+    *,
+    executable: Path,
+    allowlist: Sequence[str],
+) -> ProblemDetailsDict:
+    """Return Problem Details describing an allowlisted executable violation."""
+    return build_tool_problem_details(
+        category="tool-exec-disallowed",
+        command=command,
+        status=403,
+        title="Executable not allowed",
+        detail=(
+            f"Executable '{executable.name}' is not permitted by the TOOLS_EXEC_ALLOWLIST setting"
+        ),
+        instance_suffix="disallowed",
+        extensions={
+            "executable": str(executable),
+            "allowlist": list(allowlist),
+        },
+    )
+
+
+def tool_failure_problem_details(
+    command: Sequence[str],
+    *,
+    returncode: int,
+    detail: str,
+) -> ProblemDetailsDict:
+    """Return Problem Details describing a non-zero tooling exit code."""
+    return build_tool_problem_details(
+        category="tool-failure",
+        command=command,
+        status=500,
+        title="Tool returned a non-zero exit code",
+        detail=detail,
+        instance_suffix=f"exit-{returncode}",
+        extensions={"returncode": returncode},
+    )
 
 
 def problem_from_exception(  # noqa: PLR0913

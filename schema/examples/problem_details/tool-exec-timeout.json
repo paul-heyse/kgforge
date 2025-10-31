@@ -7,3 +7,4 @@
   "command": ["git", "rev-parse", "--short", "HEAD"],
   "timeout": 10.0
 }
+

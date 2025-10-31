@@ -26,6 +26,12 @@ from tools._shared.problem_details import (
 from tools._shared.proc import ToolExecutionError, ToolRunResult, run_tool
 from tools._shared.schema import get_schema_path, validate_tools_payload
 from tools._shared.settings import SettingsError, ToolRuntimeSettings, get_runtime_settings
+from tools._shared.validation import (
+    ValidationError,
+    require_directory,
+    require_file,
+    resolve_path,
+)
 
 __all__ = [
     "CLI_ENVELOPE_SCHEMA_ID",
@@ -44,6 +50,7 @@ __all__ = [
     "ToolRunObservation",
     "ToolRunResult",
     "ToolRuntimeSettings",
+    "ValidationError",
     "build_problem_details",
     "get_logger",
     "get_runtime_settings",
@@ -52,6 +59,9 @@ __all__ = [
     "observe_tool_run",
     "render_cli_envelope",
     "render_problem",
+    "require_directory",
+    "require_file",
+    "resolve_path",
     "run_tool",
     "validate_cli_envelope",
     "validate_tools_payload",

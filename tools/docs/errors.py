@@ -6,8 +6,6 @@ following RFC 9457 Problem Details patterns.
 
 from __future__ import annotations
 
-from tools.docstring_builder.models import DocstringBuilderError
-
 __all__ = [
     "CatalogBuildError",
     "DocumentationBuildError",
@@ -18,7 +16,7 @@ __all__ = [
 ]
 
 
-class DocumentationBuildError(DocstringBuilderError):
+class DocumentationBuildError(RuntimeError):
     """Base exception for all documentation build failures."""
 
 

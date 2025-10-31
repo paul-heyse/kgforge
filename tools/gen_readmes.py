@@ -783,7 +783,7 @@ def _process_module(module: GriffeObjectLike, cfg: Config, missing_meta: set[str
 
 def _report_duration(start: float, changed_any: bool) -> None:
     """Print a timing summary when verbose mode is enabled."""
-    duration = time.time() - start
+    duration = time.monotonic() - start
     LOGGER.info("completed in %.2fs; changed=%s", duration, changed_any)
 
 
@@ -803,7 +803,7 @@ def main() -> None:
     loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
     missing_meta: set[str] = set()
     changed_any = False
-    start = time.time()
+    start = time.monotonic()
 
     for pkg in cfg.packages:
         module = loader.load(pkg)

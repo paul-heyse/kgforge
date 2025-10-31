@@ -13,15 +13,14 @@ import ast
 import sys
 import time
 from collections.abc import Iterable, Mapping, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from pprint import pformat
-from typing import Any, cast
+from typing import cast
 
 from tools import (
     CliEnvelope,
     CliEnvelopeBuilder,
-    CliErrorStatus,
-    CliFileStatus,
     build_problem_details,
     get_logger,
     render_cli_envelope,
@@ -42,6 +41,27 @@ except ModuleNotFoundError:  # pragma: no cover - fallback for direct execution
 
 ModuleInfo = _navmap_builder.ModuleInfo
 _collect_module = _navmap_builder._collect_module
+
+type SymbolMetadata = dict[str, str]
+
+
+@dataclass(frozen=True)
+class RepairResult:
+    """Aggregate outcome for repairing a single module."""
+
+    module: Path
+    messages: list[str]
+    changed: bool
+    applied: bool
+
+
+@dataclass(frozen=True)
+class RepairArgs:
+    """CLI arguments normalized for downstream consumption."""
+
+    root: Path
+    apply: bool
+    json: bool
 
 
 def _collect_modules(root: Path) -> list[ModuleInfo]:
@@ -173,7 +193,8 @@ def _docstring_end(tree: ast.Module) -> int | None:
         and isinstance(node.value, ast.Constant)
         and isinstance(node.value.value, str)
     ):
-        return getattr(node, "end_lineno", node.lineno)
+        end_lineno = cast(int | None, getattr(node, "end_lineno", None))
+        return end_lineno if isinstance(end_lineno, int) else node.lineno
     return None
 
 
@@ -204,13 +225,15 @@ def _all_assignment_end(tree: ast.Module) -> int | None:
         if isinstance(node, ast.Assign):
             for target in node.targets:
                 if isinstance(target, ast.Name) and target.id == "__all__":
-                    return getattr(node, "end_lineno", node.lineno)
+                    end_lineno = cast(int | None, getattr(node, "end_lineno", None))
+                    return end_lineno if isinstance(end_lineno, int) else node.lineno
         if (
             isinstance(node, ast.AnnAssign)
             and isinstance(node.target, ast.Name)
             and node.target.id == "__all__"
         ):
-            return getattr(node, "end_lineno", node.lineno)
+            end_lineno = cast(int | None, getattr(node, "end_lineno", None))
+            return end_lineno if isinstance(end_lineno, int) else node.lineno
     return None
 
 
@@ -238,23 +261,27 @@ def _navmap_assignment_span(tree: ast.Module) -> tuple[int, int] | None:
     >>> _navmap_assignment_span(...)
     """
     for node in tree.body:
-        if isinstance(node, (ast.Assign, ast.AnnAssign)):
-            targets: Iterable[ast.expr]
-            targets = node.targets if isinstance(node, ast.Assign) else (node.target,)
-            for target in targets:
-                if isinstance(target, ast.Name) and target.id == "__navmap__":
-                    start = node.lineno
-                    end = getattr(node, "end_lineno", start)
-                    return start, end
+        if isinstance(node, ast.Assign):
+            targets: Iterable[ast.expr] = node.targets
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.expr):
+            targets = (node.target,)
+        else:
+            continue
+        for target in targets:
+            if isinstance(target, ast.Name) and target.id == "__navmap__":
+                start = node.lineno
+                end_lineno = cast(int | None, getattr(node, "end_lineno", None))
+                end = end_lineno if isinstance(end_lineno, int) else start
+                return start, end
     return None
 
 
-def _serialize_navmap(navmap: dict[str, Any]) -> list[str]:
+def _serialize_navmap(navmap: Mapping[str, object]) -> list[str]:
     """Serialize navmap.
 
     Parameters
     ----------
-    navmap : dict[str, Any]
+    navmap : Mapping[str, object]
         Description.
 
     Returns
@@ -272,11 +299,11 @@ def _serialize_navmap(navmap: dict[str, Any]) -> list[str]:
     --------
     >>> _serialize_navmap(...)
     """
-    literal = "__navmap__ = " + pformat(navmap, width=88, sort_dicts=True)
+    literal = "__navmap__ = " + pformat(dict(navmap), width=88, sort_dicts=True)
     return literal.splitlines()
 
 
-def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, Any]:
+def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, object]:
     """Ensure navmap structure.
 
     Parameters
@@ -286,7 +313,7 @@ def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, Any]:
 
     Returns
     -------
-    dict[str, Any]
+    dict[str, object]
         Description.
 
 
@@ -300,7 +327,7 @@ def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, Any]:
     >>> _ensure_navmap_structure(...)
     """
     raw_navmap = info.navmap_dict if info.navmap_dict else {}
-    navmap: dict[str, Any] = dict(raw_navmap)
+    navmap = cast(dict[str, object], dict(raw_navmap))
     exports = _normalize_exports(navmap.get("exports"), info.exports)
     navmap["exports"] = exports
 
@@ -318,40 +345,30 @@ def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, Any]:
     return navmap
 
 
-def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
-    """Compute repair module.
-
-    Carry out the repair module operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+def repair_module(info: ModuleInfo, apply: bool = False) -> RepairResult:
+    """Repair a single module's navmap metadata and optionally persist fixes.
 
     Parameters
     ----------
-    info : ModuleInfo
-        Description for ``info``.
-    apply : bool | None
-        Optional parameter default ``False``. Description for ``apply``.
+    info
+        Metadata describing the target module discovered by ``build_navmap``.
+    apply
+        When ``True`` the computed edits are written back to disk.
 
     Returns
     -------
-    List[str]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.navmap.repair_navmaps import repair_module
-    >>> result = repair_module(...)
-    >>> result  # doctest: +ELLIPSIS
+    RepairResult
+        Outcome describing emitted messages alongside change and apply flags.
     """
     path = info.path
-    text = path.read_text(encoding="utf-8")
-    lines = text.splitlines()
+    original_text = path.read_text(encoding="utf-8")
+    lines = original_text.splitlines()
     tree = _load_tree(path)
 
-    current_navmap = info.navmap_dict or {}
-    exports = _normalize_exports(current_navmap.get("exports"), info.exports)
-    definition_lines = _definition_lines(tree)
+    exports = _normalize_exports((info.navmap_dict or {}).get("exports"), info.exports)
     messages: list[str] = []
 
-    insertions, anchor_messages = _collect_anchor_insertions(info, exports, definition_lines)
+    insertions, anchor_messages = _collect_anchor_insertions(info, exports, _definition_lines(tree))
     messages.extend(anchor_messages)
 
     section_insertion = _public_api_insertion(info, tree)
@@ -363,7 +380,7 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
 
     changed = _apply_insertions(lines, insertions)
 
-    nav_changed, nav_messages = _sync_navmap_literal(info, tree, text, lines, exports)
+    nav_changed, nav_messages = _sync_navmap_literal(info, tree, original_text, lines, exports)
     changed = changed or nav_changed
     messages.extend(nav_messages)
 
@@ -373,39 +390,20 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> list[str]:
             new_text += "\n"
         path.write_text(new_text, encoding="utf-8")
 
-    return messages
+    return RepairResult(
+        module=path,
+        messages=messages,
+        changed=changed,
+        applied=changed and apply,
+    )
 
 
-def repair_all(root: Path, apply: bool) -> list[str]:
-    """Compute repair all.
-
-    Carry out the repair all operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    root : Path
-        Description for ``root``.
-    apply : bool
-        Description for ``apply``.
-
-    Returns
-    -------
-    List[str]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.navmap.repair_navmaps import repair_all
-    >>> result = repair_all(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    """
-    messages: list[str] = []
-    for info in _collect_modules(root):
-        messages.extend(repair_module(info, apply=apply))
-    return messages
+def repair_all(root: Path, apply: bool) -> list[RepairResult]:
+    """Repair every module under ``root`` and aggregate the results."""
+    return [repair_module(info, apply=apply) for info in _collect_modules(root)]
 
 
-def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+def _parse_args(argv: list[str] | None = None) -> RepairArgs:
     """Parse args.
 
     Parameters
@@ -445,7 +443,11 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Emit machine-readable results to stdout using the base CLI envelope schema.",
     )
-    return parser.parse_args(argv)
+    namespace = parser.parse_args(argv)
+    root_arg = cast(Path, namespace.root)
+    apply_flag = cast(bool, namespace.apply)
+    json_flag = cast(bool, namespace.json)
+    return RepairArgs(root=root_arg, apply=apply_flag, json=json_flag)
 
 
 def _build_json_envelope(
@@ -476,17 +478,17 @@ def _build_json_envelope(
                 file_path, detail = msg.split(": ", 1)
                 builder.add_file(
                     path=file_path,
-                    status=cast(CliFileStatus, "violation"),
+                    status="violation",
                     message=detail,
                 )
                 builder.add_error(
-                    status=cast(CliErrorStatus, "violation"),
+                    status="violation",
                     message=detail,
                     file=file_path,
                 )
             else:
                 builder.add_error(
-                    status=cast(CliErrorStatus, "violation"),
+                    status="violation",
                     message=msg,
                 )
 
@@ -521,7 +523,7 @@ def _build_error_envelope(exc: Exception, duration: float) -> CliEnvelope:
         command="repair_navmaps", status="error", subcommand="repair"
     )
     builder.add_error(
-        status=cast(CliErrorStatus, "error"),
+        status="error",
         message=str(exc),
     )
     builder.set_problem(
@@ -563,9 +565,10 @@ def main(argv: list[str] | None = None) -> int:
     root = args.root.resolve()
 
     try:
-        messages = repair_all(root, apply=args.apply)
+        results = repair_all(root, apply=args.apply)
+        messages = [msg for result in results for msg in result.messages]
         duration = time.monotonic() - start_time
-        has_issues = bool(messages)
+        has_issues = any(result.changed or result.messages for result in results)
 
         if args.json:
             envelope = _build_json_envelope(messages, duration, has_issues, args.apply)
@@ -605,34 +608,36 @@ if __name__ == "__main__":
     raise SystemExit(main())
 
 
-def _collect_section_dicts(raw: object) -> list[dict[str, Any]]:
+def _collect_section_dicts(raw: object) -> list[dict[str, object]]:
     """Return section dictionaries extracted from ``raw`` when possible."""
     if not isinstance(raw, list):
         return []
-    sections: list[dict[str, Any]] = []
+    sections: list[dict[str, object]] = []
     for entry in raw:
         if isinstance(entry, dict):
             sections.append(entry)
     return sections
 
 
-def _build_sections(sections: Iterable[dict[str, Any]], exports: list[str]) -> list[dict[str, Any]]:
+def _build_sections(
+    sections: Iterable[dict[str, object]], exports: list[str]
+) -> list[dict[str, object]]:
     """Return the canonical ``sections`` payload with the public API section first."""
     remaining = [section for section in sections if section.get("id") != "public-api"]
     return [{"id": "public-api", "symbols": exports}, *remaining]
 
 
-def _collect_top_level_meta(navmap: Mapping[str, Any]) -> dict[str, Any]:
+def _collect_top_level_meta(navmap: Mapping[str, object]) -> dict[str, object]:
     """Return module metadata declared at the root of ``navmap``."""
-    meta: dict[str, Any] = {}
+    meta: dict[str, object] = {}
     for key in ("owner", "stability", "since", "deprecated_in"):
         value = navmap.get(key)
-        if value is not None:
+        if isinstance(value, str) and value:
             meta[key] = value
     return meta
 
 
-def _normalized_module_meta(navmap: dict[str, Any]) -> dict[str, Any]:
+def _normalized_module_meta(navmap: dict[str, object]) -> dict[str, object]:
     """Return module metadata after merging root-level defaults."""
     module_meta = _coerce_dict(navmap.get("module_meta"))
     top_level = _collect_top_level_meta(navmap)
@@ -642,30 +647,49 @@ def _normalized_module_meta(navmap: dict[str, Any]) -> dict[str, Any]:
     return module_meta
 
 
-def _normalized_symbols(raw: object) -> dict[str, dict[str, Any]]:
+def _normalized_symbols(raw: object) -> dict[str, SymbolMetadata]:
     """Return symbol metadata dictionaries keyed by symbol name."""
     if not isinstance(raw, dict):
         return {}
-    result: dict[str, dict[str, Any]] = {}
+    result: dict[str, SymbolMetadata] = {}
     for name, meta in raw.items():
-        if isinstance(name, str) and isinstance(meta, dict):
-            result[name] = dict(meta)
+        if not isinstance(name, str) or not isinstance(meta, dict):
+            continue
+        filtered: SymbolMetadata = {
+            key: value
+            for key, value in meta.items()
+            if isinstance(key, str) and isinstance(value, str) and value
+        }
+        if filtered:
+            result[name] = filtered
     return result
 
 
 def _apply_symbol_defaults(
-    symbols_meta: dict[str, dict[str, Any]],
+    symbols_meta: dict[str, SymbolMetadata],
     exports: Iterable[str],
-    module_meta: Mapping[str, Any],
+    module_meta: Mapping[str, object],
 ) -> None:
     """Ensure every exported symbol inherits module-level defaults."""
     owner_default = module_meta.get("owner", "@todo-owner")
+    if not isinstance(owner_default, str) or not owner_default:
+        owner_default = "@todo-owner"
+
     stability_default = module_meta.get("stability", "experimental")
+    if not isinstance(stability_default, str) or not stability_default:
+        stability_default = "experimental"
+
     since_default = module_meta.get("since", "0.0.0")
-    deprecated_default = module_meta.get("deprecated_in")
+    if not isinstance(since_default, str) or not since_default:
+        since_default = "0.0.0"
+
+    deprecated_raw = module_meta.get("deprecated_in")
+    deprecated_default = deprecated_raw if isinstance(deprecated_raw, str) else None
 
     for name in exports:
-        fields = symbols_meta.setdefault(name, {})
+        if name not in symbols_meta:
+            symbols_meta[name] = _empty_symbol_meta()
+        fields = symbols_meta[name]
         fields.setdefault("owner", owner_default)
         fields.setdefault("stability", stability_default)
         fields.setdefault("since", since_default)
@@ -681,14 +705,24 @@ def _normalize_exports(value: object, fallback: Iterable[str]) -> list[str]:
         candidates = fallback
 
     exports: list[str] = [item for item in candidates if isinstance(item, str)]
-    # ``dict.fromkeys`` preserves order while deduplicating.
-    return list(dict.fromkeys(exports))
+    seen: set[str] = set()
+    result: list[str] = []
+    for item in exports:
+        if item not in seen:
+            seen.add(item)
+            result.append(item)
+    return result
 
 
-def _coerce_dict(value: object) -> dict[str, Any]:
-    """Return ``value`` as a shallow ``dict[str, Any]`` when possible."""
+def _coerce_dict(value: object) -> dict[str, object]:
+    """Return ``value`` as a shallow ``dict[str, object]`` when possible."""
     if isinstance(value, dict):
-        return dict(value)
+        return {k: v for k, v in value.items() if isinstance(k, str)}
+    return {}
+
+
+def _empty_symbol_meta() -> SymbolMetadata:
+    """Return an empty symbol metadata mapping."""
     return {}
 
 
@@ -721,11 +755,16 @@ def _public_api_insertion(info: ModuleInfo, tree: ast.Module) -> tuple[int, str]
     return doc_end, "# [nav:section public-api]"
 
 
+def _insertion_index(entry: tuple[int, str]) -> int:
+    """Return the insertion index for sorting."""
+    return entry[0]
+
+
 def _apply_insertions(lines: list[str], insertions: list[tuple[int, str]]) -> bool:
     """Apply ``insertions`` to ``lines`` preserving relative order."""
     if not insertions:
         return False
-    insertions.sort(key=lambda item: item[0])
+    insertions.sort(key=_insertion_index)
     for offset, (index, content) in enumerate(insertions):
         lines.insert(index + offset, content)
     return True

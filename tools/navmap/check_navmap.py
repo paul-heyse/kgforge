@@ -13,12 +13,13 @@ import ast
 import re
 import sys
 from collections.abc import Sequence
-from functools import singledispatch
 from pathlib import Path
 from typing import TypedDict, cast
 
 from packaging.version import InvalidVersion, Version
-from tools._shared.logging import get_logger
+from tools import get_logger
+from tools.navmap.build_navmap import NavmapError as BuildNavmapError
+from tools.navmap.build_navmap import build_index
 
 LOGGER = get_logger(__name__)
 
@@ -131,36 +132,26 @@ class NavIndexDict(TypedDict, total=False):
     modules: dict[str, ModuleEntryDict]
 
 
-@singledispatch
 def _eval_nav_literal(node: ast.AST) -> NavTree:
     """Return the navmap literal represented by ``node``."""
+    if isinstance(node, ast.Constant):
+        return _eval_constant(node)
+    if isinstance(node, ast.Name):
+        return _eval_name(node)
+    if isinstance(node, (ast.List, ast.Tuple)):
+        return _eval_sequence(node.elts)
+    if isinstance(node, ast.Set):
+        return _eval_set(node)
+    if isinstance(node, ast.Dict):
+        return _eval_dict(node)
+    if isinstance(node, ast.DictComp):
+        return _eval_dict_comprehension(node)
     message = f"Unsupported navmap literal node: {ast.dump(node)}"
     raise NavmapLiteralError(message)
 
 
-@_eval_nav_literal.register
-def _(node: ast.Constant) -> NavTree:
-    """.
-
-    Parameters
-    ----------
-    node : ast.Constant
-        Description.
-
-    Returns
-    -------
-    NavTree
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _(...)
-    """
+def _eval_constant(node: ast.Constant) -> NavTree:
+    """Return the literal value encoded by ``node`` when supported."""
     value = node.value
     if isinstance(value, (str, int, float, bool)) or value is None:
         return value
@@ -168,29 +159,8 @@ def _(node: ast.Constant) -> NavTree:
     raise NavmapLiteralError(message)
 
 
-@_eval_nav_literal.register
-def _(node: ast.Name) -> NavTree:
-    """.
-
-    Parameters
-    ----------
-    node : ast.Name
-        Description.
-
-    Returns
-    -------
-    NavTree
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _(...)
-    """
+def _eval_name(node: ast.Name) -> NavTree:
+    """Resolve placeholder names used inside navmap literals."""
     if node.id == "__all__":
         return PLACEHOLDER_ALL
     message = f"Unsupported name in navmap literal: {node.id!r}"
@@ -202,81 +172,8 @@ def _eval_sequence(nodes: Sequence[ast.AST]) -> list[NavTree]:
     return [_literal_eval_navmap(child) for child in nodes]
 
 
-@_eval_nav_literal.register
-def _(node: ast.List) -> NavTree:
-    """.
-
-    Parameters
-    ----------
-    node : ast.List
-        Description.
-
-    Returns
-    -------
-    NavTree
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _(...)
-    """
-    return _eval_sequence(node.elts)
-
-
-@_eval_nav_literal.register
-def _(node: ast.Tuple) -> NavTree:
-    """.
-
-    Parameters
-    ----------
-    node : ast.Tuple
-        Description.
-
-    Returns
-    -------
-    NavTree
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _(...)
-    """
-    return _eval_sequence(node.elts)
-
-
-@_eval_nav_literal.register
-def _(node: ast.Set) -> NavTree:
-    """.
-
-    Parameters
-    ----------
-    node : ast.Set
-        Description.
-
-    Returns
-    -------
-    NavTree
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _(...)
-    """
+def _eval_set(node: ast.Set) -> set[NavTree]:
+    """Evaluate a set literal into navmap values."""
     return {_literal_eval_navmap(elt) for elt in node.elts}
 
 
@@ -290,32 +187,6 @@ def _eval_dict(node: ast.Dict) -> dict[str, NavTree]:
             raise NavmapLiteralError(message)
         result[key] = _literal_eval_navmap(value_node)
     return result
-
-
-@_eval_nav_literal.register
-def _(node: ast.Dict) -> NavTree:
-    """.
-
-    Parameters
-    ----------
-    node : ast.Dict
-        Description.
-
-    Returns
-    -------
-    NavTree
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _(...)
-    """
-    return _eval_dict(node)
 
 
 def _eval_dict_comprehension(node: ast.DictComp) -> AllDictTemplate:
@@ -342,32 +213,6 @@ def _eval_dict_comprehension(node: ast.DictComp) -> AllDictTemplate:
     return AllDictTemplate(template)
 
 
-@_eval_nav_literal.register
-def _(node: ast.DictComp) -> NavTree:
-    """.
-
-    Parameters
-    ----------
-    node : ast.DictComp
-        Description.
-
-    Returns
-    -------
-    NavTree
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _(...)
-    """
-    return _eval_dict_comprehension(node)
-
-
 def _literal_eval_navmap(node: ast.AST | None) -> NavTree:
     """Evaluate ``node`` into a navmap literal."""
     if node is None:
@@ -378,7 +223,13 @@ def _literal_eval_navmap(node: ast.AST | None) -> NavTree:
 
 def _dedupe_str_list(items: Sequence[str]) -> list[str]:
     """Return ``items`` with original ordering and duplicates removed."""
-    return list(dict.fromkeys(items))
+    seen: set[str] = set()
+    unique: list[str] = []
+    for item in items:
+        if item not in seen:
+            seen.add(item)
+            unique.append(item)
+    return unique
 
 
 def _expand_all_placeholder(exports: Sequence[str]) -> list[ResolvedNavValue]:
@@ -515,7 +366,7 @@ def _read_text(py: Path) -> list[str]:
     """Return file contents as a list of lines, or an empty list on failure."""
     try:
         return py.read_text(encoding="utf-8").splitlines()
-    except Exception:
+    except (OSError, UnicodeDecodeError):
         return []
 
 
@@ -788,7 +639,7 @@ def _module_path(py: Path) -> str | None:
     """Return the dotted module path for ``py`` within ``src/`` if possible."""
     try:
         rel = py.relative_to(SRC)
-    except Exception:
+    except ValueError:
         return None
     if rel.suffix != ".py":
         return None
@@ -797,10 +648,10 @@ def _module_path(py: Path) -> str | None:
 
 def _validate_pep440(field_val: object) -> str | None:
     """Validate PEP 440 version strings and report an error message when invalid."""
-    if field_val is None or field_val == "":
+    if field_val is None:
         return None
-    if Version is None:
-        return "packaging not installed (cannot validate PEP 440)"
+    if isinstance(field_val, str) and not field_val.strip():
+        return None
     try:
         Version(str(field_val))
     except InvalidVersion:
@@ -858,14 +709,11 @@ def main(argv: list[str] | None = None) -> int:
 
     # Round-trip check: compare freshly built JSON to inline markers
     try:
-        # Local import to avoid creating a hard dependency in module scope
-        from tools.navmap.build_navmap import build_index
-    except Exception:  # pragma: no cover
-        LOGGER.exception("navmap check: unable to import build_navmap for round-trip")
+        index = build_index(json_path=INDEX)
+    except BuildNavmapError:
+        LOGGER.exception("navmap check: build_navmap failed during round-trip")
         return 1
-
-    index = build_index(json_path=INDEX)  # also refreshes file on disk
-    rt_errs = _round_trip_errors(cast(dict[str, object], index))
+    rt_errs = _round_trip_errors(index)
 
     if rt_errs:
         LOGGER.error("\n".join(rt_errs))
