@@ -14,70 +14,74 @@ Examples
 
 from __future__ import annotations
 
+import io
 import re
 import sys
+import tokenize
+from collections.abc import Iterable
+from dataclasses import dataclass
 from pathlib import Path
 
 from tools._shared.logging import get_logger
 
 LOGGER = get_logger(__name__)
 
-# Pattern to match type ignore or noqa with optional ticket tag
-SUPPRESSION_PATTERN = re.compile(
-    r"(?:#\s*(?:type:\s*ignore|noqa(?::\s*[\w,]+)?))(?:\s*#\s*(?:.*?TICKET:.*?))?$",
-    re.MULTILINE,
+# Regex patterns for suppression markers and ticket tags within a comment token.
+SUPPRESSION_MARKER = re.compile(
+    r"#\s*(?:type\s*:\s*ignore|noqa(?:\s*[:\s][\w,]+)?)",
+    re.IGNORECASE,
 )
+TICKET_PATTERN = re.compile(r"#\s*TICKET:\s*\S+", re.IGNORECASE)
 
-TICKET_PATTERN = re.compile(r"TICKET:\s*\S+", re.IGNORECASE)
+
+@dataclass(frozen=True, slots=True)
+class SuppressionViolation:
+    """Record representing a suppression comment missing a ``TICKET:`` tag."""
+
+    path: Path
+    line_number: int
+    line_preview: str
 
 
-def check_file(file_path: Path) -> list[tuple[int, str]]:
-    """Check a single file for untracked suppressions.
+def _iter_suppression_comments(content: str) -> Iterable[tuple[int, str]]:
+    """Yield ``(line_number, comment)`` pairs for suppression comments."""
+    reader = io.StringIO(content).readline
+    for token in tokenize.generate_tokens(reader):
+        if token.type != tokenize.COMMENT:
+            continue
+        comment = token.string
+        if SUPPRESSION_MARKER.search(comment):
+            yield token.start[0], comment
 
-    Parameters
-    ----------
-    file_path : Path
-        Path to the Python file to check.
 
-    Returns
-    -------
-    list[tuple[int, str]]
-        List of (line_number, line_content) tuples for lines with untracked suppressions.
-    """
-    violations: list[tuple[int, str]] = []
+def check_file(file_path: Path) -> list[SuppressionViolation]:
+    """Return suppressions lacking ``TICKET:`` metadata within ``file_path``."""
     try:
         content = file_path.read_text(encoding="utf-8")
-        lines = content.splitlines()
-
-        for line_num, line in enumerate(lines, start=1):
-            # Check for type: ignore or noqa
-            if ("# type: ignore" in line or "# noqa" in line) and not TICKET_PATTERN.search(line):
-                violations.append((line_num, line.strip()))
-
     except (OSError, UnicodeDecodeError) as exc:
-        # If we can't read the file, report but don't fail (may be binary)
-        LOGGER.warning("Could not read %s: %s", file_path, exc)
+        LOGGER.warning("Could not read %s", file_path, exc_info=exc)
         return []
+
+    lines = content.splitlines()
+    violations: list[SuppressionViolation] = []
+
+    for line_number, comment in _iter_suppression_comments(content):
+        if TICKET_PATTERN.search(comment):
+            continue
+
+        preview = lines[line_number - 1].strip() if 0 < line_number <= len(lines) else ""
+        violations.append(
+            SuppressionViolation(path=file_path, line_number=line_number, line_preview=preview)
+        )
 
     return violations
 
 
-def check_directory(directory: Path) -> dict[Path, list[tuple[int, str]]]:
-    """Check all Python files in a directory for untracked suppressions.
+def check_directory(directory: Path) -> dict[Path, list[SuppressionViolation]]:
+    """Return per-file suppressions lacking ``TICKET:`` metadata."""
+    violations: dict[Path, list[SuppressionViolation]] = {}
 
-    Parameters
-    ----------
-    directory : Path
-        Directory to scan for Python files.
-
-    Returns
-    -------
-    dict[Path, list[tuple[int, str]]]
-        Dictionary mapping file paths to lists of violations.
-    """
-    violations: dict[Path, list[tuple[int, str]]] = {}
-
-    for py_file in directory.rglob("*.py"):
+    for py_file in sorted(directory.rglob("*.py")):
         file_violations = check_file(py_file)
         if file_violations:
             violations[py_file] = file_violations
@@ -86,13 +90,7 @@ def check_directory(directory: Path) -> dict[Path, list[tuple[int, str]]]:
 
 
 def main() -> int:
-    """Check source files for untracked suppressions.
-
-    Returns
-    -------
-    int
-        Exit code: 0 if all suppressions tracked, 1 if violations found.
-    """
+    """Check source files for untracked suppressions."""
     if len(sys.argv) < 2:
         LOGGER.error("Usage: python tools/check_new_suppressions.py <directory>")
         return 1
@@ -105,11 +103,16 @@ def main() -> int:
     violations = check_directory(target_dir)
 
     if not violations:
-        LOGGER.info("✅ All suppressions include TICKET: tags")
+        LOGGER.info("✅ All suppressions include TICKET: tags", extra={"path": str(target_dir)})
         return 0
 
-    LOGGER.error("❌ Found suppressions without TICKET: tags:")
-    LOGGER.error("")
+    LOGGER.error(
+        "❌ Found suppressions without TICKET: tags",
+        extra={
+            "path": str(target_dir),
+            "violation_count": sum(len(v) for v in violations.values()),
+        },
+    )
 
     cwd = Path.cwd()
     for file_path, file_violations in sorted(violations.items()):
@@ -117,10 +120,18 @@ def main() -> int:
             rel_path = file_path.relative_to(cwd)
         except ValueError:
             rel_path = file_path
-        LOGGER.error("%s:", rel_path)
-        for line_num, line_content in file_violations:
-            LOGGER.error("  Line %s: %s", line_num, line_content)
-        LOGGER.error("")
+        LOGGER.error("%s:", rel_path, extra={"path": str(rel_path)})
+        for violation in file_violations:
+            LOGGER.error(
+                "  Line %s: %s",
+                violation.line_number,
+                violation.line_preview,
+                extra={
+                    "path": str(rel_path),
+                    "line": violation.line_number,
+                    "line_preview": violation.line_preview,
+                },
+            )
 
     LOGGER.error("Fix: Add TICKET: <ticket-id> to each suppression line.")
     LOGGER.error("Example: # type: ignore[misc]  # TICKET: ABC-123  # numpy dtype contains Any")
