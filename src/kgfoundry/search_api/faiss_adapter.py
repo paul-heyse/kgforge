@@ -8,7 +8,6 @@ import search_api.faiss_adapter as _module
 from kgfoundry.namespace_bridge import (
     namespace_attach,
     namespace_dir,
-    namespace_exports,
     namespace_getattr,
 )
 from search_api.faiss_adapter import HAVE_FAISS, DenseVecs, FaissAdapter, VecArray

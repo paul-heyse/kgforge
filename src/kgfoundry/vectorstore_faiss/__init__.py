@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-import vectorstore_faiss as _module
 from typing import cast
+
+import vectorstore_faiss as _module
 from kgfoundry._namespace_proxy import (
     namespace_attach,
     namespace_dir,

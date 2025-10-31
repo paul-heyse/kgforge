@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 from typing import cast
 
 import msgspec
+
 from tools.navmap.models import NavIndex, SymbolMeta
 
 NAVMAP_SCHEMA = "navmap_document.json"

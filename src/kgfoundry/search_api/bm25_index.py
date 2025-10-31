@@ -8,7 +8,6 @@ import search_api.bm25_index as _module
 from kgfoundry.namespace_bridge import (
     namespace_attach,
     namespace_dir,
-    namespace_exports,
     namespace_getattr,
 )
 from search_api.bm25_index import BM25Doc, BM25Index, toks

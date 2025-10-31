@@ -1,4 +1,4 @@
-project-includes = ["src", "tests"]
+project-includes = ["src", "tests", "tools"]
 project-excludes = [
     "**/tests/fixtures*",
     "**/build/",

@@ -3,6 +3,9 @@ from __future__ import annotations
 import datetime as dt
 import inspect
 from pathlib import Path
+from typing import Literal
+
+import pytest
 
 from tools.docstring_builder.harvest import ParameterHarvest, SymbolHarvest
 from tools.docstring_builder.policy import (
@@ -22,7 +25,7 @@ def _make_semantic(
     parameter_description: str = "todo",
     return_description: str = "todo",
     qname: str = "pkg.module.func",
-    kind: str = "function",
+    kind: Literal["class", "function", "method"] = "function",
     decorators: list[str] | None = None,
     schema_parameters: list[ParameterDoc] | None = None,
     examples: list[str] | None = None,

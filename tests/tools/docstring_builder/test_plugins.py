@@ -2,14 +2,20 @@ from __future__ import annotations
 
 import warnings
 from pathlib import Path
-from typing import cast
+from typing import ClassVar, Literal, cast
 
 import pytest
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import SymbolHarvest
 from tools.docstring_builder.models import PluginExecutionError
 from tools.docstring_builder.plugins import load_plugins
-from tools.docstring_builder.plugins.base import LegacyPluginAdapter, PluginContext
+from tools.docstring_builder.plugins.base import (
+    DocstringBuilderPlugin,
+    LegacyPluginAdapter,
+    PluginContext,
+    PluginStage,
+    TransformerPlugin,
+)
 from tools.docstring_builder.plugins.dataclass_fields import DataclassFieldDocPlugin
 from tools.docstring_builder.schema import DocstringSchema, ParameterDoc
 from tools.docstring_builder.semantics import SemanticResult
@@ -72,7 +78,10 @@ class ModuleClass:
     )
 
     config = BuilderConfig()
-    manager = load_plugins(config, tmp_path, builtin=[DataclassFieldDocPlugin])
+    builtin_plugins = cast(
+        tuple[type[DocstringBuilderPlugin], ...], (DataclassFieldDocPlugin,)
+    )
+    manager = load_plugins(config, tmp_path, builtin=builtin_plugins)
     result = _semantic_result(module_path)
     first = manager.apply_transformers(module_path, [result])[0]
     second = manager.apply_transformers(module_path, [result])[0]
@@ -86,23 +95,23 @@ class ModuleClass:
     assert first.schema.parameters == second.schema.parameters
 
 
-class RecordingPlugin:
-    name = "recording"
-    stage = "transformer"
+class RecordingPlugin(TransformerPlugin):
+    name: ClassVar[str] = "recording"
+    stage: ClassVar[Literal["transformer"]] = "transformer"
 
     def __init__(self) -> None:
         self.invocations = 0
 
-    def on_start(self, context: object) -> None:  # pragma: no cover - no-op hook
+    def on_start(self, context: PluginContext) -> None:  # pragma: no cover - no-op hook  # noqa: PLR6301
         del context
 
-    def on_finish(self, context: object) -> None:  # pragma: no cover - no-op hook
+    def on_finish(self, context: PluginContext) -> None:  # pragma: no cover - no-op hook  # noqa: PLR6301
         del context
 
-    def apply(self, context: object, result: SemanticResult) -> SemanticResult:
+    def apply(self, context: PluginContext, payload: SemanticResult) -> SemanticResult:
         del context
         self.invocations += 1
-        return result
+        return payload
 
 
 class UnusedPlugin(RecordingPlugin):
@@ -115,7 +124,9 @@ def test_plugin_only_and_disable_filters(tmp_path: Path) -> None:
         config,
         tmp_path,
         only=["recording"],
-        builtin=[RecordingPlugin, UnusedPlugin],
+        builtin=cast(
+            tuple[type[DocstringBuilderPlugin], ...], (RecordingPlugin, UnusedPlugin)
+        ),
     )
     assert [plugin.name for plugin in only_manager.transformers] == ["recording"]
     assert "unused" in only_manager.skipped
@@ -128,31 +139,31 @@ def test_plugin_only_and_disable_filters(tmp_path: Path) -> None:
         config,
         tmp_path,
         disable=["recording"],
-        builtin=[RecordingPlugin],
+        builtin=cast(tuple[type[DocstringBuilderPlugin], ...], (RecordingPlugin,)),
     )
     assert disable_manager.transformers == []
     assert disable_manager.disabled == ["recording"]
 
 
-class FailingPlugin:
-    name = "failing"
-    stage = "transformer"
+class FailingPlugin(TransformerPlugin):
+    name: ClassVar[str] = "failing"
+    stage: ClassVar[Literal["transformer"]] = "transformer"
 
-    def on_start(self, context: object) -> None:  # pragma: no cover - no-op hook
+    def on_start(self, context: PluginContext) -> None:  # pragma: no cover - no-op hook  # noqa: PLR6301
         del context
 
-    def on_finish(self, context: object) -> None:  # pragma: no cover - no-op hook
+    def on_finish(self, context: PluginContext) -> None:  # pragma: no cover - no-op hook  # noqa: PLR6301
         del context
 
-    def apply(self, context: object, result: SemanticResult) -> SemanticResult:
-        del context, result
+    def apply(self, context: PluginContext, payload: SemanticResult) -> SemanticResult:  # noqa: PLR6301
+        del context, payload
         message = "plugin failure"
         raise ValueError(message)
 
 
 def test_plugin_failures_raise_plugin_execution_error(tmp_path: Path) -> None:
     config = BuilderConfig()
-    manager = load_plugins(config, tmp_path, builtin=[FailingPlugin])
+    manager = load_plugins(config, tmp_path, builtin=cast(tuple[type[DocstringBuilderPlugin], ...], (FailingPlugin,)))
     result = _semantic_result(tmp_path / "module.py")
     with pytest.raises(PluginExecutionError) as excinfo:
         manager.apply_transformers(result.symbol.filepath, [result])
@@ -162,11 +173,17 @@ def test_plugin_failures_raise_plugin_execution_error(tmp_path: Path) -> None:
 class LegacyTransformerPlugin:
     """Legacy plugin using the deprecated run() API."""
 
-    name = "legacy_transformer"
-    stage = "transformer"
+    name: ClassVar[str] = "legacy_transformer"
+    stage: ClassVar[Literal["transformer"]] = "transformer"
 
     def __init__(self) -> None:
         self.invocations = 0
+
+    def on_start(self, context: PluginContext) -> None:  # pragma: no cover - legacy hook  # noqa: PLR6301
+        del context
+
+    def on_finish(self, context: PluginContext) -> None:  # pragma: no cover - legacy hook  # noqa: PLR6301
+        del context
 
     def run(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
         """Legacy run() method."""
@@ -178,7 +195,9 @@ class LegacyTransformerPlugin:
 def test_legacy_plugin_adapter_warns_and_delegates(tmp_path: Path) -> None:
     """LegacyPluginAdapter emits deprecation warnings and delegates to run()."""
     config = BuilderConfig()
-    manager = load_plugins(config, tmp_path, builtin=[LegacyTransformerPlugin])
+    manager = load_plugins(config, tmp_path, builtin=cast(
+            tuple[type[DocstringBuilderPlugin], ...], (LegacyTransformerPlugin,)
+        ))
     result = _semantic_result(tmp_path / "module.py")
 
     with pytest.warns(DeprecationWarning, match="uses the legacy run\\(\\) API"):

@@ -95,7 +95,9 @@ def test_problem_from_exception_converts_exception() -> None:
     assert problem["type"] == "https://kgfoundry.dev/problems/invalid-input"
     assert problem["title"] == "Invalid input"
     assert problem["status"] == 400
-    assert "Invalid input provided" in problem["detail"]
+    detail = problem["detail"]
+    assert isinstance(detail, str)
+    assert "Invalid input provided" in detail
     assert problem["exception_type"] == "ValueError"
 
 
