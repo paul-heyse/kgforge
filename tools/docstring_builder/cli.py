@@ -29,7 +29,6 @@ import importlib
 import json
 import logging
 import os
-import subprocess
 import sys
 import time
 from collections import Counter
@@ -38,6 +37,8 @@ from pathlib import Path
 from typing import cast
 
 import yaml
+from tools._shared.logging import get_logger, with_fields
+from tools._shared.proc import ToolExecutionError, run_tool
 from tools.docstring_builder import BUILDER_VERSION
 from tools.docstring_builder.apply import apply_edits
 from tools.docstring_builder.cache import BuilderCache
@@ -64,6 +65,7 @@ from tools.docstring_builder.models import (
     ErrorReport,
     FileReport,
     InputHash,
+    ProblemDetails,
     RunStatus,
     SchemaViolationError,
     StatusCounts,
@@ -88,7 +90,7 @@ from tools.docstring_builder.semantics import SemanticResult, build_semantic_sch
 from tools.drift_preview import DocstringDriftEntry, write_docstring_drift, write_html_diff
 from tools.stubs.drift_check import run as run_stub_drift
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(__name__)
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CACHE_PATH = REPO_ROOT / ".cache" / "docstring_builder.json"
 DOCFACTS_PATH = REPO_ROOT / "docs" / "_build" / "docfacts.json"
@@ -175,6 +177,44 @@ def _status_from_label(label: str) -> RunStatus:
             return RunStatus.ERROR
 
 
+def _http_status_for_exit(status: ExitStatus) -> int:
+    match status:
+        case ExitStatus.SUCCESS:
+            return 200
+        case ExitStatus.VIOLATION:
+            return 422
+        case ExitStatus.CONFIG:
+            return 400
+        case ExitStatus.ERROR:
+            return 500
+    return 500
+
+
+def _build_problem_details(
+    status: ExitStatus,
+    errors: Sequence[ErrorReport],
+    *,
+    command: str,
+    subcommand: str,
+) -> ProblemDetails | None:
+    if status is ExitStatus.SUCCESS:
+        return None
+    detail = errors[0]["message"] if errors else f"Run exited with {STATUS_LABELS[status]}"
+    problem: ProblemDetails = {
+        "type": "https://kgfoundry.dev/problems/docbuilder/run-failed",
+        "title": "Docstring builder run failed",
+        "status": _http_status_for_exit(status),
+        "detail": detail,
+        "instance": f"urn:docbuilder:{datetime.datetime.now(datetime.UTC).isoformat()}",
+        "extensions": {
+            "command": command,
+            "subcommand": subcommand,
+            "errorCount": len(errors),
+        },
+    }
+    return problem
+
+
 def _handle_schema_violation(context: str, exc: SchemaViolationError) -> None:
     if TYPED_PIPELINE_ENABLED:
         raise exc
@@ -226,8 +266,14 @@ _DEFAULT_PROVENANCE_TIMESTAMP = "1970-01-01T00:00:00Z"
 
 def _git_output(arguments: Sequence[str]) -> str | None:
     """Return stripped stdout for a git command or ``None`` on failure."""
-    result = subprocess.run(arguments, check=False, text=True, capture_output=True)
+    adapter = with_fields(LOGGER, command=list(arguments))
+    try:
+        result = run_tool(arguments, timeout=10.0)
+    except ToolExecutionError as exc:  # pragma: no cover - git unavailable
+        adapter.debug("git invocation failed: %s", exc)
+        return None
     if result.returncode != 0:
+        adapter.debug("git returned non-zero exit code: %s", result.returncode)
         return None
     output = result.stdout.strip()
     return output or None
@@ -302,9 +348,23 @@ def _read_baseline_version(baseline: str, path: Path) -> str | None:
         "show",
         f"{baseline}:{relative.as_posix()}",
     ]
-    result = subprocess.run(command, check=False, text=True, capture_output=True)
+    try:
+        result = run_tool(command, timeout=10.0)
+    except ToolExecutionError as exc:  # pragma: no cover - git missing
+        LOGGER.debug(
+            "Unable to read %s from baseline %s: %s",
+            relative,
+            baseline,
+            exc,
+        )
+        return None
     if result.returncode != 0:
-        LOGGER.debug("Unable to read %s from baseline %s: %s", relative, baseline, result.stderr)
+        LOGGER.debug(
+            "Unable to read %s from baseline %s: %s",
+            relative,
+            baseline,
+            result.stderr,
+        )
         return None
     return result.stdout
 
@@ -454,7 +514,11 @@ def _should_ignore(path: Path, config: BuilderConfig) -> bool:
 
 def _changed_files_since(revision: str) -> set[str]:
     cmd = ["git", "-C", str(REPO_ROOT), "diff", "--name-only", revision, "HEAD", "--"]
-    result = subprocess.run(cmd, check=False, text=True, capture_output=True)
+    try:
+        result = run_tool(cmd, timeout=20.0)
+    except ToolExecutionError as exc:  # pragma: no cover - git missing
+        LOGGER.warning("git diff failed: %s", exc)
+        return set()
     if result.returncode != 0:
         LOGGER.warning("git diff failed: %s", result.stderr.strip())
         return set()
@@ -550,7 +614,7 @@ def _collect_edits(
     return edits, semantics, ir_entries
 
 
-def _handle_docfacts(
+def _handle_docfacts(  # noqa: C901
     docfacts: list[DocFact],
     config: BuilderConfig,
     check_mode: bool,
@@ -624,7 +688,7 @@ def _load_docfacts_from_disk() -> dict[str, DocFact]:
     return entries
 
 
-def _load_docfact_state(config: BuilderConfig) -> tuple[dict[str, DocFact], dict[str, Path]]:
+def _load_docfact_state() -> tuple[dict[str, DocFact], dict[str, Path]]:
     """Load docfact entries along with best-effort source mapping."""
     entries = _load_docfacts_from_disk()
     sources: dict[str, Path] = {}
@@ -678,7 +742,10 @@ def _default_since_revision() -> str | None:
         ["git", "-C", str(REPO_ROOT), "rev-parse", "HEAD~1"],
     ]
     for cmd in candidates:
-        result = subprocess.run(cmd, check=False, text=True, capture_output=True)
+        try:
+            result = run_tool(cmd, timeout=10.0)
+        except ToolExecutionError:
+            continue
         if result.returncode == 0:
             revision = result.stdout.strip()
             if revision:
@@ -870,7 +937,7 @@ def _run(  # noqa: C901, PLR0912, PLR0915
     files: Iterable[Path], args: argparse.Namespace, config: BuilderConfig
 ) -> int:
     cache = BuilderCache(CACHE_PATH)
-    docfact_entries, docfact_sources = _load_docfact_state(config)
+    docfact_entries, docfact_sources = _load_docfact_state()
     is_update = args.command == "update"
     is_check = args.command == "check"
     start = time.perf_counter()
@@ -1307,6 +1374,14 @@ def _run(  # noqa: C901, PLR0912, PLR0915
             cli_result["docfacts"] = docfacts_report
             if options.baseline:
                 cli_result["baseline"] = options.baseline
+            problem = _build_problem_details(
+                exit_status,
+                errors,
+                command=args.command or "",
+                subcommand=invoked,
+            )
+            if problem is not None:
+                cli_result["problem"] = problem
             try:
                 validate_cli_output(cli_result)
             except SchemaViolationError as exc:
@@ -1390,7 +1465,7 @@ def _command_list(args: argparse.Namespace) -> int:
         result = harvest_file(file_path, config, REPO_ROOT)
         for symbol in result.symbols:
             if symbol.owned:
-                print(symbol.qname)
+                sys.stdout.write(f"{symbol.qname}\n")
     return EXIT_SUCCESS
 
 
@@ -1532,7 +1607,7 @@ def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PL
         drift_status = run_stub_drift()
         if drift_status != 0:
             message = "Stub drift detected; see output above."
-            print(message)
+            sys.stdout.write(f"{message}\n")
             issues.append(message)
 
     if issues:

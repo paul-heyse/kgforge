@@ -105,6 +105,24 @@ class PolicyReport:
     violations: list[PolicyViolation]
 
 
+_ACTION_KEY_ALIASES: Mapping[str, str] = {
+    "coverage": "coverage_action",
+    "coverage_action": "coverage_action",
+    "missing_params": "missing_params_action",
+    "missing_params_action": "missing_params_action",
+    "missing_returns": "missing_returns_action",
+    "missing_returns_action": "missing_returns_action",
+    "missing_examples": "missing_examples_action",
+    "missing_examples_action": "missing_examples_action",
+    "summary_mood": "summary_mood_action",
+    "summary_mood_action": "summary_mood_action",
+    "dataclass_parity": "dataclass_parity_action",
+    "dataclass_parity_action": "dataclass_parity_action",
+}
+
+_MIN_SUMMARY_WORD_LENGTH = 3
+
+
 def _read_pyproject_policy(repo_root: Path) -> Mapping[str, Any]:
     pyproject = repo_root / "pyproject.toml"
     if not pyproject.exists():
@@ -143,45 +161,31 @@ def _parse_exceptions(entries: Iterable[Mapping[str, Any]]) -> list[PolicyExcept
     return parsed
 
 
+def _normalized_key(key: str) -> str:
+    return key.strip().replace("-", "_").lower()
+
+
 def _apply_mapping(settings: PolicySettings, mapping: Mapping[str, Any]) -> None:
-    if "coverage-threshold" in mapping:
-        settings.coverage_threshold = float(mapping["coverage-threshold"])
-    if "coverage_action" in mapping:
-        settings.coverage_action = PolicyAction.parse(str(mapping["coverage_action"]))
-    if "coverage-action" in mapping:
-        settings.coverage_action = PolicyAction.parse(str(mapping["coverage-action"]))
-    if "missing_params_action" in mapping:
-        settings.missing_params_action = PolicyAction.parse(str(mapping["missing_params_action"]))
-    if "missing-params-action" in mapping:
-        settings.missing_params_action = PolicyAction.parse(str(mapping["missing-params-action"]))
-    if "missing_returns_action" in mapping:
-        settings.missing_returns_action = PolicyAction.parse(str(mapping["missing_returns_action"]))
-    if "missing-returns-action" in mapping:
-        settings.missing_returns_action = PolicyAction.parse(str(mapping["missing-returns-action"]))
-    if "missing_examples_action" in mapping:
-        settings.missing_examples_action = PolicyAction.parse(
-            str(mapping["missing_examples_action"])
-        )
-    if "missing-examples-action" in mapping:
-        settings.missing_examples_action = PolicyAction.parse(
-            str(mapping["missing-examples-action"])
-        )
-    if "summary_mood_action" in mapping:
-        settings.summary_mood_action = PolicyAction.parse(str(mapping["summary_mood_action"]))
-    if "summary-mood-action" in mapping:
-        settings.summary_mood_action = PolicyAction.parse(str(mapping["summary-mood-action"]))
-    if "dataclass_parity_action" in mapping:
-        settings.dataclass_parity_action = PolicyAction.parse(
-            str(mapping["dataclass_parity_action"])
-        )
-    if "dataclass-parity-action" in mapping:
-        settings.dataclass_parity_action = PolicyAction.parse(
-            str(mapping["dataclass-parity-action"])
-        )
-    if "exceptions" in mapping:
-        entries = mapping["exceptions"]
-        if isinstance(entries, Iterable) and not isinstance(entries, (str, bytes)):
-            settings.exceptions = _parse_exceptions(cast(Iterable[Mapping[str, Any]], entries))
+    for raw_key, value in sorted(mapping.items(), key=lambda item: str(item[0])):
+        key = _normalized_key(str(raw_key))
+        if key == "coverage_threshold":
+            settings.coverage_threshold = float(value)
+            continue
+        if key in {"coverage_action", "coverage"}:
+            settings.coverage_action = PolicyAction.parse(str(value))
+            continue
+        alias = _ACTION_KEY_ALIASES.get(key)
+        if alias:
+            setattr(settings, alias, PolicyAction.parse(str(value)))
+            continue
+        if key == "exceptions":
+            if isinstance(value, Iterable) and not isinstance(value, (str, bytes)):
+                settings.exceptions = _parse_exceptions(cast(Iterable[Mapping[str, Any]], value))
+                continue
+            message = "Policy exceptions must be an iterable of mappings"
+            raise PolicyConfigurationError(message)
+        message = f"Unknown policy key: {raw_key}"
+        raise PolicyConfigurationError(message)
 
 
 def _parse_override_pairs(raw: str) -> dict[str, str]:
@@ -198,34 +202,20 @@ def _parse_override_pairs(raw: str) -> dict[str, str]:
 
 
 def _apply_overrides(settings: PolicySettings, overrides: Mapping[str, str]) -> None:
-    for key, value in overrides.items():
-        if key in {"coverage", "coverage-threshold"}:
-            settings.coverage_threshold = float(value)
-        elif key in {"coverage-action", "coverage_action"}:
-            settings.coverage_action = PolicyAction.parse(value)
-        elif key in {"missing-params", "missing-params-action", "missing_params_action"}:
-            settings.missing_params_action = PolicyAction.parse(value)
-        elif key in {"missing-returns", "missing-returns-action", "missing_returns_action"}:
-            settings.missing_returns_action = PolicyAction.parse(value)
-        elif key in {
-            "missing-examples",
-            "missing_examples",
-            "missing-examples-action",
-            "missing_examples_action",
-        }:
-            settings.missing_examples_action = PolicyAction.parse(value)
-        elif key in {"summary-mood", "summary_mood", "summary-mood-action", "summary_mood_action"}:
-            settings.summary_mood_action = PolicyAction.parse(value)
-        elif key in {
-            "dataclass-parity",
-            "dataclass_parity",
-            "dataclass-parity-action",
-            "dataclass_parity_action",
-        }:
-            settings.dataclass_parity_action = PolicyAction.parse(value)
-        else:
-            message = f"Unknown policy override: {key}"
-            raise PolicyConfigurationError(message)
+    for raw_key, raw_value in overrides.items():
+        key = _normalized_key(raw_key)
+        if key in {"coverage", "coverage_threshold"}:
+            settings.coverage_threshold = float(raw_value)
+            continue
+        if key == "coverage_action":
+            settings.coverage_action = PolicyAction.parse(raw_value)
+            continue
+        alias = _ACTION_KEY_ALIASES.get(key)
+        if alias:
+            setattr(settings, alias, PolicyAction.parse(raw_value))
+            continue
+        message = f"Unknown policy override: {raw_key}"
+        raise PolicyConfigurationError(message)
 
 
 def load_policy_settings(
@@ -254,7 +244,7 @@ class PolicyEngine:
         self.total_symbols = 0
         self.documented_symbols = 0
         self.violations: list[PolicyViolation] = []
-        self._today = _dt.date.today()
+        self._today = _dt.datetime.now(tz=_dt.UTC).date()
         self._dataclass_field_cache: dict[Path, dict[str, list[str]]] = {}
 
     def record(self, semantics: Iterable[SemanticResult]) -> None:
@@ -371,9 +361,7 @@ class PolicyEngine:
         first = summary.split()[0].lower()
         if first in {"this", "the"}:
             return True
-        if first.endswith("s") and len(first) > 3:
-            return True
-        return False
+        return bool(first.endswith("s") and len(first) > _MIN_SUMMARY_WORD_LENGTH)
 
     def _dataclass_parity_detail(self, entry: SemanticResult) -> str | None:
         """Return a violation detail when dataclass fields and docstrings drift."""
