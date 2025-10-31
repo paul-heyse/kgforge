@@ -1,10 +1,13 @@
+"""Plugin that derives docstring content from dataclass field metadata."""
+
 from __future__ import annotations
 
 import ast
 from dataclasses import dataclass, replace
 from pathlib import Path
+from typing import ClassVar
 
-from tools.docstring_builder.plugins import PluginContext, TransformerPlugin
+from tools.docstring_builder.plugins.base import PluginContext, PluginStage
 from tools.docstring_builder.schema import ParameterDoc
 from tools.docstring_builder.semantics import SemanticResult
 
@@ -66,7 +69,7 @@ def _has_dataclass_decorator(decorators: list[ast.AST]) -> bool:
 def _stringify(node: ast.AST) -> str | None:
     try:
         return ast.unparse(node)
-    except Exception:  # pragma: no cover - ast.unparse can fail for exotic nodes
+    except (AttributeError, ValueError):  # pragma: no cover - ast.unparse can fail for exotic nodes
         return None
 
 
@@ -74,11 +77,7 @@ def _annotation_is_optional(annotation: str | None) -> bool:
     if not annotation:
         return False
     lowered = annotation.replace(" ", "").lower()
-    if "optional[" in lowered:
-        return True
-    if "|none" in lowered or "none|" in lowered:
-        return True
-    return False
+    return bool("optional[" in lowered or "|none" in lowered or "none|" in lowered)
 
 
 def _default_description(name: str, default: str | None) -> str:
@@ -157,15 +156,25 @@ class _DataclassFieldCollector(ast.NodeVisitor):
         self.namespace.pop()
 
 
-class DataclassFieldDocPlugin(TransformerPlugin):
+class DataclassFieldDocPlugin:
     """Populate dataclass parameter documentation from field definitions."""
 
-    name = "dataclass_field_docs"
+    name: ClassVar[str] = "dataclass_field_docs"
+    stage: ClassVar[PluginStage] = "transformer"
 
     def __init__(self) -> None:
         self._cache: dict[Path, dict[str, list[_FieldInfo]]] = {}
 
-    def run(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
+    def on_start(self, context: PluginContext) -> None:
+        """Reset caches before processing begins."""
+        del context
+
+    def on_finish(self, context: PluginContext) -> None:
+        """Release cached field metadata at the end of processing."""
+        del context
+
+    def apply(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
+        """Populate dataclass parameter metadata for ``result``."""
         if result.symbol.kind != "class":
             return result
         if not self._decorators_indicate_dataclass(result.symbol.decorators):
@@ -188,6 +197,7 @@ class DataclassFieldDocPlugin(TransformerPlugin):
         return any(decorator in normalized for decorator in _DATACLASS_DECORATORS)
 
     def _collect_fields(self, path: Path, module: str) -> dict[str, list[_FieldInfo]]:
+        """Parse ``path`` and return dataclass field metadata keyed by qualified name."""
         try:
             source = path.read_text(encoding="utf-8")
         except OSError:  # pragma: no cover - non-readable file
@@ -201,9 +211,11 @@ class DataclassFieldDocPlugin(TransformerPlugin):
         return collector.fields
 
     def _apply_fields(self, result: SemanticResult, fields: list[_FieldInfo]) -> SemanticResult:
+        """Return ``result`` updated with dataclass field documentation."""
         schema = result.schema
         existing = {parameter.name: parameter for parameter in schema.parameters}
         updated: list[ParameterDoc] = []
+        field_names = {field.name for field in fields}
         for field in fields:
             current = existing.get(field.name)
             description = field.description or (current.description if current else None)
@@ -232,7 +244,7 @@ class DataclassFieldDocPlugin(TransformerPlugin):
                 )
             )
         for parameter in schema.parameters:
-            if parameter.name not in {field.name for field in fields}:
+            if parameter.name not in field_names:
                 updated.append(parameter)
         if updated == schema.parameters:
             return result
