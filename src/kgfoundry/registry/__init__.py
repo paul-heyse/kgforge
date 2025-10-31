@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import registry as _module
+from typing import cast
 from kgfoundry._namespace_proxy import (
     namespace_attach,
     namespace_dir,
@@ -11,7 +12,8 @@ from kgfoundry._namespace_proxy import (
 )
 
 __all__ = namespace_exports(_module)
-namespace_attach(_module, globals(), __all__)
+_namespace = cast(dict[str, object], globals())
+namespace_attach(_module, _namespace, __all__)
 
 __doc__ = _module.__doc__
 if hasattr(_module, "__path__"):

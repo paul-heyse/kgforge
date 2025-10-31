@@ -8,12 +8,17 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import msgspec
 from msgspec import DecodeError
 from msgspec import json as msgspec_json
-from tools import validate_tools_payload
+
+if TYPE_CHECKING:
+    def validate_tools_payload(payload: Mapping[str, object], schema_name: str) -> None: ...
+
+else:
+    from tools import validate_tools_payload
 from tools.docs.analytics_models import (
     ANALYTICS_SCHEMA,
     AgentAnalyticsDocument,
@@ -41,10 +46,18 @@ def _get_list(value: object) -> list[object] | None:
 
 
 def _int_or_default(value: object, default: int = 0) -> int:
-    try:
-        return int(value)  # type: ignore[arg-type]
-    except (TypeError, ValueError):
-        return default
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return int(value)
+    if isinstance(value, str):
+        try:
+            return int(value)
+        except ValueError:
+            return default
+    return default
 
 
 @dataclass(frozen=True, slots=True)
@@ -92,10 +105,10 @@ def _load_previous(path: Path) -> AgentAnalyticsDocument | None:
         return None
     raw = path.read_bytes()
     try:
-        decoded = msgspec_json.decode(raw, type=AgentAnalyticsDocument)
+        decoded: AgentAnalyticsDocument = msgspec_json.decode(raw, type=AgentAnalyticsDocument)
     except DecodeError:
         try:
-            legacy_raw = json.loads(raw.decode("utf-8"))
+            legacy_raw: object = json.loads(raw.decode("utf-8"))
         except json.JSONDecodeError:
             return None
         legacy_mapping = _get_mapping(legacy_raw)
@@ -293,13 +306,18 @@ def _legacy_generated_at(value: object) -> str:
 
 def build_analytics(args: argparse.Namespace) -> AgentAnalyticsDocument:
     """Return the analytics document for the current catalog snapshot."""
-    catalog_payload = load_catalog_payload(args.catalog, load_shards=True)
+    catalog_path = cast(Path, args.catalog)
+    output_path = cast(Path, args.output)
+    repo_root = cast(Path, args.repo_root)
+    link_sample = cast(int, args.link_sample)
+
+    catalog_payload: object = load_catalog_payload(catalog_path, load_shards=True)
     catalog = cast(JSONMapping, catalog_payload)
-    previous = _load_previous(args.output)
+    previous = _load_previous(output_path)
     metrics = _catalog_metrics(catalog)
-    broken_links = _check_links(catalog, args.repo_root, args.link_sample)
+    broken_links = _check_links(catalog, repo_root, link_sample)
     return AgentAnalyticsDocument(
-        repo=RepoInfo(root=str(args.repo_root)),
+        repo=RepoInfo(root=str(repo_root)),
         catalog=metrics,
         portal=PortalAnalytics(sessions=_portal_sessions(previous)),
         errors=AnalyticsErrors(broken_links=len(broken_links), details=broken_links),
@@ -311,7 +329,7 @@ def write_analytics(args: argparse.Namespace) -> None:
     document = build_analytics(args)
     payload = cast(dict[str, object], msgspec.to_builtins(document))
     validate_tools_payload(payload, ANALYTICS_SCHEMA)
-    output = args.output
+    output = cast(Path, args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     encoded = json.dumps(payload, indent=2)
     output.write_text(encoded, encoding="utf-8")
@@ -334,7 +352,7 @@ def _legacy_to_document(payload: JSONMapping) -> AgentAnalyticsDocument:
     generated_at = _legacy_generated_at(payload.get("generated_at"))
 
     return AgentAnalyticsDocument(
-        generated_at=generated_at,
+        generatedAt=generated_at,
         repo=RepoInfo(root=repo_root),
         catalog=metrics,
         portal=PortalAnalytics(sessions=sessions),
