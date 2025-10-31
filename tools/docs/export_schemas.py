@@ -8,6 +8,7 @@ for implementation specifics.
 
 from __future__ import annotations
 
+import argparse
 import importlib
 import inspect
 import json
@@ -19,9 +20,12 @@ from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from tools._shared.logging import get_logger
+
+if TYPE_CHECKING:
+    pass
 
 LOGGER = get_logger(__name__)
 
@@ -98,7 +102,8 @@ def _module_iter() -> Iterable[str]:
     for pkg in TOP_PACKAGES:
         try:
             module = importlib.import_module(pkg)
-        except Exception:
+        except (ImportError, ModuleNotFoundError) as exc:
+            LOGGER.debug("Failed to import package %s: %s", pkg, exc)
             continue
         if not hasattr(module, "__path__"):
             continue
@@ -128,8 +133,8 @@ def is_pydantic_model(obj: object) -> bool:
     >>> result  # doctest: +ELLIPSIS
     """
     try:
-        from pydantic import BaseModel
-    except Exception:
+        from pydantic import BaseModel  # noqa: PLC0415
+    except ImportError:
         return False
     return inspect.isclass(obj) and issubclass(obj, BaseModel) and obj is not BaseModel
 
@@ -182,8 +187,8 @@ def _load_navmap() -> dict[str, Any]:
     if not NAVMAP.exists():
         return {}
     try:
-        return json.loads(NAVMAP.read_text(encoding="utf-8"))
-    except Exception:
+        return json.loads(NAVMAP.read_text(encoding="utf-8"))  # type: ignore[no-any-return]
+    except (json.JSONDecodeError, OSError, UnicodeDecodeError):
         return {}
 
 
@@ -232,7 +237,7 @@ def _example_for_pydantic(model_cls: type[object]) -> dict[str, object]:
     """Synthesize a minimal example dict from model_fields (Pydantic v2)."""
     try:
         fields = getattr(model_cls, "model_fields", {})
-    except Exception:
+    except AttributeError:
         return {}
     example: dict[str, object] = {}
     for name, finfo in (fields or {}).items():
@@ -256,7 +261,7 @@ def _example_for_pandera(model_cls: type[object]) -> dict[str, object]:
     try:
         schema_json = to_schema().to_json()
         data = json.loads(schema_json)
-    except Exception:
+    except (AttributeError, json.JSONDecodeError, OSError):
         return {}
     # Pandera JSON often exposes columns under 'fields' or 'properties' after conversion.
     cols = []
@@ -523,7 +528,7 @@ def _export_one_pandera(
     try:
         schema_json = to_schema().to_json()
         schema_obj = json.loads(schema_json)
-    except Exception:
+    except (AttributeError, json.JSONDecodeError, OSError):
         return (OUT / f"{module_name}.{name}.json", {})
     schema: dict[str, object] = dict(schema_obj)
     _apply_headers(schema, module_name, name, cfg.base_url)
@@ -547,7 +552,8 @@ def _iter_models() -> Iterator[tuple[str, str, type[object]]]:
     for module_name in _module_iter():
         try:
             module = importlib.import_module(module_name)
-        except Exception:
+        except (ImportError, ModuleNotFoundError) as exc:
+            LOGGER.debug("Failed to import module %s: %s", module_name, exc)
             continue
         for name, obj in vars(module).items():
             if is_pydantic_model(obj) or is_pandera_model(obj):
@@ -557,8 +563,6 @@ def _iter_models() -> Iterator[tuple[str, str, type[object]]]:
 
 def _parse_args(argv: Sequence[str] | None) -> Cfg:
     """Parse CLI arguments into a :class:`Cfg`."""
-    import argparse
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--ref-template",
@@ -594,7 +598,7 @@ def _load_existing_schema(path: Path) -> dict[str, object] | None:
         return None
     try:
         loaded = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+    except (json.JSONDecodeError, OSError, UnicodeDecodeError):
         return None
     return loaded if isinstance(loaded, dict) else None
 

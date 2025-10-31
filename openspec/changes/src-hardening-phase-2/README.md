@@ -25,6 +25,12 @@ Phase 2 tackles the highest volume Ruff/mypy/pyrefly violations in the agent c
    ```
 5. Collect representative sample payloads for API/CLI responses (for schema validation tests).
 
+6. Packaging sanity checks (local):
+```bash
+pip wheel .
+python -m venv /tmp/v && /tmp/v/bin/pip install .[faiss,duckdb,splade]
+```
+
 ## Deliverables Snapshot
 - Typed FAISS/SPLADE/BM25 interfaces via Protocols and TypedDicts; removal of `Any` flows.
 - Secure subprocess & SQL execution (parameterized queries, sanitized inputs) across search and registry modules.
@@ -32,6 +38,33 @@ Phase 2 tackles the highest volume Ruff/mypy/pyrefly violations in the agent c
 - CLI and MCP interfaces emit versioned JSON envelopes aligning with `schema/tools/cli_envelope.json` + new agent catalog schemas.
 - Expanded pytest suites covering search edge cases, plugin regression, SQL injection attempts, and error paths.
 - Updated documentation (schemas, API reference, migration notes) and optional extras for dependencies (FAISS, DuckDB, numpy).
+
+## Junior playbook: implementing Phase 2
+
+1) Typed interfaces & schemas
+- Implement `search_api/types.py` (Protocols/TypedDicts) and author schemas under `schema/search/**` with examples.
+- Add/refresh stubs for `faiss` and `duckdb` under `stubs/**`.
+
+2) Correlation ID middleware
+- Add FastAPI middleware to set `X-Correlation-ID` into a `ContextVar`; ensure all logs use `with_fields` to include it.
+
+3) SQL hardening
+- Replace string SQL with parameterized queries; create `registry/duckdb_helpers.py` and validate identifiers against allowlists.
+
+4) HTTP/CLI/MCP contracts
+- FastAPI response models mirror `search_response.json`; enable optional response validation in dev/staging.
+- CLI/MCP `--json` outputs base envelope + search payload; validate before printing.
+
+5) Testing & doctests
+- Parametrize tests for valid/invalid inputs, SQL injection, timeouts, missing index, schema mismatch.
+- Ensure doctests/xdoctests run for examples in public modules.
+
+6) Observability & performance
+- Emit metrics (`search_requests_total`, `search_duration_seconds`, `sql_errors_total`); add pytest-benchmarks and record baseline.
+
+7) Import rules & packaging
+- Add import-linter contracts for `search_api` and `agent_catalog` and fix violations.
+- Verify wheel/install with extras works; run OpenAPI linter in CI.
 
 ## Acceptance Gates (run before submission)
 ```bash

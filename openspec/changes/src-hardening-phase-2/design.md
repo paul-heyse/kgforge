@@ -35,6 +35,17 @@ Agent catalog search and the search API integrate FAISS, SPLADE, BM25, DuckDB, a
 - Centralize SQL helpers in `registry/duckdb_helpers.py` with typed exceptions.
 - Tests include SQL injection attempts verifying sanitized behavior.
 
+#### Typed helper sketch
+```python
+class SqlError(SearchError): ...
+
+def run_query(conn: duckdb.DuckDBPyConnection, sql: str, params: Mapping[str, object], *, timeout_s: float) -> duckdb.DuckDBPyRelation:
+    if "?" not in sql and ":" not in sql:
+        raise SqlInjectionAttemptError("Query must be parameterized")
+    conn.execute(f"SET statement_timeout={int(timeout_s * 1000)}")
+    return conn.execute(sql, params)
+```
+
 ### HTTP & CLI Contracts
 - JSON Schemas:
   - `schema/search/search_response.json` — HTTP response structure (results, metadata, pagination, Problem Details). 
@@ -43,10 +54,20 @@ Agent catalog search and the search API integrate FAISS, SPLADE, BM25, DuckDB, a
 - FastAPI routes wrap responses with validation helper (optional post-response validation in dev/staging).
 - CLI uses base envelope schema from Phase 1 + search-specific payloads.
 
+#### OpenAPI & schema validation strategy
+- FastAPI models mirror `schema/search/search_response.json`; enable an optional dev/staging response validator.
+- Run Spectral (or equivalent) as a CI OpenAPI linter against the generated OpenAPI.
+
 ### Logging & Observability
 - Each operation logs via `get_logger(__name__)`, using `with_fields` for correlation IDs, durations, command names.
 - Metrics via `MetricsProvider` (counters for `search_requests_total`, histograms for `search_duration_seconds`, counters for `sql_errors_total`).
 - Add OpenTelemetry spans around search requests.
+
+#### Correlation ID middleware (FastAPI)
+Use middleware to inject `X-Correlation-ID` into a `ContextVar` and ensure all logs include it. For async endpoints, wrap blocking FAISS/SQL calls using a threadpool and respect cancellations.
+
+#### Minimal structured fields
+Log at minimum: `correlation_id`, `operation`, `status`, `duration_ms`, `command`, and search‑specific fields (`k`, `alpha`, `index_name`).
 
 ### Testing Strategy
 - Unit tests for adapters (FAISS/SPLADE/BM25) using deterministic fixtures + fakes.
@@ -54,6 +75,11 @@ Agent catalog search and the search API integrate FAISS, SPLADE, BM25, DuckDB, a
 - CLI tests using `subprocess.run` (with sanitized environment), validating JSON output against schema.
 - Regression tests for SQL injection attempts (ensuring sanitized behavior).
 - Doctests for high-level API usage.
+
+#### Table-driven coverage (examples)
+- Endpoints: valid/invalid input, SQL injection attempts, timeout, missing index, schema mismatch.
+- Adapters: FAISS add/search/load, SPLADE encode failure, BM25 corners.
+- CLI/MCP: `--json` envelope validation with Problem Details on error.
 
 ### Typed API Sketches
 ```python
@@ -83,10 +109,16 @@ def search_agents(query: AgentSearchQuery, *, index: FaissIndexProtocol, logger:
 - Enforce request timeouts (HTTP client + DuckDB operations) and log warnings on slow queries.
 - Avoid storing secrets in logs; redact sensitive fields.
 
+#### Supply-chain and input safety
+- Use `yaml.safe_load`; reject naive datetime/`os.path` in new code; validate user inputs (lengths, enums, allowlists).
+
 ### Performance & Benchmarks
 - Add pytest-benchmark for FAISS search, BM25 scoring, SPLADE encoding. Document baseline and acceptable regression thresholds.
 - Use numpy vectorization and `normalize_L2` correctly typed to avoid copies.
 - Monitor metrics (p95 latency, error rates) during rollout.
+
+#### Bench harness
+Use pytest-benchmark for FAISS/BM25/SPLADE hotspots; document baseline locally and track regressions in CI (non-gating initially).
 
 ## Detailed Implementation Plan
 
@@ -101,10 +133,43 @@ def search_agents(query: AgentSearchQuery, *, index: FaissIndexProtocol, logger:
 | 7 | Expand tests (unit + integration + doctest) and benchmarks | pytest suite green; doctests/xdoctests run |
 | 8 | Documentation + changelog updates; feature flag guidance | `make artifacts` clean |
 
-## Dependencies & Stubs
+### Layering & Import Rules
+Add import-linter contracts:
+```ini
+[contract:search-api-no-upwards]
+type = forbidden
+name = search_api must not import higher app layers
+source_modules = src.search_api
+forbidden_modules =
+    src.registry
+    src.orchestration
+
+[contract:agent-catalog-no-upwards]
+type = forbidden
+name = agent_catalog must not import higher app layers
+source_modules = src.kgfoundry.agent_catalog
+forbidden_modules =
+    src.search_api
+```
+
+### Dependencies & Stubs
 - Provide `stubs/faiss/__init__.pyi` and `stubs/duckdb/__init__.pyi` updates with Protocol definitions.
 - Ensure numpy typing via `numpy.typing` strategies (`NDArray`).
 - For optional dependencies (FAISS, SPLADE), define extras in `pyproject` and guard imports with typed fallbacks.
+
+### Packaging & Extras
+Declare extras in `pyproject.toml`:
+```toml
+[project.optional-dependencies]
+faiss = ["faiss-cpu>=1.7"]
+duckdb = ["duckdb>=1.0"]
+splade = ["torch>=2.2", "transformers>=4.44"]
+```
+CI commands:
+```bash
+pip wheel .
+python -m venv /tmp/v && /tmp/v/bin/pip install .[faiss,duckdb,splade]
+```
 
 ## Rollout Plan
 1. Land typed interfaces + adapters behind feature flags; run in shadow mode in staging.

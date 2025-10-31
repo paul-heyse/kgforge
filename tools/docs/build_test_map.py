@@ -62,7 +62,7 @@ FAIL_ON_UNTESTED = os.getenv("TESTMAP_FAIL_ON_UNTESTED", "0") == "1"
 def _load_json(path: Path) -> JSONValue | None:
     """Return JSON data from ``path`` or ``None`` if the file is unreadable."""
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8"))  # type: ignore[no-any-return]
     except (OSError, json.JSONDecodeError):
         return None
 

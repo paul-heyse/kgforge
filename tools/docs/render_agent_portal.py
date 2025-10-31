@@ -11,10 +11,10 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Final
 
-CacheKey = str
-
 from kgfoundry.agent_catalog.client import AgentCatalogClient
 from kgfoundry.agent_catalog.models import ModuleModel, SymbolModel
+
+CacheKey = str
 
 DEFAULT_OUTPUT = Path("site/_build/agent/index.html")
 MAX_EXEMPLARS = 2
@@ -207,7 +207,7 @@ def _render_breadcrumbs(module_name: str) -> str:
     parts = module_name.split(".")
     items = []
     for index, part in enumerate(parts, start=1):
-        items.append(
+        items.append(  # pyrefly: ignore[bad-argument-type]
             f'<li><span aria-current="page" data-depth="{index}">{html.escape(part)}</span></li>'
         )
     return '<nav aria-label="Breadcrumb"><ol>' + "".join(items) + "</ol></nav>"
@@ -418,7 +418,7 @@ def render_portal(client: AgentCatalogClient, output_path: Path) -> None:
     used: set[CacheKey] = set()
     for package in client.list_packages():
         modules = client.list_modules(package.name)
-        package_sections.append(
+        package_sections.append(  # pyrefly: ignore[bad-argument-type]
             _render_package(package.name, modules, cache_dir=cache_dir, used=used)
         )
     packages_markup = "\n".join(package_sections)
@@ -637,6 +637,18 @@ def render_portal(client: AgentCatalogClient, output_path: Path) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Entry point for the Agent Portal renderer CLI.
+
+    Parameters
+    ----------
+    argv : list[str] | None
+        Command-line arguments (defaults to sys.argv).
+
+    Returns
+    -------
+    int
+        Exit code (0 for success).
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
     client = AgentCatalogClient.from_path(args.catalog, repo_root=args.repo_root)

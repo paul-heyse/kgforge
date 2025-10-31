@@ -21,7 +21,10 @@ from collections.abc import Iterator, Mapping, Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
-from tempfile import NamedTemporaryFile, mkdtemp
+from tempfile import (
+    NamedTemporaryFile,
+    mkdtemp,  # pyrefly: ignore[missing-module-attribute]
+)
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, cast
 
@@ -1027,7 +1030,7 @@ def collapse_to_packages(dot_path: Path) -> DiGraph:
             continue
         weight = collapsed.get_edge_data(pkg_src, pkg_dst, {}).get("weight", 0) + 1
         collapsed.add_edge(pkg_src, pkg_dst, weight=weight)
-    return collapsed
+    return collapsed  # type: ignore[no-any-return]
 
 
 def analyze_graph(graph: DiGraph, layers: LayerConfig) -> AnalysisResult:

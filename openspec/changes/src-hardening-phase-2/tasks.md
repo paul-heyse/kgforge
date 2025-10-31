@@ -95,6 +95,14 @@
 - All HTTP client calls include `timeout=5.0` (configurable) and structured error handling.
 - File paths resolved via `Path.resolve(strict=True)` and limited to configured directories.
 
+## Appendix B — CI & Packaging Checklist
+- [ ] Add import-linter contracts (`search-api-no-upwards`, `agent-catalog-no-upwards`) to `importlinter.cfg`; verify they pass.
+- [ ] Enable doctests/xdoctests in CI (already in `pytest.ini`); ensure examples execute.
+- [ ] Packaging: `pip wheel .` succeeds; `pip install .[faiss,duckdb,splade]` in a clean venv succeeds.
+- [ ] OpenAPI linter (Spectral) passes against generated API spec.
+- [ ] Security: `uv run pip-audit --strict` passes; SQL Bandit rule S608 cleared.
+- [ ] Performance: run pytest-benchmark for FAISS/BM25/SPLADE and record baseline numbers.
+
 ## Appendix B — CI & Extras
 - [ ] Ensure `pyproject.toml` defines extras for optional deps: `faiss`, `duckdb`, `splade`.
 - [ ] Add import-linter contract `agent-catalog-no-upwards` to prevent circular imports.
