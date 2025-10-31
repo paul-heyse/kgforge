@@ -5,8 +5,11 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-import importlib
+from __future__ import annotations
+
 import sys
+from importlib import import_module
+from typing import TYPE_CHECKING, Dict, List
 
 _ALIASES: dict[str, str] = {
     "docling": "docling",
@@ -25,7 +28,23 @@ _ALIASES: dict[str, str] = {
     "vectorstore_faiss": "vectorstore_faiss",
 }
 
-__all__ = sorted(_ALIASES)
+if TYPE_CHECKING:
+    from . import docling as docling
+    from . import download as download
+    from . import embeddings_dense as embeddings_dense
+    from . import embeddings_sparse as embeddings_sparse
+    from . import kg_builder as kg_builder
+    from . import kgfoundry_common as kgfoundry_common
+    from . import linking as linking
+    from . import observability as observability
+    from . import ontology as ontology
+    from . import orchestration as orchestration
+    from . import registry as registry
+    from . import search_api as search_api
+    from . import search_client as search_client
+    from . import vectorstore_faiss as vectorstore_faiss
+
+__all__: list[str] = sorted(_ALIASES)
 
 
 def _load(name: str) -> object:
@@ -44,8 +63,8 @@ def _load(name: str) -> object:
     -------
     object
         Describe return value.
-"""
-    module = importlib.import_module(_ALIASES[name])
+    """
+    module = import_module(_ALIASES[name])
     sys.modules[f"{__name__}.{name}"] = module
     return module
 
@@ -68,7 +87,7 @@ def __getattr__(name: str) -> object:
     -------
     object
         Describe return value.
-"""
+    """
     if name not in _ALIASES:
         message = f"module {__name__!r} has no attribute {name!r}"
         raise AttributeError(message) from None
@@ -84,7 +103,7 @@ def __dir__() -> list[str]:
     -------
     list[str]
         Sorted union of exports and implementation attributes.
-"""
+    """
     return sorted(set(__all__))
 
 
@@ -99,6 +118,6 @@ def _ensure_namespace_alias(name: str) -> None:
     ----------
     name : str
         Describe ``name``.
-"""
+    """
     if f"{__name__}.{name}" not in sys.modules:
         _load(name)

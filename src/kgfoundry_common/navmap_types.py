@@ -29,7 +29,7 @@ class NavSection(TypedDict):
     &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    """
 
     id: str
     title: str
@@ -43,7 +43,7 @@ class SymbolMeta(TypedDict, total=False):
     &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    """
 
     since: str
     stability: Stability
@@ -67,7 +67,7 @@ class ModuleMeta(TypedDict, total=False):
     &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    """
 
     owner: str
     stability: Stability
@@ -82,7 +82,7 @@ class NavMap(TypedDict, total=False):
     &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    """
 
     title: str
     synopsis: str

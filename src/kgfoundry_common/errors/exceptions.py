@@ -87,7 +87,7 @@ class KgFoundryError(Exception):
     >>> assert error.code == ErrorCode.RUNTIME_ERROR
     >>> details = error.to_problem_details(instance="/api/operation")
     >>> assert details["status"] == 500
-"""
+    """
 
     def __init__(  # noqa: PLR0913
         self,
@@ -121,7 +121,7 @@ class KgFoundryError(Exception):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(message)
         self.message = message
         self.code = code
@@ -162,7 +162,7 @@ class KgFoundryError(Exception):
         >>> assert details["type"] == "https://kgfoundry.dev/problems/resource-unavailable"
         >>> assert details["status"] == 404
         >>> assert details["code"] == "resource-unavailable"
-"""
+        """
         return build_problem_details(
             type=get_type_uri(self.code),
             title=title or self.__class__.__name__,
@@ -182,7 +182,7 @@ class KgFoundryError(Exception):
         -------
         str
             Describe return value.
-"""
+        """
         base = f"{self.__class__.__name__}[{self.code.value}]: {self.message}"
         if self.__cause__:
             base += f" (caused by: {type(self.__cause__).__name__})"
@@ -208,7 +208,7 @@ class DownloadError(KgFoundryError):
     Examples
     --------
     >>> raise DownloadError("Failed to download PDF", cause=IOError("Connection refused"))
-"""
+    """
 
     def __init__(
         self,
@@ -230,7 +230,7 @@ class DownloadError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.DOWNLOAD_FAILED,
@@ -259,7 +259,7 @@ class UnsupportedMIMEError(KgFoundryError):
     Examples
     --------
     >>> raise UnsupportedMIMEError("application/x-unknown is not supported")
-"""
+    """
 
     def __init__(
         self,
@@ -281,7 +281,7 @@ class UnsupportedMIMEError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.UNSUPPORTED_MIME,
@@ -310,7 +310,7 @@ class DoclingError(KgFoundryError):
     Examples
     --------
     >>> raise DoclingError("Failed to parse document", cause=ValueError("Invalid format"))
-"""
+    """
 
     def __init__(
         self,
@@ -332,7 +332,7 @@ class DoclingError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.DOCLING_ERROR,
@@ -361,7 +361,7 @@ class OCRTimeoutError(KgFoundryError):
     Examples
     --------
     >>> raise OCRTimeoutError("OCR timed out after 30s")
-"""
+    """
 
     def __init__(
         self,
@@ -383,7 +383,7 @@ class OCRTimeoutError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.OCR_TIMEOUT,
@@ -412,7 +412,7 @@ class ChunkingError(KgFoundryError):
     Examples
     --------
     >>> raise ChunkingError("Failed to chunk document", cause=ValueError("Empty text"))
-"""
+    """
 
     def __init__(
         self,
@@ -434,7 +434,7 @@ class ChunkingError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.CHUNKING_ERROR,
@@ -463,7 +463,7 @@ class EmbeddingError(KgFoundryError):
     Examples
     --------
     >>> raise EmbeddingError("Failed to generate embeddings", cause=RuntimeError("GPU unavailable"))
-"""
+    """
 
     def __init__(
         self,
@@ -485,7 +485,7 @@ class EmbeddingError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.EMBEDDING_ERROR,
@@ -514,7 +514,7 @@ class SpladeOOMError(KgFoundryError):
     Examples
     --------
     >>> raise SpladeOOMError("SPLADE OOM during inference")
-"""
+    """
 
     def __init__(
         self,
@@ -536,7 +536,7 @@ class SpladeOOMError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.SPLADE_OOM,
@@ -565,7 +565,7 @@ class IndexBuildError(KgFoundryError):
     Examples
     --------
     >>> raise IndexBuildError("Failed to build FAISS index", cause=IOError("Disk full"))
-"""
+    """
 
     def __init__(
         self,
@@ -587,7 +587,7 @@ class IndexBuildError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.INDEX_BUILD_ERROR,
@@ -616,7 +616,7 @@ class OntologyParseError(KgFoundryError):
     Examples
     --------
     >>> raise OntologyParseError("Failed to parse OWL file", cause=XMLSyntaxError("Invalid XML"))
-"""
+    """
 
     def __init__(
         self,
@@ -638,7 +638,7 @@ class OntologyParseError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.ONTOLOGY_PARSE_ERROR,
@@ -667,7 +667,7 @@ class LinkerCalibrationError(KgFoundryError):
     Examples
     --------
     >>> raise LinkerCalibrationError("Calibration failed", cause=ValueError("Invalid parameters"))
-"""
+    """
 
     def __init__(
         self,
@@ -689,7 +689,7 @@ class LinkerCalibrationError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.LINKER_CALIBRATION_ERROR,
@@ -718,7 +718,7 @@ class Neo4jError(KgFoundryError):
     Examples
     --------
     >>> raise Neo4jError("Neo4j query failed", cause=ConnectionError("Database unreachable"))
-"""
+    """
 
     def __init__(
         self,
@@ -740,7 +740,7 @@ class Neo4jError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.NEO4J_ERROR,
@@ -769,7 +769,7 @@ class ConfigurationError(KgFoundryError):
     Examples
     --------
     >>> raise ConfigurationError("Missing required env var: KGFOUNDRY_API_KEY")
-"""
+    """
 
     def __init__(
         self,
@@ -791,7 +791,7 @@ class ConfigurationError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.CONFIGURATION_ERROR,
@@ -820,7 +820,7 @@ class SettingsError(KgFoundryError):
     context : Mapping[str, object] | None, optional
         Describe ``context``.
         Defaults to ``None``.
-"""
+    """
 
     def __init__(
         self,
@@ -847,7 +847,7 @@ class SettingsError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         combined_context: dict[str, object] = dict(context or {})
         if errors:
             combined_context.setdefault(
@@ -882,7 +882,7 @@ class SerializationError(KgFoundryError):
     Examples
     --------
     >>> raise SerializationError("Schema validation failed", cause=ValueError("Invalid type"))
-"""
+    """
 
     def __init__(
         self,
@@ -904,7 +904,7 @@ class SerializationError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.SERIALIZATION_ERROR,
@@ -933,7 +933,7 @@ class RegistryError(KgFoundryError):
     Examples
     --------
     >>> raise RegistryError("Failed to write to registry")
-"""
+    """
 
     def __init__(
         self,
@@ -956,7 +956,7 @@ class RegistryError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.REGISTRY_ERROR,
@@ -985,7 +985,7 @@ class DeserializationError(KgFoundryError):
     Examples
     --------
     >>> raise DeserializationError("Checksum mismatch", cause=ValueError("Corrupted data"))
-"""
+    """
 
     def __init__(
         self,
@@ -1007,7 +1007,7 @@ class DeserializationError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.DESERIALIZATION_ERROR,
@@ -1039,7 +1039,7 @@ class SchemaValidationError(KgFoundryError):
     Examples
     --------
     >>> raise SchemaValidationError("Invalid schema", errors=["Missing field: name"])
-"""
+    """
 
     def __init__(
         self,
@@ -1066,7 +1066,7 @@ class SchemaValidationError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         combined_context: dict[str, object] = dict(context or {})
         if errors:
             combined_context.setdefault("validation_errors", list(errors))
@@ -1104,7 +1104,7 @@ class RetryExhaustedError(KgFoundryError):
     retry_after_seconds : int | None, optional
         Describe ``retry_after_seconds``.
         Defaults to ``None``.
-"""
+    """
 
     def __init__(
         self,
@@ -1135,7 +1135,7 @@ class RetryExhaustedError(KgFoundryError):
         retry_after_seconds : int | NoneType, optional
             Suggested retry delay in seconds.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.RETRY_EXHAUSTED,
@@ -1169,7 +1169,7 @@ class RetryExhaustedError(KgFoundryError):
         -------
         ProblemDetails
             Problem Details JSON structure.
-"""
+        """
         extensions: dict[str, object] = {}
         if self.operation:
             extensions["operation"] = self.operation
@@ -1208,7 +1208,7 @@ class VectorSearchError(KgFoundryError):
     Examples
     --------
     >>> raise VectorSearchError("Search failed", cause=RuntimeError("Index not loaded"))
-"""
+    """
 
     def __init__(
         self,
@@ -1230,7 +1230,7 @@ class VectorSearchError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.VECTOR_SEARCH_ERROR,
@@ -1261,7 +1261,7 @@ class AgentCatalogSearchError(KgFoundryError):
     >>> raise AgentCatalogSearchError(
     ...     "Catalog search failed", cause=RuntimeError("Index not loaded")
     ... )
-"""
+    """
 
     def __init__(
         self,
@@ -1283,7 +1283,7 @@ class AgentCatalogSearchError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.AGENT_CATALOG_SEARCH_ERROR,
@@ -1312,7 +1312,7 @@ class CatalogSessionError(KgFoundryError):
     Examples
     --------
     >>> raise CatalogSessionError("Session spawn failed", cause=OSError("Command not found"))
-"""
+    """
 
     def __init__(
         self,
@@ -1334,7 +1334,7 @@ class CatalogSessionError(KgFoundryError):
         context : str | object | NoneType, optional
             Describe ``context``.
             Defaults to ``None``.
-"""
+        """
         super().__init__(
             message,
             code=ErrorCode.SESSION_ERROR,

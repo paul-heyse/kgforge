@@ -59,7 +59,7 @@ def apply(db: str, migrations_dir: str) -> None:
         Describe ``db``.
     migrations_dir : str
         Describe ``migrations_dir``.
-"""
+    """
     path = pathlib.Path(migrations_dir)
     if not path.exists():
         error_message = "Migrations directory does not exist"
@@ -96,7 +96,7 @@ def main() -> None:
 
     Python's object protocol for this class. Use it to integrate with built-in operators, protocols,
     or runtime behaviours that expect instances to participate in the language's data model.
-"""
+    """
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
     a = sp.add_parser("apply")

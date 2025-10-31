@@ -65,7 +65,7 @@ def tokenize(text: str) -> list[str]:
     -------
     list[str]
         Describe return value.
-"""
+    """
     # re.findall returns list[str] when pattern has no groups
     matches: list[str] = TOKEN_RE.findall(text or "")
     return [token.lower() for token in matches]
@@ -94,7 +94,7 @@ class FixtureDoc:
         Describe ``section``.
     text : str
         Describe ``text``.
-"""
+    """
 
     chunk_id: str
     doc_id: str
@@ -121,7 +121,7 @@ class FixtureIndex:
     db_path : str, optional
         Describe ``db_path``.
         Defaults to ``'/data/catalog/catalog.duckdb'``.
-"""
+    """
 
     def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb") -> None:
         """Describe   init  .
@@ -138,7 +138,7 @@ class FixtureIndex:
         db_path : str, optional
             Describe ``db_path``.
             Defaults to ``'/data/catalog/catalog.duckdb'``.
-"""
+        """
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []
@@ -154,7 +154,7 @@ class FixtureIndex:
         Python's object protocol for this class. Use it to integrate with built-in operators,
         protocols, or runtime behaviours that expect instances to participate in the language's data
         model.
-"""
+        """
         if not Path(self.db_path).exists():
             return
         con = duckdb.connect(self.db_path)
@@ -217,7 +217,7 @@ class FixtureIndex:
         Python's object protocol for this class. Use it to integrate with built-in operators,
         protocols, or runtime behaviours that expect instances to participate in the language's data
         model.
-"""
+        """
         self.tf.clear()
         self.df.clear()
         for doc in self.docs:
@@ -249,7 +249,7 @@ class FixtureIndex:
         -------
         list[tuple[int, float]]
             Describe return value.
-"""
+        """
         if not hasattr(self, "N") or self.N == 0:
             return []
         qtoks = tokenize(query)
@@ -288,5 +288,5 @@ class FixtureIndex:
         -------
         FixtureDoc
             Describe return value.
-"""
+        """
         return self.docs[index]

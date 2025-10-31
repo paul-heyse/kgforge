@@ -22,7 +22,7 @@ class AuditLogger:
     enabled : bool, optional
         Describe ``enabled``.
         Defaults to ``True``.
-"""
+    """
 
     def __init__(self, path: Path, *, enabled: bool = True) -> None:
         """Document   init  .
@@ -40,7 +40,7 @@ class AuditLogger:
         enabled : bool, optional
             Indicate whether enabled. Defaults to ``True``.
             Defaults to ``True``.
-"""
+        """
         self._path = path
         self._enabled = enabled
         if enabled:
@@ -73,7 +73,7 @@ class AuditLogger:
         correlation_id : str | NoneType, optional
             Describe ``correlation_id``.
             Defaults to ``None``.
-"""
+        """
         if not self._enabled:
             return
         payload: dict[str, JsonValue] = {

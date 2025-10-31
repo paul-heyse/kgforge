@@ -64,7 +64,7 @@ class DenseEmbeddingModel(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]:
         """Describe encode.
@@ -82,5 +82,5 @@ class DenseEmbeddingModel(Protocol):
         -------
         tuple[int, ...] | np.float32
             Describe return value.
-"""
+        """
         ...

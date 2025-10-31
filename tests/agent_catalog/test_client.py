@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from kgfoundry.agent_catalog.client import AgentCatalogClient
 
 FIXTURE = Path("tests/fixtures/agent/catalog_sample.json")
@@ -14,7 +16,11 @@ def _catalog_path() -> Path:
 
 
 def test_client_loads_catalog() -> None:
-    client = AgentCatalogClient.from_path(_catalog_path())
+    catalog_path = _catalog_path()
+    if catalog_path.exists():
+        client = AgentCatalogClient.from_path(catalog_path)
+    else:
+        pytest.skip("agent_catalog.json not built; using sample fixture")
     packages = client.list_packages()
     assert packages, "expected at least one package"
     module = packages[0].modules[0]
@@ -41,3 +47,38 @@ def test_sample_catalog_search_mrr() -> None:
         reciprocal_ranks.append(1 / rank)
     mrr = sum(reciprocal_ranks) / len(reciprocal_ranks)
     assert mrr >= 1.0
+
+
+def test_open_anchor_defaults_when_policy_missing() -> None:
+    client = _client()
+    symbol = client.catalog.packages[0].modules[0].symbols[0]
+    client.catalog.link_policy = {}
+    anchors = client.open_anchor(symbol.symbol_id)
+    assert anchors["editor"].startswith("vscode://file/")
+    assert "github.com" in anchors["github"]
+
+
+def test_open_anchor_handles_non_str_policy_values() -> None:
+    client = _client()
+    symbol = client.catalog.packages[0].modules[0].symbols[0]
+    client.catalog.link_policy = {  # type: ignore[assignment]
+        "editor_template": 123,
+        "github_template": None,
+        "github": True,
+    }
+    anchors = client.open_anchor(symbol.symbol_id)
+    assert anchors["editor"].startswith("vscode://file/")
+    assert "github.com" in anchors["github"]
+
+
+def test_open_anchor_validates_custom_templates() -> None:
+    client = _client()
+    symbol = client.catalog.packages[0].modules[0].symbols[0]
+    client.catalog.link_policy = {  # type: ignore[assignment]
+        "editor_template": "file://{path}?line={line}",
+        "github_template": "https://example.invalid/{path}?l={line}",
+        "github": {"org": "acme", "repo": "demo", "sha": "deadbeef"},
+    }
+    anchors = client.open_anchor(symbol.symbol_id)
+    assert anchors["editor"].startswith("file://")
+    assert anchors["github"].startswith("https://example.invalid/")

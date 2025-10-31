@@ -1,32 +1,28 @@
 from __future__ import annotations
 
-from typing import Dict, Iterator, List, Tuple
-
+from collections.abc import Iterator
 
 class InvalidContractOptions(Exception):
-    errors: Dict[str, str]
-
+    errors: dict[str, str]
 
 class Contract:
     name: str
-    contract_options: Dict[str, object]
-
+    contract_options: dict[str, object]
 
 class ContractCheck:
     kept: bool
-    metadata: Dict[str, object]
-    warnings: List[str]
+    metadata: dict[str, object]
+    warnings: list[str]
 
     def __init__(
         self,
         kept: bool,
-        metadata: Dict[str, object] | None = ...,
-        warnings: List[str] | None = ...,
+        metadata: dict[str, object] | None = ...,
+        warnings: list[str] | None = ...,
     ) -> None: ...
 
-
 class Report:
-    contracts: List[Contract]
+    contracts: list[Contract]
     broken_count: int
     kept_count: int
     warnings_count: int
@@ -35,17 +31,13 @@ class Report:
     graph_building_duration: int
     contains_failures: bool
     could_not_run: bool
-    invalid_contract_options: Dict[str, InvalidContractOptions]
+    invalid_contract_options: dict[str, InvalidContractOptions]
 
     def add_contract_check(
         self, contract: Contract, contract_check: ContractCheck, duration: int
     ) -> None: ...
-
     def add_invalid_contract_options(
         self, contract_name: str, exception: InvalidContractOptions
     ) -> None: ...
-
-    def get_contracts_and_checks(self) -> Iterator[Tuple[Contract, ContractCheck]]: ...
-
+    def get_contracts_and_checks(self) -> Iterator[tuple[Contract, ContractCheck]]: ...
     def get_duration(self, contract: Contract) -> int: ...
-

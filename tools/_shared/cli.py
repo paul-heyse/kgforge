@@ -6,10 +6,10 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Literal
+from typing import Literal, cast
 
 import msgspec
-from msgspec import UNSET, structs
+from msgspec import UNSET, Struct, UnsetType, structs
 
 from tools._shared.problem_details import ProblemDetailsDict
 from tools._shared.schema import validate_tools_payload
@@ -23,37 +23,39 @@ CLI_ENVELOPE_SCHEMA_VERSION = "1.0.0"
 CLI_ENVELOPE_SCHEMA_ID = "https://kgfoundry.dev/schema/cli-envelope.json"
 
 
-class CliFileResult(msgspec.Struct, kw_only=True):
+class CliFileResult(Struct, kw_only=True):
     """Individual file processing result emitted by tooling CLIs."""
 
     path: str
     status: CliFileStatus
     message: str | None = None
-    problem: ProblemDetailsDict | None = UNSET
+    problem: ProblemDetailsDict | UnsetType = UNSET
 
 
-class CliErrorEntry(msgspec.Struct, kw_only=True):
+class CliErrorEntry(Struct, kw_only=True):
     """Error-level entry attached to CLI envelopes."""
 
     status: CliErrorStatus
     message: str
     file: str | None = None
-    problem: ProblemDetailsDict | None = UNSET
+    problem: ProblemDetailsDict | UnsetType = UNSET
 
 
-class CliEnvelope(msgspec.Struct, kw_only=True):
+class CliEnvelope(Struct, kw_only=True):
     """Typed representation of ``schema/tools/cli_envelope.json``."""
 
     schemaVersion: str = CLI_ENVELOPE_SCHEMA_VERSION
     schemaId: str = CLI_ENVELOPE_SCHEMA_ID
-    generatedAt: str = msgspec.field(default_factory=lambda: datetime.now(tz=UTC).isoformat())
+    generatedAt: str = cast(
+        str, msgspec.field(default_factory=lambda: datetime.now(tz=UTC).isoformat())
+    )
     status: CliStatus = "success"
     command: str = ""
     subcommand: str = ""
     durationSeconds: float = 0.0
-    files: list[CliFileResult] = msgspec.field(default_factory=list)
-    errors: list[CliErrorEntry] = msgspec.field(default_factory=list)
-    problem: ProblemDetailsDict | None = UNSET
+    files: list[CliFileResult] = cast(list[CliFileResult], msgspec.field(default_factory=list))
+    errors: list[CliErrorEntry] = cast(list[CliErrorEntry], msgspec.field(default_factory=list))
+    problem: ProblemDetailsDict | UnsetType = UNSET
 
 
 def new_cli_envelope(*, command: str, status: CliStatus, subcommand: str = "") -> CliEnvelope:
@@ -75,13 +77,13 @@ def validate_cli_envelope(envelope: CliEnvelope) -> None:
     None
         This function raises if validation fails.
     """
-    payload = msgspec.to_builtins(envelope)
+    payload = cast(dict[str, object], msgspec.to_builtins(envelope))
     validate_tools_payload(payload, CLI_ENVELOPE_SCHEMA)
 
 
 def render_cli_envelope(envelope: CliEnvelope, *, indent: int = 2) -> str:
     """Return a JSON string for ``envelope``."""
-    return json.dumps(msgspec.to_builtins(envelope), indent=indent)
+    return json.dumps(cast(dict[str, object], msgspec.to_builtins(envelope)), indent=indent)
 
 
 @dataclass(slots=True)
@@ -129,7 +131,7 @@ class CliEnvelopeBuilder:
         )
 
     def set_problem(self, problem: ProblemDetailsDict | None) -> None:
-        replacement = problem if problem is not None else UNSET
+        replacement: ProblemDetailsDict | UnsetType = problem if problem is not None else UNSET
         self.envelope = structs.replace(self.envelope, problem=replacement)
 
     def finish(self, *, duration_seconds: float | None = None) -> CliEnvelope:

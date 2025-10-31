@@ -61,7 +61,7 @@ class DuckDBRegistryHelper:
     ----------
     db_path : str
         Describe ``db_path``.
-"""
+    """
 
     def __init__(self, db_path: str) -> None:
         """Describe   init  .
@@ -74,7 +74,7 @@ class DuckDBRegistryHelper:
         ----------
         db_path : str
             Describe ``db_path``.
-"""
+        """
         self.db_path = db_path
 
     def _connect(self) -> DuckDBPyConnection:
@@ -86,7 +86,7 @@ class DuckDBRegistryHelper:
         -------
         DuckDBPyConnection
             Describe return value.
-"""
+        """
         return duckdb_helpers.connect(self.db_path)
 
     def new_run(
@@ -117,7 +117,7 @@ class DuckDBRegistryHelper:
         -------
         str
             Describe return value.
-"""
+        """
         run_id = str(uuid.uuid4())
         with closing(self._connect()) as con:
             duckdb_helpers.execute(
@@ -148,7 +148,7 @@ class DuckDBRegistryHelper:
         notes : str | NoneType, optional
             Describe ``notes``.
             Defaults to ``None``.
-"""
+        """
         with closing(self._connect()) as con:
             duckdb_helpers.execute(
                 con,
@@ -187,7 +187,7 @@ class DuckDBRegistryHelper:
         -------
         str
             Describe return value.
-"""
+        """
         dataset_id = str(uuid.uuid4())
         with closing(self._connect()) as con:
             duckdb_helpers.execute(
@@ -217,7 +217,7 @@ class DuckDBRegistryHelper:
             Describe ``parquet_root``.
         rows : int
             Describe ``rows``.
-"""
+        """
         with closing(self._connect()) as con:
             duckdb_helpers.execute(
                 con,
@@ -249,7 +249,7 @@ class DuckDBRegistryHelper:
         ----------
         dataset_id : str
             Describe ``dataset_id``.
-"""
+        """
         with closing(self._connect()) as con:
             duckdb_helpers.execute(
                 con,
@@ -275,7 +275,7 @@ class DuckDBRegistryHelper:
         ----------
         docs : list[Doc]
             Describe ``docs``.
-"""
+        """
         with closing(self._connect()) as con:
             for doc in docs:
                 authors_list = list(doc.authors) if doc.authors is not None else []
@@ -315,7 +315,7 @@ class DuckDBRegistryHelper:
         ----------
         assets : list[DoctagsAsset]
             Describe ``assets``.
-"""
+        """
         with closing(self._connect()) as con:
             for asset in assets:
                 duckdb_helpers.execute(
@@ -347,7 +347,7 @@ class DuckDBRegistryHelper:
             Describe ``subject_id``.
         payload : str | object
             Describe ``payload``.
-"""
+        """
         with closing(self._connect()) as con:
             payload_dict: dict[str, object] = dict(payload)
             duckdb_helpers.execute(

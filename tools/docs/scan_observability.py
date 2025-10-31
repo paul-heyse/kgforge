@@ -14,15 +14,16 @@ import json
 import os
 import re
 import sys
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Any
+from typing import Literal, cast
 
-from tools._shared.logging import get_logger, with_fields
+from tools._shared.logging import StructuredLoggerAdapter, get_logger, with_fields
 from tools._shared.proc import ToolExecutionError, run_tool
 
-LOGGER = get_logger(__name__)
+LOGGER: StructuredLoggerAdapter = get_logger(__name__)
 
 
 def _optional_import(name: str) -> ModuleType | None:
@@ -66,6 +67,66 @@ G_ORG = os.getenv("DOCS_GITHUB_ORG")
 G_REPO = os.getenv("DOCS_GITHUB_REPO")
 G_SHA = os.getenv("DOCS_GITHUB_SHA")
 LINK_MODE = os.getenv("DOCS_LINK_MODE", "both").lower()  # editor|github|both
+
+
+@dataclass(frozen=True, slots=True)
+class MetricPolicy:
+    """Configuration guardrails for metric instrumentation."""
+
+    name_regex: str
+    allowed_units: tuple[str, ...]
+    counter_suffix: str
+    require_unit_suffix: bool
+
+
+@dataclass(frozen=True, slots=True)
+class LabelsPolicy:
+    """Policy for metric label usage."""
+
+    reserved: tuple[str, ...]
+    high_cardinality_patterns: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class LogsPolicy:
+    """Policy options for structured logging."""
+
+    require_structured: bool = True
+
+
+@dataclass(frozen=True, slots=True)
+class TracesPolicy:
+    """Policy constraints for tracing spans."""
+
+    name_regex: str
+
+
+@dataclass(frozen=True, slots=True)
+class ObservabilityPolicy:
+    """Typed observability scanning policy derived from YAML overrides."""
+
+    metric: MetricPolicy
+    labels: LabelsPolicy
+    logs: LogsPolicy
+    traces: TracesPolicy
+    error_taxonomy_json: str | None = None
+
+
+LintSeverity = Literal["error", "warning"]
+LintKind = Literal["metric", "log", "trace"]
+
+
+@dataclass(frozen=True, slots=True)
+class LintFinding:
+    """Structured lint finding produced during observability scans."""
+
+    severity: LintSeverity
+    kind: LintKind
+    name: str
+    rule: str
+    message: str
+    file: str
+    lineno: int
 
 
 def _rel(p: Path) -> str:
@@ -117,7 +178,7 @@ def _sha() -> str:
     """
     if G_SHA:
         return G_SHA
-    log_adapter = with_fields(LOGGER, command=["git", "rev-parse", "HEAD"])
+    log_adapter = with_fields(LOGGER, command=("git", "rev-parse", "HEAD"))
     try:
         result = run_tool(["git", "rev-parse", "HEAD"], cwd=ROOT, timeout=10.0)
         return result.stdout.strip() or "HEAD"
@@ -188,11 +249,10 @@ def _editor_link(path: Path, line: int | None) -> str:
 
 # ---------- Policy ------------------------------------------------------------
 
-DEFAULT_POLICY: dict[str, Any] = {
-    "metric": {
-        # snake_case, must end with base unit or _total (counters) when using Prometheus exposition format
-        "name_regex": r"^[a-z][a-z0-9_]*$",
-        "allowed_units": [
+DEFAULT_POLICY = ObservabilityPolicy(
+    metric=MetricPolicy(
+        name_regex=r"^[a-z][a-z0-9_]*$",
+        allowed_units=(
             "seconds",
             "bytes",
             "meters",
@@ -201,13 +261,13 @@ DEFAULT_POLICY: dict[str, Any] = {
             "volts",
             "amperes",
             "ratio",
-        ],  # Prometheus base units
-        "counter_suffix": "_total",
-        "require_unit_suffix": True,  # applies to Prometheus-style metrics
-    },
-    "labels": {
-        "reserved": ["le", "quantile", "job", "instance"],  # Prometheus specifics
-        "high_cardinality_patterns": [
+        ),
+        counter_suffix="_total",
+        require_unit_suffix=True,
+    ),
+    labels=LabelsPolicy(
+        reserved=("le", "quantile", "job", "instance"),
+        high_cardinality_patterns=(
             r"user(_)?id",
             r"session(_)?id",
             r"request(_)?id",
@@ -215,60 +275,169 @@ DEFAULT_POLICY: dict[str, Any] = {
             r"email",
             r"url",
             r"path",
-        ],
-    },
-    "logs": {"require_structured": True},  # prefer structured keys over %-format/f-strings
-    "traces": {"name_regex": r"^[a-z0-9_.]+$"},  # OTel-style dotted lowercase names
-    "error_taxonomy_json": "docs/_build/error_taxonomy.json",  # optional; map messages/codes to runbooks
-}
+        ),
+    ),
+    logs=LogsPolicy(require_structured=True),
+    traces=TracesPolicy(name_regex=r"^[a-z0-9_.]+$"),
+    error_taxonomy_json="docs/_build/error_taxonomy.json",
+)
 
 POLICY_PATH = ROOT / "docs" / "policies" / "observability.yml"
 
 
-def _deep_merge_dicts(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
+def _deep_merge_dicts(
+    base: Mapping[str, object], override: Mapping[str, object]
+) -> dict[str, object]:
     """Return a deep merge of ``override`` into ``base`` without mutating either mapping."""
-    merged: dict[str, Any] = {}
-    for key, base_value in base.items():
-        if key in override:
-            override_value = override[key]
-            if isinstance(base_value, dict) and isinstance(override_value, dict):
-                merged[key] = _deep_merge_dicts(base_value, override_value)
-            else:
-                merged[key] = override_value
-        else:
-            merged[key] = base_value
+    merged: dict[str, object] = dict(base)
     for key, override_value in override.items():
-        if key not in base:
-            merged[key] = override_value
+        existing = merged.get(key)
+        if isinstance(existing, Mapping) and isinstance(override_value, Mapping):
+            merged[key] = _deep_merge_dicts(
+                cast(Mapping[str, object], existing),
+                cast(Mapping[str, object], override_value),
+            )
+            continue
+        merged[key] = override_value
     return merged
 
 
-def load_policy() -> dict[str, Any]:
-    """Compute load policy.
+def _coerce_str(value: object, fallback: str) -> str:
+    return value if isinstance(value, str) else fallback
 
-    Carry out the load policy operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
-    Returns
-    -------
-    collections.abc.Mapping
-        Description of return value.
+def _coerce_bool(value: object, fallback: bool) -> bool:
+    return value if isinstance(value, bool) else fallback
 
-    Examples
-    --------
-    >>> from tools.docs.scan_observability import load_policy
-    >>> result = load_policy()
-    >>> result  # doctest: +ELLIPSIS
-    """
+
+def _coerce_optional_str(value: object, fallback: str | None) -> str | None:
+    if isinstance(value, str):
+        return value
+    if value is None:
+        return None
+    return fallback
+
+
+def _coerce_str_tuple(value: object, fallback: tuple[str, ...]) -> tuple[str, ...]:
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        items: list[str] = []
+        for item in value:
+            if isinstance(item, str):
+                items.append(item)
+            else:
+                return fallback
+        return tuple(items)
+    return fallback
+
+
+def _build_metric_policy(data: Mapping[str, object], default: MetricPolicy) -> MetricPolicy:
+    return MetricPolicy(
+        name_regex=_coerce_str(data.get("name_regex"), default.name_regex),
+        allowed_units=_coerce_str_tuple(data.get("allowed_units"), default.allowed_units),
+        counter_suffix=_coerce_str(data.get("counter_suffix"), default.counter_suffix),
+        require_unit_suffix=_coerce_bool(
+            data.get("require_unit_suffix"),
+            default.require_unit_suffix,
+        ),
+    )
+
+
+def _build_labels_policy(data: Mapping[str, object], default: LabelsPolicy) -> LabelsPolicy:
+    return LabelsPolicy(
+        reserved=_coerce_str_tuple(data.get("reserved"), default.reserved),
+        high_cardinality_patterns=_coerce_str_tuple(
+            data.get("high_cardinality_patterns"),
+            default.high_cardinality_patterns,
+        ),
+    )
+
+
+def _build_logs_policy(data: Mapping[str, object], default: LogsPolicy) -> LogsPolicy:
+    return LogsPolicy(
+        require_structured=_coerce_bool(
+            data.get("require_structured"),
+            default.require_structured,
+        )
+    )
+
+
+def _build_traces_policy(data: Mapping[str, object], default: TracesPolicy) -> TracesPolicy:
+    return TracesPolicy(name_regex=_coerce_str(data.get("name_regex"), default.name_regex))
+
+
+def _build_policy_from_mapping(data: Mapping[str, object]) -> ObservabilityPolicy:
+    metric_data = data.get("metric")
+    labels_data = data.get("labels")
+    logs_data = data.get("logs")
+    traces_data = data.get("traces")
+
+    if not isinstance(metric_data, Mapping) or not isinstance(labels_data, Mapping):
+        raise ValueError("Policy overrides must include metric and labels mappings")
+    if not isinstance(logs_data, Mapping) or not isinstance(traces_data, Mapping):
+        raise ValueError("Policy overrides must include logs and traces mappings")
+
+    metric = _build_metric_policy(cast(Mapping[str, object], metric_data), DEFAULT_POLICY.metric)
+    labels = _build_labels_policy(cast(Mapping[str, object], labels_data), DEFAULT_POLICY.labels)
+    logs = _build_logs_policy(cast(Mapping[str, object], logs_data), DEFAULT_POLICY.logs)
+    traces = _build_traces_policy(cast(Mapping[str, object], traces_data), DEFAULT_POLICY.traces)
+    error_taxonomy = _coerce_optional_str(
+        data.get("error_taxonomy_json"),
+        DEFAULT_POLICY.error_taxonomy_json,
+    )
+    return ObservabilityPolicy(
+        metric=metric,
+        labels=labels,
+        logs=logs,
+        traces=traces,
+        error_taxonomy_json=error_taxonomy,
+    )
+
+
+def load_policy() -> ObservabilityPolicy:
+    """Load the observability policy from disk, falling back to defaults on failure."""
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
+
     try:
-        overrides = yaml.safe_load(POLICY_PATH.read_text()) or {}
-        if not isinstance(overrides, dict):
-            return DEFAULT_POLICY
-        return _deep_merge_dicts(DEFAULT_POLICY, overrides)
-    except (OSError, yaml.YAMLError) as exc:  # type: ignore[attr-defined]
+        text = POLICY_PATH.read_text(encoding="utf-8")
+    except OSError as exc:
         with_fields(LOGGER, policy_path=str(POLICY_PATH)).warning(
-            "Failed to load observability policy: %s", exc
+            "Failed to read observability policy: %s", exc
+        )
+        return DEFAULT_POLICY
+
+    try:
+        overrides_raw: object = yaml.safe_load(text)
+    except Exception as exc:
+        yaml_error_type: type[Exception] = cast(
+            type[Exception],
+            getattr(yaml, "YAMLError", Exception),
+        )
+        if isinstance(exc, yaml_error_type):
+            with_fields(LOGGER, policy_path=str(POLICY_PATH)).warning(
+                "Failed to parse observability policy YAML: %s", exc
+            )
+            return DEFAULT_POLICY
+        raise
+
+    if overrides_raw is None:
+        return DEFAULT_POLICY
+    if not isinstance(overrides_raw, Mapping):
+        with_fields(LOGGER, policy_path=str(POLICY_PATH)).warning(
+            "Observability policy override must be a mapping, got %s",
+            type(overrides_raw).__name__,
+        )
+        return DEFAULT_POLICY
+
+    merged_data = _deep_merge_dicts(
+        cast(Mapping[str, object], asdict(DEFAULT_POLICY)),
+        cast(Mapping[str, object], overrides_raw),
+    )
+    try:
+        return _build_policy_from_mapping(merged_data)
+    except ValueError as exc:
+        with_fields(LOGGER, policy_path=str(POLICY_PATH)).warning(
+            "Observability policy overrides are invalid: %s", exc
         )
         return DEFAULT_POLICY
 
@@ -344,7 +513,7 @@ _METRIC_CALL_TYPES = {
     "create_gauge": "gauge",
     "create_histogram": "histogram",
 }
-_PROM_UNITS = set(DEFAULT_POLICY["metric"]["allowed_units"])
+_PROM_UNITS = set(DEFAULT_POLICY.metric.allowed_units)
 
 
 def _first_str(node: ast.AST) -> str | None:
@@ -359,7 +528,7 @@ def _first_str(node: ast.AST) -> str | None:
     return None
 
 
-def _keywords_map(node: ast.Call, text: str) -> dict[str, Any]:
+def _keywords_map(node: ast.Call, text: str) -> dict[str, str]:
     """Keywords map.
 
     Parameters
@@ -371,7 +540,7 @@ def _keywords_map(node: ast.Call, text: str) -> dict[str, Any]:
 
     Returns
     -------
-    dict[str, Any]
+    dict[str, str]
         Description.
 
 
@@ -522,7 +691,7 @@ def _is_structured_logging(call: ast.Call, text: str) -> tuple[list[str], bool]:
 # ---------- Lint engine -------------------------------------------------------
 
 
-def _lint_metric(policy: dict[str, Any], row: MetricRow) -> list[dict[str, Any]]:
+def _lint_metric(policy: ObservabilityPolicy, row: MetricRow) -> list[LintFinding]:
     """Lint metric.
 
     Parameters
@@ -547,21 +716,21 @@ def _lint_metric(policy: dict[str, Any], row: MetricRow) -> list[dict[str, Any]]
     --------
     >>> _lint_metric(...)
     """
-    errs: list[dict[str, Any]] = []
-    name_rx = re.compile(policy["metric"]["name_regex"])
+    errs: list[LintFinding] = []
+    name_rx = re.compile(policy.metric.name_regex)
     if not name_rx.match(row.name or ""):
         errs.append(
-            {
-                "severity": "error",
-                "kind": "metric",
-                "name": row.name,
-                "rule": "name_regex",
-                "message": f"Metric '{row.name}' must match regex {name_rx.pattern}",
-                "file": row.file,
-                "lineno": row.lineno,
-            }
+            LintFinding(
+                severity="error",
+                kind="metric",
+                name=row.name,
+                rule="name_regex",
+                message=f"Metric '{row.name}' must match regex {name_rx.pattern}",
+                file=row.file,
+                lineno=row.lineno,
+            )
         )
-    if policy["metric"]["require_unit_suffix"] and row.type in (
+    if policy.metric.require_unit_suffix and row.type in (
         "counter",
         "gauge",
         "histogram",
@@ -570,62 +739,66 @@ def _lint_metric(policy: dict[str, Any], row: MetricRow) -> list[dict[str, Any]]
         unit = _infer_unit_from_name(row.name)
         if unit is None and row.type != "counter":
             errs.append(
-                {
-                    "severity": "warning",
-                    "kind": "metric",
-                    "name": row.name,
-                    "rule": "unit_suffix",
-                    "message": "Metric should include base unit suffix (e.g., _seconds, _bytes). See Prometheus naming.",
-                    "file": row.file,
-                    "lineno": row.lineno,
-                }
+                LintFinding(
+                    severity="warning",
+                    kind="metric",
+                    name=row.name,
+                    rule="unit_suffix",
+                    message=(
+                        "Metric should include base unit suffix (e.g., _seconds, _bytes). See "
+                        "Prometheus naming."
+                    ),
+                    file=row.file,
+                    lineno=row.lineno,
+                )
             )
-        if row.type == "counter" and not row.name.endswith(policy["metric"]["counter_suffix"]):
+        if row.type == "counter" and not row.name.endswith(policy.metric.counter_suffix):
             errs.append(
-                {
-                    "severity": "error",
-                    "kind": "metric",
-                    "name": row.name,
-                    "rule": "counter_total",
-                    "message": "Counter names should end with '_total' in Prometheus exposition format.",
-                    "file": row.file,
-                    "lineno": row.lineno,
-                }
+                LintFinding(
+                    severity="error",
+                    kind="metric",
+                    name=row.name,
+                    rule="counter_total",
+                    message="Counter names should end with '_total' in Prometheus exposition format.",
+                    file=row.file,
+                    lineno=row.lineno,
+                )
             )
     # Reserved labels
-    reserved = set(policy["labels"]["reserved"])
-    hc_rx = [
-        re.compile(pat, re.IGNORECASE) for pat in policy["labels"]["high_cardinality_patterns"]
-    ]
+    reserved = set(policy.labels.reserved)
+    hc_rx = [re.compile(pat, re.IGNORECASE) for pat in policy.labels.high_cardinality_patterns]
     for lab in row.labels or []:
         if lab in reserved:
             errs.append(
-                {
-                    "severity": "error",
-                    "kind": "metric",
-                    "name": row.name,
-                    "rule": "reserved_label",
-                    "message": f"Label '{lab}' is reserved (Prometheus/internal). Avoid defining it in instrumentation.",
-                    "file": row.file,
-                    "lineno": row.lineno,
-                }
+                LintFinding(
+                    severity="error",
+                    kind="metric",
+                    name=row.name,
+                    rule="reserved_label",
+                    message=f"Label '{lab}' is reserved (Prometheus/internal). Avoid defining it in instrumentation.",
+                    file=row.file,
+                    lineno=row.lineno,
+                )
             )
         if any(rx.search(lab) for rx in hc_rx):
             errs.append(
-                {
-                    "severity": "warning",
-                    "kind": "metric",
-                    "name": row.name,
-                    "rule": "high_cardinality_label",
-                    "message": f"Label '{lab}' frequently causes cardinality explosion; reconsider (user_id/request_id/url/path…).",
-                    "file": row.file,
-                    "lineno": row.lineno,
-                }
+                LintFinding(
+                    severity="warning",
+                    kind="metric",
+                    name=row.name,
+                    rule="high_cardinality_label",
+                    message=(
+                        f"Label '{lab}' frequently causes cardinality explosion; "
+                        "reconsider (user_id/request_id/url/path…)."
+                    ),
+                    file=row.file,
+                    lineno=row.lineno,
+                )
             )
     return errs
 
 
-def _lint_log(policy: dict[str, Any], row: LogRow) -> list[dict[str, Any]]:
+def _lint_log(policy: ObservabilityPolicy, row: LogRow) -> list[LintFinding]:
     """Lint log.
 
     Parameters
@@ -650,23 +823,23 @@ def _lint_log(policy: dict[str, Any], row: LogRow) -> list[dict[str, Any]]:
     --------
     >>> _lint_log(...)
     """
-    errs: list[dict[str, Any]] = []
-    if policy["logs"].get("require_structured", True) and not row.structured_keys:
+    errs: list[LintFinding] = []
+    if policy.logs.require_structured and not row.structured_keys:
         errs.append(
-            {
-                "severity": "warning",
-                "kind": "log",
-                "name": row.message_template[:50],
-                "rule": "structured_logging",
-                "message": "Prefer structured logging (key=value/extra=…) over %-format or f-strings.",
-                "file": row.file,
-                "lineno": row.lineno,
-            }
+            LintFinding(
+                severity="warning",
+                kind="log",
+                name=row.message_template[:50],
+                rule="structured_logging",
+                message="Prefer structured logging (key=value/extra=…) over %-format or f-strings.",
+                file=row.file,
+                lineno=row.lineno,
+            )
         )
     return errs
 
 
-def _lint_trace(policy: dict[str, Any], row: TraceRow) -> list[dict[str, Any]]:
+def _lint_trace(policy: ObservabilityPolicy, row: TraceRow) -> list[LintFinding]:
     """Lint trace.
 
     Parameters
@@ -691,19 +864,19 @@ def _lint_trace(policy: dict[str, Any], row: TraceRow) -> list[dict[str, Any]]:
     --------
     >>> _lint_trace(...)
     """
-    errs: list[dict[str, Any]] = []
-    rx = re.compile(policy["traces"]["name_regex"])
+    errs: list[LintFinding] = []
+    rx = re.compile(policy.traces.name_regex)
     if row.span_name and not rx.match(row.span_name):
         errs.append(
-            {
-                "severity": "warning",
-                "kind": "trace",
-                "name": row.span_name,
-                "rule": "span_name",
-                "message": f"Span name should match regex {rx.pattern} (OTel naming).",
-                "file": row.file,
-                "lineno": row.lineno,
-            }
+            LintFinding(
+                severity="warning",
+                kind="trace",
+                name=row.span_name,
+                rule="span_name",
+                message=f"Span name should match regex {rx.pattern} (OTel naming).",
+                file=row.file,
+                lineno=row.lineno,
+            )
         )
     return errs
 
@@ -744,7 +917,7 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
 
 
 def scan_file(
-    path: Path, policy: dict[str, Any]
+    path: Path, policy: ObservabilityPolicy
 ) -> tuple[list[LogRow], list[MetricRow], list[TraceRow]]:
     """Compute scan file.
 
@@ -909,13 +1082,13 @@ def _write_config_summary(
 
 
 def _scan_repository(
-    policy: dict[str, Any],
-) -> tuple[list[LogRow], list[MetricRow], list[TraceRow], list[dict[str, Any]]]:
+    policy: ObservabilityPolicy,
+) -> tuple[list[LogRow], list[MetricRow], list[TraceRow], list[LintFinding]]:
     """Traverse the source tree and collect observability artefacts."""
     all_logs: list[LogRow] = []
     all_metrics: list[MetricRow] = []
     all_traces: list[TraceRow] = []
-    lints: list[dict[str, Any]] = []
+    lints: list[LintFinding] = []
 
     for py in SRC.rglob("*.py"):
         file_logs, file_metrics, file_traces = scan_file(py, policy)
@@ -933,33 +1106,45 @@ def _scan_repository(
     return all_logs, all_metrics, all_traces, lints
 
 
-def _load_runbooks(policy: dict[str, Any]) -> dict[str, str]:
+def _load_runbooks(policy: ObservabilityPolicy) -> dict[str, str]:
     """Load optional runbook mappings from the error taxonomy."""
-    taxonomy = policy.get("error_taxonomy_json") or ""
+    taxonomy = policy.error_taxonomy_json or ""
     tax_path = ROOT / taxonomy if taxonomy else ROOT / ""
     if not tax_path.exists():
         return {}
 
     try:
-        tax_data = json.loads(tax_path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError) as exc:
+        tax_text = tax_path.read_text(encoding="utf-8")
+    except OSError as exc:
         with_fields(LOGGER, taxonomy=str(tax_path)).warning(
-            "Failed to load error taxonomy JSON: %s", exc
+            "Failed to read error taxonomy JSON: %s", exc
         )
         return {}
-    if not isinstance(tax_data, dict):
+
+    try:
+        tax_data_raw = json.loads(tax_text)
+    except json.JSONDecodeError as exc:
+        with_fields(LOGGER, taxonomy=str(tax_path)).warning(
+            "Failed to parse error taxonomy JSON: %s", exc
+        )
+        return {}
+
+    if not isinstance(tax_data_raw, Mapping):
         return {}
 
     runbooks: dict[str, str] = {}
-    for item in tax_data.get("errors", []):
-        if (
-            isinstance(item, dict)
-            and "message" in item
-            and "extensions" in item
-            and isinstance(item.get("extensions"), dict)
-            and "runbook" in item["extensions"]
-        ):
-            runbooks[item["message"]] = item["extensions"]["runbook"]
+    errors_field = tax_data_raw.get("errors")
+    if isinstance(errors_field, Sequence):
+        for item in errors_field:
+            if not isinstance(item, Mapping):
+                continue
+            message = item.get("message")
+            extensions = item.get("extensions")
+            if not isinstance(message, str) or not isinstance(extensions, Mapping):
+                continue
+            runbook_value = extensions.get("runbook")
+            if isinstance(runbook_value, str):
+                runbooks[message] = runbook_value
     return runbooks
 
 
@@ -982,23 +1167,27 @@ def _write_outputs(
     metrics: list[MetricRow],
     logs: list[LogRow],
     traces: list[TraceRow],
-    lints: list[dict[str, Any]],
+    lints: list[LintFinding],
 ) -> None:
     """Persist JSON artefacts used by downstream documentation builders."""
+    metrics_payload = [cast(dict[str, object], asdict(x)) for x in metrics]
     (OUT / "metrics.json").write_text(
-        json.dumps([asdict(x) for x in metrics], indent=2) + "\n",
+        json.dumps(metrics_payload, indent=2) + "\n",
         encoding="utf-8",
     )
+    log_payload = [cast(dict[str, object], asdict(x)) for x in logs]
     (OUT / "log_events.json").write_text(
-        json.dumps([asdict(x) for x in logs], indent=2) + "\n",
+        json.dumps(log_payload, indent=2) + "\n",
         encoding="utf-8",
     )
+    trace_payload = [cast(dict[str, object], asdict(x)) for x in traces]
     (OUT / "traces.json").write_text(
-        json.dumps([asdict(x) for x in traces], indent=2) + "\n",
+        json.dumps(trace_payload, indent=2) + "\n",
         encoding="utf-8",
     )
+    lint_payload = [cast(dict[str, object], asdict(finding)) for finding in lints]
     (OUT / "observability_lint.json").write_text(
-        json.dumps(lints, indent=2) + "\n",
+        json.dumps(lint_payload, indent=2) + "\n",
         encoding="utf-8",
     )
     _write_config_summary(metrics, logs, traces)
@@ -1008,12 +1197,12 @@ def _summarize_exit(
     metrics: list[MetricRow],
     logs: list[LogRow],
     traces: list[TraceRow],
-    lints: list[dict[str, Any]],
+    lints: list[LintFinding],
 ) -> int:
     """Report a summary to stdout and return the desired exit code."""
     fail = os.getenv("OBS_FAIL_ON_LINT", "0") == "1"
-    error_count = sum(1 for item in lints if item.get("severity") == "error")
-    warning_count = sum(1 for item in lints if item.get("severity") == "warning")
+    error_count = sum(1 for item in lints if item.severity == "error")
+    warning_count = sum(1 for item in lints if item.severity == "warning")
     if fail and error_count:
         LOGGER.error(
             "[obs] %d error(s), %d warning(s) — failing (OBS_FAIL_ON_LINT=1)",
@@ -1037,7 +1226,6 @@ def main() -> int:
     """Coordinate observability scanning."""
     policy = load_policy()
     if not SRC.exists():
-        sys.exit(0)
         return 0
 
     logs, metrics, traces, lints = _scan_repository(policy)
@@ -1045,9 +1233,8 @@ def main() -> int:
     _apply_runbooks(logs, runbooks)
     _write_outputs(metrics, logs, traces, lints)
     exit_code = _summarize_exit(metrics, logs, traces, lints)
-    sys.exit(exit_code)
     return exit_code
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

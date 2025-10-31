@@ -123,7 +123,7 @@ class Doc(BaseModel):
     ...     Path(__file__).parent.parent.parent / "schema" / "examples" / "models" / "doc.v1.json"
     ... )
     >>> assert_model_roundtrip(Doc, example_path)
-"""
+    """
 
     model_config = ConfigDict(extra="forbid")
 
@@ -166,7 +166,7 @@ class DoctagsAsset(BaseModel):
     avg_logprob : float | NoneType, optional
         Describe ``avg_logprob``.
         Defaults to ``None``.
-"""
+    """
 
     doc_id: Id
     doctags_uri: str
@@ -201,7 +201,7 @@ class Chunk(BaseModel):
         Describe ``tokens``.
     doctags_span : dict[str, int]
         Describe ``doctags_span``.
-"""
+    """
 
     id: Id
     doc_id: Id
@@ -241,7 +241,7 @@ class LinkAssertion(BaseModel):
         Defaults to ``<factory>``.
     run_id : str
         Describe ``run_id``.
-"""
+    """
 
     id: Id
     chunk_id: Id

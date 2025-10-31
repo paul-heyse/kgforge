@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from pathlib import Path
-from typing import cast
+from typing import NotRequired, TypedDict, cast
 
 from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.models import (
@@ -15,7 +15,48 @@ from kgfoundry.agent_catalog.models import (
     SymbolModel,
     load_catalog_model,
 )
-from kgfoundry_common.problem_details import JsonValue
+from kgfoundry_common.problem_details import JsonObject, JsonValue
+
+
+class GithubLinkPolicy(TypedDict, total=False):
+    """Optional GitHub link configuration."""
+
+    org: str
+    repo: str
+    sha: str
+
+
+class LinkPolicy(TypedDict, total=False):
+    """Catalog link policy schema."""
+
+    editor_template: str
+    github_template: str
+    github: NotRequired[GithubLinkPolicy]
+
+
+class _SafeFormatDict(dict[str, object]):
+    """Dictionary that returns an empty string for missing keys."""
+
+    def __missing__(self, key: str) -> str:  # type: ignore[override]
+        return ""
+
+
+_DEFAULT_EDITOR_TEMPLATE = "vscode://file/{path}:{line}"
+_DEFAULT_GITHUB_TEMPLATE = "https://github.com/{org}/{repo}/blob/{sha}/{path}#L{line}"
+
+
+def _coerce_str(value: object, default: str = "") -> str:
+    """Return *value* if it is a string; otherwise return *default*."""
+    return value if isinstance(value, str) else default
+
+
+def _coerce_mapping(value: object) -> Mapping[str, object]:
+    """Return *value* as a mapping when possible; otherwise return an empty mapping."""
+    return value if isinstance(value, Mapping) else {}
+
+
+DEFAULT_EDITOR_TEMPLATE = "vscode://file/{path}:{line}"
+DEFAULT_GITHUB_TEMPLATE = "https://github.com/{org}/{repo}/blob/{sha}/{path}#L{line}"
 
 
 class AgentCatalogClientError(RuntimeError):
@@ -24,7 +65,7 @@ class AgentCatalogClientError(RuntimeError):
     &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    """
 
 
 class AgentCatalogClient:
@@ -42,7 +83,7 @@ class AgentCatalogClient:
     catalog_path : Path | None, optional
         Describe ``catalog_path``.
         Defaults to ``None``.
-"""
+    """
 
     def __init__(
         self,
@@ -69,7 +110,7 @@ class AgentCatalogClient:
         catalog_path : Path | NoneType, optional
             Filesystem path for the catalog. Defaults to ``None``.
             Defaults to ``None``.
-"""
+        """
         self._catalog = catalog
         self._catalog_path = catalog_path
         self._repo_root = repo_root or (catalog_path.parent if catalog_path else Path.cwd())
@@ -101,7 +142,7 @@ class AgentCatalogClient:
         -------
         AgentCatalogClient
             Describe return value.
-"""
+        """
         model = load_catalog_model(path, load_shards=load_shards)
         root = repo_root or path.parent
         return cls(model, repo_root=root, catalog_path=path)
@@ -120,7 +161,7 @@ class AgentCatalogClient:
         -------
         SymbolModel
             Describe return value.
-"""
+        """
         symbol = self.get_symbol(symbol_id)
         if symbol is None:
             message = f"Unknown symbol: {symbol_id}"
@@ -141,7 +182,7 @@ class AgentCatalogClient:
         -------
         ModuleModel
             Describe return value.
-"""
+        """
         module = self.get_module(qualified)
         if module is None:
             message = f"Unknown module: {qualified}"
@@ -167,7 +208,7 @@ class AgentCatalogClient:
         -------
         list[PackageModel]
             Describe return value.
-"""
+        """
         return list(self._catalog.packages)
 
     def list_modules(self, package: str | PackageModel) -> list[ModuleModel]:
@@ -184,7 +225,7 @@ class AgentCatalogClient:
         -------
         list[ModuleModel]
             Describe return value.
-"""
+        """
         package_name = package.name if isinstance(package, PackageModel) else package
         for pkg in self._catalog.packages:
             if pkg.name == package_name:
@@ -206,7 +247,7 @@ class AgentCatalogClient:
         -------
         ModuleModel | NoneType
             Describe return value.
-"""
+        """
         return self._catalog.get_module(qualified)
 
     def iter_symbols(self) -> Iterable[SymbolModel]:
@@ -218,7 +259,7 @@ class AgentCatalogClient:
         -------
         SymbolModel
             Describe return value.
-"""
+        """
         yield from self._catalog.iter_symbols()
 
     def get_symbol(self, symbol_id: str) -> SymbolModel | None:
@@ -235,7 +276,7 @@ class AgentCatalogClient:
         -------
         SymbolModel | NoneType
             Describe return value.
-"""
+        """
         return self._catalog.get_symbol(symbol_id)
 
     def find_callers(self, symbol_id: str) -> list[str]:
@@ -252,7 +293,7 @@ class AgentCatalogClient:
         -------
         list[str]
             Describe return value.
-"""
+        """
         symbol = self._require_symbol(symbol_id)
         return list(symbol.change_impact.callers)
 
@@ -270,7 +311,7 @@ class AgentCatalogClient:
         -------
         list[str]
             Describe return value.
-"""
+        """
         symbol = self._require_symbol(symbol_id)
         return list(symbol.change_impact.callees)
 
@@ -288,7 +329,7 @@ class AgentCatalogClient:
         -------
         ChangeImpactModel
             Describe return value.
-"""
+        """
         symbol = self._require_symbol(symbol_id)
         return symbol.change_impact
 
@@ -306,10 +347,10 @@ class AgentCatalogClient:
         -------
         list[dict[str, object]]
             Describe return value.
-"""
+        """
         # ChangeImpactModel.tests is a list of dicts from Pydantic model_dump
         # Cast to JsonValue since these are JSON-serializable structures
-        return cast(list[dict[str, JsonValue]], list(self.change_impact(symbol_id).tests))
+        return list(self.change_impact(symbol_id).tests)
 
     def search(
         self,
@@ -337,7 +378,7 @@ class AgentCatalogClient:
         -------
         list[catalog_search.SearchResult]
             Describe return value.
-"""
+        """
         options = catalog_search.SearchOptions(facets=facets)
         request = catalog_search.SearchRequest(
             repo_root=self.repo_root,
@@ -364,7 +405,7 @@ class AgentCatalogClient:
         -------
         dict[str, str]
             Describe return value.
-"""
+        """
         symbol = self._require_symbol(symbol_id)
         module_name = symbol.qname.rsplit(".", 1)[0] if "." in symbol.qname else symbol.qname
         module = self._require_module(module_name)
@@ -373,24 +414,37 @@ class AgentCatalogClient:
             message = "Symbol source path missing from catalog"
             raise AgentCatalogClientError(message)
         start_line = symbol.anchors.start_line or 1
-        link_policy = self._catalog.link_policy
-        editor_template = link_policy.get("editor_template", "vscode://file/{path}:{line}")
-        github_template = link_policy.get(
-            "github_template",
-            "https://github.com/{org}/{repo}/blob/{sha}/{path}#L{line}",
-        )
+
+        raw_policy = cast(JsonObject | None, self._catalog.link_policy)
+        policy: LinkPolicy = cast(LinkPolicy, raw_policy)
+        editor_template = _coerce_str(policy.get("editor_template"), _DEFAULT_EDITOR_TEMPLATE)
+        github_template = _coerce_str(policy.get("github_template"), _DEFAULT_GITHUB_TEMPLATE)
         rel_path = Path(source_path)
         if rel_path.is_absolute():
             rel_path = rel_path.relative_to(self.repo_root)
-        editor_link = editor_template.format(path=str(self.repo_root / rel_path), line=start_line)
-        github_vars = link_policy.get("github") or {}
-        github_link = github_template.format(
-            org=github_vars.get("org", ""),
-            repo=github_vars.get("repo", ""),
-            sha=github_vars.get("sha", ""),
-            path=str(rel_path),
-            line=start_line,
+        editor_vars = _SafeFormatDict({"path": str(self.repo_root / rel_path), "line": start_line})
+        try:
+            editor_link = editor_template.format_map(editor_vars)
+        except Exception as exc:
+            message = "Invalid editor_template in catalog link_policy"
+            raise AgentCatalogClientError(message) from exc
+
+        raw_github = _coerce_mapping(policy.get("github"))
+        github_policy = cast(GithubLinkPolicy, raw_github)
+        github_vars = _SafeFormatDict(
+            {
+                "org": _coerce_str(github_policy.get("org")),
+                "repo": _coerce_str(github_policy.get("repo")),
+                "sha": _coerce_str(github_policy.get("sha")),
+                "path": str(rel_path),
+                "line": start_line,
+            }
         )
+        try:
+            github_link = github_template.format_map(github_vars)
+        except Exception as exc:
+            message = "Invalid github_template in catalog link_policy"
+            raise AgentCatalogClientError(message) from exc
         return {"editor": editor_link, "github": github_link}
 
 
@@ -398,3 +452,42 @@ __all__ = [
     "AgentCatalogClient",
     "AgentCatalogClientError",
 ]
+
+
+def _normalize_link_policy(raw_policy: JsonObject | None) -> LinkPolicy:
+    """Normalize catalog link policy structure."""
+    if raw_policy is None or not isinstance(raw_policy, Mapping):
+        return {}
+
+    normalized: dict[str, object] = {}
+
+    editor_template = raw_policy.get("editor_template")
+    if isinstance(editor_template, str):
+        normalized["editor_template"] = editor_template
+
+    github_template = raw_policy.get("github_template")
+    if isinstance(github_template, str):
+        normalized["github_template"] = github_template
+
+    github_raw = raw_policy.get("github")
+    if isinstance(github_raw, Mapping):
+        github_values: dict[str, str] = {}
+        for key in ("org", "repo", "sha"):
+            value = github_raw.get(key)
+            if isinstance(value, str):
+                github_values[key] = value
+        if github_values:
+            normalized["github"] = github_values
+
+    return cast(LinkPolicy, normalized)
+
+
+def _format_template(template: str, context: Mapping[str, object], fallback: str) -> str:
+    """Format a template with graceful fallback on KeyError/ValueError."""
+    safe_context = {key: str(value) for key, value in context.items()}
+    try:
+        return template.format(**safe_context)
+    except KeyError:
+        return fallback
+    except ValueError:
+        return fallback

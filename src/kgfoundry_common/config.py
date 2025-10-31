@@ -64,25 +64,25 @@ def load_config(path: str) -> dict[str, object]:
         This function loads and validates YAML configuration files, ensuring
         all keys are strings and the root value is a dictionary.
 
-        Parameters
-        ----------
+    Parameters
+    ----------
         path : str
             Path to YAML configuration file.
 
-        Returns
-        -------
+    Returns
+    -------
         dict[str, object]
             Parsed configuration dictionary with string keys.
 
-        Raises
-        ------
+    Raises
+    ------
         FileNotFoundError
             If the configuration file does not exist.
         TypeError
             If the YAML does not decode to a dictionary or contains non-string keys.
 
-        Examples
-        --------
+    Examples
+    --------
         >>> import tempfile
         >>> import os
         >>> with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
@@ -104,7 +104,7 @@ def load_config(path: str) -> dict[str, object]:
     -------
     dict[str, object]
         Describe return value.
-"""
+    """
     with Path(path).open(encoding="utf-8") as f:
         loaded: object = yaml.safe_load(f)
     if not isinstance(loaded, dict):

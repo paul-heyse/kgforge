@@ -32,69 +32,85 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
     class _NoopMetric:
         """Describe  NoopMetric.
 
-    &lt;!-- auto:docstring-builder v1 --&gt;
+        &lt;!-- auto:docstring-builder v1 --&gt;
 
-    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+        Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+        """
 
         def labels(self, *args: object, **kwargs: object) -> _NoopMetric:
             """Describe labels.
 
-        &lt;!-- auto:docstring-builder v1 --&gt;
+            &lt;!-- auto:docstring-builder v1 --&gt;
 
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+            Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
 
-        Parameters
-        ----------
-        *args : object, optional, by default ()
+            Parameters
+            ----------
+            *args : object, optional, by default ()
             Configure the args. Defaults to ``()``.
-        **kwargs : object, optional, by default {}
+            **kwargs : object, optional, by default {}
             Configure the kwargs. Defaults to ``{}``.
 
 
-        Returns
-        -------
-        _NoopMetric
+            Returns
+            -------
+            _NoopMetric
             Describe return value.
-"""
+            """
             del args, kwargs
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
             """Describe observe.
 
-        &lt;!-- auto:docstring-builder v1 --&gt;
+            &lt;!-- auto:docstring-builder v1 --&gt;
 
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+            Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
 
-        Parameters
-        ----------
-        *args : object, optional, by default ()
+            Parameters
+            ----------
+            *args : object, optional, by default ()
             Configure the args. Defaults to ``()``.
-        **kwargs : object, optional, by default {}
+            **kwargs : object, optional, by default {}
             Configure the kwargs. Defaults to ``{}``.
-"""
+            """
             del args, kwargs
 
         def inc(self, *args: object, **kwargs: object) -> None:
             """Describe inc.
 
-        &lt;!-- auto:docstring-builder v1 --&gt;
+            &lt;!-- auto:docstring-builder v1 --&gt;
 
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+            Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
 
-        Parameters
-        ----------
-        *args : object, optional, by default ()
+            Parameters
+            ----------
+            *args : object, optional, by default ()
             Configure the args. Defaults to ``()``.
-        **kwargs : object, optional, by default {}
+            **kwargs : object, optional, by default {}
             Configure the kwargs. Defaults to ``{}``.
-"""
+            """
             del args, kwargs
 
         def set(self, *args: object, **kwargs: object) -> None:
             """Describe set.
 
+            &lt;!-- auto:docstring-builder v1 --&gt;
+
+            Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+
+            Parameters
+            ----------
+            *args : object, optional, by default ()
+            Configure the args. Defaults to ``()``.
+            **kwargs : object, optional, by default {}
+            Configure the kwargs. Defaults to ``{}``.
+            """
+            del args, kwargs
+
+    def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:
+        """Describe  make noop metric.
+
         &lt;!-- auto:docstring-builder v1 --&gt;
 
         Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
@@ -102,32 +118,16 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
         Parameters
         ----------
         *args : object, optional, by default ()
-            Configure the args. Defaults to ``()``.
-        **kwargs : object, optional, by default {}
-            Configure the kwargs. Defaults to ``{}``.
-"""
-            del args, kwargs
-
-    def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:
-        """Describe  make noop metric.
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
-
-    Parameters
-    ----------
-    *args : object, optional, by default ()
         Configure the args. Defaults to ``()``.
-    **kwargs : object, optional, by default {}
+        **kwargs : object, optional, by default {}
         Configure the kwargs. Defaults to ``{}``.
 
 
-    Returns
-    -------
-    _NoopMetric
+        Returns
+        -------
+        _NoopMetric
         Describe return value.
-"""
+        """
         del args, kwargs
         return _NoopMetric()
 

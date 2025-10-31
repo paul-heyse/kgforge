@@ -64,13 +64,13 @@ class SupportsResponse(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def raise_for_status(self) -> None:
         """Raise an HTTP error if the response indicates failure.
 
         <!-- auto:docstring-builder v1 -->
-"""
+        """
 
     def json(self) -> JsonValue:
         """Return the response payload as JSON.
@@ -81,7 +81,7 @@ class SupportsResponse(Protocol):
         -------
         object
             Decoded JSON body returned by the HTTP service. Can be a dict, list, str, int, float, bool, or None.
-"""
+        """
         ...
 
 
@@ -106,7 +106,7 @@ class SupportsHttp(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
         """Issue an HTTP ``GET`` request.
@@ -126,7 +126,7 @@ class SupportsHttp(Protocol):
         -------
         SupportsResponse
             Response wrapper produced by the HTTP implementation.
-"""
+        """
         ...
 
     def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
@@ -147,7 +147,7 @@ class SupportsHttp(Protocol):
         -------
         SupportsResponse
             Response wrapper produced by the HTTP implementation.
-"""
+        """
         ...
 
 
@@ -165,7 +165,7 @@ class RequestsHttp(SupportsHttp):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
         """Send a ``GET`` request using :func:`requests.get`.
@@ -185,7 +185,7 @@ class RequestsHttp(SupportsHttp):
         -------
         SupportsResponse
             Response returned by :mod:`requests`.
-"""
+        """
         # Cast args/kwargs for requests API compatibility
         # requests.get accepts *args and **kwargs with Any types
         # mypy cannot infer the complex overloads, so we use type: ignore
@@ -209,7 +209,7 @@ class RequestsHttp(SupportsHttp):
         -------
         SupportsResponse
             Response returned by :mod:`requests`.
-"""
+        """
         # Cast args/kwargs for requests API compatibility
         # requests.post accepts *args and **kwargs with Any types
         # mypy cannot infer the complex overloads, so we use type: ignore
@@ -238,7 +238,7 @@ class KGFoundryClient:
     http : SupportsHttp | None, optional
         Describe ``http``.
         Defaults to ``None``.
-"""
+    """
 
     def __init__(
         self,
@@ -265,7 +265,7 @@ class KGFoundryClient:
         http : SupportsHttp | NoneType, optional
             Describe ``http``.
             Defaults to ``None``.
-"""
+        """
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
@@ -280,7 +280,7 @@ class KGFoundryClient:
         -------
         dict[str, str]
             Header dictionary including ``Authorization`` when an API key is configured.
-"""
+        """
         headers = {"Content-Type": "application/json"}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
@@ -300,7 +300,7 @@ class KGFoundryClient:
         ------
         requests.HTTPError
         Raised when the API responds with a non-success status code.
-"""
+        """
         response = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         response.raise_for_status()
         return response.json()
@@ -339,7 +339,7 @@ class KGFoundryClient:
         ------
         requests.HTTPError
         Raised when the API responds with a non-success status code.
-"""
+        """
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         response = self._http.post(
             f"{self.base_url}/search",
@@ -372,7 +372,7 @@ class KGFoundryClient:
         ------
         requests.HTTPError
         Raised when the API responds with a non-success status code.
-"""
+        """
         response = self._http.post(
             f"{self.base_url}/graph/concepts",
             json={"q": q, "limit": limit},

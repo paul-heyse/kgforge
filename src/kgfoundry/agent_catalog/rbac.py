@@ -22,7 +22,7 @@ class Role(str, Enum):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     VIEWER = "viewer"
     CONTRIBUTOR = "contributor"
@@ -42,7 +42,7 @@ class AccessController:
     enabled : bool, optional
         Describe ``enabled``.
         Defaults to ``False``.
-"""
+    """
 
     role: Role
     enabled: bool = False
@@ -97,7 +97,7 @@ class AccessController:
         ----------
         method : str
             Describe ``method``.
-"""
+        """
         if not self.enabled:
             return
         allowed = self._PERMISSIONS.get(self.role, frozenset())

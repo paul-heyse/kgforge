@@ -53,4 +53,4 @@ class OntologyLoader:
     -------
     inspect._empty
         Describe return value.
-"""
+    """

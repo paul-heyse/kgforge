@@ -126,7 +126,7 @@ class CorrelationIDMiddleware(BaseHTTPMiddleware):
     dispatch : DispatchFunction | None, optional
         Describe ``dispatch``.
         Defaults to ``None``.
-"""
+    """
 
     async def dispatch(
         self,
@@ -148,7 +148,7 @@ class CorrelationIDMiddleware(BaseHTTPMiddleware):
         -------
         Response
             Describe return value.
-"""
+        """
         correlation_id = request.headers.get("X-Correlation-ID")
         if not correlation_id:
             correlation_id = str(uuid.uuid4())
@@ -177,7 +177,7 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
     schema_path : Path | None, optional
         Describe ``schema_path``.
         Defaults to ``None``.
-"""
+    """
 
     def __init__(
         self,
@@ -203,7 +203,7 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
             If None, searches for schema/search/search_response.json.
             Defaults to None.
             Defaults to ``None``.
-"""
+        """
         super().__init__(app)
         self.enabled = enabled
         if schema_path is None:
@@ -247,7 +247,7 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
         -------
         Response
             Describe return value.
-"""
+        """
         if not self.enabled or self.schema is None:
             return await call_next(request)
 
@@ -333,21 +333,21 @@ if settings.search.validate_responses:
     def _create_response_validator(app: FastAPI) -> ResponseValidationMiddleware:
         """Describe  create response validator.
 
-    &lt;!-- auto:docstring-builder v1 --&gt;
+        &lt;!-- auto:docstring-builder v1 --&gt;
 
-    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
 
-    Parameters
-    ----------
-    app : FastAPI
+        Parameters
+        ----------
+        app : FastAPI
         Configure the app.
 
 
-    Returns
-    -------
-    ResponseValidationMiddleware
+        Returns
+        -------
+        ResponseValidationMiddleware
         Describe return value.
-"""
+        """
         return ResponseValidationMiddleware(app, enabled=True)
 
     app.middleware("http")(_create_response_validator)
@@ -394,7 +394,7 @@ def auth(
     ------
     HTTPException
         Returns 401 if token is invalid or missing.
-"""
+    """
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing or invalid Bearer token")
     token = authorization.split(" ", 1)[1]
@@ -412,7 +412,7 @@ def healthz() -> dict[str, str | dict[str, str]]:
     -------
     dict[str, str | dict[str, str]]
         Health status with component availability.
-"""
+    """
     return {
         "status": "ok",
         "components": {
@@ -466,7 +466,7 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> SearchResponse:  # ty
     >>> response = search(req, None)
     >>> len(response.results) <= 5
     True
-"""
+    """
     # Correlation ID is set by middleware, use with_fields for structured logging
     with (
         with_fields(logger, operation="search", query=req.query, k=req.k),
@@ -607,7 +607,7 @@ def graph_concepts(
     >>> result = graph_concepts({"q": "test", "limit": 10}, None)
     >>> "concepts" in result
     True
-"""
+    """
     with with_fields(logger, operation="graph_concepts") as log_adapter:
         q: str = ""
         try:

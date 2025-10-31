@@ -16,28 +16,104 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+from collections.abc import Sequence
+from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
 import libcst as cst
-from libcst import matchers as m
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(levelname)s: %(message)s",
 )
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class PathlibArgs:
+    """Parsed CLI options for the pathlib codemod."""
+
+    targets: tuple[Path, ...]
+    dry_run: bool
+    log: Path | None
+
+
+def _parse_args(argv: Sequence[str] | None = None) -> PathlibArgs:
+    parser = argparse.ArgumentParser(
+        description="Convert os.path operations to pathlib.Path",
+    )
+    parser.add_argument(
+        "targets",
+        nargs="+",
+        type=Path,
+        help="Files or directories to transform",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Report changes without modifying files",
+    )
+    parser.add_argument(
+        "--log",
+        type=Path,
+        help="Write change log to file",
+    )
+
+    parsed: argparse.Namespace = parser.parse_args(argv)
+    targets = tuple(cast(list[Path], parsed.targets))
+    log_path = cast(Path | None, parsed.log)
+    dry_run = bool(cast(bool, parsed.dry_run))
+    return PathlibArgs(targets=targets, dry_run=dry_run, log=log_path)
+
+
+def _is_os_call(expression: cst.BaseExpression, *, name: str) -> bool:
+    return (
+        isinstance(expression, cst.Attribute)
+        and isinstance(expression.value, cst.Name)
+        and expression.value.value == "os"
+        and expression.attr.value == name
+    )
+
+
+def _is_os_path_call(expression: cst.BaseExpression, *, name: str) -> bool:
+    return (
+        isinstance(expression, cst.Attribute)
+        and isinstance(expression.value, cst.Attribute)
+        and isinstance(expression.value.value, cst.Name)
+        and expression.value.value.value == "os"
+        and expression.value.attr.value == "path"
+        and expression.attr.value == name
+    )
+
+
+def _is_name(node: cst.BaseExpression, value: str) -> bool:
+    return isinstance(node, cst.Name) and node.value == value
+
+
+MIN_PATH_PARTS = 2
+
+
+def _path_join_expression(arguments: Sequence[cst.Arg]) -> cst.BaseExpression | None:
+    pos_args = [arg for arg in arguments if arg.keyword is None]
+    if len(pos_args) < MIN_PATH_PARTS:
+        return None
+    base = cst.Call(
+        func=cst.Name("Path"),
+        args=(cst.Arg(pos_args[0].value),),
+    )
+    result: cst.BaseExpression = base
+    for arg in pos_args[1:]:
+        result = cst.BinaryOperation(
+            left=result,
+            operator=cst.Divide(),
+            right=arg.value,
+        )
+    return result
 
 
 class PathlibTransformer(cst.CSTTransformer):
-    """Transform os.path operations to pathlib.Path.
-
-    This transformer handles:
-    - os.makedirs(path, exist_ok=True) → Path(path).mkdir(parents=True, exist_ok=True)
-    - os.path.join(a, b, ...) → Path(a) / b / ...
-    - os.path.exists(path) → Path(path).exists()
-    - os.path.dirname(path) → Path(path).parent
-    - open(os.path.join(...)) → Path(...).open()
-    """
+    """Apply pathlib conversions to common ``os.path`` call sites."""
 
     def __init__(self) -> None:
         """Initialize transformer with change tracking."""
@@ -51,256 +127,227 @@ class PathlibTransformer(cst.CSTTransformer):
             if isinstance(alias.name, cst.Name) and alias.name.value == "pathlib":
                 self.needs_pathlib_import = True
 
-    def leave_Call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.Call:
+    def _transform_makedirs(self, node: cst.Call) -> cst.BaseExpression | None:
+        if not (
+            isinstance(node.func, cst.Attribute)
+            and _is_os_call(node.func, name="makedirs")
+            and node.args
+        ):
+            return None
+
+        path_arg = node.args[0].value
+        exist_ok = False
+        for kw in node.args:
+            if kw.keyword and _is_name(kw.keyword, "exist_ok"):
+                if isinstance(kw.value, cst.Name) and kw.value.value == "True":
+                    exist_ok = True
+                elif isinstance(kw.value, cst.Name) and kw.value.value == "False":
+                    exist_ok = False
+                break
+
+        self.changes.append("os.makedirs() → Path().mkdir()")
+        self.needs_pathlib_import = True
+
+        mkdir_keywords = [
+            cst.Arg(cst.Name("True"), keyword=cst.Name("parents")),
+        ]
+        if exist_ok:
+            mkdir_keywords.append(cst.Arg(cst.Name("True"), keyword=cst.Name("exist_ok")))
+
+        return cst.Call(
+            func=cst.Attribute(
+                value=cst.Call(
+                    func=cst.Name("Path"),
+                    args=(cst.Arg(path_arg),),
+                ),
+                attr=cst.Name("mkdir"),
+            ),
+            args=tuple(mkdir_keywords),
+        )
+
+    def _transform_path_join(self, node: cst.Call) -> cst.BaseExpression | None:
+        if not (isinstance(node.func, cst.Attribute) and _is_os_path_call(node.func, name="join")):
+            return None
+        join_expr = _path_join_expression(node.args)
+        if join_expr is None:
+            return None
+        self.changes.append("os.path.join() → Path / operator")
+        self.needs_pathlib_import = True
+        return join_expr
+
+    def _transform_exists(self, node: cst.Call) -> cst.BaseExpression | None:
+        if not (
+            isinstance(node.func, cst.Attribute)
+            and _is_os_path_call(node.func, name="exists")
+            and node.args
+        ):
+            return None
+        self.changes.append("os.path.exists() → Path().exists()")
+        self.needs_pathlib_import = True
+        return cst.Call(
+            func=cst.Attribute(
+                value=cst.Call(
+                    func=cst.Name("Path"),
+                    args=(cst.Arg(node.args[0].value),),
+                ),
+                attr=cst.Name("exists"),
+            ),
+        )
+
+    def _transform_dirname(self, node: cst.Call) -> cst.BaseExpression | None:
+        if not (
+            isinstance(node.func, cst.Attribute)
+            and _is_os_path_call(node.func, name="dirname")
+            and node.args
+        ):
+            return None
+        self.changes.append("os.path.dirname() → Path().parent")
+        self.needs_pathlib_import = True
+        return cst.Attribute(
+            value=cst.Call(
+                func=cst.Name("Path"),
+                args=(cst.Arg(node.args[0].value),),
+            ),
+            attr=cst.Name("parent"),
+        )
+
+    def leave_Call(  # noqa: N802 (LibCST visitor pattern)
+        self, original_node: cst.Call, updated_node: cst.Call
+    ) -> cst.BaseExpression:
         """Transform function calls to pathlib equivalents."""
-        # os.makedirs(path, exist_ok=True) → Path(path).mkdir(parents=True, exist_ok=True)
-        if m.matches(
-            original_node,
-            m.Call(
-                func=m.Attribute(value=m.Name("os"), attr=m.Name("makedirs")),
-            ),
+        for transformer in (
+            self._transform_makedirs,
+            self._transform_path_join,
+            self._transform_exists,
+            self._transform_dirname,
         ):
-            args = original_node.args
-            if len(args) >= 1:
-                path_arg = args[0].value
-                # Check for exist_ok keyword
-                exist_ok = False
-                for kw in original_node.args:
-                    if kw.keyword and kw.keyword.value == "exist_ok":
-                        if isinstance(kw.value, cst.Name) and kw.value.value == "True":
-                            exist_ok = True
-                        elif isinstance(kw.value, cst.Name) and kw.value.value == "False":
-                            exist_ok = False
-                        break
-
-                self.changes.append("os.makedirs() → Path().mkdir()")
-                self.needs_pathlib_import = True
-
-                # Build Path(path).mkdir(parents=True, exist_ok=...)
-                mkdir_keywords = [
-                    cst.Arg(
-                        cst.Name("True"),
-                        keyword=cst.Name("parents"),
-                    ),
-                ]
-                if exist_ok:
-                    mkdir_keywords.append(
-                        cst.Arg(
-                            cst.Name("True"),
-                            keyword=cst.Name("exist_ok"),
-                        ),
-                    )
-
-                return cst.Call(
-                    func=cst.Attribute(
-                        value=cst.Call(
-                            func=cst.Name("Path"),
-                            args=[cst.Arg(path_arg)],
-                        ),
-                        attr=cst.Name("mkdir"),
-                    ),
-                    args=mkdir_keywords,
-                )
-
-        # os.path.join(a, b, ...) → Path(a) / b / ...
-        if m.matches(
-            original_node,
-            m.Call(
-                func=m.Attribute(
-                    value=m.Attribute(value=m.Name("os"), attr=m.Name("path")),
-                    attr=m.Name("join"),
-                ),
-            ),
-        ):
-            if len(original_node.args) >= 2:
-                self.changes.append("os.path.join() → Path / operator")
-                self.needs_pathlib_import = True
-
-                # Convert Path(arg0) / arg1 / arg2 / ...
-                # Only use positional args (skip keyword args)
-                pos_args = [arg for arg in original_node.args if not arg.keyword]
-                if len(pos_args) >= 2:
-                    base = cst.Call(
-                        func=cst.Name("Path"),
-                        args=[cst.Arg(pos_args[0].value)],
-                    )
-                    result: cst.BaseExpression = base
-                    for arg in pos_args[1:]:
-                        result = cst.BinaryOperation(
-                            left=result,
-                            operator=cst.Divide(),
-                            right=arg.value,
-                        )
-                    return result
-
-        # os.path.exists(path) → Path(path).exists()
-        if m.matches(
-            original_node,
-            m.Call(
-                func=m.Attribute(
-                    value=m.Attribute(value=m.Name("os"), attr=m.Name("path")),
-                    attr=m.Name("exists"),
-                ),
-            ),
-        ):
-            if len(original_node.args) >= 1:
-                self.changes.append("os.path.exists() → Path().exists()")
-                self.needs_pathlib_import = True
-                return cst.Call(
-                    func=cst.Attribute(
-                        value=cst.Call(
-                            func=cst.Name("Path"),
-                            args=[cst.Arg(original_node.args[0].value)],
-                        ),
-                        attr=cst.Name("exists"),
-                    ),
-                )
-
-        # os.path.dirname(path) → Path(path).parent
-        if m.matches(
-            original_node,
-            m.Call(
-                func=m.Attribute(
-                    value=m.Attribute(value=m.Name("os"), attr=m.Name("path")),
-                    attr=m.Name("dirname"),
-                ),
-            ),
-        ):
-            if len(original_node.args) >= 1:
-                self.changes.append("os.path.dirname() → Path().parent")
-                self.needs_pathlib_import = True
-                return cst.Attribute(
-                    value=cst.Call(
-                        func=cst.Name("Path"),
-                        args=[cst.Arg(original_node.args[0].value)],
-                    ),
-                    attr=cst.Name("parent"),
-                )
+            replacement = transformer(original_node)
+            if replacement is not None:
+                return replacement
 
         return updated_node
 
-    def leave_With(self, original_node: cst.With, updated_node: cst.With) -> cst.With:
+    def leave_With(  # noqa: N802 (LibCST visitor pattern)
+        self, original_node: cst.With, updated_node: cst.With
+    ) -> cst.With:
         """Transform open(os.path.join(...)) patterns."""
         # Handle open(os.path.join(...)) → Path(...).open()
-        for item in original_node.items:
-            if isinstance(item, cst.WithItem):
-                if m.matches(
-                    item.item,
-                    m.Call(
-                        func=m.Name("open"),
-                        args=[
-                            m.Arg(
-                                value=m.Call(
-                                    func=m.Attribute(
-                                        value=m.Attribute(
-                                            value=m.Name("os"),
-                                            attr=m.Name("path"),
-                                        ),
-                                        attr=m.Name("join"),
-                                    ),
-                                ),
-                            ),
-                        ],
-                    ),
-                ):
-                    # Extract path components
-                    join_call = item.item
-                    if isinstance(join_call, cst.Call) and len(join_call.args) >= 2:
-                        self.changes.append("open(os.path.join(...)) → Path(...).open()")
-                        self.needs_pathlib_import = True
+        for index, (original_item, updated_item) in enumerate(
+            zip(original_node.items, updated_node.items, strict=True)
+        ):
+            original_call = original_item.item
+            if (
+                not isinstance(original_call, cst.Call)
+                or not isinstance(original_call.func, cst.Name)
+                or original_call.func.value != "open"
+                or not original_call.args
+            ):
+                continue
 
-                        # Build Path(arg0) / arg1 / ... / argN
-                        # Only use positional args (skip keyword args)
-                        pos_args = [arg for arg in join_call.args if not arg.keyword]
-                        if len(pos_args) >= 2:
-                            base = cst.Call(
-                                func=cst.Name("Path"),
-                                args=[cst.Arg(pos_args[0].value)],
-                            )
-                            result: cst.BaseExpression = base
-                            for arg in pos_args[1:]:
-                                result = cst.BinaryOperation(
-                                    left=result,
-                                    operator=cst.Divide(),
-                                    right=arg.value,
-                                )
-                        else:
-                            return updated_node
+            first_arg = original_call.args[0]
+            if first_arg.keyword is not None:
+                continue
 
-                        # Replace open(os.path.join(...)) with Path(...).open()
-                        new_items = []
-                        for orig_item in updated_node.items:
-                            if orig_item == item:
-                                new_open_call = cst.Call(
-                                    func=cst.Attribute(
-                                        value=result,
-                                        attr=cst.Name("open"),
-                                    ),
-                                    args=join_call.args[len(join_call.args) :],
-                                )
-                                new_items.append(
-                                    cst.WithItem(
-                                        item=new_open_call,
-                                        asname=item.asname,
-                                    ),
-                                )
-                            else:
-                                new_items.append(orig_item)
+            join_call = first_arg.value
+            if not (
+                isinstance(join_call, cst.Call)
+                and isinstance(join_call.func, cst.Attribute)
+                and _is_os_path_call(join_call.func, name="join")
+            ):
+                continue
 
-                        return updated_node.with_changes(items=tuple(new_items))
+            path_expr = _path_join_expression(join_call.args)
+            if path_expr is None:
+                continue
+
+            self.changes.append("open(os.path.join(...)) → Path(...).open()")
+            self.needs_pathlib_import = True
+
+            remaining_args: tuple[cst.Arg, ...] = ()
+            if isinstance(updated_item.item, cst.Call):
+                remaining_args = tuple(updated_item.item.args[1:])
+
+            new_open_call = cst.Call(
+                func=cst.Attribute(
+                    value=path_expr,
+                    attr=cst.Name("open"),
+                ),
+                args=remaining_args,
+            )
+
+            new_items = list(updated_node.items)
+            new_items[index] = cst.WithItem(
+                item=new_open_call,
+                asname=updated_item.asname,
+            )
+            return updated_node.with_changes(items=tuple(new_items))
 
         return updated_node
+
+
+def _iter_simple_bodies(module: cst.Module) -> Sequence[cst.CSTNode]:
+    items: list[cst.CSTNode] = []
+    for statement in module.body:
+        if isinstance(statement, cst.SimpleStatementLine):
+            items.extend(statement.body)
+    return items
+
+
+def _module_has_pathlib(module: cst.Module) -> bool:
+    for node in _iter_simple_bodies(module):
+        imports_pathlib = isinstance(node, cst.Import) and any(
+            isinstance(alias.name, cst.Name) and alias.name.value == "pathlib"
+            for alias in node.names
+        )
+        from_pathlib = (
+            isinstance(node, cst.ImportFrom)
+            and isinstance(node.module, cst.Name)
+            and node.module.value == "pathlib"
+        )
+        if imports_pathlib or from_pathlib:
+            return True
+    return False
+
+
+def _insertion_index(module: cst.Module) -> int:
+    index_after_future = 0
+    for position, statement in enumerate(module.body):
+        if not isinstance(statement, cst.SimpleStatementLine):
+            continue
+        if any(
+            isinstance(item, cst.ImportFrom)
+            and isinstance(item.module, cst.Name)
+            and item.module.value == "__future__"
+            for item in statement.body
+        ):
+            index_after_future = position + 1
+    return index_after_future
+
+
+def _pathlib_import_statement() -> cst.SimpleStatementLine:
+    return cst.SimpleStatementLine(
+        body=[
+            cst.Import(
+                names=[
+                    cst.ImportAlias(
+                        name=cst.Name("pathlib"),
+                    ),
+                ],
+            ),
+        ],
+    )
 
 
 def ensure_pathlib_import(
     module: cst.Module,
 ) -> cst.Module:
     """Add pathlib import if missing."""
-    has_pathlib = False
-    for stmt in module.body:
-        if isinstance(stmt, cst.SimpleStatementLine):
-            for stmt_body in stmt.body:
-                if isinstance(stmt_body, cst.Import):
-                    for alias in stmt_body.names:
-                        if isinstance(alias.name, cst.Name) and alias.name.value == "pathlib":
-                            has_pathlib = True
-                elif isinstance(stmt_body, cst.ImportFrom):
-                    if (
-                        isinstance(stmt_body.module, cst.Name)
-                        and stmt_body.module.value == "pathlib"
-                    ):
-                        has_pathlib = True
+    if _module_has_pathlib(module):
+        return module
 
-    if not has_pathlib:
-        # Find insertion point after __future__ imports
-        insert_idx = 0
-        for i, stmt in enumerate(module.body):
-            if isinstance(stmt, cst.SimpleStatementLine):
-                for stmt_body in stmt.body:
-                    if isinstance(stmt_body, cst.ImportFrom):
-                        if (
-                            isinstance(stmt_body.module, cst.Name)
-                            and stmt_body.module.value == "__future__"
-                        ):
-                            insert_idx = i + 1
-                            break
-
-        new_import = cst.SimpleStatementLine(
-            body=[
-                cst.Import(
-                    names=[
-                        cst.ImportAlias(
-                            name=cst.Name("pathlib"),
-                        ),
-                    ],
-                ),
-            ],
-        )
-        new_body = list(module.body)
-        new_body.insert(insert_idx, new_import)
-        return module.with_changes(body=tuple(new_body))
-
-    return module
+    new_body = list(module.body)
+    new_body.insert(_insertion_index(module), _pathlib_import_statement())
+    return module.with_changes(body=tuple(new_body))
 
 
 def transform_file(file_path: Path, dry_run: bool = False) -> list[str]:
@@ -362,31 +409,12 @@ def main() -> int:
     int
         Exit code (0 on success, 1 on error).
     """
-    parser = argparse.ArgumentParser(
-        description="Convert os.path operations to pathlib.Path",
-    )
-    parser.add_argument(
-        "targets",
-        nargs="+",
-        help="Files or directories to transform",
-    )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Report changes without modifying files",
-    )
-    parser.add_argument(
-        "--log",
-        help="Write change log to file",
-    )
-
-    args = parser.parse_args()
+    args = _parse_args()
 
     all_changes: dict[Path, list[str]] = {}
     target_paths: list[Path] = []
 
-    for target in args.targets:
-        path = Path(target)
+    for path in args.targets:
         if path.is_file() and path.suffix == ".py":
             target_paths.append(path)
         elif path.is_dir():
@@ -405,8 +433,8 @@ def main() -> int:
         if changes:
             all_changes[file_path] = changes
 
-    if args.log:
-        log_path = Path(args.log)
+    if args.log is not None:
+        log_path = args.log
         with log_path.open("w", encoding="utf-8") as f:
             f.write("Pathlib Codemod Change Log\n")
             f.write("=" * 50 + "\n\n")

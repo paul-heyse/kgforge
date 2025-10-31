@@ -15,20 +15,59 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+from collections.abc import Sequence
+from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
 import libcst as cst
-from libcst import matchers as m
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(levelname)s: %(message)s",
 )
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class BlindExceptArgs:
+    """Parsed CLI options for the blind-except codemod."""
+
+    targets: tuple[Path, ...]
+    dry_run: bool
+    log: Path | None
+
+
+def _parse_args(argv: Sequence[str] | None = None) -> BlindExceptArgs:
+    parser = argparse.ArgumentParser(
+        description="Transform blind except blocks to add TODOs and exception variables",
+    )
+    parser.add_argument(
+        "targets",
+        nargs="+",
+        type=Path,
+        help="Files or directories to transform",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Report changes without modifying files",
+    )
+    parser.add_argument(
+        "--log",
+        type=Path,
+        help="Write change log to file",
+    )
+
+    parsed: argparse.Namespace = parser.parse_args(argv)
+    targets = tuple(cast(list[Path], parsed.targets))
+    log_path = cast(Path | None, parsed.log)
+    dry_run = bool(cast(bool, parsed.dry_run))
+    return BlindExceptArgs(targets=targets, dry_run=dry_run, log=log_path)
 
 
 class BlindExceptTransformer(cst.CSTTransformer):
-    """Transform blind except blocks to add TODOs and exception variable names."""
+    """Rewrite blind ``except`` handlers to capture exceptions explicitly."""
 
     def __init__(self) -> None:
         """Initialize transformer with change tracking."""
@@ -44,14 +83,15 @@ class BlindExceptTransformer(cst.CSTTransformer):
         # Match `except Exception:` or bare `except:`
         is_blind_except = False
 
+        exc_type: cst.BaseExpression | None = updated_node.type
+        whitespace_after_except = updated_node.whitespace_after_except
         if original_node.type is None:
             # Bare `except:`
             is_blind_except = True
             self.changes.append("bare except: → TODO + exception variable")
-        elif m.matches(
-            original_node.type,
-            m.Name("Exception"),
-        ):
+            exc_type = cst.Name("Exception")
+            whitespace_after_except = cst.SimpleWhitespace(" ")
+        elif isinstance(original_node.type, cst.Name) and original_node.type.value == "Exception":
             # `except Exception:`
             is_blind_except = True
             self.changes.append("except Exception: → TODO + logging scaffold")
@@ -73,10 +113,16 @@ class BlindExceptTransformer(cst.CSTTransformer):
         new_body = cst.IndentedBlock(body=body_statements)
 
         # Update handler with name if changed
-        if updated_node.name != exc_var_name:
+        if (
+            updated_node.name != exc_var_name
+            or updated_node.type is not exc_type
+            or updated_node.whitespace_after_except is not whitespace_after_except
+        ):
             return updated_node.with_changes(
                 body=new_body,
                 name=exc_var_name,
+                type=exc_type,
+                whitespace_after_except=whitespace_after_except,
             )
         return updated_node.with_changes(body=new_body)
 
@@ -137,31 +183,12 @@ def main() -> int:
     int
         Exit code (0 on success, 1 on error).
     """
-    parser = argparse.ArgumentParser(
-        description="Transform blind except blocks to add TODOs and exception variables",
-    )
-    parser.add_argument(
-        "targets",
-        nargs="+",
-        help="Files or directories to transform",
-    )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Report changes without modifying files",
-    )
-    parser.add_argument(
-        "--log",
-        help="Write change log to file",
-    )
-
-    args = parser.parse_args()
+    args = _parse_args()
 
     all_changes: dict[Path, list[str]] = {}
     target_paths: list[Path] = []
 
-    for target in args.targets:
-        path = Path(target)
+    for path in args.targets:
         if path.is_file() and path.suffix == ".py":
             target_paths.append(path)
         elif path.is_dir():
@@ -180,8 +207,8 @@ def main() -> int:
         if changes:
             all_changes[file_path] = changes
 
-    if args.log:
-        log_path = Path(args.log)
+    if args.log is not None:
+        log_path = args.log
         with log_path.open("w", encoding="utf-8") as f:
             f.write("Blind Except Codemod Change Log\n")
             f.write("=" * 50 + "\n\n")

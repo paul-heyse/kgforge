@@ -56,7 +56,7 @@ class SearchResponse(BaseModel):
     ----------
     **data : Any
         Describe ``data``.
-"""
+    """
 
     model_config = ConfigDict(extra="forbid")
 
@@ -98,7 +98,7 @@ class SearchRequest(BaseModel):
     ...     / "search_request.v1.json"
     ... )
     >>> assert_model_roundtrip(SearchRequest, example_path)
-"""
+    """
 
     model_config = ConfigDict(extra="forbid")
 
@@ -151,7 +151,7 @@ class SearchResult(BaseModel):
     ...     / "search_result.v1.json"
     ... )
     >>> assert_model_roundtrip(SearchResult, example_path)
-"""
+    """
 
     model_config = ConfigDict(extra="forbid")
 

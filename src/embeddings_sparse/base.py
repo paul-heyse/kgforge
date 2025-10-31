@@ -66,7 +66,7 @@ class SparseEncoder(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     name: str
 
@@ -86,7 +86,7 @@ class SparseEncoder(Protocol):
         -------
         list[tuple[list[int], list[float]]]
             Describe return value.
-"""
+        """
         ...
 
 
@@ -111,7 +111,7 @@ class SparseIndex(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Describe build.
@@ -124,7 +124,7 @@ class SparseIndex(Protocol):
         ----------
         docs_iterable : tuple[str, dict[str, str]]
             Describe ``docs_iterable``.
-"""
+        """
         ...
 
     def search(
@@ -150,5 +150,5 @@ class SparseIndex(Protocol):
         -------
         list[tuple[str, float]]
             Describe return value.
-"""
+        """
         ...

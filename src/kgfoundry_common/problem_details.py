@@ -37,17 +37,21 @@ from kgfoundry_common.logging import get_logger
 # JsonPrimitive represents the basic JSON types
 JsonPrimitive = str | int | float | bool | None
 
+# Recursive JSON type alias (used only for type checking)
 if TYPE_CHECKING:
-    # Recursive JSON type alias for type checking
-    type JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
+    JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
 else:
-    # Runtime: use object (matches jsonschema's expectations)
     JsonValue = object  # type: ignore[assignment, misc]
+
+JsonObject = dict[str, JsonValue]
 
 # JSON Schema type (from jsonschema stubs: Mapping[str, object])
 JsonSchema = Mapping[str, object]
 
 __all__ = [
+    "JsonObject",
+    "JsonPrimitive",
+    "JsonValue",
     "ProblemDetails",
     "ProblemDetailsValidationError",
     "build_problem_details",
@@ -68,7 +72,7 @@ class ProblemDetails(TypedDict, total=False):
     &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    """
 
     type: str
     title: str
@@ -95,7 +99,7 @@ class ProblemDetailsValidationError(Exception):
     Examples
     --------
     >>> raise ProblemDetailsValidationError("Missing required field: type")
-"""
+    """
 
     def __init__(self, message: str, validation_errors: list[str] | None = None) -> None:
         """Initialize validation error.
@@ -109,7 +113,7 @@ class ProblemDetailsValidationError(Exception):
         validation_errors : list[str] | NoneType, optional
             List of specific validation error messages. Defaults to None.
             Defaults to ``None``.
-"""
+        """
         super().__init__(message)
         self.validation_errors = validation_errors or []
 
@@ -129,7 +133,7 @@ def _load_schema() -> JsonSchema:
     ------
     ProblemDetailsValidationError
         If schema file is missing or invalid.
-"""
+    """
     if not _SCHEMA_PATH.exists():
         msg = f"Problem Details schema not found: {_SCHEMA_PATH}"
         raise ProblemDetailsValidationError(msg)
@@ -176,7 +180,7 @@ def validate_problem_details(payload: dict[str, object]) -> None:
     ...     "instance": "/api/v1/operation",
     ... }
     >>> validate_problem_details(problem)
-"""
+    """
     schema = _load_schema()
     try:
         jsonschema.validate(instance=payload, schema=schema)
@@ -250,7 +254,7 @@ def build_problem_details(  # noqa: PLR0913
     ... )
     >>> assert problem["type"] == "https://kgfoundry.dev/problems/tool-timeout"
     >>> assert problem["status"] == 504
-"""
+    """
     payload: dict[str, object] = {
         "type": type,
         "title": title,
@@ -323,7 +327,7 @@ def problem_from_exception(  # noqa: PLR0913
     ...         instance="urn:validation:input",
     ...     )
     >>> assert "Invalid input" in problem["detail"]
-"""
+    """
     detail = str(exc)
     exc_type_name = exc.__class__.__name__
     merged_extensions: dict[str, JsonValue] = {
@@ -377,5 +381,5 @@ def render_problem(problem: ProblemDetails | dict[str, object]) -> str:
     >>> json_str = render_problem(problem)
     >>> assert json_str.startswith("{")
     >>> assert "tool-failure" in json_str
-"""
+    """
     return json.dumps(problem, default=str, ensure_ascii=False)

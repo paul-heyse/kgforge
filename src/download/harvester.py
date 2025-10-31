@@ -73,7 +73,7 @@ class HarvesterConfig:
     out_dir : str, optional
         Describe ``out_dir``.
         Defaults to ``'/data/pdfs'``.
-"""
+    """
 
     openalex_base: str = "https://api.openalex.org"
     unpaywall_base: str = "https://api.unpaywall.org"
@@ -107,7 +107,7 @@ class OpenAccessHarvester:
     Raised when TODO for DownloadError.
     UnsupportedMIMEError
     Raised when TODO for UnsupportedMIMEError.
-"""
+    """
 
     def __init__(
         self,
@@ -130,7 +130,7 @@ class OpenAccessHarvester:
         config : HarvesterConfig | NoneType, optional
             Describe ``config``.
             Defaults to ``None``.
-"""
+        """
         cfg = config or HarvesterConfig()
         self.ua = user_agent
         self.email = contact_email
@@ -167,7 +167,7 @@ class OpenAccessHarvester:
         ------
         TypeError
         Raised when TODO for TypeError.
-"""
+        """
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
             "topic": topic,
@@ -208,7 +208,7 @@ class OpenAccessHarvester:
         -------
         str | NoneType
             Describe return value.
-"""
+        """
         direct = self._lookup_direct_pdf(work)
         if direct:
             return direct
@@ -243,7 +243,7 @@ class OpenAccessHarvester:
         -------
         str | NoneType
             Describe return value.
-"""
+        """
         best = work.get("best_oa_location")
         if isinstance(best, Mapping):
             pdf_url = best.get("pdf_url")
@@ -267,7 +267,7 @@ class OpenAccessHarvester:
         -------
         str | NoneType
             Describe return value.
-"""
+        """
         if isinstance(locations, (str, bytes)):
             return None
         if not isinstance(locations, Sequence):
@@ -295,7 +295,7 @@ class OpenAccessHarvester:
         -------
         str | NoneType
             Describe return value.
-"""
+        """
         response = self.session.get(
             f"{self.unpaywall}/v2/{doi}", params={"email": self.email}, timeout=15
         )
@@ -326,7 +326,7 @@ class OpenAccessHarvester:
         -------
         str | NoneType
             Describe return value.
-"""
+        """
         if not self.pdf_host:
             return None
         return f"{self.pdf_host}/pdf/{doi.replace('/', '_')}.pdf"
@@ -356,7 +356,7 @@ class OpenAccessHarvester:
         Raised when TODO for DownloadError.
         UnsupportedMIMEError
         Raised when TODO for UnsupportedMIMEError.
-"""
+        """
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
             message = f"Bad status {response.status_code} for {url}"
@@ -390,7 +390,7 @@ class OpenAccessHarvester:
         -------
         list[Doc]
             Describe return value.
-"""
+        """
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)
         for work in works:

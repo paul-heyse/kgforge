@@ -140,7 +140,7 @@ class FaissIndexProtocol(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def add(self, vectors: VectorArray) -> None:
         """Add vectors to the index.
@@ -159,7 +159,7 @@ class FaissIndexProtocol(Protocol):
             If index has not been trained (for trainable indexes).
         ValueError
             If vector dimensions do not match index configuration.
-"""
+        """
         ...
 
     def search(self, vectors: VectorArray, k: int) -> tuple[NDArray[np.float32], NDArray[np.int64]]:
@@ -187,7 +187,7 @@ class FaissIndexProtocol(Protocol):
         - For inner-product metrics, higher scores indicate better matches
         - Invalid indices (no match) are typically represented as -1
         - Search performance depends on index type (exact vs approximate)
-"""
+        """
         ...
 
     def train(self, vectors: VectorArray) -> None:
@@ -208,7 +208,7 @@ class FaissIndexProtocol(Protocol):
         - Flat indexes (exact search) do not require training
         - Quantized indexes (IVF, PQ) require training before add()
         - Calling train() on a non-trainable index is a no-op
-"""
+        """
         ...
 
     def add_with_ids(self, vectors: VectorArray, ids: IndexArray) -> None:
@@ -230,7 +230,7 @@ class FaissIndexProtocol(Protocol):
         -----
         - IndexIDMap2 wrapper enables add_with_ids for any base index
         - If not supported, use add() which assigns sequential IDs
-"""
+        """
         ...
 
 
@@ -266,7 +266,7 @@ class FaissModuleProtocol(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     METRIC_INNER_PRODUCT: int
     """Constant for inner-product metric (used with index_factory)."""
@@ -294,7 +294,7 @@ class FaissModuleProtocol(Protocol):
         - Flat indexes provide exact search but are slower for large datasets
         - Suitable for small-to-medium corpora (< 1M vectors)
         - No training required before adding vectors
-"""
+        """
         ...
 
     def index_factory(self, dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
@@ -320,7 +320,7 @@ class FaissModuleProtocol(Protocol):
         --------
         >>> # Create quantized index for large-scale search
         >>> index = faiss.index_factory(2560, "OPQ64,IVF8192,PQ64", faiss.METRIC_INNER_PRODUCT)
-"""
+        """
         ...
 
     def IndexIDMap2(self, index: FaissIndexProtocol) -> FaissIndexProtocol:  # noqa: N802
@@ -342,7 +342,7 @@ class FaissModuleProtocol(Protocol):
         -----
         - Use IndexIDMap2 for large corpora requiring 64-bit IDs
         - Wrapped index supports add_with_ids(vectors, ids) method
-"""
+        """
         ...
 
     def write_index(self, index: FaissIndexProtocol, path: str) -> None:
@@ -361,7 +361,7 @@ class FaissModuleProtocol(Protocol):
         ------
         OSError
             If the file cannot be written.
-"""
+        """
         ...
 
     def read_index(self, path: str) -> FaissIndexProtocol:
@@ -385,7 +385,7 @@ class FaissModuleProtocol(Protocol):
             If the index file does not exist.
         OSError
             If the file cannot be read or is corrupted.
-"""
+        """
         ...
 
     def normalize_L2(self, vectors: VectorArray) -> None:  # noqa: N802
@@ -403,7 +403,7 @@ class FaissModuleProtocol(Protocol):
         - Normalization is required for inner-product search
         - Operation is destructive (modifies input array)
         - Zero vectors are handled gracefully (no division by zero)
-"""
+        """
         ...
 
 
@@ -422,13 +422,13 @@ class GpuResourcesProtocol(Protocol):
     ...     def __init__(self) -> None:
     ...         pass
     >>> resources: GpuResourcesProtocol = MockGpuResources()
-"""
+    """
 
     def __init__(self) -> None:
         """Initialize GPU resources.
 
         <!-- auto:docstring-builder v1 -->
-"""
+        """
         ...
 
 
@@ -459,7 +459,7 @@ class GpuClonerOptionsProtocol(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     use_cuvs: bool
     """Enable cuVS acceleration for GPU operations (default: False)."""
@@ -496,7 +496,7 @@ class VectorSearchResult:
     ...     vector_score=0.95,
     ... )
     >>> assert result.score == 0.95
-"""
+    """
 
     doc_id: str
     """Document identifier (URN format)."""
@@ -517,7 +517,7 @@ class VectorSearchResult:
 
         This method is called automatically by dataclass after initialization.
         In frozen dataclasses, we can't modify fields, so validation is limited.
-"""
+        """
         # Dataclass types are enforced at construction time, so runtime validation
         # is primarily for documentation. The type checker ensures correct usage.
 
@@ -554,7 +554,7 @@ class SpladeEncoderProtocol(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def encode(self, texts: Sequence[str]) -> VectorArray:
         """Encode text sequences into sparse vector representations.
@@ -578,7 +578,7 @@ class SpladeEncoderProtocol(Protocol):
             If the encoder model fails to load or encode.
         ValueError
             If input texts are invalid or exceed maximum sequence length.
-"""
+        """
         ...
 
 
@@ -613,7 +613,7 @@ class BM25IndexProtocol(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def search(self, query: str, k: int = 10) -> list[tuple[str, float]]:
         """Search the index for documents matching the query.
@@ -640,7 +640,7 @@ class BM25IndexProtocol(Protocol):
             If the index has not been built or loaded.
         ValueError
             If the query is empty or invalid.
-"""
+        """
         ...
 
 
@@ -679,7 +679,7 @@ class AgentSearchQuery:
     ... )
     >>> assert query.k == 10
     >>> assert query.facets["package"] == "search_api"
-"""
+    """
 
     query: str
     """Search query text (tokenized and normalized internally)."""
@@ -713,7 +713,7 @@ class AgentSearchQuery:
         ------
         ValueError
             If query is empty or k is not positive.
-"""
+        """
         if not self.query.strip():
             msg = "Query text cannot be empty"
             raise ValueError(msg)
@@ -728,7 +728,7 @@ class VectorSearchResultTypedDict(TypedDict, total=True):
     &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    """
 
     symbol_id: str
     """Fully qualified symbol identifier (e.g., 'py:module.Class.method')."""
@@ -767,7 +767,7 @@ class AgentSearchResponse(TypedDict, total=True):
     &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-"""
+    """
 
     results: list[VectorSearchResultTypedDict]
     """List of search results, sorted by score descending."""

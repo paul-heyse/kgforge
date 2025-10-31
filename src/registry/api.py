@@ -62,7 +62,7 @@ class Registry(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def begin_dataset(self, kind: str, run_id: str) -> str:
         """Describe begin dataset.
@@ -82,7 +82,7 @@ class Registry(Protocol):
         -------
         str
             Describe return value.
-"""
+        """
         ...
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
@@ -100,7 +100,7 @@ class Registry(Protocol):
             Describe ``parquet_root``.
         rows : int
             Describe ``rows``.
-"""
+        """
         ...
 
     def rollback_dataset(self, dataset_id: str) -> None:
@@ -114,7 +114,7 @@ class Registry(Protocol):
         ----------
         dataset_id : str
             Describe ``dataset_id``.
-"""
+        """
         ...
 
     def insert_run(
@@ -145,7 +145,7 @@ class Registry(Protocol):
         -------
         str
             Describe return value.
-"""
+        """
         ...
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
@@ -164,7 +164,7 @@ class Registry(Protocol):
         notes : str | NoneType, optional
             Describe ``notes``.
             Defaults to ``None``.
-"""
+        """
         ...
 
     def register_documents(self, docs: list[Doc]) -> None:
@@ -178,7 +178,7 @@ class Registry(Protocol):
         ----------
         docs : list[Doc]
             Describe ``docs``.
-"""
+        """
         ...
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
@@ -192,7 +192,7 @@ class Registry(Protocol):
         ----------
         assets : list[DoctagsAsset]
             Describe ``assets``.
-"""
+        """
         ...
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
@@ -210,7 +210,7 @@ class Registry(Protocol):
             Describe ``subject_id``.
         payload : str | object
             Describe ``payload``.
-"""
+        """
         ...
 
     def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
@@ -230,5 +230,5 @@ class Registry(Protocol):
             Describe ``error_class``.
         message : str
             Describe ``message``.
-"""
+        """
         ...

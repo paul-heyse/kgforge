@@ -103,7 +103,7 @@ def index_bm25(
       fails due to transient errors (e.g., file system issues), run the
       command again manually. For persistent failures, check logs and
       verify input data integrity.
-"""
+    """
     Path(index_dir).mkdir(parents=True, exist_ok=True)
 
     # Check if index already exists and warn if so (idempotency)
@@ -201,7 +201,7 @@ def index_faiss(
       fails due to transient errors (e.g., GPU memory issues), run the
       command again manually. For persistent failures, check logs and
       verify input data integrity.
-"""
+    """
     Path(index_path).parent.mkdir(parents=True, exist_ok=True)
 
     # Check if index already exists and warn if so (idempotency)
@@ -244,7 +244,7 @@ def api(port: int = 8080) -> None:
     port : int, optional
         Describe ``port``.
         Defaults to ``8080``.
-"""
+    """
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
@@ -262,7 +262,7 @@ def e2e() -> None:
     ------
     Exit
     Raised when TODO for Exit.
-"""
+    """
     try:
         from orchestration.flows import e2e_flow
     except ModuleNotFoundError as exc:  # pragma: no cover - defensive messaging
