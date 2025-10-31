@@ -58,7 +58,7 @@
    uv run pytest -q
    make artifacts && git diff --exit-code    # docs/nav/catalog/schemas in sync
    python tools/check_new_suppressions.py src    # verify no untracked suppressions
-   uv run python -m importlinter --config importlinter.cfg      # verify architectural boundaries
+   python tools/check_imports.py      # verify architectural boundaries
    ```
 
 5) **Ship the PR**
@@ -264,7 +264,7 @@ Example `PATH_MAP`:
 [ ] uv run pytest -q
 [ ] make artifacts && git diff --exit-code
 [ ] python tools/check_new_suppressions.py src
-[ ] uv run python -m importlinter --config importlinter.cfg
+[ ] python tools/check_imports.py
 ```
 
 **Problem Details Example:**
@@ -293,7 +293,7 @@ git diff --exit-code
 
 # Architectural boundaries & suppression guard
 python tools/check_new_suppressions.py src
-uv run python -m importlinter --config importlinter.cfg
+python tools/check_imports.py
 
 # All pre-commit hooks
 uvx pre-commit run --all-files

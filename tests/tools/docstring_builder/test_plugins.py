@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 from typing import cast
 
@@ -8,6 +9,7 @@ from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import SymbolHarvest
 from tools.docstring_builder.models import PluginExecutionError
 from tools.docstring_builder.plugins import load_plugins
+from tools.docstring_builder.plugins.base import LegacyPluginAdapter, PluginContext
 from tools.docstring_builder.plugins.dataclass_fields import DataclassFieldDocPlugin
 from tools.docstring_builder.schema import DocstringSchema, ParameterDoc
 from tools.docstring_builder.semantics import SemanticResult
@@ -155,3 +157,49 @@ def test_plugin_failures_raise_plugin_execution_error(tmp_path: Path) -> None:
     with pytest.raises(PluginExecutionError) as excinfo:
         manager.apply_transformers(result.symbol.filepath, [result])
     assert isinstance(excinfo.value.__cause__, ValueError)
+
+
+class LegacyTransformerPlugin:
+    """Legacy plugin using the deprecated run() API."""
+
+    name = "legacy_transformer"
+    stage = "transformer"
+
+    def __init__(self) -> None:
+        self.invocations = 0
+
+    def run(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
+        """Legacy run() method."""
+        del context  # Unused parameter
+        self.invocations += 1
+        return result
+
+
+def test_legacy_plugin_adapter_warns_and_delegates(tmp_path: Path) -> None:
+    """LegacyPluginAdapter emits deprecation warnings and delegates to run()."""
+    config = BuilderConfig()
+    manager = load_plugins(config, tmp_path, builtin=[LegacyTransformerPlugin])
+    result = _semantic_result(tmp_path / "module.py")
+
+    with pytest.warns(DeprecationWarning, match="uses the legacy run\\(\\) API"):
+        processed = manager.apply_transformers(result.symbol.filepath, [result])
+
+    assert len(processed) == 1
+    assert processed[0] == result
+    legacy_plugin = manager.transformers[0]
+    assert isinstance(legacy_plugin, LegacyPluginAdapter)
+    assert legacy_plugin.name == "legacy_transformer"
+    assert legacy_plugin.stage == "transformer"
+    # Access the underlying plugin to verify it was invoked
+    underlying = legacy_plugin._plugin
+    assert isinstance(underlying, LegacyTransformerPlugin)
+    assert underlying.invocations == 1
+
+    # Second invocation should not warn again
+    with warnings.catch_warnings(record=True) as warnings_record:
+        warnings.simplefilter("always")
+        manager.apply_transformers(result.symbol.filepath, [result])
+    deprecation_warnings = [
+        w for w in warnings_record if issubclass(w.category, DeprecationWarning)
+    ]
+    assert len(deprecation_warnings) == 0

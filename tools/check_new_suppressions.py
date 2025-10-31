@@ -18,6 +18,10 @@ import re
 import sys
 from pathlib import Path
 
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
+
 # Pattern to match type ignore or noqa with optional ticket tag
 SUPPRESSION_PATTERN = re.compile(
     r"(?:#\s*(?:type:\s*ignore|noqa(?::\s*[\w,]+)?))(?:\s*#\s*(?:.*?TICKET:.*?))?$",
@@ -52,7 +56,7 @@ def check_file(file_path: Path) -> list[tuple[int, str]]:
 
     except (OSError, UnicodeDecodeError) as exc:
         # If we can't read the file, report but don't fail (may be binary)
-        print(f"Warning: Could not read {file_path}: {exc}", file=sys.stderr)
+        LOGGER.warning("Could not read %s: %s", file_path, exc)
         return []
 
     return violations
@@ -90,22 +94,22 @@ def main() -> int:
         Exit code: 0 if all suppressions tracked, 1 if violations found.
     """
     if len(sys.argv) < 2:
-        print("Usage: python tools/check_new_suppressions.py <directory>", file=sys.stderr)
+        LOGGER.error("Usage: python tools/check_new_suppressions.py <directory>")
         return 1
 
     target_dir = Path(sys.argv[1])
     if not target_dir.exists():
-        print(f"Error: Directory {target_dir} does not exist", file=sys.stderr)
+        LOGGER.error("Directory %s does not exist", target_dir)
         return 1
 
     violations = check_directory(target_dir)
 
     if not violations:
-        print("✅ All suppressions include TICKET: tags")
+        LOGGER.info("✅ All suppressions include TICKET: tags")
         return 0
 
-    print("❌ Found suppressions without TICKET: tags:", file=sys.stderr)
-    print("", file=sys.stderr)
+    LOGGER.error("❌ Found suppressions without TICKET: tags:")
+    LOGGER.error("")
 
     cwd = Path.cwd()
     for file_path, file_violations in sorted(violations.items()):
@@ -113,19 +117,13 @@ def main() -> int:
             rel_path = file_path.relative_to(cwd)
         except ValueError:
             rel_path = file_path
-        print(f"{rel_path}:", file=sys.stderr)
+        LOGGER.error("%s:", rel_path)
         for line_num, line_content in file_violations:
-            print(f"  Line {line_num}: {line_content}", file=sys.stderr)
-        print("", file=sys.stderr)
+            LOGGER.error("  Line %s: %s", line_num, line_content)
+        LOGGER.error("")
 
-    print(
-        "Fix: Add TICKET: <ticket-id> to each suppression line.",
-        file=sys.stderr,
-    )
-    print(
-        "Example: # type: ignore[misc]  # TICKET: ABC-123  # numpy dtype contains Any",
-        file=sys.stderr,
-    )
+    LOGGER.error("Fix: Add TICKET: <ticket-id> to each suppression line.")
+    LOGGER.error("Example: # type: ignore[misc]  # TICKET: ABC-123  # numpy dtype contains Any")
 
     return 1
 

@@ -8,8 +8,13 @@ for implementation specifics.
 
 from __future__ import annotations
 
-import subprocess
 import sys
+from pathlib import Path
+
+from tools._shared.logging import get_logger
+from tools._shared.proc import ToolExecutionError, run_tool
+
+LOGGER = get_logger(__name__)
 
 
 def git_diff_names() -> set[str]:
@@ -28,13 +33,12 @@ def git_diff_names() -> set[str]:
     >>> result = git_diff_names()
     >>> result  # doctest: +ELLIPSIS
     """
-    result = subprocess.run(
-        ["git", "diff", "--name-only"],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return {line for line in result.stdout.splitlines() if line.strip()}
+    try:
+        result = run_tool(["git", "diff", "--name-only"], timeout=10.0, check=True)
+        return {line for line in result.stdout.splitlines() if line.strip()}
+    except ToolExecutionError as exc:
+        LOGGER.exception("Failed to get git diff names")
+        raise SystemExit(exc.returncode if exc.returncode is not None else 1) from exc
 
 
 def main() -> int:
@@ -53,12 +57,13 @@ def main() -> int:
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
     """
-    repo = subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"],
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
+    try:
+        repo_result = run_tool(["git", "rev-parse", "--show-toplevel"], timeout=10.0, check=True)
+        repo = repo_result.stdout.strip()
+    except ToolExecutionError as exc:
+        LOGGER.exception("Failed to resolve git repository root")
+        return exc.returncode if exc.returncode is not None else 1
+
     before = git_diff_names()
 
     cmd = [
@@ -71,16 +76,21 @@ def main() -> int:
         "-r",
         "src",
     ]
-    result = subprocess.run(cmd, check=False, cwd=repo)
+    try:
+        result = run_tool(cmd, timeout=20.0, cwd=Path(repo), check=False)
+    except ToolExecutionError as exc:
+        LOGGER.exception("docformatter execution failed")
+        return exc.returncode if exc.returncode is not None else 1
+
     if result.returncode not in {0, 3}:
         return result.returncode
 
     after = git_diff_names()
     changed = sorted(after - before)
     if changed:
-        sys.stderr.write("docformatter updated:\n")
+        LOGGER.info("docformatter updated:")
         for path in changed:
-            sys.stderr.write(f"  {path}\n")
+            LOGGER.info("  %s", path)
     return 0
 
 

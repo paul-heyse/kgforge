@@ -58,7 +58,7 @@ def _decorator_name(node: ast.AST) -> str | None:
     return None
 
 
-def _has_dataclass_decorator(decorators: list[ast.AST]) -> bool:
+def _has_dataclass_decorator(decorators: list[ast.expr]) -> bool:
     for decorator in decorators:
         name = _decorator_name(decorator)
         if name in _DATACLASS_DECORATORS:

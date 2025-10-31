@@ -18,6 +18,10 @@ from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any, Final
 
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
+
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 TESTS = ROOT / "tests"
@@ -181,7 +185,7 @@ def load_symbol_spans() -> dict[str, dict[str, Any]]:
         return out
     try:
         rows = json.loads(symbols_json.read_text(encoding="utf-8"))
-    except Exception:
+    except (json.JSONDecodeError, OSError, UnicodeDecodeError):
         rows = []
     for r in rows:
         p = r.get("path")
@@ -928,8 +932,8 @@ def main() -> None:
     spans = load_symbol_spans()
     try:
         public_syms = load_public_symbols()
-    except NavMapLoadError as exc:
-        print(f"[testmap] ERROR: {exc}", file=sys.stderr)
+    except NavMapLoadError:
+        LOGGER.exception("[testmap] ERROR loading public symbols")
         sys.exit(1)
 
     # 1) heuristic test map
@@ -950,10 +954,16 @@ def main() -> None:
 
     # strict mode
     if FAIL_ON_UNTESTED and any(x["severity"] == "error" for x in lints):
-        print(f"[testmap] FAIL: {sum(1 for x in lints if x['severity'] == 'error')} error(s)")
+        LOGGER.error(
+            "[testmap] FAIL: %d error(s)", sum(1 for x in lints if x["severity"] == "error")
+        )
         sys.exit(2)
-    print(
-        f"[testmap] wrote {OUTFILE_MAP.name}, {OUTFILE_COV.name}, {OUTFILE_SUM.name}, {OUTFILE_LINT.name}"
+    LOGGER.info(
+        "[testmap] wrote %s, %s, %s, %s",
+        OUTFILE_MAP.name,
+        OUTFILE_COV.name,
+        OUTFILE_SUM.name,
+        OUTFILE_LINT.name,
     )
     sys.exit(0)
 

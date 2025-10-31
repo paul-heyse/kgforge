@@ -11,20 +11,27 @@ from __future__ import annotations
 import argparse
 import ast
 import json
-import logging
 import os
 import re
-import subprocess
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import singledispatch
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import cast
 
+from tools._shared.logging import get_logger
+from tools._shared.proc import ToolExecutionError, run_tool
 from tools.drift_preview import write_html_diff
+from tools.navmap.models import (
+    ModuleEntryDict,
+    ModuleMetaDict,
+    NavIndexDict,
+    NavSectionDict,
+    SymbolMetaDict,
+)
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(__name__)
 
 REPO = Path(__file__).resolve().parents[2]
 SRC = REPO / "src"
@@ -45,57 +52,6 @@ SECTION_RE = re.compile(r"^\s*#\s*\[nav:section\s+([a-z0-9]+(?:-[a-z0-9]+)*)\]\s
 ANCHOR_RE = re.compile(r"^\s*#\s*\[nav:anchor\s+([A-Za-z_]\w*)\]\s*$")
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 IDENT_RE = re.compile(r"^[A-Za-z_]\w*$")
-
-
-class NavSectionDict(TypedDict):
-    """Represent a normalized nav section."""
-
-    id: str
-    symbols: list[str]
-
-
-class SymbolMetaDict(TypedDict, total=False):
-    """Represent metadata for a single symbol."""
-
-    owner: str
-    stability: str
-    since: str
-    deprecated_in: str
-
-
-class ModuleMetaDict(TypedDict, total=False):
-    """Represent module-level metadata defaults."""
-
-    owner: str
-    stability: str
-    since: str
-    deprecated_in: str
-
-
-class ModuleEntryDict(TypedDict):
-    """Represent the JSON entry for a module."""
-
-    path: str
-    exports: list[str]
-    sections: list[NavSectionDict]
-    section_lines: dict[str, int]
-    anchors: dict[str, int]
-    links: dict[str, str]
-    meta: dict[str, SymbolMetaDict]
-    module_meta: ModuleMetaDict
-    tags: list[str]
-    synopsis: str
-    see_also: list[str]
-    deps: list[str]
-
-
-class NavIndexDict(TypedDict):
-    """Represent the persisted nav index."""
-
-    commit: str
-    policy_version: str
-    link_mode: str
-    modules: dict[str, ModuleEntryDict]
 
 
 class AllPlaceholder:
@@ -490,7 +446,7 @@ def _rel(p: Path) -> str:
     """Return ``p`` relative to the repository root when possible."""
     try:
         return str(p.relative_to(REPO))
-    except Exception:
+    except ValueError:
         return str(p)
 
 
@@ -499,10 +455,10 @@ def _git_sha() -> str:
     if G_SHA:
         return G_SHA
     try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=str(REPO), text=True
-        ).strip()
-    except Exception:
+        result = run_tool(["git", "rev-parse", "HEAD"], timeout=10.0, cwd=REPO)
+        return result.stdout.strip()
+    except ToolExecutionError:
+        LOGGER.warning("Failed to resolve git SHA, using 'HEAD'")
         return "HEAD"
 
 
@@ -562,7 +518,7 @@ def _module_name(py: Path) -> str | None:
         return None
     try:
         rel = py.relative_to(SRC)
-    except Exception:
+    except ValueError:
         return None
     parts = list(rel.with_suffix("").parts)
     if not parts:
@@ -729,8 +685,8 @@ def _scan_inline_markers(py: Path) -> tuple[dict[str, int], dict[str, int]]:
             m = ANCHOR_RE.match(line)
             if m:
                 anchors[m.group(1)] = i
-    except Exception:
-        pass
+    except (OSError, UnicodeDecodeError) as exc:
+        LOGGER.debug("Failed to scan inline markers: %s", exc)
     return sections, anchors
 
 
@@ -987,7 +943,6 @@ def main(argv: Sequence[str] | None = None) -> int:
         default=None,
     )
     args = parser.parse_args(argv)
-    logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 
     target = args.write if args.write is not None else None
     build_index(json_path=target)

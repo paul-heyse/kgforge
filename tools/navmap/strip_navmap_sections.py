@@ -6,6 +6,10 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
+
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 
@@ -101,9 +105,9 @@ def main() -> None:
         if rewrite_module(file_path):
             changed += 1
             relative = file_path.relative_to(ROOT)
-            print(f"[navmap] Stripped legacy NavMap section from {relative}")
+            LOGGER.info("[navmap] Stripped legacy NavMap section from %s", relative)
     if changed == 0:
-        print("[navmap] No NavMap sections found.")
+        LOGGER.info("[navmap] No NavMap sections found.")
 
 
 if __name__ == "__main__":

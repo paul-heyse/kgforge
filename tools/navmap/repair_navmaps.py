@@ -11,10 +11,21 @@ from __future__ import annotations
 import argparse
 import ast
 import sys
+import time
 from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
 from pprint import pformat
 from typing import Any
+
+from tools._shared.logging import get_logger
+from tools._shared.problem_details import build_problem_details
+from tools.navmap.cli_envelope import (
+    build_cli_envelope_skeleton,
+    render_cli_envelope,
+    validate_cli_envelope,
+)
+
+LOGGER = get_logger(__name__)
 
 REPO = Path(__file__).resolve().parents[2]
 SRC = REPO / "src"
@@ -423,7 +434,97 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Write fixes back to disk instead of printing suggested changes.",
     )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit machine-readable results to stdout using the base CLI envelope schema.",
+    )
     return parser.parse_args(argv)
+
+
+def _build_json_envelope(
+    messages: list[str], duration: float, has_issues: bool, apply: bool
+) -> dict[str, Any]:
+    """Build CLI envelope JSON payload for repair results.
+
+    Parameters
+    ----------
+    messages : list[str]
+        List of repair messages.
+    duration : float
+        Operation duration in seconds.
+    has_issues : bool
+        Whether any issues were detected.
+    apply : bool
+        Whether fixes were applied.
+
+    Returns
+    -------
+    dict[str, Any]
+        CLI envelope payload.
+    """
+    envelope = build_cli_envelope_skeleton("violation" if has_issues else "success")
+    envelope["durationSeconds"] = duration
+    envelope["command"] = "repair_navmaps"
+    envelope["subcommand"] = "repair"
+
+    if has_issues:
+        # Parse messages to extract file paths and details
+        file_results: list[dict[str, Any]] = []
+        error_entries: list[dict[str, Any]] = []
+        for msg in messages:
+            if ": " in msg:
+                file_path, detail = msg.split(": ", 1)
+                file_results.append({"path": file_path, "status": "violation", "message": detail})
+                error_entries.append({"file": file_path, "status": "violation", "message": detail})
+            else:
+                error_entries.append({"status": "violation", "message": msg})
+
+        envelope["files"] = file_results
+        envelope["errors"] = error_entries
+
+        if not apply:
+            envelope["problem"] = build_problem_details(
+                type="https://kgfoundry.dev/problems/navmap-repair-needed",
+                title="Navmap repair needed",
+                status=422,
+                detail=f"Found {len(messages)} issue(s) requiring repair. Re-run with --apply to write fixes.",
+                instance="urn:navmap:repair:issues-detected",
+                extensions={"issue_count": len(messages), "apply_required": True},
+            )
+
+    return envelope
+
+
+def _build_error_envelope(exc: Exception, duration: float) -> dict[str, Any]:
+    """Build CLI envelope JSON payload for error cases.
+
+    Parameters
+    ----------
+    exc : Exception
+        Exception that occurred.
+    duration : float
+        Operation duration in seconds.
+
+    Returns
+    -------
+    dict[str, Any]
+        CLI envelope payload with error details.
+    """
+    envelope = build_cli_envelope_skeleton("error")
+    envelope["durationSeconds"] = duration
+    envelope["command"] = "repair_navmaps"
+    envelope["subcommand"] = "repair"
+    envelope["errors"] = [{"status": "error", "message": str(exc)}]
+    envelope["problem"] = build_problem_details(
+        type="https://kgfoundry.dev/problems/navmap-repair-error",
+        title="Navmap repair failed",
+        status=500,
+        detail=str(exc),
+        instance="urn:navmap:repair:error",
+        extensions={"exception_type": exc.__class__.__name__},
+    )
+    return envelope
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -447,18 +548,47 @@ def main(argv: list[str] | None = None) -> int:
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
     """
+    start_time = time.monotonic()
     args = _parse_args(argv)
     root = args.root.resolve()
-    messages = repair_all(root, apply=args.apply)
-    if not messages:
-        print("navmap repair: no issues detected")
-        return 0
-    print("\n".join(messages))
-    if not args.apply:
-        print("\nRe-run with --apply to write these fixes.")
+
+    try:
+        messages = repair_all(root, apply=args.apply)
+        duration = time.monotonic() - start_time
+        has_issues = bool(messages)
+
+        if args.json:
+            envelope = _build_json_envelope(messages, duration, has_issues, args.apply)
+            validate_cli_envelope(envelope)
+            sys.stdout.write(render_cli_envelope(envelope))
+            sys.stdout.write("\n")
+            return 1 if has_issues else 0
+
+        # Non-JSON output (existing behavior)
+        if not messages:
+            LOGGER.info("navmap repair: no issues detected")
+            return 0
+        LOGGER.info("\n".join(messages))
+        if not args.apply:
+            LOGGER.info("\nRe-run with --apply to write these fixes.")
+        else:
+            LOGGER.info("\nnavmap repair: applied fixes")
+    except Exception as exc:
+        duration = time.monotonic() - start_time
+        if args.json:
+            envelope = _build_error_envelope(exc, duration)
+            try:
+                validate_cli_envelope(envelope)
+                sys.stdout.write(render_cli_envelope(envelope))
+                sys.stdout.write("\n")
+            except Exception as validation_exc:
+                LOGGER.exception("Failed to validate error envelope")
+                sys.stderr.write(f"Error: {validation_exc}\n")
+            return 1
+        LOGGER.exception("navmap repair failed")
+        return 1
     else:
-        print("\nnavmap repair: applied fixes")
-    return 0
+        return 1 if has_issues else 0
 
 
 if __name__ == "__main__":

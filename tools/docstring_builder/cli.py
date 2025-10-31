@@ -38,6 +38,7 @@ from typing import cast
 
 import yaml
 from tools._shared.logging import get_logger, with_fields
+from tools._shared.problem_details import build_problem_details as build_problem_details_shared
 from tools._shared.proc import ToolExecutionError, run_tool
 from tools.docstring_builder import BUILDER_VERSION
 from tools.docstring_builder.apply import apply_edits
@@ -60,6 +61,7 @@ from tools.docstring_builder.harvest import HarvestResult, harvest_file, iter_ta
 from tools.docstring_builder.ir import IR_VERSION, IRDocstring, build_ir, validate_ir, write_schema
 from tools.docstring_builder.models import (
     CacheSummary,
+    DocfactsDocumentLike,
     DocfactsDocumentPayload,
     DocfactsReport,
     ErrorReport,
@@ -193,7 +195,7 @@ def _http_status_for_exit(status: ExitStatus) -> int:
             return 400
         case ExitStatus.ERROR:
             return 500
-    return 500
+    return 500  # type: ignore[unreachable]  # defensive return
 
 
 def _build_problem_details(
@@ -203,22 +205,26 @@ def _build_problem_details(
     command: str,
     subcommand: str,
 ) -> ProblemDetails | None:
+    """Build Problem Details for CLI failures using shared helper."""
     if status is ExitStatus.SUCCESS:
         return None
     detail = errors[0]["message"] if errors else f"Run exited with {STATUS_LABELS[status]}"
-    problem: ProblemDetails = {
-        "type": "https://kgfoundry.dev/problems/docbuilder/run-failed",
-        "title": "Docstring builder run failed",
-        "status": _http_status_for_exit(status),
-        "detail": detail,
-        "instance": f"urn:docbuilder:{datetime.datetime.now(datetime.UTC).isoformat()}",
-        "extensions": {
-            "command": command,
-            "subcommand": subcommand,
-            "errorCount": len(errors),
-        },
+    instance = f"urn:docbuilder:{datetime.datetime.now(datetime.UTC).isoformat()}"
+    problem_dict = build_problem_details_shared(
+        type="https://kgfoundry.dev/problems/docbuilder/run-failed",
+        title="Docstring builder run failed",
+        status=_http_status_for_exit(status),
+        detail=detail,
+        instance=instance,
+        extensions=None,  # We'll add extensions separately to match schema
+    )
+    # Schema requires extensions to be nested under "extensions" key, not top-level
+    problem_dict["extensions"] = {
+        "command": command,
+        "subcommand": subcommand,
+        "errorCount": len(errors),
     }
-    return problem
+    return cast(ProblemDetails, problem_dict)
 
 
 def _handle_schema_violation(context: str, exc: SchemaViolationError) -> None:
@@ -627,7 +633,7 @@ def _handle_docfacts(  # noqa: C901
 ) -> DocfactsOutcome:
     provenance = _build_docfacts_provenance(config)
     document = build_docfacts_document(docfacts, provenance, DOCFACTS_VERSION)
-    payload = build_docfacts_document_payload(document)
+    payload = build_docfacts_document_payload(cast(DocfactsDocumentLike, document))
     if check_mode:
         if not DOCFACTS_PATH.exists():
             LOGGER.error("DocFacts missing at %s", DOCFACTS_PATH)

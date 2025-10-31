@@ -21,6 +21,10 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any, cast
 
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
+
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 OUT = ROOT / "docs" / "reference" / "schemas"
@@ -676,10 +680,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         DRIFT_OUT.write_text(json.dumps(drift_summaries, indent=2) + "\n", encoding="utf-8")
 
     if cfg.check_drift and changed:
-        print("[schemas] drift detected; see docs/_build/schema_drift.json")
+        LOGGER.warning("[schemas] drift detected; see docs/_build/schema_drift.json")
         return 2
 
-    print("[schemas] export complete; drift:", "yes" if changed else "no")
+    LOGGER.info("[schemas] export complete; drift: %s", "yes" if changed else "no")
     return 0
 
 

@@ -51,7 +51,9 @@ class HarvesterPlugin(DocstringBuilderPlugin, Protocol):
 
     stage: ClassVar[Literal["harvester"]]
 
-    def apply(self, context: PluginContext, result: HarvestResult) -> HarvestResult:
+    def apply(  # type: ignore[override]
+        self, context: PluginContext, payload: HarvestResult
+    ) -> HarvestResult:  # pyrefly: ignore[bad-override]  # intentionally narrows type
         """Transform harvested metadata before semantic analysis."""
         ...
 
@@ -62,7 +64,9 @@ class TransformerPlugin(DocstringBuilderPlugin, Protocol):
 
     stage: ClassVar[Literal["transformer"]]
 
-    def apply(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
+    def apply(  # type: ignore[override]
+        self, context: PluginContext, payload: SemanticResult
+    ) -> SemanticResult:  # pyrefly: ignore[bad-override]  # intentionally narrows type
         """Mutate semantic results before rendering."""
         ...
 
@@ -73,7 +77,9 @@ class FormatterPlugin(DocstringBuilderPlugin, Protocol):
 
     stage: ClassVar[Literal["formatter"]]
 
-    def apply(self, context: PluginContext, edit: DocstringEdit) -> DocstringEdit:
+    def apply(  # type: ignore[override]
+        self, context: PluginContext, payload: DocstringEdit
+    ) -> DocstringEdit:  # pyrefly: ignore[bad-override]  # intentionally narrows type
         """Amend rendered docstring edits prior to writing."""
         ...
 

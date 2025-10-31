@@ -8,6 +8,10 @@ import re
 import sys
 from collections.abc import Iterable
 
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
+
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 TESTS_ROOT = REPO_ROOT / "tests"
 
@@ -88,10 +92,10 @@ def main() -> int:
     if not failures:
         return 0
 
-    print("GPU gating header missing in the following test files:\n")
+    LOGGER.error("GPU gating header missing in the following test files:\n")
     for path in failures:
-        print(f" - {path}")
-    print(
+        LOGGER.error(" - %s", path)
+    LOGGER.error(
         "\nAdd the standard header to each file:\n"
         "    import pytest\n"
         "    from tests.conftest import HAS_GPU_STACK\n"

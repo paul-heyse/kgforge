@@ -51,9 +51,7 @@ class PathlibTransformer(cst.CSTTransformer):
             if isinstance(alias.name, cst.Name) and alias.name.value == "pathlib":
                 self.needs_pathlib_import = True
 
-    def leave_Call(
-        self, original_node: cst.Call, updated_node: cst.Call
-    ) -> cst.Call:
+    def leave_Call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.Call:
         """Transform function calls to pathlib equivalents."""
         # os.makedirs(path, exist_ok=True) → Path(path).mkdir(parents=True, exist_ok=True)
         if m.matches(
@@ -181,9 +179,7 @@ class PathlibTransformer(cst.CSTTransformer):
 
         return updated_node
 
-    def leave_With(
-        self, original_node: cst.With, updated_node: cst.With
-    ) -> cst.With:
+    def leave_With(self, original_node: cst.With, updated_node: cst.With) -> cst.With:
         """Transform open(os.path.join(...)) patterns."""
         # Handle open(os.path.join(...)) → Path(...).open()
         for item in original_node.items:

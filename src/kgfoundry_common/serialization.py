@@ -20,24 +20,140 @@ from __future__ import annotations
 
 import hashlib
 import json
-import logging
+from collections.abc import Mapping
+from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING
 
 import jsonschema
+from jsonschema.exceptions import SchemaError, ValidationError
 
-from kgfoundry_common.errors import DeserializationError, SerializationError
+from kgfoundry_common.errors import (
+    DeserializationError,
+    SchemaValidationError,
+    SerializationError,
+)
 from kgfoundry_common.fs import atomic_write, read_text, write_text
+from kgfoundry_common.logging import get_logger
+
+if TYPE_CHECKING:
+    from typing import Any
+else:
+    # Runtime: use object for JSON-serializable values (matches jsonschema expectations)
+    Any = object  # type: ignore[assignment, misc]
+
+# JSON Schema type (from jsonschema stubs: Mapping[str, object])
+JsonSchema = Mapping[str, object]
 
 __all__ = [
     "compute_checksum",
     "deserialize_json",
     "serialize_json",
+    "validate_payload",
     "verify_checksum",
 ]
 
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
+logger = get_logger(__name__)
+
+# Schema cache: module-level dict mapping schema paths (as strings) to parsed schema objects
+_schema_cache: dict[str, dict[str, object]] = {}
+
+
+@lru_cache(maxsize=128)  # type: ignore[misc]  # lru_cache is a descriptor, handled by mypy built-in stubs
+def _load_schema_cached(schema_path: Path) -> dict[str, object]:
+    """Load and parse a JSON Schema file with caching.
+
+    This function uses LRU cache to avoid repeated I/O for the same schema file.
+    The cache is keyed by the resolved Path object (converted to string).
+
+    Parameters
+    ----------
+    schema_path : Path
+        Path to JSON Schema 2020-12 file.
+
+    Returns
+    -------
+    dict[str, object]
+        Parsed schema dictionary.
+
+    Raises
+    ------
+    FileNotFoundError
+        If schema file does not exist.
+    SchemaValidationError
+        If schema is invalid JSON or fails schema validation.
+    """
+    if not schema_path.exists():
+        msg = f"Schema file not found: {schema_path}"
+        raise FileNotFoundError(msg)
+
+    # Convert Path to string for caching (Path objects are not hashable)
+    schema_key = str(schema_path.resolve())
+
+    # Check module-level cache first
+    if schema_key in _schema_cache:
+        return _schema_cache[schema_key]
+
+    try:
+        schema_text = read_text(schema_path)
+        schema_obj: dict[str, object] = json.loads(schema_text)
+    except json.JSONDecodeError as exc:
+        msg = f"Invalid JSON in schema file {schema_path}: {exc}"
+        raise SchemaValidationError(msg) from exc
+
+    # Validate against JSON Schema 2020-12 meta-schema
+    try:
+        jsonschema.Draft202012Validator.check_schema(schema_obj)
+    except SchemaError as exc:
+        msg = f"Invalid JSON Schema 2020-12 in {schema_path}: {exc.message}"
+        raise SchemaValidationError(msg) from exc
+
+    # Store in module-level cache
+    _schema_cache[schema_key] = schema_obj
+    return schema_obj
+
+
+def validate_payload(payload: Mapping[str, object], schema_path: Path) -> None:
+    """Validate a payload against a JSON Schema 2020-12.
+
+    This function loads the schema (with caching), validates the payload,
+    and raises SchemaValidationError if validation fails.
+
+    Parameters
+    ----------
+    payload : Mapping[str, object]
+        Payload to validate (must be JSON-serializable).
+    schema_path : Path
+        Path to JSON Schema 2020-12 file.
+
+    Raises
+    ------
+    FileNotFoundError
+        If schema file does not exist.
+    SchemaValidationError
+        If payload does not match schema.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> import tempfile
+    >>> with tempfile.TemporaryDirectory() as tmpdir:
+    ...     tmp = Path(tmpdir)
+    ...     schema = tmp / "schema.json"
+    ...     schema.write_text('{"type": "object", "properties": {"k1": {"type": "number"}}}')
+    ...     validate_payload({"k1": 0.9}, schema)
+    ...     validate_payload({"k1": "invalid"}, schema)  # doctest: +SKIP
+    SchemaValidationError: Schema validation failed
+    """
+    schema_obj = _load_schema_cached(schema_path)
+    try:
+        jsonschema.validate(instance=payload, schema=schema_obj)
+    except ValidationError as exc:
+        msg = f"Schema validation failed: {exc.message}"
+        raise SchemaValidationError(msg) from exc
+    except SchemaError as exc:
+        msg = f"Invalid schema: {exc.message}"
+        raise SchemaValidationError(msg) from exc
 
 
 def compute_checksum(data: bytes) -> str:
@@ -92,7 +208,7 @@ def verify_checksum(data: bytes, expected: str) -> None:
 
 
 def serialize_json(
-    obj: Any,  # noqa: ANN401  # JSON-serializable: dict, list, str, int, float, bool, None (Any required for JSON)
+    obj: object,  # JSON-serializable: dict, list, str, int, float, bool, None
     schema_path: Path,
     output_path: Path,
     *,
@@ -107,7 +223,7 @@ def serialize_json(
 
     Parameters
     ----------
-    obj : Any
+    obj : object
         Python object to serialize (must be JSON-serializable).
     schema_path : Path
         Path to JSON Schema 2020-12 file for validation.
@@ -126,7 +242,9 @@ def serialize_json(
     Raises
     ------
     SerializationError
-        If serialization fails, schema validation fails, or file write fails.
+        If serialization fails or file write fails.
+    SchemaValidationError
+        If schema validation fails.
     FileNotFoundError
         If schema file does not exist.
 
@@ -145,31 +263,26 @@ def serialize_json(
     ...     assert output.exists()
     """
     try:
-        # Load and validate schema
-        if not schema_path.exists():
-            msg = f"Schema file not found: {schema_path}"
-            raise FileNotFoundError(msg)  # noqa: TRY301
-        schema_text = read_text(schema_path)
-        schema_obj = json.loads(schema_text)
+        # Validate payload against schema (uses cached schema loader)
+        if isinstance(obj, Mapping):
+            validate_payload(obj, schema_path)
+        else:
+            # For non-Mapping objects, load schema and validate directly
+            schema_obj = _load_schema_cached(schema_path)
+            try:
+                jsonschema.validate(instance=obj, schema=schema_obj)
+            except ValidationError as exc:
+                msg = f"Schema validation failed: {exc.message}"
+                raise SchemaValidationError(msg) from exc
 
         # Serialize object
         try:
-            json_text = json.dumps(obj, indent=indent, ensure_ascii=False)
+            json_text: str = json.dumps(obj, indent=indent, ensure_ascii=False)
         except (TypeError, ValueError) as exc:
             msg = f"Failed to serialize object to JSON: {exc}"
             raise SerializationError(msg) from exc
 
         json_bytes = json_text.encode("utf-8")
-
-        # Validate against schema
-        try:
-            jsonschema.validate(instance=obj, schema=schema_obj)
-        except jsonschema.ValidationError as exc:
-            msg = f"Schema validation failed: {exc.message}"
-            raise SerializationError(msg) from exc
-        except jsonschema.SchemaError as exc:
-            msg = f"Invalid schema: {exc.message}"
-            raise SerializationError(msg) from exc
 
         # Compute checksum
         checksum = compute_checksum(json_bytes)
@@ -199,12 +312,12 @@ def serialize_json(
         raise SerializationError(msg) from exc
 
 
-def deserialize_json(  # noqa: C901
+def deserialize_json(  # noqa: C901, PLR0912
     data_path: Path,
     schema_path: Path,
     *,
     verify_checksum_file: bool = True,
-) -> Any:  # noqa: ANN401  # JSON types: dict, list, str, int, float, bool, None (Any required for JSON)
+) -> object:  # JSON types: dict, list, str, int, float, bool, None
     """Deserialize JSON with schema validation and checksum verification.
 
     The JSON is validated against the provided schema and (optionally) verified
@@ -221,13 +334,15 @@ def deserialize_json(  # noqa: C901
 
     Returns
     -------
-    Any
-        Deserialized Python object.
+    object
+        Deserialized Python object (JSON-serializable types).
 
     Raises
     ------
-    SerializationError
-        If deserialization fails, schema validation fails, or checksum mismatch.
+    DeserializationError
+        If deserialization fails or checksum mismatch.
+    SchemaValidationError
+        If schema validation fails.
     FileNotFoundError
         If data or schema file does not exist.
 
@@ -263,37 +378,31 @@ def deserialize_json(  # noqa: C901
                     extra={"data_path": str(data_path), "checksum_path": str(checksum_path)},
                 )
 
-        # Load schema
-        if not schema_path.exists():
-            msg = f"Schema file not found: {schema_path}"
-            raise FileNotFoundError(msg)  # noqa: TRY301
-        schema_text = read_text(schema_path)
-        try:
-            schema_obj = json.loads(schema_text)
-        except json.JSONDecodeError as exc:
-            msg = f"Invalid JSON schema in {schema_path}: {exc}"
-            raise DeserializationError(msg) from exc
-
         # Read and parse JSON
         if not data_path.exists():
             msg = f"Data file not found: {data_path}"
             raise FileNotFoundError(msg)  # noqa: TRY301
         json_text = read_text(data_path)
         try:
-            obj = json.loads(json_text)
+            obj: object = json.loads(json_text)
         except json.JSONDecodeError as exc:
             msg = f"Invalid JSON in {data_path}: {exc}"
             raise DeserializationError(msg) from exc
 
-        # Validate against schema
-        try:
-            jsonschema.validate(instance=obj, schema=schema_obj)
-        except jsonschema.ValidationError as exc:
-            msg = f"Schema validation failed: {exc.message}"
-            raise DeserializationError(msg) from exc
-        except jsonschema.SchemaError as exc:
-            msg = f"Invalid schema: {exc.message}"
-            raise DeserializationError(msg) from exc
+        # Validate against schema (uses cached schema loader)
+        if isinstance(obj, Mapping):
+            validate_payload(obj, schema_path)
+        else:
+            # For non-Mapping objects, load schema and validate directly
+            schema_obj = _load_schema_cached(schema_path)
+            try:
+                jsonschema.validate(instance=obj, schema=schema_obj)
+            except ValidationError as exc:
+                msg = f"Schema validation failed: {exc.message}"
+                raise SchemaValidationError(msg) from exc
+            except SchemaError as exc:
+                msg = f"Invalid schema: {exc.message}"
+                raise SchemaValidationError(msg) from exc
 
         logger.debug(
             "Deserialized JSON",
@@ -302,11 +411,11 @@ def deserialize_json(  # noqa: C901
                 "schema_path": str(schema_path),
             },
         )
-        return obj  # noqa: TRY300
-
     except FileNotFoundError:
         # Preserve FileNotFoundError for missing files
         raise
     except (OSError, json.JSONDecodeError) as exc:
         msg = f"Deserialization failed: {exc}"
         raise DeserializationError(msg) from exc
+    else:
+        return obj

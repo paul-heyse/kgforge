@@ -10,6 +10,10 @@ import sys
 from collections.abc import Iterable
 from pathlib import Path
 
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
+
 REPO = Path(__file__).resolve().parents[1]
 TARGETS = [
     REPO / "src",
@@ -73,7 +77,7 @@ def check_placeholders() -> int:
                 continue
 
     if errors:
-        print("Docstring placeholder check failed:\n" + "\n".join(errors), file=sys.stderr)
+        LOGGER.error("Docstring placeholder check failed:\n%s", "\n".join(errors))
         return 1
     return 0
 

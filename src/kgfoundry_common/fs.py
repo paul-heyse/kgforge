@@ -16,49 +16,13 @@ Examples
 
 from __future__ import annotations
 
-import logging
 import tempfile
 from pathlib import Path
 from typing import Literal
 
-from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.logging import get_logger
 
-__all__ = [
-    "atomic_write",
-    "ensure_dir",
-    "read_text",
-    "safe_join",
-    "write_text",
-]
-
-__navmap__: NavMap = {
-    "title": "kgfoundry_common.fs",
-    "synopsis": "Filesystem utilities using pathlib for safe, typed operations",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@kgfoundry-common",
-        "stability": "stable",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        }
-        for name in __all__
-    },
-}
-
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
+logger = get_logger(__name__)
 
 
 def ensure_dir(path: Path, *, exist_ok: bool = True) -> Path:
@@ -230,24 +194,25 @@ def atomic_write(
     ensure_dir(path.parent, exist_ok=True)
     tmp_path: Path | None = None
     try:
-        with tempfile.NamedTemporaryFile(  # type: ignore[misc]
+        with tempfile.NamedTemporaryFile(
             mode="w" if mode == "text" else "wb",
-            dir=path.parent,
+            dir=str(path.parent) if path.parent else None,
             delete=False,
             encoding="utf-8" if mode == "text" else None,
         ) as temp_file:
+            # temp_file is _TemporaryFileWrapper with name: str attribute
             tmp_path = Path(temp_file.name)
             if mode == "text":
                 if not isinstance(data, str):
                     msg = "text mode requires str data"
                     raise ValueError(msg)  # noqa: TRY301
-                temp_file.write(data)  # type: ignore[misc]
+                temp_file.write(data)
             else:
                 if not isinstance(data, bytes):
                     msg = "binary mode requires bytes data"
                     raise ValueError(msg)  # noqa: TRY301
-                temp_file.write(data)  # type: ignore[misc]
-            temp_file.flush()  # type: ignore[misc]
+                temp_file.write(data)
+            temp_file.flush()
         if tmp_path is not None:
             tmp_path.replace(path)
     except Exception:

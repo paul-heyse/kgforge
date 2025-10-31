@@ -15,7 +15,6 @@ Examples
 from __future__ import annotations
 
 import json
-import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -25,6 +24,7 @@ from jsonschema.exceptions import SchemaError
 
 from kgfoundry_common.errors import DeserializationError, SerializationError
 from kgfoundry_common.fs import read_text
+from kgfoundry_common.logging import get_logger
 from kgfoundry_common.pydantic import BaseModel
 
 if TYPE_CHECKING:
@@ -32,8 +32,7 @@ if TYPE_CHECKING:
 
 __all__ = ["assert_model_roundtrip", "load_schema", "validate_model_against_schema"]
 
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
+logger = get_logger(__name__)
 
 
 def load_schema(schema_path: Path) -> dict[str, Any]:

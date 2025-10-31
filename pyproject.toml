@@ -443,6 +443,8 @@ dependencies = [
     "jpype1>=1.6.0",
     "myst-parser",
     "faiss-cpu",
+    "pytest-asyncio>=1.2.0",
+    "pip-audit>=2.9.0",
 ]
 
 [project.scripts]

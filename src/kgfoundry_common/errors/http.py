@@ -13,17 +13,16 @@ Examples
 
 from __future__ import annotations
 
-import logging
-
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from kgfoundry_common.errors import KgFoundryError
+from kgfoundry_common.logging import get_logger
+from kgfoundry_common.problem_details import ProblemDetails
 
 __all__ = ["problem_details_response", "register_problem_details_handler"]
 
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
+logger = get_logger(__name__)
 
 
 def problem_details_response(
@@ -59,7 +58,7 @@ def problem_details_response(
         if request.url.query:
             instance += f"?{request.url.query}"
 
-    details = error.to_problem_details(instance=instance)
+    details: ProblemDetails = error.to_problem_details(instance=instance)
 
     # Log the error at appropriate level
     logger.log(error.log_level, "Error: %s", error.message, exc_info=error.__cause__)
@@ -89,7 +88,7 @@ def register_problem_details_handler(app: FastAPI) -> None:
     >>> register_problem_details_handler(app)
     """
 
-    @app.exception_handler(KgFoundryError)
-    async def kgfoundry_error_handler(request: Request, exc: KgFoundryError) -> JSONResponse:
+    @app.exception_handler(KgFoundryError)  # type: ignore[misc]  # Starlette's exception_handler returns Callable[..., object] which mypy flags as containing Any via ...
+    async def kgfoundry_error_handler(request: Request, exc: KgFoundryError) -> JSONResponse:  # type: ignore[misc]  # Decorated function type contains Any from Starlette's Callable[..., object]
         """Handle KgFoundryError exceptions with Problem Details."""
         return problem_details_response(exc, request=request)

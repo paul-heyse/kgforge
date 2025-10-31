@@ -10,6 +10,10 @@ from __future__ import annotations
 from collections.abc import Callable
 from pathlib import Path
 
+from tools._shared.logging import get_logger
+
+LOGGER = get_logger(__name__)
+
 
 def _build_template(pkg: str) -> str:
     """Return the contents of the ``.importlinter`` file for ``pkg``."""
@@ -94,4 +98,4 @@ def _import_detect_primary() -> str:
 
 if __name__ == "__main__":
     out_path = main()
-    print(f"Wrote {out_path}")
+    LOGGER.info("Wrote %s", out_path)

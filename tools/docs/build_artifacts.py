@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
-import subprocess
 import sys
 from pathlib import Path
+
+from tools._shared.logging import get_logger, with_fields
+from tools._shared.proc import ToolExecutionError, run_tool
+
+LOGGER = get_logger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -72,14 +76,23 @@ STEPS: list[tuple[str, list[str], str]] = [
 
 def _run_step(name: str, command: list[str], message: str) -> int:
     """Execute a single artefact regeneration step."""
-    result = subprocess.run(
-        command, cwd=REPO_ROOT, check=False
-    )
-    if result.returncode != 0:
-        sys.stderr.write(f"[artifacts] {name} failed (exit {result.returncode})\n")
-        return result.returncode
-    sys.stdout.write(f"{message}\n")
-    return 0
+    log_adapter = with_fields(LOGGER, operation=name, command=command)
+    try:
+        result = run_tool(command, timeout=20.0, cwd=REPO_ROOT, check=False)
+        if result.returncode != 0:
+            log_adapter.error(
+                "[artifacts] %s failed (exit %d)",
+                name,
+                result.returncode,
+                extra={"returncode": result.returncode},
+            )
+            return result.returncode
+    except ToolExecutionError as exc:
+        log_adapter.exception("[artifacts] %s failed", name)
+        return exc.returncode if exc.returncode is not None else 1
+    else:
+        log_adapter.info(message)
+        return 0
 
 
 def main() -> int:
@@ -88,7 +101,7 @@ def main() -> int:
         status = _run_step(name, command, message)
         if status != 0:
             return status
-    sys.stdout.write("[artifacts] all steps completed successfully\n")
+    LOGGER.info("[artifacts] all steps completed successfully")
     return 0
 
 

@@ -326,6 +326,25 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> SearchResponse:
         Returns Problem Details JSON (RFC 9457) on errors.
         Example: `schema/examples/problem_details/search-missing-index.json`
 
+    Notes
+    -----
+    - **Await semantics**: This is a synchronous function, but FastAPI runs it in
+      a thread pool, allowing cancellation via HTTP client disconnect.
+    - **Timeout**: No explicit timeout is enforced; long-running searches may
+      be cancelled by FastAPI's request timeout or client disconnect.
+    - **Cancellation**: If the client disconnects, FastAPI will cancel the
+      request thread, which may leave partial results in logs/metrics.
+    - **Correlation ID**: Each request receives a unique correlation ID via
+      `contextvars.ContextVar`, which propagates through all synchronous
+      and async operations automatically.
+    - **Idempotency**: This endpoint is **idempotent**. Multiple requests with
+      identical parameters produce identical results without side effects.
+      Results are determined solely by the query and k parameters; no state
+      is modified by search operations.
+    - **Retries**: The endpoint does not implement automatic retries. Clients
+      should implement exponential backoff with jitter for transient failures.
+      Recommended retry strategy: 3 attempts with delays of 1s, 2s, 4s.
+
     See Also
     --------
     - `schema/examples/problem_details/search-missing-index.json` - Example error response

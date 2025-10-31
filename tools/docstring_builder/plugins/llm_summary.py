@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-import logging
 from dataclasses import replace
 from typing import ClassVar
 
+from tools._shared.logging import get_logger
 from tools.docstring_builder.plugins.base import PluginContext, PluginStage
 from tools.docstring_builder.semantics import SemanticResult
 
-LOGGER = logging.getLogger(__name__)
-if not LOGGER.handlers:
-    LOGGER.addHandler(logging.NullHandler())
+LOGGER = get_logger(__name__)
 
 MIN_WORD_LENGTH = 4
 

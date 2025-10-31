@@ -81,6 +81,6 @@ def detect_primary() -> str:
 if __name__ == "__main__":
     if "--all" in sys.argv:
         for name in detect_packages():
-            print(name)
+            sys.stdout.write(f"{name}\n")
     else:
-        print(detect_primary())
+        sys.stdout.write(f"{detect_primary()}\n")

@@ -6,7 +6,6 @@ import inspect
 import textwrap
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any
 
 from tools.docstring_builder.harvest import SymbolHarvest
 from tools.docstring_builder.models import DocstringBuilderError
@@ -189,9 +188,9 @@ def _merge_default(description: list[str], default: str | None) -> list[str]:
 
 def _build_parameters_content(
     signature: inspect.Signature,
-    hints: dict[str, Any],
+    hints: dict[str, object],
     section: _Section | None,
-    module_globals: Mapping[str, Any],
+    module_globals: Mapping[str, object],
     symbol: SymbolHarvest,
 ) -> list[str]:
     blocks: dict[str, _ParameterBlock] = _parse_parameters(section) if section else {}
@@ -230,9 +229,9 @@ def _build_parameters_content(
 
 def _build_returns_content(
     signature: inspect.Signature,
-    hints: dict[str, Any],
+    hints: dict[str, object],
     section: _Section | None,
-    module_globals: Mapping[str, Any],
+    module_globals: Mapping[str, object],
 ) -> list[str]:
     annotation = hints.get("return", signature.return_annotation)
     annotation_text = format_annotation(annotation, module_globals)

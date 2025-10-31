@@ -58,28 +58,48 @@ def index_bm25(
     backend: str = typer.Option("lucene", help="lucene|pure"),
     index_dir: str = typer.Option("./_indices/bm25", help="Output index directory"),
 ) -> None:
-    """Describe index bm25.
+    """Build BM25 index from chunk data.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    This command builds a BM25 index from chunk data. The operation is
+    **idempotent**: if an index already exists at the output directory, it
+    will be rebuilt from scratch. No side effects occur beyond writing
+    the index files.
 
     Parameters
     ----------
-    chunks_parquet : str, optional
-        Describe ``chunks_parquet``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x7926329556a0>``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x73eabc2086e0>``.
+    chunks_parquet : str
+        Path to Parquet or JSONL file containing chunks.
     backend : str, optional
-        Describe ``backend``.
-        Defaults to ``<typer.models.OptionInfo object at 0x79263290b890>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x73ea67fb5a90>``.
+        Backend to use: "lucene" or "pure" (default: "lucene").
     index_dir : str, optional
-        Describe ``index_dir``.
-        Defaults to ``<typer.models.OptionInfo object at 0x79263290b9d0>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x73ea67fb5bd0>``.
+        Output directory for the index (default: "./_indices/bm25").
+
+    Notes
+    -----
+    - **Idempotency**: This command is idempotent. Running it twice with
+      identical inputs will rebuild the index, producing the same result.
+      Existing index files are overwritten.
+    - **Retries**: No automatic retries are implemented. If the operation
+      fails due to transient errors (e.g., file system issues), run the
+      command again manually. For persistent failures, check logs and
+      verify input data integrity.
     """
     Path(index_dir).mkdir(parents=True, exist_ok=True)
+
+    # Check if index already exists and warn if so (idempotency)
+    index_path = Path(index_dir)
+    if backend == "pure":
+        index_file = index_path / "pure_bm25.pkl"
+    else:
+        index_file = index_path / "bm25_index"
+
+    if index_file.exists():
+        logger.warning(
+            "Index already exists at %s; will be rebuilt",
+            index_dir,
+            extra={"operation": "index_bm25", "status": "warning"},
+        )
+        typer.echo(f"Warning: Index already exists at {index_dir}, will be rebuilt")
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
     if chunks_parquet.endswith(".jsonl"):
@@ -124,24 +144,41 @@ def index_faiss(
         "./_indices/faiss/shard_000.idx", help="Output index (CPU .idx)"
     ),
 ) -> None:
-    """Describe index faiss.
+    """Build FAISS index from dense vectors.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    This command builds a FAISS index from dense vector data. The operation
+    is **idempotent**: if an index already exists at the output path, it
+    will be rebuilt from scratch. No side effects occur beyond writing
+    the index files.
 
     Parameters
     ----------
-    dense_vectors : str, optional
-        Describe ``dense_vectors``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x79263290bb10>``.
-        Defaults to ``<typer.models.ArgumentInfo object at 0x73ea67fb5d10>``.
+    dense_vectors : str
+        Path to JSON file containing dense vectors (skeleton format).
     index_path : str, optional
-        Describe ``index_path``.
-        Defaults to ``<typer.models.OptionInfo object at 0x79263290bc50>``.
-        Defaults to ``<typer.models.OptionInfo object at 0x73ea67fb5e50>``.
+        Output path for the index file (default: "./_indices/faiss/shard_000.idx").
+
+    Notes
+    -----
+    - **Idempotency**: This command is idempotent. Running it twice with
+      identical inputs will rebuild the index, producing the same result.
+      Existing index files are overwritten.
+    - **Retries**: No automatic retries are implemented. If the operation
+      fails due to transient errors (e.g., GPU memory issues), run the
+      command again manually. For persistent failures, check logs and
+      verify input data integrity.
     """
     Path(index_path).parent.mkdir(parents=True, exist_ok=True)
+
+    # Check if index already exists and warn if so (idempotency)
+    if Path(index_path).exists():
+        logger.warning(
+            "Index already exists at %s; will be rebuilt",
+            index_path,
+            extra={"operation": "index_faiss", "status": "warning"},
+        )
+        typer.echo(f"Warning: Index already exists at {index_path}, will be rebuilt")
+
     with Path(dense_vectors).open(encoding="utf-8") as fh:
         vecs = json.load(fh)
     keys = [r["key"] for r in vecs]

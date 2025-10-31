@@ -227,7 +227,7 @@ PY
       - name: Check import-linter contracts
         if: ${{ always() }}
         run: |
-          uv run python -m importlinter --config importlinter.cfg || echo "::warning::import-linter check failed"
+          uv run python tools/check_imports.py || echo "::warning::import-linter check failed"
 
       - name: Check suppression guard
         if: ${{ always() }}

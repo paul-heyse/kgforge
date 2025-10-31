@@ -10,9 +10,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-JsonPrimitive = str | int | float | bool | None
-JsonValue = JsonPrimitive | Sequence["JsonValue"] | Mapping[str, "JsonValue"]
-ProblemDetailsDict = Mapping[str, JsonValue]
+from tools._shared.problem_details import ProblemDetailsDict, build_problem_details
 
 
 @dataclass(slots=True)
@@ -28,7 +26,33 @@ class ToolRunResult:
 
 
 class ToolExecutionError(RuntimeError):
-    """Raised when a subprocess fails to execute successfully."""
+    """Raised when a subprocess fails to execute successfully.
+
+    This exception includes Problem Details for structured error handling
+    and preserves stdout/stderr for debugging.
+
+    Parameters
+    ----------
+    message : str
+        Human-readable error message.
+    command : Sequence[str]
+        Command that failed.
+    returncode : int | None, optional
+        Process exit code if available.
+    streams : tuple[str, str] | None, optional
+        (stdout, stderr) tuple if available.
+    problem : ProblemDetailsDict | None, optional
+        RFC 9457 Problem Details payload.
+
+    Examples
+    --------
+    >>> from tools._shared.proc import run_tool, ToolExecutionError
+    >>> try:
+    ...     run_tool(["nonexistent"], check=True)
+    ... except ToolExecutionError as e:
+    ...     assert e.problem is not None
+    ...     assert e.problem["type"].startswith("https://kgfoundry.dev/problems/")
+    """
 
     def __init__(
         self,
@@ -52,8 +76,15 @@ def _resolve_executable(executable: str) -> Path:
         return candidate
     resolved = shutil.which(executable)
     if resolved is None:
+        problem = build_problem_details(
+            type="https://kgfoundry.dev/problems/tool-missing",
+            title="Executable not found",
+            status=500,
+            detail=f"Executable '{executable}' could not be resolved to an absolute path",
+            instance=f"urn:tool:{executable}:missing",
+        )
         message = f"Executable '{executable}' could not be resolved to an absolute path"
-        raise ToolExecutionError(message, command=[executable])
+        raise ToolExecutionError(message, command=[executable], problem=problem)
     return Path(resolved)
 
 
@@ -108,37 +139,47 @@ def run_tool(
         )
         timed_out = False
     except subprocess.TimeoutExpired as exc:
-        problem: ProblemDetailsDict = {
-            "type": "https://kgfoundry.dev/problems/tool-timeout",
-            "title": "Tool execution timed out",
-            "status": 504,
-            "detail": (
+        problem = build_problem_details(
+            type="https://kgfoundry.dev/problems/tool-timeout",
+            title="Tool execution timed out",
+            status=504,
+            detail=(
                 f"Command '{command[0]}' timed out after {timeout} seconds"
                 if timeout is not None
                 else f"Command '{command[0]}' timed out"
             ),
-            "instance": f"urn:tool:{command[0]}:timeout",
-            "extensions": {
+            instance=f"urn:tool:{command[0]}:timeout",
+            extensions={
                 "command": list(command),
                 "timeout": timeout,
             },
-        }
+        )
         message = "Subprocess timed out"
+        stdout_text = (
+            exc.stdout.decode("utf-8", errors="replace")
+            if isinstance(exc.stdout, bytes)
+            else (exc.stdout or "")
+        )
+        stderr_text = (
+            exc.stderr.decode("utf-8", errors="replace")
+            if isinstance(exc.stderr, bytes)
+            else (exc.stderr or "")
+        )
         raise ToolExecutionError(
             message,
             command=command,
             returncode=None,
-            streams=(exc.stdout or "", exc.stderr or ""),
+            streams=(stdout_text, stderr_text),
             problem=problem,
         ) from exc
     except FileNotFoundError as exc:
-        problem = {
-            "type": "https://kgfoundry.dev/problems/tool-missing",
-            "title": "Executable not found",
-            "status": 500,
-            "detail": str(exc),
-            "instance": f"urn:tool:{command[0]}:missing",
-        }
+        problem = build_problem_details(
+            type="https://kgfoundry.dev/problems/tool-missing",
+            title="Executable not found",
+            status=500,
+            detail=str(exc),
+            instance=f"urn:tool:{command[0]}:missing",
+        )
         message = "Executable not found"
         raise ToolExecutionError(
             message,
@@ -157,17 +198,17 @@ def run_tool(
         timed_out=timed_out,
     )
     if check and completed.returncode != 0:
-        problem: ProblemDetailsDict = {
-            "type": "https://kgfoundry.dev/problems/tool-failure",
-            "title": "Tool returned a non-zero exit code",
-            "status": 500,
-            "detail": completed.stderr.strip() or "Unknown failure",
-            "instance": f"urn:tool:{command[0]}:exit-{completed.returncode}",
-            "extensions": {
+        problem = build_problem_details(
+            type="https://kgfoundry.dev/problems/tool-failure",
+            title="Tool returned a non-zero exit code",
+            status=500,
+            detail=completed.stderr.strip() or "Unknown failure",
+            instance=f"urn:tool:{command[0]}:exit-{completed.returncode}",
+            extensions={
                 "command": list(command),
                 "returncode": completed.returncode,
             },
-        }
+        )
         message = "Subprocess returned a non-zero exit status"
         raise ToolExecutionError(
             message,
@@ -180,9 +221,6 @@ def run_tool(
 
 
 __all__ = [
-    "JsonPrimitive",
-    "JsonValue",
-    "ProblemDetailsDict",
     "ToolExecutionError",
     "ToolRunResult",
     "run_tool",

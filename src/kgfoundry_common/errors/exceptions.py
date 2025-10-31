@@ -17,9 +17,14 @@ Examples
 from __future__ import annotations
 
 import logging
-from typing import Any
+from collections.abc import Mapping
+from typing import cast
 
 from kgfoundry_common.errors.codes import ErrorCode, get_type_uri
+from kgfoundry_common.logging import get_logger
+from kgfoundry_common.problem_details import JsonValue, ProblemDetails, build_problem_details
+
+logger = get_logger(__name__)
 
 __all__ = [
     "ChunkingError",
@@ -34,7 +39,10 @@ __all__ = [
     "Neo4jError",
     "OCRTimeoutError",
     "OntologyParseError",
+    "RetryExhaustedError",
+    "SchemaValidationError",
     "SerializationError",
+    "SettingsError",
     "SpladeOOMError",
     "UnsupportedMIMEError",
     "VectorSearchError",
@@ -79,7 +87,7 @@ class KgFoundryError(Exception):
         http_status: int = 500,
         log_level: int = logging.ERROR,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize error with structured fields."""
         super().__init__(message)
@@ -87,7 +95,7 @@ class KgFoundryError(Exception):
         self.code = code
         self.http_status = http_status
         self.log_level = log_level
-        self.context = context or {}
+        self.context = dict(context) if context else {}
         if cause is not None:
             self.__cause__ = cause
 
@@ -95,7 +103,7 @@ class KgFoundryError(Exception):
         self,
         instance: str | None = None,
         title: str | None = None,
-    ) -> dict[str, Any]:
+    ) -> ProblemDetails:
         """Convert to RFC 9457 Problem Details JSON.
 
         Parameters
@@ -107,7 +115,7 @@ class KgFoundryError(Exception):
 
         Returns
         -------
-        dict[str, Any]
+        ProblemDetails
             Problem Details object with type, title, status, detail, code,
             instance, and optional errors fields.
 
@@ -119,18 +127,15 @@ class KgFoundryError(Exception):
         >>> assert details["status"] == 404
         >>> assert details["code"] == "resource-unavailable"
         """
-        result: dict[str, Any] = {
-            "type": get_type_uri(self.code),
-            "title": title or self.__class__.__name__,
-            "status": self.http_status,
-            "detail": self.message,
-            "code": self.code.value,
-        }
-        if instance:
-            result["instance"] = instance
-        if self.context:
-            result["errors"] = self.context
-        return result
+        return build_problem_details(
+            type=get_type_uri(self.code),
+            title=title or self.__class__.__name__,
+            status=self.http_status,
+            detail=self.message,
+            instance=instance or "urn:kgfoundry:error",
+            code=self.code.value,
+            extensions=cast(Mapping[str, JsonValue] | None, self.context if self.context else None),
+        )
 
     def __str__(self) -> str:
         """Return formatted error string."""
@@ -152,7 +157,7 @@ class DownloadError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize download error."""
         super().__init__(
@@ -176,7 +181,7 @@ class UnsupportedMIMEError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize unsupported MIME error."""
         super().__init__(
@@ -200,7 +205,7 @@ class DoclingError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize docling error."""
         super().__init__(
@@ -224,7 +229,7 @@ class OCRTimeoutError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize OCR timeout error."""
         super().__init__(
@@ -248,7 +253,7 @@ class ChunkingError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize chunking error."""
         super().__init__(
@@ -272,7 +277,7 @@ class EmbeddingError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize embedding error."""
         super().__init__(
@@ -296,7 +301,7 @@ class SpladeOOMError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize SPLADE OOM error."""
         super().__init__(
@@ -320,7 +325,7 @@ class IndexBuildError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize index build error."""
         super().__init__(
@@ -344,7 +349,7 @@ class OntologyParseError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize ontology parse error."""
         super().__init__(
@@ -368,7 +373,7 @@ class LinkerCalibrationError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize linker calibration error."""
         super().__init__(
@@ -392,7 +397,7 @@ class Neo4jError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize Neo4j error."""
         super().__init__(
@@ -416,7 +421,7 @@ class ConfigurationError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize configuration error."""
         super().__init__(
@@ -441,12 +446,60 @@ class SerializationError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize serialization error."""
         super().__init__(
             message,
             code=ErrorCode.SERIALIZATION_ERROR,
+            http_status=500,
+            cause=cause,
+            context=context,
+        )
+
+
+class SchemaValidationError(KgFoundryError):
+    """Error during JSON Schema validation.
+
+    Examples
+    --------
+    >>> raise SchemaValidationError("Schema validation failed", cause=ValueError("Invalid type"))
+    """
+
+    def __init__(
+        self,
+        message: str,
+        cause: Exception | None = None,
+        context: Mapping[str, object] | None = None,
+    ) -> None:
+        """Initialize schema validation error."""
+        super().__init__(
+            message,
+            code=ErrorCode.SCHEMA_VALIDATION_ERROR,
+            http_status=400,
+            cause=cause,
+            context=context,
+        )
+
+
+class SettingsError(KgFoundryError):
+    """Error during settings loading or validation.
+
+    Examples
+    --------
+    >>> raise SettingsError("Missing required environment variable KGFOUNDRY_API_KEY")
+    """
+
+    def __init__(
+        self,
+        message: str,
+        cause: Exception | None = None,
+        context: Mapping[str, object] | None = None,
+    ) -> None:
+        """Initialize settings error."""
+        super().__init__(
+            message,
+            code=ErrorCode.CONFIGURATION_ERROR,
             http_status=500,
             cause=cause,
             context=context,
@@ -465,7 +518,7 @@ class DeserializationError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize deserialization error."""
         super().__init__(
@@ -474,6 +527,87 @@ class DeserializationError(KgFoundryError):
             http_status=500,
             cause=cause,
             context=context,
+        )
+
+
+class RetryExhaustedError(KgFoundryError):
+    """Raised when retry logic exhausts all attempts.
+
+    This exception indicates that a retryable operation has exhausted
+    all retry attempts and should surface Problem Details with retry
+    guidance information.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        operation: str | None = None,
+        attempts: int | None = None,
+        last_error: Exception | None = None,
+        retry_after_seconds: int | None = None,
+    ) -> None:
+        """Initialize retry exhausted error.
+
+        Parameters
+        ----------
+        message : str
+            Error message describing the failure.
+        operation : str | None, optional
+            Name of the operation that failed.
+        attempts : int | None, optional
+            Number of retry attempts that were made.
+        last_error : Exception | None, optional
+            The last exception that occurred before retries were exhausted.
+        retry_after_seconds : int | None, optional
+            Suggested retry delay in seconds.
+        """
+        super().__init__(
+            message,
+            code=ErrorCode.RETRY_EXHAUSTED,
+            http_status=503,
+            log_level=logging.ERROR,
+        )
+        self.operation = operation
+        self.attempts = attempts
+        self.last_error = last_error
+        self.retry_after_seconds = retry_after_seconds
+
+    def to_problem_details(
+        self,
+        instance: str | None = None,
+        title: str | None = None,
+    ) -> ProblemDetails:
+        """Convert to RFC 9457 Problem Details JSON.
+
+        Parameters
+        ----------
+        instance : str | None, optional
+            Instance URI for the specific error occurrence.
+        title : str | None, optional
+            Short summary. Defaults to the exception class name.
+
+        Returns
+        -------
+        ProblemDetails
+            Problem Details JSON structure.
+        """
+        extensions: dict[str, object] = {}
+        if self.operation:
+            extensions["operation"] = self.operation
+        if self.attempts is not None:
+            extensions["attempts"] = self.attempts
+        if self.retry_after_seconds is not None:
+            extensions["retry_after_seconds"] = self.retry_after_seconds
+
+        return build_problem_details(
+            type=get_type_uri(self.code),
+            title=title or self.__class__.__name__,
+            status=self.http_status,
+            detail=self.message,
+            instance=instance or "urn:kgfoundry:error",
+            code=self.code.value,
+            extensions=cast(Mapping[str, JsonValue] | None, extensions if extensions else None),
         )
 
 
@@ -489,7 +623,7 @@ class VectorSearchError(KgFoundryError):
         self,
         message: str,
         cause: Exception | None = None,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize vector search error."""
         super().__init__(

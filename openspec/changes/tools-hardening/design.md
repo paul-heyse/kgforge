@@ -25,6 +25,9 @@ The `tools/` directory orchestrates documentation, catalog generation, navmap ma
 | I/O Boundaries | CLI entry points, file reads/writes, subprocess invocations | CLI refactors, environment configuration (`pydantic_settings` usage where needed) |
 | Observability | Structured logging adapters, Prometheus metrics, Problem Details emission | Metrics provider classes, logging configuration, JSON examples |
 
+### Logging Unification
+`tools/_shared/logging.py` SHALL delegate to `src/kgfoundry_common/logging.py` for JSON formatting, correlation ID propagation, and `NullHandler` behavior. Libraries remain handler-agnostic; CLIs configure handlers. This ensures a consistent structured log envelope across packages and tools.
+
 ### Error Taxonomy
 - `ToolError` (base) — extends `Exception`, ensures `raise ... from e` for causality.
 - `ConfigurationError`, `SchemaViolationError`, `SubprocessError`, `PluginExecutionError`, `RenderingError`, `NavmapError`, `DocumentationBuildError` — precise variants mapped to modules.
@@ -33,11 +36,29 @@ The `tools/` directory orchestrates documentation, catalog generation, navmap ma
 ### Schema Strategy
 - `schema/tools/docstring_builder_cli.json` (existing) — validated in CLI integration tests.
 - **New:**
+  - `schema/tools/cli_envelope.json` — base versioned envelope emitted by all tooling CLIs when `--json` is used.
   - `schema/tools/doc_analytics.json` — analytics summary emitted by `build_agent_analytics.py`.
   - `schema/tools/doc_graph_manifest.json` — graph outputs from `build_graphs.py`.
   - `schema/tools/navmap_document.json` — navmap documents and repair outputs.
   - `schema/tools/gallery_validation.json` — gallery validator machine outputs.
 - Each schema has version constants, example fixtures under `docs/examples/`, and round-trip tests in `tests/tools/`.
+
+### Base CLI Envelope (canonical)
+Fields (JSON Schema lives at `schema/tools/cli_envelope.json`):
+- `schemaVersion` (string, SemVer; e.g., "1.0.0")
+- `schemaId` (string, URI; e.g., `https://kgfoundry.dev/schema/cli-envelope.json`)
+- `generatedAt` (string, `date-time` in UTC)
+- `status` (enum: `success | violation | config | error`)
+- `command` (string)
+- `subcommand` (string)
+- `durationSeconds` (number ≥ 0)
+- `files` (array of per-file objects with `path`, `status`, optional `message`, `problem`)
+- `errors` (array of error entries)
+- `problem` (RFC 9457 Problem Details object on failure)
+
+Derivation/usage:
+- Tools MAY extend the base envelope with domain sections (e.g., `policy`, `cache`).
+- Docstring builder retains its richer schema; other tools adopt the base as a minimum.
 
 ## Detailed Implementation Plan
 
@@ -57,16 +78,40 @@ The `tools/` directory orchestrates documentation, catalog generation, navmap ma
 - CLI outputs must validate against schemas before writing; failure triggers `SchemaViolationError` with Problem Details payload.
 - Navmap and docs builders produce JSON/HTML artifacts; JSON outputs get schemas, HTML generation logging includes sanitized file paths only.
 
+## Configuration & 12-factor
+CLIs SHALL use typed settings via `pydantic_settings` (env-only inputs, fast fail for required variables). Libraries accept explicit parameters and avoid global configuration.
+
+Defaults and timeouts (apply unless overridden by CLI options):
+- git: 10.0s; graphviz/dot: 30.0s; doctoc/formatters: 20.0s; python -m invocations: 20.0s.
+- Environment allowlist: PATH, HOME, LANG/LC_*, PYTHON*, TZ, and CI/GIT/UV prefixes.
+
+Input validation:
+- Paths resolved via `Path(...).resolve(strict=True)` and must remain under repo root; reject non-`.py` where applicable.
+- YAML must use `yaml.safe_load`.
+
 ## Observability
 - Structured logging via `_shared.logging.get_logger()`; logs include `event`, `status`, `duration_ms`, `command`, `path_count`, etc.
 - Prometheus metrics via `tools.docstring_builder.observability.MetricsProvider` and analogous providers for docs/navmap (counters + histograms with labels). Stubs implement `labels()` returning `self` to satisfy type checkers.
 - Optional OpenTelemetry instrumentation points at CLI boundaries (span created with command name, status).
+
+Metrics naming (minimum):
+- `<tool>_runs_total{status}` (counter)
+- `<tool>_cli_duration_seconds{command,status}` (histogram)
+
+Logging fields (minimum): `correlation_id`, `operation`, `status`, `command`, `duration_ms`.
 
 ## Risks / Mitigations
 - **Risk:** Large refactor may regress outputs. **Mitigation:** Table-driven regression tests, schema validation, feature flags, fallback mode with explicit warning logs.
 - **Risk:** Third-party plugins break. **Mitigation:** Compatibility shim, documentation updates, deprecation notice with removal schedule.
 - **Risk:** Performance regression due to extra validation. **Mitigation:** Keep validation optional in dry-run mode; add micro-bench tests and monitor metrics.
 - **Risk:** Schema drift. **Mitigation:** Source-of-truth schemas under `schema/tools/`, round-trip tests, task requiring `make artifacts` and schema validation.
+- **Risk:** Supply-chain vulnerabilities. **Mitigation:** Add `pip-audit` gate in CI; pin versions with sensible ranges; use safe deserializers (e.g., YAML safe_load).
+
+## Traceability (Requirements → Tasks)
+- Structured logging replaces prints → Tasks 1.1, 3.4, 4.2, Appendix A per-file steps.
+- Subprocess execution is secured → Tasks 1.2, 3.2, 4.2, Appendix A replacements to `run_tool`.
+- CLI emits versioned JSON envelope → Tasks 1.5, 3.4, 4.4, Appendix A Base CLI envelope tasks.
+- Tests cover edge and failure cases → Tasks 1.4, 2.5, 3.4, 5.2–5.4, Appendix A tests to add.
 
 ## Rollout Plan
 1. Merge shared infrastructure changes; ensure legacy paths continue functioning (feature flag default `0`).
