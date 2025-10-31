@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from tools.docstring_builder.harvest import SymbolHarvest
+from tools.docstring_builder.models import DocstringBuilderError
 from tools.docstring_builder.normalizer_annotations import format_annotation
 from tools.docstring_builder.normalizer_signature import (
     load_module_globals,
@@ -287,13 +288,11 @@ def normalize_docstring(symbol: SymbolHarvest, marker: str) -> str | None:
     if not symbol.docstring:
         return None
     original = textwrap.dedent(symbol.docstring).strip()
-    callable_obj = resolve_callable(symbol)
-    if callable_obj is None:
-        return None
-
-    module_globals = load_module_globals(symbol.module)
-    signature, hints = signature_and_hints(callable_obj, module_globals)
-    if signature is None:
+    try:
+        callable_obj = resolve_callable(symbol)
+        module_globals = load_module_globals(symbol.module)
+        signature, hints = signature_and_hints(callable_obj, module_globals)
+    except DocstringBuilderError:
         return None
 
     body = original

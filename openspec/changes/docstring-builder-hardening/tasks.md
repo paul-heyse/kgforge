@@ -20,26 +20,26 @@
 - [x] 2.6 Update docs to record schema versions and bump `CLI_SCHEMA_VERSION` when fields change; regenerate schema artifacts (`docstring_builder schema`). _(No schema changes required in this patch; version remains 1.0.0.)_
 
 ## 3. Refactor Core Modules
-- [ ] 3.1 Extract helper modules (`normalizer_signature.py`, `normalizer_annotations.py`) or internal functions as outlined in design doc Section “Detailed Implementation Plan”.
-- [ ] 3.2 Refactor `policy.py` `_apply_mapping` into pure helper functions with deterministic ordering; add unit tests covering new branches.
-- [ ] 3.3 Split `render.py` `_build_signature` into composable units and enable Jinja `autoescape=True` (or `select_autoescape`).
-- [ ] 3.4 Replace broad `except Exception` blocks across builder modules with targeted exceptions (e.g., `ImportError`, `TypeError`); rethrow as custom `DocstringBuilderError` hierarchy with `raise ... from e`.
-- [ ] 3.5 Update module-level docstrings and type hints to meet NumPy docstring + strict typing requirements while returning typed models.
+- [x] 3.1 Extract helper modules (`normalizer_signature.py`, `normalizer_annotations.py`) or internal functions as outlined in design doc Section “Detailed Implementation Plan”.
+- [x] 3.2 Refactor `policy.py` `_apply_mapping` into pure helper functions with deterministic ordering; add unit tests covering new branches.
+- [x] 3.3 Split `render.py` `_build_signature` into composable units and enable Jinja `autoescape=True` (or `select_autoescape`).
+- [x] 3.4 Replace broad `except Exception` blocks across builder modules with targeted exceptions (e.g., `ImportError`, `TypeError`); rethrow as custom `DocstringBuilderError` hierarchy with `raise ... from e`.
+- [x] 3.5 Update module-level docstrings and type hints to meet NumPy docstring + strict typing requirements while returning typed models.
 
 ## 4. Plugin Architecture
-- [ ] 4.1 Define `DocstringBuilderPlugin` `Protocol` in `plugins/base.py` (or similar) with explicit method signatures and typed payloads.
-- [ ] 4.2 Update bundled plugins (`dataclass_fields.py`, `llm_summary.py`, `normalize_numpy_params.py`, others) to satisfy the Protocol, removing `Any` and blind exceptions.
-- [ ] 4.3 Add regression test (`tests/tools/docstring_builder/test_plugins.py`) covering the dataclass variance bug, plugin opt-in/out behaviors, and error wrapping.
-- [ ] 4.4 Provide compatibility shim that adapts legacy call signatures, emits `DeprecationWarning`, and document removal timeline in changelog.
-- [ ] 4.5 Update developer documentation (`docs/contributing/quality.md`) with a plugin authoring guide referencing the new Protocol and schemas.
+- [x] 4.1 Define `DocstringBuilderPlugin` `Protocol` in `plugins/base.py` (or similar) with explicit method signatures and typed payloads.
+- [x] 4.2 Update bundled plugins (`dataclass_fields.py`, `llm_summary.py`, `normalize_numpy_params.py`, others) to satisfy the Protocol, removing `Any` and blind exceptions.
+- [x] 4.3 Add regression test (`tests/tools/docstring_builder/test_plugins.py`) covering the dataclass variance bug, plugin opt-in/out behaviors, and error wrapping.
+- [x] 4.4 Provide compatibility shim that adapts legacy call signatures, emits `DeprecationWarning`, and document removal timeline in changelog.
+- [x] 4.5 Update developer documentation (`docs/contributing/quality.md`) with a plugin authoring guide referencing the new Protocol and schemas.
 
 ## 5. CLI & Shared Infrastructure
-- [ ] 5.1 Add `tools/_shared/logging.py` with `get_logger(name: str) -> logging.Logger` (NullHandler, structured logging helpers).
-- [ ] 5.2 Add `tools/_shared/proc.py` with `run_tool(...)` enforcing absolute executables, sanitized env, timeouts, and Problem Details error translation.
-- [ ] 5.3 Update `docstring_builder/cli.py` to construct responses via `build_cli_result_skeleton`, populate typed fields, and emit Problem Details JSON on failure.
-- [ ] 5.4 Emit typed machine outputs for `--json` (current) and placeholder structure for `--baseline`; validate against `schema/tools/docstring_builder_cli.json` before writing.
-- [ ] 5.5 Add CLI integration tests under `tests/tools/docstring_builder/test_cli.py` (parametrized for success/failure and feature-flag combinations) asserting schema validation.
-- [ ] 5.6 Provide a `docs/examples/docstring_builder_problem_details.json` fixture used in doctests and developer guides.
+- [x] 5.1 Add `tools/_shared/logging.py` with `get_logger(name: str) -> logging.Logger` (NullHandler, structured logging helpers).
+- [x] 5.2 Add `tools/_shared/proc.py` with `run_tool(...)` enforcing absolute executables, sanitized env, timeouts, and Problem Details error translation.
+- [x] 5.3 Update `docstring_builder/cli.py` to construct responses via `build_cli_result_skeleton`, populate typed fields, and emit Problem Details JSON on failure.
+- [x] 5.4 Emit typed machine outputs for `--json` (current) and placeholder structure for `--baseline`; validate against `schema/tools/docstring_builder_cli.json` before writing.
+- [x] 5.5 Add CLI integration tests under `tests/tools/docstring_builder/test_cli.py` (parametrized for success/failure and feature-flag combinations) asserting schema validation.
+- [x] 5.6 Provide a `docs/examples/docstring_builder_problem_details.json` fixture used in doctests and developer guides.
 
 ## 6. Observability & Performance
 - [ ] 6.1 Instrument builder with operation timers, counters, and trace spans (OTel); update design doc with metric names and trace spans.
