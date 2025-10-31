@@ -1,18 +1,22 @@
 ## Why
-The first wave of hardening work brought our Ruff and pyrefly suites back to green, yet the type system still leaks `Any` across critical tooling paths:
+The first wave of hardening work brought our Ruff and pyrefly suites back to green, yet the type system still leaks `Any` across critical tooling paths. During the latest `mypy --config-file mypy.ini tests/tools` run, we logged nearly 500 errors. Until those diagnostics are cleared, we cannot trust the tests or confidently refactor the tooling stack. Developers reviewing the output mainly asked: “Where are these `Any` values coming from, and what files must I fix so the test suite type-checks?”
+
+This proposal focuses exclusively on driving `mypy` **and** `pyrefly` to zero errors for `tests/tools/**` (plus the supporting modules those tests import). Once the test tree is clean, Ruff/pyrefly/mypy gates will hold, and junior contributors will have typed helpers to follow.
+
+The concrete root causes we must address are:
 
 - msgspec-backed payloads (docstring builder cache, docs analytics, navmap, CLI envelopes, sitecustomize) instantiate untyped dictionaries, so `mypy --config-file mypy.ini tests/tools` reports hundreds of errors.
 - LibCST codemods depend on incomplete or missing stubs, making even simple transformer edits opaque to junior contributors and forcing reviewers to ignore warnings.
 - Tooling tests rely on untyped fixtures and decorators, meaning regressions can slip past reviewers because mypy does not cover the test harness.
 - The published `tools` package does not carry a `py.typed` marker or precise stubs/exposed exports, so downstream automation cannot rely on our helpers without treating them as `Any`.
 
-Without addressing these gaps, we cannot meet the repository’s “strict types everywhere” bar. The developer experience for junior engineers is especially painful: the IDE offers no completions, `mypy` produces overwhelming error dumps, and it is unclear which files must be touched to add a new payload or codemod. This follow-on change provides the missing structure and documentation so that even a new team member can confidently implement or extend the tooling stack.
+Without addressing these gaps, we cannot meet the repository’s “strict types everywhere” bar. The developer experience for junior engineers is especially painful: the IDE offers no completions, `mypy` produces overwhelming error dumps, and it is unclear which files must be touched to add a new payload or codemod. This follow-on change provides the missing structure and documentation so a teammate can confidently extend the tooling stack and, most importantly, unblock `mypy --config-file mypy.ini tests/tools` and the companion `pyrefly` checks.
 
 ## What Changes
-- **MODIFIED**: Typed payload requirement to mandate msgspec struct definitions, schema-backed validators, and mypy-safe helpers for docstring caches, docs analytics, navmap documents, CLI envelopes, and `sitecustomize` scaffolding. The change explicitly maps each runtime payload to its schema, helper module, and regression tests so contributors have a checklist to follow.
-- **ADDED**: LibCST typing requirement deltas covering a local `py.typed` stub package, extended `stubs/libcst/**`, and codemod helper refactors. Both production code and pytest fixtures must compile under strict typing, and we document a recipe for adding new transformers.
+- **MODIFIED**: Typed payload requirement to mandate msgspec struct definitions, schema-backed validators, and mypy-safe helpers for docstring caches, docs analytics, navmap documents, CLI envelopes, and `sitecustomize` scaffolding. This is the largest single contributor to the failing tests.
+- **ADDED**: LibCST typing requirement deltas covering local `stubs/libcst/**` and codemod helper refactors so `tools/codemods/**` and their tests type-check without `Any`.
 - **ADDED**: New requirement ensuring tooling tests declare types (parametrized fixtures, decorators, and helpers) and run cleanly under `mypy --config-file mypy.ini tests/tools` without lossy `Any` casts. We provide fixture templates, typing guidelines, and verification commands tailored to junior engineers.
-- **MODIFIED**: Packaged tools requirement so the published distribution ships `py.typed`, public re-exports (`tools.*`), and precise stubs for Problem Details / CLI helpers that match runtime behavior. The proposal includes an installation smoke-test script and wheel verification checklist.
+- **MODIFIED**: Export/stub requirement so the modules imported from tests expose typed surfaces (`tools/__init__`, `tools/docstring_builder/__init__`, etc.). This directly addresses “module does not explicitly export attribute …” errors in the test tree.
 
 ## Impact
 - **Affected specs**: `tools-suite`.
@@ -24,22 +28,24 @@ Without addressing these gaps, we cannot meet the repository’s “strict types
 
 ## Implementation Plan (Step-by-step)
 
-### 1. Typed payload surfaces
+### 1. Typed payload surfaces (primary source of test failures)
 1. **Inventory payloads**: enumerate every JSON/CLI payload in scope (docstring cache, docfacts/IR models, analytics, navmap, CLI envelopes, sitecustomize). Capture the owning module, existing schema (if any), and runtime producer/consumer in a table inside the PR description.
 2. **Define msgspec structs**: for each payload, create or refine a `msgspec.Struct` (immutable unless mutation is required) with precise field types, default values, and version fields. Place shared structs in `tools/_shared/cli.py` or `tools/navmap/document_models.py` as appropriate.
 3. **Schema alignment**: update or add JSON Schemas under `schema/tools/**` so they mirror the struct definitions. Add normative examples illustrating both happy-path and error payloads.
 4. **Conversion helpers**: replace ad-hoc `dict` construction with helper functions (`from_payload`, `to_payload`, `validate_*`) that perform schema validation and return typed structs. These helpers must be unit-tested with both valid and invalid inputs.
 5. **Remove `Any` escapes**: audit each payload module and tests to eliminate `cast(Any, …)` or `dict[str, Any]` scaffolding. Use `mypy --config-file mypy.ini tools/<module>.py` to ensure the module compiles in isolation before moving on.
 6. **Regression tests**: add or expand pytest coverage that round-trips payloads (model → JSON → model) and asserts the schema validator rejects malformed inputs.
+    - Every step above is required to make `mypy --config-file mypy.ini tests/tools` stop reporting payload-related `Any` values.
 
-### 2. LibCST typing & codemod ergonomics
+### 2. LibCST typing & codemod ergonomics (codemod tests must type-check)
 1. **Stub coverage**: extend `stubs/libcst/__init__.pyi` (and related modules) to include every node, visitor, and helper used by our codemods. Organise the stub into logical sections (expressions, statements, transformers) with references to the upstream API docs.
 2. **Publish `py.typed`**: add `tools/py.typed` and update packaging metadata so the stub package is shipped with the wheel.
 3. **Codemod helpers**: refactor codemod modules (`tools/codemods/pathlib_fix.py`, `blind_except_fix.py`, etc.) to use typed helper functions when constructing CST nodes. Replace dynamic attribute access with explicit constructors (`cst.Call(...)`, `cst.Attribute(...)`).
 4. **Test templates**: create reusable pytest fixtures for parsing source, applying transformers, and asserting results. Annotate fixtures with precise types (e.g., `Callable[[str], Module]`).
 5. **Validation**: run `mypy --config-file mypy.ini tools/codemods` and `pyrefly check tools/codemods` to confirm stubs cover every use. Document the command sequence in the PR so junior contributors can reproduce it.
+    - These fixes directly clear the LibCST errors raised by `mypy`/`pyrefly` when analysing `tests/tools/codemods/**`.
 
-### 3. Typed tests harness
+### 3. Typed tests harness (finish cleansing `tests/tools/**`)
 1. **Fixture guidelines**: draft a short developer guide (added to `tests/tools/README.md`) showing how to annotate fixtures, `pytest.mark.parametrize`, and context-manager helpers.
 2. **Systematic cleanup**: iterate through `tests/tools/**` and:
    - add return types to test functions when decorators transform call signatures,
@@ -48,11 +54,10 @@ Without addressing these gaps, we cannot meet the repository’s “strict types
 3. **Command verification**: after each directory is cleaned, run `mypy --config-file mypy.ini tests/tools/<subdir>` and capture the output in the PR so reviewers see progress.
 4. **CI guard**: add a dedicated job (or document existing one) ensuring `mypy --config-file mypy.ini tests/tools` runs on every PR touching tooling.
 
-### 4. Packaging & exported APIs
-1. **Re-export audit**: list every helper we expect consumers to rely on (Problem Details builders, CLI envelopes, validation utilities). Ensure `tools/__init__.py` and `tools/docstring_builder/__init__.py` expose them with accurate signatures.
-2. **Stub sync**: add precise `.pyi` files under `stubs/tools/**` that mirror the runtime exports. The stubs should import concrete types (e.g., `from tools._shared.problem_details import ProblemDetailsDict`) instead of aliasing to `Any`.
-3. **Install smoke test**: script a smoke test (documented in `tasks.md`) that creates a temp venv, runs `pip install .[tools]`, imports the key modules, and executes a no-op CLI command. Capture the command output in the PR checklist.
-4. **Wheel validation**: run `uv build`, inspect the generated wheel to ensure `py.typed` and stubs are included, and attach the `wheel unpack` tree in the PR description for transparency.
+### 4. Exports referenced by tests
+1. **Re-export audit**: list every helper imported from `tools` by `tests/tools/**` (Problem Details builders, CLI envelope types, validation utilities). Ensure `tools/__init__.py` and `tools/docstring_builder/__init__.py` expose them with accurate signatures.
+2. **Stub sync**: add precise `.pyi` files under `stubs/tools/**` that mirror the runtime exports so mypy stops complaining about missing attributes.
+3. **Local verification**: after the exports are updated, rerun `uv run --no-sync mypy --config-file mypy.ini tests/tools` to confirm the missing-export errors disappear.
 
 ## Non-Goals
 - Reworking the public API surface of docstring builder or navmap beyond typing and validation. Behavioural changes require a separate proposal.
