@@ -74,15 +74,15 @@ async def test_async_context_invariant_parallel_tasks():
     task_1_result_id, task_1_correlation_id = results[0]
     task_2_result_id, task_2_correlation_id = results[1]
 
-    assert task_1_correlation_id == correlation_id_1, (
-        f"Task 1 should maintain correlation ID {correlation_id_1}"
-    )
-    assert task_2_correlation_id == correlation_id_2, (
-        f"Task 2 should maintain correlation ID {correlation_id_2}"
-    )
-    assert task_1_correlation_id != task_2_correlation_id, (
-        "Correlation IDs should not cross between tasks"
-    )
+    assert (
+        task_1_correlation_id == correlation_id_1
+    ), f"Task 1 should maintain correlation ID {correlation_id_1}"
+    assert (
+        task_2_correlation_id == correlation_id_2
+    ), f"Task 2 should maintain correlation ID {correlation_id_2}"
+    assert (
+        task_1_correlation_id != task_2_correlation_id
+    ), "Correlation IDs should not cross between tasks"
 
 
 @pytest.mark.asyncio
@@ -124,9 +124,9 @@ async def test_context_isolation_with_task_creation():
     task = asyncio.create_task(task_with_id(correlation_id_2))
 
     # Verify original correlation ID is still set
-    assert get_correlation_id() == correlation_id_1, (
-        "Original correlation ID should remain unchanged"
-    )
+    assert (
+        get_correlation_id() == correlation_id_1
+    ), "Original correlation ID should remain unchanged"
 
     # Wait for task to complete and verify it used its own correlation ID
     task_result = await task
@@ -157,9 +157,9 @@ async def test_multiple_concurrent_requests():
     # Verify each request maintained its own correlation ID
     for request_num, retrieved_id in results:
         expected_id = correlation_ids[request_num]
-        assert retrieved_id == expected_id, (
-            f"Request {request_num} should maintain correlation ID {expected_id}"
-        )
+        assert (
+            retrieved_id == expected_id
+        ), f"Request {request_num} should maintain correlation ID {expected_id}"
 
     # Verify all correlation IDs are unique
     retrieved_ids = [rid for _, rid in results]

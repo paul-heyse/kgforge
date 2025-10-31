@@ -27,6 +27,8 @@ from kgfoundry_common.problem_details import JsonValue, ProblemDetails, build_pr
 logger = get_logger(__name__)
 
 __all__ = [
+    "AgentCatalogSearchError",
+    "CatalogSessionError",
     "ChunkingError",
     "ConfigurationError",
     "DeserializationError",
@@ -630,6 +632,56 @@ class VectorSearchError(KgFoundryError):
             message,
             code=ErrorCode.VECTOR_SEARCH_ERROR,
             http_status=503,
+            cause=cause,
+            context=context,
+        )
+
+
+class AgentCatalogSearchError(KgFoundryError):
+    """Error during agent catalog search operations.
+
+    Examples
+    --------
+    >>> raise AgentCatalogSearchError(
+    ...     "Catalog search failed", cause=RuntimeError("Index not loaded")
+    ... )
+    """
+
+    def __init__(
+        self,
+        message: str,
+        cause: Exception | None = None,
+        context: Mapping[str, object] | None = None,
+    ) -> None:
+        """Initialize agent catalog search error."""
+        super().__init__(
+            message,
+            code=ErrorCode.AGENT_CATALOG_SEARCH_ERROR,
+            http_status=503,
+            cause=cause,
+            context=context,
+        )
+
+
+class CatalogSessionError(KgFoundryError):
+    """Error during catalog session operations (JSON-RPC, subprocess).
+
+    Examples
+    --------
+    >>> raise CatalogSessionError("Session spawn failed", cause=OSError("Command not found"))
+    """
+
+    def __init__(
+        self,
+        message: str,
+        cause: Exception | None = None,
+        context: Mapping[str, object] | None = None,
+    ) -> None:
+        """Initialize catalog session error."""
+        super().__init__(
+            message,
+            code=ErrorCode.SESSION_ERROR,
+            http_status=500,
             cause=cause,
             context=context,
         )

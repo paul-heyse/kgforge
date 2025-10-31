@@ -66,7 +66,9 @@ def tok(text: str) -> list[str]:
     list[str]
         Describe return value.
     """
-    return [token.lower() for token in TOKEN.findall(text or "")]
+    # re.findall returns list[str] when pattern has no groups
+    matches: list[str] = TOKEN.findall(text or "")
+    return [token.lower() for token in matches]
 
 
 # [nav:anchor SpladeDoc]
@@ -172,11 +174,28 @@ class SpladeIndex:
                 "WHERE kind='chunks' ORDER BY created_at DESC LIMIT 1"
             ).fetchone()
             if dataset:
-                rows = con.execute(
-                    "SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text "
-                    f"FROM read_parquet('{dataset[0]}/*/*.parquet', union_by_name=true) AS c"
-                ).fetchall()
-                for chunk_id, doc_id, section, text in rows:
+                root = dataset[0]
+                if not isinstance(root, str):
+                    msg = f"Invalid parquet_root type: {type(root)}"
+                    raise ValueError(msg)
+                # Parameterize query - use pathlib for safe path construction
+                root_path = Path(root)
+                parquet_pattern = str(root_path / "*" / "*.parquet")
+                sql = """
+                    SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text
+                    FROM read_parquet(?, union_by_name=true) AS c
+                """
+                rows = con.execute(sql, [parquet_pattern]).fetchall()
+                # Explicitly type DuckDB query results
+                for row in rows:
+                    chunk_id_val: object = row[0]
+                    doc_id_val: object = row[1]
+                    section_val: object = row[2]
+                    text_val: object = row[3]
+                    chunk_id: str = str(chunk_id_val)
+                    doc_id: str = str(doc_id_val)
+                    section: str = str(section_val)
+                    text: str = str(text_val)
                     self.docs.append(
                         SpladeDoc(
                             chunk_id=chunk_id,
@@ -229,7 +248,12 @@ class SpladeIndex:
                     idf = (self.N + 1) / (self.df[term] + 0.5)
                     score += term_freq.get(term, 0) * idf
             scores[index] = score
-        ranked = sorted(enumerate(scores), key=lambda item: item[1], reverse=True)
+
+        # Explicitly type sorted callable to avoid Any
+        def key_func(item: tuple[int, float]) -> float:
+            return item[1]
+
+        ranked: list[tuple[int, float]] = sorted(enumerate(scores), key=key_func, reverse=True)
         return [(idx, value) for idx, value in ranked[:k] if value > 0.0]
 
     def doc(self, index: int) -> SpladeDoc:

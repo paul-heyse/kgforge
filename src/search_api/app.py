@@ -118,23 +118,22 @@ bm25 = get_bm25(
     BM25_DIR,
     k1=settings.sparse_embedding.bm25_k1,
     b=settings.sparse_embedding.bm25_b,
-    field_boosts=None,  # TODO: Add field_boosts to SparseEmbeddingConfig
+    field_boosts=None,  # TODO(@search-api): Add field_boosts to SparseEmbeddingConfig (https://github.com/kgfoundry/kgfoundry/issues/TBD)
 )
 # load index if exists
 try:
     if isinstance(bm25, PurePythonBM25) and (Path(BM25_DIR) / "pure_bm25.pkl").exists():
         bm25.load()
-except Exception as exc:
+except (FileNotFoundError, OSError, ValueError, RuntimeError) as exc:
     logger.warning("Failed to load BM25 index: %s", exc, exc_info=True)
     # Continue without index (will be built on first use)
 
 splade = get_splade(SPARSE_BACKEND, SPLADE_DIR, query_encoder=SPLADE_QUERY_ENCODER)
 try:
-    # for PureImpactIndex, try to load
-    if hasattr(splade, "load"):
-        splade.load()
-except Exception as exc:
-    logger.warning("Failed to load SPLADE index: %s", exc, exc_info=True)
+    # for PureImpactIndex, try to load - load() is an optional Protocol method
+    splade.load()
+except (AttributeError, FileNotFoundError, OSError) as exc:
+    logger.debug("SPLADE index load not available or failed: %s", exc, exc_info=True)
     # Continue without index (will be built on first use)
 
 faiss = faiss_gpu.FaissGpuIndex(
@@ -146,7 +145,7 @@ faiss = faiss_gpu.FaissGpuIndex(
 try:
     if Path(FAISS_PATH).exists():
         faiss.load(FAISS_PATH, None)
-except Exception as exc:
+except (FileNotFoundError, OSError, RuntimeError, ValueError) as exc:
     logger.warning("Failed to load FAISS index: %s", exc, exc_info=True)
     # Continue without index (will be built on first use)
 
@@ -375,7 +374,7 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> SearchResponse:
         if bm25:
             try:
                 bm25_hits = bm25.search(req.query, k=settings.search.sparse_candidates)
-            except Exception as exc:
+            except (RuntimeError, ValueError, AttributeError, OSError) as exc:
                 logger.warning(
                     "BM25 search failed, falling back to empty results: %s",
                     exc,
@@ -387,7 +386,7 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> SearchResponse:
             splade_hits = (
                 splade.search(req.query, k=settings.search.sparse_candidates) if splade else []
             )
-        except Exception as exc:
+        except (RuntimeError, ValueError, AttributeError, OSError) as exc:
             logger.warning(
                 "SPLADE search failed, falling back to empty results: %s",
                 exc,
@@ -446,7 +445,9 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> SearchResponse:
 
 
 # [nav:anchor graph_concepts]
-def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str, Any]:
+def graph_concepts(
+    body: Mapping[str, Any], _: None = Depends(auth)
+) -> dict[str, list[dict[str, str]]]:
     """Describe graph concepts.
 
     <!-- auto:docstring-builder v1 -->
@@ -464,16 +465,17 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
 
     Returns
     -------
-    dict[str, Any]
+    dict[str, list[dict[str, str]]]
         Describe return value.
     """
-    q = (body or {}).get("q", "").lower()
+    q: str = str((body or {}).get("q", "")).lower()
+    limit: int = int(body.get("limit", 50)) if body else 50
     # toy: return nodes that contain the query substring
-    concepts = [
+    concepts: list[dict[str, str]] = [
         {"concept_id": c, "label": c}
         for c in sorted({c for cs in kg.chunk2concepts.values() for c in cs})
         if q in c.lower()
-    ][: body.get("limit", 50)]
+    ][:limit]
     return {"concepts": concepts}
 
 

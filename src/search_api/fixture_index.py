@@ -67,7 +67,9 @@ def tokenize(text: str) -> list[str]:
     list[str]
         Describe return value.
     """
-    return [token.lower() for token in TOKEN_RE.findall(text or "")]
+    # re.findall returns list[str] when pattern has no groups
+    matches: list[str] = TOKEN_RE.findall(text or "")
+    return [token.lower() for token in matches]
 
 
 # [nav:anchor FixtureDoc]
@@ -169,27 +171,42 @@ class FixtureIndex:
             if not dataset:
                 return
             root = dataset[0]
-            rows = con.execute(
-                f"""
+            if not isinstance(root, str):
+                msg = f"Invalid parquet_root type: {type(root)}"
+                raise TypeError(msg)
+            # Parameterize query - use pathlib for safe path construction
+            root_path = Path(root)
+            parquet_pattern = str(root_path / "*" / "*.parquet")
+            sql = """
                 SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text,
                        coalesce(d.title,'') AS title
-                FROM read_parquet('{root}/*/*.parquet', union_by_name=true) AS c
+                FROM read_parquet(?, union_by_name=true) AS c
                 LEFT JOIN documents d ON c.doc_id = d.doc_id
             """
-            ).fetchall()
+            rows = con.execute(sql, [parquet_pattern]).fetchall()
+            # Explicitly type DuckDB query results
+            for row in rows:
+                chunk_id_val: object = row[0]
+                doc_id_val: object = row[1]
+                section_val: object = row[2]
+                text_val: object = row[3]
+                title_val: object = row[4]
+                chunk_id: str = str(chunk_id_val)
+                doc_id: str = str(doc_id_val)
+                section: str = str(section_val)
+                text: str = str(text_val)
+                title: str = str(title_val)
+                self.docs.append(
+                    FixtureDoc(
+                        chunk_id=chunk_id,
+                        doc_id=doc_id or "urn:doc:fixture",
+                        title=title or "Fixture",
+                        section=section or "",
+                        text=text or "",
+                    )
+                )
         finally:
             con.close()
-
-        for chunk_id, doc_id, section, text, title in rows:
-            self.docs.append(
-                FixtureDoc(
-                    chunk_id=chunk_id,
-                    doc_id=doc_id or "urn:doc:fixture",
-                    title=title or "Fixture",
-                    section=section or "",
-                    text=text or "",
-                )
-            )
 
         self._build_lex()
 
@@ -235,7 +252,7 @@ class FixtureIndex:
         list[tuple[int, float]]
             Describe return value.
         """
-        if getattr(self, "N", 0) == 0:
+        if not hasattr(self, "N") or self.N == 0:
             return []
         qtoks = tokenize(query)
         if not qtoks:
@@ -249,7 +266,12 @@ class FixtureIndex:
                 idf = math.log((self.N + 1) / (self.df[token] + 0.5) + 1.0)
                 score += idf * tf.get(token, 0)
             scores[i] = score
-        ranked = sorted(enumerate(scores), key=lambda item: item[1], reverse=True)
+
+        # Explicitly type sorted callable to avoid Any
+        def key_func(item: tuple[int, float]) -> float:
+            return item[1]
+
+        ranked: list[tuple[int, float]] = sorted(enumerate(scores), key=key_func, reverse=True)
         return [(index, score) for index, score in ranked[:k] if score > 0.0]
 
     def doc(self, index: int) -> FixtureDoc:
