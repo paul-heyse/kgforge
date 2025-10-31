@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import cast
 
 from tools.docs import build_agent_api
 
@@ -11,12 +12,18 @@ from tools.docs import build_agent_api
 def test_build_spec_contains_required_components() -> None:
     """The generated specification should expose ProblemDetails and Symbol schemas."""
     spec = build_agent_api.build_spec()
+    components = cast(dict[str, object], spec["components"])
+    schemas = cast(dict[str, object], components["schemas"])
+    symbol_schema = cast(dict[str, object], schemas["Symbol"])
+    symbol_props = cast(dict[str, object], symbol_schema["properties"])
+    anchors = cast(dict[str, object], symbol_props["anchors"])
+    anchor_props = cast(dict[str, object], anchors["properties"])
+    remap_order = cast(dict[str, object], anchor_props["remap_order"])
+
     assert spec["openapi"] == "3.2.0"
-    components = spec["components"]["schemas"]
-    assert "ProblemDetails" in components
-    assert "Symbol" in components
-    remap = components["Symbol"]["properties"]["anchors"]["properties"]["remap_order"]
-    assert remap["type"] == "array"
+    assert "ProblemDetails" in schemas
+    assert "Symbol" in schemas
+    assert remap_order["type"] == "array"
 
 
 def test_main_writes_openapi_document(tmp_path: Path) -> None:

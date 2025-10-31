@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from contextlib import AbstractContextManager
+from re import Pattern
 from types import ModuleType, TracebackType
 from typing import Any, TypeVar, overload
 from warnings import WarningMessage
 
 T = TypeVar("T")
+TW = TypeVar("TW", bound=BaseException)
 
 class CaptureResult[T]:
     out: T
@@ -58,9 +60,19 @@ class ExceptionInfo[TExc: BaseException]:
         tb: BaseException | None,
     ) -> bool: ...
 
+@overload
 def raises[TExc: BaseException](
-    expected_exception: type[TExc],
+    expected_exception: type[TExc] | tuple[type[TExc], ...],
+    *,
+    match: str | Pattern[str] | None = ...,
 ) -> AbstractContextManager[ExceptionInfo[TExc]]: ...
+
+@overload
+def raises(
+    expected_exception: tuple[type[BaseException], ...],
+    *,
+    match: str | Pattern[str] | None = ...,
+) -> AbstractContextManager[ExceptionInfo[BaseException]]: ...
 
 class UsageError(Exception): ...
 
@@ -94,3 +106,23 @@ def importorskip(
     minversion: str | None = ...,
     reason: str | None = ...,
 ) -> ModuleType: ...
+
+def warns(
+    expected_warning: type[Warning] | tuple[type[Warning], ...],
+    *,
+    match: str | Pattern[str] | None = ...,
+) -> AbstractContextManager[list[WarningMessage]]: ...
+
+class _ApproxReturn:
+    def __iter__(self) -> Any: ...
+
+@overload
+def approx(expected: float, *, rel: float | None = ..., abs: float | None = ...) -> _ApproxReturn: ...
+
+@overload
+def approx(
+    expected: Sequence[float],
+    *,
+    rel: float | None = ...,
+    abs: float | None = ...,
+) -> Sequence[_ApproxReturn]: ...

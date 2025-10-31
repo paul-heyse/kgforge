@@ -6,7 +6,12 @@ import importlib
 
 import pytest
 from tools.docstring_builder import cli
-from tools.docstring_builder.models import RunStatus, build_cli_result_skeleton, validate_cli_output
+from tools.docstring_builder.models import (
+    ErrorReport,
+    RunStatus,
+    build_cli_result_skeleton,
+    validate_cli_output,
+)
 
 
 @pytest.mark.parametrize(
@@ -24,19 +29,13 @@ def test_cli_problem_details(exit_status: cli.ExitStatus, expect_problem: bool) 
     cli_result["subcommand"] = "check"
     cli_result["summary"]["subcommand"] = "check"
     cli_result["files"] = []
-    errors = []
-    if exit_status is not cli.ExitStatus.SUCCESS:
-        cli_result["summary"]["status_counts"]["error"] = int(exit_status is cli.ExitStatus.ERROR)
-        cli_result["summary"]["status_counts"]["violation"] = int(
-            exit_status is cli.ExitStatus.VIOLATION
-        )
-        errors = [
-            {
-                "file": "tools/example.py",
-                "status": RunStatus.ERROR,
-                "message": "Unable to render docstring",
-            }
-        ]
+    errors: list[ErrorReport] = [
+        {
+            "file": "tools/example.py",
+            "status": RunStatus.ERROR,
+            "message": "Unable to render docstring",
+        }
+    ]
     cli_result["errors"] = errors
     problem = cli._build_problem_details(
         exit_status,

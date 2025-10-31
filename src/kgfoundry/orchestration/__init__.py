@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-import kgfoundry.orchestration as _module
 from typing import cast
+
+import kgfoundry.orchestration as _module
 from kgfoundry.namespace_bridge import (
     namespace_attach,
     namespace_dir,

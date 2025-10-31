@@ -49,7 +49,9 @@ class TestRunTool:
         assert error.problem is not None
         assert error.problem["type"] == "https://kgfoundry.dev/problems/tool-timeout"
         assert error.problem["status"] == 504
-        assert "timed out" in error.problem["detail"].lower()
+        detail = error.problem.get("detail")
+        assert isinstance(detail, str)
+        assert "timed out" in detail.lower()
 
     def test_missing_executable_raises(self) -> None:
         """run_tool raises ToolExecutionError when executable not found."""

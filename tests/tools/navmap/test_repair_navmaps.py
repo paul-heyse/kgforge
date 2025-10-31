@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import cast
 
 import pytest
 from tools.navmap.build_navmap import ModuleInfo
@@ -57,7 +58,10 @@ def test_repair_module_applies_changes_to_disk(module_file: Path) -> None:
 
 
 def test_migrate_navmaps_writes_payload(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    payload = {"commit": "HEAD", "modules": {}}
+    payload: dict[str, object] = {
+        "commit": "HEAD",
+        "modules": cast(dict[str, object], {}),
+    }
 
     def _fake_build_index() -> dict[str, object]:
         return payload

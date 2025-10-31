@@ -1087,9 +1087,7 @@ class AgentCatalogBuilder:
         return None
 
     @staticmethod
-    def _lookup_docfacts(
-        qname: str, index: dict[str, dict[str, Any]]
-    ) -> dict[str, Any] | None:
+    def _lookup_docfacts(qname: str, index: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
         if qname in index:
             return index[qname]
         tail = qname.split(".", 1)[-1]

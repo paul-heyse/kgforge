@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import TypedDict, cast
 
 from packaging.version import InvalidVersion, Version
+
 from tools import get_logger
 from tools.navmap.build_navmap import NavmapError as BuildNavmapError
 from tools.navmap.build_navmap import build_index

@@ -14,6 +14,8 @@ import numpy.typing as npt
 import pytest
 from tools.docs import build_agent_catalog
 
+from kgfoundry.agent_catalog import search as catalog_search
+
 
 class SupportsSetEnv(Protocol):
     def setenv(self, name: str, value: str, prepend: str | None = None) -> None:
@@ -240,12 +242,12 @@ def test_build_anchors_use_docfacts_end_lineno(tmp_path: Path) -> None:
 def test_load_faiss_falls_back_when_missing(monkeypatch: pytest.MonkeyPatch) -> None:
     """Missing FAISS modules should fall back to the in-memory implementation."""
     monkeypatch.setattr(
-        build_agent_catalog,
+        catalog_search,
         "_FAISS_DEFAULT_MODULES",
         ("not_a_real_module",),
         raising=False,
     )
-    module = build_agent_catalog._load_faiss("unit-test")
+    module = catalog_search.load_faiss("unit-test")
     index = module.IndexFlatIP(2)
     vectors = np.zeros((1, 2), dtype=np.float32)
     index.add(vectors)
@@ -257,14 +259,14 @@ def test_load_faiss_falls_back_when_missing(monkeypatch: pytest.MonkeyPatch) -> 
 def test_load_faiss_respects_fallback_flag(monkeypatch: pytest.MonkeyPatch) -> None:
     """Disabling the fallback should raise a CatalogBuildError when FAISS is missing."""
     monkeypatch.setattr(
-        build_agent_catalog,
+        catalog_search,
         "_FAISS_DEFAULT_MODULES",
         ("not_a_real_module",),
         raising=False,
     )
     monkeypatch.setenv("KGF_DISABLE_FAISS_FALLBACK", "1")
-    with pytest.raises(build_agent_catalog.CatalogBuildError):
-        build_agent_catalog._load_faiss("unit-test")
+    with pytest.raises(catalog_search.AgentCatalogSearchError):
+        catalog_search.load_faiss("unit-test")
 
 
 def test_link_policy_cli_precedence(

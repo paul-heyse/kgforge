@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-import search_api as _module
 from typing import cast
+
+import search_api as _module
 from kgfoundry.namespace_bridge import (
     namespace_attach,
     namespace_dir,

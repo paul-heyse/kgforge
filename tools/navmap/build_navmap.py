@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import cast
 
 import msgspec
+
 from tools import ToolExecutionError, get_logger, run_tool, validate_tools_payload
 from tools.drift_preview import write_html_diff
 from tools.navmap.document_models import (

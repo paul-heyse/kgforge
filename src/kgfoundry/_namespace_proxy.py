@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from collections.abc import Iterable as TypingIterable
 from types import ModuleType
-from typing import Iterable as TypingIterable, cast
+from typing import cast
 
 
 def namespace_getattr(module: ModuleType, name: str) -> object:
@@ -43,7 +44,6 @@ def namespace_exports(module: ModuleType) -> list[str]:
 
 def namespace_attach(module: ModuleType, target: dict[str, object], names: TypingIterable[str]) -> None:
     """Populate ``target`` with attributes from ``module`` while preserving typing."""
-
     for name in names:
         target[name] = cast(object, getattr(module, name))
 
