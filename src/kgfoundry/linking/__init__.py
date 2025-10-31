@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import cast
 
-import linking as _module
-from kgfoundry._namespace_proxy import (
+import kgfoundry.linking as _module
+from kgfoundry.namespace_bridge import (
     namespace_attach,
     namespace_dir,
     namespace_exports,

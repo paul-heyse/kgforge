@@ -5,7 +5,12 @@ from __future__ import annotations
 from typing import cast
 
 import search_api.faiss_adapter as _module
-from kgfoundry._namespace_proxy import namespace_attach, namespace_dir, namespace_getattr
+from kgfoundry.namespace_bridge import (
+    namespace_attach,
+    namespace_dir,
+    namespace_exports,
+    namespace_getattr,
+)
 from search_api.faiss_adapter import HAVE_FAISS, DenseVecs, FaissAdapter, VecArray
 
 __all__ = ["HAVE_FAISS", "DenseVecs", "FaissAdapter", "VecArray"]

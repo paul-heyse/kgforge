@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import search_api as _module
 from typing import cast
-from kgfoundry._namespace_proxy import (
+from kgfoundry.namespace_bridge import (
     namespace_attach,
     namespace_dir,
     namespace_exports,
