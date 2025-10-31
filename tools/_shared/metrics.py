@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Iterator, Sequence
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from dataclasses import dataclass, field
 from importlib import import_module
 from pathlib import Path
@@ -20,6 +20,7 @@ from typing import Final, Protocol, cast
 
 from kgfoundry_common.observability import start_span
 from tools._shared.logging import StructuredLoggerAdapter, get_logger, with_fields
+from tools._shared.settings import get_runtime_settings
 
 LOGGER = get_logger(__name__)
 
@@ -44,20 +45,22 @@ class _NoopCounter:
     """Counter stub used when Prometheus is unavailable."""
 
     def labels(self, **kwargs: object) -> CounterLike:  # noqa: ARG002
+        _ = self
         return self
 
     def inc(self, value: float = 1.0) -> None:  # noqa: ARG002
-        return None
+        _ = self
 
 
 class _NoopHistogram:
     """Histogram stub used when Prometheus is unavailable."""
 
     def labels(self, **kwargs: object) -> HistogramLike:  # noqa: ARG002
+        _ = self
         return self
 
     def observe(self, value: float) -> None:  # noqa: ARG002
-        return None
+        _ = self
 
 
 CounterFactory = Callable[[str, str, Sequence[str]], CounterLike]
@@ -150,6 +153,8 @@ class ToolRunObservation:
     returncode: int | None = field(default=None, init=False)
     timed_out: bool = field(default=False, init=False)
     start_time: float = field(default_factory=time.monotonic, init=False)
+    metrics_enabled: bool = True
+    tracing_enabled: bool = True
 
     def __post_init__(self) -> None:
         self.tool = Path(self.command[0]).name if self.command else "<unknown>"
@@ -187,7 +192,14 @@ def observe_tool_run(
     timeout: float | None,
 ) -> Iterator[ToolRunObservation]:
     """Context manager that records metrics and tracing for a subprocess."""
-    observation = ToolRunObservation(command=command, cwd=cwd, timeout=timeout)
+    settings = get_runtime_settings()
+    observation = ToolRunObservation(
+        command=command,
+        cwd=cwd,
+        timeout=timeout,
+        metrics_enabled=settings.metrics_enabled,
+        tracing_enabled=settings.tracing_enabled,
+    )
     command_parts: list[str] = list(command)
     logger = with_fields(
         LOGGER,
@@ -204,9 +216,15 @@ def observe_tool_run(
         "timeout_s": timeout if timeout is not None else -1.0,
     }
 
-    with start_span(
-        span_name, attributes={k: v for k, v in span_attributes.items() if v is not None}
-    ):
+    span_context = (
+        start_span(
+            span_name, attributes={k: v for k, v in span_attributes.items() if v is not None}
+        )
+        if observation.tracing_enabled
+        else nullcontext()
+    )
+
+    with span_context:
         try:
             yield observation
         except Exception:
@@ -225,8 +243,9 @@ def _record(
     """Persist metrics and structured logs for the finished observation."""
     duration = observation.duration_seconds()
     status = observation.status
-    TOOL_RUNS_TOTAL.labels(tool=observation.tool, status=status).inc()
-    TOOL_DURATION_SECONDS.labels(tool=observation.tool, status=status).observe(duration)
+    if observation.metrics_enabled:
+        TOOL_RUNS_TOTAL.labels(tool=observation.tool, status=status).inc()
+        TOOL_DURATION_SECONDS.labels(tool=observation.tool, status=status).observe(duration)
     extra: dict[str, object] = {
         "duration_ms": duration * 1000,
         "tool": observation.tool,
@@ -236,7 +255,8 @@ def _record(
     }
     if status == "error":
         reason = observation.failure_reason or "unknown"
-        TOOL_FAILURES_TOTAL.labels(tool=observation.tool, reason=reason).inc()
+        if observation.metrics_enabled:
+            TOOL_FAILURES_TOTAL.labels(tool=observation.tool, reason=reason).inc()
         extra["reason"] = reason
         logger.error("Tool run failed", extra=extra)
     else:

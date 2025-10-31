@@ -40,7 +40,18 @@ class AnalyticsErrors(msgspec.Struct, kw_only=True):
     """Aggregate error metrics for analytics runs."""
 
     broken_links: int
-    details: list[BrokenLinkDetail] = msgspec.field(default_factory=list)
+    details: list[BrokenLinkDetail]
+
+    def __init__(
+        self,
+        *,
+        broken_links: int,
+        details: list[BrokenLinkDetail] | None = None,
+    ) -> None:
+        super().__init__(
+            broken_links=broken_links,
+            details=list(details) if details is not None else [],
+        )
 
 
 class PortalSessions(msgspec.Struct, kw_only=True):
@@ -59,16 +70,29 @@ class PortalAnalytics(msgspec.Struct, kw_only=True):
 class AgentAnalyticsDocument(msgspec.Struct, kw_only=True):
     """Top-level analytics document matching ``doc_analytics.json``."""
 
-    schemaVersion: str = ANALYTICS_SCHEMA_VERSION
-    schemaId: str = ANALYTICS_SCHEMA_ID
-    generatedAt: str = msgspec.field(default_factory=lambda: datetime.now(tz=UTC).isoformat())
-    repo: RepoInfo = msgspec.field(default_factory=lambda: RepoInfo(root="."))
-    catalog: CatalogMetrics = msgspec.field(
-        default_factory=lambda: CatalogMetrics(packages=0, modules=0, symbols=0, shards=0)
-    )
-    portal: PortalAnalytics = msgspec.field(
-        default_factory=lambda: PortalAnalytics(sessions=PortalSessions(builds=0, unique_users=0))
-    )
-    errors: AnalyticsErrors = msgspec.field(
-        default_factory=lambda: AnalyticsErrors(broken_links=0, details=[])
-    )
+    schemaVersion: str
+    schemaId: str
+    generatedAt: str
+    repo: RepoInfo
+    catalog: CatalogMetrics
+    portal: PortalAnalytics
+    errors: AnalyticsErrors
+
+    def __init__(
+        self,
+        *,
+        generated_at: str | None = None,
+        repo: RepoInfo | None = None,
+        catalog: CatalogMetrics | None = None,
+        portal: PortalAnalytics | None = None,
+        errors: AnalyticsErrors | None = None,
+    ) -> None:
+        super().__init__(
+            schemaVersion=ANALYTICS_SCHEMA_VERSION,
+            schemaId=ANALYTICS_SCHEMA_ID,
+            generatedAt=generated_at or datetime.now(tz=UTC).isoformat(),
+            repo=repo or RepoInfo(root="."),
+            catalog=catalog or CatalogMetrics(packages=0, modules=0, symbols=0, shards=0),
+            portal=portal or PortalAnalytics(sessions=PortalSessions(builds=0, unique_users=0)),
+            errors=errors or AnalyticsErrors(broken_links=0),
+        )

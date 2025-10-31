@@ -5,8 +5,9 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Final
+from typing import Final, cast
 
 from tools import get_logger
 from tools.navmap.build_navmap import build_index
@@ -16,6 +17,14 @@ LOGGER = get_logger(__name__)
 DEFAULT_OUTPUT: Final[Path] = (
     Path(__file__).resolve().parents[2] / "site" / "_build" / "navmap.json"
 )
+
+
+@dataclass(frozen=True)
+class MigrateArgs:
+    """CLI arguments for ``migrate_navmaps`` after parsing."""
+
+    output: Path
+    compact: bool
 
 
 def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str, object]:
@@ -44,7 +53,7 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str
     return index
 
 
-def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+def _parse_args(argv: list[str] | None = None) -> MigrateArgs:
     """Parse CLI arguments for the navmap migration utility."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -58,7 +67,11 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Emit JSON without indentation to save space.",
     )
-    return parser.parse_args(argv)
+    namespace = parser.parse_args(argv)
+    return MigrateArgs(
+        output=cast(Path, namespace.output),
+        compact=cast(bool, namespace.compact),
+    )
 
 
 def main(argv: list[str] | None = None) -> int:

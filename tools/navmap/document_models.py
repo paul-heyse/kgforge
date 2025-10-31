@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import UTC, datetime
+from typing import cast
 
 import msgspec
 from tools.navmap.models import NavIndex, SymbolMeta
@@ -56,16 +57,28 @@ class ModuleEntryDocument(msgspec.Struct, kw_only=True):
     deps: list[str]
 
 
+def _utc_iso_now() -> str:
+    """Return the current UTC timestamp as an ISO-8601 string."""
+    return datetime.now(tz=UTC).isoformat()
+
+
+def _empty_module_map() -> dict[str, ModuleEntryDocument]:
+    """Return an empty module map for :class:`NavmapDocument`."""
+    return {}
+
+
 class NavmapDocument(msgspec.Struct, kw_only=True):
     """Top-level navmap document captured on disk."""
 
     schemaVersion: str = NAVMAP_SCHEMA_VERSION
     schemaId: str = NAVMAP_SCHEMA_ID
-    generatedAt: str = msgspec.field(default_factory=lambda: datetime.now(tz=UTC).isoformat())
+    generatedAt: str = cast(str, msgspec.field(default_factory=_utc_iso_now))
     commit: str = "HEAD"
     policyVersion: str = "1"
     linkMode: str = "editor"
-    modules: dict[str, ModuleEntryDocument] = msgspec.field(default_factory=dict)
+    modules: dict[str, ModuleEntryDocument] = cast(
+        dict[str, ModuleEntryDocument], msgspec.field(default_factory=_empty_module_map)
+    )
 
 
 def _symbol_meta_to_document(meta: SymbolMeta) -> SymbolMetaDocument:
@@ -103,7 +116,9 @@ def navmap_document_from_index(
         symbol_meta = {
             symbol: _symbol_meta_to_document(meta) for symbol, meta in entry.meta.items()
         }
-        module_meta_doc = _module_meta_to_document(entry.module_meta.to_dict())
+        module_meta_doc = _module_meta_to_document(
+            cast(Mapping[str, str | None], entry.module_meta.to_dict())
+        )
         modules[name] = ModuleEntryDocument(
             path=entry.path,
             exports=list(entry.exports),

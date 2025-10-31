@@ -4,14 +4,20 @@ from __future__ import annotations
 
 import os
 import shutil
-import subprocess
+import subprocess  # noqa: S404
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
 from tools._shared.logging import get_logger
 from tools._shared.metrics import observe_tool_run
-from tools._shared.problem_details import ProblemDetailsDict, build_problem_details
+from tools._shared.problem_details import (
+    ProblemDetailsDict,
+    tool_disallowed_problem_details,
+    tool_failure_problem_details,
+    tool_missing_problem_details,
+    tool_timeout_problem_details,
+)
 from tools._shared.settings import get_runtime_settings
 
 
@@ -82,14 +88,11 @@ def _resolve_executable(executable: str, command: Sequence[str]) -> Path:
         return candidate
     resolved = shutil.which(executable)
     if resolved is None:
-        problem = build_problem_details(
-            type="https://kgfoundry.dev/problems/tool-missing",
-            title="Executable not found",
-            status=500,
-            detail=f"Executable '{executable}' could not be resolved to an absolute path",
-            instance=f"urn:tool:{executable}:missing",
+        detail = f"Executable '{executable}' could not be resolved to an absolute path"
+        problem = tool_missing_problem_details(
+            command=command, executable=executable, detail=detail
         )
-        message = f"Executable '{executable}' could not be resolved to an absolute path"
+        message = detail
         raise ToolExecutionError(message, command=[executable], problem=problem)
     resolved_path = Path(resolved)
     _enforce_allowlist(resolved_path, command)
@@ -100,19 +103,10 @@ def _enforce_allowlist(executable: Path, command: Sequence[str]) -> None:
     settings = get_runtime_settings()
     if settings.is_allowed(executable):
         return
-    problem = build_problem_details(
-        type="https://kgfoundry.dev/problems/tool-exec-disallowed",
-        title="Executable not allowed",
-        status=403,
-        detail=(
-            f"Executable '{executable.name}' is not permitted by the TOOLS_EXEC_ALLOWLIST setting"
-        ),
-        instance=f"urn:tool:{executable.name}:disallowed",
-        extensions={
-            "command": list(command),
-            "executable": str(executable),
-            "allowlist": list(settings.exec_allowlist),
-        },
+    problem = tool_disallowed_problem_details(
+        command=command,
+        executable=executable,
+        allowlist=settings.exec_allowlist,
     )
     message = f"Executable '{executable}' is not permitted by TOOLS_EXEC_ALLOWLIST"
     raise ToolExecutionError(message, command=command, problem=problem)
@@ -169,21 +163,7 @@ def run_tool(
             )
         except subprocess.TimeoutExpired as exc:
             observation.failure("timeout", timed_out=True)
-            problem = build_problem_details(
-                type="https://kgfoundry.dev/problems/tool-timeout",
-                title="Tool execution timed out",
-                status=504,
-                detail=(
-                    f"Command '{command[0]}' timed out after {timeout} seconds"
-                    if timeout is not None
-                    else f"Command '{command[0]}' timed out"
-                ),
-                instance=f"urn:tool:{command[0]}:timeout",
-                extensions={
-                    "command": list(command),
-                    "timeout": timeout,
-                },
-            )
+            problem = tool_timeout_problem_details(command=command, timeout=timeout)
             message = "Subprocess timed out"
             stdout_text = (
                 exc.stdout.decode("utf-8", errors="replace")
@@ -204,12 +184,8 @@ def run_tool(
             ) from exc
         except FileNotFoundError as exc:
             observation.failure("missing_executable")
-            problem = build_problem_details(
-                type="https://kgfoundry.dev/problems/tool-missing",
-                title="Executable not found",
-                status=500,
-                detail=str(exc),
-                instance=f"urn:tool:{command[0]}:missing",
+            problem = tool_missing_problem_details(
+                command=command, executable=command[0], detail=str(exc)
             )
             message = "Executable not found"
             raise ToolExecutionError(
@@ -234,16 +210,10 @@ def run_tool(
             observation.failure("non_zero_exit", returncode=completed.returncode)
 
         if check and completed.returncode != 0:
-            problem = build_problem_details(
-                type="https://kgfoundry.dev/problems/tool-failure",
-                title="Tool returned a non-zero exit code",
-                status=500,
+            problem = tool_failure_problem_details(
+                command=command,
+                returncode=completed.returncode,
                 detail=completed.stderr.strip() or "Unknown failure",
-                instance=f"urn:tool:{command[0]}:exit-{completed.returncode}",
-                extensions={
-                    "command": list(command),
-                    "returncode": completed.returncode,
-                },
             )
             message = "Subprocess returned a non-zero exit status"
             raise ToolExecutionError(

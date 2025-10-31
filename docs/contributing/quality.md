@@ -169,6 +169,25 @@ Metrics are exposed via the Prometheus client library and can be scraped by
 observability infrastructure. Structured logs include correlation IDs that
 propagate across subprocess boundaries for end-to-end tracing.
 
+### Runtime toggles and rollback levers
+
+Tooling processes load `ToolRuntimeSettings` from environment variables with the
+`TOOLS_` prefix. These settings provide fast rollback levers when new
+instrumentation or subprocess policies need to be disabled temporarily:
+
+- `TOOLS_METRICS_ENABLED=0` disables Prometheus counters and histograms emitted
+  by `tools._shared.metrics`, while keeping structured logs intact. Re-enable by
+  restoring the variable to `1` (default).
+- `TOOLS_TRACING_ENABLED=0` disables OpenTelemetry spans for subprocess runs.
+  Restore to `1` to resume tracing.
+- `TOOLS_EXEC_ALLOWLIST` accepts a comma-separated list of glob patterns to
+  override the default subprocess allow list. To roll back a restrictive change
+  set the variable to the previous allow list (or unset it to fall back to the
+  built-in defaults).
+
+All settings changes apply on the next process start, making it easy to roll
+forward or roll back without touching code.
+
 VS Code users can trigger common workflows from `.vscode/tasks.json`:
 
 - **Docstrings: Generate** runs the full regeneration with
