@@ -148,7 +148,7 @@ def process(item: str, limit: int | None = None) -> str:
 
 
 @pytest.mark.parametrize(
-    "source, module_name, expected_lines",
+    ("source", "module_name", "expected_lines"),
     [
         (
             """

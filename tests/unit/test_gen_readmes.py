@@ -289,6 +289,7 @@ def test_write_readme_is_deterministic(
 def test_format_badges_handles_partial_metadata(
     readme_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    del readme_env
     monkeypatch.setattr(
         gr,
         "NAVMAP",
@@ -429,11 +430,12 @@ def test_fail_on_metadata_miss_exits(
             pass
 
         def load(self, name: str) -> SimpleNamespace:
+            del name
             return pkg
 
     monkeypatch.setattr(gr, "GriffeLoader", Loader)
     monkeypatch.setattr(gr, "iter_packages", lambda: ["pkg"])
-    monkeypatch.setattr(gr, "write_readme", lambda node, cfg: False)
+    monkeypatch.setattr(gr, "write_readme", lambda *_: False)
     monkeypatch.setattr(gr, "NAVMAP", {})
     monkeypatch.setattr(gr, "TEST_MAP", {})
     monkeypatch.setattr(gr, "NAVMAP_PATH", Path("missing-nav.json"))
@@ -458,11 +460,12 @@ def test_fail_on_metadata_miss_passes_when_complete(
             pass
 
         def load(self, name: str) -> SimpleNamespace:
+            del name
             return pkg
 
     monkeypatch.setattr(gr, "GriffeLoader", Loader)
     monkeypatch.setattr(gr, "iter_packages", lambda: ["pkg"])
-    monkeypatch.setattr(gr, "write_readme", lambda node, cfg: False)
+    monkeypatch.setattr(gr, "write_readme", lambda *_: False)
     monkeypatch.setattr(
         gr,
         "NAVMAP",
@@ -506,11 +509,12 @@ def test_missing_navmap_and_testmap_warn(
             pass
 
         def load(self, name: str) -> SimpleNamespace:
+            del name
             return pkg
 
     monkeypatch.setattr(gr, "GriffeLoader", Loader)
     monkeypatch.setattr(gr, "iter_packages", lambda: ["pkg"])
-    monkeypatch.setattr(gr, "write_readme", lambda node, cfg: False)
+    monkeypatch.setattr(gr, "write_readme", lambda *_: False)
     monkeypatch.setattr(gr, "NAVMAP", {})
     monkeypatch.setattr(gr, "TEST_MAP", {})
     monkeypatch.setattr(gr, "NAVMAP_PATH", tmp_path / "missing-nav.json")

@@ -25,6 +25,7 @@ def sample_function(texts: list[str], filters: dict[str, int] | None = None) -> 
     Dict[str, int]
         Response payload.
     """
+    del filters
     return {"example": len(texts)}
 
 

@@ -451,10 +451,9 @@ def summarize(name: str, kind: str) -> str:
     return f"Describe the ``{cleaned}`` callable."
 
 
-def extended_summary(
-    kind: str, name: str, module: str, node: object | None = None
-) -> str:
+def extended_summary(kind: str, name: str, module: str, node: object | None = None) -> str:
     """Return the extended summary paragraph for the symbol."""
+    del module
     if kind == "function":
         summary = _function_extended_summary(name)
         return summary or DEFAULT_MAGIC_METHOD_FALLBACK

@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, cast
 
 import jsonschema
 from jsonschema import ValidationError
@@ -25,17 +25,20 @@ from jsonschema.exceptions import SchemaError
 from kgfoundry_common.errors import DeserializationError, SerializationError
 from kgfoundry_common.fs import read_text
 from kgfoundry_common.logging import get_logger
+from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.pydantic import BaseModel
 
 if TYPE_CHECKING:
-    pass
+    from typing import cast
+else:
+    from typing import cast
 
 __all__ = ["assert_model_roundtrip", "load_schema", "validate_model_against_schema"]
 
 logger = get_logger(__name__)
 
 
-def load_schema(schema_path: Path) -> dict[str, Any]:
+def load_schema(schema_path: Path) -> dict[str, JsonValue]:
     """Load and parse a JSON Schema file.
 
     Parameters
@@ -45,7 +48,7 @@ def load_schema(schema_path: Path) -> dict[str, Any]:
 
     Returns
     -------
-    dict[str, Any]
+    dict[str, JsonValue]
         Parsed schema dictionary.
 
     Raises
@@ -67,24 +70,24 @@ def load_schema(schema_path: Path) -> dict[str, Any]:
 
     try:
         schema_text = read_text(schema_path)
-        schema_obj: dict[str, Any] = json.loads(schema_text)  # JSON parsing returns Any
+        schema_obj: dict[str, JsonValue] = json.loads(schema_text)
     except json.JSONDecodeError as exc:
         msg = f"Invalid JSON in schema file {schema_path}: {exc}"
         raise DeserializationError(msg) from exc
 
     # Validate against JSON Schema 2020-12 meta-schema
     try:
-        jsonschema.Draft202012Validator.check_schema(schema_obj)  # type: ignore[misc]  # jsonschema accepts Any
-    except SchemaError as exc:  # type: ignore[misc]  # SchemaError type from jsonschema
+        jsonschema.Draft202012Validator.check_schema(schema_obj)
+    except SchemaError as exc:
         msg = f"Invalid JSON Schema 2020-12 in {schema_path}: {exc.message}"
         raise DeserializationError(msg) from exc
 
-    return schema_obj  # type: ignore[misc]  # JSON schema dict contains Any
+    return schema_obj
 
 
 def validate_model_against_schema(
     model_instance: BaseModel,
-    schema: dict[str, Any],
+    schema: dict[str, JsonValue],
 ) -> None:
     """Validate a Pydantic model instance against a JSON Schema.
 
@@ -92,7 +95,7 @@ def validate_model_against_schema(
     ----------
     model_instance : BaseModel
         Pydantic model instance to validate.
-    schema : dict[str, Any]
+    schema : dict[str, JsonValue]
         JSON Schema 2020-12 dictionary.
 
     Raises
@@ -109,14 +112,15 @@ def validate_model_against_schema(
     """
     try:
         # Convert model to dict (using model_dump with mode='json' for JSON-compatible types)
-        data: dict[str, Any] = model_instance.model_dump(
-            mode="json"
-        )  # JSON serialization returns Any
-        jsonschema.validate(instance=data, schema=schema)  # type: ignore[misc]  # jsonschema accepts Any
+        # model_dump returns dict[str, object], cast to JsonValue since it's JSON-serializable
+        data: dict[str, JsonValue] = cast(
+            dict[str, JsonValue], model_instance.model_dump(mode="json")
+        )
+        jsonschema.validate(instance=data, schema=schema)
     except ValidationError as exc:
         msg = f"Model instance does not match schema: {exc.message}"
         raise SerializationError(msg) from exc
-    except SchemaError as exc:  # type: ignore[misc]  # SchemaError type from jsonschema
+    except SchemaError as exc:
         msg = f"Invalid schema: {exc.message}"
         raise SerializationError(msg) from exc
 
@@ -171,25 +175,25 @@ def assert_model_roundtrip(
     # Load example JSON
     try:
         example_text = read_text(example_path)
-        example_data: dict[str, Any] = json.loads(example_text)  # JSON parsing returns Any
+        example_data: dict[str, JsonValue] = json.loads(example_text)
     except json.JSONDecodeError as exc:
         msg = f"Invalid JSON in example file {example_path}: {exc}"
         raise DeserializationError(msg) from exc
 
     # Load and validate schema if provided
-    schema_obj: dict[str, Any] | None = None
+    schema_obj: dict[str, JsonValue] | None = None
     if schema_path is not None:
         schema_obj = load_schema(schema_path)
         # Validate example against schema
         try:
-            jsonschema.validate(instance=example_data, schema=schema_obj)  # type: ignore[misc]  # jsonschema accepts Any
+            jsonschema.validate(instance=example_data, schema=schema_obj)
         except ValidationError as exc:
             msg = f"Example JSON does not match schema: {exc.message}"
             raise DeserializationError(msg) from exc
 
     # Deserialize example into model instance
     try:
-        instance = model_cls.model_validate(example_data)  # type: ignore[misc]  # example_data is Any from JSON
+        instance = model_cls.model_validate(example_data)
     except Exception as exc:
         msg = f"Failed to deserialize example into {model_cls.__name__}: {exc}"
         raise DeserializationError(msg) from exc
@@ -202,8 +206,8 @@ def assert_model_roundtrip(
         raise SerializationError(msg) from exc
 
     # Validate round-trip data against schema if provided
-    if schema_obj is not None:  # type: ignore[misc]  # schema_obj dict contains Any
-        validate_model_against_schema(instance, schema_obj)  # type: ignore[misc]  # schema_obj dict contains Any
+    if schema_obj is not None:
+        validate_model_against_schema(instance, schema_obj)
 
     logger.debug(
         "Model round-trip validated",

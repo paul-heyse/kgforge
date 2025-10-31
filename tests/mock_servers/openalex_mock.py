@@ -9,8 +9,9 @@ app = FastAPI(title="OpenAlex Mock")
 
 @app.get("/works")
 def works(topic: str = "test", per_page: int = 2, cursor: str = "*") -> dict[str, Any]:
+    next_cursor = None if cursor in {"*", ""} else cursor
     return {
-        "meta": {"count": 2, "per_page": per_page, "next_cursor": None},
+        "meta": {"count": 2, "per_page": per_page, "next_cursor": next_cursor},
         "results": [
             {
                 "id": "W1",

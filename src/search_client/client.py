@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Protocol, cast
+from typing import Final, Protocol, cast
 
 import requests
 
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.problem_details import JsonValue
 
 __all__ = [
     "KGFoundryClient",
@@ -72,15 +73,15 @@ class SupportsResponse(Protocol):
         <!-- auto:docstring-builder v1 -->
         """
 
-    def json(self) -> dict[str, Any]:
+    def json(self) -> JsonValue:
         """Return the response payload as JSON.
 
         <!-- auto:docstring-builder v1 -->
 
         Returns
         -------
-        dict[str, Any]
-            Decoded JSON body returned by the HTTP service.
+        JsonValue
+            Decoded JSON body returned by the HTTP service. Can be a dict, list, str, int, float, bool, or None.
         """
         ...
 
@@ -190,14 +191,10 @@ class RequestsHttp(SupportsHttp):
         SupportsResponse
             Response returned by :mod:`requests`.
         """
-        return cast(
-            SupportsResponse,
-            requests.get(
-                url,
-                *cast(tuple[Any, ...], args),
-                **cast(dict[str, Any], kwargs),
-            ),
-        )
+        # Cast args/kwargs for requests API compatibility
+        # requests.get accepts *args and **kwargs with Any types
+        # mypy cannot infer the complex overloads, so we use type: ignore
+        return cast(SupportsResponse, requests.get(url, *args, **kwargs))  # type: ignore[arg-type]
 
     def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
         """Send a ``POST`` request using :func:`requests.post`.
@@ -219,14 +216,10 @@ class RequestsHttp(SupportsHttp):
         SupportsResponse
             Response returned by :mod:`requests`.
         """
-        return cast(
-            SupportsResponse,
-            requests.post(
-                url,
-                *cast(tuple[Any, ...], args),
-                **cast(dict[str, Any], kwargs),
-            ),
-        )
+        # Cast args/kwargs for requests API compatibility
+        # requests.post accepts *args and **kwargs with Any types
+        # mypy cannot infer the complex overloads, so we use type: ignore
+        return cast(SupportsResponse, requests.post(url, *args, **kwargs))  # type: ignore[arg-type]
 
 
 _DEFAULT_HTTP: Final[SupportsHttp] = RequestsHttp()
@@ -299,14 +292,14 @@ class KGFoundryClient:
             headers["Authorization"] = f"Bearer {self.api_key}"
         return headers
 
-    def healthz(self) -> dict[str, Any]:
+    def healthz(self) -> JsonValue:
         """Fetch the service health endpoint.
 
         <!-- auto:docstring-builder v1 -->
 
         Returns
         -------
-        dict[str, Any]
+        JsonValue
             JSON payload describing service health.
 
 
@@ -325,9 +318,9 @@ class KGFoundryClient:
         self,
         query: str,
         k: int = 10,
-        filters: dict[str, Any] | None = None,
+        filters: dict[str, JsonValue] | None = None,
         explain: bool = False,
-    ) -> dict[str, Any]:
+    ) -> JsonValue:
         """Execute a semantic search request.
 
         <!-- auto:docstring-builder v1 -->
@@ -339,7 +332,7 @@ class KGFoundryClient:
         k : int, optional
             Describe ``k``.
             Defaults to ``10``.
-        filters : dict[str, Any] | None, optional
+        filters : dict[str, JsonValue] | None, optional
             Describe ``filters``.
             Defaults to ``None``.
         explain : bool, optional
@@ -349,7 +342,7 @@ class KGFoundryClient:
 
         Returns
         -------
-        dict[str, Any]
+        JsonValue
             JSON response containing the ranked search results.
 
 
@@ -370,7 +363,7 @@ class KGFoundryClient:
         response.raise_for_status()
         return response.json()
 
-    def concepts(self, q: str, limit: int = 50) -> dict[str, Any]:
+    def concepts(self, q: str, limit: int = 50) -> JsonValue:
         """Retrieve graph concepts that match the provided query string.
 
         <!-- auto:docstring-builder v1 -->
@@ -386,7 +379,7 @@ class KGFoundryClient:
 
         Returns
         -------
-        dict[str, Any]
+        JsonValue
             JSON response containing matching concepts.
 
 

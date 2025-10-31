@@ -5,11 +5,12 @@ from __future__ import annotations
 import json
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
+from typing import cast
 
 from pydantic import BaseModel, Field
 
 from kgfoundry.agent_catalog.sqlite import load_catalog_from_sqlite, sqlite_candidates
+from kgfoundry_common.problem_details import JsonValue
 
 
 class AnchorsModel(BaseModel):
@@ -28,7 +29,7 @@ class AnchorsModel(BaseModel):
     cst_fingerprint : str | None, optional
         Describe ``cst_fingerprint``.
         Defaults to ``None``.
-    remap_order : list[dict[str, Any]], optional
+    remap_order : list[dict[str, JsonValue]], optional
         Describe ``remap_order``.
         Defaults to ``<factory>``.
     """
@@ -36,7 +37,7 @@ class AnchorsModel(BaseModel):
     start_line: int | None = None
     end_line: int | None = None
     cst_fingerprint: str | None = None
-    remap_order: list[dict[str, Any]] = Field(default_factory=list)
+    remap_order: list[dict[str, JsonValue]] = Field(default_factory=list)
 
 
 class QualityModel(BaseModel):
@@ -149,7 +150,7 @@ class ChangeImpactModel(BaseModel):
     callees : list[str], optional
         Describe ``callees``.
         Defaults to ``<factory>``.
-    tests : list[dict[str, Any]], optional
+    tests : list[dict[str, JsonValue]], optional
         Describe ``tests``.
         Defaults to ``<factory>``.
     codeowners : list[str], optional
@@ -162,7 +163,7 @@ class ChangeImpactModel(BaseModel):
 
     callers: list[str] = Field(default_factory=list)
     callees: list[str] = Field(default_factory=list)
-    tests: list[dict[str, Any]] = Field(default_factory=list)
+    tests: list[dict[str, JsonValue]] = Field(default_factory=list)
     codeowners: list[str] = Field(default_factory=list)
     churn_last_n: int | None = None
 
@@ -180,7 +181,7 @@ class SymbolModel(BaseModel):
         Describe ``kind``.
     symbol_id : str
         Describe ``symbol_id``.
-    docfacts : dict[str, Any] | None, optional
+    docfacts : dict[str, JsonValue] | None, optional
         Describe ``docfacts``.
         Defaults to ``None``.
     anchors : AnchorsModel
@@ -193,7 +194,7 @@ class SymbolModel(BaseModel):
         Describe ``agent_hints``.
     change_impact : ChangeImpactModel
         Describe ``change_impact``.
-    exemplars : list[dict[str, Any]], optional
+    exemplars : list[dict[str, JsonValue]], optional
         Describe ``exemplars``.
         Defaults to ``<factory>``.
     """
@@ -201,13 +202,13 @@ class SymbolModel(BaseModel):
     qname: str
     kind: str
     symbol_id: str
-    docfacts: dict[str, Any] | None = None
+    docfacts: dict[str, JsonValue] | None = None
     anchors: AnchorsModel
     quality: QualityModel
     metrics: MetricsModel
     agent_hints: AgentHintsModel
     change_impact: ChangeImpactModel
-    exemplars: list[dict[str, Any]] = Field(default_factory=list)
+    exemplars: list[dict[str, JsonValue]] = Field(default_factory=list)
 
     model_config = {
         "extra": "ignore",
@@ -224,13 +225,13 @@ class ModuleGraphModel(BaseModel):
     imports : list[str], optional
         Describe ``imports``.
         Defaults to ``<factory>``.
-    calls : list[dict[str, Any]], optional
+    calls : list[dict[str, JsonValue]], optional
         Describe ``calls``.
         Defaults to ``<factory>``.
     """
 
     imports: list[str] = Field(default_factory=list)
-    calls: list[dict[str, Any]] = Field(default_factory=list)
+    calls: list[dict[str, JsonValue]] = Field(default_factory=list)
 
 
 class ModuleModel(BaseModel):
@@ -370,9 +371,9 @@ class AgentCatalogModel(BaseModel):
         Describe ``generated_at``.
     repo : dict[str, str]
         Describe ``repo``.
-    link_policy : dict[str, Any]
+    link_policy : dict[str, JsonValue]
         Describe ``link_policy``.
-    artifacts : dict[str, Any]
+    artifacts : dict[str, JsonValue]
         Describe ``artifacts``.
     packages : list[PackageModel], optional
         Describe ``packages``.
@@ -383,7 +384,7 @@ class AgentCatalogModel(BaseModel):
     semantic_index : SemanticIndexModel | None, optional
         Describe ``semantic_index``.
         Defaults to ``None``.
-    search : dict[str, Any] | None, optional
+    search : dict[str, JsonValue] | None, optional
         Describe ``search``.
         Defaults to ``None``.
     """
@@ -391,12 +392,12 @@ class AgentCatalogModel(BaseModel):
     version: str
     generated_at: str
     repo: dict[str, str]
-    link_policy: dict[str, Any]
-    artifacts: dict[str, Any]
+    link_policy: dict[str, JsonValue]
+    artifacts: dict[str, JsonValue]
     packages: list[PackageModel] = Field(default_factory=list)
     shards: ShardsModel | None = None
     semantic_index: SemanticIndexModel | None = None
-    search: dict[str, Any] | None = None
+    search: dict[str, JsonValue] | None = None
 
     model_config = {
         "extra": "ignore",
@@ -458,7 +459,7 @@ class AgentCatalogModel(BaseModel):
         return None
 
 
-def load_catalog_payload(path: Path, *, load_shards: bool = True) -> dict[str, Any]:
+def load_catalog_payload(path: Path, *, load_shards: bool = True) -> dict[str, JsonValue]:
     """Load a catalog payload from disk, expanding shards if requested.
 
     <!-- auto:docstring-builder v1 -->
@@ -473,10 +474,15 @@ def load_catalog_payload(path: Path, *, load_shards: bool = True) -> dict[str, A
 
     Returns
     -------
-    dict[str, Any]
+    dict[str, JsonValue]
         Describe return value.
     """
-    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload_raw: object = json.loads(path.read_text(encoding="utf-8"))
+    # json.loads returns object (JsonValue at runtime), narrow to dict
+    if not isinstance(payload_raw, dict):
+        msg = f"Invalid catalog format: expected dict, got {type(payload_raw)}"
+        raise ValueError(msg)
+    payload: dict[str, JsonValue] = cast(dict[str, JsonValue], payload_raw)
     shards = payload.get("shards")
     if load_shards and not payload.get("packages") and isinstance(shards, dict):
         index_rel = shards.get("index")
@@ -484,17 +490,33 @@ def load_catalog_payload(path: Path, *, load_shards: bool = True) -> dict[str, A
             index_path = Path(index_rel)
             if not index_path.is_absolute():
                 index_path = (path.parent / index_path).resolve()
-            index_payload = json.loads(index_path.read_text(encoding="utf-8"))
-            packages: list[dict[str, Any]] = []
-            for entry in index_payload.get("packages", []):
-                shard_path = Path(entry.get("path", ""))
-                if not shard_path:
-                    continue
-                if not shard_path.is_absolute():
-                    shard_path = (index_path.parent / shard_path).resolve()
-                shard_payload = json.loads(shard_path.read_text(encoding="utf-8"))
-                packages.append(shard_payload)
-            payload["packages"] = packages
+            index_payload_raw: object = json.loads(index_path.read_text(encoding="utf-8"))
+            if not isinstance(index_payload_raw, dict):
+                msg = f"Invalid index format: expected dict, got {type(index_payload_raw)}"
+                raise ValueError(msg)
+            index_payload: dict[str, JsonValue] = cast(dict[str, JsonValue], index_payload_raw)
+            packages: list[dict[str, JsonValue]] = []
+            packages_raw: JsonValue = index_payload.get("packages", [])
+            if isinstance(packages_raw, list):
+                for entry in packages_raw:
+                    if not isinstance(entry, dict):
+                        continue
+                    # isinstance check narrows type - mypy understands this
+                    entry_dict: dict[str, JsonValue] = entry
+                    shard_path_raw = entry_dict.get("path", "")
+                    if not isinstance(shard_path_raw, str):
+                        continue
+                    shard_path = Path(shard_path_raw)
+                    if not shard_path:
+                        continue
+                    if not shard_path.is_absolute():
+                        shard_path = (index_path.parent / shard_path).resolve()
+                    shard_payload_raw: object = json.loads(shard_path.read_text(encoding="utf-8"))
+                    if not isinstance(shard_payload_raw, dict):
+                        continue
+                    packages.append(cast(dict[str, JsonValue], shard_payload_raw))
+            # Cast packages to JsonValue for assignment to payload dict
+            payload["packages"] = cast(JsonValue, packages)
     return payload
 
 
@@ -516,9 +538,26 @@ def load_catalog_model(path: Path, *, load_shards: bool = True) -> AgentCatalogM
     AgentCatalogModel
         Describe return value.
     """
+
+    # Helper to isolate Pydantic's Any expression from model_validate
+    # The class type itself contains Any, so we wrap the call to isolate it
+    def _validate(
+        model_cls: type[AgentCatalogModel], payload: dict[str, JsonValue]
+    ) -> AgentCatalogModel:
+        # Cast payload to object to satisfy Pydantic's model_validate signature
+        return model_cls.model_validate(cast(object, payload))
+
     for candidate in sqlite_candidates(path):
         if candidate.exists():
             payload = load_catalog_from_sqlite(candidate)
-            return AgentCatalogModel.model_validate(payload)
+            # Pydantic class type contains Any - isolate to helper function call
+            return _validate(
+                AgentCatalogModel,  # type: ignore[misc]  # Pydantic class type contains Any
+                payload,
+            )
     payload = load_catalog_payload(path, load_shards=load_shards)
-    return AgentCatalogModel.model_validate(payload)
+    # Pydantic class type contains Any - isolate to helper function call
+    return _validate(
+        AgentCatalogModel,  # type: ignore[misc]  # Pydantic class type contains Any
+        payload,
+    )

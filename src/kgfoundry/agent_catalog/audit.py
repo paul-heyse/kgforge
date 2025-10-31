@@ -5,7 +5,8 @@ from __future__ import annotations
 import json
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+
+from kgfoundry_common.problem_details import JsonValue
 
 
 class AuditLogger:
@@ -21,7 +22,7 @@ class AuditLogger:
         """Append an audit entry if logging is enabled."""
         if not self._enabled:
             return
-        payload: dict[str, Any] = {
+        payload: dict[str, JsonValue] = {
             "timestamp": datetime.now(tz=UTC).isoformat(),
             "action": action,
             "role": role,

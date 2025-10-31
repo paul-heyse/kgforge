@@ -22,6 +22,7 @@ from contextlib import contextmanager
 from typing import Any, Final
 
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.problem_details import JsonValue
 
 __all__ = [
     "CorrelationContext",
@@ -95,7 +96,8 @@ class JsonFormatter(logging.Formatter):
         str
             JSON-encoded log entry.
         """
-        data: dict[str, Any] = {
+        # Log data is JSON-serializable - use JsonValue instead of Any
+        data: dict[str, JsonValue] = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
             "level": record.levelname,
             "name": record.name,
@@ -171,9 +173,7 @@ class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]  # pyrefly
     >>> # Correlation ID is automatically injected from context
     """
 
-    def process(
-        self, msg: str, kwargs: Any
-    ) -> tuple[str, Any]:  # LoggerAdapter uses Any
+    def process(self, msg: str, kwargs: Any) -> tuple[str, Any]:  # LoggerAdapter uses Any
         """Process log message and inject structured fields.
 
         Parameters

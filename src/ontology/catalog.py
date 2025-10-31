@@ -8,9 +8,10 @@ implementation specifics.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Final
+from typing import Final
 
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.problem_details import JsonValue
 
 
 @dataclass
@@ -97,17 +98,17 @@ class OntologyCatalog:
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
         """Describe neighbors.
 
-        <!-- auto:docstring-builder v1 -->
+            <!-- auto:docstring-builder v1 -->
 
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+            Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
         Parameters
         ----------
-        concept_id : str
-            Describe ``concept_id``.
-        depth : int, optional
-            Describe ``depth``.
-            Defaults to ``1``.
+            concept_id : str
+                Describe ``concept_id``.
+            depth : int, optional
+                Describe ``depth``.
+                Defaults to ``1``.
 
 
         Returns
@@ -115,25 +116,27 @@ class OntologyCatalog:
         set[str]
             Describe return value.
         """
+        del concept_id, depth
         # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return set()
 
-    def hydrate(self, concept_id: str) -> dict[str, Any]:
+    def hydrate(self, concept_id: str) -> dict[str, JsonValue]:
         """Describe hydrate.
 
-        <!-- auto:docstring-builder v1 -->
+            <!-- auto:docstring-builder v1 -->
 
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+            Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
         Parameters
         ----------
-        concept_id : str
-            Describe ``concept_id``.
+            concept_id : str
+                Describe ``concept_id``.
 
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, JsonValue]
             Describe return value.
         """
+        del concept_id
         return {}

@@ -126,6 +126,7 @@ def test_docfacts_kind_values_are_valid() -> None:
 
 def test_docfacts_modules_are_importable(monkeypatch: MonkeyPatch) -> None:
     # Ensure the project sources are importable regardless of PYTHONPATH settings.
+    del monkeypatch  # MonkeyPatch fixture reserved for future environment tweaks
     repo_root = Path(__file__).resolve().parents[2]
     original_path = list(sys.path)
     sys.path.insert(0, str(repo_root / "src"))

@@ -12,7 +12,7 @@
 5. [Type Checking (pyrefly sharp, mypy strict)](#type-checking-pyrefly-sharp-mypy-strict)
 6. [Docstrings (NumPy style; enforced; runnable)](#docstrings-numpy-style-enforced-runnable)
 7. [Testing Standards (markers, coverage, GPU hygiene)](#testing-standards-markers-coverage-gpu-hygiene)
-8. [Data Contracts (JSON Schema 2020‑12 / OpenAPI 3.1)](#data-contracts-json-schema-2020-12--openapi-31)
+8. [Data Contracts (JSON Schema 2020‑12 / OpenAPI 3.2)](#data-contracts-json-schema-2020-12--openapi-32)
 9. [Link Policy for Remote Editors](#link-policy-for-remote-editors)
 10. [Agent Catalog & STDIO API (session‑scoped, no daemon)](#agent-catalog--stdio-api-sessionscoped-no-daemon)
 11. [Task Playbooks (feature / refactor / bugfix)](#task-playbooks-feature--refactor--bugfix)
@@ -44,22 +44,24 @@
      2. Public API sketch (typed signatures)
      3. Data/Schema contracts affected (JSON Schema, OpenAPI)
      4. Test plan (happy paths, edge cases, negative cases)
-   - If data crosses boundaries, confirm schemas (see [Data Contracts](#data-contracts-json-schema-2020-12--openapi-31)).
+   - If data crosses boundaries, confirm schemas (see [Data Contracts](#data-contracts-json-schema-2020-12--openapi-32)).
 
 3) **Implement**
    - Code to the typed API sketch.
    - Keep functions small; separate I/O from pure logic; prefer composition over inheritance.
 
 4) **Validate quality gates locally**
-   ```bash
-   uv run ruff format && uv run ruff check --fix
-   uv run pyrefly check
-   uv run mypy --config-file mypy.ini
-   uv run pytest -q
-   make artifacts && git diff --exit-code    # docs/nav/catalog/schemas in sync
-   python tools/check_new_suppressions.py src    # verify no untracked suppressions
-   python tools/check_imports.py      # verify architectural boundaries
-   ```
+  ```bash
+  uv run ruff format && uv run ruff check --fix
+  uv run pyrefly check
+  uv run mypy --config-file mypy.ini
+  uv run pytest -q
+  uv run pip-audit
+  # If OpenAPI changed: lint spec (e.g., spectral lint openapi.yaml)
+  make artifacts && git diff --exit-code    # docs/nav/catalog/schemas in sync
+  python tools/check_new_suppressions.py src    # verify no untracked suppressions
+  python tools/check_imports.py      # verify architectural boundaries
+  ```
 
 5) **Ship the PR**
    - PR description = the **4‑item design note** + **checklist outputs** (commands & exit codes).
@@ -170,9 +172,9 @@ Read these first when editing configs or debugging local vs CI drift:
 
 ---
 
-## Data Contracts (JSON Schema 2020‑12 / OpenAPI 3.1)
+## Data Contracts (JSON Schema 2020‑12 / OpenAPI 3.2)
 
-- **Boundary rule:** whenever data crosses a boundary (API, file, queue), define a **JSON Schema 2020‑12**. For HTTP, use **OpenAPI 3.1** (embeds 2020‑12).
+- **Boundary rule:** whenever data crosses a boundary (API, file, queue), define a **JSON Schema 2020‑12**. For HTTP, use **OpenAPI 3.2** (embeds 2020‑12).
 - **Source of truth:** the schema is canonical; models may be generated from it (or emit it) but do not replace it.
 - **Validation:** validate inputs/outputs in tests; version schemas with SemVer and document breaking changes.
 
@@ -265,6 +267,8 @@ Example `PATH_MAP`:
 [ ] make artifacts && git diff --exit-code
 [ ] python tools/check_new_suppressions.py src
 [ ] python tools/check_imports.py
+[ ] uv run pip-audit
+[ ] OpenAPI spec lints clean (if applicable)
 ```
 
 **Problem Details Example:**
@@ -295,6 +299,9 @@ git diff --exit-code
 python tools/check_new_suppressions.py src
 python tools/check_imports.py
 
+# Security (vuln scan)
+uv run pip-audit
+
 # All pre-commit hooks
 uvx pre-commit run --all-files
 ```
@@ -322,6 +329,7 @@ uvx pre-commit run --all-files
 - **Validation**: sanitize all untrusted inputs at boundaries; validate against schemas.
 - **Dependencies**: run `uv run pip-audit` locally before large upgrades; nightlies may run in CI.
 - **Licenses**: prefer MIT/Apache‑2.0; consult SBOM when adding third‑party libs.
+- **Gate**: PRs MUST pass `uv run pip-audit` (or include a justified, time‑bound suppression).
 
 ---
 

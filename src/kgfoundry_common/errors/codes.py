@@ -66,6 +66,7 @@ class ErrorCode(str, Enum):
     SERIALIZATION_ERROR = "serialization-error"
     DESERIALIZATION_ERROR = "deserialization-error"
     SCHEMA_VALIDATION_ERROR = "schema-validation-error"
+    REGISTRY_ERROR = "registry-error"
 
     def __str__(self) -> str:
         """Return the code value."""

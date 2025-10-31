@@ -33,6 +33,7 @@ from kgfoundry_common.errors.exceptions import (
     Neo4jError,
     OCRTimeoutError,
     OntologyParseError,
+    RegistryError,
     RetryExhaustedError,
     SchemaValidationError,
     SerializationError,
@@ -58,6 +59,7 @@ except ImportError:
 __all__ = [
     "AgentCatalogSearchError",
     "BASE_TYPE_URI",
+    "CatalogSessionError",
     "ChunkingError",
     "ConfigurationError",
     "DeserializationError",
@@ -72,6 +74,7 @@ __all__ = [
     "OCRTimeoutError",
     "OntologyParseError",
     "RetryExhaustedError",
+    "RegistryError",
     "SchemaValidationError",
     "SerializationError",
     "SettingsError",

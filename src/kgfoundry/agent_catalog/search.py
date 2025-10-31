@@ -215,7 +215,7 @@ class _SimpleFaissModule:
         return cast(FaissIndexProtocol, _SimpleFaissIndex(dimension))
 
     @staticmethod
-    def index_factory(dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:  # noqa: ARG004
+    def index_factory(dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
         """Create an index from a factory string.
 
         For the simple implementation, factory strings are ignored and a flat index

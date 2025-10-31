@@ -188,6 +188,7 @@ class FaissGpuIndex:
             Describe ``seed``.
             Defaults to ``42``.
         """
+        del seed
         if self._faiss is None:
             return
         train_mat: FloatArray = np.asarray(train_vectors, dtype=np.float32, order="C")
@@ -379,8 +380,9 @@ class FaissGpuIndex:
             sims_matrix: FloatArray = cast(FloatArray, sims_matrix_result.astype(np.float32))  # type: ignore[misc]
             sims: FloatArray = np.asarray(sims_matrix, dtype=np.float32).squeeze()
             indices: NDArray[np.int64] = np.argsort(-sims)[:k]
-            # numpy tolist() returns Any due to typing limitations
-            indices_list: list[int] = indices.tolist()
+            # numpy tolist() returns list[Any] but can be narrowed based on dtype
+            # For int64 arrays, tolist() returns list[int] at runtime
+            indices_list: list[int] = cast(list[int], indices.tolist())
             # Index sims explicitly - numpy indexing returns Any
             return [(str(self._idmap[i]), float(sims[i])) for i in indices_list]  # type: ignore[misc]
         if self._idmap is None:
@@ -393,9 +395,11 @@ class FaissGpuIndex:
         indices_result: NDArray[np.int64] = distances_result[1]
         ids: NDArray[np.int64] = indices_result[0]
         scores: NDArray[np.float32] = distances[0]
-        # numpy tolist() returns list[Any] due to typing limitations
-        ids_list: list[int] = ids.tolist()
-        scores_list: list[float] = scores.tolist()
+        # numpy tolist() returns list[Any] but can be narrowed based on dtype
+        # For int64 arrays, tolist() returns list[int] at runtime
+        # For float32 arrays, tolist() returns list[float] at runtime
+        ids_list: list[int] = cast(list[int], ids.tolist())
+        scores_list: list[float] = cast(list[float], scores.tolist())
         return [
             (str(ids_list[i]), scores_list[i]) for i in range(len(ids_list)) if ids_list[i] != -1
         ]

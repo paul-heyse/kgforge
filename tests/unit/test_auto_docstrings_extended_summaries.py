@@ -176,7 +176,9 @@ def test_magic_methods_cover_required_count() -> None:
     assert len(auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES) >= 100
 
 
-@pytest.mark.parametrize("name, summary", auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES.items())
+@pytest.mark.parametrize(
+    ("name", "summary"), auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES.items()
+)
 def test_magic_method_summaries_are_multi_sentence(name: str, summary: str) -> None:
     assert _is_multi_sentence(summary), f"Summary for {name!r} must include multiple sentences"
 
@@ -187,16 +189,13 @@ def test_magic_method_fallback_is_multi_sentence() -> None:
     assert _is_multi_sentence(summary)
 
 
-@pytest.mark.parametrize(
-    "pydantic_helper",
-    sorted(PYDANTIC_EXPECTED),
-)
+@pytest.mark.parametrize("pydantic_helper", sorted(PYDANTIC_EXPECTED))
 def test_pydantic_artifacts_are_documented(pydantic_helper: str) -> None:
     assert pydantic_helper in auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES
 
 
 @pytest.mark.parametrize(
-    "name, summary",
+    ("name", "summary"),
     auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES.items(),
 )
 def test_pydantic_artifact_summaries_are_multi_sentence(name: str, summary: str) -> None:
@@ -215,7 +214,7 @@ def test_generic_function_summary_is_multi_sentence() -> None:
 
 
 @pytest.mark.parametrize(
-    "source, expected_phrase",
+    ("source", "expected_phrase"),
     [
         ("class Example: ...", "data structure"),
         ("class Example(BaseModel): ...", "Pydantic model"),
@@ -250,7 +249,7 @@ def test_is_magic_detection() -> None:
 
 
 @pytest.mark.parametrize(
-    "kind, name",
+    ("kind", "name"),
     [("module", ""), ("class", ""), ("function", "")],
 )
 def test_extended_summary_returns_text_for_edge_cases(kind: str, name: str) -> None:

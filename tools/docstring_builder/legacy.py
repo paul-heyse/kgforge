@@ -221,6 +221,7 @@ def _required_sections(  # noqa: PLR0913
     is_public: bool,
 ) -> list[str]:
     """Return the ordered docstring section headers required for a symbol."""
+    del name
     required: list[str] = []
     if parameters:
         required.append("Parameters")

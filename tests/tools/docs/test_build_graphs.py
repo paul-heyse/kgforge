@@ -116,6 +116,7 @@ def test_dirty_worktree_invalidates_cache(tmp_path: Path, monkeypatch: pytest.Mo
     def fake_pydeps(
         pkg: str, imports_out: Path, excludes: list[str], max_bacon: int, fmt: str
     ) -> None:
+        del pkg, excludes, max_bacon, fmt
         counters["pydeps"] += 1
         imports_out.write_text(f"deps {counters['pydeps']}\n", encoding="utf-8")
 

@@ -99,6 +99,10 @@ class SearchConfig(BaseSettings):
         One-hop KG boost weight.
         Environment variable: `KGFOUNDRY_SEARCH_KG_BOOSTS_ONE_HOP`.
         Defaults to 0.04.
+    validate_responses : bool, optional
+        Enable response schema validation (dev/staging only).
+        Environment variable: `SEARCH_API_VALIDATE`.
+        Defaults to False.
     """
 
     model_config = SettingsConfigDict(env_prefix="KGFOUNDRY_SEARCH_", extra="forbid")
@@ -120,6 +124,9 @@ class SearchConfig(BaseSettings):
     )
     kg_boosts_direct: float = Field(default=0.08, description="Direct KG boost weight")
     kg_boosts_one_hop: float = Field(default=0.04, description="One-hop KG boost weight")
+    validate_responses: bool = Field(
+        default=False, description="Enable response schema validation (dev/staging only)"
+    )
 
 
 class ObservabilityConfig(BaseSettings):

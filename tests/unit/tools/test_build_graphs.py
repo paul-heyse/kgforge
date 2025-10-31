@@ -52,7 +52,7 @@ class _DummyExecutor:
         return fut
 
     def shutdown(self, wait: bool = True) -> None:  # pragma: no cover - interface compat
-        return None
+        del wait
 
 
 def test_main_exits_on_failure_and_cleans_outputs(
@@ -90,6 +90,7 @@ def test_main_exits_on_failure_and_cleans_outputs(
     def failing_pydeps(
         pkg: str, out_svg: Path, excludes: list[str] | None, max_bacon: int, fmt: str
     ) -> None:
+        del pkg, excludes, max_bacon, fmt
         out_svg.write_text("partial", encoding="utf-8")
         message = "boom"
         raise RuntimeError(message)
@@ -138,6 +139,7 @@ def test_build_one_package_supports_png_and_cache(
         pkg: str, out_path: Path, excludes: list[str] | None, max_bacon: int, requested_fmt: str
     ) -> None:
         nonlocal pydeps_calls
+        del pkg, excludes, max_bacon
         pydeps_calls += 1
         assert requested_fmt == fmt
         out_path.write_text("deps", encoding="utf-8")

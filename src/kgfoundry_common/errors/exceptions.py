@@ -41,6 +41,7 @@ __all__ = [
     "Neo4jError",
     "OCRTimeoutError",
     "OntologyParseError",
+    "RegistryError",
     "RetryExhaustedError",
     "SchemaValidationError",
     "SerializationError",
@@ -70,7 +71,7 @@ class KgFoundryError(Exception):
         Defaults to logging.ERROR.
     cause : Exception | None, optional
         Original exception that caused this error. Preserved via __cause__.
-    context : dict[str, Any] | None, optional
+    context : dict[str, JsonValue] | None, optional
         Additional context for error reporting.
 
     Examples
@@ -460,48 +461,25 @@ class SerializationError(KgFoundryError):
         )
 
 
-class SchemaValidationError(KgFoundryError):
-    """Error during JSON Schema validation.
+class RegistryError(KgFoundryError):
+    """Errors raised during registry or DuckDB operations.
 
     Examples
     --------
-    >>> raise SchemaValidationError("Schema validation failed", cause=ValueError("Invalid type"))
+    >>> raise RegistryError("Failed to write to registry")
     """
 
     def __init__(
         self,
         message: str,
+        *,
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize schema validation error."""
+        """Initialize registry error."""
         super().__init__(
             message,
-            code=ErrorCode.SCHEMA_VALIDATION_ERROR,
-            http_status=400,
-            cause=cause,
-            context=context,
-        )
-
-
-class SettingsError(KgFoundryError):
-    """Error during settings loading or validation.
-
-    Examples
-    --------
-    >>> raise SettingsError("Missing required environment variable KGFOUNDRY_API_KEY")
-    """
-
-    def __init__(
-        self,
-        message: str,
-        cause: Exception | None = None,
-        context: Mapping[str, object] | None = None,
-    ) -> None:
-        """Initialize settings error."""
-        super().__init__(
-            message,
-            code=ErrorCode.CONFIGURATION_ERROR,
+            code=ErrorCode.REGISTRY_ERROR,
             http_status=500,
             cause=cause,
             context=context,

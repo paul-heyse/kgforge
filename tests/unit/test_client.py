@@ -58,9 +58,11 @@ class _StubHttp(SupportsHttp):
         self.response = response
 
     def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
+        del url, args, kwargs
         return self.response
 
     def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
+        del url, args, kwargs
         return self.response
 
 

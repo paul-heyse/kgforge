@@ -50,6 +50,7 @@ class FakeExecutor:
         *args: object,
         **kwargs: object,
     ) -> FakeFuture:
+        del fn, args, kwargs
         return FakeFuture(self._results[pkg])
 
 
@@ -80,7 +81,7 @@ def fixture_graph_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setattr(
         build_graphs,
         "ProcessPoolExecutor",
-        lambda max_workers: FakeExecutor(
+        lambda *_: FakeExecutor(
             {
                 "pkg_ok": ("pkg_ok", True, True, True),
                 "pkg_bad": ("pkg_bad", False, False, True),
@@ -106,6 +107,7 @@ def fixture_graph_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
 def test_main_exits_when_package_build_fails(
     graph_env: None, capfd: pytest.CaptureFixture[str]
 ) -> None:
+    del graph_env
     with pytest.raises(SystemExit) as excinfo:
         build_graphs.main()
 

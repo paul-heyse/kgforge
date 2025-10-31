@@ -6,9 +6,9 @@ implementation specifics.
 """
 
 from kgfoundry_common.navmap_types import NavMap
-from registry import api, duckdb_registry, helper, migrate
+from registry import api, duckdb_helpers, duckdb_registry, helper, migrate
 
-__all__ = ["api", "duckdb_registry", "helper", "migrate"]
+__all__ = ["api", "duckdb_helpers", "duckdb_registry", "helper", "migrate"]
 
 __navmap__: NavMap = {
     "title": "registry",
@@ -32,6 +32,11 @@ __navmap__: NavMap = {
             "owner": "@registry",
             "since": "0.1.0",
         },
+        "duckdb_helpers": {
+            "stability": "beta",
+            "owner": "@registry",
+            "since": "0.1.0",
+        },
         "duckdb_registry": {
             "stability": "beta",
             "owner": "@registry",
@@ -51,6 +56,7 @@ __navmap__: NavMap = {
 }
 
 # [nav:anchor api]
+# [nav:anchor duckdb_helpers]
 # [nav:anchor duckdb_registry]
 # [nav:anchor helper]
 # [nav:anchor migrate]

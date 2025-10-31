@@ -55,8 +55,9 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             Returns
             -------
             _NoopMetric
-            Describe return value.
+                Describe return value.
             """
+            del args, kwargs
             return self
 
         def observe(self, *args: object, **kwargs: object) -> None:
@@ -69,11 +70,11 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             Parameters
             ----------
             *args : object, optional, by default ()
-            Configure the args. Defaults to ``()``.
+                Configure the args. Defaults to ``()``.
             **kwargs : object, optional, by default {}
-            Configure the kwargs. Defaults to ``{}``.
+                Configure the kwargs. Defaults to ``{}``.
             """
-            return
+            del args, kwargs
 
         def inc(self, *args: object, **kwargs: object) -> None:
             """Describe inc.
@@ -85,11 +86,11 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             Parameters
             ----------
             *args : object, optional, by default ()
-            Configure the args. Defaults to ``()``.
+                Configure the args. Defaults to ``()``.
             **kwargs : object, optional, by default {}
-            Configure the kwargs. Defaults to ``{}``.
+                Configure the kwargs. Defaults to ``{}``.
             """
-            return
+            del args, kwargs
 
         def set(self, *args: object, **kwargs: object) -> None:
             """Describe set.
@@ -101,11 +102,11 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
             Parameters
             ----------
             *args : object, optional, by default ()
-            Configure the args. Defaults to ``()``.
+                Configure the args. Defaults to ``()``.
             **kwargs : object, optional, by default {}
-            Configure the kwargs. Defaults to ``{}``.
+                Configure the kwargs. Defaults to ``{}``.
             """
-            return
+            del args, kwargs
 
     def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:
         """Describe  make noop metric.
@@ -125,8 +126,9 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
         Returns
         -------
         _NoopMetric
-        Describe return value.
+            Describe return value.
         """
+        del args, kwargs
         return _NoopMetric()
 
     Counter = cast(CounterFactory, _make_noop_metric)
