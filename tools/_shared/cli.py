@@ -41,20 +41,30 @@ class CliErrorEntry(Struct, kw_only=True):
     problem: ProblemDetailsDict | UnsetType = UNSET
 
 
+def _default_generated_at() -> str:
+    return datetime.now(tz=UTC).isoformat()
+
+
+def _default_files() -> list[CliFileResult]:
+    return []
+
+
+def _default_errors() -> list[CliErrorEntry]:
+    return []
+
+
 class CliEnvelope(Struct, kw_only=True):
     """Typed representation of ``schema/tools/cli_envelope.json``."""
 
     schemaVersion: str = CLI_ENVELOPE_SCHEMA_VERSION
     schemaId: str = CLI_ENVELOPE_SCHEMA_ID
-    generatedAt: str = cast(
-        str, msgspec.field(default_factory=lambda: datetime.now(tz=UTC).isoformat())
-    )
+    generatedAt: str = msgspec.field(default_factory=_default_generated_at)
     status: CliStatus = "success"
     command: str = ""
     subcommand: str = ""
     durationSeconds: float = 0.0
-    files: list[CliFileResult] = cast(list[CliFileResult], msgspec.field(default_factory=list))
-    errors: list[CliErrorEntry] = cast(list[CliErrorEntry], msgspec.field(default_factory=list))
+    files: list[CliFileResult] = msgspec.field(default_factory=_default_files)
+    errors: list[CliErrorEntry] = msgspec.field(default_factory=_default_errors)
     problem: ProblemDetailsDict | UnsetType = UNSET
 
 

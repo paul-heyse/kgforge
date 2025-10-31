@@ -1,45 +1,49 @@
-from collections.abc import Callable, Iterable
-from typing import Any, TypeVar, dataclass_transform, overload
+from __future__ import annotations
 
-T = TypeVar("T")
+from collections.abc import Callable
+from typing import Any
 
-@overload
-def field(*, default: T, name: str | None = None) -> T: ...
-@overload
-def field(*, default_factory: Callable[[], T], name: str | None = None) -> T: ...
-@overload
-def field(*, name: str | None = None) -> Any: ...
-@dataclass_transform(field_specifiers=(field,))
+class UnsetType: ...
+
+UNSET: UnsetType
+
+def field(
+    *,
+    default: Any | None = ...,
+    default_factory: Callable[[], Any] | None = ...,
+    name: str | None = None,
+) -> Any: ...
+
 class Struct:
     __struct_fields__: tuple[str, ...]
-    __struct_config__: Any
-    __match_args__: tuple[str, ...]
 
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
-    def __init_subclass__(
-        cls,
-        *,
-        kw_only: bool = False,
-        **kwargs: Any,
-    ) -> None: ...
-
-class MsgspecError(Exception): ...
-class DecodeError(MsgspecError): ...
-
-class _JsonModule:
-    @overload
-    def decode(self, data: bytes, *, type: type[T]) -> T: ...
-    @overload
-    def decode(self, data: bytes, *, type: None = ...) -> Any: ...
-    def decode(self, data: bytes, *, type: type[Any] | None = ...) -> Any: ...
-
-json: _JsonModule
+    def __init_subclass__(cls, **kwargs: Any) -> None: ...
 
 def to_builtins(
     obj: Any,
     *,
     str_keys: bool = False,
-    builtin_types: Iterable[type] | None = None,
+    builtin_types: tuple[type[Any], ...] | None = None,
     enc_hook: Callable[[Any], Any] | None = None,
     order: str | None = None,
 ) -> Any: ...
+def convert(obj: Any, type: Any, *, strict: bool = True, from_attributes: bool = False) -> Any: ...
+
+class _StructsModule:
+    def replace(self, obj: Any, /, **changes: Any) -> Any: ...
+
+structs: _StructsModule
+
+def json_decode(data: bytes, *, type: Any | None = ...) -> Any: ...
+def json_encode(obj: Any) -> bytes: ...
+
+class _JsonModule:
+    def decode(self, data: bytes, *, type: Any | None = ...) -> Any: ...
+    def encode(self, obj: Any) -> bytes: ...
+
+json: _JsonModule
+
+class MsgspecError(Exception): ...
+class DecodeError(MsgspecError): ...
+class ValidationError(DecodeError): ...

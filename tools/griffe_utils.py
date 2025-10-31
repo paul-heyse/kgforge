@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import importlib
 from dataclasses import dataclass
-from functools import cache
 from types import ModuleType
 from typing import Any, cast
 
@@ -35,7 +34,9 @@ class GriffeAPI:
     module_type: GriffeModuleObjectType
 
 
-@cache
+_GRIFFE_SINGLETON: GriffeAPI | None = None
+
+
 def resolve_griffe() -> GriffeAPI:
     """Return the ``griffe`` module along with key symbol/loader types.
 
@@ -46,6 +47,11 @@ def resolve_griffe() -> GriffeAPI:
     fall back to the top-level attributes whenever the nested modules are
     unavailable.
     """
+    global _GRIFFE_SINGLETON
+
+    if _GRIFFE_SINGLETON is not None:
+        return _GRIFFE_SINGLETON
+
     griffe_module = importlib.import_module("griffe")
     try:
         loader_module = importlib.import_module("griffe.loader")
@@ -66,7 +72,7 @@ def resolve_griffe() -> GriffeAPI:
     module_cls = cast(GriffeModuleObjectType, symbols_source.Module)
     object_cls = cast(GriffeObjectType, griffe_module.Object)
 
-    return GriffeAPI(
+    _GRIFFE_SINGLETON = GriffeAPI(
         package=griffe_module,
         object_type=object_cls,
         loader_type=loader_cls,
@@ -74,3 +80,4 @@ def resolve_griffe() -> GriffeAPI:
         function_type=function_cls,
         module_type=module_cls,
     )
+    return _GRIFFE_SINGLETON

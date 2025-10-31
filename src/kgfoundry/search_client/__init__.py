@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import search_client as _module
+from typing import cast
 from kgfoundry._namespace_proxy import (
     namespace_attach,
     namespace_dir,
@@ -14,7 +15,8 @@ from search_client import KGFoundryClient as _KGFoundryClient
 KGFoundryClient = _KGFoundryClient
 
 __all__ = namespace_exports(_module)
-namespace_attach(_module, globals(), __all__)
+_namespace = cast(dict[str, object], globals())
+namespace_attach(_module, _namespace, __all__)
 
 __doc__ = _module.__doc__
 __path__ = list(_module.__path__)

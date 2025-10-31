@@ -10,7 +10,8 @@ from __future__ import annotations
 import datetime as dt
 from collections.abc import Iterable
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, NotRequired, TypedDict
+from types import ModuleType
+from typing import TYPE_CHECKING, Any, Final, NotRequired, TypedDict, cast
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -19,12 +20,15 @@ from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
 
 if TYPE_CHECKING:
-    import pandas as pd
+    from pandas import DataFrame
 else:
-    try:
-        import pandas as pd
-    except ImportError:
-        pd = None  # type: ignore[assignment, misc]
+    DataFrame = Any
+
+pd: ModuleType | None
+try:
+    import pandas as pd
+except ImportError:  # pragma: no cover - optional dependency
+    pd = None
 
 __all__ = [
     "ChunkDocTags",
@@ -131,7 +135,7 @@ class ParquetVectorWriter:
     """
 
     @staticmethod
-    def dense_schema(dim: int) -> pa.schema:
+    def dense_schema(dim: int) -> pa.Schema:
         """Describe dense schema.
 
         <!-- auto:docstring-builder v1 -->
@@ -233,7 +237,7 @@ class ParquetVectorWriter:
         return str(self.root)
 
     @staticmethod
-    def splade_schema() -> pa.schema:
+    def splade_schema() -> pa.Schema:
         """Describe splade schema.
 
         <!-- auto:docstring-builder v1 -->
@@ -336,7 +340,7 @@ class ParquetChunkWriter:
     """
 
     @staticmethod
-    def chunk_schema() -> pa.schema:
+    def chunk_schema() -> pa.Schema:
         """Describe chunk schema.
 
         <!-- auto:docstring-builder v1 -->
@@ -493,7 +497,7 @@ def read_table_to_dataframe(
     *,
     schema: pa.Schema | None = None,
     validate_schema: bool = True,
-) -> pd.DataFrame:
+) -> DataFrame:
     """Read a Parquet file and return a typed DataFrame.
 
     <!-- auto:docstring-builder v1 -->
@@ -537,7 +541,7 @@ def read_table_to_dataframe(
         raise ImportError(msg)
 
     table = read_table(path, schema=schema, validate_schema=validate_schema)
-    return table.to_pandas()
+    return cast(DataFrame, table.to_pandas())
 
 
 # [nav:anchor validate_table_schema]

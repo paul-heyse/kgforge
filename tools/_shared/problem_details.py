@@ -118,7 +118,8 @@ def build_tool_problem_details(  # noqa: PLR0913
     """Return a Problem Details payload describing a tooling subprocess failure."""
     command_list = list(command)
     tool_name = Path(command_list[0]).name if command_list else "<unknown>"
-    merged_extensions: dict[str, JsonValue] = {"command": command_list}
+    command_extension: JsonValue = [str(part) for part in command_list]
+    merged_extensions: dict[str, JsonValue] = {"command": command_extension}
     if extensions:
         merged_extensions.update(dict(extensions))
     return build_problem_details(
