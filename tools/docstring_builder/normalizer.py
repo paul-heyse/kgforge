@@ -1,278 +1,37 @@
-"""Utilities for harmonising existing docstrings with runtime signatures."""
+"""Normalize harvested docstrings to mirror runtime signatures."""
 
 from __future__ import annotations
 
-import importlib
 import inspect
-import re
 import textwrap
-import types
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from dataclasses import dataclass
-from types import NoneType
-from typing import Annotated, Any, Literal, Union, cast, get_args, get_origin, get_type_hints
+from typing import Any
 
 from tools.docstring_builder.harvest import SymbolHarvest
-
-_ELLIPSIS_PAIR_LENGTH = 2
-_SIGNATURE_RE = re.compile(r"^(?:\*{1,2})?[A-Za-z_][\w]*\s*:")
-
-
-def _resolve_object(symbol: SymbolHarvest) -> object | None:
-    """Import the runtime object referenced by a harvested symbol."""
-    try:
-        module = importlib.import_module(symbol.module)
-    except Exception:  # pragma: no cover - runtime import guard
-        return None
-    else:
-        module_parts = symbol.module.split(".")
-        qname_parts = symbol.qname.split(".")
-        attr_parts = qname_parts[len(module_parts) :]
-        obj: object = module
-        for part in attr_parts:
-            try:
-                obj = getattr(obj, part)
-            except AttributeError:
-                return None
-        return obj
-
-
-def _resolve_callable(symbol: SymbolHarvest) -> Callable[..., Any] | None:
-    """Return a callable object for the harvested symbol when available."""
-    obj = _resolve_object(symbol)
-    if obj is None or not callable(obj):
-        return None
-    return cast(Callable[..., Any], obj)
-
-
-def _import_module_globals(module_name: str) -> dict[str, Any]:
-    """Return module globals for the supplied module name."""
-    try:
-        module = importlib.import_module(module_name)
-    except Exception:  # pragma: no cover - import guard
-        return {}
-    return vars(module)
-
-
-def _signature_and_hints(
-    obj: Callable[..., Any], module_globals: Mapping[str, Any]
-) -> tuple[inspect.Signature | None, dict[str, Any]]:
-    try:
-        signature = inspect.signature(obj)
-    except (TypeError, ValueError):  # pragma: no cover - objects without signature
-        return None, {}
-    try:
-        hints = get_type_hints(obj, globalns=dict(module_globals), include_extras=True)
-    except Exception:
-        hints = {}
-    return signature, hints
-
-
-def _format_default(value: object) -> str:
-    if value is inspect._empty:
-        return ""
-    if isinstance(value, str):
-        return repr(value)
-    if value is Ellipsis:
-        return "..."
-    return repr(value)
-
-
-def _alias_for_type(annotation: object, module_globals: Mapping[str, object] | None) -> str | None:
-    if not module_globals:
-        return None
-    for name, value in module_globals.items():
-        if value is annotation:
-            return name
-    return None
-
-
-def _module_alias(module_name: str, module_globals: Mapping[str, object] | None) -> str | None:
-    if not module_globals:
-        return None
-    for name, value in module_globals.items():
-        if getattr(value, "__name__", None) == module_name:
-            return name
-    return None
-
-
-def _format_simple_type(annotation: object) -> str | None:
-    if annotation is inspect._empty:
-        return None
-    if isinstance(annotation, str):
-        return annotation
-    if annotation is Any:
-        return "Any"
-    if annotation in {None, NoneType}:
-        return "None"
-    return None
-
-
-def _format_union_type(
-    annotation: object, module_globals: Mapping[str, object] | None
-) -> str | None:
-    if isinstance(annotation, types.UnionType):
-        args = getattr(annotation, "__args__", ())
-        parts = [_format_type(arg, module_globals) or "Any" for arg in args]
-        return " | ".join(parts)
-    origin = get_origin(annotation)
-    if origin is Union:
-        args = get_args(annotation)
-        parts = [_format_type(arg, module_globals) or "Any" for arg in args]
-        return " | ".join(parts)
-    return None
-
-
-def _format_annotated_type(
-    annotation: object, module_globals: Mapping[str, object] | None
-) -> str | None:
-    if get_origin(annotation) is Annotated:
-        base, *_ = get_args(annotation)
-        return _format_type(base, module_globals)
-    return None
-
-
-def _format_literal_type(
-    annotation: object, module_globals: Mapping[str, object] | None
-) -> str | None:
-    if get_origin(annotation) is Literal:
-        values = ", ".join(repr(arg) for arg in get_args(annotation))
-        return f"Literal[{values}]"
-    return None
-
-
-def _format_class_type(
-    annotation: object, module_globals: Mapping[str, object] | None
-) -> str | None:
-    if not isinstance(annotation, type):
-        return None
-    alias = _alias_for_type(annotation, module_globals)
-    if alias:
-        return alias
-    module = getattr(annotation, "__module__", "")
-    qualname = getattr(annotation, "__qualname__", str(annotation))
-    if module == "builtins":
-        return qualname
-    prefix: str | None = None
-    module_alias = _module_alias(module, module_globals)
-    if module_alias:
-        prefix = f"{module_alias}.{qualname}"
-    elif module in {"typing", "collections.abc"}:
-        prefix = qualname
-    elif module == "numpy":
-        numpy_alias = _module_alias("numpy", module_globals)
-        if numpy_alias:
-            prefix = f"{numpy_alias}.{qualname}"
-    if prefix:
-        return prefix
-    return f"{module}.{qualname}"
-
-
-def _format_collection_type(
-    annotation: object, module_globals: Mapping[str, object] | None
-) -> str | None:
-    origin = get_origin(annotation)
-    if origin not in {list, set, tuple, dict}:
-        return None
-    args = get_args(annotation)
-    origin_type = cast(type, origin)
-    name = origin_type.__name__
-    if not args:
-        return name
-    if origin is tuple and len(args) == _ELLIPSIS_PAIR_LENGTH and args[1] is Ellipsis:
-        inner = _format_type(args[0], module_globals) or "Any"
-        return f"tuple[{inner}, ...]"
-    inner = ", ".join(_format_type(arg, module_globals) or "Any" for arg in args)
-    return f"{name}[{inner}]"
-
-
-def _format_generic_type(
-    annotation: object, module_globals: Mapping[str, object] | None
-) -> str | None:
-    origin = get_origin(annotation)
-    if origin is None:
-        return None
-    module = getattr(origin, "__module__", "")
-    qualname = getattr(origin, "__qualname__", str(origin))
-    if module == "numpy" and qualname == "ndarray":
-        args = get_args(annotation)
-        dtype_text = "Any"
-        if len(args) >= _ELLIPSIS_PAIR_LENGTH:
-            dtype_arg = args[1]
-            dtype_args = get_args(dtype_arg)
-            dtype_obj = dtype_args[0] if dtype_args else getattr(dtype_arg, "type", dtype_arg)
-            dtype_text = _format_type(dtype_obj, module_globals) or "Any"
-        base = "NDArray" if module_globals and "NDArray" in module_globals else "numpy.ndarray"
-        return f"{base}[{dtype_text}]"
-    alias = _alias_for_type(origin, module_globals)
-    module_alias = _module_alias(module, module_globals)
-    if alias:
-        prefix = alias
-    elif module_alias:
-        prefix = f"{module_alias}.{qualname}"
-    elif module in {"builtins", "typing"}:
-        prefix = qualname
-    else:
-        prefix = f"{module}.{qualname}"
-    args = get_args(annotation)
-    if args:
-        inner = ", ".join(_format_type(arg, module_globals) or "Any" for arg in args)
-        return f"{prefix}[{inner}]"
-    return prefix
-
-
-def _format_module_attribute(
-    annotation: object, module_globals: Mapping[str, object] | None
-) -> str | None:
-    if not hasattr(annotation, "__module__") or not hasattr(annotation, "__qualname__"):
-        return None
-    module = getattr(annotation, "__module__", "")
-    qualname = getattr(annotation, "__qualname__", str(annotation))
-    if module in {"builtins", "typing", "collections.abc"}:
-        return qualname
-    module_alias = _module_alias(module, module_globals)
-    if module_alias:
-        return f"{module_alias}.{qualname}"
-    return f"{module}.{qualname}"
-
-
-def _format_type(
-    annotation: object, module_globals: Mapping[str, object] | None = None
-) -> str | None:
-    simple = _format_simple_type(annotation)
-    if simple is not None:
-        return simple
-
-    formatted = _format_union_type(annotation, module_globals)
-    if formatted is not None:
-        return formatted
-
-    annotated = _format_annotated_type(annotation, module_globals)
-    if annotated is not None:
-        return annotated
-
-    formatters = (
-        _format_union_type,
-        _format_annotated_type,
-        _format_literal_type,
-        _format_class_type,
-        _format_collection_type,
-        _format_generic_type,
-        _format_module_attribute,
-    )
-
-    for formatter in formatters:
-        formatted = formatter(annotation, module_globals)
-        if formatted is not None:
-            return formatted
-
-    return repr(annotation)
+from tools.docstring_builder.normalizer_annotations import format_annotation
+from tools.docstring_builder.normalizer_signature import (
+    load_module_globals,
+    resolve_callable,
+    signature_and_hints,
+)
 
 
 @dataclass(slots=True)
 class _Section:
     title: str | None
     content: list[str]
+
+
+@dataclass(slots=True)
+class _ParameterBlock:
+    display_name: str
+    description: list[str]
+
+
+@dataclass(slots=True)
+class _ReturnBlock:
+    description: list[str]
 
 
 def _parse_sections(docstring: str) -> list[_Section]:
@@ -349,12 +108,6 @@ def _relayout_marker_block(docstring: str, marker: str) -> str:
     return "\n".join(parts).strip()
 
 
-@dataclass(slots=True)
-class _ParameterBlock:
-    display_name: str
-    description: list[str]
-
-
 def _parse_parameters(section: _Section) -> dict[str, _ParameterBlock]:
     entries: dict[str, _ParameterBlock] = {}
     lines = section.content
@@ -379,11 +132,6 @@ def _parse_parameters(section: _Section) -> dict[str, _ParameterBlock]:
     return entries
 
 
-@dataclass(slots=True)
-class _ReturnBlock:
-    description: list[str]
-
-
 def _parse_returns(section: _Section) -> _ReturnBlock:
     lines = section.content
     if not lines:
@@ -392,18 +140,19 @@ def _parse_returns(section: _Section) -> _ReturnBlock:
     return _ReturnBlock(description=desc)
 
 
-def _ensure_description(description: list[str], fallback: str, name: str) -> list[str]:
+def _ensure_description(description: list[str], fallback: str) -> list[str]:
     if description:
         normalised: list[str] = []
         has_text = False
         for line in description:
             stripped = line.strip()
-            if _SIGNATURE_RE.match(stripped):
-                # Drop lines that look like nested parameter signatures.
+            if not stripped:
                 continue
-            if stripped:
-                has_text = True
-            normalised.append(line if line.startswith("    ") else f"    {stripped}")
+            has_text = True
+            if not line.startswith("    "):
+                normalised.append(f"    {stripped}")
+            else:
+                normalised.append(line.rstrip())
         if has_text:
             return normalised
     return [f"    {fallback}"]
@@ -417,17 +166,17 @@ def _merge_default(description: list[str], default: str | None) -> list[str]:
     seen_defaults = False
     for line in description:
         stripped = line.strip()
-        marker = f"Optional parameter default ``{default}``."
-        if stripped.startswith(marker):
+        marker = f"Defaults to ``{default}``."
+        if stripped.startswith(f"Optional parameter default ``{default}``."):
             added = True
-            tail = stripped.removeprefix(marker).strip()
+            tail = stripped.removeprefix(f"Optional parameter default ``{default}``.").strip()
             merged.append(f"    Defaults to ``{default}``.")
             if tail:
                 merged.append(f"    {tail}")
             continue
-        if stripped == f"Defaults to ``{default}``.":
+        if stripped == marker:
             if not seen_defaults:
-                merged.append(line if line.startswith("    ") else f"    {stripped}")
+                merged.append("    " + marker)
                 seen_defaults = True
             added = True
             continue
@@ -441,7 +190,7 @@ def _build_parameters_content(
     signature: inspect.Signature,
     hints: dict[str, Any],
     section: _Section | None,
-    module_globals: dict[str, Any],
+    module_globals: Mapping[str, Any],
     symbol: SymbolHarvest,
 ) -> list[str]:
     blocks: dict[str, _ParameterBlock] = _parse_parameters(section) if section else {}
@@ -457,7 +206,7 @@ def _build_parameters_content(
         else:
             display = parameter.name
         annotation = hints.get(parameter.name, parameter.annotation)
-        annotation_text = _format_type(annotation, module_globals)
+        annotation_text = format_annotation(annotation, module_globals)
         if annotation_text is None:
             harvested_text = harvested.get(parameter.name)
             annotation_text = harvested_text or "Any"
@@ -467,9 +216,7 @@ def _build_parameters_content(
             display_name=display,
             description=[],
         )
-        desc_lines = _ensure_description(
-            block.description, f"Describe ``{parameter.name}``.", parameter.name
-        )
+        desc_lines = _ensure_description(block.description, f"Describe ``{parameter.name}``.")
         if optional and default_text:
             desc_lines = _merge_default(desc_lines, default_text)
         signature_line = f"{display} : {annotation_text}"
@@ -484,16 +231,25 @@ def _build_returns_content(
     signature: inspect.Signature,
     hints: dict[str, Any],
     section: _Section | None,
-    module_globals: dict[str, Any],
-    symbol: SymbolHarvest,
+    module_globals: Mapping[str, Any],
 ) -> list[str]:
     annotation = hints.get("return", signature.return_annotation)
-    annotation_text = _format_type(annotation, module_globals)
+    annotation_text = format_annotation(annotation, module_globals)
     if annotation_text is None or annotation_text == "None":
         return []
     block = _parse_returns(section) if section else _ReturnBlock(description=[])
-    desc_lines = _ensure_description(block.description, "Describe return value.", symbol.qname)
+    desc_lines = _ensure_description(block.description, "Describe return value.")
     return [annotation_text, *desc_lines]
+
+
+def _format_default(value: object) -> str | None:
+    if value is inspect._empty:
+        return None
+    if isinstance(value, str):
+        return repr(value)
+    if value is Ellipsis:
+        return "..."
+    return repr(value)
 
 
 def _update_parameter_section(
@@ -531,12 +287,12 @@ def normalize_docstring(symbol: SymbolHarvest, marker: str) -> str | None:
     if not symbol.docstring:
         return None
     original = textwrap.dedent(symbol.docstring).strip()
-    callable_obj = _resolve_callable(symbol)
+    callable_obj = resolve_callable(symbol)
     if callable_obj is None:
         return None
 
-    module_globals = _import_module_globals(symbol.module)
-    signature, hints = _signature_and_hints(callable_obj, module_globals)
+    module_globals = load_module_globals(symbol.module)
+    signature, hints = signature_and_hints(callable_obj, module_globals)
     if signature is None:
         return None
 
@@ -553,9 +309,7 @@ def normalize_docstring(symbol: SymbolHarvest, marker: str) -> str | None:
     parameter_content = _build_parameters_content(
         signature, hints, parameter_section, module_globals, symbol
     )
-    return_content = _build_returns_content(
-        signature, hints, return_section, module_globals, symbol
-    )
+    return_content = _build_returns_content(signature, hints, return_section, module_globals)
 
     _update_parameter_section(sections, parameter_section, parameter_content)
     _update_return_section(sections, return_section, return_content, return_section_title)
