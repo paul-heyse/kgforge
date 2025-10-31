@@ -60,6 +60,8 @@ def index_bm25(
 ) -> None:
     """Build BM25 index from chunk data.
 
+    <!-- auto:docstring-builder v1 -->
+
     This command builds a BM25 index from chunk data. The operation is
     **idempotent**: if an index already exists at the output directory, it
     will be rebuilt from scratch. No side effects occur beyond writing
@@ -67,12 +69,30 @@ def index_bm25(
 
     Parameters
     ----------
-    chunks_parquet : str
+    chunks_parquet : str, optional
         Path to Parquet or JSONL file containing chunks.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x73d12bc68590>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x73a533f438c0>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7e8056c19010>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7b8c523d1010>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x72c0dd4ed010>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x78766e60d010>``.
     backend : str, optional
         Backend to use: "lucene" or "pure" (default: "lucene").
+        Defaults to ``<typer.models.OptionInfo object at 0x73d12bb02c10>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x73a5351e6210>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7e805632c190>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7b8c51824190>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x72c0dc230190>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x78766db34190>``.
     index_dir : str, optional
         Output directory for the index (default: "./_indices/bm25").
+        Defaults to ``<typer.models.OptionInfo object at 0x73d12bb02d50>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x73a5351e6350>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7e805632c2d0>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7b8c518242d0>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x72c0dc2302d0>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x78766db342d0>``.
 
     Notes
     -----
@@ -83,7 +103,7 @@ def index_bm25(
       fails due to transient errors (e.g., file system issues), run the
       command again manually. For persistent failures, check logs and
       verify input data integrity.
-    """
+"""
     Path(index_dir).mkdir(parents=True, exist_ok=True)
 
     # Check if index already exists and warn if so (idempotency)
@@ -146,6 +166,8 @@ def index_faiss(
 ) -> None:
     """Build FAISS index from dense vectors.
 
+    <!-- auto:docstring-builder v1 -->
+
     This command builds a FAISS index from dense vector data. The operation
     is **idempotent**: if an index already exists at the output path, it
     will be rebuilt from scratch. No side effects occur beyond writing
@@ -153,10 +175,22 @@ def index_faiss(
 
     Parameters
     ----------
-    dense_vectors : str
+    dense_vectors : str, optional
         Path to JSON file containing dense vectors (skeleton format).
+        Defaults to ``<typer.models.ArgumentInfo object at 0x73d12bb02e90>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x73a5351e6490>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7e805632c410>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x7b8c51824410>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x72c0dc230410>``.
+        Defaults to ``<typer.models.ArgumentInfo object at 0x78766db34410>``.
     index_path : str, optional
         Output path for the index file (default: "./_indices/faiss/shard_000.idx").
+        Defaults to ``<typer.models.OptionInfo object at 0x73d12bb02fd0>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x73a5351e65d0>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7e805632c550>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x7b8c51824550>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x72c0dc230550>``.
+        Defaults to ``<typer.models.OptionInfo object at 0x78766db34550>``.
 
     Notes
     -----
@@ -167,7 +201,7 @@ def index_faiss(
       fails due to transient errors (e.g., GPU memory issues), run the
       command again manually. For persistent failures, check logs and
       verify input data integrity.
-    """
+"""
     Path(index_path).parent.mkdir(parents=True, exist_ok=True)
 
     # Check if index already exists and warn if so (idempotency)
@@ -210,7 +244,7 @@ def api(port: int = 8080) -> None:
     port : int, optional
         Describe ``port``.
         Defaults to ``8080``.
-    """
+"""
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
@@ -228,7 +262,7 @@ def e2e() -> None:
     ------
     Exit
     Raised when TODO for Exit.
-    """
+"""
     try:
         from orchestration.flows import e2e_flow
     except ModuleNotFoundError as exc:  # pragma: no cover - defensive messaging

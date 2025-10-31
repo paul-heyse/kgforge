@@ -55,6 +55,8 @@ __navmap__: Final[NavMap] = {
 def rrf_fuse(rankers: list[list[tuple[str, float]]], k_rrf: int = 60) -> dict[str, float]:
     """Fuse multiple ranked lists using Reciprocal Rank Fusion (RRF).
 
+    <!-- auto:docstring-builder v1 -->
+
     Combines multiple ranked lists into a single ranked list using RRF scoring.
     Each item's score is the sum of 1 / (k_rrf + rank) across all rankers.
 
@@ -65,6 +67,7 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k_rrf: int = 60) -> dict[st
     k_rrf : int, optional
         RRF constant parameter (higher = more weight to top ranks).
         Defaults to 60.
+        Defaults to ``60``.
 
     Returns
     -------
@@ -78,7 +81,7 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k_rrf: int = 60) -> dict[st
     >>> fused = rrf_fuse([dense, sparse], k_rrf=60)
     >>> "doc1" in fused and "doc2" in fused
     True
-    """
+"""
     with with_fields(logger, operation="rrf_fuse", k_rrf=k_rrf, num_rankers=len(rankers)):
         scores: dict[str, float] = {}
         for ranked in rankers:
@@ -99,6 +102,8 @@ def apply_kg_boosts(
 ) -> dict[str, float]:
     """Apply knowledge graph boosts to candidate scores.
 
+    <!-- auto:docstring-builder v1 -->
+
     Boosts scores for candidates that have direct or one-hop concept matches
     with the query. If kg_concepts is None, returns candidates unchanged.
 
@@ -111,13 +116,16 @@ def apply_kg_boosts(
     direct : float, optional
         Boost amount for direct concept matches.
         Defaults to 0.08.
+        Defaults to ``0.08``.
     one_hop : float, optional
         Boost amount for one-hop concept matches.
         Defaults to 0.04.
-    kg_concepts : Mapping[str, set[str]] | None, optional
+        Defaults to ``0.04``.
+    kg_concepts : str | set[str] | NoneType, optional
         Mapping from candidate IDs to sets of concept IDs.
         If None, no boosts are applied.
         Defaults to None.
+        Defaults to ``None``.
 
     Returns
     -------
@@ -130,7 +138,7 @@ def apply_kg_boosts(
     >>> boosted = apply_kg_boosts(cands, "test query", kg_concepts={"doc1": {"C:42"}})
     >>> boosted["doc1"] > cands["doc1"]
     True
-    """
+"""
     with with_fields(logger, operation="apply_kg_boosts", query=query[:50]):
         if kg_concepts is None:
             logger.debug("No KG concepts provided, skipping boosts")
@@ -172,6 +180,8 @@ def mmr_deduplicate(
 ) -> list[tuple[str, float]]:
     """Deduplicate results using Maximal Marginal Relevance (MMR).
 
+    <!-- auto:docstring-builder v1 -->
+
     Removes duplicate items while preserving diversity. Currently returns
     results unchanged; full MMR implementation requires document embeddings.
 
@@ -182,6 +192,7 @@ def mmr_deduplicate(
     lambda_mmr : float, optional
         MMR lambda parameter (0.0 = pure relevance, 1.0 = pure diversity).
         Defaults to 0.7.
+        Defaults to ``0.7``.
 
     Returns
     -------
@@ -194,7 +205,7 @@ def mmr_deduplicate(
     >>> deduped = mmr_deduplicate(results)
     >>> len(deduped) <= len(results)
     True
-    """
+"""
     with with_fields(logger, operation="mmr_deduplicate", lambda_mmr=lambda_mmr):
         # Simple deduplication (full MMR requires document embeddings)
         seen: set[str] = set()
@@ -219,6 +230,8 @@ def search_service(
 ) -> AgentSearchResponse:
     """Create typed search response from results.
 
+    <!-- auto:docstring-builder v1 -->
+
     Wraps search results in an AgentSearchResponse envelope with metadata
     and metrics. Includes structured logging and duration tracking.
 
@@ -226,10 +239,11 @@ def search_service(
     ----------
     results : list[VectorSearchResultTypedDict]
         List of typed search results.
-    metrics : MetricsProvider | None, optional
+    metrics : MetricsProvider | NoneType, optional
         Metrics provider for recording search metrics.
         If None, uses default provider.
         Defaults to None.
+        Defaults to ``None``.
 
     Returns
     -------
@@ -256,7 +270,7 @@ def search_service(
     >>> response = search_service(results)
     >>> response["total"] == len(results)
     True
-    """
+"""
     active_metrics = metrics or MetricsProvider.default()
     start_time = time.time()
 

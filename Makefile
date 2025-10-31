@@ -77,7 +77,7 @@ docstrings:
 	$(PY) tools/update_navmaps.py
 	$(VENV)/bin/docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i $(DOCSTRING_DIRS) || true
 	$(VENV)/bin/pydocstyle $(DOCSTRING_DIRS)
-	$(VENV)/bin/interrogate -i src --fail-under 90
+	$(VENV)/bin/docstr-coverage --fail-under 90 src
 
 docfacts-diff:
 	uv run --no-project --with libcst --with griffe python -m tools.docstring_builder.cli --diff-only --all

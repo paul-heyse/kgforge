@@ -63,6 +63,8 @@ _schema_cache: dict[str, dict[str, object]] = {}
 def _load_schema_cached(schema_path: Path) -> dict[str, object]:
     """Load and parse a JSON Schema file with caching.
 
+    <!-- auto:docstring-builder v1 -->
+
     This function uses LRU cache to avoid repeated I/O for the same schema file.
     The cache is keyed by the resolved Path object (converted to string).
 
@@ -82,7 +84,7 @@ def _load_schema_cached(schema_path: Path) -> dict[str, object]:
         If schema file does not exist.
     SchemaValidationError
         If schema is invalid JSON or fails schema validation.
-    """
+"""
     if not schema_path.exists():
         msg = f"Schema file not found: {schema_path}"
         raise FileNotFoundError(msg)
@@ -116,12 +118,14 @@ def _load_schema_cached(schema_path: Path) -> dict[str, object]:
 def validate_payload(payload: Mapping[str, object], schema_path: Path) -> None:
     """Validate a payload against a JSON Schema 2020-12.
 
+    <!-- auto:docstring-builder v1 -->
+
     This function loads the schema (with caching), validates the payload,
     and raises SchemaValidationError if validation fails.
 
     Parameters
     ----------
-    payload : Mapping[str, object]
+    payload : str | object
         Payload to validate (must be JSON-serializable).
     schema_path : Path
         Path to JSON Schema 2020-12 file.
@@ -144,7 +148,7 @@ def validate_payload(payload: Mapping[str, object], schema_path: Path) -> None:
     ...     validate_payload({"k1": 0.9}, schema)
     ...     validate_payload({"k1": "invalid"}, schema)  # doctest: +SKIP
     SchemaValidationError: Schema validation failed
-    """
+"""
     schema_obj = _load_schema_cached(schema_path)
     try:
         jsonschema.validate(instance=payload, schema=schema_obj)
@@ -158,6 +162,8 @@ def validate_payload(payload: Mapping[str, object], schema_path: Path) -> None:
 
 def compute_checksum(data: bytes) -> str:
     """Compute SHA256 checksum of binary data.
+
+    <!-- auto:docstring-builder v1 -->
 
     Parameters
     ----------
@@ -176,12 +182,14 @@ def compute_checksum(data: bytes) -> str:
     True
     >>> checksum.startswith("9")
     True
-    """
+"""
     return hashlib.sha256(data).hexdigest()
 
 
 def verify_checksum(data: bytes, expected: str) -> None:
     """Verify SHA256 checksum matches expected value.
+
+    <!-- auto:docstring-builder v1 -->
 
     Parameters
     ----------
@@ -200,7 +208,7 @@ def verify_checksum(data: bytes, expected: str) -> None:
     >>> verify_checksum(b"test", compute_checksum(b"test"))
     >>> verify_checksum(b"wrong", compute_checksum(b"test"))  # doctest: +SKIP
     SerializationError: Checksum mismatch
-    """
+"""
     actual = compute_checksum(data)
     if actual != expected:
         msg = f"Checksum mismatch: expected {expected[:16]}..., got {actual[:16]}..."
@@ -217,6 +225,8 @@ def serialize_json(
 ) -> str:
     """Serialize object to JSON with schema validation and optional checksum.
 
+    <!-- auto:docstring-builder v1 -->
+
     The serialized JSON is validated against the provided JSON Schema 2020-12
     before writing. If `include_checksum=True`, a checksum file is written
     alongside the JSON file.
@@ -231,8 +241,10 @@ def serialize_json(
         Output file path for JSON data.
     include_checksum : bool, optional
         If True, write a `.sha256` checksum file. Defaults to True.
-    indent : int | None, optional
+        Defaults to ``True``.
+    indent : int | NoneType, optional
         JSON indentation (None for compact). Defaults to 2.
+        Defaults to ``2``.
 
     Returns
     -------
@@ -261,7 +273,7 @@ def serialize_json(
     ...     checksum = serialize_json(data, schema, output)
     ...     assert len(checksum) == 64
     ...     assert output.exists()
-    """
+"""
     try:
         # Validate payload against schema (uses cached schema loader)
         if isinstance(obj, Mapping):
@@ -320,6 +332,8 @@ def deserialize_json(  # noqa: C901, PLR0912
 ) -> object:  # JSON types: dict, list, str, int, float, bool, None
     """Deserialize JSON with schema validation and checksum verification.
 
+    <!-- auto:docstring-builder v1 -->
+
     The JSON is validated against the provided schema and (optionally) verified
     against a `.sha256` checksum file before parsing.
 
@@ -331,6 +345,7 @@ def deserialize_json(  # noqa: C901, PLR0912
         Path to JSON Schema 2020-12 file for validation.
     verify_checksum_file : bool, optional
         If True, verify against `.sha256` checksum file. Defaults to True.
+        Defaults to ``True``.
 
     Returns
     -------
@@ -358,7 +373,7 @@ def deserialize_json(  # noqa: C901, PLR0912
     ...     data_path.write_text('{"k1": 0.9}')
     ...     loaded = deserialize_json(data_path, schema)
     ...     assert loaded == {"k1": 0.9}
-    """
+"""
     try:
         # Verify checksum if requested
         if verify_checksum_file:

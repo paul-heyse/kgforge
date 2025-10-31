@@ -11,6 +11,11 @@ See Also
 - `schema/models/search_result.v1.json` - Response schema
 """
 
+from __future__ import annotations
+
+import importlib
+import sys
+
 # [nav:anchor app]
 # [nav:anchor bm25_index]
 # [nav:anchor faiss_adapter]
@@ -19,33 +24,71 @@ See Also
 # [nav:anchor kg_mock]
 # [nav:anchor schemas]
 # [nav:anchor service]
-from search_api import (
-    app,
-    bm25_index,
-    faiss_adapter,
-    fixture_index,
-    fusion,
-    kg_mock,
-    schemas,
-    service,
-    splade_index,
-    types,
-)
 
-# [nav:anchor splade_index]
+_ALIASES: dict[str, str] = {
+    "app": "search_api.app",
+    "bm25_index": "search_api.bm25_index",
+    "faiss_adapter": "search_api.faiss_adapter",
+    "fixture_index": "search_api.fixture_index",
+    "fusion": "search_api.fusion",
+    "kg_mock": "search_api.kg_mock",
+    "schemas": "search_api.schemas",
+    "service": "search_api.service",
+    "splade_index": "search_api.splade_index",
+    "types": "search_api.types",
+}
 
-__all__ = [
-    "app",
-    "bm25_index",
-    "faiss_adapter",
-    "fixture_index",
-    "fusion",
-    "kg_mock",
-    "schemas",
-    "service",
-    "splade_index",
-    "types",
-]
+__all__ = sorted(_ALIASES)
+
+
+def __getattr__(name: str) -> object:
+    """Describe   getattr  .
+
+    <!-- auto:docstring-builder v1 -->
+
+    &lt;!-- auto:docstring-builder v1 --&gt;
+
+    Provide a fallback for unknown attribute lookups. This special method integrates the class with Python&#39;s data model so instances behave consistently with the language expectations.
+
+    Parameters
+    ----------
+    name : str
+        Configure the name.
+
+    Returns
+    -------
+    object
+        Describe return value.
+
+    Raises
+    ------
+    AttributeError
+        Raised when message.
+"""
+    if name not in _ALIASES:
+        message = f"module {__name__!r} has no attribute {name!r}"
+        raise AttributeError(message) from None
+    module = importlib.import_module(_ALIASES[name])
+    sys.modules[f"{__name__}.{name}"] = module
+    return module
+
+
+def __dir__() -> list[str]:
+    """Describe   dir  .
+
+    <!-- auto:docstring-builder v1 -->
+
+    &lt;!-- auto:docstring-builder v1 --&gt;
+
+    Expose the attributes reported when ``dir()`` is called on the instance. This special method integrates the class with Python&#39;s data model so instances behave consistently with the language expectations.
+
+    Returns
+    -------
+    list[str]
+        Describe return value.
+"""
+    return sorted(set(__all__))
+
 
 __navmap__ = {
     "title": "search_api",

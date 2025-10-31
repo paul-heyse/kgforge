@@ -104,7 +104,7 @@ class ParquetVectorWriter:
     ----------
     root : str
         Describe ``root``.
-    """
+"""
 
     @staticmethod
     def dense_schema(dim: int) -> pa.schema:
@@ -119,12 +119,11 @@ class ParquetVectorWriter:
         dim : int
             Describe ``dim``.
 
-
         Returns
         -------
         pyarrow.lib.schema
             Describe return value.
-        """
+"""
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -148,7 +147,7 @@ class ParquetVectorWriter:
         ----------
         root : str
             Describe ``root``.
-        """
+"""
         self.root = Path(root)
 
     def write_dense(
@@ -173,18 +172,17 @@ class ParquetVectorWriter:
             Describe ``run_id``.
         dim : int
             Describe ``dim``.
-        records : Iterable[tuple[str, list[float], float]]
+        records : tuple[str, list[float], float]
             Describe ``records``.
         shard : int, optional
             Describe ``shard``.
             Defaults to ``0``.
 
-
         Returns
         -------
         str
             Describe return value.
-        """
+"""
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -222,7 +220,7 @@ class ParquetVectorWriter:
         -------
         pyarrow.lib.schema
             Describe return value.
-        """
+"""
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -254,18 +252,17 @@ class ParquetVectorWriter:
             Describe ``model``.
         run_id : str
             Describe ``run_id``.
-        records : Iterable[tuple[str, list[int], list[float]]]
+        records : tuple[str, list[int], list[float]]
             Describe ``records``.
         shard : int, optional
             Describe ``shard``.
             Defaults to ``0``.
 
-
         Returns
         -------
         str
             Describe return value.
-        """
+"""
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -312,7 +309,7 @@ class ParquetChunkWriter:
     run_id : str, optional
         Describe ``run_id``.
         Defaults to ``'dev'``.
-    """
+"""
 
     @staticmethod
     def chunk_schema() -> pa.schema:
@@ -326,7 +323,7 @@ class ParquetChunkWriter:
         -------
         pyarrow.lib.schema
             Describe return value.
-        """
+"""
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -368,7 +365,7 @@ class ParquetChunkWriter:
         run_id : str, optional
             Describe ``run_id``.
             Defaults to ``'dev'``.
-        """
+"""
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
@@ -381,15 +378,14 @@ class ParquetChunkWriter:
 
         Parameters
         ----------
-        rows : Iterable[dict[str, JsonValue]]
+        rows : dict[str, object]
             Describe ``rows``.
-
 
         Returns
         -------
         str
             Describe return value.
-        """
+"""
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(
             table,
@@ -410,11 +406,13 @@ def read_table(
 ) -> pa.Table:
     """Read a Parquet file and return a typed Table.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     path : str | Path
         Path to Parquet file or directory.
-    schema : pa.Schema | None, optional
+    schema : pyarrow.lib.Schema | NoneType, optional
         Expected schema for validation. If provided and validate_schema=True,
         raises DeserializationError on mismatch.
         Defaults to ``None``.
@@ -424,7 +422,7 @@ def read_table(
 
     Returns
     -------
-    pa.Table
+    pyarrow.lib.Table
         Typed pyarrow Table with concrete schema.
 
     Raises
@@ -441,7 +439,7 @@ def read_table(
     >>> # Note: requires existing Parquet file
     >>> # table = read_table("data.parquet")
     >>> # assert table.num_rows > 0
-    """
+"""
     path_obj = Path(path)
     if not path_obj.exists():
         msg = f"Parquet file not found: {path_obj}"
@@ -468,11 +466,13 @@ def read_table_to_dataframe(
 ) -> pd.DataFrame:
     """Read a Parquet file and return a typed DataFrame.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     path : str | Path
         Path to Parquet file or directory.
-    schema : pa.Schema | None, optional
+    schema : pyarrow.lib.Schema | NoneType, optional
         Expected schema for validation. If provided and validate_schema=True,
         raises DeserializationError on mismatch.
         Defaults to ``None``.
@@ -482,7 +482,7 @@ def read_table_to_dataframe(
 
     Returns
     -------
-    pd.DataFrame
+    pandas.core.frame.DataFrame
         Typed pandas DataFrame with schema metadata preserved.
 
     Raises
@@ -501,7 +501,7 @@ def read_table_to_dataframe(
     >>> # Note: requires existing Parquet file and pandas
     >>> # df = read_table_to_dataframe("data.parquet")
     >>> # assert len(df) > 0
-    """
+"""
     if pd is None:
         msg = "pandas is required for DataFrame conversion"
         raise ImportError(msg)
@@ -514,11 +514,13 @@ def read_table_to_dataframe(
 def validate_table_schema(table: pa.Table, expected_schema: pa.Schema) -> None:
     """Validate that a table matches an expected schema.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
-    table : pa.Table
+    table : pyarrow.lib.Table
         Table to validate.
-    expected_schema : pa.Schema
+    expected_schema : pyarrow.lib.Schema
         Expected schema.
 
     Raises
@@ -533,7 +535,7 @@ def validate_table_schema(table: pa.Table, expected_schema: pa.Schema) -> None:
     >>> schema = pa.schema([pa.field("id", pa.string())])
     >>> table = pa.Table.from_pylist([{"id": "test"}], schema=schema)
     >>> validate_table_schema(table, schema)  # No error
-    """
+"""
     if not table.schema.equals(expected_schema):
         msg = f"Schema mismatch: expected {expected_schema}, got {table.schema}"
         raise DeserializationError(msg)

@@ -1,0 +1,213 @@
+{
+  "$defs": {
+    "FaissConfig": {
+      "additionalProperties": false,
+      "description": "FAISS index configuration.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\n_case_sensitive : bool | None, optional\n    Describe ``_case_sensitive``.\n    Defaults to ``None``.\n_nested_model_default_partial_update : bool | None, optional\n    Describe ``_nested_model_default_partial_update``.\n    Defaults to ``None``.\n_env_prefix : str | None, optional\n    Describe ``_env_prefix``.\n    Defaults to ``None``.\n_env_file : DotenvType | None, optional\n    Describe ``_env_file``.\n    Defaults to ``PosixPath('.')``.\n_env_file_encoding : str | None, optional\n    Describe ``_env_file_encoding``.\n    Defaults to ``None``.\n_env_ignore_empty : bool | None, optional\n    Describe ``_env_ignore_empty``.\n    Defaults to ``None``.\n_env_nested_delimiter : str | None, optional\n    Describe ``_env_nested_delimiter``.\n    Defaults to ``None``.\n_env_nested_max_split : int | None, optional\n    Describe ``_env_nested_max_split``.\n    Defaults to ``None``.\n_env_parse_none_str : str | None, optional\n    Describe ``_env_parse_none_str``.\n    Defaults to ``None``.\n_env_parse_enums : bool | None, optional\n    Describe ``_env_parse_enums``.\n    Defaults to ``None``.\n_cli_prog_name : str | None, optional\n    Describe ``_cli_prog_name``.\n    Defaults to ``None``.\n_cli_parse_args : bool | list[str] | tuple[str, ...] | None, optional\n    Describe ``_cli_parse_args``.\n    Defaults to ``None``.\n_cli_settings_source : CliSettingsSource[Any] | None, optional\n    Describe ``_cli_settings_source``.\n    Defaults to ``None``.\n_cli_parse_none_str : str | None, optional\n    Describe ``_cli_parse_none_str``.\n    Defaults to ``None``.\n_cli_hide_none_type : bool | None, optional\n    Describe ``_cli_hide_none_type``.\n    Defaults to ``None``.\n_cli_avoid_json : bool | None, optional\n    Describe ``_cli_avoid_json``.\n    Defaults to ``None``.\n_cli_enforce_required : bool | None, optional\n    Describe ``_cli_enforce_required``.\n    Defaults to ``None``.\n_cli_use_class_docs_for_groups : bool | None, optional\n    Describe ``_cli_use_class_docs_for_groups``.\n    Defaults to ``None``.\n_cli_exit_on_error : bool | None, optional\n    Describe ``_cli_exit_on_error``.\n    Defaults to ``None``.\n_cli_prefix : str | None, optional\n    Describe ``_cli_prefix``.\n    Defaults to ``None``.\n_cli_flag_prefix_char : str | None, optional\n    Describe ``_cli_flag_prefix_char``.\n    Defaults to ``None``.\n_cli_implicit_flags : bool | None, optional\n    Describe ``_cli_implicit_flags``.\n    Defaults to ``None``.\n_cli_ignore_unknown_args : bool | None, optional\n    Describe ``_cli_ignore_unknown_args``.\n    Defaults to ``None``.\n_cli_kebab_case : bool | None, optional\n    Describe ``_cli_kebab_case``.\n    Defaults to ``None``.\n_cli_shortcuts : Mapping[str, str | list[str]] | None, optional\n    Describe ``_cli_shortcuts``.\n    Defaults to ``None``.\n_secrets_dir : PathType | None, optional\n    Describe ``_secrets_dir``.\n    Defaults to ``None``.\ngpu : bool, optional\n    Enable GPU acceleration.\n    Environment variable: `KGFOUNDRY_FAISS_GPU`.\n    Defaults to True.\n    Defaults to ``True``.\ncuvs : bool, optional\n    Enable cuVS support.\n    Environment variable: `KGFOUNDRY_FAISS_CUVS`.\n    Defaults to True.\n    Defaults to ``True``.\nindex_factory : str, optional\n    FAISS index factory string.\n    Environment variable: `KGFOUNDRY_FAISS_INDEX_FACTORY`.\n    Defaults to 'OPQ64,IVF8192,PQ64'.\n    Defaults to ``'OPQ64,IVF8192,PQ64'``.\nnprobe : int, optional\n    Number of probes for IVF indexes.\n    Environment variable: `KGFOUNDRY_FAISS_NPROBE`.\n    Defaults to 64.\n    Defaults to ``64``.\nindex_path : str, optional\n    FAISS index file path.\n    Environment variable: `KGFOUNDRY_FAISS_INDEX_PATH`.\n    Defaults to './_indices/faiss/shard_000.idx'.\n    Defaults to ``'./_indices/faiss/shard_000.idx'``.",
+      "properties": {
+        "cuvs": {
+          "default": true,
+          "description": "Enable cuVS support",
+          "title": "Cuvs",
+          "type": "boolean"
+        },
+        "gpu": {
+          "default": true,
+          "description": "Enable GPU acceleration",
+          "title": "Gpu",
+          "type": "boolean"
+        },
+        "index_factory": {
+          "default": "OPQ64,IVF8192,PQ64",
+          "description": "FAISS index factory string",
+          "title": "Index Factory",
+          "type": "string"
+        },
+        "index_path": {
+          "default": "./_indices/faiss/shard_000.idx",
+          "description": "FAISS index file path",
+          "title": "Index Path",
+          "type": "string"
+        },
+        "nprobe": {
+          "default": 64,
+          "description": "Number of probes for IVF indexes",
+          "title": "Nprobe",
+          "type": "integer"
+        }
+      },
+      "title": "FaissConfig",
+      "type": "object"
+    },
+    "ObservabilityConfig": {
+      "additionalProperties": false,
+      "description": "Observability configuration.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\n_case_sensitive : bool | None, optional\n    Describe ``_case_sensitive``.\n    Defaults to ``None``.\n_nested_model_default_partial_update : bool | None, optional\n    Describe ``_nested_model_default_partial_update``.\n    Defaults to ``None``.\n_env_prefix : str | None, optional\n    Describe ``_env_prefix``.\n    Defaults to ``None``.\n_env_file : DotenvType | None, optional\n    Describe ``_env_file``.\n    Defaults to ``PosixPath('.')``.\n_env_file_encoding : str | None, optional\n    Describe ``_env_file_encoding``.\n    Defaults to ``None``.\n_env_ignore_empty : bool | None, optional\n    Describe ``_env_ignore_empty``.\n    Defaults to ``None``.\n_env_nested_delimiter : str | None, optional\n    Describe ``_env_nested_delimiter``.\n    Defaults to ``None``.\n_env_nested_max_split : int | None, optional\n    Describe ``_env_nested_max_split``.\n    Defaults to ``None``.\n_env_parse_none_str : str | None, optional\n    Describe ``_env_parse_none_str``.\n    Defaults to ``None``.\n_env_parse_enums : bool | None, optional\n    Describe ``_env_parse_enums``.\n    Defaults to ``None``.\n_cli_prog_name : str | None, optional\n    Describe ``_cli_prog_name``.\n    Defaults to ``None``.\n_cli_parse_args : bool | list[str] | tuple[str, ...] | None, optional\n    Describe ``_cli_parse_args``.\n    Defaults to ``None``.\n_cli_settings_source : CliSettingsSource[Any] | None, optional\n    Describe ``_cli_settings_source``.\n    Defaults to ``None``.\n_cli_parse_none_str : str | None, optional\n    Describe ``_cli_parse_none_str``.\n    Defaults to ``None``.\n_cli_hide_none_type : bool | None, optional\n    Describe ``_cli_hide_none_type``.\n    Defaults to ``None``.\n_cli_avoid_json : bool | None, optional\n    Describe ``_cli_avoid_json``.\n    Defaults to ``None``.\n_cli_enforce_required : bool | None, optional\n    Describe ``_cli_enforce_required``.\n    Defaults to ``None``.\n_cli_use_class_docs_for_groups : bool | None, optional\n    Describe ``_cli_use_class_docs_for_groups``.\n    Defaults to ``None``.\n_cli_exit_on_error : bool | None, optional\n    Describe ``_cli_exit_on_error``.\n    Defaults to ``None``.\n_cli_prefix : str | None, optional\n    Describe ``_cli_prefix``.\n    Defaults to ``None``.\n_cli_flag_prefix_char : str | None, optional\n    Describe ``_cli_flag_prefix_char``.\n    Defaults to ``None``.\n_cli_implicit_flags : bool | None, optional\n    Describe ``_cli_implicit_flags``.\n    Defaults to ``None``.\n_cli_ignore_unknown_args : bool | None, optional\n    Describe ``_cli_ignore_unknown_args``.\n    Defaults to ``None``.\n_cli_kebab_case : bool | None, optional\n    Describe ``_cli_kebab_case``.\n    Defaults to ``None``.\n_cli_shortcuts : Mapping[str, str | list[str]] | None, optional\n    Describe ``_cli_shortcuts``.\n    Defaults to ``None``.\n_secrets_dir : PathType | None, optional\n    Describe ``_secrets_dir``.\n    Defaults to ``None``.\nlog_level : str, optional\n    Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL).\n    Environment variable: `KGFOUNDRY_LOG_LEVEL`.\n    Defaults to \"INFO\".\n    Defaults to ``'INFO'``.\nmetrics_enabled : bool, optional\n    Enable Prometheus metrics export.\n    Environment variable: `KGFOUNDRY_METRICS_ENABLED`.\n    Defaults to True.\n    Defaults to ``True``.\ntraces_enabled : bool, optional\n    Enable OpenTelemetry tracing.\n    Environment variable: `KGFOUNDRY_TRACES_ENABLED`.\n    Defaults to False.\n    Defaults to ``False``.\nmetrics_port : int, optional\n    Port for Prometheus metrics endpoint.\n    Environment variable: `KGFOUNDRY_METRICS_PORT`.\n    Defaults to 9090.\n    Defaults to ``9090``.",
+      "properties": {
+        "log_level": {
+          "default": "INFO",
+          "description": "Logging level (DEBUG, INFO, WARNING, ERROR)",
+          "title": "Log Level",
+          "type": "string"
+        },
+        "metrics_enabled": {
+          "default": true,
+          "description": "Enable Prometheus metrics export",
+          "title": "Metrics Enabled",
+          "type": "boolean"
+        },
+        "metrics_port": {
+          "default": 9090,
+          "description": "Port for Prometheus metrics endpoint",
+          "title": "Metrics Port",
+          "type": "integer"
+        },
+        "traces_enabled": {
+          "default": false,
+          "description": "Enable OpenTelemetry tracing",
+          "title": "Traces Enabled",
+          "type": "boolean"
+        }
+      },
+      "title": "ObservabilityConfig",
+      "type": "object"
+    },
+    "SearchConfig": {
+      "additionalProperties": false,
+      "description": "Search service configuration.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\n_case_sensitive : bool | None, optional\n    Describe ``_case_sensitive``.\n    Defaults to ``None``.\n_nested_model_default_partial_update : bool | None, optional\n    Describe ``_nested_model_default_partial_update``.\n    Defaults to ``None``.\n_env_prefix : str | None, optional\n    Describe ``_env_prefix``.\n    Defaults to ``None``.\n_env_file : DotenvType | None, optional\n    Describe ``_env_file``.\n    Defaults to ``PosixPath('.')``.\n_env_file_encoding : str | None, optional\n    Describe ``_env_file_encoding``.\n    Defaults to ``None``.\n_env_ignore_empty : bool | None, optional\n    Describe ``_env_ignore_empty``.\n    Defaults to ``None``.\n_env_nested_delimiter : str | None, optional\n    Describe ``_env_nested_delimiter``.\n    Defaults to ``None``.\n_env_nested_max_split : int | None, optional\n    Describe ``_env_nested_max_split``.\n    Defaults to ``None``.\n_env_parse_none_str : str | None, optional\n    Describe ``_env_parse_none_str``.\n    Defaults to ``None``.\n_env_parse_enums : bool | None, optional\n    Describe ``_env_parse_enums``.\n    Defaults to ``None``.\n_cli_prog_name : str | None, optional\n    Describe ``_cli_prog_name``.\n    Defaults to ``None``.\n_cli_parse_args : bool | list[str] | tuple[str, ...] | None, optional\n    Describe ``_cli_parse_args``.\n    Defaults to ``None``.\n_cli_settings_source : CliSettingsSource[Any] | None, optional\n    Describe ``_cli_settings_source``.\n    Defaults to ``None``.\n_cli_parse_none_str : str | None, optional\n    Describe ``_cli_parse_none_str``.\n    Defaults to ``None``.\n_cli_hide_none_type : bool | None, optional\n    Describe ``_cli_hide_none_type``.\n    Defaults to ``None``.\n_cli_avoid_json : bool | None, optional\n    Describe ``_cli_avoid_json``.\n    Defaults to ``None``.\n_cli_enforce_required : bool | None, optional\n    Describe ``_cli_enforce_required``.\n    Defaults to ``None``.\n_cli_use_class_docs_for_groups : bool | None, optional\n    Describe ``_cli_use_class_docs_for_groups``.\n    Defaults to ``None``.\n_cli_exit_on_error : bool | None, optional\n    Describe ``_cli_exit_on_error``.\n    Defaults to ``None``.\n_cli_prefix : str | None, optional\n    Describe ``_cli_prefix``.\n    Defaults to ``None``.\n_cli_flag_prefix_char : str | None, optional\n    Describe ``_cli_flag_prefix_char``.\n    Defaults to ``None``.\n_cli_implicit_flags : bool | None, optional\n    Describe ``_cli_implicit_flags``.\n    Defaults to ``None``.\n_cli_ignore_unknown_args : bool | None, optional\n    Describe ``_cli_ignore_unknown_args``.\n    Defaults to ``None``.\n_cli_kebab_case : bool | None, optional\n    Describe ``_cli_kebab_case``.\n    Defaults to ``None``.\n_cli_shortcuts : Mapping[str, str | list[str]] | None, optional\n    Describe ``_cli_shortcuts``.\n    Defaults to ``None``.\n_secrets_dir : PathType | None, optional\n    Describe ``_secrets_dir``.\n    Defaults to ``None``.\napi_url : str | NoneType, optional\n    Search API base URL. Required if search features are used.\n    Environment variable: `KGFOUNDRY_SEARCH_API_URL`.\n    Defaults to None.\n    Defaults to ``None``.\nk : int, optional\n    Default number of results to return.\n    Environment variable: `KGFOUNDRY_SEARCH_K`.\n    Defaults to 10.\n    Defaults to ``10``.\ndense_candidates : int, optional\n    Number of dense candidates for hybrid search.\n    Environment variable: `KGFOUNDRY_SEARCH_DENSE_CANDIDATES`.\n    Defaults to 200.\n    Defaults to ``200``.\nsparse_candidates : int, optional\n    Number of sparse candidates for hybrid search.\n    Environment variable: `KGFOUNDRY_SEARCH_SPARSE_CANDIDATES`.\n    Defaults to 200.\n    Defaults to ``200``.\nrrf_k : int, optional\n    Reciprocal Rank Fusion parameter.\n    Environment variable: `KGFOUNDRY_SEARCH_RRF_K`.\n    Defaults to 60.\n    Defaults to ``60``.\nsparse_backend : str, optional\n    Sparse backend type ('lucene' or 'pure').\n    Environment variable: `KGFOUNDRY_SEARCH_SPARSE_BACKEND`.\n    Defaults to 'lucene'.\n    Defaults to ``'lucene'``.\nkg_boosts_direct : float, optional\n    Direct KG boost weight.\n    Environment variable: `KGFOUNDRY_SEARCH_KG_BOOSTS_DIRECT`.\n    Defaults to 0.08.\n    Defaults to ``0.08``.\nkg_boosts_one_hop : float, optional\n    One-hop KG boost weight.\n    Environment variable: `KGFOUNDRY_SEARCH_KG_BOOSTS_ONE_HOP`.\n    Defaults to 0.04.\n    Defaults to ``0.04``.\nvalidate_responses : bool, optional\n    Enable response schema validation (dev/staging only).\n    Environment variable: `SEARCH_API_VALIDATE`.\n    Defaults to False.\n    Defaults to ``False``.",
+      "properties": {
+        "api_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Search API base URL (required if search features are used)",
+          "title": "Api Url"
+        },
+        "dense_candidates": {
+          "default": 200,
+          "description": "Number of dense candidates for hybrid search",
+          "title": "Dense Candidates",
+          "type": "integer"
+        },
+        "k": {
+          "default": 10,
+          "description": "Default number of results to return",
+          "title": "K",
+          "type": "integer"
+        },
+        "kg_boosts_direct": {
+          "default": 0.08,
+          "description": "Direct KG boost weight",
+          "title": "Kg Boosts Direct",
+          "type": "number"
+        },
+        "kg_boosts_one_hop": {
+          "default": 0.04,
+          "description": "One-hop KG boost weight",
+          "title": "Kg Boosts One Hop",
+          "type": "number"
+        },
+        "rrf_k": {
+          "default": 60,
+          "description": "Reciprocal Rank Fusion parameter",
+          "title": "Rrf K",
+          "type": "integer"
+        },
+        "sparse_backend": {
+          "default": "lucene",
+          "description": "Sparse backend type ('lucene' or 'pure')",
+          "title": "Sparse Backend",
+          "type": "string"
+        },
+        "sparse_candidates": {
+          "default": 200,
+          "description": "Number of sparse candidates for hybrid search",
+          "title": "Sparse Candidates",
+          "type": "integer"
+        },
+        "validate_responses": {
+          "default": false,
+          "description": "Enable response schema validation (dev/staging only)",
+          "title": "Validate Responses",
+          "type": "boolean"
+        }
+      },
+      "title": "SearchConfig",
+      "type": "object"
+    },
+    "SparseEmbeddingConfig": {
+      "additionalProperties": false,
+      "description": "Sparse embedding configuration.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\n_case_sensitive : bool | None, optional\n    Describe ``_case_sensitive``.\n    Defaults to ``None``.\n_nested_model_default_partial_update : bool | None, optional\n    Describe ``_nested_model_default_partial_update``.\n    Defaults to ``None``.\n_env_prefix : str | None, optional\n    Describe ``_env_prefix``.\n    Defaults to ``None``.\n_env_file : DotenvType | None, optional\n    Describe ``_env_file``.\n    Defaults to ``PosixPath('.')``.\n_env_file_encoding : str | None, optional\n    Describe ``_env_file_encoding``.\n    Defaults to ``None``.\n_env_ignore_empty : bool | None, optional\n    Describe ``_env_ignore_empty``.\n    Defaults to ``None``.\n_env_nested_delimiter : str | None, optional\n    Describe ``_env_nested_delimiter``.\n    Defaults to ``None``.\n_env_nested_max_split : int | None, optional\n    Describe ``_env_nested_max_split``.\n    Defaults to ``None``.\n_env_parse_none_str : str | None, optional\n    Describe ``_env_parse_none_str``.\n    Defaults to ``None``.\n_env_parse_enums : bool | None, optional\n    Describe ``_env_parse_enums``.\n    Defaults to ``None``.\n_cli_prog_name : str | None, optional\n    Describe ``_cli_prog_name``.\n    Defaults to ``None``.\n_cli_parse_args : bool | list[str] | tuple[str, ...] | None, optional\n    Describe ``_cli_parse_args``.\n    Defaults to ``None``.\n_cli_settings_source : CliSettingsSource[Any] | None, optional\n    Describe ``_cli_settings_source``.\n    Defaults to ``None``.\n_cli_parse_none_str : str | None, optional\n    Describe ``_cli_parse_none_str``.\n    Defaults to ``None``.\n_cli_hide_none_type : bool | None, optional\n    Describe ``_cli_hide_none_type``.\n    Defaults to ``None``.\n_cli_avoid_json : bool | None, optional\n    Describe ``_cli_avoid_json``.\n    Defaults to ``None``.\n_cli_enforce_required : bool | None, optional\n    Describe ``_cli_enforce_required``.\n    Defaults to ``None``.\n_cli_use_class_docs_for_groups : bool | None, optional\n    Describe ``_cli_use_class_docs_for_groups``.\n    Defaults to ``None``.\n_cli_exit_on_error : bool | None, optional\n    Describe ``_cli_exit_on_error``.\n    Defaults to ``None``.\n_cli_prefix : str | None, optional\n    Describe ``_cli_prefix``.\n    Defaults to ``None``.\n_cli_flag_prefix_char : str | None, optional\n    Describe ``_cli_flag_prefix_char``.\n    Defaults to ``None``.\n_cli_implicit_flags : bool | None, optional\n    Describe ``_cli_implicit_flags``.\n    Defaults to ``None``.\n_cli_ignore_unknown_args : bool | None, optional\n    Describe ``_cli_ignore_unknown_args``.\n    Defaults to ``None``.\n_cli_kebab_case : bool | None, optional\n    Describe ``_cli_kebab_case``.\n    Defaults to ``None``.\n_cli_shortcuts : Mapping[str, str | list[str]] | None, optional\n    Describe ``_cli_shortcuts``.\n    Defaults to ``None``.\n_secrets_dir : PathType | None, optional\n    Describe ``_secrets_dir``.\n    Defaults to ``None``.\nbm25_index_dir : str, optional\n    BM25 index directory path.\n    Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_BM25_INDEX_DIR`.\n    Defaults to './_indices/bm25'.\n    Defaults to ``'./_indices/bm25'``.\nbm25_k1 : float, optional\n    BM25 k1 parameter.\n    Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_BM25_K1`.\n    Defaults to 0.9.\n    Defaults to ``0.9``.\nbm25_b : float, optional\n    BM25 b parameter.\n    Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_BM25_B`.\n    Defaults to 0.4.\n    Defaults to ``0.4``.\nsplade_index_dir : str, optional\n    SPLADE index directory path.\n    Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_SPLADE_INDEX_DIR`.\n    Defaults to './_indices/splade_impact'.\n    Defaults to ``'./_indices/splade_impact'``.\nsplade_query_encoder : str, optional\n    SPLADE query encoder model name.\n    Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_SPLADE_QUERY_ENCODER`.\n    Defaults to 'naver/splade-v3-distilbert'.\n    Defaults to ``'naver/splade-v3-distilbert'``.",
+      "properties": {
+        "bm25_b": {
+          "default": 0.4,
+          "description": "BM25 b parameter",
+          "title": "Bm25 B",
+          "type": "number"
+        },
+        "bm25_index_dir": {
+          "default": "./_indices/bm25",
+          "description": "BM25 index directory path",
+          "title": "Bm25 Index Dir",
+          "type": "string"
+        },
+        "bm25_k1": {
+          "default": 0.9,
+          "description": "BM25 k1 parameter",
+          "title": "Bm25 K1",
+          "type": "number"
+        },
+        "splade_index_dir": {
+          "default": "./_indices/splade_impact",
+          "description": "SPLADE index directory path",
+          "title": "Splade Index Dir",
+          "type": "string"
+        },
+        "splade_query_encoder": {
+          "default": "naver/splade-v3-distilbert",
+          "description": "SPLADE query encoder model name",
+          "title": "Splade Query Encoder",
+          "type": "string"
+        }
+      },
+      "title": "SparseEmbeddingConfig",
+      "type": "object"
+    }
+  },
+  "$id": "https://kgfoundry/schemas/kgfoundry.kgfoundry_common.settings.KgFoundrySettings.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Runtime configuration with typed nested models and fail-fast validation.\n\n<!-- auto:docstring-builder v1 -->\n\nThis class loads configuration from environment variables with type validation.\nMissing required fields raise SettingsError with Problem Details metadata.\n\nParameters\n----------\nsearch : SearchConfig, optional\n    Describe ``search``.\n    Defaults to ``<factory>``.\nobservability : ObservabilityConfig, optional\n    Describe ``observability``.\n    Defaults to ``<factory>``.\nsparse_embedding : SparseEmbeddingConfig, optional\n    Describe ``sparse_embedding``.\n    Defaults to ``<factory>``.\nfaiss : FaissConfig, optional\n    Describe ``faiss``.\n    Defaults to ``<factory>``.\n\nEnvironment Variables\n---------------------\nKGFOUNDRY_SEARCH_API_URL : str, optional\n    Search API base URL (required if search features are used).\nKGFOUNDRY_SEARCH_K : int, optional\n    Default number of search results (default: 10).\nKGFOUNDRY_SEARCH_SPARSE_BACKEND : str, optional\n    Sparse backend type ('lucene' or 'pure', default: 'lucene').\nKGFOUNDRY_SPARSE_EMBEDDING_BM25_INDEX_DIR : str, optional\n    BM25 index directory (default: './_indices/bm25').\nKGFOUNDRY_FAISS_GPU : bool, optional\n    Enable FAISS GPU acceleration (default: True).\nKGFOUNDRY_LOG_LEVEL : str, optional\n    Logging level (default: INFO).\nKGFOUNDRY_METRICS_ENABLED : bool, optional\n    Enable Prometheus metrics (default: True).\nKGFOUNDRY_TRACES_ENABLED : bool, optional\n    Enable OpenTelemetry tracing (default: False).\n\nExamples\n--------\n>>> import os\n>>> os.environ[\"KGFOUNDRY_SEARCH_API_URL\"] = \"http://localhost:8000\"\n>>> settings = RuntimeSettings()\n>>> assert settings.search.api_url == \"http://localhost:8000\"\n\nRaises\n------\nSettingsError\n    If required environment variables are missing or invalid.\n    The error includes Problem Details metadata for structured error handling.\n\nNotes\n-----\n- All nested models use `extra=\"forbid\"` to prevent unknown fields\n- Settings are validated at instantiation time (fail-fast)\n- Configuration can be overridden via environment variables or `.env` files",
+  "examples": [
+    {
+      "faiss": null,
+      "observability": null,
+      "search": null,
+      "sparse_embedding": null
+    }
+  ],
+  "properties": {
+    "faiss": {
+      "$ref": "#/$defs/FaissConfig",
+      "description": "FAISS index configuration"
+    },
+    "observability": {
+      "$ref": "#/$defs/ObservabilityConfig",
+      "description": "Observability configuration"
+    },
+    "search": {
+      "$ref": "#/$defs/SearchConfig",
+      "description": "Search service configuration"
+    },
+    "sparse_embedding": {
+      "$ref": "#/$defs/SparseEmbeddingConfig",
+      "description": "Sparse embedding configuration"
+    }
+  },
+  "title": "RuntimeSettings",
+  "type": "object"
+}

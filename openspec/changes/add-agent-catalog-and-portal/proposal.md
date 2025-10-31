@@ -23,7 +23,7 @@ Agents need one stable entry point to discover and navigate all documentation ar
 ### Best-in-class enhancements (included in this change)
 - Catalog enrichments
   - Symbol graph: import and call-graph edges per module/symbol; dependency visualization pointers.
-  - Quality signals: mypy status, ruff rule hits, pydoclint parity, interrogate coverage, doctest outcomes.
+- Quality signals: mypy status, ruff rule hits, pydoclint parity, docstr-coverage results, doctest outcomes.
   - Metrics & provenance: complexity (mccabe), churn, LOC, last_modified, codeowners, stability/deprecation flags.
   - Stable identifiers and anchors: `symbol_id` (content hash of normalized AST) and CST/AST spans with fuzzy remap across line drift.
 
@@ -76,7 +76,7 @@ Agents need one stable entry point to discover and navigate all documentation ar
   - Anchors include `start_line`, `end_line`. Fuzzy remap on link resolve: (1) `symbol_id` match using AST hash; (2) name + arity match; (3) nearest-text search fallback.
 
 - Quality signals
-  - mypy: `ok|error|unknown`; ruff: list of rule codes hit; doc parity: boolean from pydoclint; coverage: docstring coverage from interrogate; doctest: `ok|fail|skip|unknown`.
+  - mypy: `ok|error|unknown`; ruff: list of rule codes hit; doc parity: boolean from pydoclint; coverage: docstring coverage from docstr-coverage; doctest: `ok|fail|skip|unknown`.
   - Complexity: mccabe; churn: last-N commit count; last_modified: ISO timestamp; stability: `experimental|stable|internal`; deprecated: boolean.
 
 - Semantic index

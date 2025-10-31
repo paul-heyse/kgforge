@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -23,11 +24,14 @@ def test_apply_runs_all_migrations(tmp_path: Path) -> None:
 
     connection = duckdb_helpers.connect(db_path, read_only=True)
     try:
-        rows = duckdb_helpers.fetch_all(
-            connection,
-            "SELECT id FROM alpha",
-            operation="tests.registry.migrate_fetch",
-            require_parameterized=False,
+        rows = cast(
+            list[tuple[int]],
+            duckdb_helpers.fetch_all(
+                connection,
+                "SELECT id FROM alpha",
+                operation="tests.registry.migrate_fetch",
+                require_parameterized=False,
+            ),
         )
     finally:
         connection.close()

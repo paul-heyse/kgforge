@@ -15,12 +15,15 @@ import time
 from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
 from pprint import pformat
-from typing import Any
+from typing import Any, cast
 
-from tools._shared.logging import get_logger
-from tools._shared.problem_details import build_problem_details
-from tools.navmap.cli_envelope import (
-    build_cli_envelope_skeleton,
+from tools import (
+    CliEnvelope,
+    CliEnvelopeBuilder,
+    CliErrorStatus,
+    CliFileStatus,
+    build_problem_details,
+    get_logger,
     render_cli_envelope,
     validate_cli_envelope,
 )
@@ -31,11 +34,14 @@ REPO = Path(__file__).resolve().parents[2]
 SRC = REPO / "src"
 
 try:
-    from tools.navmap.build_navmap import ModuleInfo, _collect_module
+    import tools.navmap.build_navmap as _navmap_builder
 except ModuleNotFoundError:  # pragma: no cover - fallback for direct execution
     if str(REPO) not in sys.path:
         sys.path.insert(0, str(REPO))
-    from tools.navmap.build_navmap import ModuleInfo, _collect_module
+    import tools.navmap.build_navmap as _navmap_builder
+
+ModuleInfo = _navmap_builder.ModuleInfo
+_collect_module = _navmap_builder._collect_module
 
 
 def _collect_modules(root: Path) -> list[ModuleInfo]:
@@ -444,7 +450,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def _build_json_envelope(
     messages: list[str], duration: float, has_issues: bool, apply: bool
-) -> dict[str, Any]:
+) -> CliEnvelope:
     """Build CLI envelope JSON payload for repair results.
 
     Parameters
@@ -457,46 +463,51 @@ def _build_json_envelope(
         Whether any issues were detected.
     apply : bool
         Whether fixes were applied.
-
-    Returns
-    -------
-    dict[str, Any]
-        CLI envelope payload.
     """
-    envelope = build_cli_envelope_skeleton("violation" if has_issues else "success")
-    envelope["durationSeconds"] = duration
-    envelope["command"] = "repair_navmaps"
-    envelope["subcommand"] = "repair"
+    builder = CliEnvelopeBuilder.create(
+        command="repair_navmaps",
+        status="violation" if has_issues else "success",
+        subcommand="repair",
+    )
 
     if has_issues:
-        # Parse messages to extract file paths and details
-        file_results: list[dict[str, Any]] = []
-        error_entries: list[dict[str, Any]] = []
         for msg in messages:
             if ": " in msg:
                 file_path, detail = msg.split(": ", 1)
-                file_results.append({"path": file_path, "status": "violation", "message": detail})
-                error_entries.append({"file": file_path, "status": "violation", "message": detail})
+                builder.add_file(
+                    path=file_path,
+                    status=cast(CliFileStatus, "violation"),
+                    message=detail,
+                )
+                builder.add_error(
+                    status=cast(CliErrorStatus, "violation"),
+                    message=detail,
+                    file=file_path,
+                )
             else:
-                error_entries.append({"status": "violation", "message": msg})
-
-        envelope["files"] = file_results
-        envelope["errors"] = error_entries
+                builder.add_error(
+                    status=cast(CliErrorStatus, "violation"),
+                    message=msg,
+                )
 
         if not apply:
-            envelope["problem"] = build_problem_details(
-                type="https://kgfoundry.dev/problems/navmap-repair-needed",
-                title="Navmap repair needed",
-                status=422,
-                detail=f"Found {len(messages)} issue(s) requiring repair. Re-run with --apply to write fixes.",
-                instance="urn:navmap:repair:issues-detected",
-                extensions={"issue_count": len(messages), "apply_required": True},
+            builder.set_problem(
+                build_problem_details(
+                    type="https://kgfoundry.dev/problems/navmap-repair-needed",
+                    title="Navmap repair needed",
+                    status=422,
+                    detail=(
+                        f"Found {len(messages)} issue(s) requiring repair. Re-run with --apply to write fixes."
+                    ),
+                    instance="urn:navmap:repair:issues-detected",
+                    extensions={"issue_count": len(messages), "apply_required": True},
+                )
             )
 
-    return envelope
+    return builder.finish(duration_seconds=duration)
 
 
-def _build_error_envelope(exc: Exception, duration: float) -> dict[str, Any]:
+def _build_error_envelope(exc: Exception, duration: float) -> CliEnvelope:
     """Build CLI envelope JSON payload for error cases.
 
     Parameters
@@ -505,26 +516,25 @@ def _build_error_envelope(exc: Exception, duration: float) -> dict[str, Any]:
         Exception that occurred.
     duration : float
         Operation duration in seconds.
-
-    Returns
-    -------
-    dict[str, Any]
-        CLI envelope payload with error details.
     """
-    envelope = build_cli_envelope_skeleton("error")
-    envelope["durationSeconds"] = duration
-    envelope["command"] = "repair_navmaps"
-    envelope["subcommand"] = "repair"
-    envelope["errors"] = [{"status": "error", "message": str(exc)}]
-    envelope["problem"] = build_problem_details(
-        type="https://kgfoundry.dev/problems/navmap-repair-error",
-        title="Navmap repair failed",
-        status=500,
-        detail=str(exc),
-        instance="urn:navmap:repair:error",
-        extensions={"exception_type": exc.__class__.__name__},
+    builder = CliEnvelopeBuilder.create(
+        command="repair_navmaps", status="error", subcommand="repair"
     )
-    return envelope
+    builder.add_error(
+        status=cast(CliErrorStatus, "error"),
+        message=str(exc),
+    )
+    builder.set_problem(
+        build_problem_details(
+            type="https://kgfoundry.dev/problems/navmap-repair-error",
+            title="Navmap repair failed",
+            status=500,
+            detail=str(exc),
+            instance="urn:navmap:repair:error",
+            extensions={"exception_type": exc.__class__.__name__},
+        )
+    )
+    return builder.finish(duration_seconds=duration)
 
 
 def main(argv: list[str] | None = None) -> int:

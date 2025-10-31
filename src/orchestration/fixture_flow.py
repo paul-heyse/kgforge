@@ -66,12 +66,11 @@ def _t_prepare_dirs_impl(root: str) -> dict[str, bool]:
     root : str
         Describe ``root``.
 
-
     Returns
     -------
     dict[str, bool]
         Describe return value.
-    """
+"""
     path = Path(root)
     (path / "parquet" / "dense").mkdir(parents=True, exist_ok=True)
     (path / "parquet" / "sparse").mkdir(parents=True, exist_ok=True)
@@ -97,12 +96,11 @@ def _t_write_fixture_chunks_impl(chunks_root: str) -> tuple[str, int]:
     chunks_root : str
         Describe ``chunks_root``.
 
-
     Returns
     -------
     tuple[str, int]
         Describe return value.
-    """
+"""
     writer = ParquetChunkWriter(chunks_root, model="docling_hybrid", run_id="fixture")
     rows = [
         {
@@ -138,12 +136,11 @@ def _t_write_fixture_dense_impl(dense_root: str) -> tuple[str, int]:
     dense_root : str
         Describe ``dense_root``.
 
-
     Returns
     -------
     tuple[str, int]
         Describe return value.
-    """
+"""
     writer = ParquetVectorWriter(dense_root)
     vector = [0.0] * 2560
     out_root = writer.write_dense(
@@ -169,12 +166,11 @@ def _t_write_fixture_splade_impl(sparse_root: str) -> tuple[str, int]:
     sparse_root : str
         Describe ``sparse_root``.
 
-
     Returns
     -------
     tuple[str, int]
         Describe return value.
-    """
+"""
     writer = ParquetVectorWriter(sparse_root)
     out_root = writer.write_splade(
         "SPLADE-v3-distilbert",
@@ -213,12 +209,11 @@ def _t_register_in_duckdb_impl(
     sparse_info : tuple[str, int]
         Describe ``sparse_info``.
 
-
     Returns
     -------
     dict[str, list[str]]
         Describe return value.
-    """
+"""
     registry = DuckDBRegistryHelper(db_path)
     dense_run = registry.new_run("dense_embed", "Qwen3-Embedding-4B", "main", {"dim": 2560})
     sparse_run = registry.new_run("splade_encode", "SPLADE-v3-distilbert", "main", {"topk": 256})
@@ -279,12 +274,11 @@ def _fixture_pipeline_impl(
         Describe ``db_path``.
         Defaults to ``'/data/catalog/catalog.duckdb'``.
 
-
     Returns
     -------
     dict[str, list[str]]
         Describe return value.
-    """
+"""
     t_prepare_dirs(root)
     chunks_info = t_write_fixture_chunks(f"{root}/parquet/chunks")
     dense_info = t_write_fixture_dense(f"{root}/parquet/dense")

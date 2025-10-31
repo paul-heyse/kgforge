@@ -422,7 +422,7 @@ dependencies = [
     "libcst>=1.4.0",
     "doq", # generate docstring skeletons
     "pyment", # fill/convert to preferred style (Google/NumPy/reST)
-    "interrogate", # enforce docstring coverage
+    "docstr-coverage>=2.3.2", # enforce docstring coverage
     "pydoclint>=0.4.0", # enforce numpy-style parameter/return parity
     "pydocstyle", # PEP-257 lint
     "docformatter", # format docstrings
@@ -583,9 +583,10 @@ select = [
     "T20",
     "PLW",
     "PLC",
+    #"DOC",
 ]
 ignore = ["Q", "E203", "D203", "D213", "D205"]
-preview = false
+preview = true
 extend-select = ["RUF100", "D401", "D417"]
 
 [tool.ruff.lint.mccabe]
@@ -768,8 +769,6 @@ coverage-threshold = 0.9
 coverage-action = "error"
 missing-params-action = "error"
 missing-returns-action = "error"
-require-parameters = true
-require-returns = true
 
 [dependency-groups]
 dev = [

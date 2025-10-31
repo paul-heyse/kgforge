@@ -1265,7 +1265,7 @@ def hybrid_search(query: str, k: int) -> list[dict]:
 
 ### B19. Code quality & governance
 
-* **Pre‑commit**: `ruff`, `black`, `mypy --strict`, `pyupgrade`, `interrogate` (docstring coverage).
+* **Pre-commit**: `ruff`, `black`, `mypy --strict`, `pyupgrade`, `docstr-coverage` (docstring coverage).
 * **Type discipline**: `from __future__ import annotations`, Protocol/ABC for interfaces, `Final` constants.
 * **Docs**: `mkdocs` site with API docs (pdoc or mkdocstrings), how‑to guides, and ADRs (`/docs/adr/0001-...md`).
 * **Conventional commits** and **semantic versioning** per package.

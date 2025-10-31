@@ -1,0 +1,30 @@
+{
+  "$id": "https://kgfoundry/schemas/kgfoundry.agent_catalog.models.ModuleGraphModel.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Graph adjacency lists for a module.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nimports : list[str], optional\n    Describe ``imports``.\n    Defaults to ``<factory>``.\ncalls : list[dict[str, object]], optional\n    Describe ``calls``.\n    Defaults to ``<factory>``.",
+  "examples": [
+    {
+      "calls": null,
+      "imports": null
+    }
+  ],
+  "properties": {
+    "calls": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Calls",
+      "type": "array"
+    },
+    "imports": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Imports",
+      "type": "array"
+    }
+  },
+  "title": "ModuleGraphModel",
+  "type": "object"
+}

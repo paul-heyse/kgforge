@@ -19,7 +19,8 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
-from tools._shared.logging import get_logger
+from tools._shared.logging import get_logger, with_fields
+from tools._shared.proc import ToolExecutionError, run_tool
 
 LOGGER = get_logger(__name__)
 
@@ -92,7 +93,7 @@ def _rel(p: Path) -> str:
     """
     try:
         return str(p.relative_to(ROOT))
-    except Exception:
+    except ValueError:
         return str(p)
 
 
@@ -116,13 +117,12 @@ def _sha() -> str:
     """
     if G_SHA:
         return G_SHA
+    log_adapter = with_fields(LOGGER, command=["git", "rev-parse", "HEAD"])
     try:
-        import subprocess
-
-        return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=str(ROOT), text=True
-        ).strip()
-    except Exception:
+        result = run_tool(["git", "rev-parse", "HEAD"], cwd=ROOT, timeout=10.0)
+        return result.stdout.strip() or "HEAD"
+    except ToolExecutionError as exc:
+        log_adapter.debug("Unable to resolve git SHA: %s", exc)
         return "HEAD"
 
 
@@ -266,7 +266,10 @@ def load_policy() -> dict[str, Any]:
         if not isinstance(overrides, dict):
             return DEFAULT_POLICY
         return _deep_merge_dicts(DEFAULT_POLICY, overrides)
-    except Exception:
+    except (OSError, yaml.YAMLError) as exc:  # type: ignore[attr-defined]
+        with_fields(LOGGER, policy_path=str(POLICY_PATH)).warning(
+            "Failed to load observability policy: %s", exc
+        )
         return DEFAULT_POLICY
 
 
@@ -388,7 +391,8 @@ def _keywords_map(node: ast.Call, text: str) -> dict[str, Any]:
             continue
         try:
             vsrc = ast.get_source_segment(text, kw.value) or ""
-        except Exception:
+        except (OSError, TypeError, ValueError) as exc:
+            with_fields(LOGGER, keyword=k).debug("Unable to read source segment: %s", exc)
             vsrc = ""
         out[k] = vsrc.strip()
     return out
@@ -938,7 +942,10 @@ def _load_runbooks(policy: dict[str, Any]) -> dict[str, str]:
 
     try:
         tax_data = json.loads(tax_path.read_text(encoding="utf-8"))
-    except Exception:
+    except (json.JSONDecodeError, OSError) as exc:
+        with_fields(LOGGER, taxonomy=str(tax_path)).warning(
+            "Failed to load error taxonomy JSON: %s", exc
+        )
         return {}
     if not isinstance(tax_data, dict):
         return {}

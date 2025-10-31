@@ -54,13 +54,11 @@ def canonicalize_text(blocks: list[str]) -> str:
     blocks : list[str]
         Describe `blocks`.
 
-
-
     Returns
     -------
     str
         Describe return value.
-    """
+"""
 
     def norm(s: str) -> str:
         """Compute norm.

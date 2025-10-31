@@ -43,10 +43,10 @@ __navmap__: Final[NavMap] = {
 class ConceptMeta(TypedDict):
     """Describe ConceptMeta.
 
-    <!-- auto:docstring-builder v1 -->
+    &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
+"""
 
     label: str
     keywords: list[str]
@@ -77,12 +77,11 @@ def detect_query_concepts(query: str) -> set[str]:
     query : str
         Describe ``query``.
 
-
     Returns
     -------
     set[str]
         Describe return value.
-    """
+"""
     lowered = query.lower()
     hits: set[str] = set()
     for concept_id, meta in CONCEPTS.items():
@@ -104,12 +103,11 @@ def linked_concepts_for_text(text: str) -> list[str]:
     text : str
         Describe ``text``.
 
-
     Returns
     -------
     list[str]
         Describe return value.
-    """
+"""
     lowered = text.lower()
     hits = []
     for concept_id, meta in CONCEPTS.items():
@@ -144,11 +142,10 @@ def kg_boost(
         Describe ``one_hop``.
         Defaults to ``0.04``.
 
-
     Returns
     -------
     float
         Describe return value.
-    """
+"""
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

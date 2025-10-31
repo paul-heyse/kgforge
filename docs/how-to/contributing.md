@@ -68,7 +68,7 @@ The following tools run automatically in CI and via `pre-commit`:
 
 - `pydoclint --style numpy src` enforces parameter/return parity
 - `pydocstyle` checks NumPy docstring formatting
-- `interrogate -i src --fail-under 90` maintains 90% coverage
+- `docstr-coverage --fail-under 90 src` maintains 90% coverage
 - `python tools/update_navmaps.py` aborts if any docstring still contains `NavMap:`
 
 Run these locally before pushing:

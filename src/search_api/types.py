@@ -95,6 +95,8 @@ from search operations alongside distance/similarity scores.
 class FaissIndexProtocol(Protocol):
     """Protocol for FAISS-compatible vector indexes.
 
+    <!-- auto:docstring-builder v1 -->
+
     This protocol defines the minimum interface required for vector search
     operations. Implementations may support additional features (GPU acceleration,
     quantization, etc.) but must satisfy these core methods.
@@ -108,6 +110,13 @@ class FaissIndexProtocol(Protocol):
     - Index operations are not thread-safe; serialize access from multiple threads
     - GPU indexes may block the calling thread during kernel execution
     - For async code, run index operations in thread pools to avoid blocking
+
+    Parameters
+    ----------
+    *args : inspect._empty
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
 
     Examples
     --------
@@ -126,14 +135,21 @@ class FaissIndexProtocol(Protocol):
     ...         distances = np.take_along_axis(scores, indices, axis=1)
     ...         return distances.astype(np.float32), indices.astype(np.int64)
     >>> idx: FaissIndexProtocol = SimpleIndex()
-    """
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+"""
 
     def add(self, vectors: VectorArray) -> None:
         """Add vectors to the index.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
-        vectors : VectorArray
+        vectors : tuple[int, ...] | np.float32
             Array of shape (n_vectors, dimension) with float32 dtype.
             Vectors should be normalized to unit length for inner-product search.
 
@@ -143,15 +159,17 @@ class FaissIndexProtocol(Protocol):
             If index has not been trained (for trainable indexes).
         ValueError
             If vector dimensions do not match index configuration.
-        """
+"""
         ...
 
     def search(self, vectors: VectorArray, k: int) -> tuple[NDArray[np.float32], NDArray[np.int64]]:
         """Search for nearest neighbors.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
-        vectors : VectorArray
+        vectors : tuple[int, ...] | np.float32
             Query vectors of shape (n_queries, dimension) with float32 dtype.
             Must be normalized to unit length for inner-product search.
         k : int
@@ -159,7 +177,7 @@ class FaissIndexProtocol(Protocol):
 
         Returns
         -------
-        tuple[NDArray[np.float32], NDArray[np.int64]
+        tuple[tuple[int, ...] | np.float32, tuple[int, ...] | np.int64]
             Tuple of (distances, indices) where:
             - distances: shape (n_queries, k) with similarity scores (higher is better for IP)
             - indices: shape (n_queries, k) with vector indices in the index
@@ -169,18 +187,20 @@ class FaissIndexProtocol(Protocol):
         - For inner-product metrics, higher scores indicate better matches
         - Invalid indices (no match) are typically represented as -1
         - Search performance depends on index type (exact vs approximate)
-        """
+"""
         ...
 
     def train(self, vectors: VectorArray) -> None:
         """Train the index with sample vectors (optional method).
+
+        <!-- auto:docstring-builder v1 -->
 
         Some FAISS indexes (e.g., quantized indexes) require training before
         adding vectors. This method is optional - not all indexes support it.
 
         Parameters
         ----------
-        vectors : VectorArray
+        vectors : tuple[int, ...] | np.float32
             Training vectors of shape (n_train, dimension) with float32 dtype.
 
         Notes
@@ -188,36 +208,47 @@ class FaissIndexProtocol(Protocol):
         - Flat indexes (exact search) do not require training
         - Quantized indexes (IVF, PQ) require training before add()
         - Calling train() on a non-trainable index is a no-op
-        """
+"""
         ...
 
     def add_with_ids(self, vectors: VectorArray, ids: IndexArray) -> None:
         """Add vectors with explicit IDs (optional method).
+
+        <!-- auto:docstring-builder v1 -->
 
         Some FAISS indexes support adding vectors with explicit IDs rather than
         sequential indices. This method is optional - not all indexes support it.
 
         Parameters
         ----------
-        vectors : VectorArray
+        vectors : tuple[int, ...] | np.float32
             Vectors to add, shape (n_vectors, dimension) with float32 dtype.
-        ids : IndexArray
+        ids : tuple[int, ...] | np.int64
             Explicit IDs for each vector, shape (n_vectors,) with int64 dtype.
 
         Notes
         -----
         - IndexIDMap2 wrapper enables add_with_ids for any base index
         - If not supported, use add() which assigns sequential IDs
-        """
+"""
         ...
 
 
 class FaissModuleProtocol(Protocol):
     """Protocol for FAISS module surface used by adapters.
 
+    <!-- auto:docstring-builder v1 -->
+
     This protocol describes the subset of FAISS API used by kgfoundry
     adapters. It enables type checking and allows fallback implementations
     (e.g., `_SimpleFaissModule`) to satisfy the protocol.
+
+    Parameters
+    ----------
+    *args : inspect._empty
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
 
     Examples
     --------
@@ -230,7 +261,12 @@ class FaissModuleProtocol(Protocol):
     ...     def read_index(self, path: str) -> FaissIndexProtocol: ...
     ...     def normalize_L2(self, vectors: VectorArray) -> None: ...
     >>> module: FaissModuleProtocol = MockFaissModule()
-    """
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+"""
 
     METRIC_INNER_PRODUCT: int
     """Constant for inner-product metric (used with index_factory)."""
@@ -240,6 +276,8 @@ class FaissModuleProtocol(Protocol):
 
     def IndexFlatIP(self, dimension: int) -> FaissIndexProtocol:  # noqa: N802
         """Create a flat inner-product index.
+
+        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
@@ -256,11 +294,13 @@ class FaissModuleProtocol(Protocol):
         - Flat indexes provide exact search but are slower for large datasets
         - Suitable for small-to-medium corpora (< 1M vectors)
         - No training required before adding vectors
-        """
+"""
         ...
 
     def index_factory(self, dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
         """Create an index from a factory string.
+
+        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
@@ -280,11 +320,13 @@ class FaissModuleProtocol(Protocol):
         --------
         >>> # Create quantized index for large-scale search
         >>> index = faiss.index_factory(2560, "OPQ64,IVF8192,PQ64", faiss.METRIC_INNER_PRODUCT)
-        """
+"""
         ...
 
     def IndexIDMap2(self, index: FaissIndexProtocol) -> FaissIndexProtocol:  # noqa: N802
         """Wrap an index with 64-bit ID mapping.
+
+        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
@@ -300,11 +342,13 @@ class FaissModuleProtocol(Protocol):
         -----
         - Use IndexIDMap2 for large corpora requiring 64-bit IDs
         - Wrapped index supports add_with_ids(vectors, ids) method
-        """
+"""
         ...
 
     def write_index(self, index: FaissIndexProtocol, path: str) -> None:
         """Persist an index to disk.
+
+        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
@@ -317,11 +361,13 @@ class FaissModuleProtocol(Protocol):
         ------
         OSError
             If the file cannot be written.
-        """
+"""
         ...
 
     def read_index(self, path: str) -> FaissIndexProtocol:
         """Load an index from disk.
+
+        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
@@ -339,15 +385,17 @@ class FaissModuleProtocol(Protocol):
             If the index file does not exist.
         OSError
             If the file cannot be read or is corrupted.
-        """
+"""
         ...
 
     def normalize_L2(self, vectors: VectorArray) -> None:  # noqa: N802
         """Normalize vectors to unit length in-place.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
-        vectors : VectorArray
+        vectors : tuple[int, ...] | np.float32
             Array to normalize (modified in-place).
 
         Notes
@@ -355,12 +403,14 @@ class FaissModuleProtocol(Protocol):
         - Normalization is required for inner-product search
         - Operation is destructive (modifies input array)
         - Zero vectors are handled gracefully (no division by zero)
-        """
+"""
         ...
 
 
 class GpuResourcesProtocol(Protocol):
     """Protocol for FAISS GPU resources.
+
+    <!-- auto:docstring-builder v1 -->
 
     This protocol describes the StandardGpuResources interface used for GPU
     index operations. Implementations manage GPU memory and resources.
@@ -372,18 +422,30 @@ class GpuResourcesProtocol(Protocol):
     ...     def __init__(self) -> None:
     ...         pass
     >>> resources: GpuResourcesProtocol = MockGpuResources()
-    """
+"""
 
     def __init__(self) -> None:
-        """Initialize GPU resources."""
+        """Initialize GPU resources.
+
+        <!-- auto:docstring-builder v1 -->
+"""
         ...
 
 
 class GpuClonerOptionsProtocol(Protocol):
     """Protocol for FAISS GPU cloner options.
 
+    <!-- auto:docstring-builder v1 -->
+
     This protocol describes the GpuClonerOptions interface used when cloning
     CPU indexes to GPU. The `use_cuvs` attribute controls cuVS acceleration.
+
+    Parameters
+    ----------
+    *args : inspect._empty
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
 
     Examples
     --------
@@ -392,7 +454,12 @@ class GpuClonerOptionsProtocol(Protocol):
     ...     use_cuvs: bool = False
     >>> options: GpuClonerOptionsProtocol = MockGpuClonerOptions()
     >>> options.use_cuvs = True
-    """
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+"""
 
     use_cuvs: bool
     """Enable cuVS acceleration for GPU operations (default: False)."""
@@ -402,9 +469,22 @@ class GpuClonerOptionsProtocol(Protocol):
 class VectorSearchResult:
     """Typed result from vector search operations.
 
+    <!-- auto:docstring-builder v1 -->
+
     This dataclass represents a single search result with typed fields
     and performance metadata. Results are immutable to prevent accidental
     modification.
+
+    Parameters
+    ----------
+    doc_id : str
+        Describe ``doc_id``.
+    chunk_id : str
+        Describe ``chunk_id``.
+    score : float
+        Describe ``score``.
+    vector_score : float
+        Describe ``vector_score``.
 
     Examples
     --------
@@ -416,7 +496,7 @@ class VectorSearchResult:
     ...     vector_score=0.95,
     ... )
     >>> assert result.score == 0.95
-    """
+"""
 
     doc_id: str
     """Document identifier (URN format)."""
@@ -433,9 +513,11 @@ class VectorSearchResult:
     def __post_init__(self) -> None:
         """Validate result fields.
 
+        <!-- auto:docstring-builder v1 -->
+
         This method is called automatically by dataclass after initialization.
         In frozen dataclasses, we can't modify fields, so validation is limited.
-        """
+"""
         # Dataclass types are enforced at construction time, so runtime validation
         # is primarily for documentation. The type checker ensures correct usage.
 
@@ -443,9 +525,18 @@ class VectorSearchResult:
 class SpladeEncoderProtocol(Protocol):
     """Protocol for SPLADE encoder implementations.
 
+    <!-- auto:docstring-builder v1 -->
+
     SPLADE (Sparse Lexical and Expansion) encoders transform text into
     sparse vector representations suitable for semantic search. This protocol
     defines the interface required for SPLADE-based search operations.
+
+    Parameters
+    ----------
+    *args : inspect._empty
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
 
     Examples
     --------
@@ -458,19 +549,26 @@ class SpladeEncoderProtocol(Protocol):
     >>> encoder: SpladeEncoderProtocol = MySpladeEncoder()
     >>> vecs = encoder.encode(["query text"])
     >>> assert vecs.shape[0] == 1
-    """
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+"""
 
     def encode(self, texts: Sequence[str]) -> VectorArray:
         """Encode text sequences into sparse vector representations.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
-        texts : Sequence[str]
+        texts : str
             Input text sequences to encode.
 
         Returns
         -------
-        VectorArray
+        tuple[int, ...] | np.float32
             Sparse vector array of shape (len(texts), vocab_size) with float32 dtype.
             Vectors are typically sparse (many zeros) and represent term importance.
 
@@ -480,16 +578,25 @@ class SpladeEncoderProtocol(Protocol):
             If the encoder model fails to load or encode.
         ValueError
             If input texts are invalid or exceed maximum sequence length.
-        """
+"""
         ...
 
 
 class BM25IndexProtocol(Protocol):
     """Protocol for BM25 lexical search index implementations.
 
+    <!-- auto:docstring-builder v1 -->
+
     BM25 indexes provide term-frequency based lexical search over document
     collections. This protocol defines the interface required for BM25-based
     search operations.
+
+    Parameters
+    ----------
+    *args : inspect._empty
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
 
     Examples
     --------
@@ -501,10 +608,17 @@ class BM25IndexProtocol(Protocol):
     >>> index: BM25IndexProtocol = MyBM25Index()
     >>> results = index.search("search query", k=5)
     >>> assert len(results) <= 5
-    """
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+"""
 
     def search(self, query: str, k: int = 10) -> list[tuple[str, float]]:
         """Search the index for documents matching the query.
+
+        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
@@ -526,7 +640,7 @@ class BM25IndexProtocol(Protocol):
             If the index has not been built or loaded.
         ValueError
             If the query is empty or invalid.
-        """
+"""
         ...
 
 
@@ -534,9 +648,25 @@ class BM25IndexProtocol(Protocol):
 class AgentSearchQuery:
     """Query parameters for agent catalog search operations.
 
+    <!-- auto:docstring-builder v1 -->
+
     This dataclass represents a search query with typed fields for query text,
     result count, filtering facets, and explanation flags. All fields are
     validated at construction time.
+
+    Parameters
+    ----------
+    query : str
+        Describe ``query``.
+    k : int, optional
+        Describe ``k``.
+        Defaults to ``10``.
+    facets : str | str | NoneType, optional
+        Describe ``facets``.
+        Defaults to ``None``.
+    explain : bool, optional
+        Describe ``explain``.
+        Defaults to ``False``.
 
     Examples
     --------
@@ -549,7 +679,7 @@ class AgentSearchQuery:
     ... )
     >>> assert query.k == 10
     >>> assert query.facets["package"] == "search_api"
-    """
+"""
 
     query: str
     """Search query text (tokenized and normalized internally)."""
@@ -577,11 +707,13 @@ class AgentSearchQuery:
     def __post_init__(self) -> None:
         """Validate query parameters.
 
+        <!-- auto:docstring-builder v1 -->
+
         Raises
         ------
         ValueError
             If query is empty or k is not positive.
-        """
+"""
         if not self.query.strip():
             msg = "Query text cannot be empty"
             raise ValueError(msg)
@@ -591,28 +723,12 @@ class AgentSearchQuery:
 
 
 class VectorSearchResultTypedDict(TypedDict, total=True):
-    """TypedDict for agent search result entries.
+    """Describe VectorSearchResultTypedDict.
 
-    This TypedDict represents a single search result with all metadata fields
-    required for agent catalog search. It provides runtime type checking
-    and JSON serialization compatibility.
+    &lt;!-- auto:docstring-builder v1 --&gt;
 
-    Examples
-    --------
-    >>> from kgfoundry.search_api.types import VectorSearchResultTypedDict
-    >>> result: VectorSearchResultTypedDict = {
-    ...     "symbol_id": "py:search_api.types.FaissIndexProtocol",
-    ...     "score": 0.95,
-    ...     "lexical_score": 0.8,
-    ...     "vector_score": 0.9,
-    ...     "package": "search_api",
-    ...     "module": "types",
-    ...     "qname": "FaissIndexProtocol",
-    ...     "kind": "class",
-    ...     "anchor": {"start_line": 78, "end_line": 156},
-    ...     "metadata": {},
-    ... }
-    """
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+"""
 
     symbol_id: str
     """Fully qualified symbol identifier (e.g., 'py:module.Class.method')."""
@@ -646,36 +762,12 @@ class VectorSearchResultTypedDict(TypedDict, total=True):
 
 
 class AgentSearchResponse(TypedDict, total=True):
-    """TypedDict for agent catalog search response envelope.
+    """Describe AgentSearchResponse.
 
-    This TypedDict represents the complete response from an agent catalog
-    search operation, including results, metadata, and performance metrics.
-    It provides runtime type checking and JSON serialization compatibility.
+    &lt;!-- auto:docstring-builder v1 --&gt;
 
-    Examples
-    --------
-    >>> from kgfoundry.search_api.types import AgentSearchResponse, VectorSearchResultTypedDict
-    >>> response: AgentSearchResponse = {
-    ...     "results": [
-    ...         {
-    ...             "symbol_id": "py:search_api.types.FaissIndexProtocol",
-    ...             "score": 0.95,
-    ...             "lexical_score": 0.8,
-    ...             "vector_score": 0.9,
-    ...             "package": "search_api",
-    ...             "module": "types",
-    ...             "qname": "FaissIndexProtocol",
-    ...             "kind": "class",
-    ...             "anchor": {"start_line": 78},
-    ...             "metadata": {},
-    ...         }
-    ...     ],
-    ...     "total": 1,
-    ...     "took_ms": 42,
-    ...     "metadata": {"alpha": 0.7, "backend": "faiss"},
-    ... }
-    >>> assert len(response["results"]) == response["total"]
-    """
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+"""
 
     results: list[VectorSearchResultTypedDict]
     """List of search results, sorted by score descending."""

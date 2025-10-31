@@ -115,14 +115,40 @@ register_problem_details_handler(app)
 
 # Correlation ID middleware
 class CorrelationIDMiddleware(BaseHTTPMiddleware):
-    """Middleware to extract and set correlation ID from X-Correlation-ID header."""
+    """Middleware to extract and set correlation ID from X-Correlation-ID header.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    app : ASGIApp
+        Describe ``app``.
+    dispatch : DispatchFunction | None, optional
+        Describe ``dispatch``.
+        Defaults to ``None``.
+"""
 
     async def dispatch(
         self,
         request: StarletteRequest,
         call_next: Callable[[StarletteRequest], Awaitable[Response]],
     ) -> Response:
-        """Extract correlation ID from header or generate new one."""
+        """Extract correlation ID from header or generate new one.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        request : StarletteRequest
+            Describe ``request``.
+        call_next : [<class 'starlette.requests.Request'>] | Response
+            Describe ``call_next``.
+
+        Returns
+        -------
+        Response
+            Describe return value.
+"""
         correlation_id = request.headers.get("X-Correlation-ID")
         if not correlation_id:
             correlation_id = str(uuid.uuid4())
@@ -136,9 +162,22 @@ class CorrelationIDMiddleware(BaseHTTPMiddleware):
 class ResponseValidationMiddleware(BaseHTTPMiddleware):
     """Middleware to validate JSON responses against schema (dev/staging only).
 
+    <!-- auto:docstring-builder v1 -->
+
     Validates responses against search_response.json schema when enabled.
     Logs validation failures and returns Problem Details on schema mismatch.
-    """
+
+    Parameters
+    ----------
+    app : FastAPI
+        Describe ``app``.
+    enabled : bool, optional
+        Describe ``enabled``.
+        Defaults to ``False``.
+    schema_path : Path | None, optional
+        Describe ``schema_path``.
+        Defaults to ``None``.
+"""
 
     def __init__(
         self,
@@ -149,6 +188,8 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
     ) -> None:
         """Initialize response validation middleware.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         app : FastAPI
@@ -156,11 +197,13 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
         enabled : bool, optional
             Whether to enable response validation.
             Defaults to False.
-        schema_path : Path | None, optional
+            Defaults to ``False``.
+        schema_path : Path | NoneType, optional
             Path to search_response.json schema file.
             If None, searches for schema/search/search_response.json.
             Defaults to None.
-        """
+            Defaults to ``None``.
+"""
         super().__init__(app)
         self.enabled = enabled
         if schema_path is None:
@@ -189,7 +232,22 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
         request: StarletteRequest,
         call_next: Callable[[StarletteRequest], Awaitable[Response]],
     ) -> Response:
-        """Validate response against schema if enabled."""
+        """Validate response against schema if enabled.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        request : StarletteRequest
+            Describe ``request``.
+        call_next : [<class 'starlette.requests.Request'>] | Response
+            Describe ``call_next``.
+
+        Returns
+        -------
+        Response
+            Describe return value.
+"""
         if not self.enabled or self.schema is None:
             return await call_next(request)
 
@@ -273,6 +331,23 @@ except Exception:
 if settings.search.validate_responses:
     # Create a factory function that returns configured middleware
     def _create_response_validator(app: FastAPI) -> ResponseValidationMiddleware:
+        """Describe  create response validator.
+
+    &lt;!-- auto:docstring-builder v1 --&gt;
+
+    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+
+    Parameters
+    ----------
+    app : FastAPI
+        Configure the app.
+
+
+    Returns
+    -------
+    ResponseValidationMiddleware
+        Describe return value.
+"""
         return ResponseValidationMiddleware(app, enabled=True)
 
     app.middleware("http")(_create_response_validator)
@@ -306,17 +381,20 @@ def auth(
 ) -> None:
     """Validate bearer token authentication.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
-    authorization : str | None, optional
+    authorization : str | NoneType, optional
         Authorization header value (Bearer token).
         Defaults to None.
+        Defaults to ``Header(None)``.
 
     Raises
     ------
     HTTPException
         Returns 401 if token is invalid or missing.
-    """
+"""
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing or invalid Bearer token")
     token = authorization.split(" ", 1)[1]
@@ -328,11 +406,13 @@ def auth(
 def healthz() -> dict[str, str | dict[str, str]]:
     """Health check endpoint.
 
+    <!-- auto:docstring-builder v1 -->
+
     Returns
     -------
     dict[str, str | dict[str, str]]
         Health status with component availability.
-    """
+"""
     return {
         "status": "ok",
         "components": {
@@ -348,6 +428,8 @@ def healthz() -> dict[str, str | dict[str, str]]:
 def search(req: SearchRequest, _: None = Depends(auth)) -> SearchResponse:  # type: ignore[assignment]  # FastAPI Depends marker type
     """Execute hybrid search query.
 
+    <!-- auto:docstring-builder v1 -->
+
     Combines dense (FAISS), sparse (BM25/SPLADE), and knowledge graph signals
     using Reciprocal Rank Fusion and KG boosts. Returns ranked results with
     structured logging and metrics.
@@ -359,6 +441,12 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> SearchResponse:  # ty
     _ : None, optional
         Authentication dependency (Bearer token).
         Defaults to ``Depends(auth)``.
+        Defaults to ``Depends(dependency=<function auth at 0x73d12bcbe020>, use_cache=True)``.
+        Defaults to ``Depends(dependency=<function auth at 0x73a51e5e4c20>, use_cache=True)``.
+        Defaults to ``Depends(dependency=<function auth at 0x7e8041099800>, use_cache=True)``.
+        Defaults to ``Depends(dependency=<function auth at 0x7b8c3c365760>, use_cache=True)``.
+        Defaults to ``Depends(dependency=<function auth at 0x72c0c6f89760>, use_cache=True)``.
+        Defaults to ``Depends(dependency=<function auth at 0x7876585e9760>, use_cache=True)``.
 
     Returns
     -------
@@ -378,7 +466,7 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> SearchResponse:  # ty
     >>> response = search(req, None)
     >>> len(response.results) <= 5
     True
-    """
+"""
     # Correlation ID is set by middleware, use with_fields for structured logging
     with (
         with_fields(logger, operation="search", query=req.query, k=req.k),
@@ -481,18 +569,26 @@ def graph_concepts(
 ) -> dict[str, list[dict[str, str]]]:
     """Retrieve knowledge graph concepts matching query.
 
+    <!-- auto:docstring-builder v1 -->
+
     Returns concepts from the knowledge graph that match the query string.
     Includes structured logging and error handling.
 
     Parameters
     ----------
-    body : Mapping[str, JsonValue]
+    body : str | object
         Request body containing:
         - `q` (str): Query string to match against concept labels.
         - `limit` (int, optional): Maximum number of concepts to return. Defaults to 50.
     _ : None, optional
         Authentication dependency (Bearer token).
         Defaults to ``Depends(auth)``.
+        Defaults to ``Depends(dependency=<function auth at 0x73d12bcbe020>, use_cache=True)``.
+        Defaults to ``Depends(dependency=<function auth at 0x73a51e5e4c20>, use_cache=True)``.
+        Defaults to ``Depends(dependency=<function auth at 0x7e8041099800>, use_cache=True)``.
+        Defaults to ``Depends(dependency=<function auth at 0x7b8c3c365760>, use_cache=True)``.
+        Defaults to ``Depends(dependency=<function auth at 0x72c0c6f89760>, use_cache=True)``.
+        Defaults to ``Depends(dependency=<function auth at 0x7876585e9760>, use_cache=True)``.
 
     Returns
     -------
@@ -511,7 +607,7 @@ def graph_concepts(
     >>> result = graph_concepts({"q": "test", "limit": 10}, None)
     >>> "concepts" in result
     True
-    """
+"""
     with with_fields(logger, operation="graph_concepts") as log_adapter:
         q: str = ""
         try:

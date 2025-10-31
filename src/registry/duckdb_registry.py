@@ -46,15 +46,46 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DuckDBRegistry]
 class DuckDBRegistry:
-    """DuckDB-backed implementation of the registry protocol."""
+    """DuckDB-backed implementation of the registry protocol.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    db_path : str
+        Describe ``db_path``.
+"""
 
     def __init__(self, db_path: str) -> None:
-        """Initialize the registry with a DuckDB database path."""
+        """Initialize the registry with a DuckDB database path.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        db_path : str
+            Describe ``db_path``.
+"""
         self.db_path = db_path
         self.con = duckdb_helpers.connect(db_path, read_only=False)
 
     def begin_dataset(self, kind: str, run_id: str) -> str:
-        """Insert a dataset placeholder row and return its identifier."""
+        """Insert a dataset placeholder row and return its identifier.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        kind : str
+            Describe ``kind``.
+        run_id : str
+            Describe ``run_id``.
+
+        Returns
+        -------
+        str
+            Describe return value.
+"""
         dataset_id = str(uuid.uuid4())
         duckdb_helpers.execute(
             self.con,
@@ -69,7 +100,19 @@ class DuckDBRegistry:
         return dataset_id
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
-        """Update dataset metadata once Parquet artifacts are materialized."""
+        """Update dataset metadata once Parquet artifacts are materialized.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        dataset_id : str
+            Describe ``dataset_id``.
+        parquet_root : str
+            Describe ``parquet_root``.
+        rows : int
+            Describe ``rows``.
+"""
         del rows
         duckdb_helpers.execute(
             self.con,
@@ -79,7 +122,15 @@ class DuckDBRegistry:
         )
 
     def rollback_dataset(self, dataset_id: str) -> None:
-        """Delete a dataset placeholder if the build fails."""
+        """Delete a dataset placeholder if the build fails.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        dataset_id : str
+            Describe ``dataset_id``.
+"""
         duckdb_helpers.execute(
             self.con,
             "DELETE FROM datasets WHERE dataset_id=?",
@@ -94,7 +145,26 @@ class DuckDBRegistry:
         revision: str | None,
         config: Mapping[str, object],
     ) -> str:
-        """Create a run record and return the generated identifier."""
+        """Create a run record and return the generated identifier.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        purpose : str
+            Describe ``purpose``.
+        model_id : str | NoneType
+            Describe ``model_id``.
+        revision : str | NoneType
+            Describe ``revision``.
+        config : str | object
+            Describe ``config``.
+
+        Returns
+        -------
+        str
+            Describe return value.
+"""
         run_id = str(uuid.uuid4())
         duckdb_helpers.execute(
             self.con,
@@ -109,7 +179,20 @@ class DuckDBRegistry:
         return run_id
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
-        """Mark a run as finished and record the completion timestamp."""
+        """Mark a run as finished and record the completion timestamp.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        run_id : str
+            Describe ``run_id``.
+        success : bool
+            Describe ``success``.
+        notes : str | NoneType, optional
+            Describe ``notes``.
+            Defaults to ``None``.
+"""
         _ = success  # placeholder until success flag/notes are persisted
         _ = notes
         duckdb_helpers.execute(
@@ -120,7 +203,15 @@ class DuckDBRegistry:
         )
 
     def register_documents(self, docs: list[Doc]) -> None:
-        """Insert or update document metadata rows."""
+        """Insert or update document metadata rows.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        docs : list[Doc]
+            Describe ``docs``.
+"""
         for doc in docs:
             duckdb_helpers.execute(
                 self.con,
@@ -149,7 +240,15 @@ class DuckDBRegistry:
             )
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
-        """Insert or update doctags asset records."""
+        """Insert or update doctags asset records.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        assets : list[DoctagsAsset]
+            Describe ``assets``.
+"""
         for asset in assets:
             duckdb_helpers.execute(
                 self.con,
@@ -170,7 +269,19 @@ class DuckDBRegistry:
             )
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
-        """Persist an arbitrary pipeline event with structured payload."""
+        """Persist an arbitrary pipeline event with structured payload.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        event_name : str
+            Describe ``event_name``.
+        subject_id : str
+            Describe ``subject_id``.
+        payload : str | object
+            Describe ``payload``.
+"""
         duckdb_helpers.execute(
             self.con,
             (
@@ -183,7 +294,21 @@ class DuckDBRegistry:
         )
 
     def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
-        """Record an incident emitted by registry clients."""
+        """Record an incident emitted by registry clients.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        event : str
+            Describe ``event``.
+        subject_id : str
+            Describe ``subject_id``.
+        error_class : str
+            Describe ``error_class``.
+        message : str
+            Describe ``message``.
+"""
         duckdb_helpers.execute(
             self.con,
             (

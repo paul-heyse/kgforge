@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "span_name": null,
+    "attributes": [
+      "span.set_attribute(key, str(value))"
+    ],
+    "file": "src/kgfoundry_common/observability.py",
+    "lineno": 662,
+    "call": "tracer.start_as_current_span(name)",
+    "source_link": {
+      "editor": "vscode://file/src/kgfoundry_common/observability.py:662:1"
+    }
+  }
+]

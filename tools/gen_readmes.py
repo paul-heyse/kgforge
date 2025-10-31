@@ -13,7 +13,6 @@ import json
 import os
 import re
 import shutil
-import subprocess
 import sys
 import time
 from collections.abc import Mapping, Sequence
@@ -22,11 +21,12 @@ from pathlib import Path
 from typing import Any, Final, Protocol
 from urllib.parse import urlparse
 
+from tools._shared.logging import get_logger, with_fields
+from tools._shared.proc import ToolExecutionError, run_tool
+
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-
-from tools._shared.logging import get_logger
 from tools.griffe_utils import resolve_griffe  # noqa: E402
 
 LOGGER = get_logger(__name__)
@@ -90,11 +90,21 @@ def detect_repo() -> tuple[str, str]:
     the detected values so downstream builds can rehost the docs without
     reconfiguring git remotes.
     """
+    log_adapter = with_fields(LOGGER, command=["git", "config", "--get", "remote.origin.url"])
     try:
-        remote = subprocess.check_output(
-            ["git", "config", "--get", "remote.origin.url"], cwd=ROOT, text=True
-        ).strip()
-    except Exception:
+        result = run_tool(
+            [
+                "git",
+                "config",
+                "--get",
+                "remote.origin.url",
+            ],
+            cwd=ROOT,
+            timeout=10.0,
+        )
+        remote = result.stdout.strip()
+    except ToolExecutionError as exc:
+        log_adapter.debug("Unable to detect git remote: %s", exc)
         remote = ""
 
     override_owner = os.environ.get("DOCS_GITHUB_ORG")
@@ -127,9 +137,12 @@ def git_sha() -> str:
     A ``DOCS_GITHUB_SHA`` environment variable can provide the value when the
     repository is not available locally (for example, in CI artifacts).
     """
+    log_adapter = with_fields(LOGGER, command=["git", "rev-parse", "HEAD"])
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-    except Exception:
+        result = run_tool(["git", "rev-parse", "HEAD"], cwd=ROOT, timeout=10.0)
+        return result.stdout.strip() or os.environ.get("DOCS_GITHUB_SHA", "main")
+    except ToolExecutionError as exc:
+        log_adapter.debug("Unable to resolve git SHA: %s", exc)
         return os.environ.get("DOCS_GITHUB_SHA", "main")
 
 
@@ -252,7 +265,8 @@ def _load_json(path: Path) -> dict[str, Any]:
         return {}
     try:
         return json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+    except (json.JSONDecodeError, OSError) as exc:
+        with_fields(LOGGER, path=str(path)).debug("Failed to load JSON: %s", exc)
         return {}
 
 
@@ -702,17 +716,16 @@ def _maybe_run_doctoc(readme: Path, cfg: Config) -> None:
     if not doctoc:
         LOGGER.info("Info: doctoc not installed; skipping TOC update for %s", readme)
         return
-    result = subprocess.run(
-        [doctoc, str(readme)],
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-    if cfg.verbose:
-        if result.stdout.strip():
-            LOGGER.info("%s", result.stdout.strip())
-        if result.stderr.strip():
-            LOGGER.warning("%s", result.stderr.strip())
+    log_adapter = with_fields(LOGGER, command=[doctoc, str(readme)])
+    try:
+        result = run_tool([doctoc, str(readme)], check=False, timeout=30.0)
+    except ToolExecutionError as exc:
+        log_adapter.warning("docToc invocation failed: %s", exc)
+        return
+    if cfg.verbose and result.stdout.strip():
+        LOGGER.info("%s", result.stdout.strip())
+    if result.stderr.strip():
+        LOGGER.warning("%s", result.stderr.strip())
     if result.returncode != 0:
         LOGGER.warning("Warning: doctoc exited with code %d for %s", result.returncode, readme)
 

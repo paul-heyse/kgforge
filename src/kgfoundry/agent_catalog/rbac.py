@@ -9,7 +9,20 @@ from typing import ClassVar
 
 
 class Role(str, Enum):
-    """Supported access roles for hosted mode."""
+    """Supported access roles for hosted mode.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    *values : inspect._empty
+        Describe ``values``.
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+"""
 
     VIEWER = "viewer"
     CONTRIBUTOR = "contributor"
@@ -18,7 +31,18 @@ class Role(str, Enum):
 
 @dataclass(slots=True)
 class AccessController:
-    """Authorize catalog operations based on the configured role."""
+    """Authorize catalog operations based on the configured role.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    role : Role
+        Describe ``role``.
+    enabled : bool, optional
+        Describe ``enabled``.
+        Defaults to ``False``.
+"""
 
     role: Role
     enabled: bool = False
@@ -65,7 +89,15 @@ class AccessController:
     }
 
     def authorize(self, method: str) -> None:
-        """Raise :class:`PermissionError` if ``method`` is not permitted."""
+        """Raise :class:`PermissionError` if ``method`` is not permitted.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        method : str
+            Describe ``method``.
+"""
         if not self.enabled:
             return
         allowed = self._PERMISSIONS.get(self.role, frozenset())

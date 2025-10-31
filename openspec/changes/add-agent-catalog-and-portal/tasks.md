@@ -46,7 +46,7 @@
         - IDs stable across runs; remap survives ±20-line drift and docstring/formatting churn.
 
 - [x] 2.3 Quality signals and metrics
-    - [x] 2.3.1 Aggregate mypy status, ruff rules, pydoclint parity, interrogate coverage, doctest status.
+- [x] 2.3.1 Aggregate mypy status, ruff rules, pydoclint parity, docstr-coverage results, doctest status.
     - [x] 2.3.2 Compute mccabe complexity, LOC; extract `last_modified` via git; map `codeowners` (if present).
     - AC:
         - Quality/metrics present for sample modules; missing inputs handled gracefully.

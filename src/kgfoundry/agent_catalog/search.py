@@ -36,10 +36,40 @@ WORD_PATTERN = re.compile(r"[A-Za-z0-9_]+")
 
 
 class EmbeddingModelProtocol(Protocol):
-    """Protocol describing the embedding model encode interface."""
+    """Protocol describing the embedding model encode interface.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    *args : inspect._empty
+        Describe ``args``.
+    **kwargs : inspect._empty
+        Describe ``kwargs``.
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+"""
 
     def encode(self, sentences: Sequence[str], **_: object) -> VectorArray:
-        """Return embeddings for the provided sentences."""
+        """Return embeddings for the provided sentences.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        sentences : str
+            Describe ``sentences``.
+        **_ : object
+            Describe ``_``.
+
+        Returns
+        -------
+        tuple[int, ...] | np.float32
+            Describe return value.
+"""
         ...
 
 
@@ -55,7 +85,19 @@ LEXICAL_FIELDS = [
 
 @dataclass(slots=True)
 class SearchConfig:
-    """Configuration used for hybrid search against the catalog."""
+    """Configuration used for hybrid search against the catalog.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    alpha : float
+        Describe ``alpha``.
+    candidate_pool : int
+        Describe ``candidate_pool``.
+    lexical_fields : list[str]
+        Describe ``lexical_fields``.
+"""
 
     alpha: float
     candidate_pool: int
@@ -64,7 +106,31 @@ class SearchConfig:
 
 @dataclass(slots=True)
 class SearchOptions:
-    """Optional tuning parameters for hybrid search."""
+    """Optional tuning parameters for hybrid search.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    alpha : float | NoneType, optional
+        Describe ``alpha``.
+        Defaults to ``None``.
+    facets : str | str | NoneType, optional
+        Describe ``facets``.
+        Defaults to ``None``.
+    candidate_pool : int | NoneType, optional
+        Describe ``candidate_pool``.
+        Defaults to ``None``.
+    model_loader : [<class 'str'>] | EmbeddingModelProtocol | NoneType, optional
+        Describe ``model_loader``.
+        Defaults to ``None``.
+    embedding_model : str | NoneType, optional
+        Describe ``embedding_model``.
+        Defaults to ``None``.
+    batch_size : int | NoneType, optional
+        Describe ``batch_size``.
+        Defaults to ``None``.
+"""
 
     alpha: float | None = None
     facets: Mapping[str, str] | None = None
@@ -76,7 +142,42 @@ class SearchOptions:
 
 @dataclass(slots=True)
 class SearchDocument:
-    """Intermediate representation used to build or query the semantic index."""
+    """Intermediate representation used to build or query the semantic index.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    symbol_id : str
+        Describe ``symbol_id``.
+    package : str
+        Describe ``package``.
+    module : str
+        Describe ``module``.
+    qname : str
+        Describe ``qname``.
+    kind : str
+        Describe ``kind``.
+    stability : str | NoneType
+        Describe ``stability``.
+    deprecated : bool
+        Describe ``deprecated``.
+    summary : str | NoneType
+        Describe ``summary``.
+    docstring : str | NoneType
+        Describe ``docstring``.
+    anchor_start : int | NoneType
+        Describe ``anchor_start``.
+    anchor_end : int | NoneType
+        Describe ``anchor_end``.
+    text : str
+        Describe ``text``.
+    tokens : str
+        Describe ``tokens``.
+    row : int, optional
+        Describe ``row``.
+        Defaults to ``-1``.
+"""
 
     symbol_id: str
     package: str
@@ -96,7 +197,39 @@ class SearchDocument:
 
 @dataclass(slots=True)
 class SearchResult:
-    """Result record returned by hybrid search."""
+    """Result record returned by hybrid search.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    symbol_id : str
+        Describe ``symbol_id``.
+    score : float
+        Describe ``score``.
+    lexical_score : float
+        Describe ``lexical_score``.
+    vector_score : float
+        Describe ``vector_score``.
+    package : str
+        Describe ``package``.
+    module : str
+        Describe ``module``.
+    qname : str
+        Describe ``qname``.
+    kind : str
+        Describe ``kind``.
+    stability : str | NoneType
+        Describe ``stability``.
+    deprecated : bool
+        Describe ``deprecated``.
+    summary : str | NoneType
+        Describe ``summary``.
+    docstring : str | NoneType
+        Describe ``docstring``.
+    anchor : dict[str, int | NoneType]
+        Describe ``anchor``.
+"""
 
     symbol_id: str
     score: float
@@ -115,7 +248,29 @@ class SearchResult:
 
 @dataclass(slots=True)
 class VectorSearchContext:
-    """Data bundle required for computing vector scores."""
+    """Data bundle required for computing vector scores.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    semantic_meta : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
+        Describe ``semantic_meta``.
+    mapping_payload : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
+        Describe ``mapping_payload``.
+    index_path : Path
+        Describe ``index_path``.
+    documents : SearchDocument
+        Describe ``documents``.
+    candidate_limit : int
+        Describe ``candidate_limit``.
+    k : int
+        Describe ``k``.
+    candidate_ids : set[str]
+        Describe ``candidate_ids``.
+    row_to_document : int | SearchDocument
+        Describe ``row_to_document``.
+"""
 
     semantic_meta: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
     mapping_payload: Mapping[
@@ -135,13 +290,52 @@ _FAISS_DEFAULT_MODULES: tuple[str, ...] = ("faiss", "faiss_cpu")
 
 
 class _SimpleFaissIndex(FaissIndexProtocol):
-    """Lightweight FAISS-like index used when the real library is unavailable."""
+    """Lightweight FAISS-like index used when the real library is unavailable.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    dimension : int
+        Describe ``dimension``.
+"""
 
     def __init__(self, dimension: int) -> None:
+        """Document   init  .
+
+        <!-- auto:docstring-builder v1 -->
+
+        &lt;!-- auto:docstring-builder v1 --&gt;
+
+        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+
+        Parameters
+        ----------
+        dimension : int
+            Configure the dimension.
+"""
         self.dimension = dimension
         self._vectors: VectorArray = np.empty((0, dimension), dtype=np.float32)
 
     def add(self, vectors: VectorArray) -> None:
+        """Document add.
+
+        <!-- auto:docstring-builder v1 -->
+
+        &lt;!-- auto:docstring-builder v1 --&gt;
+
+        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+
+        Parameters
+        ----------
+        vectors : tuple[int, ...] | np.float32
+            Configure the vectors.
+
+        Raises
+        ------
+        AgentCatalogSearchError
+            Raised when message.
+"""
         array = np.asarray(vectors, dtype=np.float32)
         if array.ndim != EMBEDDING_MATRIX_RANK or array.shape[1] != self.dimension:
             message = "Vector dimension does not match index configuration"
@@ -152,17 +346,60 @@ class _SimpleFaissIndex(FaissIndexProtocol):
             self._vectors = np.vstack((self._vectors, np.ascontiguousarray(array)))
 
     def train(self, vectors: VectorArray) -> None:
-        """Train the index (no-op for simple flat index)."""
+        """Train the index (no-op for simple flat index).
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        vectors : tuple[int, ...] | np.float32
+            Describe ``vectors``.
+"""
         # Simple flat index doesn't require training
 
     def add_with_ids(self, vectors: VectorArray, ids: IndexArray) -> None:  # noqa: ARG002
-        """Add vectors with explicit IDs (not supported by simple index)."""
+        """Add vectors with explicit IDs (not supported by simple index).
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        vectors : tuple[int, ...] | np.float32
+            Describe ``vectors``.
+        ids : tuple[int, ...] | np.int64
+            Describe ``ids``.
+"""
         # Simple index doesn't support ID mapping, fall back to regular add
         self.add(vectors)
 
     def search(
         self, vectors: VectorArray, k: int
     ) -> tuple[npt.NDArray[np.float32], npt.NDArray[np.int64]]:
+        """Document search.
+
+        <!-- auto:docstring-builder v1 -->
+
+        &lt;!-- auto:docstring-builder v1 --&gt;
+
+        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+
+        Parameters
+        ----------
+        vectors : tuple[int, ...] | np.float32
+            Configure the vectors.
+        k : int
+            Configure the k.
+
+        Returns
+        -------
+        tuple[tuple[int, ...] | np.float32, tuple[int, ...] | np.int64]
+            Describe return value.
+
+        Raises
+        ------
+        AgentCatalogSearchError
+            Raised when message.
+"""
         queries = np.asarray(vectors, dtype=np.float32)
         if queries.ndim != EMBEDDING_MATRIX_RANK or queries.shape[1] != self.dimension:
             message = "Query vector dimension does not match index configuration"
@@ -191,8 +428,15 @@ class _SimpleFaissIndex(FaissIndexProtocol):
 class _SimpleFaissModule:
     """Minimal FAISS module shim using NumPy for tests and local runs.
 
+    <!-- auto:docstring-builder v1 -->
+
     Implements FaissModuleProtocol for compatibility with FAISS adapters.
-    """
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+"""
 
     # FAISS metric constants
     METRIC_INNER_PRODUCT: int = 1
@@ -201,6 +445,8 @@ class _SimpleFaissModule:
     @staticmethod
     def IndexFlatIP(dimension: int) -> FaissIndexProtocol:  # noqa: N802
         """Create a flat inner-product index.
+
+        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
@@ -211,12 +457,14 @@ class _SimpleFaissModule:
         -------
         FaissIndexProtocol
             Flat index instance.
-        """
+"""
         return cast(FaissIndexProtocol, _SimpleFaissIndex(dimension))
 
     @staticmethod
     def index_factory(dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
         """Create an index from a factory string.
+
+        <!-- auto:docstring-builder v1 -->
 
         For the simple implementation, factory strings are ignored and a flat index
         is always returned.
@@ -234,13 +482,15 @@ class _SimpleFaissModule:
         -------
         FaissIndexProtocol
             Flat index instance.
-        """
+"""
         # Simple implementation ignores factory_string and always returns flat index
         return cast(FaissIndexProtocol, _SimpleFaissIndex(dimension))
 
     @staticmethod
     def IndexIDMap2(index: FaissIndexProtocol) -> FaissIndexProtocol:  # noqa: N802
         """Wrap an index with 64-bit ID mapping.
+
+        <!-- auto:docstring-builder v1 -->
 
         For the simple implementation, this is a no-op (returns the index as-is).
 
@@ -253,7 +503,7 @@ class _SimpleFaissModule:
         -------
         FaissIndexProtocol
             Index with ID mapping (same instance in simple implementation).
-        """
+"""
         # Simple implementation doesn't support ID mapping, return as-is
         return index
 
@@ -261,13 +511,15 @@ class _SimpleFaissModule:
     def write_index(index: FaissIndexProtocol, path: str) -> None:
         """Persist an index to disk.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         index : FaissIndexProtocol
             Index instance to save.
         path : str
             File path for the persisted index.
-        """
+"""
         if not isinstance(index, _SimpleFaissIndex):
             message = f"Simple module can only write _SimpleFaissIndex instances, got {type(index)}"
             raise AgentCatalogSearchError(message)
@@ -282,6 +534,8 @@ class _SimpleFaissModule:
     def read_index(path: str) -> FaissIndexProtocol:
         """Load an index from disk.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         path : str
@@ -291,7 +545,7 @@ class _SimpleFaissModule:
         -------
         FaissIndexProtocol
             Loaded index instance.
-        """
+"""
         with Path(path).open("rb") as handle:
             payload_raw: object = pickle.load(handle)  # noqa: S301 - local trusted artifact
         if not isinstance(payload_raw, dict):
@@ -321,11 +575,13 @@ class _SimpleFaissModule:
     def normalize_L2(vectors: VectorArray) -> None:  # noqa: N802
         """Normalize vectors to unit length in-place.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
-        vectors : VectorArray
+        vectors : tuple[int, ...] | np.float32
             Array to normalize (modified in-place).
-        """
+"""
         norms = np.linalg.norm(vectors, axis=1, keepdims=True)  # type: ignore[misc]
         norms[norms == 0] = 1.0  # type: ignore[misc]
         vectors /= norms  # type: ignore[misc]
@@ -333,12 +589,33 @@ class _SimpleFaissModule:
 
 @cache  # type: ignore[misc]
 def _simple_faiss_module() -> FaissModuleProtocol:
-    """Return a cached NumPy-based FAISS shim for local usage."""
+    """Return a cached NumPy-based FAISS shim for local usage.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Returns
+    -------
+    FaissModuleProtocol
+        Describe return value.
+"""
     return cast(FaissModuleProtocol, _SimpleFaissModule())
 
 
 def load_faiss(purpose: str) -> FaissModuleProtocol:
-    """Import a FAISS module or fall back to the NumPy implementation."""
+    """Import a FAISS module or fall back to the NumPy implementation.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    purpose : str
+        Describe ``purpose``.
+
+    Returns
+    -------
+    FaissModuleProtocol
+        Describe return value.
+"""
     override = os.getenv(_FAISS_ENV_OVERRIDE)
     candidates: tuple[str, ...] = (override,) if override else _FAISS_DEFAULT_MODULES
     failures: list[str] = []
@@ -393,12 +670,38 @@ def load_faiss(purpose: str) -> FaissModuleProtocol:
 
 
 def _tokenize(text: str) -> list[str]:
-    """Return normalized word tokens for the given text."""
+    """Return normalized word tokens for the given text.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    text : str
+        Describe ``text``.
+
+    Returns
+    -------
+    list[str]
+        Describe return value.
+"""
     return WORD_PATTERN.findall(text.lower())  # type: ignore[misc]
 
 
 def _stringify(value: object) -> str | None:
-    """Return ``value`` as ``str`` when it is not ``None``."""
+    """Return ``value`` as ``str`` when it is not ``None``.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    value : object
+        Describe ``value``.
+
+    Returns
+    -------
+    str | NoneType
+        Describe return value.
+"""
     if value is None:
         return None
     return str(value)
@@ -407,6 +710,24 @@ def _stringify(value: object) -> str | None:
 def _extract_agent_hints_payload(
     symbol: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
 ) -> tuple[list[str], list[str]]:
+    """Document  extract agent hints payload.
+
+    <!-- auto:docstring-builder v1 -->
+
+    &lt;!-- auto:docstring-builder v1 --&gt;
+
+    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+
+    Parameters
+    ----------
+    symbol : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
+        Configure the symbol.
+
+    Returns
+    -------
+    tuple[list[str], list[str]]
+        Describe return value.
+"""
     intent_tags: list[str] = []
     tests_to_run: list[str] = []
     agent_hints = symbol.get("agent_hints")
@@ -423,6 +744,24 @@ def _extract_agent_hints_payload(
 def _extract_docfacts_text(
     docfacts: Mapping[str, str | int | float | bool | None] | None,
 ) -> tuple[str | None, str | None]:
+    """Document  extract docfacts text.
+
+    <!-- auto:docstring-builder v1 -->
+
+    &lt;!-- auto:docstring-builder v1 --&gt;
+
+    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+
+    Parameters
+    ----------
+    docfacts : str | str | int | float | bool | NoneType | NoneType
+        Indicate whether docfacts.
+
+    Returns
+    -------
+    tuple[str | NoneType, str | NoneType]
+        Describe return value.
+"""
     summary = None
     docstring = None
     if isinstance(docfacts, Mapping):
@@ -436,6 +775,24 @@ def _extract_docfacts_text(
 def _extract_anchor_lines(
     symbol: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
 ) -> tuple[int | None, int | None]:
+    """Document  extract anchor lines.
+
+    <!-- auto:docstring-builder v1 -->
+
+    &lt;!-- auto:docstring-builder v1 --&gt;
+
+    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+
+    Parameters
+    ----------
+    symbol : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
+        Configure the symbol.
+
+    Returns
+    -------
+    tuple[int | NoneType, int | NoneType]
+        Describe return value.
+"""
     anchors = symbol.get("anchors")
     start_line: int | None = None
     end_line: int | None = None
@@ -456,7 +813,28 @@ def build_document_from_payload(
     symbol_id: str,
     row: int,
 ) -> SearchDocument:
-    """Create a ``SearchDocument`` from the raw symbol payload."""
+    """Create a ``SearchDocument`` from the raw symbol payload.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    package_name : str
+        Describe ``package_name``.
+    module_name : str
+        Describe ``module_name``.
+    symbol : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
+        Describe ``symbol``.
+    symbol_id : str
+        Describe ``symbol_id``.
+    row : int
+        Describe ``row``.
+
+    Returns
+    -------
+    SearchDocument
+        Describe return value.
+"""
     docfacts_payload = symbol.get("docfacts")
     summary, docstring = _extract_docfacts_text(
         docfacts_payload if isinstance(docfacts_payload, Mapping) else None  # type: ignore[arg-type]
@@ -506,7 +884,20 @@ def iter_symbol_entries(
         str, str, Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
     ]
 ]:
-    """Yield ``(package, module, symbol)`` triples from the catalog payload."""
+    """Yield ``(package, module, symbol)`` triples from the catalog payload.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    catalog : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
+        Describe ``catalog``.
+
+    Returns
+    -------
+    tuple[str, str, str | str | int | float | bool | NoneType | list[object] | dict[str, object]]
+        Describe return value.
+"""
     packages = catalog.get("packages")
     entries: list[
         tuple[
@@ -540,7 +931,23 @@ def documents_from_catalog(
     catalog: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
     row_lookup: Mapping[str, int] | None = None,
 ) -> list[SearchDocument]:
-    """Return search documents extracted from the catalog payload."""
+    """Return search documents extracted from the catalog payload.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    catalog : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
+        Describe ``catalog``.
+    row_lookup : str | int | NoneType, optional
+        Describe ``row_lookup``.
+        Defaults to ``None``.
+
+    Returns
+    -------
+    list[SearchDocument]
+        Describe return value.
+"""
     documents: list[SearchDocument] = []
     for package_name, module_name, symbol in iter_symbol_entries(catalog):
         symbol_id = symbol.get("symbol_id")
@@ -562,7 +969,20 @@ def documents_from_catalog(
 
 
 def parse_bool(value: str) -> bool | None:
-    """Interpret ``value`` as a boolean flag when possible."""
+    """Interpret ``value`` as a boolean flag when possible.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    value : str
+        Describe ``value``.
+
+    Returns
+    -------
+    bool | NoneType
+        Describe return value.
+"""
     lowered = value.strip().lower()
     if lowered in {"1", "true", "yes", "on"}:
         return True
@@ -572,7 +992,22 @@ def parse_bool(value: str) -> bool | None:
 
 
 def document_matches_facets(document: SearchDocument, facets: Mapping[str, str]) -> bool:
-    """Return ``True`` when ``document`` satisfies the provided facets."""
+    """Return ``True`` when ``document`` satisfies the provided facets.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    document : SearchDocument
+        Describe ``document``.
+    facets : str | str
+        Describe ``facets``.
+
+    Returns
+    -------
+    bool
+        Describe return value.
+"""
     for key, value in facets.items():
         if key == "package" and document.package != value:
             return False
@@ -590,7 +1025,20 @@ def document_matches_facets(document: SearchDocument, facets: Mapping[str, str])
 
 
 def prepare_query_tokens(query: str) -> collections.Counter[str]:
-    """Return lexical tokens for ``query`` (with a simple fallback)."""
+    """Return lexical tokens for ``query`` (with a simple fallback).
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    query : str
+        Describe ``query``.
+
+    Returns
+    -------
+    str
+        Describe return value.
+"""
     tokens = collections.Counter(_tokenize(query))
     if not tokens:
         tokens = collections.Counter(query.lower().split())
@@ -603,7 +1051,26 @@ def resolve_search_parameters(
     document_count: int,
     k: int,
 ) -> tuple[float, int]:
-    """Derive the alpha weight and candidate pool size for search."""
+    """Derive the alpha weight and candidate pool size for search.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    catalog_search : str | str | int | float | bool | NoneType
+        Describe ``catalog_search``.
+    options : SearchOptions
+        Describe ``options``.
+    document_count : int
+        Describe ``document_count``.
+    k : int
+        Describe ``k``.
+
+    Returns
+    -------
+    tuple[float, int]
+        Describe return value.
+"""
     alpha_value = options.alpha
     if alpha_value is None:
         alpha_candidate = catalog_search.get("alpha")
@@ -629,7 +1096,24 @@ def compute_lexical_scores(
     documents: Sequence[SearchDocument],
     query: str,
 ) -> dict[str, float]:
-    """Return lexical similarity scores for the candidate documents."""
+    """Return lexical similarity scores for the candidate documents.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    query_tokens : str
+        Describe ``query_tokens``.
+    documents : SearchDocument
+        Describe ``documents``.
+    query : str
+        Describe ``query``.
+
+    Returns
+    -------
+    dict[str, float]
+        Describe return value.
+"""
     scores: dict[str, float] = {}
     lowered_query = query.lower()
     for document in documents:
@@ -649,7 +1133,24 @@ def select_lexical_candidates(
     documents: Sequence[SearchDocument],
     candidate_limit: int,
 ) -> list[SearchDocument]:
-    """Return the highest-scoring lexical candidates."""
+    """Return the highest-scoring lexical candidates.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    lexical_scores : str | float
+        Describe ``lexical_scores``.
+    documents : SearchDocument
+        Describe ``documents``.
+    candidate_limit : int
+        Describe ``candidate_limit``.
+
+    Returns
+    -------
+    list[SearchDocument]
+        Describe return value.
+"""
 
     def _get_score(doc: SearchDocument) -> float:
         return lexical_scores.get(doc.symbol_id, 0.0)
@@ -671,7 +1172,22 @@ def _resolve_semantic_index_metadata(
     ]
     | None
 ):
-    """Return semantic index metadata when available, verifying artifacts."""
+    """Return semantic index metadata when available, verifying artifacts.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    catalog : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
+        Describe ``catalog``.
+    repo_root : Path
+        Describe ``repo_root``.
+
+    Returns
+    -------
+    tuple[str | str | int | float | bool | NoneType | list[object] | dict[str, object], Path, Path] | NoneType
+        Describe return value.
+"""
     semantic_meta = catalog.get("semantic_index")
     if not isinstance(semantic_meta, Mapping):
         return None
@@ -709,7 +1225,20 @@ def _load_row_lookup(
 ) -> tuple[
     dict[str, int], Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
 ]:
-    """Return the row lookup mapping and raw payload from ``mapping_path``."""
+    """Return the row lookup mapping and raw payload from ``mapping_path``.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    mapping_path : Path
+        Describe ``mapping_path``.
+
+    Returns
+    -------
+    tuple[dict[str, int], str | str | int | float | bool | NoneType | list[object] | dict[str, object]]
+        Describe return value.
+"""
     mapping_payload_raw = json.loads(mapping_path.read_text(encoding="utf-8"))  # type: ignore[misc]
     if not isinstance(mapping_payload_raw, dict):  # type: ignore[misc]
         message = "Semantic mapping file does not contain valid JSON object"
@@ -737,7 +1266,20 @@ def _load_row_lookup(
 
 
 def _load_sentence_transformer(model_name: str) -> EmbeddingModelProtocol:
-    """Instantiate a sentence-transformers model, raising ``AgentCatalogSearchError``."""
+    """Instantiate a sentence-transformers model, raising ``AgentCatalogSearchError``.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    model_name : str
+        Describe ``model_name``.
+
+    Returns
+    -------
+    EmbeddingModelProtocol
+        Describe return value.
+"""
     try:
         module = importlib.import_module("sentence_transformers")
     except ImportError as exc:  # pragma: no cover - runtime guard
@@ -761,7 +1303,22 @@ def _load_sentence_transformer(model_name: str) -> EmbeddingModelProtocol:
 def _resolve_embedding_model(
     options: SearchOptions, semantic_meta: Mapping[str, str | int | float | bool | None]
 ) -> tuple[str, EmbeddingModelProtocol]:
-    """Return the embedding model name and instance used for vector search."""
+    """Return the embedding model name and instance used for vector search.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    options : SearchOptions
+        Describe ``options``.
+    semantic_meta : str | str | int | float | bool | NoneType
+        Describe ``semantic_meta``.
+
+    Returns
+    -------
+    tuple[str, EmbeddingModelProtocol]
+        Describe return value.
+"""
     model_name_raw = options.embedding_model or _stringify(semantic_meta.get("model"))
     model_name: str | None = model_name_raw
     if not model_name:
@@ -784,7 +1341,24 @@ def _encode_query(
     *,
     batch_size: int,
 ) -> VectorArray:
-    """Return normalized embeddings for ``query`` using ``model``."""
+    """Return normalized embeddings for ``query`` using ``model``.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    model : EmbeddingModelProtocol
+        Describe ``model``.
+    query : str
+        Describe ``query``.
+    batch_size : int
+        Describe ``batch_size``.
+
+    Returns
+    -------
+    tuple[int, ...] | np.float32
+        Describe return value.
+"""
     try:
         encoded = model.encode(
             [query],
@@ -804,7 +1378,24 @@ def _scores_from_index(
     indices: npt.NDArray[np.int64],
     context: VectorSearchContext,
 ) -> dict[str, float]:
-    """Map FAISS search outputs to candidate symbol scores."""
+    """Map FAISS search outputs to candidate symbol scores.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    distances : tuple[int, ...] | np.float32
+        Describe ``distances``.
+    indices : tuple[int, ...] | np.int64
+        Describe ``indices``.
+    context : VectorSearchContext
+        Describe ``context``.
+
+    Returns
+    -------
+    dict[str, float]
+        Describe return value.
+"""
     vector_scores: dict[str, float] = {}
     for idx, distance_row in enumerate(distances):  # type: ignore[misc]
         for rank, score in enumerate(distance_row):  # type: ignore[misc]
@@ -823,7 +1414,24 @@ def compute_vector_scores(
     options: SearchOptions,
     context: VectorSearchContext,
 ) -> dict[str, float]:
-    """Return vector similarity scores for ``query`` and the candidate set."""
+    """Return vector similarity scores for ``query`` and the candidate set.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    query : str
+        Describe ``query``.
+    options : SearchOptions
+        Describe ``options``.
+    context : VectorSearchContext
+        Describe ``context``.
+
+    Returns
+    -------
+    dict[str, float]
+        Describe return value.
+"""
     _, model = _resolve_embedding_model(options, context.semantic_meta)  # type: ignore[arg-type]
     batch_size = options.batch_size or 32
     query_vector = _encode_query(model, query, batch_size=batch_size)
@@ -840,7 +1448,28 @@ def merge_scores(
     vector_scores: Mapping[str, float],
     alpha_value: float,
 ) -> list[SearchResult]:
-    """Combine lexical/vector scores into ranked ``SearchResult`` records."""
+    """Combine lexical/vector scores into ranked ``SearchResult`` records.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    documents : str | SearchDocument
+        Describe ``documents``.
+    candidate_ids : set[str]
+        Describe ``candidate_ids``.
+    lexical_scores : str | float
+        Describe ``lexical_scores``.
+    vector_scores : str | float
+        Describe ``vector_scores``.
+    alpha_value : float
+        Describe ``alpha_value``.
+
+    Returns
+    -------
+    list[SearchResult]
+        Describe return value.
+"""
     results: list[SearchResult] = []
     max_lexical = max(lexical_scores.get(symbol_id, 0.0) for symbol_id in candidate_ids) or 1.0
     for symbol_id in candidate_ids:
@@ -895,11 +1524,22 @@ def _prepare_search_documents(
 ]:
     """Prepare and filter documents from catalog.
 
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    catalog : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
+        Describe ``catalog``.
+    repo_root : Path
+        Describe ``repo_root``.
+    facets : str | str
+        Describe ``facets``.
+
     Returns
     -------
-    tuple[list[SearchDocument], semantic_meta_info, mapping_payload]
+    tuple[list[SearchDocument], tuple[str | str | int | float | bool | NoneType | list[object] | dict[str, object], Path, Path] | NoneType, str | str | int | float | bool | NoneType | list[object] | dict[str, object] | NoneType]
         Filtered documents, semantic metadata info (if available), and mapping payload.
-    """
+"""
     semantic_meta_info = _resolve_semantic_index_metadata(catalog, repo_root)
     row_lookup: dict[str, int] | None = None
     mapping_payload: (
@@ -922,11 +1562,22 @@ def _perform_lexical_search(
 ) -> tuple[dict[str, float], set[str], dict[str, SearchDocument]]:
     """Perform lexical search and return scores, candidate IDs, and document lookup.
 
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    query : str
+        Describe ``query``.
+    documents : list[SearchDocument]
+        Describe ``documents``.
+    candidate_limit : int
+        Describe ``candidate_limit``.
+
     Returns
     -------
-    tuple[lexical_scores, candidate_ids, doc_by_id]
+    tuple[dict[str, float], set[str], dict[str, SearchDocument]]
         Lexical scores, candidate symbol IDs, and document lookup map.
-    """
+"""
     query_tokens = prepare_query_tokens(query)
     lexical_scores = compute_lexical_scores(query_tokens, documents, query)
     lexical_candidates = select_lexical_candidates(lexical_scores, documents, candidate_limit)
@@ -937,7 +1588,25 @@ def _perform_lexical_search(
 
 @dataclass(slots=True)
 class VectorSearchParams:
-    """Parameters for vector search operation."""
+    """Parameters for vector search operation.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    semantic_meta_info : tuple[str | str | int | float | bool | NoneType | list[object] | dict[str, object], Path, Path]
+        Describe ``semantic_meta_info``.
+    mapping_payload : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
+        Describe ``mapping_payload``.
+    documents : list[SearchDocument]
+        Describe ``documents``.
+    candidate_limit : int
+        Describe ``candidate_limit``.
+    k : int
+        Describe ``k``.
+    candidate_ids : set[str]
+        Describe ``candidate_ids``.
+"""
 
     semantic_meta_info: tuple[
         Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]], Path, Path
@@ -958,11 +1627,22 @@ def _perform_vector_search(
 ) -> tuple[dict[str, float], float]:
     """Perform vector search and return scores and alpha value.
 
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    query : str
+        Describe ``query``.
+    options : SearchOptions
+        Describe ``options``.
+    params : VectorSearchParams
+        Describe ``params``.
+
     Returns
     -------
-    tuple[vector_scores, alpha_value]
+    tuple[dict[str, float], float]
         Vector similarity scores and alpha blending value.
-    """
+"""
     semantic_meta, index_path, _ = params.semantic_meta_info
     row_to_document = {doc.row: doc for doc in params.documents if doc.row >= 0}
     context = VectorSearchContext(
@@ -985,7 +1665,20 @@ def _perform_vector_search(
 
 @dataclass(slots=True)
 class SearchRequest:
-    """Request parameters for catalog search."""
+    """Request parameters for catalog search.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    repo_root : Path
+        Describe ``repo_root``.
+    query : str
+        Describe ``query``.
+    k : int, optional
+        Describe ``k``.
+        Defaults to ``10``.
+"""
 
     repo_root: Path
     query: str
@@ -1001,16 +1694,20 @@ def search_catalog(
 ) -> list[SearchResult]:
     """Execute hybrid lexical/vector search against the catalog.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
-    catalog : Mapping
+    catalog : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
         Catalog payload containing packages, modules, symbols, and optional semantic_index metadata.
     request : SearchRequest
         Search request containing repo_root, query, and k parameters.
-    options : SearchOptions | None, optional
+    options : SearchOptions | NoneType, optional
         Optional search parameters (alpha, facets, embedding_model, etc.). Defaults to None.
-    metrics : MetricsProvider | None, optional
+        Defaults to ``None``.
+    metrics : MetricsProvider | NoneType, optional
         Metrics provider for recording search duration and counts. Defaults to None (uses default).
+        Defaults to ``None``.
 
     Returns
     -------
@@ -1021,7 +1718,7 @@ def search_catalog(
     ------
     AgentCatalogSearchError
         Raised when search fails due to invalid input, missing artifacts, or model errors.
-    """
+"""
     active_metrics = metrics or MetricsProvider.default()
     active_options = options or SearchOptions()
     trimmed_query = request.query.strip()

@@ -52,4 +52,4 @@ class GraniteDoclingVLM:
     -------
     inspect._empty
         Describe return value.
-    """
+"""

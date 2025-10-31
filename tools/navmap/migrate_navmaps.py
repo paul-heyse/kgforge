@@ -8,8 +8,8 @@ import json
 from pathlib import Path
 from typing import Final
 
-from tools._shared.logging import get_logger
-from tools.navmap.build_navmap import NavIndexDict, build_index
+from tools import get_logger
+from tools.navmap.build_navmap import build_index
 
 LOGGER = get_logger(__name__)
 
@@ -18,7 +18,7 @@ DEFAULT_OUTPUT: Final[Path] = (
 )
 
 
-def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> NavIndexDict:
+def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str, object]:
     """Rebuild the navigation map JSON file from the current source tree.
 
     Parameters
@@ -32,7 +32,7 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> NavIndex
 
     Returns
     -------
-    NavIndexDict
+    dict[str, object]
         Structured navigation metadata emitted by
         :func:`tools.navmap.build_navmap.build_index`.
     """

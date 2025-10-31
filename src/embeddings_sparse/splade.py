@@ -102,12 +102,11 @@ class SPLADEv3Encoder:
         Describe ``max_seq_len``.
         Defaults to ``512``.
 
-
     Raises
     ------
     NotImplementedError
     Raised when TODO for NotImplementedError.
-    """
+"""
 
     name = "SPLADE-v3-distilbert"
 
@@ -138,7 +137,7 @@ class SPLADEv3Encoder:
         max_seq_len : int, optional
             Describe ``max_seq_len``.
             Defaults to ``512``.
-        """
+"""
         self.model_id = model_id
         self.device = device
         self.topk = topk
@@ -156,27 +155,16 @@ class SPLADEv3Encoder:
         texts : list[str]
             Describe ``texts``.
 
-
         Returns
         -------
         list[tuple[list[int], list[float]]]
             Describe return value.
 
-
-
-
-
-
-
-
-
-
-
         Raises
         ------
         NotImplementedError
         Raised when TODO for NotImplementedError.
-        """
+"""
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
@@ -198,7 +186,7 @@ class PureImpactIndex:
     ----------
     index_dir : str
         Describe ``index_dir``.
-    """
+"""
 
     def __init__(self, index_dir: str) -> None:
         """Describe   init  .
@@ -211,7 +199,7 @@ class PureImpactIndex:
         ----------
         index_dir : str
             Describe ``index_dir``.
-        """
+"""
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -230,12 +218,11 @@ class PureImpactIndex:
         text : str
             Describe ``text``.
 
-
         Returns
         -------
         list[str]
             Describe return value.
-        """
+"""
         return [token.lower() for token in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
@@ -247,9 +234,9 @@ class PureImpactIndex:
 
         Parameters
         ----------
-        docs_iterable : Iterable[tuple[str, dict[str, str]]]
+        docs_iterable : tuple[str, dict[str, str]]
             Describe ``docs_iterable``.
-        """
+"""
         Path(self.index_dir).mkdir(parents=True, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -284,6 +271,8 @@ class PureImpactIndex:
     def load(self) -> None:
         """Load SPLADE index metadata from disk with schema validation and checksum verification.
 
+        <!-- auto:docstring-builder v1 -->
+
         Deserializes index metadata from JSON, verifying checksum and validating
         against the schema. Falls back to legacy pickle format for backward compatibility.
 
@@ -293,7 +282,7 @@ class PureImpactIndex:
             If deserialization, schema validation, or checksum verification fails.
         FileNotFoundError
             If metadata or schema file is missing.
-        """
+"""
         metadata_path = Path(self.index_dir) / "impact.json"
         schema_path = (
             Path(__file__).parent.parent.parent / "schema" / "models" / "splade_metadata.v1.json"
@@ -368,12 +357,11 @@ class PureImpactIndex:
         k : int
             Describe ``k``.
 
-
         Returns
         -------
         list[tuple[str, float]]
             Describe return value.
-        """
+"""
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
         for token in tokens:
@@ -401,12 +389,11 @@ class LuceneImpactIndex:
         Describe ``query_encoder``.
         Defaults to ``'naver/splade-v3-distilbert'``.
 
-
     Raises
     ------
     RuntimeError
     Raised when TODO for RuntimeError.
-    """
+"""
 
     def __init__(self, index_dir: str, query_encoder: str = "naver/splade-v3-distilbert") -> None:
         """Describe   init  .
@@ -422,7 +409,7 @@ class LuceneImpactIndex:
         query_encoder : str, optional
             Describe ``query_encoder``.
             Defaults to ``'naver/splade-v3-distilbert'``.
-        """
+"""
         self.index_dir = index_dir
         self.query_encoder = query_encoder
         self._searcher: Any | None = None
@@ -438,7 +425,7 @@ class LuceneImpactIndex:
         ------
         RuntimeError
         Raised when TODO for RuntimeError.
-        """
+"""
         if self._searcher is not None:
             return
         try:
@@ -463,27 +450,16 @@ class LuceneImpactIndex:
         k : int
             Describe ``k``.
 
-
         Returns
         -------
         list[tuple[str, float]]
             Describe return value.
 
-
-
-
-
-
-
-
-
-
-
         Raises
         ------
         RuntimeError
         Raised when TODO for RuntimeError.
-        """
+"""
         self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
@@ -514,12 +490,11 @@ def get_splade(
         Describe ``query_encoder``.
         Defaults to ``'naver/splade-v3-distilbert'``.
 
-
     Returns
     -------
     PureImpactIndex | LuceneImpactIndex
         Describe return value.
-    """
+"""
     if backend == "lucene":
         try:
             return LuceneImpactIndex(index_dir=index_dir, query_encoder=query_encoder)

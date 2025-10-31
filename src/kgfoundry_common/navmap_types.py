@@ -26,10 +26,10 @@ type Stability = Literal[
 class NavSection(TypedDict):
     """Describe NavSection.
 
-    <!-- auto:docstring-builder v1 -->
+    &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
+"""
 
     id: str
     title: str
@@ -40,10 +40,10 @@ class NavSection(TypedDict):
 class SymbolMeta(TypedDict, total=False):
     """Describe SymbolMeta.
 
-    <!-- auto:docstring-builder v1 -->
+    &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
+"""
 
     since: str
     stability: Stability
@@ -64,10 +64,10 @@ class SymbolMeta(TypedDict, total=False):
 class ModuleMeta(TypedDict, total=False):
     """Describe ModuleMeta.
 
-    <!-- auto:docstring-builder v1 -->
+    &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
+"""
 
     owner: str
     stability: Stability
@@ -79,10 +79,10 @@ class ModuleMeta(TypedDict, total=False):
 class NavMap(TypedDict, total=False):
     """Describe NavMap.
 
-    <!-- auto:docstring-builder v1 -->
+    &lt;!-- auto:docstring-builder v1 --&gt;
 
     Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
+"""
 
     title: str
     synopsis: str

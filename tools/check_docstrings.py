@@ -5,12 +5,12 @@ from __future__ import annotations
 
 import argparse
 import ast
-import subprocess
 import sys
 from collections.abc import Iterable
 from pathlib import Path
 
 from tools._shared.logging import get_logger
+from tools._shared.proc import ToolExecutionError, run_tool
 
 LOGGER = get_logger(__name__)
 
@@ -102,7 +102,11 @@ def main() -> None:
         "D",
         *(str(path) for path in TARGETS if path.exists()),
     ]
-    subprocess.run(cmd, check=True)
+    try:
+        run_tool(cmd, check=True)
+    except ToolExecutionError as exc:
+        LOGGER.exception("Docstring lint command failed", extra={"command": cmd})
+        raise SystemExit(exc.returncode if exc.returncode is not None else 1) from exc
 
     if options.no_todo:
         raise SystemExit(check_placeholders())

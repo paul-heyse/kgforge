@@ -3,14 +3,30 @@
 from __future__ import annotations
 
 import sys
+import os
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+
+def _pythonpath_env() -> dict[str, str]:
+    existing = os.environ.get("PYTHONPATH")
+    parts = [str(REPO_ROOT)]
+    if existing:
+        parts.append(existing)
+    env: dict[str, str] = {
+        "PYTHONPATH": os.pathsep.join(parts),
+        "DISABLE_PROM_METRICS": "1",
+        "PROMETHEUS_DISABLE_CREATED_SERIES": "True",
+    }
+    return env
 
 from tools._shared.logging import get_logger, with_fields
 from tools._shared.proc import ToolExecutionError, run_tool
 
 LOGGER = get_logger(__name__)
-
-REPO_ROOT = Path(__file__).resolve().parents[2]
 
 STEPS: list[tuple[str, list[str], str]] = [
     (
@@ -78,8 +94,18 @@ def _run_step(name: str, command: list[str], message: str) -> int:
     """Execute a single artefact regeneration step."""
     log_adapter = with_fields(LOGGER, operation=name, command=command)
     try:
-        result = run_tool(command, timeout=20.0, cwd=REPO_ROOT, check=False)
+        result = run_tool(
+            command,
+            timeout=20.0,
+            cwd=REPO_ROOT,
+            env=_pythonpath_env(),
+            check=False,
+        )
         if result.returncode != 0:
+            if result.stdout:
+                print(result.stdout, file=sys.stderr)
+            if result.stderr:
+                print(result.stderr, file=sys.stderr)
             log_adapter.error(
                 "[artifacts] %s failed (exit %d)",
                 name,
