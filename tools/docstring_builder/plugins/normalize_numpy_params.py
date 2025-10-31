@@ -1,21 +1,32 @@
-"""Sample transformer plugin that normalises NumPy parameter descriptions."""
+"""Plugin that normalizes parameter descriptions for NumPy style docstrings."""
 
 from __future__ import annotations
 
 from dataclasses import replace
+from typing import ClassVar
 
-from tools.docstring_builder.plugins import PluginContext, TransformerPlugin
+from tools.docstring_builder.plugins.base import PluginContext, PluginStage
 from tools.docstring_builder.schema import ParameterDoc, ReturnDoc
 from tools.docstring_builder.semantics import SemanticResult
 
 
-class NormalizeNumpyParamsPlugin(TransformerPlugin):
+class NormalizeNumpyParamsPlugin:
     """Ensure parameter descriptions follow a consistent style."""
 
-    name = "normalize_numpy_params"
+    name: ClassVar[str] = "normalize_numpy_params"
+    stage: ClassVar[PluginStage] = "transformer"
 
-    def run(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
+    def on_start(self, context: PluginContext) -> None:
+        """Reset plugin state before processing begins (no-op)."""
+        del context
+
+    def on_finish(self, context: PluginContext) -> None:
+        """Clean up plugin state after processing completes (no-op)."""
+        del context
+
+    def apply(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
         """Normalise parameter and return descriptions for ``result``."""
+        del context
         schema = result.schema
         parameters = [self._normalize_parameter(parameter) for parameter in schema.parameters]
         returns = [self._normalize_return(entry) for entry in schema.returns]

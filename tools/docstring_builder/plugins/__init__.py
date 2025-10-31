@@ -1,84 +1,48 @@
-"""Plugin architecture for the docstring builder pipeline."""
+"""Plugin discovery and execution helpers for the docstring builder."""
 
 from __future__ import annotations
 
-import abc
 import threading
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from importlib import metadata
 from pathlib import Path
-from typing import ClassVar
+from typing import cast
 
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import HarvestResult
+from tools.docstring_builder.models import (
+    DocstringBuilderError,
+    PluginExecutionError,
+)
+from tools.docstring_builder.plugins.base import (
+    DocstringBuilderPlugin,
+    FormatterPlugin,
+    HarvesterPlugin,
+    LegacyPluginAdapter,
+    LegacyPluginProtocol,
+    PluginContext,
+    PluginStage,
+    TransformerPlugin,
+)
+from tools.docstring_builder.plugins.dataclass_fields import DataclassFieldDocPlugin
+from tools.docstring_builder.plugins.llm_summary import LLMSummaryRewritePlugin
+from tools.docstring_builder.plugins.normalize_numpy_params import (
+    NormalizeNumpyParamsPlugin,
+)
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult
 
 ENTRY_POINT_GROUP = "kgfoundry.docstrings.plugins"
 
 
-class PluginConfigurationError(RuntimeError):
+class PluginConfigurationError(DocstringBuilderError):
     """Raised when plugin discovery or filtering fails."""
-
-
-@dataclass(slots=True, frozen=True)
-class PluginContext:
-    """Context supplied to plugins when they execute."""
-
-    config: BuilderConfig
-    repo_root: Path
-    file_path: Path | None = None
-
-
-class BuilderPlugin(abc.ABC):
-    """Base class for docstring builder plugins."""
-
-    name: ClassVar[str]
-    stage: ClassVar[str]
-
-    def on_start(self, context: PluginContext) -> None:
-        """Execute the setup hook before any files are processed."""
-        del context
-
-    def on_finish(self, context: PluginContext) -> None:
-        """Execute the teardown hook after all files are processed."""
-        del context
-
-
-class HarvesterPlugin(BuilderPlugin):
-    """Plugins that adjust :class:`HarvestResult` instances."""
-
-    stage: ClassVar[str] = "harvester"
-
-    @abc.abstractmethod
-    def run(self, context: PluginContext, result: HarvestResult) -> HarvestResult:
-        """Return a possibly modified harvest result."""
-
-
-class TransformerPlugin(BuilderPlugin):
-    """Plugins that refine :class:`SemanticResult` entries."""
-
-    stage: ClassVar[str] = "transformer"
-
-    @abc.abstractmethod
-    def run(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
-        """Return a possibly modified semantic result."""
-
-
-class FormatterPlugin(BuilderPlugin):
-    """Plugins that adjust final :class:`DocstringEdit` entries."""
-
-    stage: ClassVar[str] = "formatter"
-
-    @abc.abstractmethod
-    def run(self, context: PluginContext, edit: DocstringEdit) -> DocstringEdit:
-        """Return a possibly modified docstring edit."""
 
 
 @dataclass(slots=True)
 class PluginManager:
-    """Container coordinating plugin execution for each pipeline stage."""
+    """Coordinate plugin execution across builder stages."""
 
     config: BuilderConfig
     repo_root: Path
@@ -92,17 +56,17 @@ class PluginManager:
     _lock: threading.RLock = field(default_factory=threading.RLock, init=False)
 
     def _context(self, file_path: Path | None = None) -> PluginContext:
-        return PluginContext(self.config, self.repo_root, file_path)
+        return PluginContext(config=self.config, repo_root=self.repo_root, file_path=file_path)
 
     def start(self) -> None:
-        """Notify plugins that processing is about to begin."""
+        """Invoke ``on_start`` for all registered plugins."""
         context = self._context()
         with self._lock:
             for plugin in self._iter_plugins():
                 plugin.on_start(context)
 
     def finish(self) -> None:
-        """Notify plugins that processing has completed."""
+        """Invoke ``on_finish`` for registered plugins in reverse order."""
         context = self._context()
         with self._lock:
             for plugin in reversed(list(self._iter_plugins())):
@@ -114,34 +78,34 @@ class PluginManager:
         updated = result
         with self._lock:
             for plugin in self.harvesters:
-                updated = plugin.run(context, updated)
+                updated = _invoke_apply(plugin, context, updated)
         return updated
 
     def apply_transformers(
         self, file_path: Path, semantics: Iterable[SemanticResult]
     ) -> list[SemanticResult]:
-        """Run transformer plugins sequentially for each semantic entry."""
+        """Run transformer plugins sequentially for each semantic result."""
         context = self._context(file_path)
         processed: list[SemanticResult] = []
         for entry in semantics:
             updated = entry
             with self._lock:
                 for plugin in self.transformers:
-                    updated = plugin.run(context, updated)
+                    updated = _invoke_apply(plugin, context, updated)
             processed.append(updated)
         return processed
 
     def apply_formatters(
         self, file_path: Path, edits: Iterable[DocstringEdit]
     ) -> list[DocstringEdit]:
-        """Run formatter plugins sequentially for each docstring edit."""
+        """Run formatter plugins sequentially for each edit."""
         context = self._context(file_path)
         processed: list[DocstringEdit] = []
         for entry in edits:
             updated = entry
             with self._lock:
                 for plugin in self.formatters:
-                    updated = plugin.run(context, updated)
+                    updated = _invoke_apply(plugin, context, updated)
             processed.append(updated)
         return processed
 
@@ -149,42 +113,83 @@ class PluginManager:
         """Return the names of active plugins in execution order."""
         return [plugin.name for plugin in self._iter_plugins()]
 
-    def _iter_plugins(self) -> Iterable[BuilderPlugin]:
+    def _iter_plugins(self) -> Iterable[DocstringBuilderPlugin]:
         yield from self.harvesters
         yield from self.transformers
         yield from self.formatters
 
 
-def _load_entry_point(entry_point: metadata.EntryPoint) -> type[BuilderPlugin]:
-    loaded = entry_point.load()
-    if isinstance(loaded, type) and issubclass(loaded, BuilderPlugin):
-        return loaded
-    if callable(loaded):  # pragma: no cover - third-party flexibility
-        candidate = loaded()
-        if isinstance(candidate, BuilderPlugin):
-            return type(candidate)
-    msg = f"Entry point {entry_point.name!r} did not return a BuilderPlugin"
-    raise PluginConfigurationError(msg)
+def _invoke_apply(
+    plugin: DocstringBuilderPlugin,
+    context: PluginContext,
+    payload: HarvestResult | SemanticResult | DocstringEdit,
+) -> HarvestResult | SemanticResult | DocstringEdit:
+    try:
+        result = plugin.apply(
+            context,
+            cast(HarvestResult | SemanticResult | DocstringEdit, payload),
+        )
+        return cast(HarvestResult | SemanticResult | DocstringEdit, result)
+    except DocstringBuilderError:
+        raise
+    except Exception as exc:  # pragma: no cover - defensive guard
+        message = f"Plugin {plugin.name!r} failed during {plugin.stage} execution"
+        raise PluginExecutionError(message) from exc
 
 
-def _discover_entry_points() -> list[type[BuilderPlugin]]:
-    discovered: list[type[BuilderPlugin]] = []
+def _instantiate_plugin(candidate: object) -> DocstringBuilderPlugin:
+    if isinstance(candidate, LegacyPluginAdapter):
+        return candidate
+    if isinstance(candidate, type):
+        instance = candidate()
+        return _ensure_plugin_instance(instance)
+    if callable(candidate):
+        instance = candidate()
+        return _ensure_plugin_instance(instance)
+    if isinstance(candidate, DocstringBuilderPlugin):  # pragma: no cover - runtime check
+        return candidate
+    return _ensure_plugin_instance(candidate)
+
+
+def _ensure_plugin_instance(obj: object) -> DocstringBuilderPlugin:
+    name = getattr(obj, "name", obj.__class__.__name__)
+    stage = getattr(obj, "stage", None)
+    if stage not in {"harvester", "transformer", "formatter"}:
+        message = f"Plugin {name!r} declares invalid stage {stage!r}"
+        raise PluginConfigurationError(message)
+    if isinstance(obj, DocstringBuilderPlugin):  # pragma: no cover - runtime check
+        return cast(DocstringBuilderPlugin, obj)
+    if hasattr(obj, "apply"):
+        return cast(DocstringBuilderPlugin, obj)
+    if hasattr(obj, "run"):
+        legacy = cast(LegacyPluginProtocol, obj)
+        return LegacyPluginAdapter(legacy)
+    message = f"Plugin {name!r} must define apply() or run()"
+    raise PluginConfigurationError(message)
+
+
+def _register_plugin(manager: PluginManager, plugin: DocstringBuilderPlugin) -> None:
+    stage: PluginStage = plugin.stage
+    if stage == "harvester":
+        manager.harvesters.append(cast(HarvesterPlugin, plugin))
+    elif stage == "transformer":
+        manager.transformers.append(cast(TransformerPlugin, plugin))
+    elif stage == "formatter":
+        manager.formatters.append(cast(FormatterPlugin, plugin))
+    else:  # pragma: no cover - stage already validated earlier
+        message = f"Unsupported plugin stage: {stage!r}"
+        raise PluginConfigurationError(message)
+
+
+def _load_entry_points() -> list[object]:
+    loaded: list[object] = []
     for entry_point in metadata.entry_points().select(group=ENTRY_POINT_GROUP):
         try:
-            discovered.append(_load_entry_point(entry_point))
-        except PluginConfigurationError:
-            raise
+            loaded.append(entry_point.load())
         except Exception as exc:  # pragma: no cover - best effort guard
-            raise PluginConfigurationError(str(exc)) from exc
-    return discovered
-
-
-def _instantiate(plugin_type: type[BuilderPlugin]) -> BuilderPlugin:
-    instance = plugin_type()
-    if not isinstance(instance, BuilderPlugin):  # pragma: no cover - safety net
-        msg = f"Plugin {plugin_type!r} is not a BuilderPlugin"
-        raise PluginConfigurationError(msg)
-    return instance
+            message = f"Failed to load plugin entry point {entry_point.name!r}"
+            raise PluginConfigurationError(message) from exc
+    return loaded
 
 
 def load_plugins(
@@ -193,16 +198,10 @@ def load_plugins(
     *,
     only: Sequence[str] | None = None,
     disable: Sequence[str] | None = None,
-    builtin: Sequence[type[BuilderPlugin]] | None = None,
+    builtin: Sequence[type[DocstringBuilderPlugin]] | None = None,
 ) -> PluginManager:
     """Discover, filter, and instantiate plugins for the current run."""
-    from tools.docstring_builder.plugins.dataclass_fields import DataclassFieldDocPlugin
-    from tools.docstring_builder.plugins.llm_summary import LLMSummaryRewritePlugin
-    from tools.docstring_builder.plugins.normalize_numpy_params import (
-        NormalizeNumpyParamsPlugin,
-    )
-
-    builtin_types: list[type[BuilderPlugin]] = [
+    builtin_types: list[object] = [
         DataclassFieldDocPlugin,
         LLMSummaryRewritePlugin,
         NormalizeNumpyParamsPlugin,
@@ -210,12 +209,20 @@ def load_plugins(
     if builtin is not None:
         builtin_types = list(builtin)
 
-    discovered = {plugin_type.name: plugin_type for plugin_type in builtin_types}
-    for plugin_type in _discover_entry_points():
-        discovered.setdefault(plugin_type.name, plugin_type)
+    discovered: dict[str, object] = {}
+    for plugin_type in builtin_types:
+        name = getattr(plugin_type, "name", plugin_type.__name__)
+        discovered[name] = plugin_type
 
-    only_set = {name.strip() for name in only or [] if name.strip()}
-    disable_set = {name.strip() for name in disable or [] if name.strip()}
+    for candidate in _load_entry_points():
+        name = getattr(candidate, "name", getattr(candidate, "__name__", None))
+        if not name:
+            message = "Discovered plugin without a name attribute"
+            raise PluginConfigurationError(message)
+        discovered.setdefault(name, candidate)
+
+    only_set = {entry.strip() for entry in only or [] if entry.strip()}
+    disable_set = {entry.strip() for entry in disable or [] if entry.strip()}
 
     missing_only = sorted(name for name in only_set if name not in discovered)
     missing_disable = sorted(name for name in disable_set if name not in discovered)
@@ -224,49 +231,25 @@ def load_plugins(
         message = f"Unknown plugin(s): {missing}"
         raise PluginConfigurationError(message)
 
-    harvesters: list[HarvesterPlugin] = []
-    transformers: list[TransformerPlugin] = []
-    formatters: list[FormatterPlugin] = []
-    skipped: list[str] = []
+    manager = PluginManager(config=config, repo_root=repo_root)
+    manager.available = sorted(discovered)
 
-    for name, plugin_type in sorted(discovered.items()):
+    for name in manager.available:
         if only_set and name not in only_set:
-            skipped.append(name)
+            manager.skipped.append(name)
             continue
         if name in disable_set:
-            skipped.append(name)
+            manager.disabled.append(name)
+            manager.skipped.append(name)
             continue
-        plugin = _instantiate(plugin_type)
-        if isinstance(plugin, HarvesterPlugin):
-            harvesters.append(plugin)
-        elif isinstance(plugin, TransformerPlugin):
-            transformers.append(plugin)
-        elif isinstance(plugin, FormatterPlugin):
-            formatters.append(plugin)
-        else:  # pragma: no cover - defensive guard
-            skipped.append(name)
+        plugin = _instantiate_plugin(discovered[name])
+        _register_plugin(manager, plugin)
 
-    manager = PluginManager(
-        config=config,
-        repo_root=repo_root,
-        harvesters=harvesters,
-        transformers=transformers,
-        formatters=formatters,
-        available=sorted(discovered.keys()),
-        disabled=sorted(disable_set),
-        skipped=sorted(skipped),
-    )
-    manager.start()
     return manager
 
 
 __all__ = [
-    "BuilderPlugin",
-    "FormatterPlugin",
-    "HarvesterPlugin",
     "PluginConfigurationError",
-    "PluginContext",
     "PluginManager",
-    "TransformerPlugin",
     "load_plugins",
 ]

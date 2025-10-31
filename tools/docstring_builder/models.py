@@ -169,6 +169,14 @@ class ToolConfigurationError(DocstringBuilderError):
     """Raised when CLI configuration (flags, environment, config files) is invalid."""
 
 
+class SymbolResolutionError(DocstringBuilderError):
+    """Raised when harvested symbols cannot be imported for inspection."""
+
+
+class SignatureIntrospectionError(DocstringBuilderError):
+    """Raised when callable signatures or annotations cannot be inspected."""
+
+
 class RunStatus(str, Enum):
     """Enumerated status labels used across CLI summaries and manifest files."""
 
@@ -722,7 +730,9 @@ __all__ = [
     "RunStatus",
     "RunSummary",
     "SchemaViolationError",
+    "SignatureIntrospectionError",
     "StatusCounts",
+    "SymbolResolutionError",
     "ToolConfigurationError",
     "build_cli_result_skeleton",
     "build_docfacts_document_payload",

@@ -1,0 +1,13 @@
+{
+    "type": "https://kgfoundry.dev/problems/docbuilder/run-failed",
+    "title": "Docstring builder run failed",
+    "status": 500,
+    "detail": "Unable to render docstring",
+    "instance": "urn:docbuilder:run:example",
+    "extensions": {
+        "command": "update",
+        "subcommand": "check",
+        "errorCount": 1,
+        "symbol": "kg.module.function",
+    },
+}
