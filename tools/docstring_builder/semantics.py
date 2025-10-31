@@ -135,7 +135,7 @@ def _exception_reason(node: ast.AST) -> str | None:
 def _stringify_expression(node: ast.AST) -> str | None:
     try:
         return ast.unparse(node)
-    except Exception:  # pragma: no cover - ast.unparse guard
+    except (AttributeError, ValueError, TypeError):  # pragma: no cover - ast.unparse guard
         return None
 
 

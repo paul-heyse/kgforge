@@ -78,28 +78,24 @@ def _group_parameters(
         "var_positional": None,
         "var_keyword": None,
     }
+
+    def _append(kind: str, value: str) -> None:
+        bucket = groups[kind]
+        if isinstance(bucket, list):
+            bucket.append(value)
+
+    list_kinds = {"positional_only", "positional_or_keyword", "keyword_only"}
     for kind, entry in formatted:
-        if kind == "positional_only":
-            positional_only = groups["positional_only"]
-            if isinstance(positional_only, list):
-                positional_only.append(entry)
-        elif kind == "positional_or_keyword":
-            positional_or_keyword = groups["positional_or_keyword"]
-            if isinstance(positional_or_keyword, list):
-                positional_or_keyword.append(entry)
-        elif kind == "var_positional":
+        if kind in list_kinds:
+            _append(kind, entry)
+            continue
+        if kind == "var_positional":
             groups["var_positional"] = entry
-        elif kind == "keyword_only":
-            keyword_only = groups["keyword_only"]
-            if isinstance(keyword_only, list):
-                keyword_only.append(entry)
-        elif kind == "var_keyword":
+            continue
+        if kind == "var_keyword":
             groups["var_keyword"] = entry
-        else:
-            # Default to positional_or_keyword
-            positional_or_keyword = groups["positional_or_keyword"]
-            if isinstance(positional_or_keyword, list):
-                positional_or_keyword.append(entry)
+            continue
+        _append("positional_or_keyword", entry)
     return groups  # complexity acceptable for parameter grouping logic
 
 

@@ -37,7 +37,7 @@ class LinkPolicy(TypedDict, total=False):
 class _SafeFormatDict(dict[str, object]):
     """Dictionary that returns an empty string for missing keys."""
 
-    def __missing__(self, key: str) -> str:  # type: ignore[override]
+    def __missing__(self, key: str) -> object:
         return ""
 
 
@@ -45,14 +45,12 @@ _DEFAULT_EDITOR_TEMPLATE = "vscode://file/{path}:{line}"
 _DEFAULT_GITHUB_TEMPLATE = "https://github.com/{org}/{repo}/blob/{sha}/{path}#L{line}"
 
 
+_EMPTY_GITHUB_POLICY: GithubLinkPolicy = cast(GithubLinkPolicy, {})
+
+
 def _coerce_str(value: object, default: str = "") -> str:
     """Return *value* if it is a string; otherwise return *default*."""
     return value if isinstance(value, str) else default
-
-
-def _coerce_mapping(value: object) -> Mapping[str, object]:
-    """Return *value* as a mapping when possible; otherwise return an empty mapping."""
-    return value if isinstance(value, Mapping) else {}
 
 
 DEFAULT_EDITOR_TEMPLATE = "vscode://file/{path}:{line}"
@@ -226,7 +224,7 @@ class AgentCatalogClient:
         list[ModuleModel]
             Describe return value.
         """
-        package_name = package.name if isinstance(package, PackageModel) else package
+        package_name = package if isinstance(package, str) else package.name
         for pkg in self._catalog.packages:
             if pkg.name == package_name:
                 return list(pkg.modules)
@@ -385,8 +383,12 @@ class AgentCatalogClient:
             query=query,
             k=k,
         )
-        return catalog_search.search_catalog(
+        catalog_payload = cast(
+            Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
             self._catalog.model_dump(),
+        )
+        return catalog_search.search_catalog(
+            catalog_payload,
             request=request,
             options=options,
         )
@@ -416,7 +418,7 @@ class AgentCatalogClient:
         start_line = symbol.anchors.start_line or 1
 
         raw_policy = cast(JsonObject | None, self._catalog.link_policy)
-        policy: LinkPolicy = cast(LinkPolicy, raw_policy)
+        policy = _normalize_link_policy(raw_policy)
         editor_template = _coerce_str(policy.get("editor_template"), _DEFAULT_EDITOR_TEMPLATE)
         github_template = _coerce_str(policy.get("github_template"), _DEFAULT_GITHUB_TEMPLATE)
         rel_path = Path(source_path)
@@ -429,8 +431,7 @@ class AgentCatalogClient:
             message = "Invalid editor_template in catalog link_policy"
             raise AgentCatalogClientError(message) from exc
 
-        raw_github = _coerce_mapping(policy.get("github"))
-        github_policy = cast(GithubLinkPolicy, raw_github)
+        github_policy = policy["github"] if "github" in policy else _EMPTY_GITHUB_POLICY
         github_vars = _SafeFormatDict(
             {
                 "org": _coerce_str(github_policy.get("org")),

@@ -9,11 +9,13 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Final
 
 import numpy as np
 import typer
+from numpy.typing import NDArray
 
 from kgfoundry.embeddings_sparse.bm25 import get_bm25
 from kgfoundry_common.navmap_types import NavMap
@@ -120,38 +122,48 @@ def index_bm25(
             extra={"operation": "index_bm25", "status": "warning"},
         )
         typer.echo(f"Warning: Index already exists at {index_dir}, will be rebuilt")
-    # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
+
+    def _extract_document(record: Mapping[str, object]) -> tuple[str, dict[str, str]] | None:
+        chunk_id = record.get("chunk_id")
+        if not isinstance(chunk_id, str):
+            return None
+        title = record.get("title")
+        section = record.get("section")
+        text = record.get("text")
+        return (
+            chunk_id,
+            {
+                "title": title if isinstance(title, str) else "",
+                "section": section if isinstance(section, str) else "",
+                "body": text if isinstance(text, str) else "",
+            },
+        )
+
     docs: list[tuple[str, dict[str, str]]] = []
     if chunks_parquet.endswith(".jsonl"):
         with Path(chunks_parquet).open(encoding="utf-8") as fh:
             for line in fh:
-                rec = json.loads(line)
-                docs.append(
-                    (
-                        rec["chunk_id"],
-                        {
-                            "title": rec.get("title", ""),
-                            "section": rec.get("section", ""),
-                            "body": rec.get("text", ""),
-                        },
-                    )
-                )
+                try:
+                    rec_obj: object = json.loads(line)
+                except json.JSONDecodeError as exc:
+                    logger.warning("Skipping invalid JSON line: %s", exc)
+                    continue
+                if isinstance(rec_obj, Mapping):
+                    document = _extract_document(rec_obj)
+                    if document:
+                        docs.append(document)
     else:
-        # naive: expect a JSON file with list under skeleton; replace with Parquet
-        # reader in implementation
         with Path(chunks_parquet).open(encoding="utf-8") as fh:
-            data = json.load(fh)
-        for rec in data:
-            docs.append(
-                (
-                    rec["chunk_id"],
-                    {
-                        "title": rec.get("title", ""),
-                        "section": rec.get("section", ""),
-                        "body": rec.get("text", ""),
-                    },
-                )
-            )
+            raw_data: object = json.load(fh)
+        if not isinstance(raw_data, Sequence) or isinstance(raw_data, (str, bytes)):
+            message = "Chunk dataset must be a sequence of mapping objects"
+            raise TypeError(message)
+        for rec_obj in raw_data:
+            if isinstance(rec_obj, Mapping):
+                document = _extract_document(rec_obj)
+                if document:
+                    docs.append(document)
+
     idx = get_bm25(backend, index_dir, k1=0.9, b=0.4)
     idx.build(docs)
     typer.echo(f"BM25 index built at {index_dir} using backend={backend} ({type(idx).__name__})")
@@ -214,9 +226,38 @@ def index_faiss(
         typer.echo(f"Warning: Index already exists at {index_path}, will be rebuilt")
 
     with Path(dense_vectors).open(encoding="utf-8") as fh:
-        vecs = json.load(fh)
-    keys = [r["key"] for r in vecs]
-    vectors = np.array([r["vector"] for r in vecs], dtype="float32")
+        raw_vecs: object = json.load(fh)
+    if not isinstance(raw_vecs, Sequence) or isinstance(raw_vecs, (str, bytes)):
+        message = "Dense vectors dataset must be a sequence of mapping objects"
+        raise TypeError(message)
+
+    keys: list[str] = []
+    rows: list[list[float]] = []
+    for entry in raw_vecs:
+        if not isinstance(entry, Mapping):
+            continue
+        key_obj = entry.get("key")
+        vector_obj = entry.get("vector")
+        if not isinstance(key_obj, str) or not isinstance(vector_obj, Sequence):
+            continue
+        vector_row: list[float] = []
+        valid = True
+        for value in vector_obj:
+            if isinstance(value, (int, float)):
+                vector_row.append(float(value))
+            else:
+                valid = False
+                break
+        if not valid or not vector_row:
+            continue
+        keys.append(key_obj)
+        rows.append(vector_row)
+
+    if not keys:
+        message = "Dense vectors dataset is empty or malformed"
+        raise TypeError(message)
+
+    vectors: NDArray[np.float32] = np.asarray(rows, dtype=np.float32)
     # Train and add
     vs = faiss_gpu.FaissGpuIndex()
     vs.train(vectors[: min(len(vectors), 10000)])  # small train set

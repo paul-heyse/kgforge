@@ -64,7 +64,7 @@ def _join_sections(sections: list[_Section]) -> str:
     output: list[str] = []
     for section in sections:
         if section.title is not None:
-            if output and output[-1] != "":
+            if output and output[-1]:
                 output.append("")
             output.append(section.title)
             output.append("-" * len(section.title))

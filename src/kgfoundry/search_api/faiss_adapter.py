@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 import search_api.faiss_adapter as _module
-from kgfoundry._namespace_proxy import namespace_dir, namespace_getattr
+from kgfoundry._namespace_proxy import namespace_attach, namespace_dir, namespace_getattr
 from search_api.faiss_adapter import HAVE_FAISS, DenseVecs, FaissAdapter, VecArray
 
 __all__ = ["HAVE_FAISS", "DenseVecs", "FaissAdapter", "VecArray"]
-__doc__ = _module.__doc__
-__path__ = list(getattr(_module, "__path__", []))
+_namespace = cast(dict[str, object], globals())
+namespace_attach(_module, _namespace, __all__)
 
 
 def __getattr__(name: str) -> object:

@@ -20,15 +20,18 @@ class LLMSummaryRewritePlugin:
     name: ClassVar[str] = "llm_summary_rewriter"
     stage: ClassVar[PluginStage] = "transformer"
 
-    def on_start(self, context: PluginContext) -> None:
+    @staticmethod
+    def on_start(context: PluginContext) -> None:
         """Prepare plugin state for execution (no-op)."""
         del context
 
-    def on_finish(self, context: PluginContext) -> None:
+    @staticmethod
+    def on_finish(context: PluginContext) -> None:
         """Clean up plugin state after execution (no-op)."""
         del context
 
-    def apply(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
+    @staticmethod
+    def apply(context: PluginContext, result: SemanticResult) -> SemanticResult:
         """Rewrite the summary text for ``result`` when configured to do so."""
         mode = getattr(context.config, "llm_summary_mode", "off").lower()
         if mode not in {"apply", "dry-run"}:

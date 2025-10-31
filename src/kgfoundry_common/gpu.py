@@ -5,8 +5,9 @@ from __future__ import annotations
 import importlib
 import importlib.util
 import os
-from collections.abc import Iterable
-from typing import Callable, cast
+from collections.abc import Callable, Iterable
+from types import ModuleType
+from typing import cast
 
 GPU_CORE_MODULES: tuple[str, ...] = (
     "torch",
@@ -65,11 +66,11 @@ def has_gpu_stack(*, allow_without_cuda_env: str = "ALLOW_GPU_TESTS_WITHOUT_CUDA
         torch_module = importlib.import_module("torch")
     except Exception:  # pragma: no cover - import guard
         return False
-    cuda_module = getattr(torch_module, "cuda", None)
-    if cuda_module is None:
+    cuda_module: object = getattr(torch_module, "cuda", None)
+    if not isinstance(cuda_module, ModuleType):
         return False
-    is_available_attr = getattr(cuda_module, "is_available", None)
+    is_available_attr: object = getattr(cuda_module, "is_available", None)
     if not callable(is_available_attr):
         return False
-    is_available: Callable[[], bool] = cast(Callable[[], bool], is_available_attr)
+    is_available = cast(Callable[[], bool], is_available_attr)
     return bool(is_available())

@@ -1,0 +1,14 @@
+{
+  "type": "https://kgfoundry.dev/problems/readme-metadata-missing",
+  "title": "Missing badge metadata",
+  "status": 422,
+  "detail": "Public symbols are missing owner or stability metadata",
+  "instance": "urn:tool:gen-readmes:missing-metadata",
+  "packages": [
+    "kgfoundry.docs"
+  ],
+  "symbols": [
+    "kgfoundry.docs.module.example_function"
+  ]
+}
+

@@ -8,7 +8,6 @@ import os
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import cast
 
 try:  # Python 3.11+
     import tomllib
@@ -98,53 +97,59 @@ def _as_list(value: object) -> list[str]:
     raise TypeError(msg)
 
 
+def _package_settings_from(data: Mapping[str, object]) -> PackageSettings:
+    packages_raw = data.get("packages", {}) or {}
+    packages = packages_raw if isinstance(packages_raw, Mapping) else {}
+    summary_verbs_raw = packages.get("summary_verbs", {}) or {}
+    summary_verbs = (
+        {str(key): str(value) for key, value in summary_verbs_raw.items()}
+        if isinstance(summary_verbs_raw, Mapping)
+        else {}
+    )
+    opt_out_values = _as_list(packages.get("opt_out")) if isinstance(packages, Mapping) else []
+    return PackageSettings(
+        summary_verbs=summary_verbs, opt_out={str(item) for item in opt_out_values}
+    )
+
+
+def _bool_option(data: Mapping[str, object], key: str, default: bool = False) -> bool:
+    return bool(data.get(key, default))
+
+
 def load_config(path: Path | None = None) -> BuilderConfig:
     """Load configuration from the provided path or default location."""
     config_path = path or DEFAULT_CONFIG_PATH
     data = _load_toml(config_path)
-    include = _as_list(data.get("include")) or ["src/**/*.py"]
-    exclude = _as_list(data.get("exclude")) or ["tests/**", "site/**", "docs/_build/**", "tools/**"]
-    ignore = _as_list(data.get("ignore"))
-    ownership_marker = data.get("ownership_marker", DEFAULT_MARKER)
-    dynamic_probes = bool(data.get("dynamic_probes", False))
-    normalize_sections = bool(data.get("normalize_sections", False))
-    navmap_metadata = bool(data.get("navmap_metadata", True))
 
-    package_section_raw = data.get("packages", {}) or {}
-    package_section = (
-        cast(Mapping[str, object], package_section_raw)
-        if isinstance(package_section_raw, Mapping)
-        else {}
-    )
-    summary_verbs_raw = package_section.get("summary_verbs", {}) or {}
-    summary_verbs = (
-        cast(Mapping[str, object], summary_verbs_raw)
-        if isinstance(summary_verbs_raw, Mapping)
-        else {}
-    )
-    opt_out = set(_as_list(package_section.get("opt_out")))
-    package_settings = PackageSettings(
-        summary_verbs={str(key): str(value) for key, value in summary_verbs.items()},
-        opt_out={str(item) for item in opt_out},
-    )
-
+    include = [str(pattern) for pattern in _as_list(data.get("include")) or ["src/**/*.py"]]
+    exclude = [
+        str(pattern)
+        for pattern in _as_list(data.get("exclude"))
+        or ["tests/**", "site/**", "docs/_build/**", "tools/**"]
+    ]
+    ignore = [str(pattern) for pattern in _as_list(data.get("ignore"))]
+    ownership_marker = str(data.get("ownership_marker", DEFAULT_MARKER))
+    dynamic_probes = _bool_option(data, "dynamic_probes")
+    normalize_sections = _bool_option(data, "normalize_sections")
+    navmap_metadata = _bool_option(data, "navmap_metadata", True)
+    package_settings = _package_settings_from(data)
     llm_summary_mode = str(data.get("llm_summary_mode", "off")).lower()
-    render_signature = bool(data.get("render_signature", False))
+    render_signature = _bool_option(data, "render_signature")
 
     config = BuilderConfig(
-        include=[str(pattern) for pattern in include],
-        exclude=[str(pattern) for pattern in exclude],
-        ownership_marker=str(ownership_marker),
+        include=include,
+        exclude=exclude,
+        ownership_marker=ownership_marker,
         dynamic_probes=dynamic_probes,
         normalize_sections=normalize_sections,
-        package_settings=package_settings,
         navmap_metadata=navmap_metadata,
-        ignore=[str(pattern) for pattern in ignore],
+        package_settings=package_settings,
+        ignore=ignore,
         llm_summary_mode=llm_summary_mode,
         render_signature=render_signature,
     )
-    if path:
-        LOGGER.debug("Loaded docstring builder config hash: %s", config.config_hash)
+
+    LOGGER.debug("Loaded docstring builder config: include=%s exclude=%s", include, exclude)
     return config
 
 

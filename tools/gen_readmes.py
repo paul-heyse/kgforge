@@ -16,25 +16,54 @@ import shutil
 import sys
 import time
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
-from typing import Any, Final, Protocol
+from typing import Final, NoReturn, Protocol, cast
 from urllib.parse import urlparse
 
 from tools._shared.logging import get_logger, with_fields
+from tools._shared.problem_details import ProblemDetailsDict, build_problem_details
 from tools._shared.proc import ToolExecutionError, run_tool
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from tools.griffe_utils import resolve_griffe  # noqa: E402
+from tools.griffe_utils import GriffeAPI, resolve_griffe  # noqa: E402
 
 LOGGER = get_logger(__name__)
 
-_griffe_api = resolve_griffe()
-_griffe_module = _griffe_api.package
-_griffe_object_type = _griffe_api.object_type
-GriffeLoader = _griffe_api.loader_type
+
+type JsonPrimitive = str | int | float | bool | None
+type JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
+type JsonObject = dict[str, JsonValue]
+
+
+class ReadmeGenerationError(RuntimeError):
+    """Base exception raised when README generation fails."""
+
+    def __init__(self, message: str, *, problem: ProblemDetailsDict | None = None) -> None:
+        super().__init__(message)
+        self.problem = problem
+
+
+class MissingMetadataError(ReadmeGenerationError):
+    """Raised when required badge metadata is missing for public symbols."""
+
+
+class LinkMode(Enum):
+    """Enumerate link emission strategies for generated README entries."""
+
+    GITHUB = "github"
+    EDITOR = "editor"
+    BOTH = "both"
+
+
+class EditorMode(Enum):
+    """Enumerate editor link formats supported by README generation."""
+
+    VSCODE = "vscode"
+    RELATIVE = "relative"
 
 
 class DocstringLike(Protocol):
@@ -71,7 +100,24 @@ class GriffeObjectLike(Protocol):
     is_package: bool | None
 
 
+class LoaderInstance(Protocol):
+    """Protocol describing loader instances returned by :mod:`griffe`."""
+
+    def load(self, name: str) -> GriffeObjectLike:
+        """Return the object graph for the package identified by ``name``."""
+
+
+class LoaderFactory(Protocol):
+    """Factory returning loader instances used to inspect packages."""
+
+    def __call__(self, *, search_paths: Sequence[str]) -> LoaderInstance:
+        """Return a loader bound to ``search_paths``."""
+
+
 from tools.detect_pkg import detect_packages, detect_primary  # noqa: E402
+
+_griffe_api: GriffeAPI = resolve_griffe()
+GriffeLoader = cast(LoaderFactory, _griffe_api.loader_type)
 
 SRC = ROOT / "src"
 NAVMAP_PATH = ROOT / "site" / "_build" / "navmap" / "navmap.json"
@@ -90,15 +136,18 @@ def detect_repo() -> tuple[str, str]:
     the detected values so downstream builds can rehost the docs without
     reconfiguring git remotes.
     """
-    log_adapter = with_fields(LOGGER, command=["git", "config", "--get", "remote.origin.url"])
+    log_adapter = with_fields(
+        LOGGER,
+        command=("git", "config", "--get", "remote.origin.url"),
+    )
     try:
         result = run_tool(
-            [
+            (
                 "git",
                 "config",
                 "--get",
                 "remote.origin.url",
-            ],
+            ),
             cwd=ROOT,
             timeout=10.0,
         )
@@ -137,9 +186,9 @@ def git_sha() -> str:
     A ``DOCS_GITHUB_SHA`` environment variable can provide the value when the
     repository is not available locally (for example, in CI artifacts).
     """
-    log_adapter = with_fields(LOGGER, command=["git", "rev-parse", "HEAD"])
+    log_adapter = with_fields(LOGGER, command=("git", "rev-parse", "HEAD"))
     try:
-        result = run_tool(["git", "rev-parse", "HEAD"], cwd=ROOT, timeout=10.0)
+        result = run_tool(("git", "rev-parse", "HEAD"), cwd=ROOT, timeout=10.0)
         return result.stdout.strip() or os.environ.get("DOCS_GITHUB_SHA", "main")
     except ToolExecutionError as exc:
         log_adapter.debug("Unable to resolve git SHA: %s", exc)
@@ -259,135 +308,286 @@ def iter_public_members(node: GriffeObjectLike) -> list[GriffeObjectLike]:
     return sorted(public, key=_member_key)
 
 
-def _load_json(path: Path) -> dict[str, Any]:
-    """Read ``path`` as JSON, returning an empty dictionary when unavailable."""
+def _load_json(path: Path) -> JsonObject:
+    """Return the JSON document stored at ``path`` or ``{}`` when unavailable."""
     if not path.exists():
         return {}
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        raw: object = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError) as exc:
         with_fields(LOGGER, path=str(path)).debug("Failed to load JSON: %s", exc)
         return {}
+    if isinstance(raw, dict):
+        return cast(JsonObject, raw)
+    with_fields(LOGGER, path=str(path), received=type(raw).__name__).debug(
+        "Expected object at JSON root, defaulting to empty document",
+    )
+    return {}
 
 
-NAVMAP = _load_json(NAVMAP_PATH)
-TEST_MAP = _load_json(TESTMAP_PATH)
+@dataclass(frozen=True, slots=True)
+class SymbolMetadata:
+    """Badge metadata derived from the navigation map for a single symbol."""
+
+    owner: str | None = None
+    stability: str | None = None
+    section: str | None = None
+    since: str | None = None
+    deprecated_in: str | None = None
+
+    def merged(self, override: SymbolMetadata | None) -> SymbolMetadata:
+        """Return a metadata instance where ``override`` values take precedence."""
+        if override is None:
+            return self
+        return SymbolMetadata(
+            owner=override.owner or self.owner,
+            stability=override.stability or self.stability,
+            section=override.section or self.section,
+            since=override.since or self.since,
+            deprecated_in=override.deprecated_in or self.deprecated_in,
+        )
+
+    def with_section(self, section: str | None) -> SymbolMetadata:
+        """Return metadata with ``section`` applied when provided."""
+        if section is None or self.section == section:
+            return self
+        return SymbolMetadata(
+            owner=self.owner,
+            stability=self.stability,
+            section=section,
+            since=self.since,
+            deprecated_in=self.deprecated_in,
+        )
 
 
-@dataclass(frozen=True)
-class Config:
-    """Model the Config.
+@dataclass(frozen=True, slots=True)
+class NavMatch:
+    """Result of attempting to resolve badge metadata for a symbol."""
 
-    Represent the config data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
-
-    packages: list[str]
-    link_mode: str  # github | editor | both
-    editor: str  # vscode | relative
-    fail_on_metadata_miss: bool
-    dry_run: bool
-    verbose: bool
-    run_doctoc: bool
+    symbol_meta: SymbolMetadata | None
+    defaults: SymbolMetadata
+    matches_symbol_list: bool
+    matches_prefix: bool
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
+class NavModuleData:
+    """Typed representation of a module entry within the navigation map."""
+
+    identifier: str
+    defaults: SymbolMetadata
+    overrides: dict[str, SymbolMetadata]
+    sections: dict[str, str]
+    listed_symbols: frozenset[str]
+
+    def lookup(self, qname: str, symbol: str) -> NavMatch:
+        """Return metadata lookup result for ``qname`` within this module."""
+        override = self.overrides.get(qname) or self.overrides.get(symbol)
+        section = self.sections.get(symbol)
+        defaults = self.defaults.with_section(section)
+        resolved_override = override.with_section(section) if override is not None else None
+        return NavMatch(
+            symbol_meta=resolved_override,
+            defaults=defaults,
+            matches_symbol_list=symbol in self.listed_symbols,
+            matches_prefix=qname.startswith(self.identifier),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class NavData:
+    """Navigation metadata extracted from ``navmap.json``."""
+
+    modules: dict[str, NavModuleData]
+
+    def lookup(self, qname: str) -> tuple[SymbolMetadata | None, SymbolMetadata]:
+        """Return override metadata and defaults for ``qname``."""
+        symbol = qname.rsplit(".", maxsplit=1)[-1]
+        fallback: SymbolMetadata | None = None
+        for module in self.modules.values():
+            match = module.lookup(qname, symbol)
+            if match.symbol_meta is not None:
+                return match.symbol_meta, match.defaults
+            if match.matches_symbol_list or (match.matches_prefix and fallback is None):
+                fallback = match.defaults
+        return None, fallback or SymbolMetadata()
+
+
+@dataclass(frozen=True, slots=True)
+class TestRecord:
+    """Association between a symbol and one or more validating tests."""
+
+    file: str
+    lines: tuple[int, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class TestCatalog:
+    """Collection of test coverage metadata derived from ``test_map.json``."""
+
+    records: dict[str, tuple[TestRecord, ...]]
+
+    def lookup(self, qname: str) -> tuple[TestRecord, ...]:
+        """Return test records associated with ``qname`` or its short name."""
+        symbol = qname.rsplit(".", maxsplit=1)[-1]
+        return self.records.get(qname) or self.records.get(symbol) or ()
+
+
+@dataclass(frozen=True, slots=True)
 class Badges:
-    """Model the Badges.
-
-    Represent the badges data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
+    """Resolved badge metadata for a public symbol."""
 
     stability: str | None = None
     owner: str | None = None
     section: str | None = None
     since: str | None = None
     deprecated_in: str | None = None
-    tested_by: list[dict[str, Any]] = field(default_factory=list)
+    tested_by: tuple[TestRecord, ...] = ()
 
 
-@dataclass(frozen=True)
-class NavMatch:
-    """Computed data for a symbol while scanning the NavMap."""
+@dataclass(frozen=True, slots=True)
+class ReadmeConfig:
+    """Validated configuration derived from CLI flags and environment variables."""
 
-    symbol_meta: dict[str, Any]
-    defaults: dict[str, Any]
-    matches_symbol_list: bool
-    matches_prefix: bool
+    packages: tuple[str, ...]
+    link_mode: LinkMode
+    editor: EditorMode
+    fail_on_metadata_miss: bool
+    dry_run: bool
+    verbose: bool
+    run_doctoc: bool
 
-
-def _module_defaults(module: Mapping[str, Any]) -> dict[str, Any]:
-    """Return module-level defaults for badge metadata."""
-    module_meta = module.get("module_meta")
-    if isinstance(module_meta, Mapping):
-        return dict(module_meta)
-    defaults: dict[str, Any] = {}
-    for key in ("owner", "stability", "since", "deprecated_in"):
-        value = module.get(key)
-        if value is not None:
-            defaults[key] = value
-    return defaults
-
-
-def _section_for_symbol(module: Mapping[str, Any], symbol: str) -> str | None:
-    """Return the section identifier for ``symbol`` when present."""
-    sections = module.get("sections")
-    if not isinstance(sections, Sequence):
-        return None
-    for section in sections:
-        if not isinstance(section, Mapping):
-            continue
-        section_id = section.get("id")
-        symbols = section.get("symbols")
-        if (
-            isinstance(section_id, str)
-            and isinstance(symbols, Sequence)
-            and any(entry == symbol for entry in symbols)
-        ):
-            return section_id
-    return None
+    @classmethod
+    def from_namespace(cls, namespace: argparse.Namespace) -> ReadmeConfig:
+        """Construct configuration from an argparse namespace."""
+        packages_arg: str = getattr(namespace, "packages", "")
+        packages = tuple(pkg for pkg in (part.strip() for part in packages_arg.split(",")) if pkg)
+        if not packages:
+            packages = tuple(iter_packages())
+        link_mode = LinkMode(cast(str, namespace.link_mode))
+        editor = EditorMode(cast(str, namespace.editor))
+        return cls(
+            packages=packages,
+            link_mode=link_mode,
+            editor=editor,
+            fail_on_metadata_miss=bool(namespace.fail_on_metadata_miss),
+            dry_run=bool(namespace.dry_run),
+            verbose=bool(namespace.verbose),
+            run_doctoc=bool(namespace.run_doctoc),
+        )
 
 
-def _module_match_for_symbol(
-    module_id: str,
-    module: Mapping[str, Any],
-    qname: str,
-    symbol: str,
-) -> NavMatch:
-    """Return per-module metadata for ``symbol``."""
-    symbol_meta: dict[str, Any] = {}
-    meta = module.get("meta")
-    if isinstance(meta, Mapping):
-        candidate = meta.get(qname) or meta.get(symbol)
-        if isinstance(candidate, Mapping):
-            symbol_meta = dict(candidate)
-            if "section" not in symbol_meta:
-                section_id = _section_for_symbol(module, symbol)
-                if section_id:
-                    symbol_meta = {**symbol_meta, "section": section_id}
+def _optional_str(value: JsonValue | None) -> str | None:
+    return value if isinstance(value, str) else None
 
-    defaults = _module_defaults(module)
 
-    symbol_entries = module.get("symbols")
-    matches_symbol_list = False
-    if isinstance(symbol_entries, Sequence):
-        matches_symbol_list = any(entry == symbol for entry in symbol_entries)
-
-    matches_prefix = qname.startswith(module_id)
-
-    return NavMatch(
-        symbol_meta=symbol_meta,
-        defaults=defaults,
-        matches_symbol_list=matches_symbol_list,
-        matches_prefix=matches_prefix,
+def _symbol_metadata_from_mapping(payload: Mapping[str, JsonValue]) -> SymbolMetadata:
+    return SymbolMetadata(
+        owner=_optional_str(payload.get("owner")),
+        stability=_optional_str(payload.get("stability")),
+        section=_optional_str(payload.get("section")),
+        since=_optional_str(payload.get("since")),
+        deprecated_in=_optional_str(payload.get("deprecated_in")),
     )
 
 
-def parse_config() -> Config:
-    """Parse CLI arguments and environment overrides into a :class:`Config`."""
+def _parse_symbol_overrides(payload: Mapping[str, JsonValue]) -> dict[str, SymbolMetadata]:
+    overrides: dict[str, SymbolMetadata] = {}
+    meta_value = payload.get("meta")
+    if isinstance(meta_value, Mapping):
+        for key, raw_meta in meta_value.items():
+            if isinstance(key, str) and isinstance(raw_meta, Mapping):
+                overrides[key] = _symbol_metadata_from_mapping(raw_meta)
+    return overrides
+
+
+def _parse_sections_map(payload: Mapping[str, JsonValue]) -> dict[str, str]:
+    sections: dict[str, str] = {}
+    section_entries = payload.get("sections")
+    if isinstance(section_entries, list):
+        for entry in section_entries:
+            if not isinstance(entry, Mapping):
+                continue
+            section_id = _optional_str(entry.get("id"))
+            if not section_id:
+                continue
+            symbols_value = entry.get("symbols")
+            if not isinstance(symbols_value, list):
+                continue
+            for symbol in symbols_value:
+                if isinstance(symbol, str):
+                    sections[symbol] = section_id
+    return sections
+
+
+def _parse_listed_symbols(payload: Mapping[str, JsonValue]) -> frozenset[str]:
+    symbol_entries = payload.get("symbols")
+    collected: set[str] = set()
+    if isinstance(symbol_entries, list):
+        for entry in symbol_entries:
+            if isinstance(entry, str):
+                collected.add(entry)
+    return frozenset(collected)
+
+
+def _parse_nav_module(identifier: str, payload: Mapping[str, JsonValue]) -> NavModuleData:
+    module_meta = payload.get("module_meta")
+    defaults = (
+        _symbol_metadata_from_mapping(module_meta)
+        if isinstance(module_meta, Mapping)
+        else SymbolMetadata(
+            owner=_optional_str(payload.get("owner")),
+            stability=_optional_str(payload.get("stability")),
+            since=_optional_str(payload.get("since")),
+            deprecated_in=_optional_str(payload.get("deprecated_in")),
+        )
+    )
+    return NavModuleData(
+        identifier=identifier,
+        defaults=defaults,
+        overrides=_parse_symbol_overrides(payload),
+        sections=_parse_sections_map(payload),
+        listed_symbols=_parse_listed_symbols(payload),
+    )
+
+
+def _build_nav_data(document: JsonObject) -> NavData:
+    modules_value = document.get("modules")
+    modules: dict[str, NavModuleData] = {}
+    if isinstance(modules_value, Mapping):
+        for identifier, payload in modules_value.items():
+            if isinstance(identifier, str) and isinstance(payload, Mapping):
+                modules[identifier] = _parse_nav_module(identifier, payload)
+    return NavData(modules=modules)
+
+
+def _build_test_catalog(document: JsonObject) -> TestCatalog:
+    records: dict[str, tuple[TestRecord, ...]] = {}
+    for key, value in document.items():
+        if not isinstance(key, str) or not isinstance(value, list):
+            continue
+        entries: list[TestRecord] = []
+        for item in value:
+            if not isinstance(item, Mapping):
+                continue
+            file_path = _optional_str(item.get("file"))
+            if not file_path:
+                continue
+            lines_value = item.get("lines")
+            lines: tuple[int, ...] = ()
+            if isinstance(lines_value, list):
+                lines = tuple(number for number in lines_value if isinstance(number, int))
+            entries.append(TestRecord(file=file_path, lines=lines))
+        records[key] = tuple(entries)
+    return TestCatalog(records=records)
+
+
+_NAV_DATA = _build_nav_data(_load_json(NAVMAP_PATH))
+_TEST_CATALOG = _build_test_catalog(_load_json(TESTMAP_PATH))
+
+
+def parse_config(argv: Sequence[str] | None = None) -> ReadmeConfig:
+    """Parse CLI arguments and environment overrides into a :class:`ReadmeConfig`."""
     parser = argparse.ArgumentParser(description="Generate per-package README files.")
     parser.add_argument("--packages", default=os.getenv("DOCS_PKG", ""))
     parser.add_argument(
@@ -404,105 +604,42 @@ def parse_config() -> Config:
     parser.add_argument("--dry-run", action="store_true", default=False)
     parser.add_argument("--verbose", action="store_true", default=False)
     parser.add_argument("--run-doctoc", action="store_true", default=False)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
-    packages = (
-        [pkg.strip() for pkg in args.packages.split(",") if pkg.strip()]
-        if args.packages
-        else iter_packages()
-    )
-    return Config(
-        packages=packages,
-        link_mode=args.link_mode,
-        editor=args.editor,
-        fail_on_metadata_miss=args.fail_on_metadata_miss,
-        dry_run=args.dry_run,
-        verbose=args.verbose,
-        run_doctoc=args.run_doctoc,
-    )
+    return ReadmeConfig.from_namespace(args)
 
 
-def _lookup_nav(qname: str) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Return symbol metadata and module defaults from the NavMap.
-
-    The NavMap JSON generated by ``tools/navmap/build_navmap.py`` has the
-    structure::
-
-        {
-            "modules": {
-                "package.module": {
-                    "meta": {"package.module.symbol": {...}},
-                    "module_meta": {...},
-                    "sections": [
-                        {"id": "storage", "symbols": ["symbol"]},
-                    ],
-                }
-            }
-        }
-
-    ``meta`` entries are per-symbol overrides; ``module_meta`` supplies default
-    values that cascade to every symbol in the module.  We normalise the lookup
-    so ``badges_for`` can merge overrides with defaults seamlessly.
-    """
-    modules = NAVMAP.get("modules", {}) if isinstance(NAVMAP, Mapping) else {}
-    if not isinstance(modules, Mapping):
-        return {}, {}
-
-    symbol = qname.rsplit(".", maxsplit=1)[-1]
-    best_defaults: dict[str, Any] = {}
-    for module_id, module in modules.items():
-        if not isinstance(module_id, str) or not isinstance(module, Mapping):
-            continue
-        match = _module_match_for_symbol(module_id, module, qname, symbol)
-        if match.symbol_meta:
-            return match.symbol_meta, match.defaults
-        if match.defaults and (match.matches_symbol_list or match.matches_prefix):
-            return {}, match.defaults
-        if match.defaults and match.matches_prefix:
-            best_defaults = match.defaults
-    if best_defaults:
-        return {}, best_defaults
-    return {}, {}
-
-
-def badges_for(qname: str) -> Badges:
-    """Return badge metadata for ``qname`` using NavMap and test fixtures.
-
-    Symbol-specific overrides take precedence over module defaults in the NavMap
-    so the resulting :class:`Badges` instance reflects the same precedence rules
-    as the documentation site.
-    """
-    symbol_meta, defaults = _lookup_nav(qname)
-    merged = {**defaults, **symbol_meta}
-    tests: list[dict[str, Any]] = []
-    if isinstance(TEST_MAP, dict):
-        recorded = TEST_MAP.get(qname) or TEST_MAP.get(qname.rsplit(".", maxsplit=1)[-1])
-        if isinstance(recorded, list):
-            tests = [entry for entry in recorded if isinstance(entry, dict)][:3]
+def badges_for(
+    qname: str,
+    *,
+    nav: NavData | None = None,
+    tests: TestCatalog | None = None,
+) -> Badges:
+    """Return badge metadata for ``qname`` using NavMap and test fixtures."""
+    nav_data = nav if nav is not None else _NAV_DATA
+    test_catalog = tests if tests is not None else _TEST_CATALOG
+    symbol_meta, defaults = nav_data.lookup(qname)
+    merged = defaults.merged(symbol_meta)
     return Badges(
-        stability=merged.get("stability"),
-        owner=merged.get("owner"),
-        section=merged.get("section"),
-        since=merged.get("since"),
-        deprecated_in=merged.get("deprecated_in"),
-        tested_by=tests,
+        stability=merged.stability,
+        owner=merged.owner,
+        section=merged.section,
+        since=merged.since,
+        deprecated_in=merged.deprecated_in,
+        tested_by=test_catalog.lookup(qname),
     )
 
 
-def _format_test_badge(entries: list[dict[str, Any]] | None) -> str | None:
+def _format_test_badge(entries: Sequence[TestRecord] | None) -> str | None:
     """Format the ``tested-by`` badge snippet when entries exist."""
     if not entries:
         return None
     formatted: list[str] = []
     for entry in entries:
-        file = entry.get("file")
-        lines = entry.get("lines")
-        if not file:
-            continue
-        if isinstance(lines, list) and lines:
-            formatted.append(f"{file}:{lines[0]}")
+        if entry.lines:
+            formatted.append(f"{entry.file}:{entry.lines[0]}")
         else:
-            formatted.append(file)
+            formatted.append(entry.file)
     if not formatted:
         return None
     return "`tested-by: " + ", ".join(formatted) + "`"
@@ -517,7 +654,11 @@ def _badge_parts(badge: Badges) -> list[str]:
         ("since", "since"),
         ("deprecated_in", "deprecated"),
     ]
-    parts = [f"`{label}:{value}`" for attr, label in attributes if (value := getattr(badge, attr))]
+    parts = [
+        f"`{label}:{value}`"
+        for attr, label in attributes
+        if (value := cast(str | None, getattr(badge, attr)))
+    ]
     test_badge = _format_test_badge(badge.tested_by)
     if test_badge:
         parts.append(test_badge)
@@ -571,17 +712,18 @@ def format_badges(qname: str, base_length: int = 0) -> str:
     return "\n    " + "\n    ".join(wrapped)
 
 
-def editor_link(abs_path: Path, lineno: int, editor_mode: str) -> str | None:
+def editor_link(abs_path: Path, lineno: int, editor_mode: EditorMode) -> str | None:
     """Return an editor-friendly link for ``abs_path`` based on ``editor_mode``."""
-    if editor_mode == "vscode":
+    if editor_mode is EditorMode.VSCODE:
         return f"vscode://file/{abs_path}:{lineno}:1"
-    if editor_mode == "relative":
+    if editor_mode is EditorMode.RELATIVE:
         try:
             rel = abs_path.relative_to(ROOT)
         except ValueError:
             rel = abs_path
         return f"./{rel.as_posix()}:{lineno}:1"
-    return None
+    message = f"Unsupported editor mode: {editor_mode}"
+    raise ValueError(message)
 
 
 def _is_exception(node: GriffeObjectLike) -> bool:
@@ -613,7 +755,7 @@ def bucket_for(node: GriffeObjectLike) -> str:
     return "Other"
 
 
-def render_line(node: GriffeObjectLike, readme_dir: Path, cfg: Config) -> str | None:
+def render_line(node: GriffeObjectLike, readme_dir: Path, cfg: ReadmeConfig) -> str | None:
     """Render a Markdown bullet for ``node`` including navigation links.
 
     The output includes GitHub links, optional editor URIs, and badges derived
@@ -622,10 +764,13 @@ def render_line(node: GriffeObjectLike, readme_dir: Path, cfg: Config) -> str | 
     qname = node.path
     summary = summarize(node)
 
-    open_link = get_open_link(node, readme_dir) if cfg.link_mode in {"editor", "both"} else None
-    view_link = get_view_link(node) if cfg.link_mode in {"github", "both"} else None
+    link_mode = cfg.link_mode
+    open_link = (
+        get_open_link(node, readme_dir) if link_mode in {LinkMode.EDITOR, LinkMode.BOTH} else None
+    )
+    view_link = get_view_link(node) if link_mode in {LinkMode.GITHUB, LinkMode.BOTH} else None
 
-    if cfg.link_mode in {"editor", "both"} and node.relative_package_filepath:
+    if link_mode in {LinkMode.EDITOR, LinkMode.BOTH} and node.relative_package_filepath:
         base = SRC if SRC.exists() else ROOT
         abs_path = (base / node.relative_package_filepath).resolve()
         direct = editor_link(abs_path, int(node.lineno or 1), cfg.editor)
@@ -663,7 +808,7 @@ def write_if_changed(path: Path, content: str) -> bool:
     return True
 
 
-def write_readme(node: GriffeObjectLike, cfg: Config) -> bool:
+def write_readme(node: GriffeObjectLike, cfg: ReadmeConfig) -> bool:
     """Generate or update the README for the package described by ``node``."""
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"
@@ -699,35 +844,41 @@ def write_readme(node: GriffeObjectLike, cfg: Config) -> bool:
 
     content = "".join(lines).rstrip() + "\n"
     if cfg.dry_run:
-        LOGGER.info("[dry-run] would write %s", readme)
+        with_fields(LOGGER, path=str(readme)).info("Dry run: README write skipped")
         return False
     changed = write_if_changed(readme, content)
     if changed:
-        LOGGER.info("Wrote %s", readme)
+        with_fields(LOGGER, path=str(readme)).info("README updated")
         _maybe_run_doctoc(readme, cfg)
+    else:
+        with_fields(LOGGER, path=str(readme)).debug("README already up to date")
     return changed
 
 
-def _maybe_run_doctoc(readme: Path, cfg: Config) -> None:
+def _maybe_run_doctoc(readme: Path, cfg: ReadmeConfig) -> None:
     """Run DocToc when enabled via ``--run-doctoc``."""
     if not cfg.run_doctoc:
         return
     doctoc = shutil.which("doctoc")
     if not doctoc:
-        LOGGER.info("Info: doctoc not installed; skipping TOC update for %s", readme)
+        with_fields(LOGGER, path=str(readme)).info(
+            "docToc executable not available; skipping TOC update"
+        )
         return
-    log_adapter = with_fields(LOGGER, command=[doctoc, str(readme)])
+    log_adapter = with_fields(LOGGER, command=(doctoc, str(readme)))
     try:
         result = run_tool([doctoc, str(readme)], check=False, timeout=30.0)
     except ToolExecutionError as exc:
         log_adapter.warning("docToc invocation failed: %s", exc)
         return
     if cfg.verbose and result.stdout.strip():
-        LOGGER.info("%s", result.stdout.strip())
+        with_fields(log_adapter, stdout=result.stdout.strip()).info("docToc stdout")
     if result.stderr.strip():
-        LOGGER.warning("%s", result.stderr.strip())
+        with_fields(log_adapter, stderr=result.stderr.strip()).warning("docToc stderr")
     if result.returncode != 0:
-        LOGGER.warning("Warning: doctoc exited with code %d for %s", result.returncode, readme)
+        with_fields(log_adapter, returncode=result.returncode).warning(
+            "DocToc exited with non-zero code"
+        )
 
 
 def _collect_missing_metadata(node: GriffeObjectLike, missing: set[str]) -> None:
@@ -754,14 +905,14 @@ def _ensure_packages_selected(packages: Sequence[str]) -> None:
 def _warn_missing_inputs() -> None:
     """Emit warnings when auxiliary metadata files are missing."""
     if not NAVMAP_PATH.exists():
-        LOGGER.warning("Warning: NavMap not found at %s; badges will be empty", NAVMAP_PATH)
+        with_fields(LOGGER, path=str(NAVMAP_PATH)).warning("NavMap not found; badges will be empty")
     if not TESTMAP_PATH.exists():
-        LOGGER.warning(
-            "Warning: Test map not found at %s; tested-by badges will be empty", TESTMAP_PATH
+        with_fields(LOGGER, path=str(TESTMAP_PATH)).warning(
+            "Test map not found; tested-by badges will be empty"
         )
 
 
-def _process_module(module: GriffeObjectLike, cfg: Config, missing_meta: set[str]) -> bool:
+def _process_module(module: GriffeObjectLike, cfg: ReadmeConfig, missing_meta: set[str]) -> bool:
     """Render README files for ``module`` and its package members."""
     changed = False
     if cfg.fail_on_metadata_miss:
@@ -784,40 +935,79 @@ def _process_module(module: GriffeObjectLike, cfg: Config, missing_meta: set[str
 def _report_duration(start: float, changed_any: bool) -> None:
     """Print a timing summary when verbose mode is enabled."""
     duration = time.monotonic() - start
-    LOGGER.info("completed in %.2fs; changed=%s", duration, changed_any)
+    with_fields(LOGGER, duration_seconds=round(duration, 2), changed=changed_any).info(
+        "README generation completed"
+    )
 
 
-def main() -> None:
-    """Generate README files for configured packages.
+def _log_problem_and_exit(problem: ProblemDetailsDict, exit_code: int) -> NoReturn:
+    """Log ``problem`` using structured context before exiting."""
+    with_fields(
+        LOGGER,
+        problemType=problem["type"],
+        status=problem.get("status"),
+        problem=problem,
+    ).error(problem["detail"])
+    raise SystemExit(exit_code)
 
-    Raises
-    ------
-    SystemExit
-        Raised with exit code ``2`` when ``--fail-on-metadata-miss`` is enabled
-        and badges are incomplete.
-    """
-    cfg = parse_config()
-    _ensure_packages_selected(cfg.packages)
-    _warn_missing_inputs()
 
-    loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
-    missing_meta: set[str] = set()
-    changed_any = False
-    start = time.monotonic()
+def _raise_missing_metadata(detail: str, problem: ProblemDetailsDict) -> NoReturn:
+    """Raise ``MissingMetadataError`` with the provided context."""
+    raise MissingMetadataError(detail, problem=problem)
 
-    for pkg in cfg.packages:
-        module = loader.load(pkg)
-        changed_any |= _process_module(module, cfg, missing_meta)
 
-    if cfg.fail_on_metadata_miss and missing_meta:
-        LOGGER.error(
-            "ERROR: Missing owner/stability for public symbols:\n  - %s",
-            "\n  - ".join(sorted(missing_meta)),
+def main(argv: Sequence[str] | None = None) -> None:
+    """Generate README files for configured packages."""
+    try:
+        cfg = parse_config(argv)
+        _ensure_packages_selected(cfg.packages)
+        _warn_missing_inputs()
+
+        loader: LoaderInstance = GriffeLoader(search_paths=(str(SRC if SRC.exists() else ROOT),))
+        missing_meta: set[str] = set()
+        changed_any = False
+        start = time.monotonic()
+
+        for pkg in cfg.packages:
+            module = loader.load(pkg)
+            changed_any |= _process_module(module, cfg, missing_meta)
+
+        if cfg.fail_on_metadata_miss and missing_meta:
+            detail = "Public symbols are missing owner or stability metadata"
+            problem = build_problem_details(
+                type="https://kgfoundry.dev/problems/readme-metadata-missing",
+                title="Missing badge metadata",
+                status=422,
+                detail=detail,
+                instance="urn:tool:gen-readmes:missing-metadata",
+                extensions={
+                    "packages": list(cfg.packages),
+                    "symbols": sorted(missing_meta),
+                },
+            )
+            _raise_missing_metadata(detail, problem)
+
+        if cfg.verbose:
+            _report_duration(start, changed_any)
+
+    except MissingMetadataError as exc:
+        problem = exc.problem or build_problem_details(
+            type="https://kgfoundry.dev/problems/readme-metadata-missing",
+            title="Missing badge metadata",
+            status=422,
+            detail=str(exc),
+            instance="urn:tool:gen-readmes:missing-metadata",
         )
-        raise SystemExit(2)
-
-    if cfg.verbose:
-        _report_duration(start, changed_any)
+        _log_problem_and_exit(problem, exit_code=2)
+    except ReadmeGenerationError as exc:
+        problem = exc.problem or build_problem_details(
+            type="https://kgfoundry.dev/problems/readme-generation-error",
+            title="README generation failed",
+            status=500,
+            detail=str(exc),
+            instance="urn:tool:gen-readmes:failure",
+        )
+        _log_problem_and_exit(problem, exit_code=1)
 
 
 if __name__ == "__main__":

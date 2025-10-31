@@ -641,11 +641,12 @@ def _load_packages_table(connection: sqlite3.Connection) -> dict[str, JsonObject
     )
     for package_name, data_raw in rows:
         package_data = _json_loads(data_raw)
+        data: JsonObject
         if isinstance(package_data, dict):
             data = _to_json_object(cast(Mapping[str, JsonValue], package_data))
         else:
-            data = {"name": package_name}
-        modules_list = [
+            data = cast(JsonObject, {"name": package_name})
+        modules_list: list[JsonObject] = [
             _to_json_object(module) for module in _iter_modules(cast(PackagePayload, data))
         ]
         data["modules"] = cast(JsonValue, modules_list)
@@ -682,11 +683,12 @@ def _load_modules_table(
     )
     for qualified, package_name, data_raw in rows:
         module_data = _json_loads(data_raw)
+        data: JsonObject
         if isinstance(module_data, dict):
             data = _to_json_object(cast(Mapping[str, JsonValue], module_data))
         else:
-            data = {"qualified": qualified}
-        symbols_list = [
+            data = cast(JsonObject, {"qualified": qualified})
+        symbols_list: list[JsonObject] = [
             _to_json_object(symbol) for symbol in _iter_symbols(cast(ModulePayload, data))
         ]
         data["symbols"] = cast(JsonValue, symbols_list)
@@ -694,10 +696,11 @@ def _load_modules_table(
         package_entry = packages.get(package_name)
         if package_entry is not None:
             module_list_value = package_entry.get("modules")
+            module_list: list[JsonObject]
             if isinstance(module_list_value, list):
                 module_list = cast(list[JsonObject], module_list_value)
             else:
-                module_list = []
+                module_list = cast(list[JsonObject], [])
                 package_entry["modules"] = cast(JsonValue, module_list)
             module_list.append(data)
     return modules
