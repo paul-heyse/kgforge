@@ -1,0 +1,191 @@
+"""Utilities for formatting annotations into human-readable strings."""
+
+from __future__ import annotations
+
+from collections.abc import Mapping
+from typing import Annotated, Literal, get_args, get_origin
+
+__all__ = ["format_annotation"]
+
+
+def format_annotation(
+    annotation: object,
+    module_globals: Mapping[str, object] | None = None,
+) -> str | None:
+    """Return a human-readable representation of ``annotation``."""
+    simple = _format_simple_type(annotation)
+    if simple is not None:
+        return simple
+
+    union = _format_union_type(annotation, module_globals)
+    if union is not None:
+        return union
+
+    annotated = _format_annotated_type(annotation, module_globals)
+    if annotated is not None:
+        return annotated
+
+    literal = _format_literal_type(annotation)
+    if literal is not None:
+        return literal
+
+    for formatter in (
+        _format_class_type,
+        _format_collection_type,
+        _format_generic_type,
+        _format_module_attribute,
+    ):
+        formatted = formatter(annotation, module_globals)
+        if formatted is not None:
+            return formatted
+
+    return repr(annotation) if annotation is not None else None
+
+
+def _format_simple_type(annotation: object) -> str | None:
+    if annotation is None:
+        return "None"
+    if isinstance(annotation, str):
+        return annotation
+    if annotation in {int, float, bool, str}:
+        return annotation.__name__
+    return None
+
+
+def _format_union_type(
+    annotation: object,
+    module_globals: Mapping[str, object] | None,
+) -> str | None:
+    origin = get_origin(annotation)
+    if origin is None or origin is Literal:
+        return None
+
+    formatted: str | None = None
+    args = get_args(annotation)
+    if origin is tuple and args and args[-1] is ...:
+        tail_args = tuple(args[:-1])
+        inner = [format_annotation(arg, module_globals) or "Any" for arg in tail_args]
+        formatted = "tuple[" + ", ".join(inner) + ", ...]"
+    elif origin in {list, set, dict, tuple}:
+        parts = [format_annotation(arg, module_globals) or "Any" for arg in args]
+        inner = ", ".join(parts)
+        formatted = f"{origin.__name__}[{inner}]"
+    elif origin is Annotated:
+        base, *_ = args
+        formatted = format_annotation(base, module_globals)
+    else:
+        if args:
+            parts = [format_annotation(arg, module_globals) or "Any" for arg in args]
+            formatted = " | ".join(parts)
+    return formatted
+
+
+def _format_annotated_type(
+    annotation: object,
+    module_globals: Mapping[str, object] | None,
+) -> str | None:
+    if get_origin(annotation) is Annotated:
+        base, *_ = get_args(annotation)
+        return format_annotation(base, module_globals)
+    return None
+
+
+def _format_literal_type(annotation: object) -> str | None:
+    if get_origin(annotation) is Literal:
+        values = ", ".join(repr(value) for value in get_args(annotation))
+        return f"Literal[{values}]"
+    return None
+
+
+def _format_class_type(
+    annotation: object,
+    module_globals: Mapping[str, object] | None,
+) -> str | None:
+    if not isinstance(annotation, type):
+        return None
+    module_name = getattr(annotation, "__module__", "")
+    qualname = getattr(annotation, "__qualname__", annotation.__name__)
+    if module_name == "builtins":
+        return qualname
+    if module_globals:
+        alias = _alias_for_type(annotation, module_globals)
+        if alias:
+            return alias
+        module_alias = _module_alias(module_name, module_globals)
+        if module_alias:
+            return f"{module_alias}.{qualname}"
+    return f"{module_name}.{qualname}" if module_name else qualname
+
+
+def _format_collection_type(
+    annotation: object,
+    module_globals: Mapping[str, object] | None,
+) -> str | None:
+    origin = get_origin(annotation)
+    if origin not in {list, set, tuple, dict}:
+        return None
+    args = get_args(annotation)
+    if origin is tuple and args and args[-1] is ...:
+        inner = format_annotation(args[0], module_globals) or "Any"
+        return f"tuple[{inner}, ...]"
+    if not args:
+        return origin.__name__
+    parts = [format_annotation(arg, module_globals) or "Any" for arg in args]
+    inner = ", ".join(parts)
+    return f"{origin.__name__}[{inner}]"
+
+
+def _format_generic_type(
+    annotation: object,
+    module_globals: Mapping[str, object] | None,
+) -> str | None:
+    origin = get_origin(annotation)
+    if origin is None:
+        return None
+    module_name = getattr(origin, "__module__", "")
+    qualname = getattr(origin, "__qualname__", getattr(origin, "__name__", ""))
+    if module_name == "typing":
+        module_alias = _module_alias(module_name, module_globals)
+        prefix = module_alias or qualname
+    elif module_name == "builtins":
+        prefix = qualname
+    else:
+        module_alias = _module_alias(module_name, module_globals)
+        prefix = f"{module_alias}.{qualname}" if module_alias else f"{module_name}.{qualname}"
+    args = get_args(annotation)
+    if not args:
+        return prefix
+    formatted_args = [format_annotation(arg, module_globals) or "Any" for arg in args]
+    return f"{prefix}[{', '.join(formatted_args)}]"
+
+
+def _format_module_attribute(
+    annotation: object,
+    module_globals: Mapping[str, object] | None,
+) -> str | None:
+    module_name = getattr(annotation, "__module__", None)
+    qualname = getattr(annotation, "__qualname__", None)
+    if module_name is None or qualname is None:
+        return None
+    if module_name in {"builtins", "typing", "collections.abc"}:
+        return qualname
+    module_alias = _module_alias(module_name, module_globals)
+    if module_alias:
+        return f"{module_alias}.{qualname}"
+    return f"{module_name}.{qualname}"
+
+
+def _alias_for_type(annotation: object, module_globals: Mapping[str, object]) -> str | None:
+    for name, value in module_globals.items():
+        if value is annotation:
+            return name
+    return None
+
+
+def _module_alias(module_name: str, module_globals: Mapping[str, object] | None) -> str | None:
+    if not module_globals:
+        return None
+    for name, value in module_globals.items():
+        if getattr(value, "__name__", None) == module_name:
+            return name
+    return None
