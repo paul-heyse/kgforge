@@ -16,48 +16,25 @@ high-level API for invoking catalog operations.
 from __future__ import annotations
 
 import json
-import logging
 import subprocess
 import sys
 from collections.abc import Iterable
-from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
 from types import TracebackType
 from typing import cast
 
-JsonValue = None | bool | int | float | str | list["JsonValue"] | dict[str, "JsonValue"]
+from kgfoundry_common.errors import CatalogSessionError
+from kgfoundry_common.logging import get_logger, with_fields
+from kgfoundry_common.problem_details import JsonValue
+
 JsonObject = dict[str, JsonValue]
 
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
+logger = get_logger(__name__)
 
-
-@dataclass(slots=True)
-class ProblemDetails:
-    """RFC 9457 error payload returned by the session server."""
-
-    type: str
-    title: str
-    status: int
-    detail: str
-
-    def as_dict(self) -> JsonObject:
-        """Return a JSON-serialisable dictionary representation."""
-        return {
-            "type": self.type,
-            "title": self.title,
-            "status": self.status,
-            "detail": self.detail,
-        }
-
-
-class CatalogSessionError(RuntimeError):
-    """Raised when the stdio session reports an error."""
-
-    def __init__(self, problem: ProblemDetails) -> None:
-        super().__init__(problem.detail)
-        self.problem = problem
+# HTTP status code boundaries
+_MIN_STATUS_CODE = 100
+_MAX_STATUS_CODE = 599
 
 
 class CatalogSession:
@@ -92,36 +69,35 @@ class CatalogSession:
     def _ensure_process(self) -> subprocess.Popen[str]:
         """Spawn the stdio server process if required."""
         if self._process is None or self._process.poll() is not None:
-            logger.debug("Starting catalog session: %s", self._command)
-            try:
-                self._process = subprocess.Popen(  # noqa: S603 - trusted command
-                    self._command,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    text=True,
-                )
-            except OSError as exc:
-                problem = ProblemDetails(
-                    type="about:blank",
-                    title="spawn-failed",
-                    status=500,
-                    detail=f"Unable to launch catalogctl-mcp: {exc}",
-                )
-                raise CatalogSessionError(problem) from exc
+            with with_fields(
+                logger, operation="session_spawn", status="started", command=" ".join(self._command)
+            ) as log_adapter:
+                log_adapter.debug("Starting catalog session")
+                try:
+                    self._process = subprocess.Popen(  # noqa: S603 - trusted command
+                        self._command,
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        text=True,
+                    )
+                    log_adapter.info("Session spawned successfully", extra={"status": "success"})
+                except OSError as exc:
+                    log_adapter.exception("Failed to spawn session", exc_info=exc)
+                    message = f"Unable to launch catalogctl-mcp: {exc}"
+                    raise CatalogSessionError(
+                        message,
+                        cause=exc,
+                        context={"command": " ".join(self._command)},
+                    ) from exc
         return self._process
 
     def _write_payload(self, process: subprocess.Popen[str], payload: JsonObject) -> None:
         """Write a JSON payload to the process stdin."""
         stdin = process.stdin
         if stdin is None:
-            problem = ProblemDetails(
-                type="about:blank",
-                title="stdin-closed",
-                status=500,
-                detail="catalogctl-mcp stdin is unavailable",
-            )
-            raise CatalogSessionError(problem)
+            message = "catalogctl-mcp stdin is unavailable"
+            raise CatalogSessionError(message, context={"operation": "write_payload"})
         stdin.write(json.dumps(payload) + "\n")
         stdin.flush()
 
@@ -129,62 +105,140 @@ class CatalogSession:
         """Read and decode a JSON-RPC response from stdout."""
         stdout = process.stdout
         if stdout is None:
-            problem = ProblemDetails(
-                type="about:blank",
-                title="stdout-closed",
-                status=500,
-                detail="catalogctl-mcp stdout is unavailable",
-            )
-            raise CatalogSessionError(problem)
+            message = "catalogctl-mcp stdout is unavailable"
+            raise CatalogSessionError(message, context={"operation": "read_response"})
         line = stdout.readline()
         if not line:
-            problem = ProblemDetails(
-                type="about:blank",
-                title="session-closed",
-                status=500,
-                detail="catalogctl-mcp terminated unexpectedly",
-            )
-            raise CatalogSessionError(problem)
+            message = "catalogctl-mcp terminated unexpectedly"
+            raise CatalogSessionError(message, context={"operation": "read_response"})
         try:
-            return cast(JsonObject, json.loads(line))
-        except json.JSONDecodeError as exc:  # pragma: no cover - defensive guard
-            problem = ProblemDetails(
-                type="about:blank",
-                title="invalid-json",
-                status=500,
-                detail=f"Received invalid JSON payload: {exc}",
+            parsed_raw: object = json.loads(line)
+            if not isinstance(parsed_raw, dict):
+                message = "Invalid JSON-RPC response: expected object"
+                parsed_type_name = type(parsed_raw).__name__
+                raise CatalogSessionError(
+                    message,
+                    context={"operation": "read_response", "parsed_type": parsed_type_name},
+                )
+            # isinstance check narrows type - mypy understands this
+            parsed: dict[str, JsonValue] = parsed_raw
+            return parsed
+        except json.JSONDecodeError as exc:
+            message = f"Received invalid JSON payload: {exc}"
+            raise CatalogSessionError(
+                message,
+                cause=exc,
+                context={"operation": "read_response"},
+            ) from exc
+
+    def _validate_jsonrpc_id(self, value: JsonValue) -> int | str:
+        """Validate and return a JSON-RPC ID (must be string or number)."""
+        if isinstance(value, (str, int)):
+            return value
+        message = f"Invalid JSON-RPC ID: expected string or number, got {type(value).__name__}"
+        raise CatalogSessionError(
+            message,
+            context={"id_value": str(value), "id_type": type(value).__name__},
+        )
+
+    def _validate_status_code(self, value: JsonValue) -> int:
+        """Validate and return an HTTP status code."""
+        if isinstance(value, int):
+            if _MIN_STATUS_CODE <= value <= _MAX_STATUS_CODE:
+                return value
+            message = (
+                f"Invalid status code: {value} (must be {_MIN_STATUS_CODE}-{_MAX_STATUS_CODE})"
             )
-            raise CatalogSessionError(problem) from exc
+            raise CatalogSessionError(message, context={"status": value})
+        if isinstance(value, str):
+            try:
+                parsed = int(value)
+                if _MIN_STATUS_CODE <= parsed <= _MAX_STATUS_CODE:
+                    return parsed
+                message = (
+                    f"Invalid status code: {parsed} (must be {_MIN_STATUS_CODE}-{_MAX_STATUS_CODE})"
+                )
+                raise CatalogSessionError(message, context={"status": parsed, "original": value})
+            except ValueError as exc:
+                message = f"Invalid status code format: {value}"
+                raise CatalogSessionError(message, cause=exc, context={"status": value}) from exc
+        message = f"Invalid status code type: expected int or str, got {type(value).__name__}"
+        raise CatalogSessionError(
+            message, context={"status": value, "status_type": type(value).__name__}
+        )
 
     def _send_request(self, method: str, params: JsonObject | None = None) -> JsonValue:
         """Send a JSON-RPC request and return the result payload."""
-        process = self._ensure_process()
-        with self._lock:
-            request_id = self._next_id
-            self._next_id += 1
-        payload: JsonObject = {
-            "jsonrpc": "2.0",
-            "id": request_id,
-            "method": method,
-            "params": params or {},
-        }
-        self._write_payload(process, payload)
-        response = self._read_response(process)
-        error = response.get("error")
-        if isinstance(error, dict):
-            problem = ProblemDetails(
-                type=str(error.get("type", "about:blank")),
-                title=str(error.get("title", "unknown")),
-                status=int(error.get("status", 500)),
-                detail=str(error.get("detail", "")),
-            )
-            raise CatalogSessionError(problem)
-        return response.get("result")
+        with with_fields(
+            logger, operation="jsonrpc_request", method=method, status="started"
+        ) as log_adapter:
+            process = self._ensure_process()
+            with self._lock:
+                request_id = self._next_id
+                self._next_id += 1
+            payload: JsonObject = {
+                "jsonrpc": "2.0",
+                "id": request_id,
+                "method": method,
+                "params": params or {},
+            }
+            self._write_payload(process, payload)
+            response = self._read_response(process)
+            # Validate JSON-RPC response structure
+            if not isinstance(response.get("jsonrpc"), str) or response.get("jsonrpc") != "2.0":
+                message = "Invalid JSON-RPC response: missing or invalid jsonrpc field"
+                raise CatalogSessionError(
+                    message,
+                    context={"method": method, "response_keys": list(response.keys())},
+                )
+            response_id = response.get("id")
+            if response_id is not None:
+                validated_id = self._validate_jsonrpc_id(response_id)
+                if validated_id != request_id:
+                    message = f"JSON-RPC ID mismatch: expected {request_id}, got {validated_id}"
+                    raise CatalogSessionError(
+                        message,
+                        context={
+                            "method": method,
+                            "expected_id": request_id,
+                            "received_id": validated_id,
+                        },
+                    )
+            error = response.get("error")
+            if isinstance(error, dict):
+                error_type = str(error.get("type", "about:blank"))
+                error_title = str(error.get("title", "unknown"))
+                error_status = self._validate_status_code(error.get("status", 500))
+                error_detail = str(error.get("detail", ""))
+                log_adapter.error(
+                    "JSON-RPC error response",
+                    extra={
+                        "status": "error",
+                        "error_type": error_type,
+                        "error_title": error_title,
+                        "error_status": error_status,
+                    },
+                )
+                raise CatalogSessionError(
+                    error_detail or error_title,
+                    context={
+                        "method": method,
+                        "error_type": error_type,
+                        "error_title": error_title,
+                        "error_status": error_status,
+                    },
+                )
+            result = response.get("result")
+            log_adapter.info("JSON-RPC request completed", extra={"status": "success"})
+            return result
 
     def initialize(self) -> JsonObject:
         """Perform the initial handshake and return advertised capabilities."""
         result = self._send_request("initialize")
-        return cast(JsonObject, result or {})
+        # result is JsonValue, narrow to JsonObject (dict)
+        if isinstance(result, dict):
+            return result  # isinstance narrows to dict[str, JsonValue] which is JsonObject
+        return {}
 
     def search(
         self,
@@ -194,10 +248,14 @@ class CatalogSession:
         facets: dict[str, str] | None = None,
     ) -> list[JsonObject]:
         """Execute hybrid search and return scored results."""
-        result = self._send_request(
-            "catalog.search",
-            {"query": query, "k": k, "facets": facets or {}},
-        )
+        # Build params dict - facets dict[str, str] is compatible with JsonValue
+        facets_dict: dict[str, str] = facets or {}
+        params: JsonObject = {
+            "query": query,
+            "k": k,
+            "facets": cast(JsonValue, facets_dict),  # dict[str, str] is JsonValue-compatible
+        }
+        result = self._send_request("catalog.search", params)
         if isinstance(result, list):
             return [cast(JsonObject, entry) for entry in result]
         return []
@@ -205,7 +263,10 @@ class CatalogSession:
     def symbol(self, symbol_id: str) -> JsonObject:
         """Return catalog metadata for ``symbol_id``."""
         result = self._send_request("catalog.symbol", {"symbol_id": symbol_id})
-        return cast(JsonObject, result or {})
+        # result is JsonValue, narrow to JsonObject (dict)
+        if isinstance(result, dict):
+            return result  # isinstance narrows to dict[str, JsonValue] which is JsonObject
+        return {}
 
     def find_callers(self, symbol_id: str) -> list[str]:
         """Return callers recorded for ``symbol_id``."""
@@ -224,7 +285,10 @@ class CatalogSession:
     def change_impact(self, symbol_id: str) -> JsonObject:
         """Return change impact metadata for ``symbol_id``."""
         result = self._send_request("catalog.change_impact", {"symbol_id": symbol_id})
-        return cast(JsonObject, result or {})
+        # result is JsonValue, narrow to JsonObject (dict)
+        if isinstance(result, dict):
+            return result  # isinstance narrows to dict[str, JsonValue] which is JsonObject
+        return {}
 
     def suggest_tests(self, symbol_id: str) -> list[JsonObject]:
         """Return suggested test metadata for ``symbol_id``."""
@@ -249,12 +313,16 @@ class CatalogSession:
 
     def shutdown(self) -> None:
         """Request a graceful shutdown of the underlying process."""
-        try:
-            self._send_request("session.shutdown")
-        except CatalogSessionError as exc:  # pragma: no cover - defensive guard
-            logger.debug("Shutdown request failed: %s", exc.problem.as_dict())
-        finally:
-            self.close()
+        with with_fields(logger, operation="session_shutdown", status="started") as log_adapter:
+            try:
+                self._send_request("session.shutdown")
+                log_adapter.info("Shutdown request successful", extra={"status": "success"})
+            except CatalogSessionError as exc:
+                log_adapter.debug(
+                    "Shutdown request failed", extra={"status": "warning", "error": str(exc)}
+                )
+            finally:
+                self.close()
 
     def close(self) -> None:
         """Terminate the session process if it is running."""
@@ -287,4 +355,4 @@ class CatalogSession:
         self.close()
 
 
-__all__ = ["CatalogSession", "CatalogSessionError", "ProblemDetails"]
+__all__ = ["CatalogSession", "CatalogSessionError", "JsonObject", "JsonValue"]

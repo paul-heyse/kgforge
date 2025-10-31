@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import argparse
 import pathlib
+from contextlib import closing
 from typing import Final
 
-import duckdb
-
+from kgfoundry_common.errors import RegistryError
 from kgfoundry_common.navmap_types import NavMap
+from registry import duckdb_helpers
 
 __all__ = ["apply", "main"]
 
@@ -59,23 +60,32 @@ def apply(db: str, migrations_dir: str) -> None:
     migrations_dir : str
         Describe ``migrations_dir``.
     """
-    con = duckdb.connect(db)
-    for p in sorted(pathlib.Path(migrations_dir).glob("*.sql")):
-        sql = p.read_text()
-        statements = [stmt.strip() for stmt in sql.split(";") if stmt.strip()]
-        for statement in statements:
-            try:
-                con.execute(statement)
-            except duckdb.Error as exc:
-                message = str(exc).lower()
-                if "read_parquet" in message and "table function" in message:
-                    # DuckDB 1.1 disallows non-constant arguments to table functions.
-                    # Later migrations may re-create these views once a compatible
-                    # approach is available, so skip them for now while still
-                    # applying schema changes.
-                    continue
-                raise
-    con.close()
+    path = pathlib.Path(migrations_dir)
+    if not path.exists():
+        error_message = "Migrations directory does not exist"
+        raise RegistryError(
+            error_message,
+            context={"migrations_dir": str(path.resolve())},
+        )
+
+    with closing(duckdb_helpers.connect(db, pragmas={"threads": 4})) as con:
+        for migration in sorted(path.glob("*.sql")):
+            sql = migration.read_text()
+            statements = [stmt.strip() for stmt in sql.split(";") if stmt.strip()]
+            for statement in statements:
+                try:
+                    duckdb_helpers.execute(
+                        con,
+                        statement,
+                        params=None,
+                        require_parameterized=False,
+                        operation=f"registry.migrate.{migration.stem}",
+                    )
+                except RegistryError as err:
+                    message = err.message.lower()
+                    if "read_parquet" in message and "table function" in message:
+                        continue
+                    raise
 
 
 # [nav:anchor main]

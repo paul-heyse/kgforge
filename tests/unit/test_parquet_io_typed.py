@@ -57,6 +57,7 @@ def test_read_table_success(parquet_file: Path, sample_schema: pa.Schema) -> Non
     assert isinstance(table, pa.Table)
     assert table.num_rows == 2
     assert table.num_columns == 2
+    assert table.schema.equals(sample_schema)
 
 
 def test_read_table_with_schema_validation(parquet_file: Path, sample_schema: pa.Schema) -> None:
@@ -87,7 +88,8 @@ def test_read_table_to_dataframe_success(parquet_file: Path, sample_schema: pa.S
     pytest.importorskip("pandas")
     df = read_table_to_dataframe(parquet_file)
     assert len(df) == 2
-    assert list(df.columns) == ["id", "value"]
+    expected_columns = [field.name for field in sample_schema]
+    assert list(df.columns) == expected_columns
     assert df["id"].dtype == "object"
     assert df["value"].dtype == "int32"
 

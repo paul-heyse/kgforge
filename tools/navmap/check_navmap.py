@@ -849,6 +849,7 @@ def main(argv: list[str] | None = None) -> int:
     >>> result = main()
     >>> result  # doctest: +ELLIPSIS
     """
+    del argv
     errors = _collect_module_errors()
 
     if errors:

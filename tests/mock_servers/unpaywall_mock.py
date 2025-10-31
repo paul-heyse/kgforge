@@ -14,4 +14,5 @@ def by_doi(doi: str, email: str = "test@example.com") -> dict[str, Any]:
         "best_oa_location": {
             "url_for_pdf": f"http://localhost:8999/pdf/{doi.replace('/', '_')}.pdf"
         },
+        "requested_by": email,
     }

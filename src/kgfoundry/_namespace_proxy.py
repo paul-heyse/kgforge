@@ -38,7 +38,8 @@ def namespace_getattr(module: ModuleType, name: str) -> object:
     AttributeError
     If the attribute is missing on ``module``.
     """
-    return getattr(module, name)
+    # getattr returns object which may contain Any - this is inherent to dynamic attribute access
+    return getattr(module, name)  # type: ignore[misc]
 
 
 def namespace_dir(module: ModuleType, exports: Iterable[str]) -> list[str]:

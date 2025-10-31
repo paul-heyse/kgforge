@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
+from typing import cast
 
 from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.models import (
@@ -15,6 +15,7 @@ from kgfoundry.agent_catalog.models import (
     SymbolModel,
     load_catalog_model,
 )
+from kgfoundry_common.problem_details import JsonValue
 
 
 class AgentCatalogClientError(RuntimeError):
@@ -114,9 +115,11 @@ class AgentCatalogClient:
         symbol = self._require_symbol(symbol_id)
         return symbol.change_impact
 
-    def suggest_tests(self, symbol_id: str) -> list[dict[str, Any]]:
+    def suggest_tests(self, symbol_id: str) -> list[dict[str, JsonValue]]:
         """Return suggested tests to run for ``symbol_id``."""
-        return list(self.change_impact(symbol_id).tests)
+        # ChangeImpactModel.tests is a list of dicts from Pydantic model_dump
+        # Cast to JsonValue since these are JSON-serializable structures
+        return cast(list[dict[str, JsonValue]], list(self.change_impact(symbol_id).tests))
 
     def search(
         self,

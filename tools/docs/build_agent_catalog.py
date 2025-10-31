@@ -768,7 +768,7 @@ class AgentCatalogBuilder:
             return None
         kind = symbol_entry.get("kind") if symbol_entry else "object"
         anchors = self._build_anchors(qname, analyzer, node, symbol_entry)
-        symbol_id = self._compute_symbol_id(qname, analyzer, node)
+        symbol_id = self._compute_symbol_id(qname, node)
         tests = self._normalize_tests(self._test_map.get(qname, []))
         hints = AgentHints(
             intent_tags=[],
@@ -843,7 +843,7 @@ class AgentCatalogBuilder:
         scope = analyzer.get_scope(qname)
         name_arity = self._compute_name_arity(node, scope)
         nearest_text = self._nearest_text(analyzer, node)
-        symbol_id = self._compute_symbol_id(qname, analyzer, node)
+        symbol_id = self._compute_symbol_id(qname, node)
         remap = [
             {
                 "symbol_id": symbol_id,
@@ -859,9 +859,7 @@ class AgentCatalogBuilder:
             remap_order=remap,
         )
 
-    def _compute_symbol_id(
-        self, qname: str, analyzer: ModuleAnalyzer, node: ast.AST | None
-    ) -> str:
+    def _compute_symbol_id(self, qname: str, node: ast.AST | None) -> str:
         if node is None:
             return hashlib.sha256(qname.encode()).hexdigest()
         normalized = _normalize_ast(node)

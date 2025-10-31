@@ -296,7 +296,7 @@ class _IndexVisitor(cst.CSTVisitor):
         self.namespace.append(node.name.value)
         return True
 
-    def leave_ClassDef(self, original_node: cst.ClassDef) -> None:  # noqa: N802
+    def leave_ClassDef(self, _original_node: cst.ClassDef) -> None:  # noqa: N802
         self.namespace.pop()
 
     def visit_FunctionDef(self, node: cst.FunctionDef) -> bool:  # noqa: N802 - LibCST API contract
@@ -305,7 +305,7 @@ class _IndexVisitor(cst.CSTVisitor):
         self.namespace.append(node.name.value)
         return True
 
-    def leave_FunctionDef(self, original_node: cst.FunctionDef) -> None:  # noqa: N802
+    def leave_FunctionDef(self, _original_node: cst.FunctionDef) -> None:  # noqa: N802
         self.namespace.pop()
 
 

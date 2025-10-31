@@ -344,7 +344,7 @@ _METRIC_CALL_TYPES = {
 _PROM_UNITS = set(DEFAULT_POLICY["metric"]["allowed_units"])
 
 
-def _first_str(node: ast.AST, text: str) -> str | None:
+def _first_str(node: ast.AST) -> str | None:
     """Return the first string literal value found in node's args, else None."""
     if isinstance(node, ast.Call) and node.args:
         arg0 = node.args[0]
@@ -764,6 +764,7 @@ def scan_file(
     >>> result = scan_file(..., ...)
     >>> result  # doctest: +ELLIPSIS
     """
+    del policy
     text, tree = read_ast(path)
     if not text or tree is None:
         return ([], [], [])
@@ -799,7 +800,7 @@ def scan_file(
             # --- METRICS (prometheus_client.* or helper factories)
             if base_name in {"prometheus_client", "metrics", "stats"} or attr in _METRIC_CALL_TYPES:
                 mtype = _METRIC_CALL_TYPES.get(attr)
-                name = _first_str(node, text)
+                name = _first_str(node)
                 labels = _extract_labels_from_kw(kwmap)
                 unit = _infer_unit_from_name(name or "") if name else None
                 metric_row = MetricRow(
@@ -817,7 +818,7 @@ def scan_file(
 
             # Trace instrumentation (OpenTelemetry)
             if attr in {"start_span", "start_as_current_span"}:
-                span_name = _first_str(node, text)
+                span_name = _first_str(node)
                 trace_row = TraceRow(
                     span_name=span_name,
                     attributes=[],
@@ -830,7 +831,7 @@ def scan_file(
             if attr in {"set_attribute", "add_event"} and traces:
                 # attach attributes to the last span in this file list if any
                 seg = ast.get_source_segment(text, node) or ""
-                key = _first_str(node, text) or ""
+                key = _first_str(node) or ""
                 traces[-1].attributes.append(key or seg[:80])
 
     return (logs, metrics, traces)

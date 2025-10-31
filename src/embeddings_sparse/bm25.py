@@ -14,11 +14,18 @@ from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Final, cast
+from typing import TYPE_CHECKING, Final, cast
 
 from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.serialization import deserialize_json, serialize_json
+
+if TYPE_CHECKING:
+    from typing import Any
+else:
+    # Runtime: Pyserini types don't have stubs, use Any for LuceneSearcher/LuceneIndexer
+    Any = object  # type: ignore[assignment, misc]
 
 logger = logging.getLogger(__name__)
 
@@ -265,7 +272,13 @@ class PurePythonBM25:
 
         if metadata_path.exists():
             try:
-                data = deserialize_json(metadata_path, schema_path)
+                data_raw = deserialize_json(metadata_path, schema_path)
+                # deserialize_json returns object (JsonValue at runtime)
+                # Narrow to dict[str, JsonValue] since we know the schema structure
+                if not isinstance(data_raw, dict):
+                    msg = f"Invalid index data format: expected dict, got {type(data_raw)}"
+                    raise DeserializationError(msg)
+                data: dict[str, JsonValue] = data_raw
             except DeserializationError as exc:
                 logger.warning("Failed to load JSON index, trying legacy pickle: %s", exc)
                 # Fall back to legacy pickle
@@ -273,7 +286,13 @@ class PurePythonBM25:
                     import pickle  # noqa: PLC0415
 
                     with legacy_path.open("rb") as f:
-                        data = pickle.load(f)  # noqa: S301
+                        # pickle.load returns object - unavoidable for legacy format support
+                        pickle_data_raw: object = cast(object, pickle.load(f))  # noqa: S301
+                        if not isinstance(pickle_data_raw, dict):
+                            msg = f"Invalid pickle data format: expected dict, got {type(pickle_data_raw)}"
+                            raise DeserializationError(msg)
+                        # Cast to JsonValue dict since pickle payload structure matches JSON
+                        data = cast(dict[str, JsonValue], pickle_data_raw)
                 else:
                     raise
         elif legacy_path.exists():
@@ -281,34 +300,66 @@ class PurePythonBM25:
             import pickle  # noqa: PLC0415
 
             with legacy_path.open("rb") as f:
-                data = pickle.load(f)  # noqa: S301
+                # pickle.load returns object - unavoidable for legacy format support
+                legacy_pickle_data: object = cast(object, pickle.load(f))  # noqa: S301
+                if not isinstance(legacy_pickle_data, dict):
+                    msg = (
+                        f"Invalid pickle data format: expected dict, got {type(legacy_pickle_data)}"
+                    )
+                    raise DeserializationError(msg)
+                # Cast to JsonValue dict since pickle payload structure matches JSON
+                data = cast(dict[str, JsonValue], legacy_pickle_data)
             logger.warning("Loaded legacy pickle index. Consider migrating to JSON format.")
         else:
             msg = f"Index metadata not found at {metadata_path} or {legacy_path}"
             raise FileNotFoundError(msg)
 
-        self.k1 = data["k1"]
-        self.b = data["b"]
-        self.field_boosts = data.get("field_boosts", {"title": 2.0, "section": 1.2, "body": 1.0})
-        self.df = data["df"]
-        self.postings = data["postings"]
+        # Extract values with proper type narrowing
+        k1_val = data.get("k1", 0.9)
+        b_val = data.get("b", 0.4)
+        self.k1 = float(k1_val) if isinstance(k1_val, (int, float)) else 0.9
+        self.b = float(b_val) if isinstance(b_val, (int, float)) else 0.4
+        field_boosts_val = data.get("field_boosts", {"title": 2.0, "section": 1.2, "body": 1.0})
+        self.field_boosts = (
+            cast(dict[str, float], field_boosts_val)
+            if isinstance(field_boosts_val, dict)
+            else {"title": 2.0, "section": 1.2, "body": 1.0}
+        )
+        df_val = data.get("df", {})
+        self.df = cast(dict[str, int], df_val) if isinstance(df_val, dict) else {}
+        postings_val = data.get("postings", {})
+        self.postings = (
+            cast(dict[str, dict[str, int]], postings_val) if isinstance(postings_val, dict) else {}
+        )
         # Convert docs data back to BM25Doc objects if needed
-        docs_data = data.get("docs", [])
-        if docs_data and isinstance(docs_data[0], dict):
+        docs_data_raw = data.get("docs", [])
+        if docs_data_raw and isinstance(docs_data_raw, list):
             # JSON format: reconstruct docs from metadata
             self.docs = {
-                doc["doc_id"]: BM25Doc(
-                    doc_id=doc["doc_id"],
-                    length=doc.get("length", 0.0),
+                str(doc.get("doc_id", "")): BM25Doc(
+                    doc_id=str(doc.get("doc_id", "")),
+                    length=(
+                        int(length_val)
+                        if isinstance(length_val := doc.get("length", 0), (int, float))
+                        else 0
+                    ),
                     fields={},  # Fields not persisted in metadata
                 )
-                for doc in docs_data
+                for doc in docs_data_raw
+                if isinstance(doc, dict)
             }
         else:
-            # Legacy pickle format: docs already objects
-            self.docs = data["docs"]
-        self.N = data["N"]
-        self.avgdl = data["avgdl"]
+            # Legacy pickle format: docs already objects (untyped, but we handle gracefully)
+            docs_val = data.get("docs", {})
+            if isinstance(docs_val, dict):
+                # Type narrowing: assume dict[str, BM25Doc] for legacy format
+                self.docs = cast(dict[str, BM25Doc], docs_val)
+            else:
+                self.docs = {}
+        n_val = data.get("N", 0)
+        avgdl_val = data.get("avgdl", 0.0)
+        self.N = int(n_val) if isinstance(n_val, (int, float)) else 0
+        self.avgdl = float(avgdl_val) if isinstance(avgdl_val, (int, float)) else 0.0
 
     def _idf(self, term: str) -> float:
         """Compute the inverse document frequency for a given term.

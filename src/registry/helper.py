@@ -10,12 +10,14 @@ from __future__ import annotations
 import json
 import uuid
 from collections.abc import Mapping
+from contextlib import closing
 from typing import Final
 
-import duckdb
+from duckdb import DuckDBPyConnection
 
 from kgfoundry_common.models import Doc, DoctagsAsset
 from kgfoundry_common.navmap_types import NavMap
+from registry import duckdb_helpers
 
 __all__ = ["DuckDBRegistryHelper"]
 
@@ -75,19 +77,9 @@ class DuckDBRegistryHelper:
         """
         self.db_path = db_path
 
-    def _con(self) -> duckdb.DuckDBPyConnection:
-        """Describe  con.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-
-        Returns
-        -------
-        _duckdb.DuckDBPyConnection
-            Describe return value.
-        """
-        return duckdb.connect(self.db_path)
+    def _connect(self) -> DuckDBPyConnection:
+        """Create a DuckDB connection for registry operations."""
+        return duckdb_helpers.connect(self.db_path)
 
     def new_run(
         self,
@@ -120,16 +112,17 @@ class DuckDBRegistryHelper:
             Describe return value.
         """
         run_id = str(uuid.uuid4())
-        con = self._con()
-        con.execute(
-            (
-                "INSERT INTO runs "
-                "(run_id,purpose,model_id,revision,started_at,config) "
-                "VALUES (?,?,?,?,CURRENT_TIMESTAMP,?)"
-            ),
-            [run_id, purpose, model_id, revision, json.dumps(config)],
-        )
-        con.close()
+        with closing(self._connect()) as con:
+            duckdb_helpers.execute(
+                con,
+                (
+                    "INSERT INTO runs "
+                    "(run_id,purpose,model_id,revision,started_at,config) "
+                    "VALUES (?,?,?,?,CURRENT_TIMESTAMP,?)"
+                ),
+                [run_id, purpose, model_id, revision, json.dumps(config)],
+                operation="registry.helper.new_run",
+            )
         return run_id
 
     def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
@@ -149,18 +142,24 @@ class DuckDBRegistryHelper:
             Describe ``notes``.
             Defaults to ``None``.
         """
-        con = self._con()
-        con.execute("UPDATE runs SET finished_at=CURRENT_TIMESTAMP WHERE run_id=?", [run_id])
-        con.execute(
-            "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
-            [
-                str(uuid.uuid4()),
-                "RunClosed",
-                run_id,
-                json.dumps({"success": success, "notes": notes or ""}),
-            ],
-        )
-        con.close()
+        with closing(self._connect()) as con:
+            duckdb_helpers.execute(
+                con,
+                "UPDATE runs SET finished_at=CURRENT_TIMESTAMP WHERE run_id=?",
+                [run_id],
+                operation="registry.helper.close_run.finish",
+            )
+            duckdb_helpers.execute(
+                con,
+                "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
+                [
+                    str(uuid.uuid4()),
+                    "RunClosed",
+                    run_id,
+                    json.dumps({"success": success, "notes": notes or ""}),
+                ],
+                operation="registry.helper.close_run.event",
+            )
 
     def begin_dataset(self, kind: str, run_id: str) -> str:
         """Describe begin dataset.
@@ -183,16 +182,17 @@ class DuckDBRegistryHelper:
             Describe return value.
         """
         dataset_id = str(uuid.uuid4())
-        con = self._con()
-        con.execute(
-            (
-                "INSERT INTO datasets "
-                "(dataset_id,kind,parquet_root,run_id,created_at) "
-                "VALUES (?,?,?,?,CURRENT_TIMESTAMP)"
-            ),
-            [dataset_id, kind, "", run_id],
-        )
-        con.close()
+        with closing(self._connect()) as con:
+            duckdb_helpers.execute(
+                con,
+                (
+                    "INSERT INTO datasets "
+                    "(dataset_id,kind,parquet_root,run_id,created_at) "
+                    "VALUES (?,?,?,?,CURRENT_TIMESTAMP)"
+                ),
+                [dataset_id, kind, "", run_id],
+                operation="registry.helper.begin_dataset",
+            )
         return dataset_id
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
@@ -211,20 +211,24 @@ class DuckDBRegistryHelper:
         rows : int
             Describe ``rows``.
         """
-        con = self._con()
-        con.execute(
-            "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
-        )
-        con.execute(
-            "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
-            [
-                str(uuid.uuid4()),
-                "DatasetCommitted",
-                dataset_id,
-                json.dumps({"rows": rows, "root": parquet_root}),
-            ],
-        )
-        con.close()
+        with closing(self._connect()) as con:
+            duckdb_helpers.execute(
+                con,
+                "UPDATE datasets SET parquet_root=? WHERE dataset_id=?",
+                [parquet_root, dataset_id],
+                operation="registry.helper.commit_dataset.update",
+            )
+            duckdb_helpers.execute(
+                con,
+                "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
+                [
+                    str(uuid.uuid4()),
+                    "DatasetCommitted",
+                    dataset_id,
+                    json.dumps({"rows": rows, "root": parquet_root}),
+                ],
+                operation="registry.helper.commit_dataset.event",
+            )
 
     def rollback_dataset(self, dataset_id: str) -> None:
         """Describe rollback dataset.
@@ -238,13 +242,19 @@ class DuckDBRegistryHelper:
         dataset_id : str
             Describe ``dataset_id``.
         """
-        con = self._con()
-        con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
-        con.execute(
-            "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
-            [str(uuid.uuid4()), "DatasetRolledBack", dataset_id, "{}"],
-        )
-        con.close()
+        with closing(self._connect()) as con:
+            duckdb_helpers.execute(
+                con,
+                "DELETE FROM datasets WHERE dataset_id=?",
+                [dataset_id],
+                operation="registry.helper.rollback_dataset.delete",
+            )
+            duckdb_helpers.execute(
+                con,
+                "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
+                [str(uuid.uuid4()), "DatasetRolledBack", dataset_id, "{}"],
+                operation="registry.helper.rollback_dataset.event",
+            )
 
     def register_documents(self, docs: list[Doc]) -> None:
         """Describe register documents.
@@ -258,30 +268,31 @@ class DuckDBRegistryHelper:
         docs : list[Doc]
             Describe ``docs``.
         """
-        con = self._con()
-        for doc in docs:
-            con.execute(
-                """INSERT OR REPLACE INTO documents
-                (doc_id, openalex_id, doi, arxiv_id, pmcid, title, authors, pub_date, license,
-                 language, pdf_uri, source, content_hash, created_at)
+        with closing(self._connect()) as con:
+            for doc in docs:
+                duckdb_helpers.execute(
+                    con,
+                    """INSERT OR REPLACE INTO documents
+                (doc_id, openalex_id, doi, arxiv_id, pmcid, title, authors,
+                 pub_date, license, language, pdf_uri, source, content_hash, created_at)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP)""",
-                [
-                    doc.id,
-                    doc.openalex_id,
-                    doc.doi,
-                    doc.arxiv_id,
-                    doc.pmcid,
-                    doc.title,
-                    json.dumps(doc.authors),
-                    doc.pub_date,
-                    doc.license,
-                    doc.language,
-                    doc.pdf_uri,
-                    doc.source,
-                    doc.content_hash or "",
-                ],
-            )
-        con.close()
+                    [
+                        doc.id,
+                        doc.openalex_id,
+                        doc.doi,
+                        doc.arxiv_id,
+                        doc.pmcid,
+                        doc.title,
+                        json.dumps(doc.authors),
+                        doc.pub_date,
+                        doc.license,
+                        doc.language,
+                        doc.pdf_uri,
+                        doc.source,
+                        doc.content_hash or "",
+                    ],
+                    operation="registry.helper.register_documents",
+                )
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
         """Describe register doctags.
@@ -295,20 +306,21 @@ class DuckDBRegistryHelper:
         assets : list[DoctagsAsset]
             Describe ``assets``.
         """
-        con = self._con()
-        for asset in assets:
-            con.execute(
-                "INSERT OR REPLACE INTO doctags VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)",
-                [
-                    asset.doc_id,
-                    asset.doctags_uri,
-                    asset.pages,
-                    asset.vlm_model,
-                    asset.vlm_revision,
-                    asset.avg_logprob,
-                ],
-            )
-        con.close()
+        with closing(self._connect()) as con:
+            for asset in assets:
+                duckdb_helpers.execute(
+                    con,
+                    "INSERT OR REPLACE INTO doctags VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)",
+                    [
+                        asset.doc_id,
+                        asset.doctags_uri,
+                        asset.pages,
+                        asset.vlm_model,
+                        asset.vlm_revision,
+                        asset.avg_logprob,
+                    ],
+                    operation="registry.helper.register_doctags",
+                )
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
         """Describe emit event.
@@ -326,9 +338,10 @@ class DuckDBRegistryHelper:
         payload : Mapping[str, object]
             Describe ``payload``.
         """
-        con = self._con()
-        con.execute(
-            "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
-            [str(uuid.uuid4()), event_name, subject_id, json.dumps(payload)],
-        )
-        con.close()
+        with closing(self._connect()) as con:
+            duckdb_helpers.execute(
+                con,
+                "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
+                [str(uuid.uuid4()), event_name, subject_id, json.dumps(payload)],
+                operation="registry.helper.emit_event",
+            )

@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     def typed_parametrize(
         *args: object, **kwargs: object
     ) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
+
 else:
 
     def typed_parametrize(*args: object, **kwargs: object) -> MarkDecorator:

@@ -1,0 +1,75 @@
+"""Type stubs for Starlette Response."""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any
+
+__all__ = ["FileResponse", "JSONResponse", "Response"]
+
+class Response:
+    """Starlette Response object with precise type annotations."""
+
+    headers: dict[str, str]
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize response."""
+        ...
+
+class JSONResponse(Response):
+    """Starlette JSONResponse with precise type annotations."""
+
+    body: bytes
+
+    def __init__(
+        self, content: Any, status_code: int = 200, headers: dict[str, str] | None = None
+    ) -> None:
+        """Initialize JSON response.
+
+        Parameters
+        ----------
+        content : Any
+            JSON-serializable content.
+        status_code : int, optional
+            HTTP status code. Defaults to 200.
+        headers : dict[str, str] | None, optional
+            Response headers. Defaults to None.
+        """
+        ...
+
+class FileResponse(Response):
+    """Starlette FileResponse for serving files."""
+
+    def __init__(
+        self,
+        path: str | Path,
+        status_code: int = 200,
+        headers: dict[str, str] | None = None,
+        media_type: str | None = None,
+        filename: str | None = None,
+        stat_result: Any | None = None,
+        method: str | None = None,
+        content_disposition_type: str = "attachment",
+    ) -> None:
+        """Initialize file response.
+
+        Parameters
+        ----------
+        path : str | Path
+            Path to file to serve.
+        status_code : int, optional
+            HTTP status code. Defaults to 200.
+        headers : dict[str, str] | None, optional
+            Response headers. Defaults to None.
+        media_type : str | None, optional
+            Media type for Content-Type header. Defaults to None.
+        filename : str | None, optional
+            Filename for Content-Disposition header. Defaults to None.
+        stat_result : Any | None, optional
+            File stat result. Defaults to None.
+        method : str | None, optional
+            HTTP method. Defaults to None.
+        content_disposition_type : str, optional
+            Content-Disposition type. Defaults to "attachment".
+        """
+        ...

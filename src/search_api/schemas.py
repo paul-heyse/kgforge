@@ -12,6 +12,7 @@ from typing import Final
 from pydantic import ConfigDict, Field
 
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.pydantic import BaseModel
 
 __all__ = ["SearchRequest", "SearchResponse", "SearchResult"]
@@ -76,7 +77,7 @@ class SearchRequest(BaseModel):
     k : int, optional
         Describe ``k``.
         Defaults to ``10``.
-    filters : dict[str, object] | None, optional
+    filters : dict[str, JsonValue] | None, optional
         Describe ``filters``.
         Defaults to ``None``.
     explain : bool, optional
@@ -101,7 +102,7 @@ class SearchRequest(BaseModel):
 
     query: str = Field(min_length=1)
     k: int = 10
-    filters: dict[str, object] | None = None
+    filters: dict[str, JsonValue] | None = None
     explain: bool = False
 
 

@@ -10,13 +10,14 @@ from __future__ import annotations
 import datetime as dt
 from collections.abc import Iterable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Final
+from typing import TYPE_CHECKING, Final
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 
 from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.problem_details import JsonValue
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -371,7 +372,7 @@ class ParquetChunkWriter:
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
-    def write(self, rows: Iterable[dict[str, Any]]) -> str:
+    def write(self, rows: Iterable[dict[str, JsonValue]]) -> str:
         """Describe write.
 
         <!-- auto:docstring-builder v1 -->
@@ -380,7 +381,7 @@ class ParquetChunkWriter:
 
         Parameters
         ----------
-        rows : Iterable[dict[str, Any]]
+        rows : Iterable[dict[str, JsonValue]]
             Describe ``rows``.
 
 

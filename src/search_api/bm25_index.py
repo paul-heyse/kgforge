@@ -12,12 +12,13 @@ import re
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Final, cast
+from typing import Final, cast
 
 import duckdb
 
 from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.serialization import deserialize_json, serialize_json
 
 __all__ = ["BM25Doc", "BM25Index", "toks"]
@@ -406,44 +407,79 @@ class BM25Index:
         )
         try:
             payload_raw = deserialize_json(path_obj, schema_path)
-            # Type the payload as a dict with known keys
-            # deserialize_json returns dict[str, JsonValue] which we handle as dict[str, Any]
-            payload: dict[str, Any] = payload_raw if isinstance(payload_raw, dict) else {}  # type: ignore[misc]
+            # Type the payload - deserialize_json returns object (JsonValue at runtime)
+            # We validate it's a dict and narrow the type
+            if not isinstance(payload_raw, dict):
+                payload: dict[str, JsonValue] = {}
+            else:
+                # Cast to dict[str, JsonValue] since we validated it's a dict
+                # JsonValue is object at runtime, so this is safe
+                payload = cast(dict[str, JsonValue], payload_raw)
         except DeserializationError:
             # Try legacy pickle format for backward compatibility
             if path_obj.suffix == ".pkl":
                 import pickle  # noqa: PLC0415
 
                 with path_obj.open("rb") as handle:
-                    # pickle.load returns Any - unavoidable for legacy format support
+                    # pickle.load returns object - unavoidable for legacy format support
                     # Use cast to satisfy mypy while maintaining runtime safety via isinstance check
-                    # mypy flags Any types, but pickle.load inherently returns Any - suppress this specific error
                     legacy_payload_raw: object = cast(object, pickle.load(handle))  # noqa: S301
-                    payload = legacy_payload_raw if isinstance(legacy_payload_raw, dict) else {}  # type: ignore[misc]
+                    if not isinstance(legacy_payload_raw, dict):
+                        payload = {}
+                    else:
+                        # Cast to JsonValue dict since pickle payload structure matches JSON
+                        payload = cast(dict[str, JsonValue], legacy_payload_raw)
             else:
                 raise
 
-        # Type ignore needed for JSON deserialization - payload is dict[str, Any] from external source
-        index = cls(payload.get("k1", 0.9), payload.get("b", 0.4))  # type: ignore[misc]
-        index.N = int(payload.get("N", 0))  # type: ignore[misc]
-        index.avgdl = float(payload.get("avgdl", 0.0))  # type: ignore[misc]
-        index.df = dict(payload.get("df", {}))  # type: ignore[misc]
+        # Extract values from payload with proper type narrowing
+        # JsonValue types are narrowed at runtime via isinstance checks
+        k1_val = payload.get("k1", 0.9)
+        b_val = payload.get("b", 0.4)
+        index = cls(
+            k1=float(k1_val) if isinstance(k1_val, (int, float)) else 0.9,
+            b=float(b_val) if isinstance(b_val, (int, float)) else 0.4,
+        )
+        n_val = payload.get("N", 0)
+        avgdl_val = payload.get("avgdl", 0.0)
+        df_val = payload.get("df", {})
+        index.N = int(n_val) if isinstance(n_val, (int, float)) else 0
+        index.avgdl = float(avgdl_val) if isinstance(avgdl_val, (int, float)) else 0.0
+        # df_val is dict[str, JsonValue], convert to dict[str, int]
+        if isinstance(df_val, dict):
+            index.df = {k: int(v) if isinstance(v, (int, float)) else 0 for k, v in df_val.items()}
+        else:
+            index.df = {}
         # Convert docs data back to BM25Doc objects
-        # Type ignore needed - payload.get returns Any from dict[str, Any]
-        docs_data: list[dict[str, Any]] = payload.get("docs", [])  # type: ignore[misc]
-        # Type ignore needed - doc is dict[str, Any] from external JSON source
-        # mypy complains about list[dict[str, Any]] but this is unavoidable from JSON deserialization
-        # The list comprehension itself needs type ignore due to dict[str, Any] from JSON
-        index.docs = [  # type: ignore[misc]
+        docs_data_raw = payload.get("docs", [])
+        if not isinstance(docs_data_raw, list):
+            docs_data: list[dict[str, JsonValue]] = []
+        else:
+            # Narrow to list[dict[str, JsonValue]]
+            # isinstance check filters to dict - mypy understands this narrowing
+            docs_data = [doc for doc in docs_data_raw if isinstance(doc, dict)]
+            # Type annotation for mypy - isinstance in comprehension narrows to dict[str, JsonValue]
+            # Cast is needed because list comprehension doesn't preserve type narrowing
+            docs_data = cast(list[dict[str, JsonValue]], docs_data)  # type: ignore[redundant-cast]
+        # Build BM25Doc objects with type narrowing for each field
+        index.docs = [
             BM25Doc(
-                chunk_id=str(doc.get("chunk_id", "")),  # type: ignore[misc]
-                doc_id=str(doc.get("doc_id", "")),  # type: ignore[misc]
-                title=str(doc.get("title", "")),  # type: ignore[misc]
-                section=str(doc.get("section", "")),  # type: ignore[misc]
-                tf=dict(doc.get("tf", {})),  # type: ignore[misc]
-                dl=float(doc.get("dl", 0.0)),  # type: ignore[misc]
+                chunk_id=(
+                    str(doc.get("chunk_id", "")) if isinstance(doc.get("chunk_id"), str) else ""
+                ),
+                doc_id=str(doc.get("doc_id", "")) if isinstance(doc.get("doc_id"), str) else "",
+                title=str(doc.get("title", "")) if isinstance(doc.get("title"), str) else "",
+                section=str(doc.get("section", "")) if isinstance(doc.get("section"), str) else "",
+                tf=(
+                    cast(dict[str, float], doc.get("tf", {}))
+                    if isinstance(doc.get("tf"), dict)
+                    else {}
+                ),
+                dl=(
+                    float(dl_val) if isinstance(dl_val := doc.get("dl", 0.0), (int, float)) else 0.0
+                ),
             )
-            for doc in docs_data  # type: ignore[misc]
+            for doc in docs_data
         ]
         return index
 

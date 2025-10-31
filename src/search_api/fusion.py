@@ -40,7 +40,7 @@ __navmap__: Final[NavMap] = {
 
 
 # [nav:anchor rrf_fuse]
-def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, float]:
+def rrf_fuse(rankers: list[list[tuple[str, float]]], k_rrf: int = 60) -> dict[str, float]:
     """Describe rrf fuse.
 
     <!-- auto:docstring-builder v1 -->
@@ -51,8 +51,8 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, f
     ----------
     rankers : list[list[tuple[str, float]]]
         Describe ``rankers``.
-    k : int, optional
-        Describe ``k``.
+    k_rrf : int, optional
+        Describe ``k_rrf``.
         Defaults to ``60``.
 
 
@@ -64,5 +64,5 @@ def rrf_fuse(rankers: list[list[tuple[str, float]]], k: int = 60) -> dict[str, f
     agg: dict[str, float] = {}
     for ranked in rankers:
         for r, (key, _score) in enumerate(ranked, start=1):
-            agg[key] = agg.get(key, 0.0) + 1.0 / (k + r)
+            agg[key] = agg.get(key, 0.0) + 1.0 / (k_rrf + r)
     return agg

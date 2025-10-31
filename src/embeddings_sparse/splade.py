@@ -13,11 +13,18 @@ import re
 from collections import Counter, defaultdict
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Final
+from typing import TYPE_CHECKING, Final, cast
 
 from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.serialization import deserialize_json, serialize_json
+
+if TYPE_CHECKING:
+    from typing import Any
+else:
+    # Runtime: Pyserini types don't have stubs, use Any for LuceneImpactSearcher
+    Any = object  # type: ignore[assignment, misc]
 
 logger = logging.getLogger(__name__)
 
@@ -317,9 +324,35 @@ class PureImpactIndex:
             msg = f"Index metadata not found at {metadata_path} or {legacy_path}"
             raise FileNotFoundError(msg)
 
-        self.df = data["df"]
-        self.N = data["N"]
-        self.postings = data["postings"]
+        # Narrow data type before indexing - pickle.load returns object
+        if not isinstance(data, dict):
+            msg = f"Invalid pickle data format: expected dict, got {type(data)}"
+            raise DeserializationError(msg)
+        data_dict: dict[str, JsonValue] = cast(dict[str, JsonValue], data)
+
+        # Extract values with type narrowing
+        df_val: JsonValue = data_dict.get("df", {})
+        n_val: JsonValue = data_dict.get("N", 0)
+        postings_val: JsonValue = data_dict.get("postings", {})
+
+        # Type narrowing and conversion
+        self.df = cast(dict[str, int], df_val) if isinstance(df_val, dict) else {}
+        self.N = int(n_val) if isinstance(n_val, (int, float)) else 0
+        # postings is dict[str, dict[str, float]] - need to convert nested dict values
+        if isinstance(postings_val, dict):
+            # Convert nested dict values from JsonValue to dict[str, float]
+            postings_converted: dict[str, dict[str, float]] = {}
+            for term, term_postings in postings_val.items():
+                if isinstance(term_postings, dict):
+                    # Convert inner dict values to float
+                    term_postings_float: dict[str, float] = {
+                        str(doc_id): float(weight) if isinstance(weight, (int, float)) else 0.0
+                        for doc_id, weight in term_postings.items()
+                    }
+                    postings_converted[str(term)] = term_postings_float
+            self.postings = postings_converted
+        else:
+            self.postings = {}
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
         """Describe search.
