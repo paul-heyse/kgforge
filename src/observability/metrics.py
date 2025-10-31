@@ -7,27 +7,61 @@ implementation specifics.
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import TYPE_CHECKING, cast
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Protocol, TypeAlias, TypeVar, cast
+
+_TMetric = TypeVar("_TMetric", covariant=True)
+
+
+class MetricFactory(Protocol[_TMetric]):
+    def __call__(
+        self,
+        name: str,
+        documentation: str,
+        labelnames: Sequence[str] | None = ...,
+        *,
+        registry: object | None = ...,
+        **kwargs: object,
+    ) -> _TMetric: ...
+
 
 if TYPE_CHECKING:  # pragma: no cover - import only for type checking
     from prometheus_client import Counter as _CounterType
     from prometheus_client import Gauge as _GaugeType
     from prometheus_client import Histogram as _HistogramType
-
-    CounterFactory = Callable[..., _CounterType]
-    GaugeFactory = Callable[..., _GaugeType]
-    HistogramFactory = Callable[..., _HistogramType]
 else:  # pragma: no cover - runtime fallback types
-    CounterFactory = Callable[..., object]
-    GaugeFactory = Callable[..., object]
-    HistogramFactory = Callable[..., object]
+
+    class _CounterType:
+        """Runtime stub when prometheus_client is unavailable."""
+
+    class _GaugeType:
+        """Runtime stub when prometheus_client is unavailable."""
+
+    class _HistogramType:
+        """Runtime stub when prometheus_client is unavailable."""
+
+
+CounterFactory: TypeAlias = MetricFactory[_CounterType]
+GaugeFactory: TypeAlias = MetricFactory[_GaugeType]
+HistogramFactory: TypeAlias = MetricFactory[_HistogramType]
+
+_PromCounter: MetricFactory[_CounterType] | None = None
+_PromGauge: MetricFactory[_GaugeType] | None = None
+_PromHistogram: MetricFactory[_HistogramType] | None = None
 
 try:
-    from prometheus_client import Counter as _PromCounter
-    from prometheus_client import Gauge as _PromGauge
-    from prometheus_client import Histogram as _PromHistogram
-except Exception:  # pragma: no cover - minimal no-op fallbacks
+    from prometheus_client import Counter as _PROM_COUNTER_IMPL
+    from prometheus_client import Gauge as _PROM_GAUGE_IMPL
+    from prometheus_client import Histogram as _PROM_HISTOGRAM_IMPL
+
+    _PromCounter = cast(MetricFactory[_CounterType], _PROM_COUNTER_IMPL)
+    _PromGauge = cast(MetricFactory[_GaugeType], _PROM_GAUGE_IMPL)
+    _PromHistogram = cast(MetricFactory[_HistogramType], _PROM_HISTOGRAM_IMPL)
+except ImportError:  # pragma: no cover - optional dependency guard
+    pass
+
+
+if _PromCounter is None or _PromGauge is None or _PromHistogram is None:
 
     class _NoopMetric:
         """Describe  NoopMetric.
@@ -135,9 +169,9 @@ except Exception:  # pragma: no cover - minimal no-op fallbacks
     Gauge = cast(GaugeFactory, _make_noop_metric)
     Histogram = cast(HistogramFactory, _make_noop_metric)
 else:
-    Counter = cast(CounterFactory, _PromCounter)
-    Gauge = cast(GaugeFactory, _PromGauge)
-    Histogram = cast(HistogramFactory, _PromHistogram)
+    Counter = _PromCounter
+    Gauge = _PromGauge
+    Histogram = _PromHistogram
 
 pdf_download_success_total = Counter("pdf_download_success_total", "Successful OA PDF downloads")
 pdf_download_failure_total = Counter(

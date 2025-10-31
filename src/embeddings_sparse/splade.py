@@ -11,20 +11,35 @@ import logging
 import math
 import re
 from collections import Counter, defaultdict
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, cast
+from re import Pattern
+from typing import Final, Protocol, cast
 
 from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.serialization import deserialize_json, serialize_json
 
-if TYPE_CHECKING:
-    from typing import Any
-else:
-    # Runtime: Pyserini types don't have stubs, use Any for LuceneImpactSearcher
-    Any = object  # type: ignore[assignment, misc]
+TOKEN_RE: Pattern[str] = re.compile(r"[A-Za-z0-9_]+")
+
+
+def _default_float_dict() -> defaultdict[str, float]:
+    return defaultdict(float)
+
+
+def _score_value(item: tuple[str, float]) -> float:
+    return item[1]
+
+
+class ImpactHitProtocol(Protocol):
+    docid: str
+    score: float
+
+
+class LuceneImpactSearcherProtocol(Protocol):
+    def search(self, query: str, k: int) -> Sequence[ImpactHitProtocol]: ...
+
 
 logger = logging.getLogger(__name__)
 
@@ -75,8 +90,6 @@ __navmap__: Final[NavMap] = {
         },
     },
 }
-
-TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 
 
 # [nav:anchor SPLADEv3Encoder]
@@ -223,7 +236,8 @@ class PureImpactIndex:
         list[str]
             Describe return value.
         """
-        return [token.lower() for token in TOKEN_RE.findall(text)]
+        matches = cast(list[str], TOKEN_RE.findall(text))
+        return [token.lower() for token in matches]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Describe build.
@@ -238,8 +252,8 @@ class PureImpactIndex:
             Describe ``docs_iterable``.
         """
         Path(self.index_dir).mkdir(parents=True, exist_ok=True)
-        df: dict[str, int] = defaultdict(int)
-        postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
+        df: defaultdict[str, int] = defaultdict(int)
+        postings: defaultdict[str, defaultdict[str, float]] = defaultdict(_default_float_dict)
         doc_count = 0
         for doc_id, fields in docs_iterable:
             text = " ".join(
@@ -291,7 +305,7 @@ class PureImpactIndex:
 
         if metadata_path.exists():
             try:
-                data = deserialize_json(metadata_path, schema_path)
+                data_raw = deserialize_json(metadata_path, schema_path)
             except DeserializationError as exc:
                 logger.warning("Failed to load JSON index, trying legacy pickle: %s", exc)
                 # Fall back to legacy pickle
@@ -299,7 +313,7 @@ class PureImpactIndex:
                     import pickle  # noqa: PLC0415
 
                     with legacy_path.open("rb") as handle:
-                        data = pickle.load(handle)  # noqa: S301
+                        data_raw = pickle.load(handle)  # noqa: S301
                 else:
                     raise
         elif legacy_path.exists():
@@ -307,17 +321,17 @@ class PureImpactIndex:
             import pickle  # noqa: PLC0415
 
             with legacy_path.open("rb") as handle:
-                data = pickle.load(handle)  # noqa: S301
+                data_raw = pickle.load(handle)  # noqa: S301
             logger.warning("Loaded legacy pickle index. Consider migrating to JSON format.")
         else:
             msg = f"Index metadata not found at {metadata_path} or {legacy_path}"
             raise FileNotFoundError(msg)
 
         # Narrow data type before indexing - pickle.load returns object
-        if not isinstance(data, dict):
-            msg = f"Invalid pickle data format: expected dict, got {type(data)}"
+        if not isinstance(data_raw, dict):
+            msg = f"Invalid pickle data format: expected dict, got {type(data_raw)}"
             raise DeserializationError(msg)
-        data_dict: dict[str, JsonValue] = cast(dict[str, JsonValue], data)
+        data_dict: dict[str, JsonValue] = cast(dict[str, JsonValue], data_raw)
 
         # Extract values with type narrowing
         df_val: JsonValue = data_dict.get("df", {})
@@ -363,14 +377,18 @@ class PureImpactIndex:
             Describe return value.
         """
         tokens = self._tokenize(query)
-        scores: dict[str, float] = defaultdict(float)
+        scores: defaultdict[str, float] = defaultdict(float)
         for token in tokens:
             postings = self.postings.get(token)
             if not postings:
                 continue
             for doc_id, weight in postings.items():
                 scores[doc_id] += weight
-        return sorted(scores.items(), key=lambda item: item[1], reverse=True)[:k]
+        ranked_scores: list[tuple[str, float]] = [
+            (doc_id, score) for doc_id, score in scores.items()
+        ]
+        ranked_scores.sort(key=_score_value, reverse=True)
+        return ranked_scores[:k]
 
 
 # [nav:anchor LuceneImpactIndex]
@@ -412,7 +430,7 @@ class LuceneImpactIndex:
         """
         self.index_dir = index_dir
         self.query_encoder = query_encoder
-        self._searcher: Any | None = None
+        self._searcher: LuceneImpactSearcherProtocol | None = None
 
     def _ensure(self) -> None:
         """Describe  ensure.
@@ -434,7 +452,8 @@ class LuceneImpactIndex:
             message = "Pyserini not available for SPLADE impact search"
             logger.exception("Failed to import LuceneImpactSearcher")
             raise RuntimeError(message) from exc
-        self._searcher = LuceneImpactSearcher(self.index_dir, query_encoder=self.query_encoder)
+        searcher = LuceneImpactSearcher(self.index_dir, query_encoder=self.query_encoder)
+        self._searcher = cast(LuceneImpactSearcherProtocol, searcher)
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
         """Describe search.
@@ -464,8 +483,11 @@ class LuceneImpactIndex:
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
             raise RuntimeError(message)
-        hits = self._searcher.search(query, k=k)  # expects SPLADE-encoded string
-        return [(hit.docid, float(hit.score)) for hit in hits]
+        hits = self._searcher.search(query, k)
+        results: list[tuple[str, float]] = []
+        for hit in hits:
+            results.append((str(hit.docid), float(hit.score)))
+        return results
 
 
 # [nav:anchor get_splade]

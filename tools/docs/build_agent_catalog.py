@@ -23,9 +23,6 @@ from typing import Any, TypeVar, cast
 
 import jsonschema
 import numpy as np
-from tools._shared.logging import get_logger, with_fields
-from tools._shared.proc import ToolExecutionError, run_tool
-from tools.docs.errors import CatalogBuildError
 
 from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.search import (
@@ -39,6 +36,9 @@ from kgfoundry.agent_catalog.search import (
     load_faiss,
 )
 from kgfoundry.agent_catalog.sqlite import write_sqlite_catalog
+from tools._shared.logging import get_logger, with_fields
+from tools._shared.proc import ToolExecutionError, run_tool
+from tools.docs.errors import CatalogBuildError
 
 
 @dataclass

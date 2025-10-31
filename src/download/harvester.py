@@ -11,7 +11,7 @@ import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final
+from typing import Final, cast
 
 import requests
 
@@ -178,18 +178,22 @@ class OpenAccessHarvester:
             params["filter"] = years
         response = self.session.get(url, params=params, timeout=30)
         response.raise_for_status()
-        payload = response.json()
-        if not isinstance(payload, dict):
+        raw_payload: object = response.json()
+        if not isinstance(raw_payload, Mapping):
             message = "OpenAlex response payload must be a mapping"
             raise TypeError(message)
-        results = payload.get("results", [])
-        if not isinstance(results, list):
+        if not all(isinstance(key, str) for key in raw_payload):
+            message = "OpenAlex payload keys must be strings"
+            raise TypeError(message)
+        payload = cast(Mapping[str, object], raw_payload)
+        results_obj = payload.get("results", [])
+        if not isinstance(results_obj, list):
             message = "OpenAlex response must contain a list of results"
             raise TypeError(message)
         typed_results: list[dict[str, object]] = []
-        for item in results:
-            if isinstance(item, dict):
-                typed_results.append(item)
+        for item in results_obj:
+            if isinstance(item, Mapping) and all(isinstance(k, str) for k in item.keys()):
+                typed_results.append(dict(item))
         return typed_results[:max_works]
 
     def resolve_pdf(self, work: Mapping[str, object]) -> str | None:
@@ -301,8 +305,9 @@ class OpenAccessHarvester:
         )
         if not response.ok:
             return None
-        payload = response.json()
-        if isinstance(payload, Mapping):
+        raw_payload: object = response.json()
+        if isinstance(raw_payload, Mapping):
+            payload = cast(Mapping[str, object], raw_payload)
             best_location = payload.get("best_oa_location")
             if isinstance(best_location, Mapping):
                 url = best_location.get("url_for_pdf")
@@ -331,7 +336,7 @@ class OpenAccessHarvester:
             return None
         return f"{self.pdf_host}/pdf/{doi.replace('/', '_')}.pdf"
 
-    def download_pdf(self, url: str, target_path: str | Path) -> str | Path:
+    def download_pdf(self, url: str, target_path: str | Path) -> Path:
         """Describe download pdf.
 
         <!-- auto:docstring-builder v1 -->

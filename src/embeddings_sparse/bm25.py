@@ -11,21 +11,16 @@ import logging
 import math
 import re
 from collections import defaultdict
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, cast
+from re import Pattern
+from typing import Final, Protocol, cast
 
 from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.serialization import deserialize_json, serialize_json
-
-if TYPE_CHECKING:
-    from typing import Any
-else:
-    # Runtime: Pyserini types don't have stubs, use Any for LuceneSearcher/LuceneIndexer
-    Any = object  # type: ignore[assignment, misc]
 
 logger = logging.getLogger(__name__)
 
@@ -87,7 +82,32 @@ __navmap__: Final[NavMap] = {
     "deps": ["pyserini"],
 }
 
-TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
+TOKEN_RE: Pattern[str] = re.compile(r"[A-Za-z0-9_]+")
+
+
+def _default_int_dict() -> defaultdict[str, int]:
+    return defaultdict(int)
+
+
+class LuceneHitProtocol(Protocol):
+    docid: str
+    score: float
+
+
+class LuceneSearcherProtocol(Protocol):
+    def set_bm25(self, k1: float, b: float) -> None: ...
+
+    def search(self, query: str, k: int) -> Sequence[LuceneHitProtocol]: ...
+
+
+class LuceneIndexerProtocol(Protocol):
+    def add_doc_dict(self, doc: Mapping[str, str]) -> None: ...
+
+    def close(self) -> None: ...
+
+
+def _score_value(item: tuple[str, float]) -> float:
+    return item[1]
 
 
 # [nav:anchor BM25Doc]
@@ -184,7 +204,8 @@ class PurePythonBM25:
         list[str]
             Lowercased tokens extracted from the text.
         """
-        return [t.lower() for t in TOKEN_RE.findall(text)]
+        matches = cast(list[str], TOKEN_RE.findall(text))
+        return [token.lower() for token in matches]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Build postings and document statistics for the BM25 index.
@@ -197,8 +218,8 @@ class PurePythonBM25:
             Describe ``docs_iterable``.
         """
         Path(self.index_dir).mkdir(parents=True, exist_ok=True)
-        df: dict[str, int] = defaultdict(int)
-        postings: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+        df: defaultdict[str, int] = defaultdict(int)
+        postings: defaultdict[str, defaultdict[str, int]] = defaultdict(_default_int_dict)
         docs: dict[str, BM25Doc] = {}
         lengths: list[int] = []
         for doc_id, fields in docs_iterable:
@@ -223,7 +244,7 @@ class PurePythonBM25:
         self.avgdl = sum(lengths) / max(1, len(lengths))
         self.df = dict(df)
         # convert defaultdicts
-        self.postings = {t: dict(ps) for t, ps in postings.items()}
+        self.postings = {term: dict(term_postings) for term, term_postings in postings.items()}
         self.docs = docs
         # persist using secure JSON serialization with schema validation
         metadata_path = Path(self.index_dir) / "pure_bm25.json"
@@ -234,7 +255,7 @@ class PurePythonBM25:
         docs_data = [
             {
                 "doc_id": doc_id,
-                "length": doc.length or 0.0,
+                "length": int(doc.length),
             }
             for doc_id, doc in self.docs.items()
         ]
@@ -410,7 +431,7 @@ class PurePythonBM25:
         """
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
-        scores: dict[str, float] = defaultdict(float)
+        scores: defaultdict[str, float] = defaultdict(float)
         for term in tokens:
             idf = self._idf(term)
             postings = self.postings.get(term)
@@ -422,7 +443,11 @@ class PurePythonBM25:
                 denom = tf + self.k1 * (1 - self.b + self.b * (dl / self.avgdl))
                 contrib = idf * ((tf * (self.k1 + 1)) / (denom))
                 scores[doc_id] += contrib
-        return sorted(scores.items(), key=lambda x: x[1], reverse=True)[:k]
+        ranked_scores: list[tuple[str, float]] = [
+            (doc_id, score) for doc_id, score in scores.items()
+        ]
+        ranked_scores.sort(key=_score_value, reverse=True)
+        return ranked_scores[:k]
 
 
 # [nav:anchor LuceneBM25]
@@ -480,7 +505,7 @@ class LuceneBM25:
         self.k1 = k1
         self.b = b
         self.field_boosts = field_boosts or {"title": 2.0, "section": 1.2, "body": 1.0}
-        self._searcher: Any | None = None
+        self._searcher: LuceneSearcherProtocol | None = None
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Index documents with Pyserini's Lucene backend.
@@ -504,7 +529,7 @@ class LuceneBM25:
             logger.exception("Failed to import LuceneIndexer")
             raise RuntimeError(message) from exc
         Path(self.index_dir).mkdir(parents=True, exist_ok=True)
-        indexer = cast(Any, LuceneIndexer(self.index_dir))
+        indexer = cast(LuceneIndexerProtocol, LuceneIndexer(self.index_dir))
         for doc_id, fields in docs_iterable:
             # combine fields with boosts in a "contents" field for simplicity
             title = fields.get("title", "")
@@ -529,7 +554,7 @@ class LuceneBM25:
             return
         from pyserini.search.lucene import LuceneSearcher  # noqa: PLC0415
 
-        searcher = cast(Any, LuceneSearcher(self.index_dir))
+        searcher = cast(LuceneSearcherProtocol, LuceneSearcher(self.index_dir))
         searcher.set_bm25(self.k1, self.b)
         self._searcher = searcher
 
@@ -567,8 +592,11 @@ class LuceneBM25:
         if self._searcher is None:
             message = "Lucene searcher not initialized"
             raise RuntimeError(message)
-        hits = self._searcher.search(query, k=k)
-        return [(h.docid, float(h.score)) for h in hits]
+        hits = self._searcher.search(query, k)
+        results: list[tuple[str, float]] = []
+        for hit in hits:
+            results.append((str(hit.docid), float(hit.score)))
+        return results
 
 
 # [nav:anchor get_bm25]

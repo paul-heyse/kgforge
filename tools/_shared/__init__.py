@@ -21,6 +21,7 @@ from tools._shared.metrics import ToolRunObservation, observe_tool_run
 from tools._shared.problem_details import (
     ProblemDetailsDict,
     build_problem_details,
+    build_schema_problem_details,
     build_tool_problem_details,
     problem_from_exception,
     render_problem,
@@ -58,6 +59,7 @@ __all__ = [
     "ToolRuntimeSettings",
     "ValidationError",
     "build_problem_details",
+    "build_schema_problem_details",
     "build_tool_problem_details",
     "get_logger",
     "get_runtime_settings",

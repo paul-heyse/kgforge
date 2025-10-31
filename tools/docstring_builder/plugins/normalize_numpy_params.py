@@ -16,20 +16,26 @@ class NormalizeNumpyParamsPlugin:
     name: ClassVar[str] = "normalize_numpy_params"
     stage: ClassVar[PluginStage] = "transformer"
 
-    def on_start(self, context: PluginContext) -> None:
+    @staticmethod
+    def on_start(context: PluginContext) -> None:
         """Reset plugin state before processing begins (no-op)."""
         del context
 
-    def on_finish(self, context: PluginContext) -> None:
+    @staticmethod
+    def on_finish(context: PluginContext) -> None:
         """Clean up plugin state after processing completes (no-op)."""
         del context
 
-    def apply(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
+    @staticmethod
+    def apply(context: PluginContext, result: SemanticResult) -> SemanticResult:
         """Normalise parameter and return descriptions for ``result``."""
         del context
         schema = result.schema
-        parameters = [self._normalize_parameter(parameter) for parameter in schema.parameters]
-        returns = [self._normalize_return(entry) for entry in schema.returns]
+        parameters = [
+            NormalizeNumpyParamsPlugin._normalize_parameter(parameter)
+            for parameter in schema.parameters
+        ]
+        returns = [NormalizeNumpyParamsPlugin._normalize_return(entry) for entry in schema.returns]
         if parameters == schema.parameters and returns == schema.returns:
             return result
         updated_schema = replace(schema, parameters=parameters, returns=returns)

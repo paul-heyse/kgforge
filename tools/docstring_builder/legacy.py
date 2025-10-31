@@ -199,15 +199,15 @@ def _normalize_qualified_name(name: str) -> str:
 
 def _wrap_text(text: str) -> list[str]:
     wrapped: list[str] = []
-    for paragraph in text.splitlines():
-        paragraph = paragraph.strip()
+    for raw_paragraph in text.splitlines():
+        paragraph = raw_paragraph.strip()
         if not paragraph:
             wrapped.append("")
             continue
         wrapped.append(
             textwrap.fill(paragraph, width=88, break_long_words=False, break_on_hyphens=False)
         )
-    while wrapped and wrapped[-1] == "":
+    while wrapped and not wrapped[-1]:
         wrapped.pop()
     return wrapped
 
@@ -217,6 +217,7 @@ def _required_sections(  # noqa: PLR0913
     parameters: list[ParameterInfo],
     returns: str | None,
     raises: list[str],
+    *,
     name: str,
     is_public: bool,
 ) -> list[str]:
@@ -373,7 +374,7 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
         for param in params:
             annotation = param.annotation or "Any"
             optional = ", optional" if not param.required and not param.is_variadic else ""
-            default = f", by default {param.default}" if param.default not in (None, "...") else ""
+            default = f", by default {param.default}" if param.default not in {None, "..."} else ""
             lines.append(f"{param.display_name} : {annotation}{optional}{default}")
             lines.append(f"    Description for ``{param.name}``.")
 

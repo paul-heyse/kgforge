@@ -17,9 +17,9 @@ Examples
 from __future__ import annotations
 
 import time
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Final, Protocol, cast
+from typing import Final, Protocol, cast
 
 from kgfoundry_common.logging import get_logger
 from kgfoundry_common.navmap_types import NavMap
@@ -61,39 +61,75 @@ __navmap__: Final[NavMap] = {
 
 logger = get_logger(__name__)
 
-if TYPE_CHECKING:
-    from prometheus_client.metrics import Counter as PromCounterType
-    from prometheus_client.metrics import Histogram as PromHistogramType
-    from prometheus_client.registry import CollectorRegistry as PromCollectorRegistryType
-    CollectorRegistryType = PromCollectorRegistryType
-else:
-    PromCounterType = PromHistogramType = PromCollectorRegistryType = object
-    CollectorRegistryType = object  # type: ignore[assignment]
 
-_RuntimeCounter: object | None = None
-_RuntimeHistogram: object | None = None
-_RuntimeCollectorRegistry: object | None = None
+class CollectorRegistryProtocol(Protocol):
+    """Marker protocol for objects that behave like Prometheus registries."""
 
+
+class _CounterConstructor(Protocol):
+    def __call__(
+        self,
+        name: str,
+        documentation: str,
+        labelnames: list[str],
+        *,
+        registry: CollectorRegistryProtocol | None = ...,
+    ) -> CounterLike: ...
+
+
+class _GaugeConstructor(Protocol):
+    def __call__(
+        self,
+        name: str,
+        documentation: str,
+        labelnames: list[str],
+        *,
+        registry: CollectorRegistryProtocol | None = ...,
+    ) -> GaugeLike: ...
+
+
+class _HistogramConstructor(Protocol):
+    def __call__(
+        self,
+        name: str,
+        documentation: str,
+        labelnames: list[str],
+        *,
+        registry: CollectorRegistryProtocol | None = ...,
+    ) -> HistogramLike: ...
+
+
+CollectorRegistryType = CollectorRegistryProtocol
+
+_PROM_COUNTER: _CounterConstructor | None = None
+_PROM_GAUGE: _GaugeConstructor | None = None
+_PROM_HISTOGRAM: _HistogramConstructor | None = None
+_PROM_COLLECTOR_REGISTRY: Callable[[], CollectorRegistryProtocol] | None = None
+_PROM_DEFAULT_REGISTRY: CollectorRegistryProtocol | None = None
+
+
+# Runtime Prometheus bindings (optional dependency)
 try:
-    from prometheus_client import Counter as _RuntimeCounter
-    from prometheus_client import Histogram as _RuntimeHistogram
-    from prometheus_client.registry import CollectorRegistry as _RuntimeCollectorRegistry
+    import prometheus_client
+    from prometheus_client import REGISTRY as _PROM_DEFAULT_REGISTRY_VALUE
+    from prometheus_client import Counter as _PROM_COUNTER_CLS
+    from prometheus_client import Gauge as _PROM_GAUGE_CLS
+    from prometheus_client import Histogram as _PROM_HISTOGRAM_CLS
+    from prometheus_client.registry import CollectorRegistry as _PROM_COLLECTOR_REGISTRY_CLS
 
     HAVE_PROMETHEUS = True
-    _PROMETHEUS_VERSION: str | None
-    try:
-        import prometheus_client
-
-        _PROMETHEUS_VERSION = getattr(prometheus_client, "__version__", None)
-    except Exception as exc:  # noqa: BLE001
-        logger.debug("Could not detect Prometheus version: %s", exc)
-        _PROMETHEUS_VERSION = None
-except ImportError:
+    _PROM_COUNTER = cast(_CounterConstructor, _PROM_COUNTER_CLS)
+    _PROM_GAUGE = cast(_GaugeConstructor, _PROM_GAUGE_CLS)
+    _PROM_HISTOGRAM = cast(_HistogramConstructor, _PROM_HISTOGRAM_CLS)
+    _PROM_COLLECTOR_REGISTRY = cast(
+        Callable[[], CollectorRegistryProtocol],
+        _PROM_COLLECTOR_REGISTRY_CLS,
+    )
+    _PROM_DEFAULT_REGISTRY = cast(CollectorRegistryProtocol, _PROM_DEFAULT_REGISTRY_VALUE)
+    _PROMETHEUS_VERSION: str | None = getattr(prometheus_client, "__version__", None)
+except ImportError:  # pragma: no cover - optional dependency guard
     HAVE_PROMETHEUS = False
     _PROMETHEUS_VERSION = None
-    _RuntimeCounter = None
-    _RuntimeHistogram = None
-    _RuntimeCollectorRegistry = None
 
 
 class _StubCollectorRegistry:
@@ -311,13 +347,10 @@ def _build_counter(
     labelnames: list[str],
     registry: CollectorRegistryType | None,
 ) -> CounterLike | _StubCounter:
-    if not HAVE_PROMETHEUS or _RuntimeCounter is None:
+    counter_ctor = _PROM_COUNTER
+    if counter_ctor is None:
         return _StubCounter()
-    runtime_counter = cast(type[PromCounterType], _RuntimeCounter)
-    prom_registry: PromCollectorRegistryType | None
-    prom_registry = cast(PromCollectorRegistryType | None, registry)
-    counter = runtime_counter(name, documentation, labelnames, registry=prom_registry)
-    return cast(CounterLike, counter)
+    return counter_ctor(name, documentation, labelnames, registry=registry)
 
 
 def _build_histogram(
@@ -326,13 +359,10 @@ def _build_histogram(
     labelnames: list[str],
     registry: CollectorRegistryType | None,
 ) -> HistogramLike | _StubHistogram:
-    if not HAVE_PROMETHEUS or _RuntimeHistogram is None:
+    histogram_ctor = _PROM_HISTOGRAM
+    if histogram_ctor is None:
         return _StubHistogram()
-    runtime_histogram = cast(type[PromHistogramType], _RuntimeHistogram)
-    prom_registry: PromCollectorRegistryType | None
-    prom_registry = cast(PromCollectorRegistryType | None, registry)
-    histogram = runtime_histogram(name, documentation, labelnames, registry=prom_registry)
-    return cast(HistogramLike, histogram)
+    return histogram_ctor(name, documentation, labelnames, registry=registry)
 
 
 class MetricsProvider:
@@ -362,7 +392,7 @@ class MetricsProvider:
     runs_total: CounterLike | _StubCounter
     operation_duration_seconds: HistogramLike | _StubHistogram
 
-    def __init__(self, registry: CollectorRegistryType | None = None) -> None:
+    def __init__(self, registry: CollectorRegistryProtocol | None = None) -> None:
         """Initialize metrics provider.
 
         <!-- auto:docstring-builder v1 -->
@@ -381,12 +411,13 @@ class MetricsProvider:
             return
 
         if registry is None:
-            if _RuntimeCollectorRegistry is None:
+            if _PROM_DEFAULT_REGISTRY is not None:
+                registry = _PROM_DEFAULT_REGISTRY
+            elif _PROM_COLLECTOR_REGISTRY is not None:
+                registry = _PROM_COLLECTOR_REGISTRY()
+            else:  # pragma: no cover - defensive guard
                 msg = "Prometheus registry is unavailable despite HAVE_PROMETHEUS=True"
                 raise RuntimeError(msg)
-            from prometheus_client import REGISTRY  # noqa: PLC0415
-
-            registry = REGISTRY
 
         # Type narrowing: HAVE_PROMETHEUS is True, so Counter/Histogram are imported
         # Prometheus Counter/Histogram match Protocol interface (labels() returns self, inc/observe methods exist)
@@ -596,17 +627,17 @@ class MetricsRegistry:
         self,
         *,
         namespace: str = "kgfoundry",
-        registry: CollectorRegistryType | None = None,
+        registry: CollectorRegistryProtocol | None = None,
     ) -> None:
         if HAVE_PROMETHEUS:
             if registry is None:
-                if _RuntimeCollectorRegistry is None:
+                collector_cls = _PROM_COLLECTOR_REGISTRY
+                if collector_cls is None:  # pragma: no cover - defensive
                     msg = "Prometheus registry construction failed"
                     raise RuntimeError(msg)
-                registry = _RuntimeCollectorRegistry()
-        else:
-            if registry is None:
-                registry = _StubCollectorRegistry()
+                registry = collector_cls()
+        elif registry is None:
+            registry = _StubCollectorRegistry()
 
         metric_prefix = namespace.replace("-", "_")
         labels_counter = ["operation", "status"]
@@ -633,7 +664,7 @@ class MetricsRegistry:
         )
 
     @property
-    def registry(self) -> CollectorRegistryType | None:
+    def registry(self) -> CollectorRegistryProtocol | None:
         """Return the underlying Prometheus registry when available."""
         return self._registry
 

@@ -62,15 +62,24 @@ def resolve_griffe() -> GriffeAPI:
     except ModuleNotFoundError:
         dataclasses_module = None
 
-    loader_cls = cast(
-        GriffeLoaderType,
-        getattr(loader_module, "GriffeLoader", griffe_module.GriffeLoader),
+    if loader_module is not None and hasattr(loader_module, "GriffeLoader"):
+        loader_attr: object = loader_module.GriffeLoader
+    else:
+        loader_attr = griffe_module.GriffeLoader
+    loader_cls = cast(GriffeLoaderType, loader_attr)
+
+    symbols_source: ModuleType = (
+        dataclasses_module if dataclasses_module is not None else griffe_module
     )
-    symbols_source = dataclasses_module or griffe_module
-    class_cls = cast(GriffeClassType, symbols_source.Class)
-    function_cls = cast(GriffeFunctionType, symbols_source.Function)
-    module_cls = cast(GriffeModuleObjectType, symbols_source.Module)
-    object_cls = cast(GriffeObjectType, griffe_module.Object)
+    class_attr: object = symbols_source.Class
+    function_attr: object = symbols_source.Function
+    module_attr: object = symbols_source.Module
+    object_attr: object = griffe_module.Object
+
+    class_cls = cast(GriffeClassType, class_attr)
+    function_cls = cast(GriffeFunctionType, function_attr)
+    module_cls = cast(GriffeModuleObjectType, module_attr)
+    object_cls = cast(GriffeObjectType, object_attr)
 
     _GRIFFE_SINGLETON = GriffeAPI(
         package=griffe_module,

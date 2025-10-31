@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Literal, cast
 import libcst as cst
 
 from tools.docstring_builder.config import BuilderConfig
+from tools.docstring_builder.models import SymbolResolutionError
 from tools.griffe_utils import resolve_griffe
 
 try:  # Import lazily so unit tests can patch when griffe is unavailable.
@@ -127,17 +128,18 @@ def _load_module(module_name: str, search_paths: list[str]) -> GriffeModule:
         load_fn = cast(Callable[[str], GriffeModule], loader.load)
     try:
         return load_fn(module_name)
-    except Exception:
+    except ModuleNotFoundError as exc:
         if module_name.endswith(".__init__"):
             package_name = module_name.rsplit(".", 1)[0]
             return load_fn(package_name)
-        raise
+        message = f"Unable to load module '{module_name}'"
+        raise SymbolResolutionError(message) from exc
 
 
 def _safe_getattr(value: object, attr: str) -> object | None:
     try:
         attr_value = getattr(value, attr)
-    except Exception:  # pragma: no cover - defensive fallback
+    except AttributeError:  # pragma: no cover - defensive fallback
         return None
     return cast(object, attr_value)
 
@@ -158,7 +160,7 @@ def _expr_to_str(value: object | None) -> str | None:
     if callable(as_string):
         try:
             candidate = as_string()
-        except Exception:  # pragma: no cover - defensive fallback
+        except (TypeError, ValueError):  # pragma: no cover - defensive fallback
             candidate = None
         if isinstance(candidate, str):
             return candidate
@@ -168,7 +170,7 @@ def _expr_to_str(value: object | None) -> str | None:
             return attr_value
     try:
         return str(value)
-    except Exception:  # pragma: no cover - defensive fallback
+    except (TypeError, ValueError):  # pragma: no cover - defensive fallback
         return None
 
 

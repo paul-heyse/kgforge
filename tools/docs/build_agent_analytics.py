@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -15,10 +15,11 @@ from msgspec import DecodeError
 from msgspec import json as msgspec_json
 
 if TYPE_CHECKING:
-    def validate_tools_payload(payload: Mapping[str, object], schema_name: str) -> None: ...
-
+    from tools import validate_tools_payload as _validate_tools_payload
 else:
-    from tools import validate_tools_payload
+    from tools import validate_tools_payload as _validate_tools_payload
+
+from kgfoundry.agent_catalog.models import load_catalog_payload
 from tools.docs.analytics_models import (
     ANALYTICS_SCHEMA,
     AgentAnalyticsDocument,
@@ -30,9 +31,10 @@ from tools.docs.analytics_models import (
     RepoInfo,
 )
 
-from kgfoundry.agent_catalog.models import load_catalog_payload
-
 type JSONMapping = Mapping[str, object]
+
+validate_tools_payload: Callable[[Mapping[str, object], str], None]
+validate_tools_payload = _validate_tools_payload
 
 
 def _get_mapping(value: object) -> JSONMapping | None:

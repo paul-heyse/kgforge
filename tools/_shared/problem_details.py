@@ -29,6 +29,7 @@ __all__ = [
     "JsonValue",
     "ProblemDetailsDict",
     "build_problem_details",
+    "build_schema_problem_details",
     "build_tool_problem_details",
     "problem_from_exception",
     "render_problem",
@@ -103,6 +104,49 @@ def build_problem_details(  # noqa: PLR0913
         for key, value in extensions.items():
             payload[key] = value
     return payload
+
+
+def _json_pointer_from(error: object) -> str | None:
+    raw_path = getattr(error, "absolute_path", None)
+    if isinstance(raw_path, Sequence):
+        tokens = [str(part) for part in raw_path]
+        if tokens:
+            return "/" + "/".join(tokens)
+    return None
+
+
+def build_schema_problem_details(  # noqa: PLR0913
+    *,
+    error: Exception,
+    type: str,  # noqa: A002
+    title: str,
+    status: int,
+    instance: str,
+    extensions: Mapping[str, JsonValue] | None = None,
+) -> ProblemDetailsDict:
+    """Return Problem Details payload describing a schema validation failure."""
+    detail_attr = getattr(error, "message", None)
+    detail = str(detail_attr) if detail_attr is not None else str(error)
+    extras: dict[str, JsonValue] = {}
+    pointer = _json_pointer_from(error)
+    if pointer:
+        extras["jsonPointer"] = pointer
+    validator_raw = getattr(error, "validator", None)
+    if validator_raw is not None:
+        extras["validator"] = str(validator_raw)
+    additional = dict(extensions) if extensions else {}
+    merged_extra = {**extras, **additional} if extras or additional else None
+    problem = build_problem_details(
+        type=type,
+        title=title,
+        status=status,
+        detail=detail,
+        instance=instance,
+        extensions=None,
+    )
+    if merged_extra:
+        problem["extensions"] = merged_extra
+    return problem
 
 
 def build_tool_problem_details(  # noqa: PLR0913

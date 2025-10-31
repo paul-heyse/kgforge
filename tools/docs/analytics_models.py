@@ -166,7 +166,9 @@ class AgentAnalyticsDocument(BaseStruct, kw_only=True):
         def __init__(
             self,
             *,
-            generated_at: str | None = None,
+            schemaVersion: str = ANALYTICS_SCHEMA_VERSION,
+            schemaId: str = ANALYTICS_SCHEMA_ID,
+            generatedAt: str | None = None,
             repo: RepoInfo | None = None,
             catalog: CatalogMetrics | None = None,
             portal: PortalAnalytics | None = None,

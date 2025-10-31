@@ -25,12 +25,14 @@ import json
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from functools import lru_cache
 from pathlib import Path
 from typing import Final, Literal, Protocol, TypedDict, cast
 
 from jsonschema import Draft202012Validator, ValidationError
+
+from tools._shared.problem_details import build_schema_problem_details
 
 JsonPrimitive = str | int | float | bool | None
 JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
@@ -42,8 +44,56 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 _DOCFACTS_SCHEMA_PATH = _REPO_ROOT / "docs" / "_build" / "schema_docfacts.json"
 _CLI_SCHEMA_PATH = _REPO_ROOT / "schema" / "tools" / "docstring_builder_cli.json"
 
-_docfacts_validator: Draft202012Validator | None = None
-_cli_validator: Draft202012Validator | None = None
+
+class ProblemDetails(TypedDict, total=False):
+    """RFC 9457 Problem Details envelope used for error reporting."""
+
+    type: str
+    title: str
+    status: int
+    detail: str
+    instance: str
+    extensions: dict[str, JsonValue]
+
+
+class DocstringBuilderError(RuntimeError):
+    """Base exception for docstring builder failures."""
+
+
+@dataclass(slots=True)
+class SchemaViolationError(DocstringBuilderError):
+    """Raised when generated payloads do not satisfy the published schema."""
+
+    problem: ProblemDetails | None = None
+
+    def __init__(self, message: str, *, problem: ProblemDetails | None = None) -> None:
+        super().__init__(message)
+        self.problem = problem
+
+
+class PluginExecutionError(DocstringBuilderError):
+    """Raised when a plugin fails during execution and cannot recover."""
+
+
+class ToolConfigurationError(DocstringBuilderError):
+    """Raised when CLI configuration (flags, environment, config files) is invalid."""
+
+
+class SymbolResolutionError(DocstringBuilderError):
+    """Raised when harvested symbols cannot be imported for inspection."""
+
+
+class SignatureIntrospectionError(DocstringBuilderError):
+    """Raised when callable signatures or annotations cannot be inspected."""
+
+
+class RunStatus(StrEnum):
+    """Enumerated status labels used across CLI summaries and manifest files."""
+
+    SUCCESS = "success"
+    VIOLATION = "violation"
+    CONFIG = "config"
+    ERROR = "error"
 
 
 class DocfactsProvenanceLike(Protocol):
@@ -147,54 +197,6 @@ SymbolKind = Literal["function", "method", "class"]
 _SYMBOL_KINDS: Final = {"function", "method", "class"}
 
 _RETURN_KINDS: Final = {"returns", "yields"}
-
-
-class DocstringBuilderError(RuntimeError):
-    """Base exception for docstring builder failures."""
-
-
-class SchemaViolationError(DocstringBuilderError):
-    """Raised when generated payloads do not satisfy the published schema."""
-
-    def __init__(self, message: str, *, problem: ProblemDetails | None = None) -> None:
-        super().__init__(message)
-        self.problem: ProblemDetails | None = problem
-
-
-class PluginExecutionError(DocstringBuilderError):
-    """Raised when a plugin fails during execution and cannot recover."""
-
-
-class ToolConfigurationError(DocstringBuilderError):
-    """Raised when CLI configuration (flags, environment, config files) is invalid."""
-
-
-class SymbolResolutionError(DocstringBuilderError):
-    """Raised when harvested symbols cannot be imported for inspection."""
-
-
-class SignatureIntrospectionError(DocstringBuilderError):
-    """Raised when callable signatures or annotations cannot be inspected."""
-
-
-class RunStatus(str, Enum):
-    """Enumerated status labels used across CLI summaries and manifest files."""
-
-    SUCCESS = "success"
-    VIOLATION = "violation"
-    CONFIG = "config"
-    ERROR = "error"
-
-
-class ProblemDetails(TypedDict, total=False):
-    """RFC 9457 Problem Details envelope used for error reporting."""
-
-    type: str
-    title: str
-    status: int
-    detail: str
-    instance: str
-    extensions: dict[str, JsonValue]
 
 
 PROBLEM_DETAILS_EXAMPLE: ProblemDetails = {
@@ -470,45 +472,6 @@ def _load_cli_validator() -> Draft202012Validator:
     return Draft202012Validator(schema_data)
 
 
-def _format_json_pointer(path: Sequence[object]) -> str:
-    if not path:
-        return ""
-    return "/" + "/".join(str(part) for part in path)
-
-
-def _build_problem_details(
-    exc: ValidationError,
-    *,
-    schema: str,
-    title: str,
-    extensions: Mapping[str, JsonValue] | None = None,
-) -> ProblemDetails:
-    path_tokens_raw = getattr(exc, "absolute_path", ())
-    if isinstance(path_tokens_raw, Sequence):
-        path_tokens: Sequence[object] = tuple(path_tokens_raw)
-    else:
-        path_tokens = ()
-    pointer = _format_json_pointer(path_tokens)
-    problem: ProblemDetails = {
-        "type": f"https://kgfoundry.dev/problems/docbuilder/{schema}-schema-mismatch",
-        "title": title,
-        "status": 422,
-        "detail": exc.message,
-        "instance": f"urn:docbuilder:schema:{schema}:{datetime.now(tz=UTC).isoformat(timespec='seconds')}",
-    }
-    extras: dict[str, JsonValue] = {}
-    if pointer:
-        extras["jsonPointer"] = pointer
-    validator_raw: object | None = getattr(exc, "validator", None)
-    if validator_raw is not None:
-        extras["validator"] = str(validator_raw)
-    if extensions:
-        extras.update(dict(extensions))
-    if extras:
-        problem["extensions"] = extras
-    return problem
-
-
 def validate_docfacts_payload(payload: DocfactsDocumentPayload) -> None:
     """Validate ``payload`` against the published DocFacts schema."""
     validator = _load_docfacts_validator()
@@ -516,13 +479,17 @@ def validate_docfacts_payload(payload: DocfactsDocumentPayload) -> None:
         validator.validate(payload)
     except ValidationError as exc:
         schema_version = payload.get("docfactsVersion")
-        problem = _build_problem_details(
-            exc,
-            schema="docfacts",
+        problem = build_schema_problem_details(
+            error=exc,
+            type="https://kgfoundry.dev/problems/docbuilder/docfacts-schema-mismatch",
             title="DocFacts schema validation failed",
+            status=422,
+            instance=f"urn:docbuilder:schema:docfacts:{datetime.now(tz=UTC).isoformat(timespec='seconds')}",
             extensions={"schemaVersion": schema_version or ""},
         )
-        raise SchemaViolationError(problem["title"], problem=problem) from exc
+        problem_payload = cast(ProblemDetails, problem)
+        detail_message = str(problem_payload.get("detail", "DocFacts schema validation failed"))
+        raise SchemaViolationError(detail_message, problem=problem_payload) from exc
 
 
 def validate_cli_output(payload: CliResult) -> None:
@@ -532,13 +499,17 @@ def validate_cli_output(payload: CliResult) -> None:
         validator.validate(payload)
     except ValidationError as exc:
         schema_version = payload.get("schemaVersion")
-        problem = _build_problem_details(
-            exc,
-            schema="cli",
+        problem = build_schema_problem_details(
+            error=exc,
+            type="https://kgfoundry.dev/problems/docbuilder/cli-schema-mismatch",
             title="CLI schema validation failed",
+            status=422,
+            instance=f"urn:docbuilder:schema:cli:{datetime.now(tz=UTC).isoformat(timespec='seconds')}",
             extensions={"schemaVersion": schema_version or ""},
         )
-        raise SchemaViolationError(problem["title"], problem=problem) from exc
+        problem_payload = cast(ProblemDetails, problem)
+        detail_message = str(problem_payload.get("detail", "CLI schema validation failed"))
+        raise SchemaViolationError(detail_message, problem=problem_payload) from exc
 
 
 def _normalise_parameter(parameter: Mapping[str, object]) -> DocfactsParameter:
@@ -627,18 +598,7 @@ def build_docstring_ir_from_legacy(ir: IRDocstringLike) -> DocstringIR:
         DocstringIRParameter(
             name=parameter.name,
             display_name=parameter.display_name or parameter.name,
-            kind=(
-                parameter.kind
-                if parameter.kind
-                in {
-                    "positional_only",
-                    "positional_or_keyword",
-                    "keyword_only",
-                    "var_positional",
-                    "var_keyword",
-                }
-                else "positional_or_keyword"
-            ),
+            kind=_coerce_parameter_kind(parameter.kind),
             annotation=parameter.annotation,
             default=parameter.default,
             optional=parameter.optional,
@@ -661,7 +621,7 @@ def build_docstring_ir_from_legacy(ir: IRDocstringLike) -> DocstringIR:
     return DocstringIR(
         symbol_id=ir.symbol_id,
         module=ir.module,
-        kind=ir.kind if ir.kind in {"function", "method", "class"} else "function",
+        kind=_coerce_symbol_kind(ir.kind),
         source_path=ir.source_path,
         lineno=ir.lineno,
         end_lineno=None,
@@ -709,49 +669,71 @@ def build_cli_result_skeleton(status: RunStatus) -> CliResult:
     return payload
 
 
-__all__ = [
-    "CLI_SCHEMA_ID",
-    "CLI_SCHEMA_VERSION",
-    "PROBLEM_DETAILS_EXAMPLE",
-    "DocfactsDocumentLike",
-    "DocfactsDocumentPayload",
-    "DocfactsEntry",
-    "DocfactsParameter",
-    "DocfactsProvenanceLike",
-    "DocfactsProvenancePayload",
-    "DocfactsRaise",
-    "DocfactsReport",
-    "DocfactsReturn",
-    "DocstringBuilderError",
-    "DocstringIR",
-    "DocstringIRParameter",
-    "DocstringIRRaise",
-    "DocstringIRReturn",
-    "ErrorReport",
-    "FileReport",
-    "IRDocstringLike",
-    "IRParameterLike",
-    "IRRaiseLike",
-    "IRReturnLike",
-    "InputHash",
-    "JsonPrimitive",
-    "JsonValue",
-    "ParameterKind",
-    "PluginExecutionError",
-    "PluginReport",
-    "PolicyReport",
-    "PolicyViolationReport",
-    "ProblemDetails",
-    "RunStatus",
-    "RunSummary",
-    "SchemaViolationError",
-    "SignatureIntrospectionError",
-    "StatusCounts",
-    "SymbolResolutionError",
-    "ToolConfigurationError",
-    "build_cli_result_skeleton",
-    "build_docfacts_document_payload",
-    "build_docstring_ir_from_legacy",
-    "validate_cli_output",
-    "validate_docfacts_payload",
-]
+def _json_pointer_from(error: ValidationError) -> str | None:
+    raw_path = getattr(error, "absolute_path", ())
+    if isinstance(raw_path, Sequence):
+        tokens = [str(part) for part in raw_path if part is not None]
+        if tokens:
+            return "/" + "/".join(tokens)
+    return None
+
+
+def _coerce_parameter_kind(kind: str | None) -> ParameterKind:
+    if kind in _PARAMETER_KINDS:
+        return cast(ParameterKind, kind)
+    return "positional_or_keyword"
+
+
+def _coerce_symbol_kind(kind: str | None) -> SymbolKind:
+    if kind in _SYMBOL_KINDS:
+        return cast(SymbolKind, kind)
+    return "function"
+
+
+__all__ = sorted(
+    [
+        "CLI_SCHEMA_ID",
+        "CLI_SCHEMA_VERSION",
+        "CacheSummary",
+        "DocFactLike",
+        "DocfactsDocumentLike",
+        "DocfactsDocumentPayload",
+        "DocfactsEntry",
+        "DocfactsParameter",
+        "DocfactsProvenanceLike",
+        "DocfactsProvenancePayload",
+        "DocfactsRaise",
+        "DocfactsReport",
+        "DocfactsReturn",
+        "DocstringBuilderError",
+        "DocstringIR",
+        "DocstringIRParameter",
+        "DocstringIRRaise",
+        "DocstringIRReturn",
+        "ErrorReport",
+        "FileReport",
+        "IRDocstringLike",
+        "IRParameterLike",
+        "IRRaiseLike",
+        "IRReturnLike",
+        "InputHash",
+        "PluginExecutionError",
+        "PluginReport",
+        "PolicyReport",
+        "PolicyViolationReport",
+        "PROBLEM_DETAILS_EXAMPLE",
+        "ProblemDetails",
+        "RunStatus",
+        "RunSummary",
+        "SchemaViolationError",
+        "SignatureIntrospectionError",
+        "StatusCounts",
+        "SymbolResolutionError",
+        "ToolConfigurationError",
+        "build_cli_result_skeleton",
+        "build_docfacts_document_payload",
+        "build_docstring_ir_from_legacy",
+        "validate_cli_output",
+        "validate_docfacts_payload",
+    ]
+)

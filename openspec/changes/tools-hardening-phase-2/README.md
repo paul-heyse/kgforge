@@ -15,3 +15,9 @@
 - `make artifacts`
 
 
+### Metrics & Settings Toggles
+- `TOOLS_METRICS_ENABLED=0` disables Prometheus counters/histograms emitted by `tools._shared.metrics` – useful if dashboards regress or scrape load must be rolled back quickly.
+- `TOOLS_TRACING_ENABLED=0` stops OpenTelemetry span emission while leaving metrics untouched.
+- `TOOLS_EXEC_ALLOWLIST` (comma-separated globs) controls the subprocess allow list enforced by `tools._shared.proc`; updating the variable provides an immediate rollback lever for newly blocked binaries.
+- All toggles are read via `tools._shared.settings.ToolRuntimeSettings` so changes only require restarting the invoking CLI.
+

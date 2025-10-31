@@ -18,7 +18,9 @@ from pathlib import Path
 
 from pytestarch import LayeredArchitecture, get_evaluable_architecture
 from pytestarch.pytestarch import EvaluableArchitecture  # type: ignore[attr-defined]
-from pytestarch.query_language.layered_architecture_rule import ModuleNameFilter  # type: ignore[attr-defined]
+from pytestarch.query_language import layered_architecture_rule
+
+ModuleNameFilter = layered_architecture_rule.ModuleNameFilter  # type: ignore[attr-defined]
 
 TOOLS_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = TOOLS_ROOT.parent
@@ -69,9 +71,7 @@ class ArchitectureResult:
 def _match_modules(modules: Iterable[str], patterns: Sequence[str]) -> set[str]:
     """Return the subset of ``modules`` matching any of the provided regex ``patterns``."""
     regexes = [re.compile(pattern) for pattern in patterns]
-    return {
-        module for module in modules if any(regex.match(module) for regex in regexes)
-    }
+    return {module for module in modules if any(regex.match(module) for regex in regexes)}
 
 
 def _build_layered_architecture(
@@ -82,21 +82,13 @@ def _build_layered_architecture(
 
     cli_candidates = _match_modules(modules, CLI_PATTERNS)
     cli_candidates.difference_update(ADAPTER_SUPPORT_MODULES)
-    cli_candidates.update(
-        module for module in modules if module in CLI_SUPPORT_MODULES
-    )
+    cli_candidates.update(module for module in modules if module in CLI_SUPPORT_MODULES)
 
     adapter_candidates = _match_modules(modules, ADAPTER_PATTERNS)
-    adapter_candidates.update(
-        module for module in modules if module in ADAPTER_SUPPORT_MODULES
-    )
+    adapter_candidates.update(module for module in modules if module in ADAPTER_SUPPORT_MODULES)
 
-    adapter_modules = sorted(
-        adapter_candidates - set(domain_modules) - cli_candidates
-    )
-    adapter_modules = [
-        module for module in adapter_modules if module not in ADAPTER_BASE_PACKAGES
-    ]
+    adapter_modules = sorted(adapter_candidates - set(domain_modules) - cli_candidates)
+    adapter_modules = [module for module in adapter_modules if module not in ADAPTER_BASE_PACKAGES]
     io_modules = sorted(cli_candidates - set(domain_modules) - set(adapter_modules))
 
     architecture = LayeredArchitecture()
@@ -141,9 +133,7 @@ def _collect_violations(
     violations: list[str] = []
     for edges in dependencies.values():
         for importer, importee in edges:
-            violations.append(
-                f'{message}: "{importer.identifier}" imports "{importee.identifier}"'
-            )
+            violations.append(f'{message}: "{importer.identifier}" imports "{importee.identifier}"')
     return violations
 
 

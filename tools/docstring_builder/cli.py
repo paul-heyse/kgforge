@@ -993,16 +993,17 @@ def _run(  # noqa: C901, PLR0912, PLR0915
         logger.exception("Plugin configuration error", extra={"operation": "plugin_load"})
         return int(ExitStatus.CONFIG)
     try:
-        try:
-            cli_policy_overrides = _parse_policy_overrides(getattr(args, "policy_override", None))
-        except PolicyConfigurationError:
-            logger.exception("Policy override error", extra={"operation": "policy_override"})
-            return int(ExitStatus.CONFIG)
-        try:
-            policy_settings = load_policy_settings(REPO_ROOT, cli_overrides=cli_policy_overrides)
-        except PolicyConfigurationError:
-            logger.exception("Policy configuration error", extra={"operation": "policy_load"})
-            return int(ExitStatus.CONFIG)
+        cli_policy_overrides = _parse_policy_overrides(getattr(args, "policy_override", None))
+    except PolicyConfigurationError:
+        logger.exception("Policy override error", extra={"operation": "policy_override"})
+        return int(ExitStatus.CONFIG)
+    try:
+        policy_settings = load_policy_settings(REPO_ROOT, cli_overrides=cli_policy_overrides)
+    except PolicyConfigurationError:
+        logger.exception("Policy configuration error", extra={"operation": "policy_load"})
+        return int(ExitStatus.CONFIG)
+
+    try:
         policy_engine = PolicyEngine(policy_settings)
         all_ir: list[IRDocstring] = []
         docfacts_checked = False
@@ -1013,54 +1014,16 @@ def _run(  # noqa: C901, PLR0912, PLR0915
         if jobs <= 0:
             jobs = max(1, os.cpu_count() or 1)
 
-        def _ordered_outcomes() -> Iterable[tuple[Path, FileOutcome]]:
-            if jobs == 1:
-                for candidate in files_list:
-                    yield (
-                        candidate,
-                        _process_file(
-                            candidate,
-                            config,
-                            cache,
-                            options,
-                            plugin_manager,
-                        ),
-                    )
-                return
+        outcomes = _ordered_outcomes(
+            files_list,
+            jobs,
+            config,
+            cache,
+            options,
+            plugin_manager,
+        )
 
-            futures: list[tuple[int, Path, concurrent.futures.Future[FileOutcome]]] = []
-            with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as executor:
-                for index, candidate in enumerate(files_list):
-                    future = executor.submit(
-                        _process_file,
-                        candidate,
-                        config,
-                        cache,
-                        options,
-                        plugin_manager,
-                    )
-                    futures.append((index, candidate, future))
-
-                ordered: list[tuple[int, Path, FileOutcome]] = []
-                for index, candidate, future in futures:
-                    try:
-                        outcome = future.result()
-                    except Exception as exc:  # pragma: no cover - defensive guard
-                        LOGGER.exception("Processing failed for %s", candidate)
-                        outcome = FileOutcome(
-                            ExitStatus.ERROR,
-                            [],
-                            None,
-                            False,
-                            False,
-                            str(exc),
-                        )
-                    ordered.append((index, candidate, outcome))
-
-            for _, candidate, outcome in sorted(ordered, key=lambda item: item[0]):
-                yield candidate, outcome
-
-        for file_path, outcome in _ordered_outcomes():
+        for file_path, outcome in outcomes:
             status_counts[outcome.status] += 1
             if outcome.skipped:
                 skipped_count += 1
@@ -1417,6 +1380,61 @@ def _run(  # noqa: C901, PLR0912, PLR0915
         return int(exit_status)
     finally:
         plugin_manager.finish()
+
+
+def _ordered_outcomes(
+    files: Sequence[Path],
+    jobs: int,
+    config: BuilderConfig,
+    cache: BuilderCache,
+    options: ProcessingOptions,
+    plugin_manager: PluginManager,
+) -> Iterable[tuple[Path, FileOutcome]]:
+    if jobs <= 1:
+        for candidate in files:
+            yield (
+                candidate,
+                _process_file(
+                    candidate,
+                    config,
+                    cache,
+                    options,
+                    plugin_manager,
+                ),
+            )
+        return
+
+    futures: list[tuple[int, Path, concurrent.futures.Future[FileOutcome]]] = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as executor:
+        for index, candidate in enumerate(files):
+            future = executor.submit(
+                _process_file,
+                candidate,
+                config,
+                cache,
+                options,
+                plugin_manager,
+            )
+            futures.append((index, candidate, future))
+
+        ordered: list[tuple[int, Path, FileOutcome]] = []
+        for index, candidate, future in futures:
+            try:
+                outcome = future.result()
+            except Exception as exc:  # pragma: no cover - defensive guard
+                LOGGER.exception("Processing failed for %s", candidate)
+                outcome = FileOutcome(
+                    ExitStatus.ERROR,
+                    [],
+                    None,
+                    False,
+                    False,
+                    str(exc),
+                )
+            ordered.append((index, candidate, outcome))
+
+    for _, candidate, outcome in sorted(ordered, key=lambda item: item[0]):
+        yield candidate, outcome
 
 
 def _execute_pipeline(args: argparse.Namespace, subcommand: str, command: str) -> int:

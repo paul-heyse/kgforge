@@ -149,3 +149,20 @@ class CliEnvelopeBuilder:
             self.envelope = structs.replace(self.envelope, durationSeconds=float(duration_seconds))
         validate_cli_envelope(self.envelope)
         return self.envelope
+
+
+__all__ = [
+    "CLI_ENVELOPE_SCHEMA",
+    "CLI_ENVELOPE_SCHEMA_ID",
+    "CLI_ENVELOPE_SCHEMA_VERSION",
+    "CliEnvelope",
+    "CliEnvelopeBuilder",
+    "CliErrorEntry",
+    "CliErrorStatus",
+    "CliFileResult",
+    "CliFileStatus",
+    "CliStatus",
+    "new_cli_envelope",
+    "render_cli_envelope",
+    "validate_cli_envelope",
+]

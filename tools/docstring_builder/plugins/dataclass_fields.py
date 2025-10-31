@@ -165,11 +165,13 @@ class DataclassFieldDocPlugin:
     def __init__(self) -> None:
         self._cache: dict[Path, dict[str, list[_FieldInfo]]] = {}
 
-    def on_start(self, context: PluginContext) -> None:
+    @staticmethod
+    def on_start(context: PluginContext) -> None:
         """Reset caches before processing begins."""
         del context
 
-    def on_finish(self, context: PluginContext) -> None:
+    @staticmethod
+    def on_finish(context: PluginContext) -> None:
         """Release cached field metadata at the end of processing."""
         del context
 
@@ -196,7 +198,8 @@ class DataclassFieldDocPlugin:
         normalized = {decorator.lower() for decorator in decorators}
         return any(decorator in normalized for decorator in _DATACLASS_DECORATORS)
 
-    def _collect_fields(self, path: Path, module: str) -> dict[str, list[_FieldInfo]]:
+    @staticmethod
+    def _collect_fields(path: Path, module: str) -> dict[str, list[_FieldInfo]]:
         """Parse ``path`` and return dataclass field metadata keyed by qualified name."""
         try:
             source = path.read_text(encoding="utf-8")
@@ -210,7 +213,8 @@ class DataclassFieldDocPlugin:
         collector.visit(tree)
         return collector.fields
 
-    def _apply_fields(self, result: SemanticResult, fields: list[_FieldInfo]) -> SemanticResult:
+    @staticmethod
+    def _apply_fields(result: SemanticResult, fields: list[_FieldInfo]) -> SemanticResult:
         """Return ``result`` updated with dataclass field documentation."""
         schema = result.schema
         existing = {parameter.name: parameter for parameter in schema.parameters}
