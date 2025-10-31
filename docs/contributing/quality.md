@@ -146,9 +146,22 @@ VS Code users can trigger common workflows from `.vscode/tasks.json`:
 
 - **Plugin authoring.** New transformers or formatters live in
   `tools/docstring_builder/plugins/`. Register them via the
-  `kgfoundry.docstrings.plugins` entry point group and implement the typed
-  `Harvester`, `Transformer`, or `Formatter` protocols. The CLI honours
-  `--only-plugin` and `--disable-plugin` so you can test modules in isolation.
+  `kgfoundry.docstrings.plugins` entry point group and implement the
+  `DocstringBuilderPlugin` protocol from
+  `tools.docstring_builder.plugins.base`. Stage-specific helpers (`Harvester`,
+  `Transformer`, `Formatter`) ensure the `apply` method receives and returns
+  typed payloads. Legacy `run`-style plugins can wrap with
+  `LegacyPluginAdapter`, but must emit a deprecation warning. The CLI honours
+  `--only-plugin` and `--disable-plugin` so you can exercise modules in
+  isolation, and `tests/tools/docstring_builder/test_plugins.py` demonstrates
+  regression coverage for custom implementations.
+- **CLI outputs.** Machine-readable responses from `docstring-builder --json`
+  and `--baseline` are validated against
+  `schema/tools/docstring_builder_cli.json`. Use
+  `tools.docstring_builder.models.build_cli_result_skeleton` when constructing
+  fixtures, and reference `docs/examples/docstring_builder_problem_details.json`
+  for RFC 9457 Problem Details payloads during error handling tests or
+  documentation snippets.
 - **Stub maintenance.** Keep vendored typings current by running
   `python -m tools.docstring_builder.cli doctor --stubs`. The command fails with
   actionable output when runtime modules diverge from `stubs/`.

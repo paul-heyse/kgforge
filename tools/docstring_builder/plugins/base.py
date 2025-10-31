@@ -5,7 +5,7 @@ from __future__ import annotations
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import ClassVar, Literal, Protocol
+from typing import ClassVar, Literal, Protocol, runtime_checkable
 
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import HarvestResult
@@ -25,6 +25,7 @@ class PluginContext:
     file_path: Path | None = None
 
 
+@runtime_checkable
 class DocstringBuilderPlugin(Protocol):
     """Protocol implemented by all docstring builder plugins."""
 
@@ -44,6 +45,7 @@ class DocstringBuilderPlugin(Protocol):
         ...
 
 
+@runtime_checkable
 class HarvesterPlugin(DocstringBuilderPlugin, Protocol):
     """Plugins operating on harvested module metadata."""
 
@@ -54,6 +56,7 @@ class HarvesterPlugin(DocstringBuilderPlugin, Protocol):
         ...
 
 
+@runtime_checkable
 class TransformerPlugin(DocstringBuilderPlugin, Protocol):
     """Plugins refining semantic analysis results."""
 
@@ -64,6 +67,7 @@ class TransformerPlugin(DocstringBuilderPlugin, Protocol):
         ...
 
 
+@runtime_checkable
 class FormatterPlugin(DocstringBuilderPlugin, Protocol):
     """Plugins adjusting rendered docstring edits."""
 
@@ -74,6 +78,7 @@ class FormatterPlugin(DocstringBuilderPlugin, Protocol):
         ...
 
 
+@runtime_checkable
 class LegacyPluginProtocol(Protocol):
     """Legacy plugin signature prior to the typed ``apply`` API."""
 
@@ -132,6 +137,7 @@ __all__ = [
     "FormatterPlugin",
     "HarvesterPlugin",
     "LegacyPluginAdapter",
+    "LegacyPluginProtocol",
     "PluginContext",
     "PluginStage",
     "TransformerPlugin",
