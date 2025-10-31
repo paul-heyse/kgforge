@@ -2,40 +2,87 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable, Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING, ParamSpec, TypeVar, cast
 
 import pytest
 from tools.generate_pr_summary import (
     ArtifactSnapshot,
     CheckStatus,
+    StatusLiteral,
     collect_artifact_snapshot,
     generate_summary,
 )
 
+ArtifactCase = tuple[dict[str, str], str]
+StatusIconCase = tuple[StatusLiteral, str]
 
-@pytest.mark.parametrize(
+ARTIFACT_CASES: Sequence[ArtifactCase] = (
+    (
+        {
+            "coverage.xml": "",
+            "htmlcov/index.html": "",
+            "junit.xml": "",
+            "docs/_build/placeholder": "",
+            "site/_build/agent/index.html": "",
+            "dist/package-0.1.0-py3-none-any.whl": "",
+            "dist/package-0.1.0.tar.gz": "",
+            "codemod.log": "diagnostics",
+        },
+        "- ✅ Coverage XML: `coverage.xml`",
+    ),
+    (
+        {},
+        "- ⚪ No coverage or JUnit artifacts found",
+    ),
+)
+
+ARTIFACT_CASE_IDS: Sequence[str] = (
+    "all-artifacts-present",
+    "no-artifacts",
+)
+
+STATUS_ICON_CASES: Sequence[StatusIconCase] = (
+    ("pass", "✅"),
+    ("fail", "❌"),
+    ("skip", "⚪"),
+)
+
+STATUS_ICON_IDS: Sequence[str] = (
+    "pass",
+    "fail",
+    "skip",
+)
+
+_P = ParamSpec("_P")
+_R = TypeVar("_R")
+
+
+if TYPE_CHECKING:
+
+    def typed_parametrize(
+        *args: object, **kwargs: object
+    ) -> Callable[[Callable[_P, _R]], Callable[_P, _R]]:
+        """Type-aware shim for :func:`pytest.mark.parametrize`."""
+        ...
+
+else:
+
+    def typed_parametrize(
+        *args: object, **kwargs: object
+    ) -> Callable[[Callable[_P, _R]], Callable[_P, _R]]:
+        """Wrap :func:`pytest.mark.parametrize` with precise typing."""
+        return cast(
+            Callable[[Callable[_P, _R]], Callable[_P, _R]],
+            pytest.mark.parametrize(*args, **kwargs),
+        )
+
+
+@typed_parametrize(
     ("artifact_paths", "expected_line"),
-    [
-        pytest.param(
-            {
-                "coverage.xml": "",
-                "htmlcov/index.html": "",
-                "junit.xml": "",
-                "docs/_build/placeholder": "",
-                "site/_build/agent/index.html": "",
-                "dist/package-0.1.0-py3-none-any.whl": "",
-                "dist/package-0.1.0.tar.gz": "",
-                "codemod.log": "diagnostics",
-            },
-            "- ✅ Coverage XML: `coverage.xml`",
-            id="all-artifacts-present",
-        ),
-        pytest.param(
-            {},
-            "- ⚪ No coverage or JUnit artifacts found",
-            id="no-artifacts",
-        ),
-    ],
+    ARTIFACT_CASES,
+    ids=ARTIFACT_CASE_IDS,
 )
 def test_collect_artifact_snapshot(
     tmp_path: Path, artifact_paths: dict[str, str], expected_line: str
@@ -48,18 +95,16 @@ def test_collect_artifact_snapshot(
 
     snapshot = collect_artifact_snapshot(tmp_path)
     summary = generate_summary(snapshot=snapshot)
+
     assert expected_line in summary
 
 
-@pytest.mark.parametrize(
+@typed_parametrize(
     ("status", "icon"),
-    [
-        pytest.param("pass", "✅", id="pass"),
-        pytest.param("fail", "❌", id="fail"),
-        pytest.param("skip", "⚪", id="skip"),
-    ],
+    STATUS_ICON_CASES,
+    ids=STATUS_ICON_IDS,
 )
-def test_generate_summary_quality_gate_icons(status: str, icon: str) -> None:
+def test_generate_summary_quality_gate_icons(status: StatusLiteral, icon: str) -> None:
     """`generate_summary` renders icons that match the provided status."""
     snapshot = ArtifactSnapshot(
         coverage_xml=False,
