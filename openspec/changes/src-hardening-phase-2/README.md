@@ -42,29 +42,34 @@ python -m venv /tmp/v && /tmp/v/bin/pip install .[faiss,duckdb,splade]
 ## Junior playbook: implementing Phase 2
 
 1) Typed interfaces & schemas
-- Implement `search_api/types.py` (Protocols/TypedDicts) and author schemas under `schema/search/**` with examples.
-- Add/refresh stubs for `faiss` and `duckdb` under `stubs/**`.
+- Create `search_api/types.py` with `FaissIndexProtocol`, `SearchResultRecord`, etc.; annotate numpy types via `NDArray[np.float32]`.
+- Add JSON Schemas under `schema/search/` (`search_response.json`, `catalog_cli.json`, `mcp_payload.json`) and matching example payloads in `docs/examples/search/`.
+- Update `stubs/faiss/__init__.pyi` and `stubs/duckdb/__init__.pyi` to expose the protocol shapes used by adapters.
 
-2) Correlation ID middleware
-- Add FastAPI middleware to set `X-Correlation-ID` into a `ContextVar`; ensure all logs use `with_fields` to include it.
+2) Correlation ID middleware & logging
+- Implement middleware (e.g., `search_api/middleware.py`) that reads/creates `X-Correlation-ID`, stores in a `ContextVar`, and ensures `with_fields(logger, correlation_id=...)` usage in handlers/services.
+- Wrap blocking FAISS/DuckDB calls in `run_in_executor` to avoid event-loop blocking; propagate correlation IDs.
 
 3) SQL hardening
-- Replace string SQL with parameterized queries; create `registry/duckdb_helpers.py` and validate identifiers against allowlists.
+- Introduce `registry/duckdb_helpers.py` with `run_query(conn, sql, params, timeout_s)` that enforces parameterized statements, allowlists table names, and sets `statement_timeout`.
+- Update `faiss_adapter.py`, `bm25_index.py`, `splade_index.py`, `fixture_index.py`, and registry modules to route all queries through helpers; add unit tests covering SQL injection attempts.
 
 4) HTTP/CLI/MCP contracts
-- FastAPI response models mirror `search_response.json`; enable optional response validation in dev/staging.
-- CLI/MCP `--json` outputs base envelope + search payload; validate before printing.
+- Update FastAPI handlers to serialize responses via Pydantic models mirroring `search_response.json`; enable optional response validation (`SEARCH_API_VALIDATE=1`) in dev/staging.
+- Refactor agent catalog CLI/MCP to emit base envelope + search payload (`schema/tools/cli_envelope.json` + `schema/search/catalog_cli.json`), including Problem Details on failure.
 
 5) Testing & doctests
-- Parametrize tests for valid/invalid inputs, SQL injection, timeouts, missing index, schema mismatch.
-- Ensure doctests/xdoctests run for examples in public modules.
+- Expand pytest suites (`tests/search_api/test_endpoints.py`, `tests/agent_catalog/test_cli.py`, etc.) with table-driven cases: happy path, invalid payload, SQL injection, timeout, missing index.
+- Ensure doctests/xdoctests run by adding copy-ready examples to public docstrings and referencing schema fixtures.
 
 6) Observability & performance
-- Emit metrics (`search_requests_total`, `search_duration_seconds`, `sql_errors_total`); add pytest-benchmarks and record baseline.
+- Emit metrics (`search_requests_total`, `search_duration_seconds`, `search_errors_total`); verify stub mode still works.
+- Add pytest-benchmark coverage for FAISS/BM25/SPLADE search hot paths and record baseline numbers (include in execution note).
 
-7) Import rules & packaging
-- Add import-linter contracts for `search_api` and `agent_catalog` and fix violations.
-- Verify wheel/install with extras works; run OpenAPI linter in CI.
+7) Import rules, OpenAPI, packaging
+- Add import-linter contracts (`search-api-no-upwards`, `agent-catalog-no-upwards`) and fix any violations.
+- Lint the generated OpenAPI schema with Spectral (or equivalent) as part of CI.
+- Verify wheel/install with extras (`pip wheel .`, `pip install .[faiss,duckdb,splade]`) in a clean venv.
 
 ## Acceptance Gates (run before submission)
 ```bash

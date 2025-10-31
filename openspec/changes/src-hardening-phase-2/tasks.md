@@ -69,27 +69,92 @@
 ## Appendix A — Module Migration Guide
 
 ### `kgfoundry/agent_catalog/search.py`
-- Replace `Any` with typed numpy arrays and `VectorSearchResult` models.
-- Use `with_fields(logger, correlation_id=..., command="catalog-search")` to log.
-- Parameterize SQL via DuckDB helper; avoid concatenation.
-- Return typed `AgentSearchResponse`; on failure, raise `AgentCatalogSearchError` (subclass of `KgFoundryError`).
+- Replace `Any` with typed numpy arrays (`NDArray[np.float32]`) and TypedDict models for search results.
+- Convert helper functions (`_scores_from_index`, `compute_vector_scores`, etc.) to return typed mappings and raise `AgentCatalogSearchError` with Problem Details.
+- When opening FAISS artifacts, resolve paths with `Path.resolve(strict=True)` and validate they stay under `repo_root`.
+- Route any DuckDB access through the new helper (`registry.duckdb_helpers.run_query`) to enforce parameterization.
+- Update `_SimpleFaissModule` to satisfy `FaissModuleProtocol` during tests.
+- Tests: ensure `tests/agent_catalog/test_search.py` covers lexical-only, semantic, invalid embedding model, missing artifacts, SQL injection attempt.
 
-### `kgfoundry/search_api/faiss_adapter.py`
-- Define `FloatArray = NDArray[np.float32]`.
-- Ensure `normalize_L2` returns typed arrays; annotate accordingly.
-- Replace `try/except Exception: pass` with targeted errors (`FaissOperationError`) + logging.
-- Write tests verifying `add/search` operations and error handling.
+### `kgfoundry/agent_catalog/session.py`
+- Replace raw `int(status)` casts with validated conversions; raise `CatalogSessionError` with Problem Details on invalid data.
+- Use Phase 1 logging helpers (`with_fields`) around subprocess lifecycle; ensure `run_tool`-style wrapper enforces timeouts/env allowlist.
+- Validate JSON-RPC IDs and results strictly (`JsonObject`/`JsonValue` TypeAliases).
+- Tests: `tests/agent_catalog/test_session.py` covering success path, invalid JSON response, Problem Details propagation, process failure.
+
+### `kgfoundry/agent_catalog/cli.py`
+- Add `--json` flag that emits base CLI envelope + `catalog_cli.json` payload; validate before write.
+- Emit Problem Details to stderr when command fails, including correlation ID and exit code.
+- Use typed dataclasses for CLI outputs and avoid `asdict` on dataclass-of-dataclass (prefer `.model_dump()` from Pydantic models once typed conversions done).
+- Update `_parse_facets` to enforce allowed facet keys (package/module/kind/stability/deprecated) and surface friendly errors.
+- Tests: expand `tests/agent_catalog/test_cli.py` using `CliRunner` for search/explain/failure cases.
+
+### `kgfoundry/agent_catalog/mcp.py`
+- Define typed MCP request/response models that mirror `schema/search/mcp_payload.json`.
+- Validate incoming params (`k`, `facets`) and convert to `SearchOptions`; enforce `k` bounds.
+- Emit Problem Details via Phase 1 helper on failure; ensure logs include correlation ID.
+- Tests: new `tests/agent_catalog/test_mcp.py` verifying schema compliance and failure responses.
+
+### `kgfoundry/agent_catalog/audit.py`
+- Replace `dict[str, Any]` payloads with explicit dataclasses/TypedDicts for audit rows.
+- Parameterize file accesses; log operations with correlation IDs.
+- Tests: `tests/agent_catalog/test_audit.py` ensuring audit export success/failure and Problem Details on IO errors.
+
+### `search_api/faiss_adapter.py`
+- Introduce typed aliases (`FloatArray`, `IndexArray`) and ensure FAISS interactions use Protocol methods only.
+- Replace f-string SQL with helper-based parameterized queries; enforce `statement_timeout` via helper.
+- Normalize vectors using typed numpy operations and raise `FaissOperationError` with Problem Details.
+- Tests: `tests/search_api/test_faiss_adapter.py` covering build/load/search, missing vectors, fallback to CPU, and SQL injection rejection.
+
+### `search_api/bm25_index.py`
+- Type annotate BM25 data structures (`csr_matrix`, `BM25Model` dataclass); sanitize SQL/Parquet paths.
+- Use helper for DuckDB access; ensure Problem Details on missing indexes.
+- Tests: `tests/search_api/test_bm25_index.py` for load/build, invalid schema, injection attempt.
+
+### `search_api/splade_index.py`
+- Guard torch/transformers imports behind optional extras; use typed dataclasses for metadata.
+- Parameterize file access and ensure `Path.resolve(strict=True)` checks.
+- Tests: `tests/search_api/test_splade_index.py` covering encode success/failure, missing encoder, injection attempt.
+
+### `search_api/fixture_index.py`
+- Replace dynamic dicts with typed fixture records; avoid SQL concatenation.
+- Provide typed conversion functions for fixture JSON to dataclasses.
+- Tests: `tests/search_api/test_fixture_index.py` verifying fixture load, invalid data, injection rejection.
+
+### `search_api/service.py`
+- Introduce typed service-layer functions returning `AgentSearchResponse`; remove unused parameters.
+- Ensure lexical/vector merge uses typed dataclasses and logs metrics (`search_requests_total`, `search_duration_seconds`).
+- Wrap FAISS/DuckDB calls in threadpool with timeouts; surface Problem Details on failure.
+- Tests: `tests/search_api/test_service.py` covering success, timeout, FAISS load failure, SQL error, injection attempt.
 
 ### `search_api/app.py`
-- Use FastAPI Pydantic models mirroring `search_response` schema.
-- Map exceptions via Phase 1 `problem_from_exception` helper.
-- Validate outgoing responses against schema when `SEARCH_API_VALIDATE=1` (dev/staging).
+- Install correlation ID middleware and ensure endpoints use `with_fields`.
+- Replace placeholder docstrings with real examples referencing schema fixtures; ensure doctests run.
+- Configure optional response validation (`SEARCH_API_VALIDATE=1`) and log validation failures with Problem Details.
+- Tests: `tests/search_api/test_endpoints.py` verifying HTTP status codes, schema validation, feature flag behavior.
 
-### CLI & MCP
-- CLI `--json` outputs base envelope + search payload; validate before printing.
-- MCP messages conform to `schema/search/mcp_payload.json`.
-- Add tests invoking CLI command with `click.testing.CliRunner` and verifying output.
+### `search_api/cli.py` & MCP integration (if applicable)
+- Align CLI outputs with `catalog_cli.json`; ensure Problem Details printed on failure with exit code semantics.
+- Validate `--json` envelope via schema before writing.
+- Tests: included with CLI suite as above.
 
+### `vectorstore_faiss/gpu.py`
+- Ensure GPU wrapper implements `FaissIndexProtocol`; remove `Any` via typed numpy arrays.
+- Parameterize DuckDB interactions and guard GPU-owned resources (CUDA) with typed checks + Problem Details on unsupported hardware.
+- Tests: `tests/search_api/test_faiss_gpu.py` for CPU/GPU load, fallback behavior, error logging.
+
+### `registry/migrate.py` and new `registry/duckdb_helpers.py`
+- Move direct SQL execution to helper ensuring parameterization + timeouts; helper raises typed `RegistryError` with Problem Details.
+- Update CLI to output Problem Details on failure and include structured logs.
+- Tests: `tests/registry/test_migrate.py` + `test_duckdb_helpers.py` covering success, failure, injection attempt.
+
+### Tests & benchmarks
+- Create/expand test modules:
+  - Agent catalog: `test_search.py`, `test_cli.py`, `test_mcp.py`, `test_session.py`, `test_audit.py`
+  - Search API: `test_endpoints.py`, `test_service.py`, `test_bm25_index.py`, `test_splade_index.py`, `test_fixture_index.py`, `test_faiss_adapter.py`, `test_faiss_gpu.py`
+  - Registry: `test_duckdb_helpers.py`, `test_migrate.py`
+- Add pytest-benchmark modules for FAISS/BM25/SPLADE operations; store baseline metrics in execution note.
+- Ensure new fixtures live under `tests/fixtures/search/` mirroring JSON Schema examples.
 ### Security Defaults
 - SQL timeouts default 10 s; configurable via settings.
 - All HTTP client calls include `timeout=5.0` (configurable) and structured error handling.
@@ -102,8 +167,10 @@
 - [ ] OpenAPI linter (Spectral) passes against generated API spec.
 - [ ] Security: `uv run pip-audit --strict` passes; SQL Bandit rule S608 cleared.
 - [ ] Performance: run pytest-benchmark for FAISS/BM25/SPLADE and record baseline numbers.
+- [ ] Schema meta-validation: run helper (`python -m kgfoundry_common.schema_helpers validate schema/search`) and ensure all new schemas pass.
+- [ ] `make artifacts && git diff --exit-code` remains clean after updating docs/schemas/nav maps.
 
-## Appendix B — CI & Extras
+## Appendix C — Extras & Tooling
 - [ ] Ensure `pyproject.toml` defines extras for optional deps: `faiss`, `duckdb`, `splade`.
 - [ ] Add import-linter contract `agent-catalog-no-upwards` to prevent circular imports.
 - [ ] Enable new benchmark suite in CI (non-blocking) or provide instructions for manual execution.

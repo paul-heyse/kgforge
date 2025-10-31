@@ -86,6 +86,18 @@ Async code SHALL propagate correlation IDs via `contextvars`, avoid blocking cal
 - **THEN** it executes in a threadpool or non‑blocking path, respecting configured timeouts and cancellation
 
 ### Requirement: Documentation & Tests
+Test suites SHALL cover happy paths, edge cases, and failure modes for agent catalog and search APIs; documentation SHALL reference schemas, metrics, and feature flags.
+
+#### Scenario: Table-driven tests cover injection attempts
+- **GIVEN** `tests/search_api/test_endpoints.py`
+- **WHEN** the suite runs
+- **THEN** it includes parametrized cases for valid input, invalid schema, SQL injection attempts, timeouts, and missing indexes, all passing
+
+#### Scenario: CLI and MCP suites validate envelopes
+- **GIVEN** `tests/agent_catalog/test_cli.py` and `test_mcp.py`
+- **WHEN** the suites run
+- **THEN** they validate `--json` outputs against `schema/search/catalog_cli.json` and `schema/search/mcp_payload.json`, including Problem Details on failure
+
 ### Requirement: Doctests & Packaging
 Examples SHALL execute via doctest/xdoctest and packaging SHALL succeed with optional extras.
 
@@ -114,17 +126,6 @@ Externally triggered operations SHALL be idempotent where feasible and have docu
 - **GIVEN** the same query and deterministic state
 - **WHEN** it runs repeatedly
 - **THEN** responses are stable within tolerance and side effects do not accumulate
-Tests SHALL cover happy paths, edge cases, and failure modes; doctests/xdoctests SHALL execute successfully; documentation SHALL reference schemas and metrics.
-
-#### Scenario: Table-driven tests cover injection attempts
-- **GIVEN** `tests/search_api/test_endpoints.py`
-- **WHEN** the suite runs
-- **THEN** it includes parametrized cases for valid input, invalid schema, and SQL injection attempts, all passing
-
-#### Scenario: Doctests execute
-- **GIVEN** docstrings/examples in public modules
-- **WHEN** `pytest -q` runs
-- **THEN** doctests/xdoctests execute without failure
 
 ### Requirement: Rollout Safeguards
 Typed search pathways SHALL be gated behind feature flags with a documented rollout plan.

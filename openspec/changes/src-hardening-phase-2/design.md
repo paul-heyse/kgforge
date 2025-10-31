@@ -24,10 +24,15 @@ Agent catalog search and the search API integrate FAISS, SPLADE, BM25, DuckDB, a
 | HTTP/CLI | FastAPI app, CLI commands, MCP surfaces with schema validation | Response schemas, Problem Details emission, CLI envelopes |
 
 ### Typed Interfaces
-- Define `VectorArray = NDArray[np.float32]` (with `numpy.typing`).
-- `FaissIndexProtocol` exposes `add(vectors: VectorArray, ids: NDArray[np.int64]) -> None`, `search(vectors: VectorArray, k: int) -> tuple[ndarray, ndarray]` etc.
-- `SearchResult` TypedDict with fields (`id`, `score`, `metadata`).
-- Use Protocols to allow test stubs/mocks without `Any`.
+- Define `VectorArray = NDArray[np.float32]` using `numpy.typing`; expose aliases (`IndexArray = NDArray[np.int64]`).
+- `FaissIndexProtocol` exposes `add`, `search`, `reset`, `is_trained`, and optional `add_with_ids`; adapters must use attribute checks with typed fallbacks.
+- Additional public models:
+  - `AgentSearchQuery` dataclass (`query: str`, `k: int`, `facets: Mapping[str, str]`, `explain: bool`).
+  - `VectorSearchResult` TypedDict (`symbol_id`, `score`, `lexical_score`, `vector_score`, `package`, `module`, `qname`, `kind`, `anchor`, `metadata`).
+  - `AgentSearchResponse` TypedDict (`results: list[VectorSearchResult]`, `total: int`, `took_ms: int`, `metadata: Mapping[str, JsonValue]`).
+  - CLI/MCP envelope payloads referencing `schema/search/catalog_cli.json` and `schema/search/mcp_payload.json`.
+- Publish these types via `search_api/types.py` and `agent_catalog/models.py` with explicit `__all__`; update modules to import from these definitions rather than ad-hoc dicts.
+- Provide Protocols for SPLADE encoder (`encode(texts: Sequence[str]) -> NDArray[np.float32]`), BM25 index, and registry helpers (typed DuckDB connection wrapper).
 
 ### SQL & Data Access
 - Replace string concatenation with parameterized queries via DuckDB placeholders or binder objects.
@@ -45,6 +50,9 @@ def run_query(conn: duckdb.DuckDBPyConnection, sql: str, params: Mapping[str, ob
     conn.execute(f"SET statement_timeout={int(timeout_s * 1000)}")
     return conn.execute(sql, params)
 ```
+- Provide convenience wrappers (`fetch_all`, `fetch_one`, `stream_parquet`) that log slow queries (`duration_ms` > threshold) and attach correlation IDs.
+- All adapters (FAISS, BM25, SPLADE, fixture index, registry migrate) MUST route queries through these helpers; direct string interpolation is prohibited.
+- Maintain allowlists for schema/table names; reject user-provided identifiers that fall outside configured sets.
 
 ### HTTP & CLI Contracts
 - JSON Schemas:
@@ -57,6 +65,7 @@ def run_query(conn: duckdb.DuckDBPyConnection, sql: str, params: Mapping[str, ob
 #### OpenAPI & schema validation strategy
 - FastAPI models mirror `schema/search/search_response.json`; enable an optional dev/staging response validator.
 - Run Spectral (or equivalent) as a CI OpenAPI linter against the generated OpenAPI.
+- Generate schemas from Pydantic models and export under `schema/openapi/search_api.v1.json`; treat linter warnings as blockers.
 
 ### Logging & Observability
 - Each operation logs via `get_logger(__name__)`, using `with_fields` for correlation IDs, durations, command names.
@@ -68,6 +77,8 @@ Use middleware to inject `X-Correlation-ID` into a `ContextVar` and ensure all l
 
 #### Minimal structured fields
 Log at minimum: `correlation_id`, `operation`, `status`, `duration_ms`, `command`, and search‑specific fields (`k`, `alpha`, `index_name`).
+- CLI/MCP logs should include `command`, `result_count`, `error_type`; metrics should tag `backend` (`faiss`, `bm25`, `splade`).
+- Increment `search_errors_total{error_type=...}` alongside Problem Details emission.
 
 ### Testing Strategy
 - Unit tests for adapters (FAISS/SPLADE/BM25) using deterministic fixtures + fakes.
@@ -80,6 +91,9 @@ Log at minimum: `correlation_id`, `operation`, `status`, `duration_ms`, `command
 - Endpoints: valid/invalid input, SQL injection attempts, timeout, missing index, schema mismatch.
 - Adapters: FAISS add/search/load, SPLADE encode failure, BM25 corners.
 - CLI/MCP: `--json` envelope validation with Problem Details on error.
+- Session client: JSON-RPC success/error, invalid payload, process timeout.
+- Registry helpers: successful migration, failed statement, injection attempt, timeout.
+- Benchmarks: measure FAISS/BM25/SPLADE operations; assert results logged in execution note.
 
 ### Typed API Sketches
 ```python
@@ -119,6 +133,8 @@ def search_agents(query: AgentSearchQuery, *, index: FaissIndexProtocol, logger:
 
 #### Bench harness
 Use pytest-benchmark for FAISS/BM25/SPLADE hotspots; document baseline locally and track regressions in CI (non-gating initially).
+- Example command: `pytest tests/benchmarks -k "faiss or bm25 or splade" --benchmark-json benchmarks/search.json`.
+- Attach benchmark JSON + interpretation to execution note; flag regressions >10% for follow-up.
 
 ## Detailed Implementation Plan
 
@@ -172,10 +188,11 @@ python -m venv /tmp/v && /tmp/v/bin/pip install .[faiss,duckdb,splade]
 ```
 
 ## Rollout Plan
-1. Land typed interfaces + adapters behind feature flags; run in shadow mode in staging.
-2. Enable `AGENT_SEARCH_TYPED=1`, `SEARCH_API_TYPED=1` in staging; monitor metrics & logs.
-3. Roll to production in phases (10%, 50%, 100%) with telemetry dashboards for errors/latency.
-4. Once stable, remove legacy fallback and `--legacy-json` options in Phase 3.
+1. Land typed interfaces + adapters behind feature flags; run in shadow mode in staging while comparing results against legacy outputs.
+2. Enable `AGENT_SEARCH_TYPED=1`, `SEARCH_API_TYPED=1` in staging; monitor dashboards (latency, error rate, SQL errors, GPU utilization) and log correlation IDs.
+3. Roll to production incrementally (10%, 50%, 100%), capturing metrics + sample payloads at each step and verifying schema compliance.
+4. Confirm CLI/MCP consumers accept new envelopes; once telemetry is stable for ≥7 days, remove legacy fallbacks and deprecate `--legacy-json` flag in Phase 3.
+5. Document rollout timeline, feature flag toggles, and rollback steps in execution note and changelog.
 
 ## Migration / Backout
 - Backout by toggling feature flags to `0`; keep legacy paths until Phase 3 cleanup.
