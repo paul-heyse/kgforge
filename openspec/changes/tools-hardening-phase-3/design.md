@@ -1,12 +1,12 @@
 ## Context
 The initial hardening effort aligned our tooling suite with Ruff and pyrefly requirements, yet it left several structural gaps:
 
-1. **Typed payload debt**: msgspec-backed payloads are still instantiated as untyped dictionaries, meaning mypy cannot reason about docstring builder caches, navmap documents, docs analytics, CLI envelopes, or `sitecustomize` payloads. This makes simple refactors risky and blocks downstream consumers who rely on our helpers.
+1. **Typed payload debt**: msgspec-backed payloads are still instantiated as untyped dictionaries, meaning mypy cannot reason about docstring builder caches, navmap documents, docs analytics, CLI envelopes, or `sitecustomize` payloads. These `Any` leaks are responsible for the majority of `tests/tools/**` failures.
 2. **LibCST typing gaps**: codemods depend on incomplete stubs, forcing both production code and tests to use `Any`. Junior engineers struggle to add transformations because the IDE offers no completions and mypy produces verbose errors.
 3. **Untyped testing harness**: `tests/tools/**` relies on implicit typing, so regressions can slip through when fixtures or parametrized helpers change.
-4. **Packaging ambiguity**: despite runtime exports, the published `tools` package lacks a `py.typed` marker and precise stubs, so consumers treat the entire package as dynamically typed.
+4. **Missing exports/stubs for tests**: the test suite imports helpers (Problem Details builders, CLI envelopes, validation helpers) via `from tools import …`, but the package and stubs do not expose them, generating mypy “module does not explicitly export” errors.
 
-This design describes a phased plan to address each gap with explicit module-level responsibilities, interfaces, and validation steps aimed at an engineer new to the codebase.
+This design describes a phased plan to address each gap with explicit module-level responsibilities, interfaces, and validation steps aimed at an engineer new to the codebase. The only success metric is: `uv run --no-sync pyrefly check` and `uv run --no-sync mypy --config-file mypy.ini tests/tools` both produce zero errors.
 
 ## Goals
 - Eliminate `Any` leakage across tooling payloads by introducing first-class msgspec structs, schema validators, and helper APIs.
@@ -61,7 +61,6 @@ For each payload category:
 - `uv run --no-sync pyrefly check tools/codemods`
 - `uv run --no-sync mypy --config-file mypy.ini tools/codemods`
 - `uv run --no-sync pytest tests/tools/codemods`
-- Validate packaging: `uv build` followed by unpack/install to confirm stubs load.
 
 ### 3. Typed Tooling Test Harness
 
@@ -81,29 +80,21 @@ For each payload category:
 - `uv run --no-sync mypy --config-file mypy.ini tests/tools/navmap`
 - `uv run --no-sync mypy --config-file mypy.ini tests/tools/codemods`
 - `uv run --no-sync pytest tests/tools`
+- Capture before/after error counts in the PR description so reviewers can see progress for each directory.
 
-### 4. Packaging & Public Exports
+### 4. Exports referenced by tests
 
 #### Current state
-- Runtime exports (`tools/__init__.py`) exist but stubs were previously removed and not replaced. No `py.typed` marker is shipped.
-- Downstream projects cannot rely on typed Problem Details helpers or CLI utilities.
+- Runtime exports (`tools/__init__.py`) do not expose every helper that tests import, so mypy complains about missing attributes. Stubs under `stubs/tools/**` are also incomplete, which keeps the errors alive even after runtime code is fixed.
 
 #### Proposed structure
-1. **Export contract**: define a canonical list of exported helpers (Problem Details builders, CLI envelope builder, settings helpers, validation utilities). Update `tools/__init__.py` to expose them explicitly and add docstrings.
-2. **Stub regeneration**: create `.pyi` files under `stubs/tools/` matching the runtime exports with precise types (no `Any`). Use the new msgspec structs and helper types.
-3. **`py.typed`**: add `tools/py.typed` to the repo and ensure packaging metadata includes it.
-4. **Smoke test script**: implement `scripts/test-tools-install.sh` that creates a temporary virtual environment, installs `.[tools]`, imports the key helpers, and runs a no-op CLI to confirm entry points behave.
-5. **Wheel verification**: use `uv build` / `pip install` to confirm the wheel includes stubs and `py.typed`. Document the command output.
+1. **Export contract**: define a canonical list of exported helpers (Problem Details builders, CLI envelope builder, settings helpers, validation utilities). Update `tools/__init__.py` (and subpackage `__all__`) so the tests can import them.
+2. **Stub regeneration**: create `.pyi` files under `stubs/tools/` matching the runtime exports with precise types (no `Any` or bare `object`). Use the new msgspec structs and helper types.
+3. **Verification**: run `uv run --no-sync mypy --config-file mypy.ini tests/tools` and confirm all “module does not explicitly export attribute …” diagnostics disappear.
 
 #### Commands & checkpoints
-- `uv build`
-- `scripts/test-tools-install.sh`
-- `uv run --no-sync python - <<'PY'
-from tools import build_problem_details, CliEnvelopeBuilder
-print(build_problem_details)
-print(CliEnvelopeBuilder)
-PY`
-- `wheel unpack dist/*.whl` (verify `tools/py.typed` and stubs are present).
+- `uv run --no-sync mypy --config-file mypy.ini tests/tools`
+- `uv run --no-sync pytest tests/tools/shared tests/tools/docstring_builder tests/tools/navmap`
 
 ## Data Contracts & Validation Strategy
 - Maintain schemata under `schema/tools/**` with versioned `id` fields (e.g., `https://kgfoundry.dev/schema/tools/docstring-cache-1.1.0.json`).
@@ -118,12 +109,11 @@ PY`
    - `tools/_shared`, `tools/docstring_builder`, `tools/docs`, `tools/navmap`, `sitecustomize.py`
    - `tools/codemods`
    - `tests/tools`
-5. Packaging smoke test verifying installation and imports.
 
 ## Rollout
 - Work in phased PRs aligned with the task sections (payloads → LibCST → tests → packaging) to keep reviews manageable.
 - After each phase, run the full quality gates: `uv run --no-sync ruff format && uv run --no-sync ruff check --fix`, `uv run --no-sync pyrefly check`, `uv run --no-sync mypy --config-file mypy.ini`, `uv run --no-sync pytest`, `make artifacts`, `openspec validate tools-hardening-phase-3 --strict`.
-- Once all phases land, coordinate with release owners to publish the updated wheel and document the migration in the changelog.
+- Once all phases land, capture the final `uv run --no-sync mypy --config-file mypy.ini tests/tools` output (expected: zero errors) and include it in the PR summary.
 
 ## Appendix: Quick Reference for Junior Engineers
 - **Shared commands**: after modifying a module, run `uv run --no-sync pyrefly check <module>` and `uv run --no-sync mypy --config-file mypy.ini <module>`.
