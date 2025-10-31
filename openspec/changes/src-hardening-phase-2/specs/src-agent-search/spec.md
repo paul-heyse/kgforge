@@ -1,4 +1,17 @@
 ## ADDED Requirements
+### Requirement: Public API Hygiene
+Search packages SHALL expose explicit public APIs via `__all__`, follow PEP 8 names, provide PEP 257 one‑line docstrings, and publish fully annotated signatures.
+
+#### Scenario: Exports declared via __all__
+- **GIVEN** a public module under `search_api` or `agent_catalog`
+- **WHEN** it is imported
+- **THEN** it defines `__all__` listing public symbols and hides internal helpers
+
+#### Scenario: Docstrings present and typed
+- **GIVEN** a public function/class
+- **WHEN** docs are generated
+- **THEN** the symbol has a PEP 257 one‑sentence summary and fully annotated parameters/returns
+
 ### Requirement: Typed Search Interfaces
 Agent catalog and search services SHALL operate on typed Protocols and TypedDicts, eliminating `Any` from public interfaces.
 
@@ -59,7 +72,48 @@ All outgoing operations (HTTP calls, DuckDB queries, FAISS operations) SHALL enf
 - **WHEN** it exceeds the configured timeout
 - **THEN** the system aborts, logs a warning with correlation ID, increments `search_errors_total`, and returns Problem Details
 
+### Requirement: Concurrency & Context Correctness
+Async code SHALL propagate correlation IDs via `contextvars`, avoid blocking calls, and document/enforce timeouts and cancellations.
+
+#### Scenario: Correlation ID middleware propagates context
+- **GIVEN** a FastAPI request with `X-Correlation-ID`
+- **WHEN** the request is processed
+- **THEN** the correlation ID is set in a `ContextVar` and appears in structured logs for downstream operations
+
+#### Scenario: Blocking operations isolated
+- **GIVEN** an async endpoint calling FAISS or DuckDB
+- **WHEN** the operation runs
+- **THEN** it executes in a threadpool or non‑blocking path, respecting configured timeouts and cancellation
+
 ### Requirement: Documentation & Tests
+### Requirement: Doctests & Packaging
+Examples SHALL execute via doctest/xdoctest and packaging SHALL succeed with optional extras.
+
+#### Scenario: Doctests execute in CI
+- **GIVEN** docstrings/examples in public modules
+- **WHEN** `pytest -q` runs
+- **THEN** doctests/xdoctests execute without failure
+
+#### Scenario: Wheel builds and installs with extras
+- **GIVEN** a clean virtual environment
+- **WHEN** `pip wheel .` and `pip install .[faiss,duckdb,splade]` run
+- **THEN** both commands succeed and package metadata is correct
+
+### Requirement: Layering & Import Boundaries
+Search packages SHALL satisfy import‑linter contracts preventing upward/cross‑layer imports.
+
+#### Scenario: Import contracts pass
+- **GIVEN** `importlinter.cfg`
+- **WHEN** contracts run in CI
+- **THEN** `search_api` does not import app layers above, and `registry` does not depend on `search_api`
+
+### Requirement: Idempotency & Error Retries
+Externally triggered operations SHALL be idempotent where feasible and have documented retry semantics.
+
+#### Scenario: Idempotent repeated search
+- **GIVEN** the same query and deterministic state
+- **WHEN** it runs repeatedly
+- **THEN** responses are stable within tolerance and side effects do not accumulate
 Tests SHALL cover happy paths, edge cases, and failure modes; doctests/xdoctests SHALL execute successfully; documentation SHALL reference schemas and metrics.
 
 #### Scenario: Table-driven tests cover injection attempts

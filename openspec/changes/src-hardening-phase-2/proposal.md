@@ -30,4 +30,6 @@ Agent catalog search and the search API host the bulk of remaining Ruff/mypy/pyr
 - No blind `except Exception`; exceptions preserve causes and map to typed taxonomy.
 - Benchmarks recorded for search operations (FAISS/BM25/SPLADE) with budgets documented; regressions noted.
 - Feature flags documented; rollout plan executed with telemetry checkpoints.
+- Packaging passes: `pip wheel .` succeeds; `pip install .[faiss,duckdb,splade]` works in a clean venv; metadata correct.
+- OpenAPI linter passes for FastAPI spec; schema meta‑validation succeeds for all new JSON Schemas.
 

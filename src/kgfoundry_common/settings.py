@@ -320,7 +320,7 @@ class RuntimeSettings(BaseSettings):
             If validation fails (missing required fields, invalid types, etc.).
         """
         try:
-            super().__init__(**overrides)  # type: ignore[call-overload, misc]  # BaseSettings.__init__ accepts Any kwargs, mypy can't infer overloads
+            super().__init__(**overrides)  # type: ignore[arg-type]  # BaseSettings.__init__ accepts Any kwargs, mypy can't infer overloads
         except Exception as exc:
             # Convert Pydantic validation errors to SettingsError with Problem Details
             msg = f"Configuration validation failed: {exc}"
@@ -380,7 +380,7 @@ def load_settings(**overrides: object) -> KgFoundrySettings:
     >>> # SettingsError: Configuration validation failed
     """
     try:
-        return RuntimeSettings(**overrides)  # type: ignore[call-overload, misc]  # BaseSettings.__init__ accepts Any kwargs, mypy can't infer overloads
+        return RuntimeSettings(**overrides)
     except SettingsError:
         # Re-raise SettingsError as-is
         raise

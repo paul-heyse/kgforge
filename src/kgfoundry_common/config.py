@@ -8,7 +8,7 @@ for consistency.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Final
+from typing import Final
 
 import yaml
 
@@ -16,9 +16,6 @@ from kgfoundry_common.navmap_types import NavMap
 
 # Import JSON type aliases from problem_details for consistency
 from kgfoundry_common.problem_details import JsonPrimitive, JsonValue
-
-if TYPE_CHECKING:
-    from typing import Any
 
 __all__ = ["JsonPrimitive", "JsonValue", "load_config"]
 
@@ -59,39 +56,40 @@ __navmap__: Final[NavMap] = {
 
 
 # [nav:anchor load_config]
-def load_config(path: str) -> dict[str, Any]:
-    """Describe load config.
+def load_config(path: str) -> dict[str, object]:
+    r"""Load configuration from a YAML file.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    This function loads and validates YAML configuration files, ensuring
+    all keys are strings and the root value is a dictionary.
 
     Parameters
     ----------
     path : str
-        Describe ``path``.
-
+        Path to YAML configuration file.
 
     Returns
     -------
-    dict[str, Any]
-        Describe return value.
-
-
-
-
-
-
-
-
-
-
-
+    dict[str, object]
+        Parsed configuration dictionary with string keys.
 
     Raises
     ------
+    FileNotFoundError
+        If the configuration file does not exist.
     TypeError
-    Raised when TODO for TypeError.
+        If the YAML does not decode to a dictionary or contains non-string keys.
+
+    Examples
+    --------
+    >>> import tempfile
+    >>> import os
+    >>> with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+    ...     _ = f.write("key1: value1\nkey2: 42\n")
+    ...     config_path = f.name
+    >>> config = load_config(config_path)
+    >>> assert config["key1"] == "value1"
+    >>> assert config["key2"] == 42
+    >>> os.unlink(config_path)
     """
     with Path(path).open(encoding="utf-8") as f:
         loaded: object = yaml.safe_load(f)
