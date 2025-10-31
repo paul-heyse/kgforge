@@ -210,6 +210,19 @@ PROBLEM_DETAILS_EXAMPLE: ProblemDetails = {
     },
 }
 
+"""Example Problem Details payload conforming to RFC 9457.
+
+Examples
+--------
+>>> from tools.docstring_builder.models import PROBLEM_DETAILS_EXAMPLE
+>>> import json
+>>> payload = json.dumps(PROBLEM_DETAILS_EXAMPLE, indent=2)
+>>> assert "type" in payload
+>>> assert "status" in payload
+>>> assert PROBLEM_DETAILS_EXAMPLE["status"] == 422
+>>> assert PROBLEM_DETAILS_EXAMPLE["type"].startswith("https://kgfoundry.dev/problems/")
+"""
+
 
 @dataclass(slots=True)
 class DocstringIRParameter:
@@ -552,9 +565,9 @@ def _normalise_parameter(parameter: Mapping[str, object]) -> DocfactsParameter:
 def _normalise_return(value: Mapping[str, object]) -> DocfactsReturn:
     kind_raw = str(value.get("kind", "returns"))
     entry: DocfactsReturn = {
-        "kind": cast(Literal["returns", "yields"], kind_raw)
-        if kind_raw in _RETURN_KINDS
-        else "returns",
+        "kind": (
+            cast(Literal["returns", "yields"], kind_raw) if kind_raw in _RETURN_KINDS else "returns"
+        ),
     }
     annotation = value.get("annotation")
     entry["annotation"] = str(annotation) if annotation is not None else None
@@ -614,16 +627,18 @@ def build_docstring_ir_from_legacy(ir: IRDocstringLike) -> DocstringIR:
         DocstringIRParameter(
             name=parameter.name,
             display_name=parameter.display_name or parameter.name,
-            kind=parameter.kind
-            if parameter.kind
-            in {
-                "positional_only",
-                "positional_or_keyword",
-                "keyword_only",
-                "var_positional",
-                "var_keyword",
-            }
-            else "positional_or_keyword",
+            kind=(
+                parameter.kind
+                if parameter.kind
+                in {
+                    "positional_only",
+                    "positional_or_keyword",
+                    "keyword_only",
+                    "var_positional",
+                    "var_keyword",
+                }
+                else "positional_or_keyword"
+            ),
             annotation=parameter.annotation,
             default=parameter.default,
             optional=parameter.optional,

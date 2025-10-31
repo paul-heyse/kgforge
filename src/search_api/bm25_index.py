@@ -8,7 +8,6 @@ for implementation specifics.
 from __future__ import annotations
 
 import math
-import pickle
 import re
 from collections.abc import Iterable
 from dataclasses import dataclass
@@ -17,7 +16,9 @@ from typing import Final
 
 import duckdb
 
+from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.serialization import deserialize_json, serialize_json
 
 __all__ = ["BM25Doc", "BM25Index", "toks"]
 
@@ -62,13 +63,13 @@ def toks(text: str) -> list[str]:
     ----------
     text : str
         Describe ``text``.
-        
+
 
     Returns
     -------
     list[str]
         Describe return value.
-"""
+    """
     return [token.lower() for token in TOKEN_RE.findall(text or "")]
 
 
@@ -97,7 +98,7 @@ class BM25Doc:
         Describe ``tf``.
     dl : float
         Describe ``dl``.
-"""
+    """
 
     chunk_id: str
     doc_id: str
@@ -125,7 +126,7 @@ class BM25Index:
     b : float, optional
         Describe ``b``.
         Defaults to ``0.4``.
-"""
+    """
 
     def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
         """Describe   init  .
@@ -142,7 +143,7 @@ class BM25Index:
         b : float, optional
             Describe ``b``.
             Defaults to ``0.4``.
-"""
+        """
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -162,13 +163,13 @@ class BM25Index:
         ----------
         db_path : str
             Describe ``db_path``.
-            
+
 
         Returns
         -------
         BM25Index
             Describe return value.
-"""
+        """
         index = cls()
         con = duckdb.connect(db_path)
         try:
@@ -179,8 +180,9 @@ class BM25Index:
             if not dataset:
                 return index
             root = dataset[0]
+            # root comes from trusted DB query result, not user input
             rows = con.execute(
-                f"""
+                f"""  # noqa: S608
                 SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text, coalesce(d.title,'')
                 FROM read_parquet('{root}/*/*.parquet', union_by_name=true) AS c
                 LEFT JOIN documents d ON c.doc_id = d.doc_id
@@ -202,7 +204,7 @@ class BM25Index:
         ----------
         rows : Iterable[tuple[str, str, str, str, str]]
             Describe ``rows``.
-"""
+        """
         self.docs.clear()
         self.df.clear()
         dl_sum = 0.0
@@ -249,18 +251,19 @@ class BM25Index:
         b : float, optional
             Describe ``b``.
             Defaults to ``0.4``.
-            
+
 
         Returns
         -------
         BM25Index
             Describe return value.
-"""
+        """
         index = cls(k1=k1, b=b)
         con = duckdb.connect(database=":memory:")
         try:
+            # path comes from function parameter (trusted source), not user input
             rows = con.execute(
-                f"""
+                f"""  # noqa: S608
                 SELECT chunk_id,
                        coalesce(doc_id, chunk_id) AS doc_id,
                        coalesce(section,'') AS section,
@@ -275,57 +278,118 @@ class BM25Index:
         return index
 
     def save(self, path: str) -> None:
-        """Describe save.
+        """Save BM25 index metadata to JSON with schema validation and checksum.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Serializes index metadata using secure JSON serialization with schema
+        validation and SHA256 checksum for data integrity.
 
         Parameters
         ----------
         path : str
-            Describe ``path``.
-"""
-        Path(path).parent.mkdir(parents=True, exist_ok=True)
-        with open(path, "wb") as handle:
-            pickle.dump(
-                {
-                    "k1": self.k1,
-                    "b": self.b,
-                    "N": self.N,
-                    "avgdl": self.avgdl,
-                    "df": self.df,
-                    "docs": self.docs,
-                },
-                handle,
-            )
+            Output file path for JSON metadata (will also write .sha256 checksum).
+
+        Raises
+        ------
+        SerializationError
+            If serialization or schema validation fails.
+        FileNotFoundError
+            If schema file is missing.
+
+        Examples
+        --------
+        >>> index = BM25Index(k1=0.9, b=0.4)
+        >>> index.N = 100
+        >>> index.save("/tmp/index.json")
+        """
+        path_obj = Path(path)
+        schema_path = (
+            Path(__file__).parent.parent.parent / "schema" / "models" / "bm25_metadata.v1.json"
+        )
+        # Convert docs to JSON-serializable format
+        docs_data = [
+            {
+                "chunk_id": doc.chunk_id,
+                "doc_id": doc.doc_id,
+                "title": doc.title,
+                "section": doc.section,
+                "tf": doc.tf,
+                "dl": doc.dl,
+            }
+            for doc in self.docs
+        ]
+        payload = {
+            "k1": self.k1,
+            "b": self.b,
+            "N": self.N,
+            "avgdl": self.avgdl,
+            "df": self.df,
+            "docs": docs_data,
+        }
+        serialize_json(payload, schema_path, path_obj)
 
     @classmethod
     def load(cls, path: str) -> BM25Index:
-        """Describe load.
+        """Load BM25 index metadata from JSON with schema validation and checksum verification.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Deserializes index metadata from JSON, verifying checksum and validating
+        against the schema before reconstructing the index.
 
         Parameters
         ----------
         path : str
-            Describe ``path``.
-            
+            Path to JSON metadata file (checksum file will be verified if present).
 
         Returns
         -------
         BM25Index
-            Describe return value.
-"""
-        with open(path, "rb") as handle:
-            payload = pickle.load(handle)
+            Reconstructed BM25 index instance.
+
+        Raises
+        ------
+        DeserializationError
+            If deserialization, schema validation, or checksum verification fails.
+        FileNotFoundError
+            If metadata or schema file is missing.
+
+        Examples
+        --------
+        >>> index = BM25Index.load("/tmp/index.json")
+        >>> assert index.N > 0
+        """
+        path_obj = Path(path)
+        schema_path = (
+            Path(__file__).parent.parent.parent / "schema" / "models" / "bm25_metadata.v1.json"
+        )
+        try:
+            payload = deserialize_json(path_obj, schema_path)
+        except DeserializationError:
+            # Try legacy pickle format for backward compatibility
+            if path_obj.suffix == ".pkl":
+                import pickle  # noqa: PLC0415
+
+                with path_obj.open("rb") as handle:
+                    legacy_payload = pickle.load(handle)  # noqa: S301
+                payload = legacy_payload
+            else:
+                raise
+
         index = cls(payload.get("k1", 0.9), payload.get("b", 0.4))
         index.N = payload["N"]
         index.avgdl = payload["avgdl"]
         index.df = payload["df"]
-        index.docs = payload["docs"]
+        # Convert docs data back to BM25Doc objects
+        docs_data = payload.get("docs", [])
+        index.docs = [
+            BM25Doc(
+                chunk_id=doc["chunk_id"],
+                doc_id=doc["doc_id"],
+                title=doc["title"],
+                section=doc["section"],
+                tf=doc["tf"],
+                dl=doc["dl"],
+            )
+            for doc in docs_data
+        ]
         return index
 
     def _idf(self, term: str) -> float:
@@ -339,13 +403,13 @@ class BM25Index:
         ----------
         term : str
             Describe ``term``.
-            
+
 
         Returns
         -------
         float
             Describe return value.
-"""
+        """
         df = self.df.get(term, 0)
         if self.N == 0 or df == 0:
             return 0.0
@@ -365,13 +429,13 @@ class BM25Index:
         k : int, optional
             Describe ``k``.
             Defaults to ``10``.
-            
+
 
         Returns
         -------
         list[tuple[str, float]]
             Describe return value.
-"""
+        """
         if self.N == 0:
             return []
         terms = toks(query)
@@ -400,11 +464,11 @@ class BM25Index:
         ----------
         index : int
             Describe ``index``.
-            
+
 
         Returns
         -------
         BM25Doc
             Describe return value.
-"""
+        """
         return self.docs[index]

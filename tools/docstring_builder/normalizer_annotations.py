@@ -73,10 +73,9 @@ def _format_union_type(
     elif origin is Annotated:
         base, *_ = args
         formatted = format_annotation(base, module_globals)
-    else:
-        if args:
-            parts = [format_annotation(arg, module_globals) or "Any" for arg in args]
-            formatted = " | ".join(parts)
+    elif args:
+        parts = [format_annotation(arg, module_globals) or "Any" for arg in args]
+        formatted = " | ".join(parts)
     return formatted
 
 

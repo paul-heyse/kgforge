@@ -53,7 +53,7 @@ class SupportsResponse(Protocol):
         Describe ``args``.
     **kwargs : inspect._empty
         Describe ``kwargs``.
-        
+
 
     Notes
     -----
@@ -64,13 +64,13 @@ class SupportsResponse(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def raise_for_status(self) -> None:
         """Raise an HTTP error if the response indicates failure.
 
         <!-- auto:docstring-builder v1 -->
-"""
+        """
 
     def json(self) -> dict[str, Any]:
         """Return the response payload as JSON.
@@ -81,7 +81,7 @@ class SupportsResponse(Protocol):
         -------
         dict[str, Any]
             Decoded JSON body returned by the HTTP service.
-"""
+        """
         ...
 
 
@@ -96,7 +96,7 @@ class SupportsHttp(Protocol):
         Describe ``args``.
     **kwargs : inspect._empty
         Describe ``kwargs``.
-        
+
 
     Notes
     -----
@@ -107,7 +107,7 @@ class SupportsHttp(Protocol):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
         """Issue an HTTP ``GET`` request.
@@ -122,13 +122,13 @@ class SupportsHttp(Protocol):
             Describe ``args``.
         **kwargs : object
             Describe ``kwargs``.
-            
+
 
         Returns
         -------
         SupportsResponse
             Response wrapper produced by the HTTP implementation.
-"""
+        """
         ...
 
     def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
@@ -144,13 +144,13 @@ class SupportsHttp(Protocol):
             Describe ``args``.
         **kwargs : object
             Describe ``kwargs``.
-            
+
 
         Returns
         -------
         SupportsResponse
             Response wrapper produced by the HTTP implementation.
-"""
+        """
         ...
 
 
@@ -168,7 +168,7 @@ class RequestsHttp(SupportsHttp):
     -------
     inspect._empty
         Describe return value.
-"""
+    """
 
     def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
         """Send a ``GET`` request using :func:`requests.get`.
@@ -183,13 +183,13 @@ class RequestsHttp(SupportsHttp):
             Describe ``args``.
         **kwargs : object
             Describe ``kwargs``.
-            
+
 
         Returns
         -------
         SupportsResponse
             Response returned by :mod:`requests`.
-"""
+        """
         return cast(
             SupportsResponse,
             requests.get(
@@ -212,13 +212,13 @@ class RequestsHttp(SupportsHttp):
             Describe ``args``.
         **kwargs : object
             Describe ``kwargs``.
-            
+
 
         Returns
         -------
         SupportsResponse
             Response returned by :mod:`requests`.
-"""
+        """
         return cast(
             SupportsResponse,
             requests.post(
@@ -251,7 +251,7 @@ class KGFoundryClient:
     http : SupportsHttp | None, optional
         Describe ``http``.
         Defaults to ``None``.
-"""
+    """
 
     def __init__(
         self,
@@ -278,7 +278,7 @@ class KGFoundryClient:
         http : SupportsHttp | None, optional
             Describe ``http``.
             Defaults to ``None``.
-"""
+        """
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
@@ -293,7 +293,7 @@ class KGFoundryClient:
         -------
         dict[str, str]
             Header dictionary including ``Authorization`` when an API key is configured.
-"""
+        """
         headers = {"Content-Type": "application/json"}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
@@ -308,15 +308,15 @@ class KGFoundryClient:
         -------
         dict[str, Any]
             JSON payload describing service health.
-            
-            
-            
+
+
+
 
         Raises
         ------
         requests.HTTPError
         Raised when the API responds with a non-success status code.
-"""
+        """
         response = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
         response.raise_for_status()
         return response.json()
@@ -345,21 +345,21 @@ class KGFoundryClient:
         explain : bool, optional
             Describe ``explain``.
             Defaults to ``False``.
-            
+
 
         Returns
         -------
         dict[str, Any]
             JSON response containing the ranked search results.
-            
-            
-            
+
+
+
 
         Raises
         ------
         requests.HTTPError
         Raised when the API responds with a non-success status code.
-"""
+        """
         payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
         response = self._http.post(
             f"{self.base_url}/search",
@@ -382,21 +382,21 @@ class KGFoundryClient:
         limit : int, optional
             Describe ``limit``.
             Defaults to ``50``.
-            
+
 
         Returns
         -------
         dict[str, Any]
             JSON response containing matching concepts.
-            
-            
-            
+
+
+
 
         Raises
         ------
         requests.HTTPError
         Raised when the API responds with a non-success status code.
-"""
+        """
         response = self._http.post(
             f"{self.base_url}/graph/concepts",
             json={"q": q, "limit": limit},

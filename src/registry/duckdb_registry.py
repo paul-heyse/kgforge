@@ -59,7 +59,7 @@ class DuckDBRegistry:
     ----------
     db_path : str
         Describe ``db_path``.
-"""
+    """
 
     def __init__(self, db_path: str) -> None:
         """Describe   init  .
@@ -72,7 +72,7 @@ class DuckDBRegistry:
         ----------
         db_path : str
             Describe ``db_path``.
-"""
+        """
         self.db_path = db_path
         self.con = duckdb.connect(db_path, read_only=False)
         self.con.execute("PRAGMA threads=14")
@@ -90,13 +90,13 @@ class DuckDBRegistry:
             Describe ``kind``.
         run_id : str
             Describe ``run_id``.
-            
+
 
         Returns
         -------
         str
             Describe return value.
-"""
+        """
         dataset_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -123,7 +123,7 @@ class DuckDBRegistry:
             Describe ``parquet_root``.
         rows : int
             Describe ``rows``.
-"""
+        """
         self.con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
         )
@@ -139,7 +139,7 @@ class DuckDBRegistry:
         ----------
         dataset_id : str
             Describe ``dataset_id``.
-"""
+        """
         self.con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
 
     def insert_run(
@@ -165,13 +165,13 @@ class DuckDBRegistry:
             Describe ``revision``.
         config : Mapping[str, object]
             Describe ``config``.
-            
+
 
         Returns
         -------
         str
             Describe return value.
-"""
+        """
         run_id = str(uuid.uuid4())
         self.con.execute(
             (
@@ -199,7 +199,7 @@ class DuckDBRegistry:
         notes : str | None, optional
             Describe ``notes``.
             Defaults to ``None``.
-"""
+        """
         _ = success  # placeholder until success flag/notes are persisted
         _ = notes
         self.con.execute("UPDATE runs SET finished_at=now() WHERE run_id=?", [run_id])
@@ -215,7 +215,7 @@ class DuckDBRegistry:
         ----------
         docs : list[Doc]
             Describe ``docs``.
-"""
+        """
         for doc in docs:
             self.con.execute(
                 (
@@ -252,7 +252,7 @@ class DuckDBRegistry:
         ----------
         assets : list[DoctagsAsset]
             Describe ``assets``.
-"""
+        """
         for asset in assets:
             self.con.execute(
                 (
@@ -285,7 +285,7 @@ class DuckDBRegistry:
             Describe ``subject_id``.
         payload : Mapping[str, object]
             Describe ``payload``.
-"""
+        """
         self.con.execute(
             (
                 "INSERT INTO pipeline_events("
@@ -312,7 +312,7 @@ class DuckDBRegistry:
             Describe ``error_class``.
         message : str
             Describe ``message``.
-"""
+        """
         self.con.execute(
             (
                 "INSERT INTO incidents("

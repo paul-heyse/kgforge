@@ -7,16 +7,20 @@ implementation specifics.
 
 from __future__ import annotations
 
+import logging
 import math
-import os
-import pickle
 import re
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Final, cast
 
+from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.serialization import deserialize_json, serialize_json
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["BM25Doc", "LuceneBM25", "PurePythonBM25", "get_bm25"]
 
@@ -94,7 +98,7 @@ class BM25Doc:
         Describe ``length``.
     fields : dict[str, str]
         Describe ``fields``.
-"""
+    """
 
     doc_id: str
     length: int
@@ -120,7 +124,7 @@ class PurePythonBM25:
     field_boosts : dict[str, float] | None, optional
         Describe ``field_boosts``.
         Defaults to ``None``.
-"""
+    """
 
     def __init__(
         self,
@@ -146,7 +150,7 @@ class PurePythonBM25:
         field_boosts : dict[str, float] | None, optional
             Describe ``field_boosts``.
             Defaults to ``None``.
-"""
+        """
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -167,13 +171,13 @@ class PurePythonBM25:
         ----------
         text : str
             Describe ``text``.
-            
+
 
         Returns
         -------
         list[str]
             Lowercased tokens extracted from the text.
-"""
+        """
         return [t.lower() for t in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
@@ -185,8 +189,8 @@ class PurePythonBM25:
         ----------
         docs_iterable : Iterable[tuple[str, dict[str, str]]]
             Describe ``docs_iterable``.
-"""
-        os.makedirs(self.index_dir, exist_ok=True)
+        """
+        Path(self.index_dir).mkdir(parents=True, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
         docs: dict[str, BM25Doc] = {}
@@ -215,37 +219,94 @@ class PurePythonBM25:
         # convert defaultdicts
         self.postings = {t: dict(ps) for t, ps in postings.items()}
         self.docs = docs
-        # persist
-        with open(os.path.join(self.index_dir, "pure_bm25.pkl"), "wb") as f:
-            pickle.dump(
-                {
-                    "k1": self.k1,
-                    "b": self.b,
-                    "field_boosts": self.field_boosts,
-                    "df": self.df,
-                    "postings": self.postings,
-                    "docs": self.docs,
-                    "N": self.N,
-                    "avgdl": self.avgdl,
-                },
-                f,
-                protocol=pickle.HIGHEST_PROTOCOL,
-            )
+        # persist using secure JSON serialization with schema validation
+        metadata_path = Path(self.index_dir) / "pure_bm25.json"
+        schema_path = (
+            Path(__file__).parent.parent.parent / "schema" / "models" / "bm25_metadata.v1.json"
+        )
+        # Convert docs to JSON-serializable format
+        docs_data = [
+            {
+                "doc_id": doc_id,
+                "length": doc.length or 0.0,
+            }
+            for doc_id, doc in self.docs.items()
+        ]
+        payload = {
+            "k1": self.k1,
+            "b": self.b,
+            "field_boosts": self.field_boosts,
+            "df": self.df,
+            "postings": self.postings,
+            "docs": docs_data,
+            "N": self.N,
+            "avgdl": self.avgdl,
+        }
+        serialize_json(payload, schema_path, metadata_path)
 
     def load(self) -> None:
-        """Load an existing BM25 index from disk.
+        """Load an existing BM25 index from disk with schema validation and checksum verification.
 
-        <!-- auto:docstring-builder v1 -->
-"""
-        path = os.path.join(self.index_dir, "pure_bm25.pkl")
-        with open(path, "rb") as f:
-            data = pickle.load(f)
+        Deserializes index metadata from JSON, verifying checksum and validating
+        against the schema. Falls back to legacy pickle format for backward compatibility.
+
+        Raises
+        ------
+        DeserializationError
+            If deserialization, schema validation, or checksum verification fails.
+        FileNotFoundError
+            If metadata or schema file is missing.
+        """
+        metadata_path = Path(self.index_dir) / "pure_bm25.json"
+        schema_path = (
+            Path(__file__).parent.parent.parent / "schema" / "models" / "bm25_metadata.v1.json"
+        )
+        legacy_path = Path(self.index_dir) / "pure_bm25.pkl"
+
+        if metadata_path.exists():
+            try:
+                data = deserialize_json(metadata_path, schema_path)
+            except DeserializationError as exc:
+                logger.warning("Failed to load JSON index, trying legacy pickle: %s", exc)
+                # Fall back to legacy pickle
+                if legacy_path.exists():
+                    import pickle  # noqa: PLC0415
+
+                    with legacy_path.open("rb") as f:
+                        data = pickle.load(f)  # noqa: S301
+                else:
+                    raise
+        elif legacy_path.exists():
+            # Legacy pickle format
+            import pickle  # noqa: PLC0415
+
+            with legacy_path.open("rb") as f:
+                data = pickle.load(f)  # noqa: S301
+            logger.warning("Loaded legacy pickle index. Consider migrating to JSON format.")
+        else:
+            msg = f"Index metadata not found at {metadata_path} or {legacy_path}"
+            raise FileNotFoundError(msg)
+
         self.k1 = data["k1"]
         self.b = data["b"]
-        self.field_boosts = data["field_boosts"]
+        self.field_boosts = data.get("field_boosts", {"title": 2.0, "section": 1.2, "body": 1.0})
         self.df = data["df"]
         self.postings = data["postings"]
-        self.docs = data["docs"]
+        # Convert docs data back to BM25Doc objects if needed
+        docs_data = data.get("docs", [])
+        if docs_data and isinstance(docs_data[0], dict):
+            # JSON format: reconstruct docs from metadata
+            self.docs = {
+                doc["doc_id"]: BM25Doc(
+                    doc_id=doc["doc_id"],
+                    length=doc.get("length", 0.0),
+                    fields={},  # Fields not persisted in metadata
+                )
+                for doc in docs_data
+            }
+        else:
+            # Legacy pickle format: docs already objects
+            self.docs = data["docs"]
         self.N = data["N"]
         self.avgdl = data["avgdl"]
 
@@ -258,13 +319,13 @@ class PurePythonBM25:
         ----------
         term : str
             Describe ``term``.
-            
+
 
         Returns
         -------
         float
             Inverse document frequency score for the term.
-"""
+        """
         n_t = self.df.get(term, 0)
         if n_t == 0:
             return 0.0
@@ -272,7 +333,10 @@ class PurePythonBM25:
         return math.log((self.N - n_t + 0.5) / (n_t + 0.5) + 1.0)
 
     def search(
-        self, query: str, k: int, fields: Mapping[str, str] | None = None
+        self,
+        query: str,
+        k: int,
+        fields: Mapping[str, str] | None = None,  # noqa: ARG002
     ) -> list[tuple[str, float]]:
         """Score documents stored in the in-memory BM25 index.
 
@@ -287,13 +351,13 @@ class PurePythonBM25:
         fields : Mapping[str, str] | None, optional
             Describe ``fields``.
             Defaults to ``None``.
-            
+
 
         Returns
         -------
         list[tuple[str, float]]
             Ranked document identifiers with their BM25 scores.
-"""
+        """
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
@@ -330,13 +394,13 @@ class LuceneBM25:
     field_boosts : dict[str, float] | None, optional
         Describe ``field_boosts``.
         Defaults to ``None``.
-        
+
 
     Raises
     ------
     RuntimeError
     Raised when Pyserini is not installed in the environment.
-"""
+    """
 
     def __init__(
         self,
@@ -362,7 +426,7 @@ class LuceneBM25:
         field_boosts : dict[str, float] | None, optional
             Describe ``field_boosts``.
             Defaults to ``None``.
-"""
+        """
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -378,19 +442,20 @@ class LuceneBM25:
         ----------
         docs_iterable : Iterable[tuple[str, dict[str, str]]]
             Describe ``docs_iterable``.
-            
+
 
         Raises
         ------
         RuntimeError
         Raised when Pyserini or Lucene is unavailable.
-"""
+        """
         try:
-            from pyserini.index.lucene import LuceneIndexer
+            from pyserini.index.lucene import LuceneIndexer  # noqa: PLC0415
         except Exception as exc:
             message = "Pyserini/Lucene not available"
+            logger.exception("Failed to import LuceneIndexer")
             raise RuntimeError(message) from exc
-        os.makedirs(self.index_dir, exist_ok=True)
+        Path(self.index_dir).mkdir(parents=True, exist_ok=True)
         indexer = cast(Any, LuceneIndexer(self.index_dir))
         for doc_id, fields in docs_iterable:
             # combine fields with boosts in a "contents" field for simplicity
@@ -411,17 +476,20 @@ class LuceneBM25:
         """Initialise the Lucene searcher if it has not been created yet.
 
         <!-- auto:docstring-builder v1 -->
-"""
+        """
         if self._searcher is not None:
             return
-        from pyserini.search.lucene import LuceneSearcher
+        from pyserini.search.lucene import LuceneSearcher  # noqa: PLC0415
 
         searcher = cast(Any, LuceneSearcher(self.index_dir))
         searcher.set_bm25(self.k1, self.b)
         self._searcher = searcher
 
     def search(
-        self, query: str, k: int, fields: dict[str, str] | None = None
+        self,
+        query: str,
+        k: int,
+        fields: dict[str, str] | None = None,  # noqa: ARG002
     ) -> list[tuple[str, float]]:
         """Execute a Lucene BM25 search.
 
@@ -436,21 +504,21 @@ class LuceneBM25:
         fields : dict[str, str] | None, optional
             Describe ``fields``.
             Defaults to ``None``.
-            
+
 
         Returns
         -------
         list[tuple[str, float]]
             Ranked document identifiers paired with their BM25 scores.
-            
-            
-            
+
+
+
 
         Raises
         ------
         RuntimeError
         Raised when the Lucene searcher cannot be initialised.
-"""
+        """
         self._ensure_searcher()
         if self._searcher is None:
             message = "Lucene searcher not initialized"
@@ -487,17 +555,21 @@ def get_bm25(
     field_boosts : dict[str, float] | None, optional
         Describe ``field_boosts``.
         Defaults to ``None``.
-        
+
 
     Returns
     -------
     PurePythonBM25 | LuceneBM25
         Configured BM25 adapter.
-"""
+    """
     if backend == "lucene":
         try:
             return LuceneBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)
-        except Exception:
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                "Failed to create LuceneBM25 backend, falling back to PurePythonBM25: %s",
+                exc,
+                exc_info=True,
+            )
             # allow fallback creation
-            pass
     return PurePythonBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)

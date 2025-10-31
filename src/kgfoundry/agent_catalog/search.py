@@ -19,6 +19,12 @@ from typing import Any, Protocol, cast
 import numpy as np
 import numpy.typing as npt
 
+from kgfoundry.search_api.types import (
+    FaissIndexProtocol,
+    FaissModuleProtocol,
+    VectorArray,
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,7 +32,6 @@ class CatalogSearchError(RuntimeError):
     """Raised when a catalog search or index operation fails."""
 
 
-type VectorArray = npt.NDArray[np.float32]
 EMBEDDING_MATRIX_RANK = 2
 WORD_PATTERN = re.compile(r"[A-Za-z0-9_]+")
 
@@ -36,40 +41,6 @@ class EmbeddingModelProtocol(Protocol):
 
     def encode(self, sentences: Sequence[str], **_: object) -> VectorArray:
         """Return embeddings for the provided sentences."""
-        ...
-
-
-class FaissIndexProtocol(Protocol):
-    """Protocol describing the FAISS index surface used by the builder."""
-
-    def add(self, vectors: VectorArray) -> None:
-        """Add vectors to the index."""
-        ...
-
-    def search(
-        self, vectors: VectorArray, count: int
-    ) -> tuple[npt.NDArray[np.float32], npt.NDArray[np.int64]]:
-        """Search vectors and return distance/index pairs."""
-        ...
-
-
-class FaissModuleProtocol(Protocol):
-    """Protocol describing the the subset of FAISS used by the catalog."""
-
-    def IndexFlatIP(self, dimension: int) -> FaissIndexProtocol:  # noqa: N802
-        """Return an inner-product index for the given dimension."""
-        ...
-
-    def write_index(self, index: FaissIndexProtocol, path: str) -> None:
-        """Persist an index to the given path."""
-        ...
-
-    def read_index(self, path: str) -> FaissIndexProtocol:
-        """Load an index from disk."""
-        ...
-
-    def normalize_L2(self, vectors: VectorArray) -> None:  # noqa: N802
-        """Normalize vectors in-place to unit length."""
         ...
 
 
@@ -180,22 +151,22 @@ class _SimpleFaissIndex:
             self._vectors = np.vstack((self._vectors, np.ascontiguousarray(array)))
 
     def search(
-        self, vectors: VectorArray, count: int
+        self, vectors: VectorArray, k: int
     ) -> tuple[npt.NDArray[np.float32], npt.NDArray[np.int64]]:
         queries = np.asarray(vectors, dtype=np.float32)
         if queries.ndim != EMBEDDING_MATRIX_RANK or queries.shape[1] != self.dimension:
             message = "Query vector dimension does not match index configuration"
             raise CatalogSearchError(message)
         query_count = queries.shape[0]
-        distances = np.zeros((query_count, count), dtype=np.float32)
-        indices = -np.ones((query_count, count), dtype=np.int64)
+        distances = np.zeros((query_count, k), dtype=np.float32)
+        indices = -np.ones((query_count, k), dtype=np.int64)
         if self._vectors.size == 0:
             return distances, indices
         similarity = np.matmul(queries, self._vectors.T)
         if similarity.ndim != EMBEDDING_MATRIX_RANK:
             message = "Unexpected similarity matrix shape"
             raise CatalogSearchError(message)
-        top_k = min(count, similarity.shape[1])
+        top_k = min(k, similarity.shape[1])
         order = np.argpartition(similarity, -top_k, axis=1)
         top_indices = order[:, -top_k:]
         top_scores = np.take_along_axis(similarity, top_indices, axis=1)
@@ -208,12 +179,90 @@ class _SimpleFaissIndex:
 
 
 class _SimpleFaissModule:
-    """Minimal FAISS module shim using NumPy for tests and local runs."""
+    """Minimal FAISS module shim using NumPy for tests and local runs.
+
+    Implements FaissModuleProtocol for compatibility with FAISS adapters.
+    """
+
+    # FAISS metric constants
+    METRIC_INNER_PRODUCT: int = 1
+    METRIC_L2: int = 0
 
     IndexFlatIP = _SimpleFaissIndex
 
     @staticmethod
-    def write_index(index: _SimpleFaissIndex, path: str) -> None:
+    def IndexFlatIP(dimension: int) -> FaissIndexProtocol:  # noqa: N802
+        """Create a flat inner-product index.
+
+        Parameters
+        ----------
+        dimension : int
+            Vector dimension.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            Flat index instance.
+        """
+        return _SimpleFaissIndex(dimension)
+
+    @staticmethod
+    def index_factory(dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
+        """Create an index from a factory string.
+
+        For the simple implementation, factory strings are ignored and a flat index
+        is always returned.
+
+        Parameters
+        ----------
+        dimension : int
+            Vector dimension.
+        factory_string : str
+            Factory description (ignored in simple implementation).
+        metric : int
+            Metric type (METRIC_INNER_PRODUCT or METRIC_L2).
+
+        Returns
+        -------
+        FaissIndexProtocol
+            Flat index instance.
+        """
+        # Simple implementation ignores factory_string and always returns flat index
+        return _SimpleFaissIndex(dimension)
+
+    @staticmethod
+    def IndexIDMap2(index: FaissIndexProtocol) -> FaissIndexProtocol:  # noqa: N802
+        """Wrap an index with 64-bit ID mapping.
+
+        For the simple implementation, this is a no-op (returns the index as-is).
+
+        Parameters
+        ----------
+        index : FaissIndexProtocol
+            Base index to wrap.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            Index with ID mapping (same instance in simple implementation).
+        """
+        # Simple implementation doesn't support ID mapping, return as-is
+        return index
+
+    @staticmethod
+    def write_index(index: FaissIndexProtocol, path: str) -> None:
+        """Persist an index to disk.
+
+        Parameters
+        ----------
+        index : FaissIndexProtocol
+            Index instance to save.
+        path : str
+            File path for the persisted index.
+        """
+        if not isinstance(index, _SimpleFaissIndex):
+            message = f"Simple module can only write _SimpleFaissIndex instances, got {type(index)}"
+            raise CatalogSearchError(message)
         payload = {
             "dimension": index.dimension,
             "vectors": index._vectors,
@@ -222,7 +271,19 @@ class _SimpleFaissModule:
             pickle.dump(payload, handle)
 
     @staticmethod
-    def read_index(path: str) -> _SimpleFaissIndex:
+    def read_index(path: str) -> FaissIndexProtocol:
+        """Load an index from disk.
+
+        Parameters
+        ----------
+        path : str
+            File path to the persisted index.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            Loaded index instance.
+        """
         with Path(path).open("rb") as handle:
             payload = pickle.load(handle)  # noqa: S301 - local trusted artifact
         vectors_payload = payload.get("vectors", [])
@@ -244,6 +305,13 @@ class _SimpleFaissModule:
 
     @staticmethod
     def normalize_L2(vectors: VectorArray) -> None:  # noqa: N802
+        """Normalize vectors to unit length in-place.
+
+        Parameters
+        ----------
+        vectors : VectorArray
+            Array to normalize (modified in-place).
+        """
         norms = np.linalg.norm(vectors, axis=1, keepdims=True)
         norms[norms == 0] = 1.0
         vectors /= norms

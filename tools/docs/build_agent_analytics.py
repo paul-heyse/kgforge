@@ -4,16 +4,16 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import datetime, timezone
+from collections.abc import Mapping
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from kgfoundry.agent_catalog.models import load_catalog_payload
 
 
 def build_parser() -> argparse.ArgumentParser:
     """Return the CLI parser for the analytics builder."""
-
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--catalog",
@@ -106,7 +106,9 @@ def _check_links(catalog: Mapping[str, Any], repo_root: Path, sample: int) -> li
                 if isinstance(path_value, str):
                     candidate = repo_root / path_value
                     if not candidate.exists():
-                        broken.append({"module": str(module.get("qualified", "")), "path": path_value})
+                        broken.append(
+                            {"module": str(module.get("qualified", "")), "path": path_value}
+                        )
             pages = module.get("pages")
             if isinstance(pages, Mapping):
                 for key, value in pages.items():
@@ -114,7 +116,13 @@ def _check_links(catalog: Mapping[str, Any], repo_root: Path, sample: int) -> li
                         continue
                     candidate = repo_root / value
                     if not candidate.exists():
-                        broken.append({"module": str(module.get("qualified", "")), "page": value, "kind": str(key)})
+                        broken.append(
+                            {
+                                "module": str(module.get("qualified", "")),
+                                "page": value,
+                                "kind": str(key),
+                            }
+                        )
             checked += 1
             if checked >= sample:
                 return broken
@@ -134,7 +142,7 @@ def build_analytics(args: argparse.Namespace) -> dict[str, Any]:
     broken_links = _check_links(catalog, args.repo_root, args.link_sample)
     analytics = {
         "version": "1.0",
-        "generated_at": datetime.now(tz=timezone.utc).isoformat(),
+        "generated_at": datetime.now(tz=UTC).isoformat(),
         "repo": {"root": str(args.repo_root)},
         "catalog": metrics,
         "portal": {"sessions": _portal_sessions(previous)},
@@ -159,4 +167,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":  # pragma: no cover - CLI entrypoint
     raise SystemExit(main())
-

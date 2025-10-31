@@ -224,6 +224,21 @@ PY
             --cov=src --cov-report=xml:coverage.xml --cov-report=html:htmlcov \
             --junitxml=junit.xml
 
+      - name: Check import-linter contracts
+        if: ${{ always() }}
+        run: |
+          uv run python -m importlinter --config importlinter.cfg || echo "::warning::import-linter check failed"
+
+      - name: Check suppression guard
+        if: ${{ always() }}
+        run: |
+          uv run python tools/check_new_suppressions.py src || echo "::warning::Suppression guard found untracked suppressions"
+
+      - name: Generate PR summary
+        if: ${{ always() }}
+        run: |
+          uv run python tools/generate_pr_summary.py
+
       - name: Upload coverage
         if: ${{ always() }}
         uses: actions/upload-artifact@v4

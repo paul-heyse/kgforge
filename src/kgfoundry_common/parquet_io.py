@@ -10,14 +10,29 @@ from __future__ import annotations
 import datetime as dt
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Final
+from typing import TYPE_CHECKING, Any, Final
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
 
-__all__ = ["ParquetChunkWriter", "ParquetVectorWriter"]
+if TYPE_CHECKING:
+    import pandas as pd
+else:
+    try:
+        import pandas as pd
+    except ImportError:
+        pd = None  # type: ignore[assignment, misc]
+
+__all__ = [
+    "ParquetChunkWriter",
+    "ParquetVectorWriter",
+    "read_table",
+    "read_table_to_dataframe",
+    "validate_table_schema",
+]
 
 __navmap__: Final[NavMap] = {
     "title": "kgfoundry_common.parquet_io",
@@ -27,7 +42,13 @@ __navmap__: Final[NavMap] = {
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["ParquetVectorWriter", "ParquetChunkWriter"],
+            "symbols": [
+                "ParquetVectorWriter",
+                "ParquetChunkWriter",
+                "read_table",
+                "read_table_to_dataframe",
+                "validate_table_schema",
+            ],
         },
     ],
     "module_meta": {
@@ -42,6 +63,21 @@ __navmap__: Final[NavMap] = {
             "since": "0.1.0",
         },
         "ParquetChunkWriter": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+        "read_table": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+        "read_table_to_dataframe": {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        },
+        "validate_table_schema": {
             "owner": "@kgfoundry-common",
             "stability": "stable",
             "since": "0.1.0",
@@ -67,7 +103,7 @@ class ParquetVectorWriter:
     ----------
     root : str
         Describe ``root``.
-"""
+    """
 
     @staticmethod
     def dense_schema(dim: int) -> pa.schema:
@@ -81,13 +117,13 @@ class ParquetVectorWriter:
         ----------
         dim : int
             Describe ``dim``.
-            
+
 
         Returns
         -------
         pyarrow.lib.schema
             Describe return value.
-"""
+        """
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -111,7 +147,7 @@ class ParquetVectorWriter:
         ----------
         root : str
             Describe ``root``.
-"""
+        """
         self.root = Path(root)
 
     def write_dense(
@@ -141,13 +177,13 @@ class ParquetVectorWriter:
         shard : int, optional
             Describe ``shard``.
             Defaults to ``0``.
-            
+
 
         Returns
         -------
         str
             Describe return value.
-"""
+        """
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -185,7 +221,7 @@ class ParquetVectorWriter:
         -------
         pyarrow.lib.schema
             Describe return value.
-"""
+        """
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -222,13 +258,13 @@ class ParquetVectorWriter:
         shard : int, optional
             Describe ``shard``.
             Defaults to ``0``.
-            
+
 
         Returns
         -------
         str
             Describe return value.
-"""
+        """
         part_dir = self.root / f"model={model}" / f"run_id={run_id}" / f"shard={shard:05d}"
         part_dir.mkdir(parents=True, exist_ok=True)
         now = int(dt.datetime.now(dt.UTC).timestamp() * 1000)
@@ -275,7 +311,7 @@ class ParquetChunkWriter:
     run_id : str, optional
         Describe ``run_id``.
         Defaults to ``'dev'``.
-"""
+    """
 
     @staticmethod
     def chunk_schema() -> pa.schema:
@@ -289,7 +325,7 @@ class ParquetChunkWriter:
         -------
         pyarrow.lib.schema
             Describe return value.
-"""
+        """
         return pa.schema(
             [
                 pa.field("chunk_id", pa.string()),
@@ -331,7 +367,7 @@ class ParquetChunkWriter:
         run_id : str, optional
             Describe ``run_id``.
             Defaults to ``'dev'``.
-"""
+        """
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 
@@ -346,13 +382,13 @@ class ParquetChunkWriter:
         ----------
         rows : Iterable[dict[str, Any]]
             Describe ``rows``.
-            
+
 
         Returns
         -------
         str
             Describe return value.
-"""
+        """
         table = pa.Table.from_pylist(list(rows), schema=self.chunk_schema())
         pq.write_table(
             table,
@@ -362,3 +398,141 @@ class ParquetChunkWriter:
             data_page_size=ROW_GROUP_SIZE,
         )
         return str(self.root.parent.parent)
+
+
+# [nav:anchor read_table]
+def read_table(
+    path: str | Path,
+    *,
+    schema: pa.Schema | None = None,
+    validate_schema: bool = True,
+) -> pa.Table:
+    """Read a Parquet file and return a typed Table.
+
+    Parameters
+    ----------
+    path : str | Path
+        Path to Parquet file or directory.
+    schema : pa.Schema | None, optional
+        Expected schema for validation. If provided and validate_schema=True,
+        raises DeserializationError on mismatch.
+        Defaults to ``None``.
+    validate_schema : bool, optional
+        Whether to validate against the provided schema.
+        Defaults to ``True``.
+
+    Returns
+    -------
+    pa.Table
+        Typed pyarrow Table with concrete schema.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the Parquet file does not exist.
+    DeserializationError
+        If schema validation fails or the file is corrupted.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> from kgfoundry_common.parquet_io import read_table
+    >>> # Note: requires existing Parquet file
+    >>> # table = read_table("data.parquet")
+    >>> # assert table.num_rows > 0
+    """
+    path_obj = Path(path)
+    if not path_obj.exists():
+        msg = f"Parquet file not found: {path_obj}"
+        raise FileNotFoundError(msg)
+
+    try:
+        table = pq.read_table(path_obj)
+    except Exception as exc:
+        msg = f"Failed to read Parquet file {path_obj}: {exc}"
+        raise DeserializationError(msg) from exc
+
+    if schema is not None and validate_schema:
+        validate_table_schema(table, schema)
+
+    return table
+
+
+# [nav:anchor read_table_to_dataframe]
+def read_table_to_dataframe(
+    path: str | Path,
+    *,
+    schema: pa.Schema | None = None,
+    validate_schema: bool = True,
+) -> pd.DataFrame:
+    """Read a Parquet file and return a typed DataFrame.
+
+    Parameters
+    ----------
+    path : str | Path
+        Path to Parquet file or directory.
+    schema : pa.Schema | None, optional
+        Expected schema for validation. If provided and validate_schema=True,
+        raises DeserializationError on mismatch.
+        Defaults to ``None``.
+    validate_schema : bool, optional
+        Whether to validate against the provided schema.
+        Defaults to ``True``.
+
+    Returns
+    -------
+    pd.DataFrame
+        Typed pandas DataFrame with schema metadata preserved.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the Parquet file does not exist.
+    DeserializationError
+        If schema validation fails or the file is corrupted.
+    ImportError
+        If pandas is not installed.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> from kgfoundry_common.parquet_io import read_table_to_dataframe
+    >>> # Note: requires existing Parquet file and pandas
+    >>> # df = read_table_to_dataframe("data.parquet")
+    >>> # assert len(df) > 0
+    """
+    if pd is None:
+        msg = "pandas is required for DataFrame conversion"
+        raise ImportError(msg)
+
+    table = read_table(path, schema=schema, validate_schema=validate_schema)
+    return table.to_pandas()
+
+
+# [nav:anchor validate_table_schema]
+def validate_table_schema(table: pa.Table, expected_schema: pa.Schema) -> None:
+    """Validate that a table matches an expected schema.
+
+    Parameters
+    ----------
+    table : pa.Table
+        Table to validate.
+    expected_schema : pa.Schema
+        Expected schema.
+
+    Raises
+    ------
+    DeserializationError
+        If the table schema does not match the expected schema.
+
+    Examples
+    --------
+    >>> import pyarrow as pa
+    >>> from kgfoundry_common.parquet_io import validate_table_schema
+    >>> schema = pa.schema([pa.field("id", pa.string())])
+    >>> table = pa.Table.from_pylist([{"id": "test"}], schema=schema)
+    >>> validate_table_schema(table, schema)  # No error
+    """
+    if not table.schema.equals(expected_schema):
+        msg = f"Schema mismatch: expected {expected_schema}, got {table.schema}"
+        raise DeserializationError(msg)

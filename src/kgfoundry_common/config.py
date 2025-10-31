@@ -53,29 +53,29 @@ def load_config(path: str) -> dict[str, Any]:
     ----------
     path : str
         Describe ``path``.
-        
+
 
     Returns
     -------
     dict[str, Any]
         Describe return value.
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
+
+
+
+
+
 
     Raises
     ------
     TypeError
     Raised when TODO for TypeError.
-"""
+    """
     with open(path, encoding="utf-8") as f:
         loaded = yaml.safe_load(f)
     if not isinstance(loaded, dict):

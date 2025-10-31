@@ -29,13 +29,14 @@ def test_client_loads_catalog() -> None:
 
 def test_sample_catalog_search_mrr() -> None:
     """Hybrid search should surface target symbols within the top results."""
-
     client = _client()
     queries = [("demo function", "demo.module.fn")]
     reciprocal_ranks: list[float] = []
     for query, expected in queries:
         results = client.search(query, k=5)
-        rank = next((index + 1 for index, item in enumerate(results) if item.qname == expected), None)
+        rank = next(
+            (index + 1 for index, item in enumerate(results) if item.qname == expected), None
+        )
         assert rank is not None, f"expected {expected} in results"
         reciprocal_ranks.append(1 / rank)
     mrr = sum(reciprocal_ranks) / len(reciprocal_ranks)

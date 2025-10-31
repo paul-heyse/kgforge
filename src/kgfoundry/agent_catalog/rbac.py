@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import Enum
-from typing import ClassVar, Mapping
+from typing import ClassVar
 
 
 class Role(str, Enum):
@@ -65,7 +66,6 @@ class AccessController:
 
     def authorize(self, method: str) -> None:
         """Raise :class:`PermissionError` if ``method`` is not permitted."""
-
         if not self.enabled:
             return
         allowed = self._PERMISSIONS.get(self.role, frozenset())

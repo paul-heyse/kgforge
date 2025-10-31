@@ -8,6 +8,7 @@ for implementation specifics.
 # [nav:anchor config]
 # [nav:anchor errors]
 # [nav:anchor exceptions]
+# [nav:anchor fs]
 # [nav:anchor ids]
 # [nav:anchor logging]
 # [nav:anchor models]
@@ -17,11 +18,16 @@ from kgfoundry_common import (
     config,
     errors,
     exceptions,
+    fs,
     ids,
     logging,
     models,
     navmap_types,
+    observability,
     parquet_io,
+    schema_helpers,
+    serialization,
+    settings,
 )
 from kgfoundry_common.navmap_types import NavMap
 
@@ -29,11 +35,16 @@ __all__ = [
     "config",
     "errors",
     "exceptions",
+    "fs",
     "ids",
     "logging",
     "models",
     "navmap_types",
+    "observability",
     "parquet_io",
+    "schema_helpers",
+    "serialization",
+    "settings",
 ]
 
 __navmap__: NavMap = {

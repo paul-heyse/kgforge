@@ -1,0 +1,14 @@
+{
+  "type": "https://kgfoundry.dev/problems/search-index-missing",
+  "title": "SearchIndexMissingError",
+  "status": 503,
+  "detail": "Dense index not found at configured path: /data/indices/dense.ivf",
+  "code": "search-index-missing",
+  "instance": "/api/v1/search",
+  "errors": {
+    "index_path": "/data/indices/dense.ivf",
+    "index_type": "dense",
+    "suggested_action": "Run index build command or check configuration"
+  }
+}
+

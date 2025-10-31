@@ -57,6 +57,8 @@
    uv run mypy --config-file mypy.ini
    uv run pytest -q
    make artifacts && git diff --exit-code    # docs/nav/catalog/schemas in sync
+   python tools/check_new_suppressions.py src    # verify no untracked suppressions
+   uv run python -m importlinter --config importlinter.cfg      # verify architectural boundaries
    ```
 
 5) **Ship the PR**
@@ -261,7 +263,14 @@ Example `PATH_MAP`:
 [ ] uv run mypy --config-file mypy.ini
 [ ] uv run pytest -q
 [ ] make artifacts && git diff --exit-code
+[ ] python tools/check_new_suppressions.py src
+[ ] uv run python -m importlinter --config importlinter.cfg
 ```
+
+**Problem Details Example:**
+- Canonical example: `schema/examples/problem_details/search-missing-index.json`
+- All HTTP error responses must conform to RFC 9457 Problem Details format
+- See `src/kgfoundry_common/errors/` for exception taxonomy and Problem Details helpers
 
 ---
 
@@ -282,9 +291,18 @@ uv run pytest -q
 make artifacts
 git diff --exit-code
 
+# Architectural boundaries & suppression guard
+python tools/check_new_suppressions.py src
+uv run python -m importlinter --config importlinter.cfg
+
 # All pre-commit hooks
 uvx pre-commit run --all-files
 ```
+
+**Problem Details Reference:**
+- Example: `schema/examples/problem_details/search-missing-index.json`
+- Schema: RFC 9457 Problem Details format
+- Implementation: `src/kgfoundry_common/errors/`
 
 ---
 

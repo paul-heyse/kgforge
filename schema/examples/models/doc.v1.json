@@ -1,0 +1,16 @@
+{
+  "id": "urn:doc:sha256:abc123def456",
+  "openalex_id": "W123456789",
+  "doi": "10.1234/example.doi",
+  "arxiv_id": null,
+  "pmcid": null,
+  "title": "Example Research Paper",
+  "authors": ["Jane Doe", "John Smith"],
+  "pub_date": "2024-01-15",
+  "license": "CC-BY-4.0",
+  "language": "en",
+  "pdf_uri": "/data/pdfs/urn:doc:sha256:abc123def456.pdf",
+  "source": "openalex",
+  "content_hash": "sha256:abc123def456789"
+}
+

@@ -53,4 +53,4 @@ class Linker:
     -------
     inspect._empty
         Describe return value.
-"""
+    """

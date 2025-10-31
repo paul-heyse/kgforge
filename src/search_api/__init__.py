@@ -1,8 +1,14 @@
-"""Overview of search api.
+"""Search service endpoints and retrieval adapters.
 
-This module bundles search api logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
+This package provides typed search APIs with schema validation and
+Problem Details error responses. All public APIs are explicitly exported
+via `__all__` with full type annotations.
+
+See Also
+--------
+- `schema/examples/problem_details/search-missing-index.json` - Example error response
+- `schema/models/search_request.v1.json` - Request schema
+- `schema/models/search_result.v1.json` - Response schema
 """
 
 # [nav:anchor app]
@@ -23,6 +29,7 @@ from search_api import (
     schemas,
     service,
     splade_index,
+    types,
 )
 
 # [nav:anchor splade_index]
@@ -37,6 +44,7 @@ __all__ = [
     "schemas",
     "service",
     "splade_index",
+    "types",
 ]
 
 __navmap__ = {

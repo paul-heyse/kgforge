@@ -6,11 +6,11 @@ from .logging import StructuredLoggerAdapter, get_logger, with_fields
 from .proc import ProblemDetailsDict, ToolExecutionError, ToolRunResult, run_tool
 
 __all__ = [
-    "StructuredLoggerAdapter",
-    "get_logger",
-    "with_fields",
     "ProblemDetailsDict",
+    "StructuredLoggerAdapter",
     "ToolExecutionError",
     "ToolRunResult",
+    "get_logger",
     "run_tool",
+    "with_fields",
 ]

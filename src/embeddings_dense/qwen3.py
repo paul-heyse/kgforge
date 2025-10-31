@@ -53,4 +53,4 @@ class Qwen3Embedder:
     -------
     inspect._empty
         Describe return value.
-"""
+    """

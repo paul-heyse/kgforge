@@ -7,15 +7,19 @@ implementation specifics.
 
 from __future__ import annotations
 
+import logging
 import math
-import os
-import pickle
 import re
 from collections import Counter, defaultdict
 from collections.abc import Iterable
+from pathlib import Path
 from typing import Any, Final
 
+from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.serialization import deserialize_json, serialize_json
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["LuceneImpactIndex", "PureImpactIndex", "SPLADEv3Encoder", "get_splade"]
 
@@ -90,13 +94,13 @@ class SPLADEv3Encoder:
     max_seq_len : int, optional
         Describe ``max_seq_len``.
         Defaults to ``512``.
-        
+
 
     Raises
     ------
     NotImplementedError
     Raised when TODO for NotImplementedError.
-"""
+    """
 
     name = "SPLADE-v3-distilbert"
 
@@ -127,7 +131,7 @@ class SPLADEv3Encoder:
         max_seq_len : int, optional
             Describe ``max_seq_len``.
             Defaults to ``512``.
-"""
+        """
         self.model_id = model_id
         self.device = device
         self.topk = topk
@@ -144,28 +148,28 @@ class SPLADEv3Encoder:
         ----------
         texts : list[str]
             Describe ``texts``.
-            
+
 
         Returns
         -------
         list[tuple[list[int], list[float]]]
             Describe return value.
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+
+
+
+
+
+
+
+
+
+
 
         Raises
         ------
         NotImplementedError
         Raised when TODO for NotImplementedError.
-"""
+        """
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
             "impact index variant if available."
@@ -187,7 +191,7 @@ class PureImpactIndex:
     ----------
     index_dir : str
         Describe ``index_dir``.
-"""
+    """
 
     def __init__(self, index_dir: str) -> None:
         """Describe   init  .
@@ -200,7 +204,7 @@ class PureImpactIndex:
         ----------
         index_dir : str
             Describe ``index_dir``.
-"""
+        """
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -218,13 +222,13 @@ class PureImpactIndex:
         ----------
         text : str
             Describe ``text``.
-            
+
 
         Returns
         -------
         list[str]
             Describe return value.
-"""
+        """
         return [token.lower() for token in TOKEN_RE.findall(text)]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
@@ -238,8 +242,8 @@ class PureImpactIndex:
         ----------
         docs_iterable : Iterable[tuple[str, dict[str, str]]]
             Describe ``docs_iterable``.
-"""
-        os.makedirs(self.index_dir, exist_ok=True)
+        """
+        Path(self.index_dir).mkdir(parents=True, exist_ok=True)
         df: dict[str, int] = defaultdict(int)
         postings: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
         doc_count = 0
@@ -262,24 +266,57 @@ class PureImpactIndex:
             }
             for token, docs in postings.items()
         }
-        with open(os.path.join(self.index_dir, "impact.pkl"), "wb") as handle:
-            pickle.dump(
-                {"df": self.df, "N": self.N, "postings": self.postings},
-                handle,
-                protocol=pickle.HIGHEST_PROTOCOL,
-            )
+        # persist using secure JSON serialization with schema validation
+        metadata_path = Path(self.index_dir) / "impact.json"
+        schema_path = (
+            Path(__file__).parent.parent.parent / "schema" / "models" / "splade_metadata.v1.json"
+        )
+        payload = {"df": self.df, "N": self.N, "postings": self.postings}
+        serialize_json(payload, schema_path, metadata_path)
 
     def load(self) -> None:
-        """Describe load.
+        """Load SPLADE index metadata from disk with schema validation and checksum verification.
 
-        <!-- auto:docstring-builder v1 -->
+        Deserializes index metadata from JSON, verifying checksum and validating
+        against the schema. Falls back to legacy pickle format for backward compatibility.
 
-        Python's object protocol for this class. Use it to integrate with built-in operators,
-        protocols, or runtime behaviours that expect instances to participate in the language's data
-        model.
-"""
-        with open(os.path.join(self.index_dir, "impact.pkl"), "rb") as handle:
-            data = pickle.load(handle)
+        Raises
+        ------
+        DeserializationError
+            If deserialization, schema validation, or checksum verification fails.
+        FileNotFoundError
+            If metadata or schema file is missing.
+        """
+        metadata_path = Path(self.index_dir) / "impact.json"
+        schema_path = (
+            Path(__file__).parent.parent.parent / "schema" / "models" / "splade_metadata.v1.json"
+        )
+        legacy_path = Path(self.index_dir) / "impact.pkl"
+
+        if metadata_path.exists():
+            try:
+                data = deserialize_json(metadata_path, schema_path)
+            except DeserializationError as exc:
+                logger.warning("Failed to load JSON index, trying legacy pickle: %s", exc)
+                # Fall back to legacy pickle
+                if legacy_path.exists():
+                    import pickle  # noqa: PLC0415
+
+                    with legacy_path.open("rb") as handle:
+                        data = pickle.load(handle)  # noqa: S301
+                else:
+                    raise
+        elif legacy_path.exists():
+            # Legacy pickle format
+            import pickle  # noqa: PLC0415
+
+            with legacy_path.open("rb") as handle:
+                data = pickle.load(handle)  # noqa: S301
+            logger.warning("Loaded legacy pickle index. Consider migrating to JSON format.")
+        else:
+            msg = f"Index metadata not found at {metadata_path} or {legacy_path}"
+            raise FileNotFoundError(msg)
+
         self.df = data["df"]
         self.N = data["N"]
         self.postings = data["postings"]
@@ -297,13 +334,13 @@ class PureImpactIndex:
             Describe ``query``.
         k : int
             Describe ``k``.
-            
+
 
         Returns
         -------
         list[tuple[str, float]]
             Describe return value.
-"""
+        """
         tokens = self._tokenize(query)
         scores: dict[str, float] = defaultdict(float)
         for token in tokens:
@@ -330,13 +367,13 @@ class LuceneImpactIndex:
     query_encoder : str, optional
         Describe ``query_encoder``.
         Defaults to ``'naver/splade-v3-distilbert'``.
-        
+
 
     Raises
     ------
     RuntimeError
     Raised when TODO for RuntimeError.
-"""
+    """
 
     def __init__(self, index_dir: str, query_encoder: str = "naver/splade-v3-distilbert") -> None:
         """Describe   init  .
@@ -352,7 +389,7 @@ class LuceneImpactIndex:
         query_encoder : str, optional
             Describe ``query_encoder``.
             Defaults to ``'naver/splade-v3-distilbert'``.
-"""
+        """
         self.index_dir = index_dir
         self.query_encoder = query_encoder
         self._searcher: Any | None = None
@@ -368,13 +405,14 @@ class LuceneImpactIndex:
         ------
         RuntimeError
         Raised when TODO for RuntimeError.
-"""
+        """
         if self._searcher is not None:
             return
         try:
-            from pyserini.search.lucene import LuceneImpactSearcher
+            from pyserini.search.lucene import LuceneImpactSearcher  # noqa: PLC0415
         except Exception as exc:  # pragma: no cover - defensive for optional dep
             message = "Pyserini not available for SPLADE impact search"
+            logger.exception("Failed to import LuceneImpactSearcher")
             raise RuntimeError(message) from exc
         self._searcher = LuceneImpactSearcher(self.index_dir, query_encoder=self.query_encoder)
 
@@ -391,28 +429,28 @@ class LuceneImpactIndex:
             Describe ``query``.
         k : int
             Describe ``k``.
-            
+
 
         Returns
         -------
         list[tuple[str, float]]
             Describe return value.
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+
+
+
+
+
+
+
+
+
+
 
         Raises
         ------
         RuntimeError
         Raised when TODO for RuntimeError.
-"""
+        """
         self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
@@ -442,16 +480,20 @@ def get_splade(
     query_encoder : str, optional
         Describe ``query_encoder``.
         Defaults to ``'naver/splade-v3-distilbert'``.
-        
+
 
     Returns
     -------
     PureImpactIndex | LuceneImpactIndex
         Describe return value.
-"""
+    """
     if backend == "lucene":
         try:
             return LuceneImpactIndex(index_dir=index_dir, query_encoder=query_encoder)
-        except Exception:  # pragma: no cover - fallback to pure-python path
-            pass
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                "Failed to create LuceneImpactIndex, falling back to PureImpactIndex: %s",
+                exc,
+                exc_info=True,
+            )
     return PureImpactIndex(index_dir)

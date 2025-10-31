@@ -10,7 +10,6 @@ import sys
 from collections.abc import Callable
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any
 
 from kgfoundry.agent_catalog.audit import AuditLogger
 from kgfoundry.agent_catalog.client import AgentCatalogClient, AgentCatalogClientError
@@ -19,15 +18,7 @@ from kgfoundry.agent_catalog.rbac import AccessController, Role
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-JsonValue = (
-    None
-    | bool
-    | int
-    | float
-    | str
-    | list["JsonValue"]
-    | dict[str, "JsonValue"]
-)
+JsonValue = None | bool | int | float | str | list["JsonValue"] | dict[str, "JsonValue"]
 JsonObject = dict[str, JsonValue]
 
 DEFAULT_CATALOG = Path("docs/_build/agent_catalog.json")
@@ -36,7 +27,6 @@ DEFAULT_AUDIT_LOG = Path("docs/_build/agent/audit.log")
 
 def build_parser() -> argparse.ArgumentParser:
     """Return an argument parser for the stdio server."""
-
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--catalog",
@@ -83,7 +73,6 @@ class CatalogSessionServerError(RuntimeError):
 
     def to_problem(self) -> JsonObject:
         """Return an RFC 9457 Problem Details document."""
-
         return {
             "type": "about:blank",
             "title": self.title,
@@ -147,7 +136,9 @@ class CatalogSessionServer:
             self._audit.log(action=method, role=self._role, status="catalog-error", detail=str(exc))
             raise CatalogSessionServerError(404, "catalog-error", str(exc)) from exc
         except (TypeError, ValueError) as exc:
-            self._audit.log(action=method, role=self._role, status="invalid-params", detail=str(exc))
+            self._audit.log(
+                action=method, role=self._role, status="invalid-params", detail=str(exc)
+            )
             raise CatalogSessionServerError(400, "invalid-params", str(exc)) from exc
         self._audit.log(action=method, role=self._role, status="ok")
         return result
@@ -229,11 +220,9 @@ class CatalogSessionServer:
 
     def _handle_shutdown(self, _: JsonObject) -> None:
         self._shutdown = True
-        return None
 
     def _handle_exit(self, _: JsonObject) -> None:
         self._shutdown = True
-        return None
 
 
 def _resolve_role(value: str) -> Role:
@@ -246,7 +235,6 @@ def _resolve_role(value: str) -> Role:
 
 def main(argv: list[str] | None = None) -> int:
     """Run the stdio session server."""
-
     parser = build_parser()
     args = parser.parse_args(argv)
     catalog_path = args.catalog
@@ -268,5 +256,4 @@ def main(argv: list[str] | None = None) -> int:
     return server.serve()
 
 
-__all__ = ["build_parser", "main", "CatalogSessionServer", "CatalogSessionServerError"]
-
+__all__ = ["CatalogSessionServer", "CatalogSessionServerError", "build_parser", "main"]

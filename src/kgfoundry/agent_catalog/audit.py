@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -19,11 +19,10 @@ class AuditLogger:
 
     def log(self, *, action: str, role: str, status: str, detail: str | None = None) -> None:
         """Append an audit entry if logging is enabled."""
-
         if not self._enabled:
             return
         payload: dict[str, Any] = {
-            "timestamp": datetime.now(tz=timezone.utc).isoformat(),
+            "timestamp": datetime.now(tz=UTC).isoformat(),
             "action": action,
             "role": role,
             "status": status,
@@ -36,4 +35,3 @@ class AuditLogger:
 
 
 __all__ = ["AuditLogger"]
-

@@ -9,12 +9,12 @@ from __future__ import annotations
 
 from typing import Final
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.pydantic import BaseModel
 
-__all__ = ["SearchRequest", "SearchResult"]
+__all__ = ["SearchRequest", "SearchResponse", "SearchResult"]
 
 __navmap__: Final[NavMap] = {
     "title": "search_api.schemas",
@@ -43,6 +43,23 @@ __navmap__: Final[NavMap] = {
 }
 
 
+# [nav:anchor SearchResponse]
+class SearchResponse(BaseModel):
+    """Search API response containing results.
+
+    Response envelope for search API endpoints.
+
+    Parameters
+    ----------
+    results : list[SearchResult]
+        List of search results.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    results: list[SearchResult] = Field(default_factory=list)
+
+
 # [nav:anchor SearchRequest]
 class SearchRequest(BaseModel):
     """Describe SearchRequest.
@@ -65,7 +82,22 @@ class SearchRequest(BaseModel):
     explain : bool, optional
         Describe ``explain``.
         Defaults to ``False``.
-"""
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> from kgfoundry_common.schema_helpers import assert_model_roundtrip
+    >>> example_path = (
+    ...     Path(__file__).parent.parent.parent
+    ...     / "schema"
+    ...     / "examples"
+    ...     / "search_api"
+    ...     / "search_request.v1.json"
+    ... )
+    >>> assert_model_roundtrip(SearchRequest, example_path)
+    """
+
+    model_config = ConfigDict(extra="forbid")
 
     query: str = Field(min_length=1)
     k: int = 10
@@ -103,7 +135,22 @@ class SearchResult(BaseModel):
     concepts : list[dict[str, str]], optional
         Describe ``concepts``.
         Defaults to ``<factory>``.
-"""
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> from kgfoundry_common.schema_helpers import assert_model_roundtrip
+    >>> example_path = (
+    ...     Path(__file__).parent.parent.parent
+    ...     / "schema"
+    ...     / "examples"
+    ...     / "search_api"
+    ...     / "search_result.v1.json"
+    ... )
+    >>> assert_model_roundtrip(SearchResult, example_path)
+    """
+
+    model_config = ConfigDict(extra="forbid")
 
     doc_id: str
     chunk_id: str

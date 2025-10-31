@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections.abc import Callable
 from dataclasses import asdict
 from pathlib import Path
-import sys
 
 from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.client import AgentCatalogClient, AgentCatalogClientError
@@ -23,7 +23,6 @@ class CatalogctlError(RuntimeError):
 
 def _parse_facets(raw: list[str]) -> dict[str, str]:
     """Return a mapping of facet filters parsed from ``raw`` expressions."""
-
     facets: dict[str, str] = {}
     for value in raw:
         if "=" not in value:
@@ -39,20 +38,17 @@ def _parse_facets(raw: list[str]) -> dict[str, str]:
 
 def _render_json(payload: object) -> None:
     """Write ``payload`` as formatted JSON to stdout."""
-
     json.dump(payload, fp=sys.stdout, indent=2, ensure_ascii=False)
     sys.stdout.write("\n")
 
 
 def _render_error(message: str) -> None:
     """Render ``message`` to stderr with a trailing newline."""
-
     sys.stderr.write(f"{message}\n")
 
 
 def build_parser() -> argparse.ArgumentParser:
     """Return the argument parser configured for the CLI."""
-
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--catalog",
@@ -117,7 +113,6 @@ def build_parser() -> argparse.ArgumentParser:
 
 def _load_client(args: argparse.Namespace) -> AgentCatalogClient:
     """Return an ``AgentCatalogClient`` configured from CLI arguments."""
-
     catalog_path = args.catalog
     if not catalog_path.exists():
         if not any(candidate.exists() for candidate in sqlite_candidates(catalog_path)):
@@ -132,14 +127,12 @@ def _load_client(args: argparse.Namespace) -> AgentCatalogClient:
 
 def _cmd_capabilities(client: AgentCatalogClient, _: argparse.Namespace) -> None:
     """Render the available packages in the catalog."""
-
     packages = [pkg.name for pkg in client.list_packages()]
     _render_json(packages)
 
 
 def _cmd_symbol(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render the catalog entry for a specific symbol."""
-
     symbol = client.get_symbol(args.symbol_id)
     if symbol is None:
         message = f"Unknown symbol: {args.symbol_id}"
@@ -149,37 +142,31 @@ def _cmd_symbol(client: AgentCatalogClient, args: argparse.Namespace) -> None:
 
 def _cmd_find_callers(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render callers recorded for a symbol."""
-
     _render_json(client.find_callers(args.symbol_id))
 
 
 def _cmd_find_callees(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render callees recorded for a symbol."""
-
     _render_json(client.find_callees(args.symbol_id))
 
 
 def _cmd_change_impact(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render change impact metadata for a symbol."""
-
     _render_json(client.change_impact(args.symbol_id).model_dump())
 
 
 def _cmd_suggest_tests(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render suggested tests for a symbol."""
-
     _render_json(client.suggest_tests(args.symbol_id))
 
 
 def _cmd_open_anchor(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render editor and GitHub anchors for a symbol."""
-
     _render_json(client.open_anchor(args.symbol_id))
 
 
 def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Execute hybrid search and render the resulting documents."""
-
     try:
         facets = _parse_facets(args.facet)
     except CatalogctlError as exc:
@@ -197,7 +184,6 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
 
 def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render hybrid search results with detailed scoring metadata."""
-
     options = SearchOptions(candidate_pool=max(10, args.k))
     results = catalog_search.search_catalog(
         client.catalog.model_dump(),
@@ -211,7 +197,6 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
 
 def _cmd_list_modules(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render the module names for a package."""
-
     _render_json([module.qualified for module in client.list_modules(args.package)])
 
 
@@ -231,7 +216,6 @@ COMMANDS: dict[str, CommandHandler] = {
 
 def main(argv: list[str] | None = None) -> int:
     """Execute the CLI and return an exit code."""
-
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
@@ -251,4 +235,3 @@ def main(argv: list[str] | None = None) -> int:
 
 
 __all__ = ["build_parser", "main"]
-

@@ -59,7 +59,7 @@ class DuckDBRegistryHelper:
     ----------
     db_path : str
         Describe ``db_path``.
-"""
+    """
 
     def __init__(self, db_path: str) -> None:
         """Describe   init  .
@@ -72,7 +72,7 @@ class DuckDBRegistryHelper:
         ----------
         db_path : str
             Describe ``db_path``.
-"""
+        """
         self.db_path = db_path
 
     def _con(self) -> duckdb.DuckDBPyConnection:
@@ -86,7 +86,7 @@ class DuckDBRegistryHelper:
         -------
         _duckdb.DuckDBPyConnection
             Describe return value.
-"""
+        """
         return duckdb.connect(self.db_path)
 
     def new_run(
@@ -112,13 +112,13 @@ class DuckDBRegistryHelper:
             Describe ``revision``.
         config : Mapping[str, object]
             Describe ``config``.
-            
+
 
         Returns
         -------
         str
             Describe return value.
-"""
+        """
         run_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -148,7 +148,7 @@ class DuckDBRegistryHelper:
         notes : str | None, optional
             Describe ``notes``.
             Defaults to ``None``.
-"""
+        """
         con = self._con()
         con.execute("UPDATE runs SET finished_at=CURRENT_TIMESTAMP WHERE run_id=?", [run_id])
         con.execute(
@@ -175,13 +175,13 @@ class DuckDBRegistryHelper:
             Describe ``kind``.
         run_id : str
             Describe ``run_id``.
-            
+
 
         Returns
         -------
         str
             Describe return value.
-"""
+        """
         dataset_id = str(uuid.uuid4())
         con = self._con()
         con.execute(
@@ -210,7 +210,7 @@ class DuckDBRegistryHelper:
             Describe ``parquet_root``.
         rows : int
             Describe ``rows``.
-"""
+        """
         con = self._con()
         con.execute(
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?", [parquet_root, dataset_id]
@@ -237,7 +237,7 @@ class DuckDBRegistryHelper:
         ----------
         dataset_id : str
             Describe ``dataset_id``.
-"""
+        """
         con = self._con()
         con.execute("DELETE FROM datasets WHERE dataset_id=?", [dataset_id])
         con.execute(
@@ -257,7 +257,7 @@ class DuckDBRegistryHelper:
         ----------
         docs : list[Doc]
             Describe ``docs``.
-"""
+        """
         con = self._con()
         for doc in docs:
             con.execute(
@@ -294,7 +294,7 @@ class DuckDBRegistryHelper:
         ----------
         assets : list[DoctagsAsset]
             Describe ``assets``.
-"""
+        """
         con = self._con()
         for asset in assets:
             con.execute(
@@ -325,7 +325,7 @@ class DuckDBRegistryHelper:
             Describe ``subject_id``.
         payload : Mapping[str, object]
             Describe ``payload``.
-"""
+        """
         con = self._con()
         con.execute(
             "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",

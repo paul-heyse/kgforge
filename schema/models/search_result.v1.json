@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kgfoundry.dev/schemas/search_api/search_result.v1.json",
+  "title": "Search Result",
+  "description": "Schema for search API result items",
+  "type": "object",
+  "properties": {
+    "doc_id": {
+      "type": "string",
+      "description": "Document ID"
+    },
+    "chunk_id": {
+      "type": "string",
+      "description": "Chunk ID within the document"
+    },
+    "title": {
+      "type": "string",
+      "description": "Document title"
+    },
+    "section": {
+      "type": "string",
+      "description": "Section name or identifier"
+    },
+    "score": {
+      "type": "number",
+      "description": "Relevance score"
+    },
+    "signals": {
+      "type": "object",
+      "description": "Additional scoring signals",
+      "additionalProperties": {
+        "type": "number"
+      },
+      "default": {}
+    },
+    "spans": {
+      "type": "object",
+      "description": "Character spans for highlighting",
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "default": {}
+    },
+    "concepts": {
+      "type": "array",
+      "description": "Linked concepts or entities",
+      "items": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "default": []
+    }
+  },
+  "required": ["doc_id", "chunk_id", "title", "section", "score"],
+  "additionalProperties": false,
+  "x-version": "1.0.0",
+  "x-compatibility-notes": "Initial version. Breaking changes will increment major version."
+}
+

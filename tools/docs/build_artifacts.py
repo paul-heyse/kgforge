@@ -72,7 +72,9 @@ STEPS: list[tuple[str, list[str], str]] = [
 
 def _run_step(name: str, command: list[str], message: str) -> int:
     """Execute a single artefact regeneration step."""
-    result = subprocess.run(command, cwd=REPO_ROOT, check=False)  # noqa: S603 - commands are static python invocations
+    result = subprocess.run(
+        command, cwd=REPO_ROOT, check=False
+    )
     if result.returncode != 0:
         sys.stderr.write(f"[artifacts] {name} failed (exit {result.returncode})\n")
         return result.returncode
