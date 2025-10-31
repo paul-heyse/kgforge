@@ -19,10 +19,14 @@ import logging
 import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Any, Final
+from typing import TYPE_CHECKING, Any, Final
 
 from kgfoundry_common.navmap_types import NavMap
-from kgfoundry_common.problem_details import JsonValue
+
+if TYPE_CHECKING:
+    from kgfoundry_common.problem_details import JsonValue
+else:  # pragma: no cover - runtime fallback avoids circular import
+    JsonValue = object  # type: ignore[assignment]
 
 __all__ = [
     "CorrelationContext",
@@ -70,8 +74,28 @@ _correlation_id: contextvars.ContextVar[str | None] = contextvars.ContextVar(
 class JsonFormatter(logging.Formatter):
     """JSON formatter for structured logging.
 
+    <!-- auto:docstring-builder v1 -->
+
     Formats log records as JSON with timestamp, level, name, message,
     and structured fields (correlation_id, operation, status, duration_ms).
+
+    Parameters
+    ----------
+    fmt : inspect._empty, optional
+        Describe ``fmt``.
+        Defaults to ``None``.
+    datefmt : inspect._empty, optional
+        Describe ``datefmt``.
+        Defaults to ``None``.
+    style : inspect._empty, optional
+        Describe ``style``.
+        Defaults to ``'%'``.
+    validate : inspect._empty, optional
+        Describe ``validate``.
+        Defaults to ``True``.
+    defaults : inspect._empty, optional
+        Describe ``defaults``.
+        Defaults to ``None``.
 
     Examples
     --------
@@ -81,10 +105,17 @@ class JsonFormatter(logging.Formatter):
     >>> logger = logging.getLogger("test")
     >>> logger.addHandler(handler)
     >>> logger.info("Test message", extra={"operation": "test", "status": "success"})
-    """
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+"""
 
     def format(self, record: logging.LogRecord) -> str:
         """Format log record as JSON.
+
+        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
@@ -95,7 +126,7 @@ class JsonFormatter(logging.Formatter):
         -------
         str
             JSON-encoded log entry.
-        """
+"""
         # Log data is JSON-serializable - use JsonValue instead of Any
         data: dict[str, JsonValue] = {
             "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
@@ -161,9 +192,22 @@ class JsonFormatter(logging.Formatter):
 class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]  # pyrefly doesn't support GenericAlias
     """Logger adapter that injects structured context fields.
 
+    <!-- auto:docstring-builder v1 -->
+
     This adapter ensures that all log entries include correlation_id,
     operation, status, and duration_ms fields. It propagates correlation
     IDs from context variables for async-safe operation.
+
+    Parameters
+    ----------
+    logger : inspect._empty
+        Describe ``logger``.
+    extra : inspect._empty, optional
+        Describe ``extra``.
+        Defaults to ``None``.
+    merge_extra : inspect._empty, optional
+        Describe ``merge_extra``.
+        Defaults to ``False``.
 
     Examples
     --------
@@ -171,10 +215,17 @@ class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]  # pyrefly
     >>> logger = get_logger(__name__)
     >>> logger.info("Search started", extra={"operation": "search", "status": "started"})
     >>> # Correlation ID is automatically injected from context
-    """
 
-    def process(self, msg: str, kwargs: Any) -> tuple[str, Any]:  # LoggerAdapter uses Any
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+"""
+
+    def process(self, msg: str, kwargs: Any) -> tuple[str, Any]:  # noqa: ANN401
         """Process log message and inject structured fields.
+
+        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
@@ -187,7 +238,7 @@ class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]  # pyrefly
         -------
         tuple[str, Any]
             Processed message and kwargs with injected fields.
-        """
+"""
         if not isinstance(kwargs, dict):
             return msg, kwargs
 
@@ -214,13 +265,15 @@ class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]  # pyrefly
     def _ensure_operation_and_status(self, extra: dict[str, Any], kwargs: dict[str, Any]) -> None:
         """Ensure operation and status fields are present in extra dict.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         extra : dict[str, Any]
             Extra dict to populate.
         kwargs : dict[str, Any]
             Keyword arguments containing log level.
-        """
+"""
         if "operation" not in extra:
             extra["operation"] = "unknown"
         if "status" not in extra:
@@ -236,6 +289,8 @@ class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]  # pyrefly
 
 def get_logger(name: str) -> LoggerAdapter:
     """Get a logger adapter with structured logging support.
+
+    <!-- auto:docstring-builder v1 -->
 
     Module-level loggers use NullHandler to prevent duplicate handlers
     in libraries. Applications should configure handlers via setup_logging().
@@ -255,7 +310,7 @@ def get_logger(name: str) -> LoggerAdapter:
     >>> from kgfoundry_common.logging import get_logger
     >>> logger = get_logger(__name__)
     >>> logger.info("Operation complete", extra={"operation": "index_build", "status": "success"})
-    """
+"""
     logger = logging.getLogger(name)
 
     # Add NullHandler if no handlers exist (prevents duplicate handlers in libraries)
@@ -268,6 +323,8 @@ def get_logger(name: str) -> LoggerAdapter:
 def setup_logging(level: int = logging.INFO) -> None:
     """Configure root logger with JSON formatter.
 
+    <!-- auto:docstring-builder v1 -->
+
     This function sets up structured JSON logging to stdout. It should
     be called once at application startup.
 
@@ -275,13 +332,14 @@ def setup_logging(level: int = logging.INFO) -> None:
     ----------
     level : int, optional
         Logging level (default: logging.INFO).
+        Defaults to ``20``.
 
     Examples
     --------
     >>> from kgfoundry_common.logging import setup_logging
     >>> import logging
     >>> setup_logging(level=logging.DEBUG)
-    """
+"""
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())
     logging.basicConfig(level=level, handlers=[handler], force=True)
@@ -290,13 +348,15 @@ def setup_logging(level: int = logging.INFO) -> None:
 def set_correlation_id(correlation_id: str | None) -> None:
     """Set correlation ID in context for async propagation.
 
+    <!-- auto:docstring-builder v1 -->
+
     This function uses `contextvars.ContextVar` to ensure correlation IDs
     propagate correctly through async tasks and thread pools without
     cross-contamination between concurrent requests.
 
     Parameters
     ----------
-    correlation_id : str | None
+    correlation_id : str | NoneType
         Correlation ID to set (or None to clear).
 
     Examples
@@ -315,16 +375,18 @@ def set_correlation_id(correlation_id: str | None) -> None:
       IDs between different threads/async tasks.
     - **Cancellation**: If an async task is cancelled, the correlation ID
       context is automatically cleaned up.
-    """
+"""
     _correlation_id.set(correlation_id)
 
 
 def get_correlation_id() -> str | None:
     """Get current correlation ID from context.
 
+    <!-- auto:docstring-builder v1 -->
+
     Returns
     -------
-    str | None
+    str | NoneType
         Current correlation ID or None if not set.
 
     Examples
@@ -332,16 +394,23 @@ def get_correlation_id() -> str | None:
     >>> from kgfoundry_common.logging import set_correlation_id, get_correlation_id
     >>> set_correlation_id("req-123")
     >>> assert get_correlation_id() == "req-123"
-    """
+"""
     return _correlation_id.get()
 
 
 class CorrelationContext:
     """Context manager for correlation ID propagation using contextvars.
 
+    <!-- auto:docstring-builder v1 -->
+
     This class manages correlation ID context using `contextvars.ContextVar`,
     ensuring IDs propagate correctly through async tasks and thread pools
     without cross-contamination between concurrent requests.
+
+    Parameters
+    ----------
+    correlation_id : str | None
+        Describe ``correlation_id``.
 
     Examples
     --------
@@ -350,32 +419,38 @@ class CorrelationContext:
     >>> with CorrelationContext(correlation_id="req-123"):
     ...     logger.info("Request started")  # correlation_id="req-123" auto-injected
     >>> # Correlation ID is automatically cleared when context exits
-    """
+"""
 
     def __init__(self, correlation_id: str | None) -> None:
         """Initialize correlation context.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
-        correlation_id : str | None
+        correlation_id : str | NoneType
             Correlation ID to set in context (or None to clear).
-        """
+"""
         self.correlation_id = correlation_id
         self._token: contextvars.Token[str | None] | None = None
 
     def __enter__(self) -> CorrelationContext:
         """Enter correlation context and set correlation ID.
 
+        <!-- auto:docstring-builder v1 -->
+
         Returns
         -------
         CorrelationContext
             Self for use as context manager.
-        """
+"""
         self._token = _correlation_id.set(self.correlation_id)
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:  # noqa: ANN401
         """Exit correlation context and restore previous correlation ID.
+
+        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
@@ -385,7 +460,7 @@ class CorrelationContext:
             Exception value (if any).
         exc_tb : Any
             Exception traceback (if any).
-        """
+"""
         if self._token is not None:
             _correlation_id.reset(self._token)
 
@@ -396,6 +471,8 @@ def with_fields(
     **fields: object,
 ) -> Iterator[LoggerAdapter]:
     """Context manager for attaching structured fields to log entries.
+
+    <!-- auto:docstring-builder v1 -->
 
     This function provides a context manager that:
     1. Sets correlation_id in contextvars if provided
@@ -432,7 +509,12 @@ def with_fields(
       fields in `extra` dicts passed to log calls.
     - **NullHandler**: Libraries should use `get_logger()` which adds NullHandler
       to prevent duplicate handlers in applications.
-    """
+
+    Returns
+    -------
+    LoggerAdapter
+        Describe return value.
+"""
     # Extract underlying logger if already wrapped
     base_logger = logger.logger if isinstance(logger, LoggerAdapter) else logger
 

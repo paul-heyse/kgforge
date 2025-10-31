@@ -21,8 +21,7 @@ Examples
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping, Sequence
-from typing import TYPE_CHECKING, Any
+from collections.abc import Mapping
 
 __all__ = [
     "JsonPrimitive",
@@ -35,14 +34,9 @@ __all__ = [
 
 # Type aliases for JSON values (RFC 7159 compatible)
 JsonPrimitive = str | int | float | bool | None
+JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
 
-if TYPE_CHECKING:
-    JsonValue = JsonPrimitive | Sequence[Any] | Mapping[str, Any]
-else:
-    # Runtime alias for recursive JSON values
-    JsonValue: Any = Any  # type: ignore[misc,assignment]
-
-ProblemDetailsDict = Mapping[str, Any]
+ProblemDetailsDict = dict[str, JsonValue]
 
 
 def build_problem_details(  # noqa: PLR0913
@@ -52,8 +46,8 @@ def build_problem_details(  # noqa: PLR0913
     status: int,
     detail: str,
     instance: str,
-    extensions: Mapping[str, Any] | None = None,
-) -> dict[str, Any]:
+    extensions: Mapping[str, JsonValue] | None = None,
+) -> ProblemDetailsDict:
     """Build an RFC 9457 Problem Details payload.
 
     This function constructs a Problem Details dictionary conforming to
@@ -92,7 +86,7 @@ def build_problem_details(  # noqa: PLR0913
     >>> assert problem["type"] == "https://kgfoundry.dev/problems/tool-timeout"
     >>> assert problem["status"] == 504
     """
-    payload: dict[str, Any] = {
+    payload: ProblemDetailsDict = {
         "type": type,
         "title": title,
         "status": status,
@@ -100,7 +94,8 @@ def build_problem_details(  # noqa: PLR0913
         "instance": instance,
     }
     if extensions:
-        payload.update(extensions)
+        for key, value in extensions.items():
+            payload[key] = value
     return payload
 
 
@@ -111,8 +106,8 @@ def problem_from_exception(  # noqa: PLR0913
     title: str,
     status: int,
     instance: str,
-    extensions: Mapping[str, Any] | None = None,
-) -> dict[str, Any]:
+    extensions: Mapping[str, JsonValue] | None = None,
+) -> ProblemDetailsDict:
     """Build Problem Details from an exception.
 
     This function extracts detail from the exception message and optionally
@@ -154,11 +149,10 @@ def problem_from_exception(  # noqa: PLR0913
     """
     detail = str(exc)
     exc_type_name = exc.__class__.__name__
-    merged_extensions: dict[str, Any] = {
-        "exception_type": exc_type_name,
-    }
+    merged_extensions: dict[str, JsonValue] = {"exception_type": exc_type_name}
     if extensions:
-        merged_extensions.update(extensions)
+        for key, value in extensions.items():
+            merged_extensions[key] = value
     return build_problem_details(
         type=type,
         title=title,

@@ -25,8 +25,20 @@ BASE_TYPE_URI: Final[str] = "https://kgfoundry.dev/problems"
 class ErrorCode(str, Enum):
     """Stable error codes for kgfoundry exceptions.
 
+    <!-- auto:docstring-builder v1 -->
+
     Codes follow kebab-case naming and remain stable across releases.
-    """
+
+    Parameters
+    ----------
+    *values : inspect._empty
+        Describe ``values``.
+
+    Returns
+    -------
+    inspect._empty
+        Describe return value.
+"""
 
     # Download & Ingestion (1xx)
     DOWNLOAD_FAILED = "download-failed"
@@ -69,12 +81,22 @@ class ErrorCode(str, Enum):
     REGISTRY_ERROR = "registry-error"
 
     def __str__(self) -> str:
-        """Return the code value."""
+        """Return the code value.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Returns
+        -------
+        str
+            Describe return value.
+"""
         return self.value
 
 
 def get_type_uri(code: ErrorCode) -> str:
     """Get the RFC 9457 type URI for an error code.
+
+    <!-- auto:docstring-builder v1 -->
 
     Parameters
     ----------
@@ -90,5 +112,5 @@ def get_type_uri(code: ErrorCode) -> str:
     --------
     >>> get_type_uri(ErrorCode.DOWNLOAD_FAILED)
     'https://kgfoundry.dev/problems/download-failed'
-    """
+"""
     return f"{BASE_TYPE_URI}/{code.value}"

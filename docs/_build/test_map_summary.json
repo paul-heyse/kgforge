@@ -1,168 +1,163 @@
 {
-  "kg_builder.__init__": {
+  "embeddings_sparse.__init__": {
     "untested_top10": [
-      "kg_builder.__init__.neo4j_store",
-      "kg_builder.__init__.mock_kg"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 2,
-    "untested_count": 2
-  },
-  "kgfoundry.registry.migrate": {
-    "untested_top10": [
-      "kgfoundry.registry.migrate.apply",
-      "kgfoundry.registry.migrate.main"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 2,
-    "untested_count": 2
-  },
-  "search_api.bm25_index": {
-    "untested_top10": [
-      "search_api.bm25_index.BM25Doc",
-      "search_api.bm25_index.toks",
-      "search_api.bm25_index.BM25Index"
+      "embeddings_sparse.__init__.bm25",
+      "embeddings_sparse.__init__.splade",
+      "embeddings_sparse.__init__.base"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 3,
     "untested_count": 3
   },
-  "vectorstore_faiss.__init__": {
+  "search_api.types": {
     "untested_top10": [
-      "vectorstore_faiss.__init__.gpu"
+      "search_api.types.GpuClonerOptionsProtocol",
+      "search_api.types.AgentSearchResponse",
+      "search_api.types.SpladeEncoderProtocol",
+      "search_api.types.GpuResourcesProtocol",
+      "search_api.types.FaissIndexProtocol",
+      "search_api.types.AgentSearchQuery",
+      "search_api.types.VectorSearchResultTypedDict",
+      "search_api.types.VectorSearchResult",
+      "search_api.types.IndexArray",
+      "search_api.types.BM25IndexProtocol"
     ],
     "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
+    "public_count": 12,
+    "untested_count": 12
+  },
+  "kgfoundry.search_api.app": {
+    "untested_top10": [
+      "kgfoundry.search_api.app.apply_kg_boosts",
+      "kgfoundry.search_api.app.auth",
+      "kgfoundry.search_api.app.bm25",
+      "kgfoundry.search_api.app.graph_concepts",
+      "kgfoundry.search_api.app.rrf_fuse",
+      "kgfoundry.search_api.app.app",
+      "kgfoundry.search_api.app.search",
+      "kgfoundry.search_api.app.healthz"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 8,
+    "untested_count": 8
+  },
+  "kgfoundry_common.errors": {
+    "untested_top10": [
+      "kgfoundry_common.errors.IndexBuildError",
+      "kgfoundry_common.errors.SpladeOOMError",
+      "kgfoundry_common.errors.Neo4jError",
+      "kgfoundry_common.errors.DownloadError",
+      "kgfoundry_common.errors.LinkerCalibrationError",
+      "kgfoundry_common.errors.DoclingError",
+      "kgfoundry_common.errors.ChunkingError",
+      "kgfoundry_common.errors.EmbeddingError",
+      "kgfoundry_common.errors.OntologyParseError",
+      "kgfoundry_common.errors.UnsupportedMIMEError"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 11,
+    "untested_count": 11
   },
   "docling.__init__": {
     "untested_top10": [
-      "docling.__init__.vlm",
       "docling.__init__.canonicalizer",
-      "docling.__init__.hybrid"
+      "docling.__init__.hybrid",
+      "docling.__init__.vlm"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 3,
     "untested_count": 3
   },
-  "kgfoundry.search_api.faiss_adapter": {
+  "embeddings_sparse.bm25": {
     "untested_top10": [
-      "kgfoundry.search_api.faiss_adapter.FaissAdapter",
-      "kgfoundry.search_api.faiss_adapter.VecArray",
-      "kgfoundry.search_api.faiss_adapter.DenseVecs",
-      "kgfoundry.search_api.faiss_adapter.HAVE_FAISS"
+      "embeddings_sparse.bm25.get_bm25",
+      "embeddings_sparse.bm25.PurePythonBM25",
+      "embeddings_sparse.bm25.LuceneBM25",
+      "embeddings_sparse.bm25.BM25Doc"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 4,
     "untested_count": 4
   },
-  "orchestration.__init__": {
+  "registry.__init__": {
     "untested_top10": [
-      "orchestration.__init__.flows",
-      "orchestration.__init__.fixture_flow",
-      "orchestration.__init__.cli"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 3,
-    "untested_count": 3
-  },
-  "orchestration.fixture_flow": {
-    "untested_top10": [
-      "orchestration.fixture_flow.t_write_fixture_chunks",
-      "orchestration.fixture_flow.fixture_pipeline",
-      "orchestration.fixture_flow.t_write_fixture_dense",
-      "orchestration.fixture_flow.t_prepare_dirs",
-      "orchestration.fixture_flow.t_register_in_duckdb",
-      "orchestration.fixture_flow.t_write_fixture_splade"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 6,
-    "untested_count": 6
-  },
-  "kgfoundry_common.navmap_types": {
-    "untested_top10": [
-      "kgfoundry_common.navmap_types.NavMap",
-      "kgfoundry_common.navmap_types.Stability",
-      "kgfoundry_common.navmap_types.SymbolMeta",
-      "kgfoundry_common.navmap_types.ModuleMeta",
-      "kgfoundry_common.navmap_types.NavSection"
+      "registry.__init__.api",
+      "registry.__init__.migrate",
+      "registry.__init__.duckdb_registry",
+      "registry.__init__.helper",
+      "registry.__init__.duckdb_helpers"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 5,
     "untested_count": 5
   },
-  "vectorstore_faiss.gpu": {
+  "kgfoundry.agent_catalog.audit": {
     "untested_top10": [
-      "vectorstore_faiss.gpu.StrArray",
-      "vectorstore_faiss.gpu.FloatArray",
-      "vectorstore_faiss.gpu.FaissGpuIndex",
-      "vectorstore_faiss.gpu.IntArray"
+      "kgfoundry.agent_catalog.audit.AuditLogger"
     ],
     "coverage_ratio_avg": 0.0,
-    "public_count": 4,
-    "untested_count": 4
+    "public_count": 1,
+    "untested_count": 1
   },
-  "download.__init__": {
+  "kgfoundry_common.__init__": {
     "untested_top10": [
-      "download.__init__.harvester",
-      "download.__init__.cli"
+      "kgfoundry_common.__init__.models",
+      "kgfoundry_common.__init__.parquet_io",
+      "kgfoundry_common.__init__.fs",
+      "kgfoundry_common.__init__.navmap_types",
+      "kgfoundry_common.__init__.observability",
+      "kgfoundry_common.__init__.exceptions",
+      "kgfoundry_common.__init__.settings",
+      "kgfoundry_common.__init__.config",
+      "kgfoundry_common.__init__.schema_helpers",
+      "kgfoundry_common.__init__.ids"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 13,
+    "untested_count": 13
+  },
+  "registry.api": {
+    "untested_top10": [
+      "registry.api.Registry"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
+  "registry.migrate": {
+    "untested_top10": [
+      "registry.migrate.main",
+      "registry.migrate.apply"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 2,
     "untested_count": 2
   },
-  "kgfoundry.search_client.client": {
+  "kgfoundry.vectorstore_faiss.gpu": {
     "untested_top10": [
-      "kgfoundry.search_client.client.SupportsResponse",
-      "kgfoundry.search_client.client.RequestsHttp",
-      "kgfoundry.search_client.client.KGFoundryClient",
-      "kgfoundry.search_client.client.SupportsHttp"
+      "kgfoundry.vectorstore_faiss.gpu.FaissGpuIndex",
+      "kgfoundry.vectorstore_faiss.gpu.IntArray",
+      "kgfoundry.vectorstore_faiss.gpu.StrArray",
+      "kgfoundry.vectorstore_faiss.gpu.FloatArray"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 4,
     "untested_count": 4
   },
-  "kgfoundry.orchestration.fixture_flow": {
+  "kgfoundry_common.logging": {
     "untested_top10": [
-      "kgfoundry.orchestration.fixture_flow.t_register_in_duckdb",
-      "kgfoundry.orchestration.fixture_flow.fixture_pipeline",
-      "kgfoundry.orchestration.fixture_flow.t_write_fixture_chunks",
-      "kgfoundry.orchestration.fixture_flow.t_prepare_dirs",
-      "kgfoundry.orchestration.fixture_flow.t_write_fixture_splade",
-      "kgfoundry.orchestration.fixture_flow.t_write_fixture_dense"
+      "kgfoundry_common.logging.JsonFormatter",
+      "kgfoundry_common.logging.get_logger",
+      "kgfoundry_common.logging.with_fields",
+      "kgfoundry_common.logging.set_correlation_id",
+      "kgfoundry_common.logging.get_correlation_id",
+      "kgfoundry_common.logging.LoggerAdapter",
+      "kgfoundry_common.logging.setup_logging",
+      "kgfoundry_common.logging.CorrelationContext"
     ],
     "coverage_ratio_avg": 0.0,
-    "public_count": 6,
-    "untested_count": 6
-  },
-  "embeddings_sparse.bm25": {
-    "untested_top10": [
-      "embeddings_sparse.bm25.get_bm25",
-      "embeddings_sparse.bm25.LuceneBM25",
-      "embeddings_sparse.bm25.BM25Doc",
-      "embeddings_sparse.bm25.PurePythonBM25"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 4,
-    "untested_count": 4
-  },
-  "search_api.fixture_index": {
-    "untested_top10": [
-      "search_api.fixture_index.tokenize",
-      "search_api.fixture_index.FixtureIndex",
-      "search_api.fixture_index.FixtureDoc"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 3,
-    "untested_count": 3
-  },
-  "embeddings_dense.base": {
-    "untested_top10": [
-      "embeddings_dense.base.DenseEmbeddingModel"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
+    "public_count": 8,
+    "untested_count": 8
   },
   "ontology.catalog": {
     "untested_top10": [
@@ -172,13 +167,246 @@
     "public_count": 1,
     "untested_count": 1
   },
+  "kgfoundry.agent_catalog.sqlite": {
+    "untested_top10": [
+      "kgfoundry.agent_catalog.sqlite.write_sqlite_catalog",
+      "kgfoundry.agent_catalog.sqlite.load_catalog_from_sqlite",
+      "kgfoundry.agent_catalog.sqlite.sqlite_candidates"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 3,
+    "untested_count": 3
+  },
+  "kgfoundry.agent_catalog.client": {
+    "untested_top10": [
+      "kgfoundry.agent_catalog.client.AgentCatalogClient",
+      "kgfoundry.agent_catalog.client.AgentCatalogClientError"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 2,
+    "untested_count": 2
+  },
+  "kgfoundry_common.navmap_types": {
+    "untested_top10": [
+      "kgfoundry_common.navmap_types.Stability",
+      "kgfoundry_common.navmap_types.NavMap",
+      "kgfoundry_common.navmap_types.SymbolMeta",
+      "kgfoundry_common.navmap_types.NavSection",
+      "kgfoundry_common.navmap_types.ModuleMeta"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 5,
+    "untested_count": 5
+  },
+  "kgfoundry_common.errors.exceptions": {
+    "untested_top10": [
+      "kgfoundry_common.errors.exceptions.VectorSearchError",
+      "kgfoundry_common.errors.exceptions.IndexBuildError",
+      "kgfoundry_common.errors.exceptions.DeserializationError",
+      "kgfoundry_common.errors.exceptions.SpladeOOMError",
+      "kgfoundry_common.errors.exceptions.OntologyParseError",
+      "kgfoundry_common.errors.exceptions.OCRTimeoutError",
+      "kgfoundry_common.errors.exceptions.CatalogSessionError",
+      "kgfoundry_common.errors.exceptions.ChunkingError",
+      "kgfoundry_common.errors.exceptions.KgFoundryError",
+      "kgfoundry_common.errors.exceptions.UnsupportedMIMEError"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 21,
+    "untested_count": 21
+  },
+  "kgfoundry_common.settings": {
+    "untested_top10": [
+      "kgfoundry_common.settings.RuntimeSettings",
+      "kgfoundry_common.settings.KgFoundrySettings",
+      "kgfoundry_common.settings.SearchConfig",
+      "kgfoundry_common.settings.load_settings",
+      "kgfoundry_common.settings.ObservabilityConfig",
+      "kgfoundry_common.settings.FaissConfig",
+      "kgfoundry_common.settings.SparseEmbeddingConfig"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 7,
+    "untested_count": 7
+  },
+  "kgfoundry.agent_catalog.session": {
+    "untested_top10": [
+      "kgfoundry.agent_catalog.session.JsonObject",
+      "kgfoundry.agent_catalog.session.CatalogSession",
+      "kgfoundry.agent_catalog.session.JsonValue",
+      "kgfoundry.agent_catalog.session.CatalogSessionError"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 4,
+    "untested_count": 4
+  },
+  "kgfoundry.agent_catalog.__init__": {
+    "untested_top10": [
+      "kgfoundry.agent_catalog.__init__.AccessController",
+      "kgfoundry.agent_catalog.__init__.AgentCatalogModel",
+      "kgfoundry.agent_catalog.__init__.AgentCatalogClient",
+      "kgfoundry.agent_catalog.__init__.search",
+      "kgfoundry.agent_catalog.__init__.write_sqlite_catalog",
+      "kgfoundry.agent_catalog.__init__.Role",
+      "kgfoundry.agent_catalog.__init__.load_catalog_from_sqlite",
+      "kgfoundry.agent_catalog.__init__.AuditLogger",
+      "kgfoundry.agent_catalog.__init__.CatalogSession",
+      "kgfoundry.agent_catalog.__init__.AgentCatalogClientError"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 13,
+    "untested_count": 13
+  },
+  "kgfoundry.embeddings_sparse.bm25": {
+    "untested_top10": [
+      "kgfoundry.embeddings_sparse.bm25.LuceneBM25",
+      "kgfoundry.embeddings_sparse.bm25.PurePythonBM25",
+      "kgfoundry.embeddings_sparse.bm25.BM25Doc",
+      "kgfoundry.embeddings_sparse.bm25.get_bm25"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 4,
+    "untested_count": 4
+  },
+  "kgfoundry.agent_catalog.rbac": {
+    "untested_top10": [
+      "kgfoundry.agent_catalog.rbac.AccessController",
+      "kgfoundry.agent_catalog.rbac.Role"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 2,
+    "untested_count": 2
+  },
+  "download.harvester": {
+    "untested_top10": [
+      "download.harvester.OpenAccessHarvester"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
+  "kgfoundry.search_client.__init__": {
+    "untested_top10": [
+      "kgfoundry.search_client.__init__.KGFoundryClient"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
+  "kg_builder.mock_kg": {
+    "untested_top10": [
+      "kg_builder.mock_kg.MockKG"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
+  "kgfoundry.search_api.faiss_adapter": {
+    "untested_top10": [
+      "kgfoundry.search_api.faiss_adapter.DenseVecs",
+      "kgfoundry.search_api.faiss_adapter.HAVE_FAISS",
+      "kgfoundry.search_api.faiss_adapter.FaissAdapter",
+      "kgfoundry.search_api.faiss_adapter.VecArray"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 4,
+    "untested_count": 4
+  },
+  "kgfoundry_common.exceptions": {
+    "untested_top10": [
+      "kgfoundry_common.exceptions.DownloadError",
+      "kgfoundry_common.exceptions.UnsupportedMIMEError"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 2,
+    "untested_count": 2
+  },
+  "kgfoundry.orchestration.fixture_flow": {
+    "untested_top10": [
+      "kgfoundry.orchestration.fixture_flow.t_register_in_duckdb",
+      "kgfoundry.orchestration.fixture_flow.t_prepare_dirs",
+      "kgfoundry.orchestration.fixture_flow.t_write_fixture_dense",
+      "kgfoundry.orchestration.fixture_flow.t_write_fixture_chunks",
+      "kgfoundry.orchestration.fixture_flow.fixture_pipeline",
+      "kgfoundry.orchestration.fixture_flow.t_write_fixture_splade"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 6,
+    "untested_count": 6
+  },
+  "kgfoundry_common.errors.codes": {
+    "untested_top10": [
+      "kgfoundry_common.errors.codes.ErrorCode",
+      "kgfoundry_common.errors.codes.get_type_uri",
+      "kgfoundry_common.errors.codes.BASE_TYPE_URI"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 3,
+    "untested_count": 3
+  },
+  "linking.linker": {
+    "untested_top10": [
+      "linking.linker.Linker"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
+  "kgfoundry_common.observability": {
+    "untested_top10": [
+      "kgfoundry_common.observability.observe_duration",
+      "kgfoundry_common.observability.start_span",
+      "kgfoundry_common.observability.MetricsProvider"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 3,
+    "untested_count": 3
+  },
+  "kgfoundry.agent_catalog.cli": {
+    "untested_top10": [
+      "kgfoundry.agent_catalog.cli.main",
+      "kgfoundry.agent_catalog.cli.build_parser"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 2,
+    "untested_count": 2
+  },
+  "orchestration.cli": {
+    "untested_top10": [
+      "orchestration.cli.api",
+      "orchestration.cli.index_faiss",
+      "orchestration.cli.e2e",
+      "orchestration.cli.index_bm25"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 4,
+    "untested_count": 4
+  },
+  "docling.hybrid": {
+    "untested_top10": [
+      "docling.hybrid.HybridChunker"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
+  "search_api.splade_index": {
+    "untested_top10": [
+      "search_api.splade_index.SpladeDoc",
+      "search_api.splade_index.SpladeIndex",
+      "search_api.splade_index.tok"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 3,
+    "untested_count": 3
+  },
   "kgfoundry_common.models": {
     "untested_top10": [
-      "kgfoundry_common.models.Doc",
-      "kgfoundry_common.models.Chunk",
-      "kgfoundry_common.models.DoctagsAsset",
       "kgfoundry_common.models.Id",
-      "kgfoundry_common.models.LinkAssertion"
+      "kgfoundry_common.models.DoctagsAsset",
+      "kgfoundry_common.models.Chunk",
+      "kgfoundry_common.models.LinkAssertion",
+      "kgfoundry_common.models.Doc"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 5,
@@ -193,14 +421,102 @@
     "public_count": 2,
     "untested_count": 2
   },
-  "registry.migrate": {
+  "search_api.app": {
     "untested_top10": [
-      "registry.migrate.apply",
-      "registry.migrate.main"
+      "search_api.app.search",
+      "search_api.app.auth",
+      "search_api.app.healthz",
+      "search_api.app.ResponseValidationMiddleware",
+      "search_api.app.CorrelationIDMiddleware",
+      "search_api.app.app",
+      "search_api.app.graph_concepts"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 7,
+    "untested_count": 7
+  },
+  "search_api.service": {
+    "untested_top10": [
+      "search_api.service.apply_kg_boosts",
+      "search_api.service.rrf_fuse",
+      "search_api.service.search_service",
+      "search_api.service.mmr_deduplicate"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 4,
+    "untested_count": 4
+  },
+  "orchestration.fixture_flow": {
+    "untested_top10": [
+      "orchestration.fixture_flow.t_write_fixture_splade",
+      "orchestration.fixture_flow.t_register_in_duckdb",
+      "orchestration.fixture_flow.t_write_fixture_dense",
+      "orchestration.fixture_flow.fixture_pipeline",
+      "orchestration.fixture_flow.t_write_fixture_chunks",
+      "orchestration.fixture_flow.t_prepare_dirs"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 6,
+    "untested_count": 6
+  },
+  "embeddings_sparse.splade": {
+    "untested_top10": [
+      "embeddings_sparse.splade.PureImpactIndex",
+      "embeddings_sparse.splade.get_splade",
+      "embeddings_sparse.splade.SPLADEv3Encoder",
+      "embeddings_sparse.splade.LuceneImpactIndex"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 4,
+    "untested_count": 4
+  },
+  "kgfoundry.embeddings_sparse.base": {
+    "untested_top10": [
+      "kgfoundry.embeddings_sparse.base.SparseIndex",
+      "kgfoundry.embeddings_sparse.base.SparseEncoder"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 2,
     "untested_count": 2
+  },
+  "search_api.fixture_index": {
+    "untested_top10": [
+      "search_api.fixture_index.FixtureIndex",
+      "search_api.fixture_index.tokenize",
+      "search_api.fixture_index.FixtureDoc"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 3,
+    "untested_count": 3
+  },
+  "embeddings_sparse.base": {
+    "untested_top10": [
+      "embeddings_sparse.base.SparseEncoder",
+      "embeddings_sparse.base.SparseIndex"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 2,
+    "untested_count": 2
+  },
+  "kgfoundry.registry.migrate": {
+    "untested_top10": [
+      "kgfoundry.registry.migrate.main",
+      "kgfoundry.registry.migrate.apply"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 2,
+    "untested_count": 2
+  },
+  "search_client.client": {
+    "untested_top10": [
+      "search_client.client.SupportsHttp",
+      "search_client.client.KGFoundryClient",
+      "search_client.client.SupportsResponse",
+      "search_client.client.RequestsHttp"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 4,
+    "untested_count": 4
   },
   "search_api.faiss_adapter": {
     "untested_top10": [
@@ -212,108 +528,93 @@
     "public_count": 3,
     "untested_count": 3
   },
+  "registry.duckdb_helpers": {
+    "untested_top10": [
+      "registry.duckdb_helpers.DEFAULT_SLOW_QUERY_THRESHOLD_S",
+      "registry.duckdb_helpers.validate_identifier",
+      "registry.duckdb_helpers.fetch_one",
+      "registry.duckdb_helpers.execute",
+      "registry.duckdb_helpers.fetch_all",
+      "registry.duckdb_helpers.DEFAULT_TIMEOUT_S",
+      "registry.duckdb_helpers.connect"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 7,
+    "untested_count": 7
+  },
   "kgfoundry_common.parquet_io": {
     "untested_top10": [
+      "kgfoundry_common.parquet_io.read_table",
+      "kgfoundry_common.parquet_io.ParquetChunkWriter",
       "kgfoundry_common.parquet_io.ParquetVectorWriter",
-      "kgfoundry_common.parquet_io.ParquetChunkWriter"
+      "kgfoundry_common.parquet_io.validate_table_schema",
+      "kgfoundry_common.parquet_io.read_table_to_dataframe"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 5,
+    "untested_count": 5
+  },
+  "registry.duckdb_registry": {
+    "untested_top10": [
+      "registry.duckdb_registry.DuckDBRegistry"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
+  "kgfoundry_common.schema_helpers": {
+    "untested_top10": [
+      "kgfoundry_common.schema_helpers.validate_model_against_schema",
+      "kgfoundry_common.schema_helpers.load_schema",
+      "kgfoundry_common.schema_helpers.assert_model_roundtrip"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 3,
+    "untested_count": 3
+  },
+  "download.__init__": {
+    "untested_top10": [
+      "download.__init__.harvester",
+      "download.__init__.cli"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 2,
     "untested_count": 2
   },
-  "kgfoundry_common.errors": {
+  "kgfoundry_common.problem_details": {
     "untested_top10": [
-      "kgfoundry_common.errors.ChunkingError",
-      "kgfoundry_common.errors.OCRTimeoutError",
-      "kgfoundry_common.errors.SpladeOOMError",
-      "kgfoundry_common.errors.Neo4jError",
-      "kgfoundry_common.errors.OntologyParseError",
-      "kgfoundry_common.errors.LinkerCalibrationError",
-      "kgfoundry_common.errors.IndexBuildError",
-      "kgfoundry_common.errors.EmbeddingError",
-      "kgfoundry_common.errors.DoclingError",
-      "kgfoundry_common.errors.DownloadError"
+      "kgfoundry_common.problem_details.build_problem_details",
+      "kgfoundry_common.problem_details.ProblemDetailsValidationError",
+      "kgfoundry_common.problem_details.render_problem",
+      "kgfoundry_common.problem_details.problem_from_exception",
+      "kgfoundry_common.problem_details.validate_problem_details",
+      "kgfoundry_common.problem_details.ProblemDetails"
     ],
     "coverage_ratio_avg": 0.0,
-    "public_count": 11,
-    "untested_count": 11
+    "public_count": 6,
+    "untested_count": 6
   },
-  "kgfoundry.embeddings_sparse.splade": {
+  "search_api.kg_mock": {
     "untested_top10": [
-      "kgfoundry.embeddings_sparse.splade.SPLADEv3Encoder",
-      "kgfoundry.embeddings_sparse.splade.LuceneImpactIndex",
-      "kgfoundry.embeddings_sparse.splade.PureImpactIndex",
-      "kgfoundry.embeddings_sparse.splade.get_splade"
+      "search_api.kg_mock.kg_boost",
+      "search_api.kg_mock.linked_concepts_for_text",
+      "search_api.kg_mock.detect_query_concepts"
     ],
     "coverage_ratio_avg": 0.0,
-    "public_count": 4,
-    "untested_count": 4
+    "public_count": 3,
+    "untested_count": 3
   },
-  "kgfoundry_common.exceptions": {
+  "kgfoundry_common.serialization": {
     "untested_top10": [
-      "kgfoundry_common.exceptions.UnsupportedMIMEError",
-      "kgfoundry_common.exceptions.DownloadError"
+      "kgfoundry_common.serialization.serialize_json",
+      "kgfoundry_common.serialization.deserialize_json",
+      "kgfoundry_common.serialization.compute_checksum",
+      "kgfoundry_common.serialization.verify_checksum",
+      "kgfoundry_common.serialization.validate_payload"
     ],
     "coverage_ratio_avg": 0.0,
-    "public_count": 2,
-    "untested_count": 2
-  },
-  "orchestration.flows": {
-    "untested_top10": [
-      "orchestration.flows.t_echo",
-      "orchestration.flows.e2e_flow"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 2,
-    "untested_count": 2
-  },
-  "kgfoundry_common.__init__": {
-    "untested_top10": [
-      "kgfoundry_common.__init__.ids",
-      "kgfoundry_common.__init__.parquet_io",
-      "kgfoundry_common.__init__.navmap_types",
-      "kgfoundry_common.__init__.models",
-      "kgfoundry_common.__init__.config",
-      "kgfoundry_common.__init__.logging",
-      "kgfoundry_common.__init__.exceptions",
-      "kgfoundry_common.__init__.errors"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 8,
-    "untested_count": 8
-  },
-  "embeddings_sparse.splade": {
-    "untested_top10": [
-      "embeddings_sparse.splade.PureImpactIndex",
-      "embeddings_sparse.splade.SPLADEv3Encoder",
-      "embeddings_sparse.splade.get_splade",
-      "embeddings_sparse.splade.LuceneImpactIndex"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 4,
-    "untested_count": 4
-  },
-  "kgfoundry.vectorstore_faiss.gpu": {
-    "untested_top10": [
-      "kgfoundry.vectorstore_faiss.gpu.FaissGpuIndex",
-      "kgfoundry.vectorstore_faiss.gpu.StrArray",
-      "kgfoundry.vectorstore_faiss.gpu.FloatArray",
-      "kgfoundry.vectorstore_faiss.gpu.IntArray"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 4,
-    "untested_count": 4
-  },
-  "search_client.client": {
-    "untested_top10": [
-      "search_client.client.SupportsResponse",
-      "search_client.client.RequestsHttp",
-      "search_client.client.KGFoundryClient",
-      "search_client.client.SupportsHttp"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 4,
-    "untested_count": 4
+    "public_count": 5,
+    "untested_count": 5
   },
   "search_client.__init__": {
     "untested_top10": [
@@ -323,80 +624,60 @@
     "public_count": 1,
     "untested_count": 1
   },
-  "kgfoundry._namespace_proxy": {
+  "kg_builder.neo4j_store": {
     "untested_top10": [
-      "kgfoundry._namespace_proxy.namespace_getattr",
-      "kgfoundry._namespace_proxy.namespace_dir"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 2,
-    "untested_count": 2
-  },
-  "embeddings_dense.qwen3": {
-    "untested_top10": [
-      "embeddings_dense.qwen3.Qwen3Embedder"
+      "kg_builder.neo4j_store.Neo4jStore"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 1,
     "untested_count": 1
   },
-  "orchestration.cli": {
+  "kgfoundry._namespace_proxy": {
     "untested_top10": [
-      "orchestration.cli.api",
-      "orchestration.cli.index_bm25",
-      "orchestration.cli.e2e",
-      "orchestration.cli.index_faiss"
+      "kgfoundry._namespace_proxy.namespace_dir",
+      "kgfoundry._namespace_proxy.namespace_getattr"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 2,
+    "untested_count": 2
+  },
+  "kgfoundry.search_client.client": {
+    "untested_top10": [
+      "kgfoundry.search_client.client.KGFoundryClient",
+      "kgfoundry.search_client.client.SupportsHttp",
+      "kgfoundry.search_client.client.SupportsResponse",
+      "kgfoundry.search_client.client.RequestsHttp"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 4,
     "untested_count": 4
   },
-  "search_api.schemas": {
+  "vectorstore_faiss.gpu": {
     "untested_top10": [
-      "search_api.schemas.SearchRequest",
-      "search_api.schemas.SearchResult"
+      "vectorstore_faiss.gpu.FloatArray",
+      "vectorstore_faiss.gpu.FaissGpuIndex",
+      "vectorstore_faiss.gpu.StrArray",
+      "vectorstore_faiss.gpu.IntArray"
     ],
     "coverage_ratio_avg": 0.0,
-    "public_count": 2,
-    "untested_count": 2
+    "public_count": 4,
+    "untested_count": 4
   },
-  "search_api.__init__": {
+  "kgfoundry.search_api.bm25_index": {
     "untested_top10": [
-      "search_api.__init__.app",
-      "search_api.__init__.kg_mock",
-      "search_api.__init__.service",
-      "search_api.__init__.splade_index",
-      "search_api.__init__.fusion",
-      "search_api.__init__.bm25_index",
-      "search_api.__init__.faiss_adapter",
-      "search_api.__init__.schemas",
-      "search_api.__init__.fixture_index"
+      "kgfoundry.search_api.bm25_index.BM25Doc",
+      "kgfoundry.search_api.bm25_index.BM25Index",
+      "kgfoundry.search_api.bm25_index.toks"
     ],
     "coverage_ratio_avg": 0.0,
-    "public_count": 9,
-    "untested_count": 9
+    "public_count": 3,
+    "untested_count": 3
   },
-  "docling.hybrid": {
+  "orchestration.__init__": {
     "untested_top10": [
-      "docling.hybrid.HybridChunker"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
-  },
-  "download.harvester": {
-    "untested_top10": [
-      "download.harvester.OpenAccessHarvester"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
-  },
-  "search_api.service": {
-    "untested_top10": [
-      "search_api.service.mmr_deduplicate",
-      "search_api.service.rrf_fuse",
-      "search_api.service.apply_kg_boosts"
+      "orchestration.__init__.fixture_flow",
+      "orchestration.__init__.flows",
+      "orchestration.__init__.cli"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 3,
@@ -411,175 +692,76 @@
     "public_count": 2,
     "untested_count": 2
   },
-  "sitecustomize": {
+  "kgfoundry.agent_catalog.mcp": {
     "untested_top10": [
-      "sitecustomize.ensure_docstring_yields",
-      "sitecustomize.ensure_docstring_attrs",
-      "sitecustomize.ensure_docstring_size"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 3,
-    "untested_count": 3
-  },
-  "registry.duckdb_registry": {
-    "untested_top10": [
-      "registry.duckdb_registry.DuckDBRegistry"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
-  },
-  "kgfoundry_common.config": {
-    "untested_top10": [
-      "kgfoundry_common.config.load_config"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
-  },
-  "search_api.splade_index": {
-    "untested_top10": [
-      "search_api.splade_index.SpladeIndex",
-      "search_api.splade_index.SpladeDoc",
-      "search_api.splade_index.tok"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 3,
-    "untested_count": 3
-  },
-  "search_api.fusion": {
-    "untested_top10": [
-      "search_api.fusion.rrf_fuse"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
-  },
-  "registry.__init__": {
-    "untested_top10": [
-      "registry.__init__.migrate",
-      "registry.__init__.api",
-      "registry.__init__.duckdb_registry",
-      "registry.__init__.helper"
+      "kgfoundry.agent_catalog.mcp.CatalogSessionServerError",
+      "kgfoundry.agent_catalog.mcp.build_parser",
+      "kgfoundry.agent_catalog.mcp.main",
+      "kgfoundry.agent_catalog.mcp.CatalogSessionServer"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 4,
     "untested_count": 4
   },
-  "linking.calibration": {
+  "embeddings_dense.base": {
     "untested_top10": [
-      "linking.calibration.isotonic_calibrate"
+      "embeddings_dense.base.DenseEmbeddingModel"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 1,
     "untested_count": 1
   },
-  "observability.__init__": {
+  "kgfoundry.embeddings_sparse.splade": {
     "untested_top10": [
-      "observability.__init__.metrics"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
-  },
-  "search_api.app": {
-    "untested_top10": [
-      "search_api.app.healthz",
-      "search_api.app.search",
-      "search_api.app.auth",
-      "search_api.app.apply_kg_boosts",
-      "search_api.app.rrf_fuse",
-      "search_api.app.graph_concepts"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 6,
-    "untested_count": 6
-  },
-  "kgfoundry.embeddings_sparse.base": {
-    "untested_top10": [
-      "kgfoundry.embeddings_sparse.base.SparseEncoder",
-      "kgfoundry.embeddings_sparse.base.SparseIndex"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 2,
-    "untested_count": 2
-  },
-  "kgfoundry_common.logging": {
-    "untested_top10": [
-      "kgfoundry_common.logging.setup_logging",
-      "kgfoundry_common.logging.JsonFormatter"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 2,
-    "untested_count": 2
-  },
-  "embeddings_sparse.base": {
-    "untested_top10": [
-      "embeddings_sparse.base.SparseIndex",
-      "embeddings_sparse.base.SparseEncoder"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 2,
-    "untested_count": 2
-  },
-  "embeddings_dense.__init__": {
-    "untested_top10": [
-      "embeddings_dense.__init__.base",
-      "embeddings_dense.__init__.qwen3"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 2,
-    "untested_count": 2
-  },
-  "kgfoundry.search_api.app": {
-    "untested_top10": [
-      "kgfoundry.search_api.app.apply_kg_boosts",
-      "kgfoundry.search_api.app.graph_concepts",
-      "kgfoundry.search_api.app.app",
-      "kgfoundry.search_api.app.rrf_fuse",
-      "kgfoundry.search_api.app.healthz",
-      "kgfoundry.search_api.app.search",
-      "kgfoundry.search_api.app.bm25",
-      "kgfoundry.search_api.app.auth"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 8,
-    "untested_count": 8
-  },
-  "embeddings_sparse.__init__": {
-    "untested_top10": [
-      "embeddings_sparse.__init__.base",
-      "embeddings_sparse.__init__.splade",
-      "embeddings_sparse.__init__.bm25"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 3,
-    "untested_count": 3
-  },
-  "kgfoundry.embeddings_sparse.bm25": {
-    "untested_top10": [
-      "kgfoundry.embeddings_sparse.bm25.PurePythonBM25",
-      "kgfoundry.embeddings_sparse.bm25.LuceneBM25",
-      "kgfoundry.embeddings_sparse.bm25.get_bm25",
-      "kgfoundry.embeddings_sparse.bm25.BM25Doc"
+      "kgfoundry.embeddings_sparse.splade.get_splade",
+      "kgfoundry.embeddings_sparse.splade.LuceneImpactIndex",
+      "kgfoundry.embeddings_sparse.splade.PureImpactIndex",
+      "kgfoundry.embeddings_sparse.splade.SPLADEv3Encoder"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 4,
     "untested_count": 4
   },
-  "search_api.kg_mock": {
+  "linking.__init__": {
     "untested_top10": [
-      "search_api.kg_mock.detect_query_concepts",
-      "search_api.kg_mock.kg_boost",
-      "search_api.kg_mock.linked_concepts_for_text"
+      "linking.__init__.calibration",
+      "linking.__init__.linker"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 2,
+    "untested_count": 2
+  },
+  "search_api.bm25_index": {
+    "untested_top10": [
+      "search_api.bm25_index.toks",
+      "search_api.bm25_index.BM25Index",
+      "search_api.bm25_index.BM25Doc"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 3,
     "untested_count": 3
   },
-  "kgfoundry.search_client.__init__": {
+  "kgfoundry_common.errors.http": {
     "untested_top10": [
-      "kgfoundry.search_client.__init__.KGFoundryClient"
+      "kgfoundry_common.errors.http.register_problem_details_handler",
+      "kgfoundry_common.errors.http.problem_details_response"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 2,
+    "untested_count": 2
+  },
+  "orchestration.flows": {
+    "untested_top10": [
+      "orchestration.flows.t_echo",
+      "orchestration.flows.e2e_flow"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 2,
+    "untested_count": 2
+  },
+  "docling.vlm": {
+    "untested_top10": [
+      "docling.vlm.GraniteDoclingVLM"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 1,
@@ -593,59 +775,9 @@
     "public_count": 1,
     "untested_count": 1
   },
-  "kg_builder.mock_kg": {
-    "untested_top10": [
-      "kg_builder.mock_kg.MockKG"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
-  },
-  "kgfoundry.search_api.bm25_index": {
-    "untested_top10": [
-      "kgfoundry.search_api.bm25_index.BM25Index",
-      "kgfoundry.search_api.bm25_index.BM25Doc",
-      "kgfoundry.search_api.bm25_index.toks"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 3,
-    "untested_count": 3
-  },
   "ontology.loader": {
     "untested_top10": [
       "ontology.loader.OntologyLoader"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
-  },
-  "kgfoundry.registry.helper": {
-    "untested_top10": [
-      "kgfoundry.registry.helper.DuckDBRegistryHelper"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
-  },
-  "kg_builder.neo4j_store": {
-    "untested_top10": [
-      "kg_builder.neo4j_store.Neo4jStore"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
-  },
-  "registry.helper": {
-    "untested_top10": [
-      "registry.helper.DuckDBRegistryHelper"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
-  },
-  "download.cli": {
-    "untested_top10": [
-      "download.cli.harvest"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 1,
@@ -660,42 +792,111 @@
     "public_count": 2,
     "untested_count": 2
   },
-  "linking.linker": {
+  "kgfoundry_common.config": {
     "untested_top10": [
-      "linking.linker.Linker"
+      "kgfoundry_common.config.load_config",
+      "kgfoundry_common.config.JsonPrimitive",
+      "kgfoundry_common.config.JsonValue"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 3,
+    "untested_count": 3
+  },
+  "linking.calibration": {
+    "untested_top10": [
+      "linking.calibration.isotonic_calibrate"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 1,
     "untested_count": 1
   },
-  "docling.vlm": {
+  "search_api.schemas": {
     "untested_top10": [
-      "docling.vlm.GraniteDoclingVLM"
+      "search_api.schemas.SearchResponse",
+      "search_api.schemas.SearchRequest",
+      "search_api.schemas.SearchResult"
     ],
     "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
+    "public_count": 3,
+    "untested_count": 3
   },
-  "registry.api": {
+  "kg_builder.__init__": {
     "untested_top10": [
-      "registry.api.Registry"
-    ],
-    "coverage_ratio_avg": 0.0,
-    "public_count": 1,
-    "untested_count": 1
-  },
-  "linking.__init__": {
-    "untested_top10": [
-      "linking.__init__.calibration",
-      "linking.__init__.linker"
+      "kg_builder.__init__.mock_kg",
+      "kg_builder.__init__.neo4j_store"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 2,
     "untested_count": 2
   },
+  "download.cli": {
+    "untested_top10": [
+      "download.cli.harvest"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
+  "observability.__init__": {
+    "untested_top10": [
+      "observability.__init__.metrics"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
+  "embeddings_dense.__init__": {
+    "untested_top10": [
+      "embeddings_dense.__init__.qwen3",
+      "embeddings_dense.__init__.base"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 2,
+    "untested_count": 2
+  },
+  "vectorstore_faiss.__init__": {
+    "untested_top10": [
+      "vectorstore_faiss.__init__.gpu"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
   "kgfoundry.kg_builder.mock_kg": {
     "untested_top10": [
       "kgfoundry.kg_builder.mock_kg.MockKG"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
+  "kgfoundry.registry.helper": {
+    "untested_top10": [
+      "kgfoundry.registry.helper.DuckDBRegistryHelper"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
+  "search_api.fusion": {
+    "untested_top10": [
+      "search_api.fusion.rrf_fuse"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
+  "embeddings_dense.qwen3": {
+    "untested_top10": [
+      "embeddings_dense.qwen3.Qwen3Embedder"
+    ],
+    "coverage_ratio_avg": 0.0,
+    "public_count": 1,
+    "untested_count": 1
+  },
+  "registry.helper": {
+    "untested_top10": [
+      "registry.helper.DuckDBRegistryHelper"
     ],
     "coverage_ratio_avg": 0.0,
     "public_count": 1,

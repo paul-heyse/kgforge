@@ -1,359 +1,451 @@
 {
   "/home/paul/kgfoundry/src/docling/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763864.967269
   },
   "/home/paul/kgfoundry/src/docling/canonicalizer.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.74007
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927317.3997495
   },
   "/home/paul/kgfoundry/src/docling/hybrid.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.730592
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927317.3897862
   },
   "/home/paul/kgfoundry/src/docling/vlm.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.7224493
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927317.3825474
   },
   "/home/paul/kgfoundry/src/download/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763864.9761517
   },
   "/home/paul/kgfoundry/src/download/cli.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.667223
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.833157
   },
   "/home/paul/kgfoundry/src/download/harvester.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.7083302
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.8693554
   },
   "/home/paul/kgfoundry/src/embeddings_dense/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763864.9899704
   },
   "/home/paul/kgfoundry/src/embeddings_dense/base.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.5970075
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927316.9670367
   },
   "/home/paul/kgfoundry/src/embeddings_dense/qwen3.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.605715
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927316.9743164
   },
   "/home/paul/kgfoundry/src/embeddings_sparse/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763864.994696
   },
   "/home/paul/kgfoundry/src/embeddings_sparse/base.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.3146834
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.103244
   },
   "/home/paul/kgfoundry/src/embeddings_sparse/bm25.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.4179518
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.227911
   },
   "/home/paul/kgfoundry/src/embeddings_sparse/splade.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.3605168
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.1453865
   },
   "/home/paul/kgfoundry/src/kf_common/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763865.014449
   },
   "/home/paul/kgfoundry/src/kg_builder/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763865.0153527
   },
   "/home/paul/kgfoundry/src/kg_builder/mock_kg.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831936.7591164
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927316.7783732
   },
   "/home/paul/kgfoundry/src/kg_builder/neo4j_store.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831936.7919562
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927316.7957602
   },
   "/home/paul/kgfoundry/src/kgfoundry/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.5872328
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927333.2612982
   },
   "/home/paul/kgfoundry/src/kgfoundry/_namespace_proxy.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.558906
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927316.8867683
+  },
+  "/home/paul/kgfoundry/src/kgfoundry/agent_catalog/__init__.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761926828.8387716
+  },
+  "/home/paul/kgfoundry/src/kgfoundry/agent_catalog/audit.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927337.707615
+  },
+  "/home/paul/kgfoundry/src/kgfoundry/agent_catalog/cli.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927320.886382
+  },
+  "/home/paul/kgfoundry/src/kgfoundry/agent_catalog/client.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927337.3350596
+  },
+  "/home/paul/kgfoundry/src/kgfoundry/agent_catalog/mcp.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927337.6557775
+  },
+  "/home/paul/kgfoundry/src/kgfoundry/agent_catalog/models.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927320.5588343
+  },
+  "/home/paul/kgfoundry/src/kgfoundry/agent_catalog/rbac.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927321.5170727
+  },
+  "/home/paul/kgfoundry/src/kgfoundry/agent_catalog/search.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927337.0458453
+  },
+  "/home/paul/kgfoundry/src/kgfoundry/agent_catalog/session.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927337.9408045
+  },
+  "/home/paul/kgfoundry/src/kgfoundry/agent_catalog/sqlite.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927337.2719223
   },
   "/home/paul/kgfoundry/src/kgfoundry/docling/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.1868536
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927322.1642737
   },
   "/home/paul/kgfoundry/src/kgfoundry/download/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.5290816
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927324.167371
   },
   "/home/paul/kgfoundry/src/kgfoundry/embeddings_dense/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.1274624
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927321.6776302
   },
   "/home/paul/kgfoundry/src/kgfoundry/embeddings_sparse/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.37057
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927323.2763116
   },
   "/home/paul/kgfoundry/src/kgfoundry/embeddings_sparse/base.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761744627.3283722
   },
   "/home/paul/kgfoundry/src/kgfoundry/embeddings_sparse/bm25.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761744610.0377705
   },
   "/home/paul/kgfoundry/src/kgfoundry/embeddings_sparse/splade.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761744621.115156
   },
   "/home/paul/kgfoundry/src/kgfoundry/kg_builder/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.077995
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927320.1608405
   },
   "/home/paul/kgfoundry/src/kgfoundry/kg_builder/mock_kg.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761744634.6016252
   },
   "/home/paul/kgfoundry/src/kgfoundry/kgfoundry_common/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.5648563
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927324.3478734
   },
   "/home/paul/kgfoundry/src/kgfoundry/kgfoundry_common/parquet_io.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763865.058832
   },
   "/home/paul/kgfoundry/src/kgfoundry/linking/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.1017113
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927320.23602
   },
   "/home/paul/kgfoundry/src/kgfoundry/observability/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.3129735
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927322.6773057
   },
   "/home/paul/kgfoundry/src/kgfoundry/ontology/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.285635
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927322.6040401
   },
   "/home/paul/kgfoundry/src/kgfoundry/orchestration/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.160706
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927321.7900848
   },
   "/home/paul/kgfoundry/src/kgfoundry/orchestration/fixture_flow.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761744643.3509295
   },
   "/home/paul/kgfoundry/src/kgfoundry/registry/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.4527624
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927323.529764
   },
   "/home/paul/kgfoundry/src/kgfoundry/registry/helper.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761744699.2848759
   },
   "/home/paul/kgfoundry/src/kgfoundry/registry/migrate.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761744704.1850464
   },
   "/home/paul/kgfoundry/src/kgfoundry/search_api/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.2603872
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927322.529333
   },
   "/home/paul/kgfoundry/src/kgfoundry/search_api/app.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.2230196
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927322.3149335
   },
   "/home/paul/kgfoundry/src/kgfoundry/search_api/bm25_index.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.2017374
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927322.226833
   },
   "/home/paul/kgfoundry/src/kgfoundry/search_api/faiss_adapter.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.2374449
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927322.4404314
   },
   "/home/paul/kgfoundry/src/kgfoundry/search_client/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.5019116
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927324.0502381
   },
   "/home/paul/kgfoundry/src/kgfoundry/search_client/client.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.4780185
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927323.6035058
   },
   "/home/paul/kgfoundry/src/kgfoundry/vectorstore_faiss/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.4132495
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927323.4154215
   },
   "/home/paul/kgfoundry/src/kgfoundry/vectorstore_faiss/gpu.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761744684.234352
   },
   "/home/paul/kgfoundry/src/kgfoundry_common/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761763865.0853467
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761880665.5477974
   },
   "/home/paul/kgfoundry/src/kgfoundry_common/config.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.8268511
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927335.6185062
   },
   "/home/paul/kgfoundry/src/kgfoundry_common/errors.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831939.0055346
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761879586.2940235
+  },
+  "/home/paul/kgfoundry/src/kgfoundry_common/errors/__init__.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761926828.8387716
+  },
+  "/home/paul/kgfoundry/src/kgfoundry_common/errors/codes.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927319.9154654
+  },
+  "/home/paul/kgfoundry/src/kgfoundry_common/errors/exceptions.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927320.0513456
+  },
+  "/home/paul/kgfoundry/src/kgfoundry_common/errors/http.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927319.8867476
   },
   "/home/paul/kgfoundry/src/kgfoundry_common/exceptions.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763865.097654
   },
+  "/home/paul/kgfoundry/src/kgfoundry_common/fs.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927319.0056963
+  },
+  "/home/paul/kgfoundry/src/kgfoundry_common/gpu.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927319.559772
+  },
   "/home/paul/kgfoundry/src/kgfoundry_common/ids.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.8428059
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927319.3121839
   },
   "/home/paul/kgfoundry/src/kgfoundry_common/logging.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.858815
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927319.3572435
   },
   "/home/paul/kgfoundry/src/kgfoundry_common/models.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.7910724
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927319.0979712
   },
   "/home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.9908085
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927319.4294915
+  },
+  "/home/paul/kgfoundry/src/kgfoundry_common/observability.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.9334304
   },
   "/home/paul/kgfoundry/src/kgfoundry_common/parquet_io.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.7703276
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927319.0684152
+  },
+  "/home/paul/kgfoundry/src/kgfoundry_common/problem_details.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927319.5058415
   },
   "/home/paul/kgfoundry/src/kgfoundry_common/pydantic.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.811284
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927319.2570548
+  },
+  "/home/paul/kgfoundry/src/kgfoundry_common/schema_helpers.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927319.4639482
+  },
+  "/home/paul/kgfoundry/src/kgfoundry_common/serialization.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927319.3994021
+  },
+  "/home/paul/kgfoundry/src/kgfoundry_common/settings.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.9735084
   },
   "/home/paul/kgfoundry/src/linking/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763865.1287196
   },
   "/home/paul/kgfoundry/src/linking/calibration.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831936.808379
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927316.8106406
   },
   "/home/paul/kgfoundry/src/linking/linker.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831936.8000896
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927316.8033428
   },
   "/home/paul/kgfoundry/src/observability/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763865.1355972
   },
   "/home/paul/kgfoundry/src/observability/metrics.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.2865837
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.077517
   },
   "/home/paul/kgfoundry/src/ontology/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763865.146904
   },
   "/home/paul/kgfoundry/src/ontology/catalog.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.2601523
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.0543845
   },
   "/home/paul/kgfoundry/src/ontology/loader.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.248724
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.0439699
   },
   "/home/paul/kgfoundry/src/orchestration/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763865.1594365
   },
   "/home/paul/kgfoundry/src/orchestration/cli.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.6831198
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927582.5198145
   },
   "/home/paul/kgfoundry/src/orchestration/fixture_flow.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.6552656
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927317.3186793
   },
   "/home/paul/kgfoundry/src/orchestration/flows.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.6965725
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927317.3581307
   },
   "/home/paul/kgfoundry/src/registry/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761763865.1877065
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761921749.192417
   },
   "/home/paul/kgfoundry/src/registry/api.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.5474162
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.6481419
+  },
+  "/home/paul/kgfoundry/src/registry/duckdb_helpers.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927335.0173693
   },
   "/home/paul/kgfoundry/src/registry/duckdb_registry.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.5289133
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.6176472
   },
   "/home/paul/kgfoundry/src/registry/helper.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.5768824
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.728382
   },
   "/home/paul/kgfoundry/src/registry/migrate.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.6139383
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.7746372
   },
   "/home/paul/kgfoundry/src/search_api/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761763865.2179146
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927334.442773
   },
   "/home/paul/kgfoundry/src/search_api/app.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.8643901
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927582.8463466
   },
   "/home/paul/kgfoundry/src/search_api/bm25_index.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.8044446
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927317.4839306
   },
   "/home/paul/kgfoundry/src/search_api/faiss_adapter.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.164123
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927317.9388487
   },
   "/home/paul/kgfoundry/src/search_api/fixture_index.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.2399533
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.0335236
   },
   "/home/paul/kgfoundry/src/search_api/fusion.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.0912719
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927317.8532014
   },
   "/home/paul/kgfoundry/src/search_api/kg_mock.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.9642558
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927317.833073
   },
   "/home/paul/kgfoundry/src/search_api/schemas.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.8844585
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927317.7200541
   },
   "/home/paul/kgfoundry/src/search_api/service.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.938137
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927317.801992
   },
   "/home/paul/kgfoundry/src/search_api/splade_index.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831937.9188135
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927317.760254
+  },
+  "/home/paul/kgfoundry/src/search_api/types.py": {
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927317.5241756
   },
   "/home/paul/kgfoundry/src/search_client/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763865.2763953
   },
   "/home/paul/kgfoundry/src/search_client/client.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.636931
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.8082051
   },
   "/home/paul/kgfoundry/src/sitecustomize.py": {
     "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
     "mtime": 1761831936.655911
   },
   "/home/paul/kgfoundry/src/vectorstore_faiss/__init__.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
     "mtime": 1761763865.2849054
   },
   "/home/paul/kgfoundry/src/vectorstore_faiss/gpu.py": {
-    "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",
-    "mtime": 1761831938.4830375
+    "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
+    "mtime": 1761927318.5612817
   },
   "/workspace/kgfoundry/src/docling/__init__.py": {
     "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b",

@@ -65,12 +65,11 @@ def toks(text: str) -> list[str]:
     text : str
         Describe ``text``.
 
-
     Returns
     -------
     list[str]
         Describe return value.
-    """
+"""
     # re.findall returns list[str] when pattern has no groups
     matches: list[str] = TOKEN_RE.findall(text or "")
     return [token.lower() for token in matches]
@@ -101,7 +100,7 @@ class BM25Doc:
         Describe ``tf``.
     dl : float
         Describe ``dl``.
-    """
+"""
 
     chunk_id: str
     doc_id: str
@@ -129,7 +128,7 @@ class BM25Index:
     b : float, optional
         Describe ``b``.
         Defaults to ``0.4``.
-    """
+"""
 
     def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
         """Describe   init  .
@@ -146,7 +145,7 @@ class BM25Index:
         b : float, optional
             Describe ``b``.
             Defaults to ``0.4``.
-        """
+"""
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []
@@ -167,12 +166,11 @@ class BM25Index:
         db_path : str
             Describe ``db_path``.
 
-
         Returns
         -------
         BM25Index
             Describe return value.
-        """
+"""
         index = cls()
         con = duckdb.connect(db_path)
         try:
@@ -226,9 +224,9 @@ class BM25Index:
 
         Parameters
         ----------
-        rows : Iterable[tuple[str, str, str, str, str]]
+        rows : tuple[str, str, str, str, str]
             Describe ``rows``.
-        """
+"""
         self.docs.clear()
         self.df.clear()
         dl_sum = 0.0
@@ -276,12 +274,11 @@ class BM25Index:
             Describe ``b``.
             Defaults to ``0.4``.
 
-
         Returns
         -------
         BM25Index
             Describe return value.
-        """
+"""
         index = cls(k1=k1, b=b)
         con = duckdb.connect(database=":memory:")
         try:
@@ -325,6 +322,8 @@ class BM25Index:
     def save(self, path: str) -> None:
         """Save BM25 index metadata to JSON with schema validation and checksum.
 
+        <!-- auto:docstring-builder v1 -->
+
         Serializes index metadata using secure JSON serialization with schema
         validation and SHA256 checksum for data integrity.
 
@@ -345,7 +344,7 @@ class BM25Index:
         >>> index = BM25Index(k1=0.9, b=0.4)
         >>> index.N = 100
         >>> index.save("/tmp/index.json")
-        """
+"""
         path_obj = Path(path)
         schema_path = (
             Path(__file__).parent.parent.parent / "schema" / "models" / "bm25_metadata.v1.json"
@@ -376,6 +375,8 @@ class BM25Index:
     def load(cls, path: str) -> BM25Index:
         """Load BM25 index metadata from JSON with schema validation and checksum verification.
 
+        <!-- auto:docstring-builder v1 -->
+
         Deserializes index metadata from JSON, verifying checksum and validating
         against the schema before reconstructing the index.
 
@@ -400,7 +401,7 @@ class BM25Index:
         --------
         >>> index = BM25Index.load("/tmp/index.json")
         >>> assert index.N > 0
-        """
+"""
         path_obj = Path(path)
         schema_path = (
             Path(__file__).parent.parent.parent / "schema" / "models" / "bm25_metadata.v1.json"
@@ -495,12 +496,11 @@ class BM25Index:
         term : str
             Describe ``term``.
 
-
         Returns
         -------
         float
             Describe return value.
-        """
+"""
         df = self.df.get(term, 0)
         if self.N == 0 or df == 0:
             return 0.0
@@ -521,12 +521,11 @@ class BM25Index:
             Describe ``k``.
             Defaults to ``10``.
 
-
         Returns
         -------
         list[tuple[str, float]]
             Describe return value.
-        """
+"""
         if self.N == 0:
             return []
         terms = toks(query)
@@ -561,10 +560,9 @@ class BM25Index:
         index : int
             Describe ``index``.
 
-
         Returns
         -------
         BM25Doc
             Describe return value.
-        """
+"""
         return self.docs[index]

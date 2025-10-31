@@ -28,6 +28,8 @@ logger = get_logger(__name__)
 def ensure_dir(path: Path, *, exist_ok: bool = True) -> Path:
     """Create directory if it does not exist, including parent directories.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     path : Path
@@ -35,6 +37,7 @@ def ensure_dir(path: Path, *, exist_ok: bool = True) -> Path:
     exist_ok : bool, optional
         If True, do not raise if directory already exists.
         Defaults to True.
+        Defaults to ``True``.
 
     Returns
     -------
@@ -53,13 +56,15 @@ def ensure_dir(path: Path, *, exist_ok: bool = True) -> Path:
     >>> from pathlib import Path
     >>> ensure_dir(Path("/tmp/data/subdir"))
     Path('/tmp/data/subdir')
-    """
+"""
     path.mkdir(parents=True, exist_ok=exist_ok)
     return path
 
 
 def safe_join(base: Path, *parts: str | Path) -> Path:
     """Join path components safely, preventing directory traversal.
+
+    <!-- auto:docstring-builder v1 -->
 
     Parameters
     ----------
@@ -86,7 +91,7 @@ def safe_join(base: Path, *parts: str | Path) -> Path:
     Path('/safe/base/file.txt')
     >>> safe_join(base, "..", "etc", "passwd")  # doctest: +SKIP
     ValueError: Path escapes base directory
-    """
+"""
     if not base.is_absolute():
         msg = f"Base path must be absolute: {base}"
         raise ValueError(msg)
@@ -102,12 +107,15 @@ def safe_join(base: Path, *parts: str | Path) -> Path:
 def read_text(path: Path, encoding: str = "utf-8") -> str:
     """Read text file contents with explicit encoding.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     path : Path
         File path to read.
     encoding : str, optional
         Text encoding to use. Defaults to "utf-8".
+        Defaults to ``'utf-8'``.
 
     Returns
     -------
@@ -127,12 +135,14 @@ def read_text(path: Path, encoding: str = "utf-8") -> str:
     >>> write_text(Path("/tmp/test.txt"), "hello")
     >>> read_text(Path("/tmp/test.txt"))
     'hello'
-    """
+"""
     return path.read_text(encoding=encoding)
 
 
 def write_text(path: Path, data: str, encoding: str = "utf-8") -> None:
     """Write text data to a file, creating parent directories if needed.
+
+    <!-- auto:docstring-builder v1 -->
 
     Parameters
     ----------
@@ -142,6 +152,7 @@ def write_text(path: Path, data: str, encoding: str = "utf-8") -> None:
         Text content to write.
     encoding : str, optional
         Text encoding to use. Defaults to "utf-8".
+        Defaults to ``'utf-8'``.
 
     Raises
     ------
@@ -156,7 +167,7 @@ def write_text(path: Path, data: str, encoding: str = "utf-8") -> None:
     >>> write_text(Path("/tmp/output.txt"), "content")
     >>> read_text(Path("/tmp/output.txt"))
     'content'
-    """
+"""
     ensure_dir(path.parent, exist_ok=True)
     path.write_text(data, encoding=encoding)
 
@@ -168,14 +179,17 @@ def atomic_write(
 ) -> None:
     """Write data atomically using a temporary file and rename.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     path : Path
         Final file path to write.
     data : str | bytes
         Content to write (str for text mode, bytes for binary).
-    mode : {"text", "binary"}, optional
+    mode : Literal['text', 'binary'], optional
         Write mode. Defaults to "text".
+        Defaults to ``'text'``.
 
     Raises
     ------
@@ -190,7 +204,7 @@ def atomic_write(
     >>> atomic_write(Path("/tmp/atomic.txt"), "safe content")
     >>> read_text(Path("/tmp/atomic.txt"))
     'safe content'
-    """
+"""
     ensure_dir(path.parent, exist_ok=True)
     tmp_path: Path | None = None
     try:

@@ -1,0 +1,455 @@
+{
+  "$defs": {
+    "AgentHintsModel": {
+      "description": "Structured hints for downstream agents.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nintent_tags : list[str], optional\n    Describe ``intent_tags``.\n    Defaults to ``<factory>``.\nsafe_ops : list[str], optional\n    Describe ``safe_ops``.\n    Defaults to ``<factory>``.\ntests_to_run : list[str], optional\n    Describe ``tests_to_run``.\n    Defaults to ``<factory>``.\nperf_budgets : list[str], optional\n    Describe ``perf_budgets``.\n    Defaults to ``<factory>``.\nbreaking_change_notes : list[str], optional\n    Describe ``breaking_change_notes``.\n    Defaults to ``<factory>``.",
+      "properties": {
+        "breaking_change_notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Breaking Change Notes",
+          "type": "array"
+        },
+        "intent_tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Intent Tags",
+          "type": "array"
+        },
+        "perf_budgets": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Perf Budgets",
+          "type": "array"
+        },
+        "safe_ops": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Safe Ops",
+          "type": "array"
+        },
+        "tests_to_run": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tests To Run",
+          "type": "array"
+        }
+      },
+      "title": "AgentHintsModel",
+      "type": "object"
+    },
+    "AnchorsModel": {
+      "description": "Source anchor metadata for a symbol.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nstart_line : int | NoneType, optional\n    Describe ``start_line``.\n    Defaults to ``None``.\nend_line : int | NoneType, optional\n    Describe ``end_line``.\n    Defaults to ``None``.\ncst_fingerprint : str | NoneType, optional\n    Describe ``cst_fingerprint``.\n    Defaults to ``None``.\nremap_order : list[dict[str, object]], optional\n    Describe ``remap_order``.\n    Defaults to ``<factory>``.",
+      "properties": {
+        "cst_fingerprint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cst Fingerprint"
+        },
+        "end_line": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Line"
+        },
+        "remap_order": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Remap Order",
+          "type": "array"
+        },
+        "start_line": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Line"
+        }
+      },
+      "title": "AnchorsModel",
+      "type": "object"
+    },
+    "ChangeImpactModel": {
+      "description": "Change impact metadata for a symbol.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\ncallers : list[str], optional\n    Describe ``callers``.\n    Defaults to ``<factory>``.\ncallees : list[str], optional\n    Describe ``callees``.\n    Defaults to ``<factory>``.\ntests : list[dict[str, object]], optional\n    Describe ``tests``.\n    Defaults to ``<factory>``.\ncodeowners : list[str], optional\n    Describe ``codeowners``.\n    Defaults to ``<factory>``.\nchurn_last_n : int | NoneType, optional\n    Describe ``churn_last_n``.\n    Defaults to ``None``.",
+      "properties": {
+        "callees": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Callees",
+          "type": "array"
+        },
+        "callers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Callers",
+          "type": "array"
+        },
+        "churn_last_n": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Churn Last N"
+        },
+        "codeowners": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Codeowners",
+          "type": "array"
+        },
+        "tests": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Tests",
+          "type": "array"
+        }
+      },
+      "title": "ChangeImpactModel",
+      "type": "object"
+    },
+    "MetricsModel": {
+      "description": "Metric snapshot for a symbol.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\ncomplexity : float | NoneType, optional\n    Describe ``complexity``.\n    Defaults to ``None``.\nloc : int | NoneType, optional\n    Describe ``loc``.\n    Defaults to ``None``.\nlast_modified : str | NoneType, optional\n    Describe ``last_modified``.\n    Defaults to ``None``.\ncodeowners : list[str], optional\n    Describe ``codeowners``.\n    Defaults to ``<factory>``.\nstability : str | NoneType, optional\n    Describe ``stability``.\n    Defaults to ``None``.\ndeprecated : bool | NoneType, optional\n    Describe ``deprecated``.\n    Defaults to ``None``.",
+      "properties": {
+        "codeowners": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Codeowners",
+          "type": "array"
+        },
+        "complexity": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Complexity"
+        },
+        "deprecated": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deprecated"
+        },
+        "last_modified": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Modified"
+        },
+        "loc": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Loc"
+        },
+        "stability": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stability"
+        }
+      },
+      "title": "MetricsModel",
+      "type": "object"
+    },
+    "ModuleGraphModel": {
+      "description": "Graph adjacency lists for a module.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nimports : list[str], optional\n    Describe ``imports``.\n    Defaults to ``<factory>``.\ncalls : list[dict[str, object]], optional\n    Describe ``calls``.\n    Defaults to ``<factory>``.",
+      "properties": {
+        "calls": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Calls",
+          "type": "array"
+        },
+        "imports": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Imports",
+          "type": "array"
+        }
+      },
+      "title": "ModuleGraphModel",
+      "type": "object"
+    },
+    "ModuleModel": {
+      "description": "Representation of a module within a package.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nname : str\n    Describe ``name``.\nqualified : str\n    Describe ``qualified``.\nsource : dict[str, str]\n    Describe ``source``.\npages : dict[str, str | NoneType]\n    Describe ``pages``.\nimports : list[str], optional\n    Describe ``imports``.\n    Defaults to ``<factory>``.\nsymbols : list[SymbolModel], optional\n    Describe ``symbols``.\n    Defaults to ``<factory>``.\ngraph : ModuleGraphModel\n    Describe ``graph``.",
+      "properties": {
+        "graph": {
+          "$ref": "#/$defs/ModuleGraphModel"
+        },
+        "imports": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Imports",
+          "type": "array"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "pages": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Pages",
+          "type": "object"
+        },
+        "qualified": {
+          "title": "Qualified",
+          "type": "string"
+        },
+        "source": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Source",
+          "type": "object"
+        },
+        "symbols": {
+          "items": {
+            "$ref": "#/$defs/SymbolModel"
+          },
+          "title": "Symbols",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "qualified",
+        "source",
+        "pages",
+        "graph"
+      ],
+      "title": "ModuleModel",
+      "type": "object"
+    },
+    "QualityModel": {
+      "description": "Quality signals captured for a symbol.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nmypy_status : str | NoneType, optional\n    Describe ``mypy_status``.\n    Defaults to ``None``.\nruff_rules : list[str], optional\n    Describe ``ruff_rules``.\n    Defaults to ``<factory>``.\npydoclint_parity : bool | NoneType, optional\n    Describe ``pydoclint_parity``.\n    Defaults to ``None``.\ndocstring_coverage : float | NoneType, optional\n    Describe ``docstring_coverage``.\n    Defaults to ``None``.\ndoctest_status : str | NoneType, optional\n    Describe ``doctest_status``.\n    Defaults to ``None``.",
+      "properties": {
+        "docstring_coverage": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Docstring Coverage"
+        },
+        "doctest_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doctest Status"
+        },
+        "mypy_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mypy Status"
+        },
+        "pydoclint_parity": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pydoclint Parity"
+        },
+        "ruff_rules": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Ruff Rules",
+          "type": "array"
+        }
+      },
+      "title": "QualityModel",
+      "type": "object"
+    },
+    "SymbolModel": {
+      "description": "Catalog entry for a concrete symbol.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nqname : str\n    Describe ``qname``.\nkind : str\n    Describe ``kind``.\nsymbol_id : str\n    Describe ``symbol_id``.\ndocfacts : dict[str, object] | NoneType, optional\n    Describe ``docfacts``.\n    Defaults to ``None``.\nanchors : AnchorsModel\n    Describe ``anchors``.\nquality : QualityModel\n    Describe ``quality``.\nmetrics : MetricsModel\n    Describe ``metrics``.\nagent_hints : AgentHintsModel\n    Describe ``agent_hints``.\nchange_impact : ChangeImpactModel\n    Describe ``change_impact``.\nexemplars : list[dict[str, object]], optional\n    Describe ``exemplars``.\n    Defaults to ``<factory>``.",
+      "properties": {
+        "agent_hints": {
+          "$ref": "#/$defs/AgentHintsModel"
+        },
+        "anchors": {
+          "$ref": "#/$defs/AnchorsModel"
+        },
+        "change_impact": {
+          "$ref": "#/$defs/ChangeImpactModel"
+        },
+        "docfacts": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Docfacts"
+        },
+        "exemplars": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Exemplars",
+          "type": "array"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "metrics": {
+          "$ref": "#/$defs/MetricsModel"
+        },
+        "qname": {
+          "title": "Qname",
+          "type": "string"
+        },
+        "quality": {
+          "$ref": "#/$defs/QualityModel"
+        },
+        "symbol_id": {
+          "title": "Symbol Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "qname",
+        "kind",
+        "symbol_id",
+        "anchors",
+        "quality",
+        "metrics",
+        "agent_hints",
+        "change_impact"
+      ],
+      "title": "SymbolModel",
+      "type": "object"
+    }
+  },
+  "$id": "https://kgfoundry/schemas/kgfoundry.agent_catalog.models.PackageModel.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Grouping of modules under a package name.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nname : str\n    Describe ``name``.\nmodules : list[ModuleModel], optional\n    Describe ``modules``.\n    Defaults to ``<factory>``.",
+  "examples": [
+    {
+      "modules": null,
+      "name": null
+    }
+  ],
+  "properties": {
+    "modules": {
+      "items": {
+        "$ref": "#/$defs/ModuleModel"
+      },
+      "title": "Modules",
+      "type": "array"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "PackageModel",
+  "type": "object"
+}

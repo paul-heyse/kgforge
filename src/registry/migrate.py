@@ -10,7 +10,7 @@ from __future__ import annotations
 import argparse
 import pathlib
 from contextlib import closing
-from typing import Final
+from typing import Final, cast
 
 from kgfoundry_common.errors import RegistryError
 from kgfoundry_common.navmap_types import NavMap
@@ -59,7 +59,7 @@ def apply(db: str, migrations_dir: str) -> None:
         Describe ``db``.
     migrations_dir : str
         Describe ``migrations_dir``.
-    """
+"""
     path = pathlib.Path(migrations_dir)
     if not path.exists():
         error_message = "Migrations directory does not exist"
@@ -96,15 +96,18 @@ def main() -> None:
 
     Python's object protocol for this class. Use it to integrate with built-in operators, protocols,
     or runtime behaviours that expect instances to participate in the language's data model.
-    """
+"""
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
     a = sp.add_parser("apply")
     a.add_argument("--db", required=True)
     a.add_argument("--migrations", required=True)
     ns = ap.parse_args()
-    if ns.cmd == "apply":
-        apply(ns.db, ns.migrations)
+    db_arg = cast(str, ns.db)
+    migrations_arg = cast(str, ns.migrations)
+    cmd = cast(str, ns.cmd)
+    if cmd == "apply":
+        apply(db_arg, migrations_arg)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,40 @@
+{
+  "$id": "https://kgfoundry/schemas/kgfoundry.agent_catalog.models.ShardEntryModel.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Entry describing a package shard.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nname : str\n    Describe ``name``.\npath : str\n    Describe ``path``.\nmodules : int | NoneType, optional\n    Describe ``modules``.\n    Defaults to ``None``.",
+  "examples": [
+    {
+      "modules": {},
+      "name": null,
+      "path": null
+    }
+  ],
+  "properties": {
+    "modules": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Modules"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "path": {
+      "title": "Path",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "path"
+  ],
+  "title": "ShardEntryModel",
+  "type": "object"
+}

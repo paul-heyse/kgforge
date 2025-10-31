@@ -78,16 +78,16 @@ class Doc(BaseModel):
     ----------
     id : Id
         Describe ``id``.
-    openalex_id : str | None, optional
+    openalex_id : str | NoneType, optional
         Describe ``openalex_id``.
         Defaults to ``None``.
-    doi : str | None, optional
+    doi : str | NoneType, optional
         Describe ``doi``.
         Defaults to ``None``.
-    arxiv_id : str | None, optional
+    arxiv_id : str | NoneType, optional
         Describe ``arxiv_id``.
         Defaults to ``None``.
-    pmcid : str | None, optional
+    pmcid : str | NoneType, optional
         Describe ``pmcid``.
         Defaults to ``None``.
     title : str, optional
@@ -96,13 +96,13 @@ class Doc(BaseModel):
     authors : list[str], optional
         Describe ``authors``.
         Defaults to ``<factory>``.
-    pub_date : str | None, optional
+    pub_date : str | NoneType, optional
         Describe ``pub_date``.
         Defaults to ``None``.
-    license : str | None, optional
+    license : str | NoneType, optional
         Describe ``license``.
         Defaults to ``None``.
-    language : str | None, optional
+    language : str | NoneType, optional
         Describe ``language``.
         Defaults to ``'en'``.
     pdf_uri : str, optional
@@ -111,7 +111,7 @@ class Doc(BaseModel):
     source : str, optional
         Describe ``source``.
         Defaults to ``'unknown'``.
-    content_hash : str | None, optional
+    content_hash : str | NoneType, optional
         Describe ``content_hash``.
         Defaults to ``None``.
 
@@ -123,7 +123,7 @@ class Doc(BaseModel):
     ...     Path(__file__).parent.parent.parent / "schema" / "examples" / "models" / "doc.v1.json"
     ... )
     >>> assert_model_roundtrip(Doc, example_path)
-    """
+"""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -163,10 +163,10 @@ class DoctagsAsset(BaseModel):
         Describe ``vlm_model``.
     vlm_revision : str
         Describe ``vlm_revision``.
-    avg_logprob : float | None, optional
+    avg_logprob : float | NoneType, optional
         Describe ``avg_logprob``.
         Defaults to ``None``.
-    """
+"""
 
     doc_id: Id
     doctags_uri: str
@@ -191,7 +191,7 @@ class Chunk(BaseModel):
         Describe ``id``.
     doc_id : Id
         Describe ``doc_id``.
-    section : str | None
+    section : str | NoneType
         Describe ``section``.
     start_char : int
         Describe ``start_char``.
@@ -201,7 +201,7 @@ class Chunk(BaseModel):
         Describe ``tokens``.
     doctags_span : dict[str, int]
         Describe ``doctags_span``.
-    """
+"""
 
     id: Id
     doc_id: Id
@@ -233,7 +233,7 @@ class LinkAssertion(BaseModel):
         Describe ``score``.
     decision : Literal['link', 'reject', 'uncertain']
         Describe ``decision``.
-    evidence_span : str | None, optional
+    evidence_span : str | NoneType, optional
         Describe ``evidence_span``.
         Defaults to ``None``.
     features : dict[str, float], optional
@@ -241,7 +241,7 @@ class LinkAssertion(BaseModel):
         Defaults to ``<factory>``.
     run_id : str
         Describe ``run_id``.
-    """
+"""
 
     id: Id
     chunk_id: Id

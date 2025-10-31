@@ -65,45 +65,134 @@ __navmap__: Final[NavMap] = {
 class SearchConfig(BaseSettings):
     """Search service configuration.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
-    api_url : str | None, optional
+    _case_sensitive : bool | None, optional
+        Describe ``_case_sensitive``.
+        Defaults to ``None``.
+    _nested_model_default_partial_update : bool | None, optional
+        Describe ``_nested_model_default_partial_update``.
+        Defaults to ``None``.
+    _env_prefix : str | None, optional
+        Describe ``_env_prefix``.
+        Defaults to ``None``.
+    _env_file : DotenvType | None, optional
+        Describe ``_env_file``.
+        Defaults to ``PosixPath('.')``.
+    _env_file_encoding : str | None, optional
+        Describe ``_env_file_encoding``.
+        Defaults to ``None``.
+    _env_ignore_empty : bool | None, optional
+        Describe ``_env_ignore_empty``.
+        Defaults to ``None``.
+    _env_nested_delimiter : str | None, optional
+        Describe ``_env_nested_delimiter``.
+        Defaults to ``None``.
+    _env_nested_max_split : int | None, optional
+        Describe ``_env_nested_max_split``.
+        Defaults to ``None``.
+    _env_parse_none_str : str | None, optional
+        Describe ``_env_parse_none_str``.
+        Defaults to ``None``.
+    _env_parse_enums : bool | None, optional
+        Describe ``_env_parse_enums``.
+        Defaults to ``None``.
+    _cli_prog_name : str | None, optional
+        Describe ``_cli_prog_name``.
+        Defaults to ``None``.
+    _cli_parse_args : bool | list[str] | tuple[str, ...] | None, optional
+        Describe ``_cli_parse_args``.
+        Defaults to ``None``.
+    _cli_settings_source : CliSettingsSource[Any] | None, optional
+        Describe ``_cli_settings_source``.
+        Defaults to ``None``.
+    _cli_parse_none_str : str | None, optional
+        Describe ``_cli_parse_none_str``.
+        Defaults to ``None``.
+    _cli_hide_none_type : bool | None, optional
+        Describe ``_cli_hide_none_type``.
+        Defaults to ``None``.
+    _cli_avoid_json : bool | None, optional
+        Describe ``_cli_avoid_json``.
+        Defaults to ``None``.
+    _cli_enforce_required : bool | None, optional
+        Describe ``_cli_enforce_required``.
+        Defaults to ``None``.
+    _cli_use_class_docs_for_groups : bool | None, optional
+        Describe ``_cli_use_class_docs_for_groups``.
+        Defaults to ``None``.
+    _cli_exit_on_error : bool | None, optional
+        Describe ``_cli_exit_on_error``.
+        Defaults to ``None``.
+    _cli_prefix : str | None, optional
+        Describe ``_cli_prefix``.
+        Defaults to ``None``.
+    _cli_flag_prefix_char : str | None, optional
+        Describe ``_cli_flag_prefix_char``.
+        Defaults to ``None``.
+    _cli_implicit_flags : bool | None, optional
+        Describe ``_cli_implicit_flags``.
+        Defaults to ``None``.
+    _cli_ignore_unknown_args : bool | None, optional
+        Describe ``_cli_ignore_unknown_args``.
+        Defaults to ``None``.
+    _cli_kebab_case : bool | None, optional
+        Describe ``_cli_kebab_case``.
+        Defaults to ``None``.
+    _cli_shortcuts : Mapping[str, str | list[str]] | None, optional
+        Describe ``_cli_shortcuts``.
+        Defaults to ``None``.
+    _secrets_dir : PathType | None, optional
+        Describe ``_secrets_dir``.
+        Defaults to ``None``.
+    api_url : str | NoneType, optional
         Search API base URL. Required if search features are used.
         Environment variable: `KGFOUNDRY_SEARCH_API_URL`.
         Defaults to None.
+        Defaults to ``None``.
     k : int, optional
         Default number of results to return.
         Environment variable: `KGFOUNDRY_SEARCH_K`.
         Defaults to 10.
+        Defaults to ``10``.
     dense_candidates : int, optional
         Number of dense candidates for hybrid search.
         Environment variable: `KGFOUNDRY_SEARCH_DENSE_CANDIDATES`.
         Defaults to 200.
+        Defaults to ``200``.
     sparse_candidates : int, optional
         Number of sparse candidates for hybrid search.
         Environment variable: `KGFOUNDRY_SEARCH_SPARSE_CANDIDATES`.
         Defaults to 200.
+        Defaults to ``200``.
     rrf_k : int, optional
         Reciprocal Rank Fusion parameter.
         Environment variable: `KGFOUNDRY_SEARCH_RRF_K`.
         Defaults to 60.
+        Defaults to ``60``.
     sparse_backend : str, optional
         Sparse backend type ('lucene' or 'pure').
         Environment variable: `KGFOUNDRY_SEARCH_SPARSE_BACKEND`.
         Defaults to 'lucene'.
+        Defaults to ``'lucene'``.
     kg_boosts_direct : float, optional
         Direct KG boost weight.
         Environment variable: `KGFOUNDRY_SEARCH_KG_BOOSTS_DIRECT`.
         Defaults to 0.08.
+        Defaults to ``0.08``.
     kg_boosts_one_hop : float, optional
         One-hop KG boost weight.
         Environment variable: `KGFOUNDRY_SEARCH_KG_BOOSTS_ONE_HOP`.
         Defaults to 0.04.
+        Defaults to ``0.04``.
     validate_responses : bool, optional
         Enable response schema validation (dev/staging only).
         Environment variable: `SEARCH_API_VALIDATE`.
         Defaults to False.
-    """
+        Defaults to ``False``.
+"""
 
     model_config = SettingsConfigDict(env_prefix="KGFOUNDRY_SEARCH_", extra="forbid")
 
@@ -132,25 +221,109 @@ class SearchConfig(BaseSettings):
 class ObservabilityConfig(BaseSettings):
     """Observability configuration.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
+    _case_sensitive : bool | None, optional
+        Describe ``_case_sensitive``.
+        Defaults to ``None``.
+    _nested_model_default_partial_update : bool | None, optional
+        Describe ``_nested_model_default_partial_update``.
+        Defaults to ``None``.
+    _env_prefix : str | None, optional
+        Describe ``_env_prefix``.
+        Defaults to ``None``.
+    _env_file : DotenvType | None, optional
+        Describe ``_env_file``.
+        Defaults to ``PosixPath('.')``.
+    _env_file_encoding : str | None, optional
+        Describe ``_env_file_encoding``.
+        Defaults to ``None``.
+    _env_ignore_empty : bool | None, optional
+        Describe ``_env_ignore_empty``.
+        Defaults to ``None``.
+    _env_nested_delimiter : str | None, optional
+        Describe ``_env_nested_delimiter``.
+        Defaults to ``None``.
+    _env_nested_max_split : int | None, optional
+        Describe ``_env_nested_max_split``.
+        Defaults to ``None``.
+    _env_parse_none_str : str | None, optional
+        Describe ``_env_parse_none_str``.
+        Defaults to ``None``.
+    _env_parse_enums : bool | None, optional
+        Describe ``_env_parse_enums``.
+        Defaults to ``None``.
+    _cli_prog_name : str | None, optional
+        Describe ``_cli_prog_name``.
+        Defaults to ``None``.
+    _cli_parse_args : bool | list[str] | tuple[str, ...] | None, optional
+        Describe ``_cli_parse_args``.
+        Defaults to ``None``.
+    _cli_settings_source : CliSettingsSource[Any] | None, optional
+        Describe ``_cli_settings_source``.
+        Defaults to ``None``.
+    _cli_parse_none_str : str | None, optional
+        Describe ``_cli_parse_none_str``.
+        Defaults to ``None``.
+    _cli_hide_none_type : bool | None, optional
+        Describe ``_cli_hide_none_type``.
+        Defaults to ``None``.
+    _cli_avoid_json : bool | None, optional
+        Describe ``_cli_avoid_json``.
+        Defaults to ``None``.
+    _cli_enforce_required : bool | None, optional
+        Describe ``_cli_enforce_required``.
+        Defaults to ``None``.
+    _cli_use_class_docs_for_groups : bool | None, optional
+        Describe ``_cli_use_class_docs_for_groups``.
+        Defaults to ``None``.
+    _cli_exit_on_error : bool | None, optional
+        Describe ``_cli_exit_on_error``.
+        Defaults to ``None``.
+    _cli_prefix : str | None, optional
+        Describe ``_cli_prefix``.
+        Defaults to ``None``.
+    _cli_flag_prefix_char : str | None, optional
+        Describe ``_cli_flag_prefix_char``.
+        Defaults to ``None``.
+    _cli_implicit_flags : bool | None, optional
+        Describe ``_cli_implicit_flags``.
+        Defaults to ``None``.
+    _cli_ignore_unknown_args : bool | None, optional
+        Describe ``_cli_ignore_unknown_args``.
+        Defaults to ``None``.
+    _cli_kebab_case : bool | None, optional
+        Describe ``_cli_kebab_case``.
+        Defaults to ``None``.
+    _cli_shortcuts : Mapping[str, str | list[str]] | None, optional
+        Describe ``_cli_shortcuts``.
+        Defaults to ``None``.
+    _secrets_dir : PathType | None, optional
+        Describe ``_secrets_dir``.
+        Defaults to ``None``.
     log_level : str, optional
         Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL).
         Environment variable: `KGFOUNDRY_LOG_LEVEL`.
         Defaults to "INFO".
+        Defaults to ``'INFO'``.
     metrics_enabled : bool, optional
         Enable Prometheus metrics export.
         Environment variable: `KGFOUNDRY_METRICS_ENABLED`.
         Defaults to True.
+        Defaults to ``True``.
     traces_enabled : bool, optional
         Enable OpenTelemetry tracing.
         Environment variable: `KGFOUNDRY_TRACES_ENABLED`.
         Defaults to False.
+        Defaults to ``False``.
     metrics_port : int, optional
         Port for Prometheus metrics endpoint.
         Environment variable: `KGFOUNDRY_METRICS_PORT`.
         Defaults to 9090.
-    """
+        Defaults to ``9090``.
+"""
 
     model_config = SettingsConfigDict(env_prefix="KGFOUNDRY_", extra="forbid")
 
@@ -165,29 +338,114 @@ class ObservabilityConfig(BaseSettings):
 class SparseEmbeddingConfig(BaseSettings):
     """Sparse embedding configuration.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
+    _case_sensitive : bool | None, optional
+        Describe ``_case_sensitive``.
+        Defaults to ``None``.
+    _nested_model_default_partial_update : bool | None, optional
+        Describe ``_nested_model_default_partial_update``.
+        Defaults to ``None``.
+    _env_prefix : str | None, optional
+        Describe ``_env_prefix``.
+        Defaults to ``None``.
+    _env_file : DotenvType | None, optional
+        Describe ``_env_file``.
+        Defaults to ``PosixPath('.')``.
+    _env_file_encoding : str | None, optional
+        Describe ``_env_file_encoding``.
+        Defaults to ``None``.
+    _env_ignore_empty : bool | None, optional
+        Describe ``_env_ignore_empty``.
+        Defaults to ``None``.
+    _env_nested_delimiter : str | None, optional
+        Describe ``_env_nested_delimiter``.
+        Defaults to ``None``.
+    _env_nested_max_split : int | None, optional
+        Describe ``_env_nested_max_split``.
+        Defaults to ``None``.
+    _env_parse_none_str : str | None, optional
+        Describe ``_env_parse_none_str``.
+        Defaults to ``None``.
+    _env_parse_enums : bool | None, optional
+        Describe ``_env_parse_enums``.
+        Defaults to ``None``.
+    _cli_prog_name : str | None, optional
+        Describe ``_cli_prog_name``.
+        Defaults to ``None``.
+    _cli_parse_args : bool | list[str] | tuple[str, ...] | None, optional
+        Describe ``_cli_parse_args``.
+        Defaults to ``None``.
+    _cli_settings_source : CliSettingsSource[Any] | None, optional
+        Describe ``_cli_settings_source``.
+        Defaults to ``None``.
+    _cli_parse_none_str : str | None, optional
+        Describe ``_cli_parse_none_str``.
+        Defaults to ``None``.
+    _cli_hide_none_type : bool | None, optional
+        Describe ``_cli_hide_none_type``.
+        Defaults to ``None``.
+    _cli_avoid_json : bool | None, optional
+        Describe ``_cli_avoid_json``.
+        Defaults to ``None``.
+    _cli_enforce_required : bool | None, optional
+        Describe ``_cli_enforce_required``.
+        Defaults to ``None``.
+    _cli_use_class_docs_for_groups : bool | None, optional
+        Describe ``_cli_use_class_docs_for_groups``.
+        Defaults to ``None``.
+    _cli_exit_on_error : bool | None, optional
+        Describe ``_cli_exit_on_error``.
+        Defaults to ``None``.
+    _cli_prefix : str | None, optional
+        Describe ``_cli_prefix``.
+        Defaults to ``None``.
+    _cli_flag_prefix_char : str | None, optional
+        Describe ``_cli_flag_prefix_char``.
+        Defaults to ``None``.
+    _cli_implicit_flags : bool | None, optional
+        Describe ``_cli_implicit_flags``.
+        Defaults to ``None``.
+    _cli_ignore_unknown_args : bool | None, optional
+        Describe ``_cli_ignore_unknown_args``.
+        Defaults to ``None``.
+    _cli_kebab_case : bool | None, optional
+        Describe ``_cli_kebab_case``.
+        Defaults to ``None``.
+    _cli_shortcuts : Mapping[str, str | list[str]] | None, optional
+        Describe ``_cli_shortcuts``.
+        Defaults to ``None``.
+    _secrets_dir : PathType | None, optional
+        Describe ``_secrets_dir``.
+        Defaults to ``None``.
     bm25_index_dir : str, optional
         BM25 index directory path.
         Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_BM25_INDEX_DIR`.
         Defaults to './_indices/bm25'.
+        Defaults to ``'./_indices/bm25'``.
     bm25_k1 : float, optional
         BM25 k1 parameter.
         Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_BM25_K1`.
         Defaults to 0.9.
+        Defaults to ``0.9``.
     bm25_b : float, optional
         BM25 b parameter.
         Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_BM25_B`.
         Defaults to 0.4.
+        Defaults to ``0.4``.
     splade_index_dir : str, optional
         SPLADE index directory path.
         Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_SPLADE_INDEX_DIR`.
         Defaults to './_indices/splade_impact'.
+        Defaults to ``'./_indices/splade_impact'``.
     splade_query_encoder : str, optional
         SPLADE query encoder model name.
         Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_SPLADE_QUERY_ENCODER`.
         Defaults to 'naver/splade-v3-distilbert'.
-    """
+        Defaults to ``'naver/splade-v3-distilbert'``.
+"""
 
     model_config = SettingsConfigDict(env_prefix="KGFOUNDRY_SPARSE_EMBEDDING_", extra="forbid")
 
@@ -206,29 +464,114 @@ class SparseEmbeddingConfig(BaseSettings):
 class FaissConfig(BaseSettings):
     """FAISS index configuration.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
+    _case_sensitive : bool | None, optional
+        Describe ``_case_sensitive``.
+        Defaults to ``None``.
+    _nested_model_default_partial_update : bool | None, optional
+        Describe ``_nested_model_default_partial_update``.
+        Defaults to ``None``.
+    _env_prefix : str | None, optional
+        Describe ``_env_prefix``.
+        Defaults to ``None``.
+    _env_file : DotenvType | None, optional
+        Describe ``_env_file``.
+        Defaults to ``PosixPath('.')``.
+    _env_file_encoding : str | None, optional
+        Describe ``_env_file_encoding``.
+        Defaults to ``None``.
+    _env_ignore_empty : bool | None, optional
+        Describe ``_env_ignore_empty``.
+        Defaults to ``None``.
+    _env_nested_delimiter : str | None, optional
+        Describe ``_env_nested_delimiter``.
+        Defaults to ``None``.
+    _env_nested_max_split : int | None, optional
+        Describe ``_env_nested_max_split``.
+        Defaults to ``None``.
+    _env_parse_none_str : str | None, optional
+        Describe ``_env_parse_none_str``.
+        Defaults to ``None``.
+    _env_parse_enums : bool | None, optional
+        Describe ``_env_parse_enums``.
+        Defaults to ``None``.
+    _cli_prog_name : str | None, optional
+        Describe ``_cli_prog_name``.
+        Defaults to ``None``.
+    _cli_parse_args : bool | list[str] | tuple[str, ...] | None, optional
+        Describe ``_cli_parse_args``.
+        Defaults to ``None``.
+    _cli_settings_source : CliSettingsSource[Any] | None, optional
+        Describe ``_cli_settings_source``.
+        Defaults to ``None``.
+    _cli_parse_none_str : str | None, optional
+        Describe ``_cli_parse_none_str``.
+        Defaults to ``None``.
+    _cli_hide_none_type : bool | None, optional
+        Describe ``_cli_hide_none_type``.
+        Defaults to ``None``.
+    _cli_avoid_json : bool | None, optional
+        Describe ``_cli_avoid_json``.
+        Defaults to ``None``.
+    _cli_enforce_required : bool | None, optional
+        Describe ``_cli_enforce_required``.
+        Defaults to ``None``.
+    _cli_use_class_docs_for_groups : bool | None, optional
+        Describe ``_cli_use_class_docs_for_groups``.
+        Defaults to ``None``.
+    _cli_exit_on_error : bool | None, optional
+        Describe ``_cli_exit_on_error``.
+        Defaults to ``None``.
+    _cli_prefix : str | None, optional
+        Describe ``_cli_prefix``.
+        Defaults to ``None``.
+    _cli_flag_prefix_char : str | None, optional
+        Describe ``_cli_flag_prefix_char``.
+        Defaults to ``None``.
+    _cli_implicit_flags : bool | None, optional
+        Describe ``_cli_implicit_flags``.
+        Defaults to ``None``.
+    _cli_ignore_unknown_args : bool | None, optional
+        Describe ``_cli_ignore_unknown_args``.
+        Defaults to ``None``.
+    _cli_kebab_case : bool | None, optional
+        Describe ``_cli_kebab_case``.
+        Defaults to ``None``.
+    _cli_shortcuts : Mapping[str, str | list[str]] | None, optional
+        Describe ``_cli_shortcuts``.
+        Defaults to ``None``.
+    _secrets_dir : PathType | None, optional
+        Describe ``_secrets_dir``.
+        Defaults to ``None``.
     gpu : bool, optional
         Enable GPU acceleration.
         Environment variable: `KGFOUNDRY_FAISS_GPU`.
         Defaults to True.
+        Defaults to ``True``.
     cuvs : bool, optional
         Enable cuVS support.
         Environment variable: `KGFOUNDRY_FAISS_CUVS`.
         Defaults to True.
+        Defaults to ``True``.
     index_factory : str, optional
         FAISS index factory string.
         Environment variable: `KGFOUNDRY_FAISS_INDEX_FACTORY`.
         Defaults to 'OPQ64,IVF8192,PQ64'.
+        Defaults to ``'OPQ64,IVF8192,PQ64'``.
     nprobe : int, optional
         Number of probes for IVF indexes.
         Environment variable: `KGFOUNDRY_FAISS_NPROBE`.
         Defaults to 64.
+        Defaults to ``64``.
     index_path : str, optional
         FAISS index file path.
         Environment variable: `KGFOUNDRY_FAISS_INDEX_PATH`.
         Defaults to './_indices/faiss/shard_000.idx'.
-    """
+        Defaults to ``'./_indices/faiss/shard_000.idx'``.
+"""
 
     model_config = SettingsConfigDict(env_prefix="KGFOUNDRY_FAISS_", extra="forbid")
 
@@ -246,8 +589,25 @@ class FaissConfig(BaseSettings):
 class RuntimeSettings(BaseSettings):
     """Runtime configuration with typed nested models and fail-fast validation.
 
+    <!-- auto:docstring-builder v1 -->
+
     This class loads configuration from environment variables with type validation.
     Missing required fields raise SettingsError with Problem Details metadata.
+
+    Parameters
+    ----------
+    search : SearchConfig, optional
+        Describe ``search``.
+        Defaults to ``<factory>``.
+    observability : ObservabilityConfig, optional
+        Describe ``observability``.
+        Defaults to ``<factory>``.
+    sparse_embedding : SparseEmbeddingConfig, optional
+        Describe ``sparse_embedding``.
+        Defaults to ``<factory>``.
+    faiss : FaissConfig, optional
+        Describe ``faiss``.
+        Defaults to ``<factory>``.
 
     Environment Variables
     ---------------------
@@ -286,7 +646,7 @@ class RuntimeSettings(BaseSettings):
     - All nested models use `extra="forbid"` to prevent unknown fields
     - Settings are validated at instantiation time (fail-fast)
     - Configuration can be overridden via environment variables or `.env` files
-    """
+"""
 
     model_config = SettingsConfigDict(
         env_prefix="KGFOUNDRY_",
@@ -310,6 +670,8 @@ class RuntimeSettings(BaseSettings):
     def __init__(self, **overrides: object) -> None:
         """Initialize settings with fail-fast validation from environment variables.
 
+        <!-- auto:docstring-builder v1 -->
+
         This constructor loads from environment variables (via pydantic_settings)
         and accepts optional keyword arguments for programmatic overrides. For
         public API usage, prefer `load_settings()` which provides better error
@@ -325,7 +687,7 @@ class RuntimeSettings(BaseSettings):
         ------
         SettingsError
             If validation fails (missing required fields, invalid types, etc.).
-        """
+"""
         try:
             super().__init__(**overrides)  # type: ignore[arg-type]  # BaseSettings.__init__ accepts Any kwargs, mypy can't infer overloads
         except Exception as exc:
@@ -349,6 +711,8 @@ KgFoundrySettings = RuntimeSettings
 def load_settings(**overrides: object) -> KgFoundrySettings:
     """Load settings from environment variables with optional overrides.
 
+    <!-- auto:docstring-builder v1 -->
+
     This function loads settings from environment variables (via pydantic_settings)
     and allows programmatic overrides via keyword arguments. All overrides are
     validated against the settings schema.
@@ -361,7 +725,7 @@ def load_settings(**overrides: object) -> KgFoundrySettings:
 
     Returns
     -------
-    KgFoundrySettings
+    RuntimeSettings
         Validated settings instance.
 
     Raises
@@ -385,7 +749,7 @@ def load_settings(**overrides: object) -> KgFoundrySettings:
     >>> # Missing required env var raises SettingsError
     >>> # settings = load_settings()  # doctest: +SKIP
     >>> # SettingsError: Configuration validation failed
-    """
+"""
     try:
         return RuntimeSettings(**overrides)
     except SettingsError:

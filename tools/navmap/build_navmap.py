@@ -20,15 +20,20 @@ from functools import singledispatch
 from pathlib import Path
 from typing import cast
 
-from tools._shared.logging import get_logger
-from tools._shared.proc import ToolExecutionError, run_tool
+import msgspec
+from tools import ToolExecutionError, get_logger, run_tool, validate_tools_payload
 from tools.drift_preview import write_html_diff
+from tools.navmap.document_models import (
+    NAVMAP_SCHEMA,
+    navmap_document_from_index,
+)
 from tools.navmap.models import (
     ModuleEntryDict,
     ModuleMetaDict,
     NavIndexDict,
     NavSectionDict,
     SymbolMetaDict,
+    nav_index_from_dict,
 )
 
 LOGGER = get_logger(__name__)
@@ -744,11 +749,11 @@ def _collect_module(py: Path) -> ModuleInfo | None:
 def _build_links(info: ModuleInfo) -> dict[str, str]:
     """Return source links for a module entry based on configured link mode."""
     links: dict[str, str] = {}
-    if LINK_MODE in ("editor", "both"):
+    if LINK_MODE in {"editor", "both"}:
         editor_link = _editor_link(info.path)
         if editor_link:
             links["source"] = editor_link
-    if LINK_MODE in ("github", "both"):
+    if LINK_MODE in {"github", "both"}:
         github_link = _gh_link(info.path, None, None)
         if github_link:
             links["github"] = github_link
@@ -889,7 +894,7 @@ def _discover_py_files(root: Path = SRC) -> list[Path]:
     return sorted(p for p in root.rglob("*.py") if p.is_file())
 
 
-def build_index(root: Path = SRC, json_path: Path | None = None) -> NavIndexDict:
+def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, object]:
     """Build the navmap index and optionally persist it to disk.
 
     Parameters
@@ -901,8 +906,8 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> NavIndexDict
 
     Returns
     -------
-    NavIndexDict
-        Serialized navmap index keyed by dotted module name.
+    dict[str, object]
+        Serialized navmap document complying with ``navmap_document.json``.
 
     Examples
     --------
@@ -912,24 +917,37 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> NavIndexDict
     """
     files = _discover_py_files(root)
     modules = _collect_module_entries(files)
-    data: NavIndexDict = {
-        "commit": _git_sha(),
-        "policy_version": "1",
-        "link_mode": LINK_MODE,
+    commit = _git_sha()
+    policy_version = "1"
+    link_mode = LINK_MODE
+    index_dict: NavIndexDict = {
+        "commit": commit,
+        "policy_version": policy_version,
+        "link_mode": link_mode,
         "modules": modules,
     }
 
-    # Write
+    nav_index = nav_index_from_dict(index_dict)
+    document = navmap_document_from_index(
+        nav_index,
+        commit=commit,
+        policy_version=policy_version,
+        link_mode=link_mode,
+    )
+
+    payload = msgspec.to_builtins(document)
+    validate_tools_payload(payload, NAVMAP_SCHEMA)
+
     out = json_path or INDEX_PATH
     previous = out.read_text(encoding="utf-8") if out.exists() else ""
     out.parent.mkdir(parents=True, exist_ok=True)
-    payload = json.dumps(data, indent=2)
-    out.write_text(payload, encoding="utf-8")
-    if previous and previous != payload:
-        write_html_diff(previous, payload, NAVMAP_DIFF_PATH, "Navmap drift")
+    encoded_text = json.dumps(payload, indent=2)
+    out.write_text(encoded_text, encoding="utf-8")
+    if previous and previous != encoded_text:
+        write_html_diff(previous, encoded_text, NAVMAP_DIFF_PATH, "Navmap drift")
     else:
         NAVMAP_DIFF_PATH.unlink(missing_ok=True)
-    return data
+    return payload
 
 
 def main(argv: Sequence[str] | None = None) -> int:

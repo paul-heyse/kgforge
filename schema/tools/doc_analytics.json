@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kgfoundry.dev/schema/tools/doc_analytics.json",
+  "title": "AgentCatalogAnalytics",
+  "description": "Analytics summary for Agent Catalog documentation builds.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "schemaId", "generatedAt", "repo", "catalog", "portal", "errors"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Semantic version for this schema."
+    },
+    "schemaId": {
+      "type": "string",
+      "const": "https://kgfoundry.dev/schema/tools/doc_analytics.json",
+      "description": "Canonical identifier for this schema."
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when analytics were generated."
+    },
+    "repo": {
+      "$ref": "#/$defs/RepoInfo"
+    },
+    "catalog": {
+      "$ref": "#/$defs/CatalogMetrics"
+    },
+    "portal": {
+      "$ref": "#/$defs/PortalAnalytics"
+    },
+    "errors": {
+      "$ref": "#/$defs/AnalyticsErrors"
+    }
+  },
+  "$defs": {
+    "RepoInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root"],
+      "properties": {
+        "root": {
+          "type": "string",
+          "description": "Repository root used to resolve relative paths."
+        }
+      }
+    },
+    "CatalogMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["packages", "modules", "symbols", "shards"],
+      "properties": {
+        "packages": { "type": "integer", "minimum": 0 },
+        "modules": { "type": "integer", "minimum": 0 },
+        "symbols": { "type": "integer", "minimum": 0 },
+        "shards": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "PortalAnalytics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sessions"],
+      "properties": {
+        "sessions": { "$ref": "#/$defs/PortalSessions" }
+      }
+    },
+    "PortalSessions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["builds", "unique_users"],
+      "properties": {
+        "builds": { "type": "integer", "minimum": 0 },
+        "unique_users": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "AnalyticsErrors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["broken_links", "details"],
+      "properties": {
+        "broken_links": { "type": "integer", "minimum": 0 },
+        "details": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/BrokenLinkDetail" }
+        }
+      }
+    },
+    "BrokenLinkDetail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module"],
+      "properties": {
+        "module": { "type": "string" },
+        "path": { "type": ["string", "null"] },
+        "page": { "type": ["string", "null"] },
+        "kind": { "type": ["string", "null"] }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schemaVersion": "1.0.0",
+      "schemaId": "https://kgfoundry.dev/schema/tools/doc_analytics.json",
+      "generatedAt": "2025-01-01T12:00:00+00:00",
+      "repo": { "root": "/workspace" },
+      "catalog": { "packages": 4, "modules": 12, "symbols": 240, "shards": 2 },
+      "portal": { "sessions": { "builds": 5, "unique_users": 3 } },
+      "errors": {
+        "broken_links": 1,
+        "details": [
+          {
+            "module": "kgfoundry.docs.example",
+            "page": "missing.md",
+            "kind": "docs"
+          }
+        ]
+      }
+    }
+  ]
+}
+

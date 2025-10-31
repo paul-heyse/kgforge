@@ -5,6 +5,9 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
+import importlib
+import sys
+
 _ALIASES: dict[str, str] = {
     "docling": "docling",
     "download": "download",
@@ -37,15 +40,11 @@ def _load(name: str) -> object:
     name : str
         Describe ``name``.
 
-
     Returns
     -------
     object
         Describe return value.
-    """
-    import importlib
-    import sys
-
+"""
     module = importlib.import_module(_ALIASES[name])
     sys.modules[f"{__name__}.{name}"] = module
     return module
@@ -56,20 +55,20 @@ def __getattr__(name: str) -> object:
 
     <!-- auto:docstring-builder v1 -->
 
-    Provide a fallback for unknown attribute lookups. This special method integrates the class with Python's data model so instances behave consistently with the language expectations.
+    &lt;!-- auto:docstring-builder v1 --&gt;
+
+    Provide a fallback for unknown attribute lookups. This special method integrates the class with Python&#39;s data model so instances behave consistently with the language expectations.
 
     Parameters
     ----------
     name : str
-        Describe `name`.
-
-
+        Configure the name.
 
     Returns
     -------
     object
         Describe return value.
-    """
+"""
     if name not in _ALIASES:
         message = f"module {__name__!r} has no attribute {name!r}"
         raise AttributeError(message) from None
@@ -85,7 +84,7 @@ def __dir__() -> list[str]:
     -------
     list[str]
         Sorted union of exports and implementation attributes.
-    """
+"""
     return sorted(set(__all__))
 
 
@@ -100,12 +99,6 @@ def _ensure_namespace_alias(name: str) -> None:
     ----------
     name : str
         Describe ``name``.
-    """
-    import sys
-
+"""
     if f"{__name__}.{name}" not in sys.modules:
         _load(name)
-
-
-for _name in __all__:
-    _ensure_namespace_alias(_name)

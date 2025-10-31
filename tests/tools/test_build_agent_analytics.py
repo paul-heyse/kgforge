@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import json
 from argparse import Namespace
 from pathlib import Path
 
+import msgspec
 from tools.docs import build_agent_analytics
+from tools.docs.analytics_models import AgentAnalyticsDocument
 
 FIXTURE = Path("tests/fixtures/agent/catalog_sample.json")
 
@@ -33,10 +34,9 @@ def test_build_analytics_reports_metrics(tmp_path: Path) -> None:
         link_sample=10,
     )
     payload = build_agent_analytics.build_analytics(args)
-    assert payload["version"] == "1.0"
-    assert payload["catalog"]["packages"] >= 1
-    assert payload["portal"]["sessions"]["builds"] == 1
-    assert payload["errors"]["broken_links"] == 0
+    assert payload.catalog.packages >= 1
+    assert payload.portal.sessions.builds == 1
+    assert payload.errors.broken_links == 0
 
 
 def test_write_analytics_increments_build_counter(tmp_path: Path) -> None:
@@ -45,10 +45,10 @@ def test_write_analytics_increments_build_counter(tmp_path: Path) -> None:
     previous = {
         "version": "1.0",
         "portal": {"sessions": {"builds": 2, "unique_users": 5}},
-        "errors": {"broken_links": 0},
+        "errors": {"broken_links": 0, "details": []},
     }
     output_path = tmp_path / "analytics.json"
-    output_path.write_text(json.dumps(previous), encoding="utf-8")
+    output_path.write_text(msgspec.json.encode(previous).decode("utf-8"), encoding="utf-8")
     args = Namespace(
         catalog=FIXTURE,
         output=output_path,
@@ -56,9 +56,9 @@ def test_write_analytics_increments_build_counter(tmp_path: Path) -> None:
         link_sample=1,
     )
     build_agent_analytics.write_analytics(args)
-    refreshed = json.loads(output_path.read_text(encoding="utf-8"))
-    assert refreshed["portal"]["sessions"]["builds"] == 3
-    assert refreshed["portal"]["sessions"]["unique_users"] == 5
+    refreshed = msgspec.json.decode(output_path.read_bytes(), type=AgentAnalyticsDocument)
+    assert refreshed.portal.sessions.builds == 3
+    assert refreshed.portal.sessions.unique_users == 5
 
 
 def test_build_analytics_flags_missing_links(tmp_path: Path) -> None:
@@ -70,5 +70,5 @@ def test_build_analytics_flags_missing_links(tmp_path: Path) -> None:
         link_sample=1,
     )
     payload = build_agent_analytics.build_analytics(args)
-    assert payload["errors"]["broken_links"] >= 1
-    assert payload["errors"]["details"], "expected broken link details"
+    assert payload.errors.broken_links >= 1
+    assert payload.errors.details, "expected broken link details"

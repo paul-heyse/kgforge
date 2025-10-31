@@ -61,7 +61,7 @@ def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
     max_works : int, optional
         Describe ``max_works``.
         Defaults to ``20000``.
-    """
+"""
     typer.echo(f"[dry-run] would harvest topic={topic!r}, years={years}, max_works={max_works}")
 
 

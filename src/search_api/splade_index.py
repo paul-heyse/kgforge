@@ -60,12 +60,11 @@ def tok(text: str) -> list[str]:
     text : str
         Describe ``text``.
 
-
     Returns
     -------
     list[str]
         Describe return value.
-    """
+"""
     # re.findall returns list[str] when pattern has no groups
     matches: list[str] = TOKEN.findall(text or "")
     return [token.lower() for token in matches]
@@ -92,7 +91,7 @@ class SpladeDoc:
         Describe ``section``.
     text : str
         Describe ``text``.
-    """
+"""
 
     chunk_id: str
     doc_id: str
@@ -120,7 +119,7 @@ class SpladeIndex:
     sparse_root : str | None, optional
         Describe ``sparse_root``.
         Defaults to ``None``.
-    """
+"""
 
     def __init__(
         self,
@@ -138,13 +137,13 @@ class SpladeIndex:
         ----------
         db_path : str
             Describe ``db_path``.
-        chunks_dataset_root : str | None, optional
+        chunks_dataset_root : str | NoneType, optional
             Describe ``chunks_dataset_root``.
             Defaults to ``None``.
-        sparse_root : str | None, optional
+        sparse_root : str | NoneType, optional
             Describe ``sparse_root``.
             Defaults to ``None``.
-        """
+"""
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
@@ -161,9 +160,9 @@ class SpladeIndex:
 
         Parameters
         ----------
-        chunks_root : str | None
+        chunks_root : str | NoneType
             Describe ``chunks_root``.
-        """
+"""
         _ = chunks_root  # optional override currently unused
         if not Path(self.db_path).exists():
             return
@@ -226,12 +225,11 @@ class SpladeIndex:
             Describe ``k``.
             Defaults to ``10``.
 
-
         Returns
         -------
         list[tuple[int, float]]
             Describe return value.
-        """
+"""
         if self.N == 0:
             return []
         terms = tok(query)
@@ -268,10 +266,9 @@ class SpladeIndex:
         index : int
             Describe ``index``.
 
-
         Returns
         -------
         SpladeDoc
             Describe return value.
-        """
+"""
         return self.docs[index]

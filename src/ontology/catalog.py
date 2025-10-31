@@ -28,10 +28,10 @@ class Concept:
     ----------
     id : str
         Describe ``id``.
-    label : str | None, optional
+    label : str | NoneType, optional
         Describe ``label``.
         Defaults to ``None``.
-    """
+"""
 
     id: str
     label: str | None = None
@@ -79,7 +79,7 @@ class OntologyCatalog:
     ----------
     concepts : list[Concept]
         Describe ``concepts``.
-    """
+"""
 
     def __init__(self, concepts: list[Concept]) -> None:
         """Describe   init  .
@@ -92,30 +92,32 @@ class OntologyCatalog:
         ----------
         concepts : list[Concept]
             Describe ``concepts``.
-        """
+"""
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
         """Describe neighbors.
 
-            <!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
             Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
         Parameters
         ----------
-            concept_id : str
+        concept_id : str
                 Describe ``concept_id``.
             depth : int, optional
                 Describe ``depth``.
                 Defaults to ``1``.
-
+        depth : int, optional
+            Describe ``depth``.
+            Defaults to ``1``.
 
         Returns
         -------
         set[str]
             Describe return value.
-        """
+"""
         del concept_id, depth
         # NOTE: return neighbor concept IDs up to depth when ontology data is wired
         return set()
@@ -123,20 +125,19 @@ class OntologyCatalog:
     def hydrate(self, concept_id: str) -> dict[str, JsonValue]:
         """Describe hydrate.
 
-            <!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
             Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
 
         Parameters
         ----------
-            concept_id : str
+        concept_id : str
                 Describe ``concept_id``.
-
 
         Returns
         -------
-        dict[str, JsonValue]
+        dict[str, object]
             Describe return value.
-        """
+"""
         del concept_id
         return {}

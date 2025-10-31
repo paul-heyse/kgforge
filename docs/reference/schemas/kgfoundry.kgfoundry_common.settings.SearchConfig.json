@@ -1,0 +1,84 @@
+{
+  "$id": "https://kgfoundry/schemas/kgfoundry.kgfoundry_common.settings.SearchConfig.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Search service configuration.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\n_case_sensitive : bool | None, optional\n    Describe ``_case_sensitive``.\n    Defaults to ``None``.\n_nested_model_default_partial_update : bool | None, optional\n    Describe ``_nested_model_default_partial_update``.\n    Defaults to ``None``.\n_env_prefix : str | None, optional\n    Describe ``_env_prefix``.\n    Defaults to ``None``.\n_env_file : DotenvType | None, optional\n    Describe ``_env_file``.\n    Defaults to ``PosixPath('.')``.\n_env_file_encoding : str | None, optional\n    Describe ``_env_file_encoding``.\n    Defaults to ``None``.\n_env_ignore_empty : bool | None, optional\n    Describe ``_env_ignore_empty``.\n    Defaults to ``None``.\n_env_nested_delimiter : str | None, optional\n    Describe ``_env_nested_delimiter``.\n    Defaults to ``None``.\n_env_nested_max_split : int | None, optional\n    Describe ``_env_nested_max_split``.\n    Defaults to ``None``.\n_env_parse_none_str : str | None, optional\n    Describe ``_env_parse_none_str``.\n    Defaults to ``None``.\n_env_parse_enums : bool | None, optional\n    Describe ``_env_parse_enums``.\n    Defaults to ``None``.\n_cli_prog_name : str | None, optional\n    Describe ``_cli_prog_name``.\n    Defaults to ``None``.\n_cli_parse_args : bool | list[str] | tuple[str, ...] | None, optional\n    Describe ``_cli_parse_args``.\n    Defaults to ``None``.\n_cli_settings_source : CliSettingsSource[Any] | None, optional\n    Describe ``_cli_settings_source``.\n    Defaults to ``None``.\n_cli_parse_none_str : str | None, optional\n    Describe ``_cli_parse_none_str``.\n    Defaults to ``None``.\n_cli_hide_none_type : bool | None, optional\n    Describe ``_cli_hide_none_type``.\n    Defaults to ``None``.\n_cli_avoid_json : bool | None, optional\n    Describe ``_cli_avoid_json``.\n    Defaults to ``None``.\n_cli_enforce_required : bool | None, optional\n    Describe ``_cli_enforce_required``.\n    Defaults to ``None``.\n_cli_use_class_docs_for_groups : bool | None, optional\n    Describe ``_cli_use_class_docs_for_groups``.\n    Defaults to ``None``.\n_cli_exit_on_error : bool | None, optional\n    Describe ``_cli_exit_on_error``.\n    Defaults to ``None``.\n_cli_prefix : str | None, optional\n    Describe ``_cli_prefix``.\n    Defaults to ``None``.\n_cli_flag_prefix_char : str | None, optional\n    Describe ``_cli_flag_prefix_char``.\n    Defaults to ``None``.\n_cli_implicit_flags : bool | None, optional\n    Describe ``_cli_implicit_flags``.\n    Defaults to ``None``.\n_cli_ignore_unknown_args : bool | None, optional\n    Describe ``_cli_ignore_unknown_args``.\n    Defaults to ``None``.\n_cli_kebab_case : bool | None, optional\n    Describe ``_cli_kebab_case``.\n    Defaults to ``None``.\n_cli_shortcuts : Mapping[str, str | list[str]] | None, optional\n    Describe ``_cli_shortcuts``.\n    Defaults to ``None``.\n_secrets_dir : PathType | None, optional\n    Describe ``_secrets_dir``.\n    Defaults to ``None``.\napi_url : str | NoneType, optional\n    Search API base URL. Required if search features are used.\n    Environment variable: `KGFOUNDRY_SEARCH_API_URL`.\n    Defaults to None.\n    Defaults to ``None``.\nk : int, optional\n    Default number of results to return.\n    Environment variable: `KGFOUNDRY_SEARCH_K`.\n    Defaults to 10.\n    Defaults to ``10``.\ndense_candidates : int, optional\n    Number of dense candidates for hybrid search.\n    Environment variable: `KGFOUNDRY_SEARCH_DENSE_CANDIDATES`.\n    Defaults to 200.\n    Defaults to ``200``.\nsparse_candidates : int, optional\n    Number of sparse candidates for hybrid search.\n    Environment variable: `KGFOUNDRY_SEARCH_SPARSE_CANDIDATES`.\n    Defaults to 200.\n    Defaults to ``200``.\nrrf_k : int, optional\n    Reciprocal Rank Fusion parameter.\n    Environment variable: `KGFOUNDRY_SEARCH_RRF_K`.\n    Defaults to 60.\n    Defaults to ``60``.\nsparse_backend : str, optional\n    Sparse backend type ('lucene' or 'pure').\n    Environment variable: `KGFOUNDRY_SEARCH_SPARSE_BACKEND`.\n    Defaults to 'lucene'.\n    Defaults to ``'lucene'``.\nkg_boosts_direct : float, optional\n    Direct KG boost weight.\n    Environment variable: `KGFOUNDRY_SEARCH_KG_BOOSTS_DIRECT`.\n    Defaults to 0.08.\n    Defaults to ``0.08``.\nkg_boosts_one_hop : float, optional\n    One-hop KG boost weight.\n    Environment variable: `KGFOUNDRY_SEARCH_KG_BOOSTS_ONE_HOP`.\n    Defaults to 0.04.\n    Defaults to ``0.04``.\nvalidate_responses : bool, optional\n    Enable response schema validation (dev/staging only).\n    Environment variable: `SEARCH_API_VALIDATE`.\n    Defaults to False.\n    Defaults to ``False``.",
+  "examples": [
+    {
+      "api_url": {},
+      "dense_candidates": 200,
+      "k": 10,
+      "kg_boosts_direct": 0.08,
+      "kg_boosts_one_hop": 0.04,
+      "rrf_k": 60,
+      "sparse_backend": "lucene",
+      "sparse_candidates": 200,
+      "validate_responses": false
+    }
+  ],
+  "properties": {
+    "api_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Search API base URL (required if search features are used)",
+      "title": "Api Url"
+    },
+    "dense_candidates": {
+      "default": 200,
+      "description": "Number of dense candidates for hybrid search",
+      "title": "Dense Candidates",
+      "type": "integer"
+    },
+    "k": {
+      "default": 10,
+      "description": "Default number of results to return",
+      "title": "K",
+      "type": "integer"
+    },
+    "kg_boosts_direct": {
+      "default": 0.08,
+      "description": "Direct KG boost weight",
+      "title": "Kg Boosts Direct",
+      "type": "number"
+    },
+    "kg_boosts_one_hop": {
+      "default": 0.04,
+      "description": "One-hop KG boost weight",
+      "title": "Kg Boosts One Hop",
+      "type": "number"
+    },
+    "rrf_k": {
+      "default": 60,
+      "description": "Reciprocal Rank Fusion parameter",
+      "title": "Rrf K",
+      "type": "integer"
+    },
+    "sparse_backend": {
+      "default": "lucene",
+      "description": "Sparse backend type ('lucene' or 'pure')",
+      "title": "Sparse Backend",
+      "type": "string"
+    },
+    "sparse_candidates": {
+      "default": 200,
+      "description": "Number of sparse candidates for hybrid search",
+      "title": "Sparse Candidates",
+      "type": "integer"
+    },
+    "validate_responses": {
+      "default": false,
+      "description": "Enable response schema validation (dev/staging only)",
+      "title": "Validate Responses",
+      "type": "boolean"
+    }
+  },
+  "title": "SearchConfig",
+  "type": "object"
+}

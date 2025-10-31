@@ -36,7 +36,7 @@ run() {
 
 ensure_tools() {
   local missing_tools=()
-  for tool in doq docformatter pydocstyle pydoclint interrogate; do
+  for tool in doq docformatter pydocstyle pydoclint docstr-coverage; do
     if [[ ! -x "$BIN/$tool" ]]; then
       missing_tools+=("$tool")
     fi

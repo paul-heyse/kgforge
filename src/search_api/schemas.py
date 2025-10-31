@@ -48,13 +48,15 @@ __navmap__: Final[NavMap] = {
 class SearchResponse(BaseModel):
     """Search API response containing results.
 
+    <!-- auto:docstring-builder v1 -->
+
     Response envelope for search API endpoints.
 
     Parameters
     ----------
-    results : list[SearchResult]
-        List of search results.
-    """
+    **data : Any
+        Describe ``data``.
+"""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -77,7 +79,7 @@ class SearchRequest(BaseModel):
     k : int, optional
         Describe ``k``.
         Defaults to ``10``.
-    filters : dict[str, JsonValue] | None, optional
+    filters : dict[str, object] | NoneType, optional
         Describe ``filters``.
         Defaults to ``None``.
     explain : bool, optional
@@ -96,7 +98,7 @@ class SearchRequest(BaseModel):
     ...     / "search_request.v1.json"
     ... )
     >>> assert_model_roundtrip(SearchRequest, example_path)
-    """
+"""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -149,7 +151,7 @@ class SearchResult(BaseModel):
     ...     / "search_result.v1.json"
     ... )
     >>> assert_model_roundtrip(SearchResult, example_path)
-    """
+"""
 
     model_config = ConfigDict(extra="forbid")
 

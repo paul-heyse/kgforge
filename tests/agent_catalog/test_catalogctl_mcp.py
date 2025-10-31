@@ -59,9 +59,21 @@ def mcp_payload_validator(mcp_payload_schema: dict[str, object]) -> Draft202012V
         if problem_details_id:
             problem_details_id_str = str(problem_details_id)  # Cast to str for dict key
             store[problem_details_id_str] = problem_details  # type: ignore[misc]  # problem_details_id_str may be Any
+        store["https://kgfoundry.dev/schema/common/problem_details.json"] = problem_details
+        store["https://kgfoundry.dev/schemas/common/problem_details.json"] = problem_details
         store["../common/problem_details.json"] = problem_details
 
-    resolver = RefResolver.from_schema(mcp_payload_schema, store=store)  # type: ignore[misc]  # RefResolver typing limitation
+    def _resolve_local(uri: str) -> object:
+        key = str(uri)
+        if key in store:
+            return store[key]
+        raise KeyError(key)
+
+    resolver = RefResolver.from_schema(  # type: ignore[misc]  # RefResolver typing limitation
+        mcp_payload_schema,
+        store=store,
+        handlers={"https": _resolve_local, "http": _resolve_local},
+    )
     return Draft202012Validator(mcp_payload_schema, resolver=resolver)  # type: ignore[call-arg,misc]  # jsonschema typing limitation - resolver is valid at runtime
 
 
@@ -132,6 +144,12 @@ class TestMCPSuccess:
             first_result = results_list[0]  # type: ignore[misc]  # list access returns Any
             assert isinstance(first_result, dict)
             assert first_result.get("qname") == "demo.module.fn"  # type: ignore[misc]  # dict access returns Any
+            metadata = search_result.get("metadata")  # type: ignore[misc]  # dict access returns Any
+            assert isinstance(metadata, dict)
+            assert metadata.get("correlation_id")  # type: ignore[misc]  # dict access returns Any
+            query_info = metadata.get("query_info")  # type: ignore[misc]  # dict access returns Any
+            assert isinstance(query_info, dict)
+            assert query_info.get("query") == "demo"  # type: ignore[misc]  # dict access returns Any
 
             shutdown = _rpc(
                 process, {"jsonrpc": "2.0", "id": 3, "method": "session.shutdown", "params": {}}
@@ -206,6 +224,9 @@ class TestMCPSuccess:
                 if isinstance(entry, dict)
             }
             assert "forbidden" in statuses
+            for entry in lines:
+                if isinstance(entry, dict):
+                    assert entry.get("correlation_id")  # type: ignore[misc]  # dict access returns Any
 
 
 class TestMCPSchemaValidation:
@@ -384,8 +405,7 @@ class TestMCPInvalidInput:
                     "params": {"query": ""},  # Empty query may be invalid
                 },
             )
-            # Should either succeed (empty results) or return error
-            assert "error" in error_response or "result" in error_response
+            assert "error" in error_response
         finally:
             if process.stdin:
                 process.stdin.close()
@@ -440,6 +460,7 @@ class TestMCPProblemDetails:
                 assert "type" in problem_details
                 assert "status" in problem_details
                 assert "title" in problem_details
+                assert problem_details.get("correlation_id")  # type: ignore[misc]  # dict access returns Any
                 # Validate against schema
                 with suppress(ValidationError):
                     mcp_payload_validator.validate(error_response)
@@ -497,6 +518,7 @@ class TestMCPProblemDetails:
                 assert "type" in problem_details
                 assert "status" in problem_details
                 assert problem_details.get("status") == 403  # type: ignore[misc]  # dict access returns Any
+                assert problem_details.get("correlation_id")  # type: ignore[misc]  # dict access returns Any
         finally:
             if process.stdin:
                 process.stdin.close()

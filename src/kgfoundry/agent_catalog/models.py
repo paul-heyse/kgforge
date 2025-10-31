@@ -20,19 +20,19 @@ class AnchorsModel(BaseModel):
 
     Parameters
     ----------
-    start_line : int | None, optional
+    start_line : int | NoneType, optional
         Describe ``start_line``.
         Defaults to ``None``.
-    end_line : int | None, optional
+    end_line : int | NoneType, optional
         Describe ``end_line``.
         Defaults to ``None``.
-    cst_fingerprint : str | None, optional
+    cst_fingerprint : str | NoneType, optional
         Describe ``cst_fingerprint``.
         Defaults to ``None``.
-    remap_order : list[dict[str, JsonValue]], optional
+    remap_order : list[dict[str, object]], optional
         Describe ``remap_order``.
         Defaults to ``<factory>``.
-    """
+"""
 
     start_line: int | None = None
     end_line: int | None = None
@@ -47,22 +47,22 @@ class QualityModel(BaseModel):
 
     Parameters
     ----------
-    mypy_status : str | None, optional
+    mypy_status : str | NoneType, optional
         Describe ``mypy_status``.
         Defaults to ``None``.
     ruff_rules : list[str], optional
         Describe ``ruff_rules``.
         Defaults to ``<factory>``.
-    pydoclint_parity : bool | None, optional
+    pydoclint_parity : bool | NoneType, optional
         Describe ``pydoclint_parity``.
         Defaults to ``None``.
-    docstring_coverage : float | None, optional
+    docstring_coverage : float | NoneType, optional
         Describe ``docstring_coverage``.
         Defaults to ``None``.
-    doctest_status : str | None, optional
+    doctest_status : str | NoneType, optional
         Describe ``doctest_status``.
         Defaults to ``None``.
-    """
+"""
 
     mypy_status: str | None = None
     ruff_rules: list[str] = Field(default_factory=list)
@@ -78,25 +78,25 @@ class MetricsModel(BaseModel):
 
     Parameters
     ----------
-    complexity : float | None, optional
+    complexity : float | NoneType, optional
         Describe ``complexity``.
         Defaults to ``None``.
-    loc : int | None, optional
+    loc : int | NoneType, optional
         Describe ``loc``.
         Defaults to ``None``.
-    last_modified : str | None, optional
+    last_modified : str | NoneType, optional
         Describe ``last_modified``.
         Defaults to ``None``.
     codeowners : list[str], optional
         Describe ``codeowners``.
         Defaults to ``<factory>``.
-    stability : str | None, optional
+    stability : str | NoneType, optional
         Describe ``stability``.
         Defaults to ``None``.
-    deprecated : bool | None, optional
+    deprecated : bool | NoneType, optional
         Describe ``deprecated``.
         Defaults to ``None``.
-    """
+"""
 
     complexity: float | None = None
     loc: int | None = None
@@ -128,7 +128,7 @@ class AgentHintsModel(BaseModel):
     breaking_change_notes : list[str], optional
         Describe ``breaking_change_notes``.
         Defaults to ``<factory>``.
-    """
+"""
 
     intent_tags: list[str] = Field(default_factory=list)
     safe_ops: list[str] = Field(default_factory=list)
@@ -150,16 +150,16 @@ class ChangeImpactModel(BaseModel):
     callees : list[str], optional
         Describe ``callees``.
         Defaults to ``<factory>``.
-    tests : list[dict[str, JsonValue]], optional
+    tests : list[dict[str, object]], optional
         Describe ``tests``.
         Defaults to ``<factory>``.
     codeowners : list[str], optional
         Describe ``codeowners``.
         Defaults to ``<factory>``.
-    churn_last_n : int | None, optional
+    churn_last_n : int | NoneType, optional
         Describe ``churn_last_n``.
         Defaults to ``None``.
-    """
+"""
 
     callers: list[str] = Field(default_factory=list)
     callees: list[str] = Field(default_factory=list)
@@ -181,7 +181,7 @@ class SymbolModel(BaseModel):
         Describe ``kind``.
     symbol_id : str
         Describe ``symbol_id``.
-    docfacts : dict[str, JsonValue] | None, optional
+    docfacts : dict[str, object] | NoneType, optional
         Describe ``docfacts``.
         Defaults to ``None``.
     anchors : AnchorsModel
@@ -194,10 +194,10 @@ class SymbolModel(BaseModel):
         Describe ``agent_hints``.
     change_impact : ChangeImpactModel
         Describe ``change_impact``.
-    exemplars : list[dict[str, JsonValue]], optional
+    exemplars : list[dict[str, object]], optional
         Describe ``exemplars``.
         Defaults to ``<factory>``.
-    """
+"""
 
     qname: str
     kind: str
@@ -225,10 +225,10 @@ class ModuleGraphModel(BaseModel):
     imports : list[str], optional
         Describe ``imports``.
         Defaults to ``<factory>``.
-    calls : list[dict[str, JsonValue]], optional
+    calls : list[dict[str, object]], optional
         Describe ``calls``.
         Defaults to ``<factory>``.
-    """
+"""
 
     imports: list[str] = Field(default_factory=list)
     calls: list[dict[str, JsonValue]] = Field(default_factory=list)
@@ -247,7 +247,7 @@ class ModuleModel(BaseModel):
         Describe ``qualified``.
     source : dict[str, str]
         Describe ``source``.
-    pages : dict[str, str | None]
+    pages : dict[str, str | NoneType]
         Describe ``pages``.
     imports : list[str], optional
         Describe ``imports``.
@@ -257,7 +257,7 @@ class ModuleModel(BaseModel):
         Defaults to ``<factory>``.
     graph : ModuleGraphModel
         Describe ``graph``.
-    """
+"""
 
     name: str
     qualified: str
@@ -284,7 +284,7 @@ class PackageModel(BaseModel):
     modules : list[ModuleModel], optional
         Describe ``modules``.
         Defaults to ``<factory>``.
-    """
+"""
 
     name: str
     modules: list[ModuleModel] = Field(default_factory=list)
@@ -301,16 +301,16 @@ class SemanticIndexModel(BaseModel):
         Describe ``index``.
     mapping : str
         Describe ``mapping``.
-    model : str | None, optional
+    model : str | NoneType, optional
         Describe ``model``.
         Defaults to ``None``.
-    dimension : int | None, optional
+    dimension : int | NoneType, optional
         Describe ``dimension``.
         Defaults to ``None``.
-    count : int | None, optional
+    count : int | NoneType, optional
         Describe ``count``.
         Defaults to ``None``.
-    """
+"""
 
     index: str
     mapping: str
@@ -330,10 +330,10 @@ class ShardEntryModel(BaseModel):
         Describe ``name``.
     path : str
         Describe ``path``.
-    modules : int | None, optional
+    modules : int | NoneType, optional
         Describe ``modules``.
         Defaults to ``None``.
-    """
+"""
 
     name: str
     path: str
@@ -352,7 +352,7 @@ class ShardsModel(BaseModel):
     packages : list[ShardEntryModel], optional
         Describe ``packages``.
         Defaults to ``<factory>``.
-    """
+"""
 
     index: str
     packages: list[ShardEntryModel] = Field(default_factory=list)
@@ -371,23 +371,23 @@ class AgentCatalogModel(BaseModel):
         Describe ``generated_at``.
     repo : dict[str, str]
         Describe ``repo``.
-    link_policy : dict[str, JsonValue]
+    link_policy : dict[str, object]
         Describe ``link_policy``.
-    artifacts : dict[str, JsonValue]
+    artifacts : dict[str, object]
         Describe ``artifacts``.
     packages : list[PackageModel], optional
         Describe ``packages``.
         Defaults to ``<factory>``.
-    shards : ShardsModel | None, optional
+    shards : ShardsModel | NoneType, optional
         Describe ``shards``.
         Defaults to ``None``.
-    semantic_index : SemanticIndexModel | None, optional
+    semantic_index : SemanticIndexModel | NoneType, optional
         Describe ``semantic_index``.
         Defaults to ``None``.
-    search : dict[str, JsonValue] | None, optional
+    search : dict[str, object] | NoneType, optional
         Describe ``search``.
         Defaults to ``None``.
-    """
+"""
 
     version: str
     generated_at: str
@@ -410,9 +410,9 @@ class AgentCatalogModel(BaseModel):
 
         Returns
         -------
-        Iterable[SymbolModel]
+        SymbolModel
             Describe return value.
-        """
+"""
         for package in self.packages:
             for module in package.modules:
                 yield from module.symbols
@@ -429,9 +429,9 @@ class AgentCatalogModel(BaseModel):
 
         Returns
         -------
-        SymbolModel | None
+        SymbolModel | NoneType
             Describe return value.
-        """
+"""
         for symbol in self.iter_symbols():
             if symbol.symbol_id == symbol_id:
                 return symbol
@@ -449,9 +449,9 @@ class AgentCatalogModel(BaseModel):
 
         Returns
         -------
-        ModuleModel | None
+        ModuleModel | NoneType
             Describe return value.
-        """
+"""
         for package in self.packages:
             for module in package.modules:
                 if module.qualified == qualified:
@@ -474,9 +474,9 @@ def load_catalog_payload(path: Path, *, load_shards: bool = True) -> dict[str, J
 
     Returns
     -------
-    dict[str, JsonValue]
+    dict[str, object]
         Describe return value.
-    """
+"""
     payload_raw: object = json.loads(path.read_text(encoding="utf-8"))
     # json.loads returns object (JsonValue at runtime), narrow to dict
     if not isinstance(payload_raw, dict):
@@ -537,7 +537,7 @@ def load_catalog_model(path: Path, *, load_shards: bool = True) -> AgentCatalogM
     -------
     AgentCatalogModel
         Describe return value.
-    """
+"""
 
     # Helper to isolate Pydantic's Any expression from model_validate
     # The class type itself contains Any, so we wrap the call to isolate it

@@ -13,31 +13,21 @@ def namespace_getattr(module: ModuleType, name: str) -> object:
 
     Parameters
     ----------
-    module : ModuleType
+    module : module
         Describe ``module``.
     name : str
         Describe ``name``.
-
 
     Returns
     -------
     object
         Attribute resolved from ``module``.
 
-
-
-
-
-
-
-
-
-
     Raises
     ------
     AttributeError
     If the attribute is missing on ``module``.
-    """
+"""
     # getattr returns object which may contain Any - this is inherent to dynamic attribute access
     return getattr(module, name)  # type: ignore[misc]
 
@@ -49,17 +39,16 @@ def namespace_dir(module: ModuleType, exports: Iterable[str]) -> list[str]:
 
     Parameters
     ----------
-    module : ModuleType
+    module : module
         Describe ``module``.
-    exports : Iterable[str]
+    exports : str
         Describe ``exports``.
-
 
     Returns
     -------
     list[str]
         Sorted set of attribute names surfaced to callers.
-    """
+"""
     candidates = set(exports)
     candidates.update(attr for attr in dir(module) if not attr.startswith("__"))
     return sorted(candidates)

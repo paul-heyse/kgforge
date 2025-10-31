@@ -101,7 +101,7 @@ Files to add:
       - mypy summary (per-module): `ok|error|unknown`.
       - ruff rule hits (list unique rule codes for module/symbol if available).
       - pydoclint parity (boolean).
-      - interrogate docstring coverage percentage (module-level).
+      - docstr-coverage docstring coverage percentage (module-level).
       - doctest outcomes from pytest xdoctest logs (`ok|fail|skip|unknown`).
     - Metrics: compute mccabe complexity and LOC per symbol/module; get `last_modified` via `git log -1 --format=%cI` per file; map `codeowners` from CODEOWNERS (optional).
     - Semantic index: concatenate symbol name + docstring + brief context; encode with MiniLM (configurable); write FAISS index and JSON mapping `symbol_id` → row.

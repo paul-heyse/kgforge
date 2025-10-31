@@ -12,7 +12,6 @@ from kgfoundry.agent_catalog.rbac import AccessController, Role
 from kgfoundry.agent_catalog.session import (
     CatalogSession,
     CatalogSessionError,
-    ProblemDetails,
 )
 from kgfoundry.agent_catalog.sqlite import load_catalog_from_sqlite, write_sqlite_catalog
 
@@ -24,7 +23,6 @@ __all__ = [
     "AuditLogger",
     "CatalogSession",
     "CatalogSessionError",
-    "ProblemDetails",
     "Role",
     "load_catalog_from_sqlite",
     "load_catalog_model",

@@ -142,7 +142,7 @@ Read these first when editing configs or debugging local vs CI drift:
 ## Docstrings (NumPy style; enforced; runnable)
 
 - **Style:** NumPy docstrings; PEP 257 structure (module/class/function docstrings for all public symbols)
-- **Enforcement:** `pydoclint` parity checks + `interrogate` coverage (≥90%)
+- **Enforcement:** `pydoclint` parity checks + `docstr-coverage` (≥90%)
 - **Runnability:** Examples in `Examples` must execute (doctest/xdoctest); keep snippets short and copy‑ready
 - **Required sections (public APIs):**
   - Summary (one line, imperative)

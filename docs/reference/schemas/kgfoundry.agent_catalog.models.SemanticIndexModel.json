@@ -1,0 +1,66 @@
+{
+  "$id": "https://kgfoundry/schemas/kgfoundry.agent_catalog.models.SemanticIndexModel.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Metadata describing persisted semantic index artifacts.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nindex : str\n    Describe ``index``.\nmapping : str\n    Describe ``mapping``.\nmodel : str | NoneType, optional\n    Describe ``model``.\n    Defaults to ``None``.\ndimension : int | NoneType, optional\n    Describe ``dimension``.\n    Defaults to ``None``.\ncount : int | NoneType, optional\n    Describe ``count``.\n    Defaults to ``None``.",
+  "examples": [
+    {
+      "count": {},
+      "dimension": {},
+      "index": null,
+      "mapping": null,
+      "model": {}
+    }
+  ],
+  "properties": {
+    "count": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Count"
+    },
+    "dimension": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Dimension"
+    },
+    "index": {
+      "title": "Index",
+      "type": "string"
+    },
+    "mapping": {
+      "title": "Mapping",
+      "type": "string"
+    },
+    "model": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model"
+    }
+  },
+  "required": [
+    "index",
+    "mapping"
+  ],
+  "title": "SemanticIndexModel",
+  "type": "object"
+}

@@ -62,12 +62,11 @@ class SparseEncoder(Protocol):
     **kwargs : inspect._empty
         Describe ``kwargs``.
 
-
     Returns
     -------
     inspect._empty
         Describe return value.
-    """
+"""
 
     name: str
 
@@ -83,12 +82,11 @@ class SparseEncoder(Protocol):
         texts : list[str]
             Describe ``texts``.
 
-
         Returns
         -------
         list[tuple[list[int], list[float]]]
             Describe return value.
-        """
+"""
         ...
 
 
@@ -109,12 +107,11 @@ class SparseIndex(Protocol):
     **kwargs : inspect._empty
         Describe ``kwargs``.
 
-
     Returns
     -------
     inspect._empty
         Describe return value.
-    """
+"""
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
         """Describe build.
@@ -125,9 +122,9 @@ class SparseIndex(Protocol):
 
         Parameters
         ----------
-        docs_iterable : Iterable[tuple[str, dict[str, str]]]
+        docs_iterable : tuple[str, dict[str, str]]
             Describe ``docs_iterable``.
-        """
+"""
         ...
 
     def search(
@@ -145,14 +142,13 @@ class SparseIndex(Protocol):
             Describe ``query``.
         k : int
             Describe ``k``.
-        fields : Mapping[str, str] | None, optional
+        fields : str | str | NoneType, optional
             Describe ``fields``.
             Defaults to ``None``.
-
 
         Returns
         -------
         list[tuple[str, float]]
             Describe return value.
-        """
+"""
         ...

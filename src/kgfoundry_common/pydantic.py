@@ -10,62 +10,62 @@ if TYPE_CHECKING:
     class BaseModel:
         """Typing-friendly stub that mirrors Pydantic's ``BaseModel``.
 
-        <!-- auto:docstring-builder v1 -->
+    <!-- auto:docstring-builder v1 -->
 
-        Parameters
-        ----------
-        **data : Any
+    Parameters
+    ----------
+    **data : Any
         Describe ``data``.
-        """
+"""
 
         model_config: ClassVar[object]
 
         def __init__(self, **data: object) -> None:
             """Populate the model from keyword arguments.
 
-            <!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-            Parameters
-            ----------
-            **data : Any
+        Parameters
+        ----------
+        **data : Any
             Describe ``data``.
-            """
+"""
             raise NotImplementedError
 
         @classmethod
         def model_validate(cls, obj: object, /) -> Self:
             """Validate ``obj`` using the underlying Pydantic implementation.
 
-            <!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-            Parameters
-            ----------
-            obj : Any
+        Parameters
+        ----------
+        obj : Any
             Describe ``obj``.
-            strict : bool | None, optional
+        strict : bool | None, optional
             Describe ``strict``.
             Defaults to ``None``.
-            extra : ExtraValues | None, optional
+        extra : ExtraValues | None, optional
             Describe ``extra``.
             Defaults to ``None``.
-            from_attributes : bool | None, optional
+        from_attributes : bool | None, optional
             Describe ``from_attributes``.
             Defaults to ``None``.
-            context : Any | None, optional
+        context : Any | None, optional
             Describe ``context``.
             Defaults to ``None``.
-            by_alias : bool | None, optional
+        by_alias : bool | None, optional
             Describe ``by_alias``.
             Defaults to ``None``.
-            by_name : bool | None, optional
+        by_name : bool | None, optional
             Describe ``by_name``.
             Defaults to ``None``.
 
-            Returns
-            -------
-            Self
+        Returns
+        -------
+        Self
             Describe return value.
-            """
+"""
             raise NotImplementedError
 
         def model_dump(  # noqa: PLR0913
@@ -87,55 +87,55 @@ if TYPE_CHECKING:
         ) -> dict[str, object]:
             """Return the dictionary representation produced by Pydantic.
 
-            <!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-            Parameters
-            ----------
-            mode : Literal['json', 'python'] | str, optional
+        Parameters
+        ----------
+        mode : Literal['json', 'python'] | str, optional
             Describe ``mode``.
             Defaults to ``'python'``.
-            include : IncEx | None, optional
+        include : IncEx | None, optional
             Describe ``include``.
             Defaults to ``None``.
-            exclude : IncEx | None, optional
+        exclude : IncEx | None, optional
             Describe ``exclude``.
             Defaults to ``None``.
-            context : Any | None, optional
+        context : Any | None, optional
             Describe ``context``.
             Defaults to ``None``.
-            by_alias : bool | None, optional
+        by_alias : bool | None, optional
             Describe ``by_alias``.
             Defaults to ``None``.
-            exclude_unset : bool, optional
+        exclude_unset : bool, optional
             Describe ``exclude_unset``.
             Defaults to ``False``.
-            exclude_defaults : bool, optional
+        exclude_defaults : bool, optional
             Describe ``exclude_defaults``.
             Defaults to ``False``.
-            exclude_none : bool, optional
+        exclude_none : bool, optional
             Describe ``exclude_none``.
             Defaults to ``False``.
-            exclude_computed_fields : bool, optional
+        exclude_computed_fields : bool, optional
             Describe ``exclude_computed_fields``.
             Defaults to ``False``.
-            round_trip : bool, optional
+        round_trip : bool, optional
             Describe ``round_trip``.
             Defaults to ``False``.
-            warnings : bool | Literal['none', 'warn', 'error'], optional
+        warnings : bool | Literal['none', 'warn', 'error'], optional
             Describe ``warnings``.
             Defaults to ``True``.
-            fallback : Callable[[Any], Any] | None, optional
+        fallback : Callable[[Any], Any] | None, optional
             Describe ``fallback``.
             Defaults to ``None``.
-            serialize_as_any : bool, optional
+        serialize_as_any : bool, optional
             Describe ``serialize_as_any``.
             Defaults to ``False``.
 
-            Returns
-            -------
-            dict[str, Any]
+        Returns
+        -------
+        dict[str, Any]
             Describe return value.
-            """
+"""
             raise NotImplementedError
 
         def model_dump_json(  # noqa: PLR0913
@@ -158,58 +158,58 @@ if TYPE_CHECKING:
         ) -> str:
             """Return the JSON representation produced by Pydantic.
 
-            <!-- auto:docstring-builder v1 -->
+        <!-- auto:docstring-builder v1 -->
 
-            Parameters
-            ----------
-            indent : int | None, optional
+        Parameters
+        ----------
+        indent : int | None, optional
             Describe ``indent``.
             Defaults to ``None``.
-            ensure_ascii : bool, optional
+        ensure_ascii : bool, optional
             Describe ``ensure_ascii``.
             Defaults to ``False``.
-            include : IncEx | None, optional
+        include : IncEx | None, optional
             Describe ``include``.
             Defaults to ``None``.
-            exclude : IncEx | None, optional
+        exclude : IncEx | None, optional
             Describe ``exclude``.
             Defaults to ``None``.
-            context : Any | None, optional
+        context : Any | None, optional
             Describe ``context``.
             Defaults to ``None``.
-            by_alias : bool | None, optional
+        by_alias : bool | None, optional
             Describe ``by_alias``.
             Defaults to ``None``.
-            exclude_unset : bool, optional
+        exclude_unset : bool, optional
             Describe ``exclude_unset``.
             Defaults to ``False``.
-            exclude_defaults : bool, optional
+        exclude_defaults : bool, optional
             Describe ``exclude_defaults``.
             Defaults to ``False``.
-            exclude_none : bool, optional
+        exclude_none : bool, optional
             Describe ``exclude_none``.
             Defaults to ``False``.
-            exclude_computed_fields : bool, optional
+        exclude_computed_fields : bool, optional
             Describe ``exclude_computed_fields``.
             Defaults to ``False``.
-            round_trip : bool, optional
+        round_trip : bool, optional
             Describe ``round_trip``.
             Defaults to ``False``.
-            warnings : bool | Literal['none', 'warn', 'error'], optional
+        warnings : bool | Literal['none', 'warn', 'error'], optional
             Describe ``warnings``.
             Defaults to ``True``.
-            fallback : Callable[[Any], Any] | None, optional
+        fallback : Callable[[Any], Any] | None, optional
             Describe ``fallback``.
             Defaults to ``None``.
-            serialize_as_any : bool, optional
+        serialize_as_any : bool, optional
             Describe ``serialize_as_any``.
             Defaults to ``False``.
 
-            Returns
-            -------
-            str
+        Returns
+        -------
+        str
             Describe return value.
-            """
+"""
             raise NotImplementedError
 
 else:

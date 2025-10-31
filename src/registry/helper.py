@@ -61,7 +61,7 @@ class DuckDBRegistryHelper:
     ----------
     db_path : str
         Describe ``db_path``.
-    """
+"""
 
     def __init__(self, db_path: str) -> None:
         """Describe   init  .
@@ -74,11 +74,19 @@ class DuckDBRegistryHelper:
         ----------
         db_path : str
             Describe ``db_path``.
-        """
+"""
         self.db_path = db_path
 
     def _connect(self) -> DuckDBPyConnection:
-        """Create a DuckDB connection for registry operations."""
+        """Create a DuckDB connection for registry operations.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Returns
+        -------
+        DuckDBPyConnection
+            Describe return value.
+"""
         return duckdb_helpers.connect(self.db_path)
 
     def new_run(
@@ -98,19 +106,18 @@ class DuckDBRegistryHelper:
         ----------
         purpose : str
             Describe ``purpose``.
-        model_id : str | None
+        model_id : str | NoneType
             Describe ``model_id``.
-        revision : str | None
+        revision : str | NoneType
             Describe ``revision``.
-        config : Mapping[str, object]
+        config : str | object
             Describe ``config``.
-
 
         Returns
         -------
         str
             Describe return value.
-        """
+"""
         run_id = str(uuid.uuid4())
         with closing(self._connect()) as con:
             duckdb_helpers.execute(
@@ -138,10 +145,10 @@ class DuckDBRegistryHelper:
             Describe ``run_id``.
         success : bool
             Describe ``success``.
-        notes : str | None, optional
+        notes : str | NoneType, optional
             Describe ``notes``.
             Defaults to ``None``.
-        """
+"""
         with closing(self._connect()) as con:
             duckdb_helpers.execute(
                 con,
@@ -149,6 +156,7 @@ class DuckDBRegistryHelper:
                 [run_id],
                 operation="registry.helper.close_run.finish",
             )
+            payload: dict[str, object] = {"success": success, "notes": notes or ""}
             duckdb_helpers.execute(
                 con,
                 "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
@@ -156,7 +164,7 @@ class DuckDBRegistryHelper:
                     str(uuid.uuid4()),
                     "RunClosed",
                     run_id,
-                    json.dumps({"success": success, "notes": notes or ""}),
+                    json.dumps(payload),
                 ],
                 operation="registry.helper.close_run.event",
             )
@@ -175,12 +183,11 @@ class DuckDBRegistryHelper:
         run_id : str
             Describe ``run_id``.
 
-
         Returns
         -------
         str
             Describe return value.
-        """
+"""
         dataset_id = str(uuid.uuid4())
         with closing(self._connect()) as con:
             duckdb_helpers.execute(
@@ -210,7 +217,7 @@ class DuckDBRegistryHelper:
             Describe ``parquet_root``.
         rows : int
             Describe ``rows``.
-        """
+"""
         with closing(self._connect()) as con:
             duckdb_helpers.execute(
                 con,
@@ -218,6 +225,7 @@ class DuckDBRegistryHelper:
                 [parquet_root, dataset_id],
                 operation="registry.helper.commit_dataset.update",
             )
+            payload: dict[str, object] = {"rows": rows, "root": parquet_root}
             duckdb_helpers.execute(
                 con,
                 "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
@@ -225,7 +233,7 @@ class DuckDBRegistryHelper:
                     str(uuid.uuid4()),
                     "DatasetCommitted",
                     dataset_id,
-                    json.dumps({"rows": rows, "root": parquet_root}),
+                    json.dumps(payload),
                 ],
                 operation="registry.helper.commit_dataset.event",
             )
@@ -241,7 +249,7 @@ class DuckDBRegistryHelper:
         ----------
         dataset_id : str
             Describe ``dataset_id``.
-        """
+"""
         with closing(self._connect()) as con:
             duckdb_helpers.execute(
                 con,
@@ -267,9 +275,11 @@ class DuckDBRegistryHelper:
         ----------
         docs : list[Doc]
             Describe ``docs``.
-        """
+"""
         with closing(self._connect()) as con:
             for doc in docs:
+                authors_list = list(doc.authors) if doc.authors is not None else []
+                authors_json = json.dumps(authors_list)
                 duckdb_helpers.execute(
                     con,
                     """INSERT OR REPLACE INTO documents
@@ -283,7 +293,7 @@ class DuckDBRegistryHelper:
                         doc.arxiv_id,
                         doc.pmcid,
                         doc.title,
-                        json.dumps(doc.authors),
+                        authors_json,
                         doc.pub_date,
                         doc.license,
                         doc.language,
@@ -305,7 +315,7 @@ class DuckDBRegistryHelper:
         ----------
         assets : list[DoctagsAsset]
             Describe ``assets``.
-        """
+"""
         with closing(self._connect()) as con:
             for asset in assets:
                 duckdb_helpers.execute(
@@ -335,13 +345,14 @@ class DuckDBRegistryHelper:
             Describe ``event_name``.
         subject_id : str
             Describe ``subject_id``.
-        payload : Mapping[str, object]
+        payload : str | object
             Describe ``payload``.
-        """
+"""
         with closing(self._connect()) as con:
+            payload_dict: dict[str, object] = dict(payload)
             duckdb_helpers.execute(
                 con,
                 "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
-                [str(uuid.uuid4()), event_name, subject_id, json.dumps(payload)],
+                [str(uuid.uuid4()), event_name, subject_id, json.dumps(payload_dict)],
                 operation="registry.helper.emit_event",
             )

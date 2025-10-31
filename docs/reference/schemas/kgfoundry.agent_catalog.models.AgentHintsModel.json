@@ -1,0 +1,53 @@
+{
+  "$id": "https://kgfoundry/schemas/kgfoundry.agent_catalog.models.AgentHintsModel.json#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Structured hints for downstream agents.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nintent_tags : list[str], optional\n    Describe ``intent_tags``.\n    Defaults to ``<factory>``.\nsafe_ops : list[str], optional\n    Describe ``safe_ops``.\n    Defaults to ``<factory>``.\ntests_to_run : list[str], optional\n    Describe ``tests_to_run``.\n    Defaults to ``<factory>``.\nperf_budgets : list[str], optional\n    Describe ``perf_budgets``.\n    Defaults to ``<factory>``.\nbreaking_change_notes : list[str], optional\n    Describe ``breaking_change_notes``.\n    Defaults to ``<factory>``.",
+  "examples": [
+    {
+      "breaking_change_notes": null,
+      "intent_tags": null,
+      "perf_budgets": null,
+      "safe_ops": null,
+      "tests_to_run": null
+    }
+  ],
+  "properties": {
+    "breaking_change_notes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Breaking Change Notes",
+      "type": "array"
+    },
+    "intent_tags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Intent Tags",
+      "type": "array"
+    },
+    "perf_budgets": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Perf Budgets",
+      "type": "array"
+    },
+    "safe_ops": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Safe Ops",
+      "type": "array"
+    },
+    "tests_to_run": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Tests To Run",
+      "type": "array"
+    }
+  },
+  "title": "AgentHintsModel",
+  "type": "object"
+}

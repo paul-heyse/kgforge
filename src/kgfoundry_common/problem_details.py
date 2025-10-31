@@ -63,11 +63,12 @@ _SCHEMA_PATH = Path(__file__).parent.parent.parent / "schema" / "common" / "prob
 
 
 class ProblemDetails(TypedDict, total=False):
-    """RFC 9457 Problem Details structure.
+    """Describe ProblemDetails.
 
-    All fields except `code` and `extensions` are required per RFC 9457 section 3.1.
-    The `code` field is a kgfoundry extension providing machine-readable error codes.
-    """
+    &lt;!-- auto:docstring-builder v1 --&gt;
+
+    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+"""
 
     type: str
     title: str
@@ -81,21 +82,34 @@ class ProblemDetails(TypedDict, total=False):
 class ProblemDetailsValidationError(Exception):
     """Raised when Problem Details payload fails schema validation.
 
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    message : str
+        Describe ``message``.
+    validation_errors : list[str] | None, optional
+        Describe ``validation_errors``.
+        Defaults to ``None``.
+
     Examples
     --------
     >>> raise ProblemDetailsValidationError("Missing required field: type")
-    """
+"""
 
     def __init__(self, message: str, validation_errors: list[str] | None = None) -> None:
         """Initialize validation error.
+
+        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
         message : str
             Error message describing the validation failure.
-        validation_errors : list[str] | None, optional
+        validation_errors : list[str] | NoneType, optional
             List of specific validation error messages. Defaults to None.
-        """
+            Defaults to ``None``.
+"""
         super().__init__(message)
         self.validation_errors = validation_errors or []
 
@@ -104,16 +118,18 @@ class ProblemDetailsValidationError(Exception):
 def _load_schema() -> JsonSchema:
     """Load and cache the Problem Details schema.
 
+    <!-- auto:docstring-builder v1 -->
+
     Returns
     -------
-    JsonSchema
+    str | object
         Parsed schema dictionary.
 
     Raises
     ------
     ProblemDetailsValidationError
         If schema file is missing or invalid.
-    """
+"""
     if not _SCHEMA_PATH.exists():
         msg = f"Problem Details schema not found: {_SCHEMA_PATH}"
         raise ProblemDetailsValidationError(msg)
@@ -138,6 +154,8 @@ def _load_schema() -> JsonSchema:
 def validate_problem_details(payload: dict[str, object]) -> None:
     """Validate Problem Details payload against canonical schema.
 
+    <!-- auto:docstring-builder v1 -->
+
     Parameters
     ----------
     payload : dict[str, object]
@@ -158,7 +176,7 @@ def validate_problem_details(payload: dict[str, object]) -> None:
     ...     "instance": "/api/v1/operation",
     ... }
     >>> validate_problem_details(problem)
-    """
+"""
     schema = _load_schema()
     try:
         jsonschema.validate(instance=payload, schema=schema)
@@ -186,6 +204,8 @@ def build_problem_details(  # noqa: PLR0913
 ) -> ProblemDetails:
     """Build an RFC 9457 Problem Details payload.
 
+    <!-- auto:docstring-builder v1 -->
+
     This function constructs a Problem Details dictionary conforming to
     RFC 9457 and validates it against the canonical schema.
 
@@ -201,10 +221,12 @@ def build_problem_details(  # noqa: PLR0913
         Human-readable explanation of the problem.
     instance : str
         URI reference identifying the specific occurrence (e.g., "urn:tool:git:exit-1").
-    code : str | None, optional
+    code : str | NoneType, optional
         Machine-readable error code (kgfoundry extension). Defaults to None.
-    extensions : Mapping[str, JsonValue] | None, optional
+        Defaults to ``None``.
+    extensions : str | object | NoneType, optional
         Additional problem-specific fields. Defaults to None.
+        Defaults to ``None``.
 
     Returns
     -------
@@ -228,7 +250,7 @@ def build_problem_details(  # noqa: PLR0913
     ... )
     >>> assert problem["type"] == "https://kgfoundry.dev/problems/tool-timeout"
     >>> assert problem["status"] == 504
-    """
+"""
     payload: dict[str, object] = {
         "type": type,
         "title": title,
@@ -259,6 +281,8 @@ def problem_from_exception(  # noqa: PLR0913
 ) -> ProblemDetails:
     """Build Problem Details from an exception.
 
+    <!-- auto:docstring-builder v1 -->
+
     This function extracts detail from the exception message and optionally
     includes exception type and traceback information in extensions.
 
@@ -274,10 +298,12 @@ def problem_from_exception(  # noqa: PLR0913
         HTTP status code.
     instance : str
         URI reference identifying the specific occurrence.
-    code : str | None, optional
+    code : str | NoneType, optional
         Machine-readable error code. Defaults to None.
-    extensions : Mapping[str, JsonValue] | None, optional
+        Defaults to ``None``.
+    extensions : str | object | NoneType, optional
         Additional problem-specific fields. Defaults to None.
+        Defaults to ``None``.
 
     Returns
     -------
@@ -297,7 +323,7 @@ def problem_from_exception(  # noqa: PLR0913
     ...         instance="urn:validation:input",
     ...     )
     >>> assert "Invalid input" in problem["detail"]
-    """
+"""
     detail = str(exc)
     exc_type_name = exc.__class__.__name__
     merged_extensions: dict[str, JsonValue] = {
@@ -324,6 +350,8 @@ def problem_from_exception(  # noqa: PLR0913
 def render_problem(problem: ProblemDetails | dict[str, object]) -> str:
     """Render Problem Details as JSON string.
 
+    <!-- auto:docstring-builder v1 -->
+
     This function serializes a Problem Details payload to JSON for stdout
     or HTTP response bodies.
 
@@ -349,5 +377,5 @@ def render_problem(problem: ProblemDetails | dict[str, object]) -> str:
     >>> json_str = render_problem(problem)
     >>> assert json_str.startswith("{")
     >>> assert "tool-failure" in json_str
-    """
+"""
     return json.dumps(problem, default=str, ensure_ascii=False)

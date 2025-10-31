@@ -121,7 +121,7 @@ class DenseVecs:
         Describe ``ids``.
     mat : VecArray
         Describe ``mat``.
-    """
+"""
 
     ids: list[str]
     mat: VecArray
@@ -143,7 +143,7 @@ class FaissAdapter:
     metric : str, optional
         Describe ``metric``.
         Defaults to ``'ip'``.
-    """
+"""
 
     def __init__(
         self,
@@ -165,7 +165,7 @@ class FaissAdapter:
         metric : str, optional
             Describe ``metric``.
             Defaults to ``'ip'``.
-        """
+"""
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
@@ -192,7 +192,7 @@ class FaissAdapter:
         ------
         VectorSearchError
             Raised when the file does not contain any vector records or SQL execution fails.
-        """
+"""
         # Validate and sanitize file path
         resolved_source = source.resolve(strict=True)
         if not resolved_source.exists():
@@ -244,14 +244,11 @@ class FaissAdapter:
         DenseVecs
             Normalised vectors available to the adapter.
 
-
-
-
         Raises
         ------
         RuntimeError
         Raised when no vectors are available on disk.
-        """
+"""
         candidate = Path(self.db_path)
         if candidate.is_dir() or candidate.suffix == ".parquet":
             return self._load_dense_from_parquet(candidate)
@@ -308,13 +305,15 @@ class FaissAdapter:
     def build(self) -> None:
         """Build or refresh the FAISS index from the persisted vector store.
 
+        <!-- auto:docstring-builder v1 -->
+
         Raises
         ------
         VectorSearchError
             Raised when dense vectors cannot be loaded from disk.
         IndexBuildError
             Raised when FAISS index construction fails.
-        """
+"""
         vectors = self._load_dense_parquet()
         self.vecs = vectors
         self.idmap = vectors.ids
@@ -352,10 +351,10 @@ class FaissAdapter:
 
         Parameters
         ----------
-        cpu_index_path : str | None, optional
+        cpu_index_path : str | NoneType, optional
             Describe ``cpu_index_path``.
             Defaults to ``None``.
-        """
+"""
         faiss_module = faiss
         if faiss_module is None:
             self.build()
@@ -379,21 +378,23 @@ class FaissAdapter:
     def _clone_to_gpu(self, cpu_index: FaissIndexProtocol) -> FaissIndexProtocol:
         """Clone a CPU index onto a GPU when GPU support is available.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
-        cpu_index : FaissIndexProtocol
+        cpu_index : object
             CPU index to clone.
 
         Returns
         -------
-        FaissIndexProtocol
+        object
             GPU-backed FAISS index when cloning succeeds, otherwise the original CPU index.
 
         Raises
         ------
         IndexBuildError
             Raised when GPU cloning fails and no fallback is available.
-        """
+"""
         faiss_module = faiss
         if faiss_module is None:
             return cpu_index
@@ -449,9 +450,11 @@ class FaissAdapter:
     def search(self, qvec: VectorArray | VecArray, k: int = 10) -> list[list[tuple[str, float]]]:
         """Search the index for nearest neighbours.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
-        qvec : VectorArray | VecArray
+        qvec : tuple[int, ...] | np.float32 | VecArray
             Query vector(s) as numpy array of shape (n_queries, dimension) or (dimension,).
         k : int, optional
             Number of nearest neighbors to return per query.
@@ -466,7 +469,7 @@ class FaissAdapter:
         ------
         VectorSearchError
             Raised when search fails or index is not loaded.
-        """
+"""
         if self.vecs is None and self.index is None:
             return []
         queries = self._prepare_queries(qvec)
@@ -484,12 +487,11 @@ class FaissAdapter:
         qvec : VecArray
             Describe ``qvec``.
 
-
         Returns
         -------
         VecArray
             Two-dimensional, normalised query matrix.
-        """
+"""
         query_arr: VecArray = np.asarray(qvec, dtype=np.float32, order="C")
         if query_arr.ndim == 1:
             query_arr = query_arr[None, :]
@@ -497,6 +499,8 @@ class FaissAdapter:
 
     def _search_with_faiss(self, queries: VecArray, k: int) -> list[list[tuple[str, float]]]:
         """Perform a batched search using the GPU-backed FAISS index.
+
+        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
@@ -514,7 +518,7 @@ class FaissAdapter:
         ------
         VectorSearchError
             Raised when the FAISS index or identifier mapping has not been loaded.
-        """
+"""
         if self.index is None or self.idmap is None:
             msg = "FAISS index or ID mapping not loaded"
             raise VectorSearchError(msg)
@@ -544,6 +548,8 @@ class FaissAdapter:
     def _search_with_cpu(self, queries: VecArray, k: int) -> list[list[tuple[str, float]]]:
         """Perform a batched search using the CPU fallback implementation.
 
+        <!-- auto:docstring-builder v1 -->
+
         Parameters
         ----------
         queries : VecArray
@@ -560,7 +566,7 @@ class FaissAdapter:
         ------
         VectorSearchError
             Raised when dense vectors have not been loaded into memory.
-        """
+"""
         if self.vecs is None:
             msg = "Dense vectors not loaded"
             raise VectorSearchError(msg)

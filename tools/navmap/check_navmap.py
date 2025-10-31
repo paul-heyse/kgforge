@@ -773,7 +773,7 @@ def _round_trip_errors(index: NavIndexDict | dict[str, object]) -> list[str]:
             continue
         file_path = REPO / path_value
         lines = _read_text(file_path)
-        section_lines = entry.get("section_lines")
+        section_lines = entry.get("sectionLines") or entry.get("section_lines")
         if isinstance(section_lines, dict):
             errors.extend(
                 _round_trip_line_errors(file_path, lines, section_lines, SECTION_RE, "section")
