@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kgfoundry.dev/schemas/bm25_metadata.v1.json",
+  "title": "BM25 Index Metadata",
+  "description": "Metadata schema for BM25 index serialization",
+  "type": "object",
+  "required": ["k1", "b", "N", "avgdl", "df"],
+  "properties": {
+    "k1": {
+      "type": "number",
+      "description": "BM25 k1 parameter (term frequency saturation)",
+      "minimum": 0
+    },
+    "b": {
+      "type": "number",
+      "description": "BM25 b parameter (length normalization)",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "N": {
+      "type": "integer",
+      "description": "Total number of documents in the index",
+      "minimum": 0
+    },
+    "avgdl": {
+      "type": "number",
+      "description": "Average document length",
+      "minimum": 0
+    },
+    "df": {
+      "type": "object",
+      "description": "Document frequency map (term -> count)",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "docs": {
+      "type": "array",
+      "description": "List of document records (optional, for full index state)",
+      "items": {
+        "type": "object",
+        "required": ["chunk_id", "doc_id", "title", "section", "tf", "dl"],
+        "properties": {
+          "chunk_id": {"type": "string"},
+          "doc_id": {"type": "string"},
+          "title": {"type": "string"},
+          "section": {"type": "string"},
+          "tf": {
+            "type": "object",
+            "additionalProperties": {"type": "number", "minimum": 0}
+          },
+          "dl": {"type": "number", "minimum": 0}
+        }
+      }
+    },
+    "field_boosts": {
+      "type": "object",
+      "description": "Field boost weights (optional, for PurePythonBM25)",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "postings": {
+      "type": "object",
+      "description": "Postings list (optional, for PurePythonBM25)",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "x-version": "1.0.0",
+  "x-compatibility-notes": "Initial version. All fields except 'docs' and 'postings' are required for basic index functionality."
+}
+

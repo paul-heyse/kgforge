@@ -79,7 +79,6 @@ def test_catalogctl_mcp_session_round_trip() -> None:
 
 def test_catalogctl_mcp_enforces_rbac(tmp_path: Path) -> None:
     """Hosted mode should forbid viewer roles from invoking admin methods."""
-
     audit_log = tmp_path / "audit.jsonl"
     command = [
         sys.executable,

@@ -27,7 +27,6 @@ def test_render_portal_enriched_sections(tmp_path: Path) -> None:
 
 def test_render_portal_uses_cached_module_cards(tmp_path: Path) -> None:
     """Module card HTML snippets should be reused across renders."""
-
     client = AgentCatalogClient.from_path(FIXTURE, repo_root=Path.cwd())
     output = tmp_path / "portal.html"
     start = perf_counter()
@@ -49,7 +48,6 @@ def test_render_portal_uses_cached_module_cards(tmp_path: Path) -> None:
 
 def test_render_portal_prunes_unused_cache_entries(tmp_path: Path) -> None:
     """Stale cache entries should be removed after rendering."""
-
     client = AgentCatalogClient.from_path(FIXTURE, repo_root=Path.cwd())
     output = tmp_path / "portal.html"
     render_portal(client, output)

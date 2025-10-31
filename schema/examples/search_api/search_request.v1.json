@@ -1,0 +1,10 @@
+{
+  "query": "machine learning",
+  "k": 10,
+  "filters": {
+    "source": "arxiv",
+    "year": "2024"
+  },
+  "explain": false
+}
+

@@ -17,11 +17,11 @@ from kgfoundry.agent_catalog.session import (
 from kgfoundry.agent_catalog.sqlite import load_catalog_from_sqlite, write_sqlite_catalog
 
 __all__ = [
+    "AccessController",
     "AgentCatalogClient",
     "AgentCatalogClientError",
-    "AuditLogger",
     "AgentCatalogModel",
-    "AccessController",
+    "AuditLogger",
     "CatalogSession",
     "CatalogSessionError",
     "ProblemDetails",

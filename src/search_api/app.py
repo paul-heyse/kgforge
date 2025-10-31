@@ -1,25 +1,50 @@
-"""Overview of app.
+"""Search service endpoints and helper utilities.
 
-This module bundles app logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
+This module provides FastAPI endpoints for hybrid search using dense (FAISS),
+sparse (BM25/SPLADE), and knowledge graph boosting. All endpoints return
+RFC 9457 Problem Details for error responses.
+
+Error Responses
+---------------
+When search operations fail, the API returns Problem Details JSON responses.
+See `schema/examples/problem_details/search-missing-index.json` for an example.
+
+Examples
+--------
+>>> from search_api.schemas import SearchRequest
+>>> from search_api.app import search
+>>> req = SearchRequest(query="test query", k=5)
+>>> response = search(req, None)
+>>> len(response.results) <= 5
+True
+
+See Also
+--------
+- `schema/examples/problem_details/search-missing-index.json` - Example Problem Details response
+- `schema/models/search_request.v1.json` - SearchRequest JSON Schema
+- `schema/models/search_result.v1.json` - SearchResult JSON Schema
 """
 
 from __future__ import annotations
 
-import logging
-import os
+import uuid
 from collections.abc import Mapping
+from pathlib import Path
 from typing import Any, Final
 
-import yaml
 from fastapi import Depends, FastAPI, Header, HTTPException
 
 from kgfoundry.embeddings_sparse.bm25 import PurePythonBM25, get_bm25
 from kgfoundry.embeddings_sparse.splade import get_splade
 from kgfoundry.kg_builder.mock_kg import MockKG
+from kgfoundry_common.errors import (
+    register_problem_details_handler,
+)
+from kgfoundry_common.logging import get_logger, set_correlation_id
 from kgfoundry_common.navmap_types import NavMap
-from search_api.schemas import SearchRequest, SearchResult
+from kgfoundry_common.observability import get_metrics_registry, record_operation
+from kgfoundry_common.settings import RuntimeSettings
+from search_api.schemas import SearchRequest, SearchResponse, SearchResult
 from vectorstore_faiss import gpu as faiss_gpu
 
 __all__ = [
@@ -64,64 +89,66 @@ __navmap__: Final[NavMap] = {
     },
 }
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
+metrics = get_metrics_registry()
 
 API_KEYS: set[str] = set()  # NOTE: load from env SEARCH_API_KEYS when secrets wiring is ready
 
 app = FastAPI(title="kgfoundry Search API", version="0.2.0")
 
-# --- bootstrap lightweight dependencies from config ---
-CFG_PATH = os.environ.get(
-    "KGF_CONFIG", os.path.join(os.path.dirname(__file__), "../../config/config.yaml")
-)
-with open(CFG_PATH) as f:
-    CFG = yaml.safe_load(f)
+# Register Problem Details exception handler
+register_problem_details_handler(app)
 
-SPARSE_BACKEND = (CFG.get("search", {}).get("sparse_backend", "lucene") or "lucene").lower()
-BM25_DIR = CFG.get("sparse_embedding", {}).get("bm25", {}).get("index_dir", "./_indices/bm25")
-SPLADE_DIR = (
-    CFG.get("sparse_embedding", {}).get("splade", {}).get("index_dir", "./_indices/splade_impact")
-)
-SPLADE_QUERY_ENCODER = (
-    CFG.get("sparse_embedding", {})
-    .get("splade", {})
-    .get("query_encoder", "naver/splade-v3-distilbert")
-)
-FAISS_PATH = "./_indices/faiss/shard_000.idx"
+# --- bootstrap typed configuration ---
+try:
+    settings = RuntimeSettings()
+except Exception:
+    logger.exception("Failed to load configuration")
+    raise
+
+# Extract configuration values with defaults
+SPARSE_BACKEND = settings.search.sparse_backend.lower()
+BM25_DIR = settings.sparse_embedding.bm25_index_dir
+SPLADE_DIR = settings.sparse_embedding.splade_index_dir
+SPLADE_QUERY_ENCODER = settings.sparse_embedding.splade_query_encoder
+FAISS_PATH = settings.faiss.index_path
 
 bm25 = get_bm25(
     SPARSE_BACKEND,
     BM25_DIR,
-    k1=CFG.get("sparse_embedding", {}).get("bm25", {}).get("k1", 0.9),
-    b=CFG.get("sparse_embedding", {}).get("bm25", {}).get("b", 0.4),
-    field_boosts=CFG.get("sparse_embedding", {}).get("bm25", {}).get("field_boosts", None),
+    k1=settings.sparse_embedding.bm25_k1,
+    b=settings.sparse_embedding.bm25_b,
+    field_boosts=None,  # TODO: Add field_boosts to SparseEmbeddingConfig
 )
 # load index if exists
 try:
-    if isinstance(bm25, PurePythonBM25) and os.path.exists(os.path.join(BM25_DIR, "pure_bm25.pkl")):
+    if isinstance(bm25, PurePythonBM25) and (Path(BM25_DIR) / "pure_bm25.pkl").exists():
         bm25.load()
-except Exception:
-    pass
+except Exception as exc:
+    logger.warning("Failed to load BM25 index: %s", exc, exc_info=True)
+    # Continue without index (will be built on first use)
 
 splade = get_splade(SPARSE_BACKEND, SPLADE_DIR, query_encoder=SPLADE_QUERY_ENCODER)
 try:
     # for PureImpactIndex, try to load
     if hasattr(splade, "load"):
         splade.load()
-except Exception:
-    pass
+except Exception as exc:
+    logger.warning("Failed to load SPLADE index: %s", exc, exc_info=True)
+    # Continue without index (will be built on first use)
 
 faiss = faiss_gpu.FaissGpuIndex(
-    factory=CFG.get("faiss", {}).get("index_factory", "OPQ64,IVF8192,PQ64"),
-    nprobe=int(CFG.get("faiss", {}).get("nprobe", 64)),
-    gpu=bool(CFG.get("faiss", {}).get("gpu", True)),
-    cuvs=bool(CFG.get("faiss", {}).get("cuvs", True)),
+    factory=settings.faiss.index_factory,
+    nprobe=settings.faiss.nprobe,
+    gpu=settings.faiss.gpu,
+    cuvs=settings.faiss.cuvs,
 )
 try:
-    if os.path.exists(FAISS_PATH):
+    if Path(FAISS_PATH).exists():
         faiss.load(FAISS_PATH, None)
-except Exception:
-    pass
+except Exception as exc:
+    logger.warning("Failed to load FAISS index: %s", exc, exc_info=True)
+    # Continue without index (will be built on first use)
 
 # tiny KG mock with a few edges/mentions to demonstrate boosts
 kg = MockKG()
@@ -142,13 +169,13 @@ def auth(authorization: str | None = Header(default=None)) -> None:
     authorization : str | None, optional
         Describe ``authorization``.
         Defaults to ``Header(None)``.
-        
+
 
     Raises
     ------
     HTTPException
     Raised when TODO for HTTPException.
-"""
+    """
     if not API_KEYS:
         return  # disabled in skeleton
     if not authorization or not authorization.startswith("Bearer "):
@@ -170,7 +197,7 @@ def healthz() -> dict[str, Any]:
     -------
     dict[str, Any]
         Describe return value.
-"""
+    """
     return {
         "status": "ok",
         "components": {
@@ -197,13 +224,13 @@ def rrf_fuse(lists: list[list[tuple[str, float]]], k_rrf: int) -> dict[str, floa
         Describe ``lists``.
     k_rrf : int
         Describe ``k_rrf``.
-        
+
 
     Returns
     -------
     dict[str, float]
         Describe return value.
-"""
+    """
     scores: dict[str, float] = {}
     for hits in lists:
         for rank, (doc_id, _score) in enumerate(hits, start=1):
@@ -236,13 +263,13 @@ def apply_kg_boosts(
     one_hop : float, optional
         Describe ``one_hop``.
         Defaults to ``0.04``.
-        
+
 
     Returns
     -------
     dict[str, float]
         Describe return value.
-"""
+    """
     q_concepts = set()
     for w in query.lower().split():
         if w.startswith("concept"):
@@ -263,82 +290,140 @@ def apply_kg_boosts(
 
 
 # [nav:anchor search]
-def search(req: SearchRequest, _: None = Depends(auth)) -> dict[str, Any]:
-    """Describe search.
+def search(req: SearchRequest, _: None = Depends(auth)) -> SearchResponse:
+    """Execute hybrid search query.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Performs hybrid search using dense (FAISS), sparse (BM25), and SPLADE vectors,
+    then applies RRF fusion and KG boosts. Includes structured logging and metrics.
 
     Parameters
     ----------
     req : SearchRequest
-        Describe ``req``.
+        Search request containing query, k, filters, and explain flag.
+        Schema: `schema/models/search_request.v1.json`
     _ : None, optional
-        Describe ``_``.
+        Authentication dependency (Bearer token).
         Defaults to ``Depends(auth)``.
-        
 
     Returns
     -------
-    dict[str, Any]
-        Describe return value.
-"""
-    # Retrieve from each channel
-    # We don't have a query embedder here; fallback to empty or demo vector
-    dense_hits: list[tuple[str, float]] = []
-    # sparse via BM25 (preferred) and SPLADE
-    bm25_hits: list[tuple[str, float]] = []
-    if bm25:
-        try:
-            bm25_hits = bm25.search(req.query, k=CFG["search"]["sparse_candidates"])
-        except Exception as exc:  # pragma: no cover - defensive fallback for missing indices
-            logger.warning("BM25 search failed, falling back to empty results: %s", exc)
-            bm25_hits = []
-    try:
-        splade_hits = (
-            splade.search(req.query, k=CFG["search"]["sparse_candidates"]) if splade else []
-        )
-    except Exception:
-        splade_hits = []
+    SearchResponse
+        Typed response containing list of search results.
+        Schema: `schema/models/search_result.v1.json`
 
-    # RRF fusion
-    fused = rrf_fuse([dense_hits, bm25_hits, splade_hits], k_rrf=int(CFG["search"]["rrf_k"]))
-    # KG boosts
-    boosted = apply_kg_boosts(
-        fused,
-        req.query,
-        direct=CFG["search"]["kg_boosts"]["direct"],
-        one_hop=CFG["search"]["kg_boosts"]["one_hop"],
-    )
-    # Rank and craft results
-    top = sorted(boosted.items(), key=lambda x: x[1], reverse=True)[: req.k]
-    results: list[dict[str, Any]] = []
-    for chunk_id, score in top:
-        # In real system we'd hydrate title/section via DuckDB; here we echo ids
-        results.append(
-            SearchResult(
-                doc_id=f"doc-of-{chunk_id}",
-                chunk_id=chunk_id,
-                title=f"Title for {chunk_id}",
-                section="Methods",
-                score=float(score),
-                signals={
-                    "rrf": float(fused.get(chunk_id, 0.0)),
-                    "kg_boost": float(boosted[chunk_id] - fused.get(chunk_id, 0.0)),
-                },
-                spans={"start_char": 0, "end_char": 50},
-                concepts=[
-                    {
-                        "concept_id": c,
-                        "label": c,
-                        "match": ("direct" if c in req.query else "nearby"),
-                    }
-                    for c in kg.linked_concepts(chunk_id)
-                ],
-            ).model_dump()
+    Examples
+    --------
+    >>> from search_api.schemas import SearchRequest
+    >>> from search_api.app import search
+    >>> req = SearchRequest(query="test query", k=5)
+    >>> response = search(req, None)
+    >>> len(response.results) <= 5
+    True
+
+    Raises
+    ------
+    HTTPException
+        Returns Problem Details JSON (RFC 9457) on errors.
+        Example: `schema/examples/problem_details/search-missing-index.json`
+
+    See Also
+    --------
+    - `schema/examples/problem_details/search-missing-index.json` - Example error response
+    - `schema/models/search_request.v1.json` - Request schema
+    - `schema/models/search_result.v1.json` - Response schema
+    """
+    # Generate correlation ID for this request
+    correlation_id = str(uuid.uuid4())
+    set_correlation_id(correlation_id)
+
+    # Record operation metrics and duration
+    with record_operation(metrics, operation="search", status="success"):
+        logger.info(
+            "Search request received",
+            extra={
+                "operation": "search",
+                "status": "started",
+                "query": req.query,
+                "k": req.k,
+            },
         )
-    return {"results": results}
+
+        # Retrieve from each channel
+        # We don't have a query embedder here; fallback to empty or demo vector
+        dense_hits: list[tuple[str, float]] = []
+        # sparse via BM25 (preferred) and SPLADE
+        bm25_hits: list[tuple[str, float]] = []
+        if bm25:
+            try:
+                bm25_hits = bm25.search(req.query, k=settings.search.sparse_candidates)
+            except Exception as exc:
+                logger.warning(
+                    "BM25 search failed, falling back to empty results: %s",
+                    exc,
+                    extra={"operation": "search", "status": "warning"},
+                    exc_info=True,
+                )
+                bm25_hits = []
+        try:
+            splade_hits = (
+                splade.search(req.query, k=settings.search.sparse_candidates) if splade else []
+            )
+        except Exception as exc:
+            logger.warning(
+                "SPLADE search failed, falling back to empty results: %s",
+                exc,
+                extra={"operation": "search", "status": "warning"},
+                exc_info=True,
+            )
+            splade_hits = []
+
+        # RRF fusion
+        fused = rrf_fuse([dense_hits, bm25_hits, splade_hits], k_rrf=settings.search.rrf_k)
+        # KG boosts
+        boosted = apply_kg_boosts(
+            fused,
+            req.query,
+            direct=settings.search.kg_boosts_direct,
+            one_hop=settings.search.kg_boosts_one_hop,
+        )
+        # Rank and craft results
+        top = sorted(boosted.items(), key=lambda x: x[1], reverse=True)[: req.k]
+        results: list[SearchResult] = []
+        for chunk_id, score in top:
+            # In real system we'd hydrate title/section via DuckDB; here we echo ids
+            results.append(
+                SearchResult(
+                    doc_id=f"doc-of-{chunk_id}",
+                    chunk_id=chunk_id,
+                    title=f"Title for {chunk_id}",
+                    section="Methods",
+                    score=float(score),
+                    signals={
+                        "rrf": float(fused.get(chunk_id, 0.0)),
+                        "kg_boost": float(boosted[chunk_id] - fused.get(chunk_id, 0.0)),
+                    },
+                    spans={"start_char": 0, "end_char": 50},
+                    concepts=[
+                        {
+                            "concept_id": c,
+                            "label": c,
+                            "match": ("direct" if c in req.query else "nearby"),
+                        }
+                        for c in kg.linked_concepts(chunk_id)
+                    ],
+                )
+            )
+
+        logger.info(
+            "Search completed",
+            extra={
+                "operation": "search",
+                "status": "success",
+                "result_count": len(results),
+            },
+        )
+
+        return SearchResponse(results=results)
 
 
 # [nav:anchor graph_concepts]
@@ -356,13 +441,13 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
     _ : None, optional
         Describe ``_``.
         Defaults to ``Depends(auth)``.
-        
+
 
     Returns
     -------
     dict[str, Any]
         Describe return value.
-"""
+    """
     q = (body or {}).get("q", "").lower()
     # toy: return nodes that contain the query substring
     concepts = [
@@ -374,5 +459,5 @@ def graph_concepts(body: Mapping[str, Any], _: None = Depends(auth)) -> dict[str
 
 
 app.get("/healthz")(healthz)
-app.post("/search", response_model=dict)(search)
+app.post("/search", response_model=SearchResponse)(search)
 app.post("/graph/concepts", response_model=dict)(graph_concepts)

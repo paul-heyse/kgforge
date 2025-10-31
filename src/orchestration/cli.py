@@ -8,7 +8,8 @@ implementation specifics.
 from __future__ import annotations
 
 import json
-import os
+import logging
+from pathlib import Path
 from typing import Final
 
 import numpy as np
@@ -17,6 +18,8 @@ import typer
 from kgfoundry.embeddings_sparse.bm25 import get_bm25
 from kgfoundry_common.navmap_types import NavMap
 from vectorstore_faiss import gpu as faiss_gpu
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["api", "e2e", "index_bm25", "index_faiss"]
 
@@ -75,12 +78,12 @@ def index_bm25(
         Describe ``index_dir``.
         Defaults to ``<typer.models.OptionInfo object at 0x79263290b9d0>``.
         Defaults to ``<typer.models.OptionInfo object at 0x73ea67fb5bd0>``.
-"""
-    os.makedirs(index_dir, exist_ok=True)
+    """
+    Path(index_dir).mkdir(parents=True, exist_ok=True)
     # Very small loader that supports JSONL in this skeleton (Parquet in real pipeline).
     docs: list[tuple[str, dict[str, str]]] = []
     if chunks_parquet.endswith(".jsonl"):
-        with open(chunks_parquet, encoding="utf-8") as fh:
+        with Path(chunks_parquet).open(encoding="utf-8") as fh:
             for line in fh:
                 rec = json.loads(line)
                 docs.append(
@@ -96,7 +99,7 @@ def index_bm25(
     else:
         # naive: expect a JSON file with list under skeleton; replace with Parquet
         # reader in implementation
-        with open(chunks_parquet, encoding="utf-8") as fh:
+        with Path(chunks_parquet).open(encoding="utf-8") as fh:
             data = json.load(fh)
         for rec in data:
             docs.append(
@@ -137,9 +140,9 @@ def index_faiss(
         Describe ``index_path``.
         Defaults to ``<typer.models.OptionInfo object at 0x79263290bc50>``.
         Defaults to ``<typer.models.OptionInfo object at 0x73ea67fb5e50>``.
-"""
-    os.makedirs(os.path.dirname(index_path), exist_ok=True)
-    with open(dense_vectors, encoding="utf-8") as fh:
+    """
+    Path(index_path).parent.mkdir(parents=True, exist_ok=True)
+    with Path(dense_vectors).open(encoding="utf-8") as fh:
         vecs = json.load(fh)
     keys = [r["key"] for r in vecs]
     vectors = np.array([r["vector"] for r in vecs], dtype="float32")
@@ -151,8 +154,9 @@ def index_faiss(
     try:
         vs.save(index_path, None)
         typer.echo(f"FAISS index saved to {index_path}")
-    except Exception as e:
-        typer.echo(f"Saved fallback matrix (npz) due to {e!r}")
+    except Exception as exc:
+        logger.warning("Failed to save FAISS index, using fallback: %s", exc, exc_info=True)
+        typer.echo(f"Saved fallback matrix (npz) due to {exc!r}")
         vs.save(index_path, None)
 
 
@@ -169,7 +173,7 @@ def api(port: int = 8080) -> None:
     port : int, optional
         Describe ``port``.
         Defaults to ``8080``.
-"""
+    """
     import uvicorn
 
     uvicorn.run("search_api.app:app", host="0.0.0.0", port=port, reload=False)
@@ -187,7 +191,7 @@ def e2e() -> None:
     ------
     Exit
     Raised when TODO for Exit.
-"""
+    """
     try:
         from orchestration.flows import e2e_flow
     except ModuleNotFoundError as exc:  # pragma: no cover - defensive messaging

@@ -7,16 +7,22 @@ for implementation specifics.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
-from types import ModuleType
-from typing import Any, Final, cast
+from typing import TYPE_CHECKING, Final, cast
 
 import duckdb
 import numpy as np
 from numpy.typing import NDArray
 
 from kgfoundry_common.navmap_types import NavMap
+
+if TYPE_CHECKING:
+    from search_api.types import FaissIndexProtocol, FaissModuleProtocol
+else:
+    FaissIndexProtocol = object  # type: ignore[assignment, misc]
+    FaissModuleProtocol = object  # type: ignore[assignment, misc]
 
 __all__ = ["DenseVecs", "FaissAdapter", "VecArray"]
 
@@ -57,7 +63,9 @@ __navmap__: Final[NavMap] = {
 
 MIN_FACTORY_DIMENSION: Final[int] = 64
 
-faiss: ModuleType | None = None
+logger = logging.getLogger(__name__)
+
+faiss: FaissModuleProtocol | None = None
 
 try:
     try:
@@ -66,10 +74,11 @@ try:
         _load_cuvs()
     except Exception:
         pass
-    import faiss
+    import faiss as _faiss_module
 
     HAVE_FAISS = True
-except Exception:  # pragma: no cover - exercised when FAISS is unavailable
+    faiss = _faiss_module  # type: ignore[assignment]
+except Exception:
     faiss = None
     HAVE_FAISS = False
 
@@ -93,7 +102,7 @@ class DenseVecs:
         Describe ``ids``.
     mat : VecArray
         Describe ``mat``.
-"""
+    """
 
     ids: list[str]
     mat: VecArray
@@ -115,7 +124,7 @@ class FaissAdapter:
     metric : str, optional
         Describe ``metric``.
         Defaults to ``'ip'``.
-"""
+    """
 
     def __init__(
         self,
@@ -137,11 +146,11 @@ class FaissAdapter:
         metric : str, optional
             Describe ``metric``.
             Defaults to ``'ip'``.
-"""
+        """
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
-        self.index: Any | None = None
+        self.index: FaissIndexProtocol | None = None
         self.idmap: list[str] | None = None
         self.vecs: DenseVecs | None = None
 
@@ -154,21 +163,21 @@ class FaissAdapter:
         ----------
         source : Path
             Describe ``source``.
-            
+
 
         Returns
         -------
         DenseVecs
             Normalised vectors paired with their document identifiers.
-            
-            
-            
+
+
+
 
         Raises
         ------
         RuntimeError
         Raised when the file does not contain any vector records.
-"""
+        """
         con = duckdb.connect(database=":memory:")
         try:
             rows = con.execute(
@@ -200,15 +209,15 @@ class FaissAdapter:
         -------
         DenseVecs
             Normalised vectors available to the adapter.
-            
-            
-            
+
+
+
 
         Raises
         ------
         RuntimeError
         Raised when no vectors are available on disk.
-"""
+        """
         candidate = Path(self.db_path)
         if candidate.is_dir() or candidate.suffix == ".parquet":
             return self._load_dense_from_parquet(candidate)
@@ -253,7 +262,7 @@ class FaissAdapter:
         ------
         RuntimeError
         Raised when dense vectors cannot be loaded from disk.
-"""
+        """
         vectors = self._load_dense_parquet()
         self.vecs = vectors
         self.idmap = vectors.ids
@@ -270,10 +279,15 @@ class FaissAdapter:
         cpu = faiss_module.IndexIDMap2(cpu)
         train = vectors.mat[: min(100000, vectors.mat.shape[0])].copy()
         faiss_module.normalize_L2(train)
-        index_map = cast(Any, cpu)
-        index_map.train(train)
+        # Type cast needed because FAISS index objects don't expose typed interfaces
+        # The actual index satisfies FaissIndexProtocol at runtime
+        index_map = cast(FaissIndexProtocol, cpu)
+        # Call train() and add_with_ids() via attribute access (FAISS API)
+        if hasattr(index_map, "train"):
+            index_map.train(train)  # type: ignore[misc]
         ids64 = cast(IndexArray, np.arange(vectors.mat.shape[0], dtype=np.int64))
-        index_map.add_with_ids(vectors.mat, ids64)
+        if hasattr(index_map, "add_with_ids"):
+            index_map.add_with_ids(vectors.mat, ids64)  # type: ignore[misc]
         self.index = self._clone_to_gpu(cpu)
 
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
@@ -286,7 +300,7 @@ class FaissAdapter:
         cpu_index_path : str | None, optional
             Describe ``cpu_index_path``.
             Defaults to ``None``.
-"""
+        """
         faiss_module = faiss
         if faiss_module is None:
             self.build()
@@ -299,26 +313,28 @@ class FaissAdapter:
                 self.vecs = dense
                 self.idmap = dense.ids
                 return
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning(
+                "Failed to load FAISS index from %s: %s", cpu_index_path, exc, exc_info=True
+            )
+            # Fall back to building index
         self.build()
 
-    def _clone_to_gpu(self, cpu_index: object) -> object:
+    def _clone_to_gpu(self, cpu_index: FaissIndexProtocol) -> FaissIndexProtocol:
         """Clone a CPU index onto a GPU when GPU support is available.
 
         <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
-        cpu_index : object
-            Describe ``cpu_index``.
-            
+        cpu_index : FaissIndexProtocol
+            CPU index to clone.
 
         Returns
         -------
-        object
+        FaissIndexProtocol
             GPU-backed FAISS index when cloning succeeds, otherwise the original CPU index.
-"""
+        """
         faiss_module = faiss
         if faiss_module is None:
             return cpu_index
@@ -331,10 +347,11 @@ class FaissAdapter:
         options = gpu_cloner_options()
         options.use_cuvs = True
         try:
-            return index_cpu_to_gpu(resources, 0, cpu_index, options)
-        except Exception:  # pragma: no cover - fallback path without cuVS
+            return index_cpu_to_gpu(resources, 0, cpu_index, options)  # type: ignore[return-value]
+        except Exception as exc:
+            logger.debug("GPU cloning with cuVS failed, falling back to CPU: %s", exc)
             options.use_cuvs = False
-            return index_cpu_to_gpu(resources, 0, cpu_index, options)
+            return index_cpu_to_gpu(resources, 0, cpu_index, options)  # type: ignore[return-value]
 
     def search(self, qvec: FloatArrayLike, k: int = 10) -> list[list[tuple[str, float]]]:
         """Search the index for nearest neighbours.
@@ -348,13 +365,13 @@ class FaissAdapter:
         k : int, optional
             Describe ``k``.
             Defaults to ``10``.
-            
+
 
         Returns
         -------
         list[list[tuple[str, float]]]
             Ranked matches for each query with document identifiers and similarity scores.
-"""
+        """
         if self.vecs is None and self.index is None:
             return []
         queries = self._prepare_queries(qvec)
@@ -371,13 +388,13 @@ class FaissAdapter:
         ----------
         qvec : VecArray
             Describe ``qvec``.
-            
+
 
         Returns
         -------
         VecArray
             Two-dimensional, normalised query matrix.
-"""
+        """
         query_arr: VecArray = np.asarray(qvec, dtype=np.float32, order="C")
         if query_arr.ndim == 1:
             query_arr = query_arr[None, :]
@@ -394,21 +411,21 @@ class FaissAdapter:
             Describe ``queries``.
         k : int
             Describe ``k``.
-            
+
 
         Returns
         -------
         list[list[tuple[str, float]]]
             Ranked matches for each query.
-            
-            
-            
+
+
+
 
         Raises
         ------
         RuntimeError
         Raised when the FAISS index or identifier mapping has not been loaded.
-"""
+        """
         if self.index is None or self.idmap is None:
             message = "FAISS index or ID mapping not loaded"
             raise RuntimeError(message)
@@ -434,21 +451,21 @@ class FaissAdapter:
             Describe ``queries``.
         k : int
             Describe ``k``.
-            
+
 
         Returns
         -------
         list[list[tuple[str, float]]]
             Ranked matches for each query.
-            
-            
-            
+
+
+
 
         Raises
         ------
         RuntimeError
         Raised when dense vectors have not been loaded into memory.
-"""
+        """
         if self.vecs is None:
             message = "Dense vectors not loaded"
             raise RuntimeError(message)

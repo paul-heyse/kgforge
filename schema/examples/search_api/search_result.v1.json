@@ -1,0 +1,24 @@
+{
+  "doc_id": "urn:doc:sha256:abc123def456",
+  "chunk_id": "urn:chunk:abc123def456:0-500",
+  "title": "Example Research Paper",
+  "section": "Introduction",
+  "score": 0.95,
+  "signals": {
+    "bm25": 0.8,
+    "dense": 0.9,
+    "sparse": 0.85
+  },
+  "spans": {
+    "start_char": 0,
+    "end_char": 500
+  },
+  "concepts": [
+    {
+      "concept_id": "urn:concept:ml",
+      "label": "Machine Learning",
+      "match": "direct"
+    }
+  ]
+}
+

@@ -74,6 +74,11 @@ from tools.docstring_builder.models import (
     validate_cli_output,
 )
 from tools.docstring_builder.normalizer import normalize_docstring
+from tools.docstring_builder.observability import (
+    get_correlation_id,
+    get_metrics_registry,
+    record_operation_metrics,
+)
 from tools.docstring_builder.plugins import (
     PluginConfigurationError,
     PluginManager,
@@ -91,6 +96,7 @@ from tools.drift_preview import DocstringDriftEntry, write_docstring_drift, writ
 from tools.stubs.drift_check import run as run_stub_drift
 
 LOGGER = get_logger(__name__)
+METRICS = get_metrics_registry()
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CACHE_PATH = REPO_ROOT / ".cache" / "docstring_builder.json"
 DOCFACTS_PATH = REPO_ROOT / "docs" / "_build" / "docfacts.json"
@@ -787,7 +793,8 @@ def _process_file(  # noqa: C901, PLR0911
             cache_hit=True,
         )
     try:
-        result = harvest_file(file_path, config, REPO_ROOT)
+        with record_operation_metrics("harvest", status="success"):
+            result = harvest_file(file_path, config, REPO_ROOT)
         if plugin_manager is not None:
             result = plugin_manager.apply_harvest(file_path, result)
     except ModuleNotFoundError as exc:
@@ -936,6 +943,15 @@ def _print_failure_summary(payload: Mapping[str, object]) -> None:  # noqa: C901
 def _run(  # noqa: C901, PLR0912, PLR0915
     files: Iterable[Path], args: argparse.Namespace, config: BuilderConfig
 ) -> int:
+    correlation_id = get_correlation_id()
+    command = args.command or "unknown"
+    subcommand = str(
+        getattr(args, "invoked_subcommand", getattr(args, "subcommand", command)) or command
+    )
+    logger = with_fields(
+        LOGGER, correlation_id=correlation_id, command=command, subcommand=subcommand
+    )
+
     cache = BuilderCache(CACHE_PATH)
     docfact_entries, docfact_sources = _load_docfact_state()
     is_update = args.command == "update"
@@ -967,18 +983,18 @@ def _run(  # noqa: C901, PLR0912, PLR0915
             disable=_parse_plugin_names(getattr(args, "disable_plugin", None)),
         )
     except PluginConfigurationError:
-        LOGGER.exception("Plugin configuration error")
+        logger.exception("Plugin configuration error", extra={"operation": "plugin_load"})
         return int(ExitStatus.CONFIG)
     try:
         try:
             cli_policy_overrides = _parse_policy_overrides(getattr(args, "policy_override", None))
         except PolicyConfigurationError:
-            LOGGER.exception("Policy override error")
+            logger.exception("Policy override error", extra={"operation": "policy_override"})
             return int(ExitStatus.CONFIG)
         try:
             policy_settings = load_policy_settings(REPO_ROOT, cli_overrides=cli_policy_overrides)
         except PolicyConfigurationError:
-            LOGGER.exception("Policy configuration error")
+            logger.exception("Policy configuration error", extra={"operation": "policy_load"})
             return int(ExitStatus.CONFIG)
         policy_engine = PolicyEngine(policy_settings)
         all_ir: list[IRDocstring] = []
@@ -1141,6 +1157,9 @@ def _run(  # noqa: C901, PLR0912, PLR0915
         exit_status = max(
             (status for status, count in status_counts.items() if count), default=ExitStatus.SUCCESS
         )
+        status_label = STATUS_LABELS[exit_status]
+        METRICS.cli_duration_seconds.labels(command=command, status=status_label).observe(duration)
+        METRICS.runs_total.labels(status=status_label).inc()
         status_counts.setdefault(ExitStatus.SUCCESS, 0)
         status_counts_full: StatusCounts = {
             "success": status_counts.get(ExitStatus.SUCCESS, 0),

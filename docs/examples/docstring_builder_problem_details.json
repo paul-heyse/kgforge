@@ -1,13 +1,12 @@
 {
-    "type": "https://kgfoundry.dev/problems/docbuilder/run-failed",
-    "title": "Docstring builder run failed",
-    "status": 500,
-    "detail": "Unable to render docstring",
-    "instance": "urn:docbuilder:run:example",
-    "extensions": {
-        "command": "update",
-        "subcommand": "check",
-        "errorCount": 1,
-        "symbol": "kg.module.function",
-    },
+  "type": "https://kgfoundry.dev/problems/docbuilder/schema-mismatch",
+  "title": "DocFacts schema validation failed",
+  "status": 422,
+  "detail": "Field anchors.endLine is missing",
+  "instance": "urn:docbuilder:run:2025-10-30T12:00:00Z",
+  "extensions": {
+    "schemaVersion": "2.0.0",
+    "docstringBuilderVersion": "1.6.0",
+    "symbol": "kg.module.function"
+  }
 }

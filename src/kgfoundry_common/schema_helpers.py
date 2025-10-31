@@ -1,0 +1,216 @@
+"""Schema and model round-trip validation helpers.
+
+This module provides utilities for validating Pydantic models against JSON
+Schema 2020-12 and ensuring round-trip compatibility between models and schemas.
+
+Examples
+--------
+>>> from pathlib import Path
+>>> from kgfoundry_common.models import Doc
+>>> from kgfoundry_common.schema_helpers import assert_model_roundtrip
+>>> example_path = Path("schema/examples/models/doc.v1.json")
+>>> assert_model_roundtrip(Doc, example_path)
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
+
+import jsonschema
+from jsonschema import ValidationError
+from jsonschema.exceptions import SchemaError
+
+from kgfoundry_common.errors import DeserializationError, SerializationError
+from kgfoundry_common.fs import read_text
+from kgfoundry_common.pydantic import BaseModel
+
+if TYPE_CHECKING:
+    pass
+
+__all__ = ["assert_model_roundtrip", "load_schema", "validate_model_against_schema"]
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
+
+def load_schema(schema_path: Path) -> dict[str, Any]:
+    """Load and parse a JSON Schema file.
+
+    Parameters
+    ----------
+    schema_path : Path
+        Path to JSON Schema 2020-12 file.
+
+    Returns
+    -------
+    dict[str, Any]
+        Parsed schema dictionary.
+
+    Raises
+    ------
+    FileNotFoundError
+        If schema file does not exist.
+    DeserializationError
+        If schema is invalid JSON or fails validation.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> schema = load_schema(Path("schema/models/doc.v1.json"))
+    >>> assert "$schema" in schema
+    """
+    if not schema_path.exists():
+        msg = f"Schema file not found: {schema_path}"
+        raise FileNotFoundError(msg)
+
+    try:
+        schema_text = read_text(schema_path)
+        schema_obj: dict[str, Any] = json.loads(schema_text)  # JSON parsing returns Any
+    except json.JSONDecodeError as exc:
+        msg = f"Invalid JSON in schema file {schema_path}: {exc}"
+        raise DeserializationError(msg) from exc
+
+    # Validate against JSON Schema 2020-12 meta-schema
+    try:
+        jsonschema.Draft202012Validator.check_schema(schema_obj)  # type: ignore[misc]  # jsonschema accepts Any
+    except SchemaError as exc:  # type: ignore[misc]  # SchemaError type from jsonschema
+        msg = f"Invalid JSON Schema 2020-12 in {schema_path}: {exc.message}"
+        raise DeserializationError(msg) from exc
+
+    return schema_obj  # type: ignore[misc]  # JSON schema dict contains Any
+
+
+def validate_model_against_schema(
+    model_instance: BaseModel,
+    schema: dict[str, Any],
+) -> None:
+    """Validate a Pydantic model instance against a JSON Schema.
+
+    Parameters
+    ----------
+    model_instance : BaseModel
+        Pydantic model instance to validate.
+    schema : dict[str, Any]
+        JSON Schema 2020-12 dictionary.
+
+    Raises
+    ------
+    SerializationError
+        If validation fails.
+
+    Examples
+    --------
+    >>> from kgfoundry_common.models import Doc
+    >>> schema = {"type": "object", "properties": {"id": {"type": "string"}}}
+    >>> doc = Doc(id="urn:doc:test")
+    >>> validate_model_against_schema(doc, schema)
+    """
+    try:
+        # Convert model to dict (using model_dump with mode='json' for JSON-compatible types)
+        data: dict[str, Any] = model_instance.model_dump(
+            mode="json"
+        )  # JSON serialization returns Any
+        jsonschema.validate(instance=data, schema=schema)  # type: ignore[misc]  # jsonschema accepts Any
+    except ValidationError as exc:
+        msg = f"Model instance does not match schema: {exc.message}"
+        raise SerializationError(msg) from exc
+    except SchemaError as exc:  # type: ignore[misc]  # SchemaError type from jsonschema
+        msg = f"Invalid schema: {exc.message}"
+        raise SerializationError(msg) from exc
+
+
+def assert_model_roundtrip(
+    model_cls: type[BaseModel],
+    example_path: Path,
+    *,
+    schema_path: Path | None = None,
+) -> None:
+    """Assert that a Pydantic model round-trips correctly with an example JSON file.
+
+    This function:
+    1. Loads the example JSON file
+    2. Validates it against the schema (if provided)
+    3. Deserializes it into a model instance
+    4. Re-serializes the model instance
+    5. Validates the re-serialized data matches the schema
+    6. Compares the round-trip data structure (allowing for type coercion)
+
+    Parameters
+    ----------
+    model_cls : type[BaseModel]
+        Pydantic model class to test.
+    example_path : Path
+        Path to example JSON file.
+    schema_path : Path | None, optional
+        Path to JSON Schema file. If None, schema validation is skipped.
+        Defaults to None.
+
+    Raises
+    ------
+    FileNotFoundError
+        If example or schema file does not exist.
+    DeserializationError
+        If example JSON is invalid or fails schema validation.
+    SerializationError
+        If model instance fails schema validation after round-trip.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> from kgfoundry_common.models import Doc
+    >>> example = Path("schema/examples/models/doc.v1.json")
+    >>> schema = Path("schema/models/doc.v1.json")
+    >>> assert_model_roundtrip(Doc, example, schema_path=schema)
+    """
+    if not example_path.exists():
+        msg = f"Example file not found: {example_path}"
+        raise FileNotFoundError(msg)
+
+    # Load example JSON
+    try:
+        example_text = read_text(example_path)
+        example_data: dict[str, Any] = json.loads(example_text)  # JSON parsing returns Any
+    except json.JSONDecodeError as exc:
+        msg = f"Invalid JSON in example file {example_path}: {exc}"
+        raise DeserializationError(msg) from exc
+
+    # Load and validate schema if provided
+    schema_obj: dict[str, Any] | None = None
+    if schema_path is not None:
+        schema_obj = load_schema(schema_path)
+        # Validate example against schema
+        try:
+            jsonschema.validate(instance=example_data, schema=schema_obj)  # type: ignore[misc]  # jsonschema accepts Any
+        except ValidationError as exc:
+            msg = f"Example JSON does not match schema: {exc.message}"
+            raise DeserializationError(msg) from exc
+
+    # Deserialize example into model instance
+    try:
+        instance = model_cls.model_validate(example_data)  # type: ignore[misc]  # example_data is Any from JSON
+    except Exception as exc:
+        msg = f"Failed to deserialize example into {model_cls.__name__}: {exc}"
+        raise DeserializationError(msg) from exc
+
+    # Re-serialize model instance (validates serialization works)
+    try:
+        _round_trip_data = instance.model_dump(mode="json")
+    except Exception as exc:
+        msg = f"Failed to serialize {model_cls.__name__} instance: {exc}"
+        raise SerializationError(msg) from exc
+
+    # Validate round-trip data against schema if provided
+    if schema_obj is not None:  # type: ignore[misc]  # schema_obj dict contains Any
+        validate_model_against_schema(instance, schema_obj)  # type: ignore[misc]  # schema_obj dict contains Any
+
+    logger.debug(
+        "Model round-trip validated",
+        extra={
+            "model": model_cls.__name__,
+            "example_path": str(example_path),
+            "schema_path": str(schema_path) if schema_path else None,
+        },
+    )

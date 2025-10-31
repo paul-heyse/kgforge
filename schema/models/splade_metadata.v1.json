@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kgfoundry.dev/schemas/splade_metadata.v1.json",
+  "title": "SPLADE Index Metadata",
+  "description": "Metadata schema for SPLADE impact index serialization",
+  "type": "object",
+  "required": ["df", "N", "postings"],
+  "properties": {
+    "df": {
+      "type": "object",
+      "description": "Document frequency map (token -> count)",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "N": {
+      "type": "integer",
+      "description": "Total number of documents in the index",
+      "minimum": 0
+    },
+    "postings": {
+      "type": "object",
+      "description": "Postings list (token -> doc_id -> weight)",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "x-version": "1.0.0",
+  "x-compatibility-notes": "Initial version. All fields are required for index functionality."
+}
+

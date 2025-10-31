@@ -101,7 +101,6 @@ def _collect_module_hints(symbols: Iterable[SymbolModel]) -> dict[str, list[str]
 
 def _module_cache_key(package: str, module: ModuleModel) -> CacheKey:
     """Return a stable cache key for ``module`` within ``package``."""
-
     payload = {
         "version": MODULE_CARD_VERSION,
         "package": package,
@@ -113,7 +112,6 @@ def _module_cache_key(package: str, module: ModuleModel) -> CacheKey:
 
 def _cache_directory(output_path: Path) -> Path:
     """Return the directory used to persist cached module cards."""
-
     return output_path.parent / ".module_cache"
 
 
@@ -124,7 +122,6 @@ def _render_module_card_cached(
     used: set[CacheKey],
 ) -> str:
     """Render ``module`` using a content-addressed HTML cache when available."""
-
     key = _module_cache_key(package, module)
     used.add(key)
     try:
@@ -147,7 +144,6 @@ def _render_module_card_cached(
 
 def _prune_cache(cache_dir: Path, used: set[CacheKey]) -> None:
     """Remove cached cards in ``cache_dir`` that were not ``used``."""
-
     if not cache_dir.exists():
         return
     for cached in cache_dir.glob("*.html"):

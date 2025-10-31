@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kgfoundry.dev/schemas/models/doc.v1.json",
+  "title": "Document Model",
+  "description": "Schema for kgfoundry document records",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Content-addressed document ID (URN format)"
+    },
+    "openalex_id": {
+      "type": ["string", "null"],
+      "description": "OpenAlex identifier if available"
+    },
+    "doi": {
+      "type": ["string", "null"],
+      "description": "DOI if available"
+    },
+    "arxiv_id": {
+      "type": ["string", "null"],
+      "description": "arXiv identifier if available"
+    },
+    "pmcid": {
+      "type": ["string", "null"],
+      "description": "PubMed Central ID if available"
+    },
+    "title": {
+      "type": "string",
+      "description": "Document title",
+      "default": ""
+    },
+    "authors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of author names",
+      "default": []
+    },
+    "pub_date": {
+      "type": ["string", "null"],
+      "description": "Publication date (ISO8601 format)"
+    },
+    "license": {
+      "type": ["string", "null"],
+      "description": "License identifier"
+    },
+    "language": {
+      "type": "string",
+      "description": "Language code (ISO 639-1)",
+      "default": "en"
+    },
+    "pdf_uri": {
+      "type": "string",
+      "description": "Local path to PDF file",
+      "default": ""
+    },
+    "source": {
+      "type": "string",
+      "description": "Source identifier (e.g., 'openalex', 'arxiv', 'pmc')",
+      "default": "unknown"
+    },
+    "content_hash": {
+      "type": ["string", "null"],
+      "description": "SHA256 hash of canonical text content"
+    }
+  },
+  "required": ["id"],
+  "additionalProperties": false,
+  "x-version": "1.0.0",
+  "x-compatibility-notes": "Initial version. Breaking changes will increment major version."
+}
+

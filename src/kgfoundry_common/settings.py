@@ -1,0 +1,320 @@
+"""Runtime settings with typed configuration and fail-fast validation.
+
+This module provides RuntimeSettings (pydantic_settings.BaseSettings) with
+nested models, environment variable support, and fail-fast Problem Details
+on validation errors.
+
+Examples
+--------
+>>> from kgfoundry_common.settings import RuntimeSettings
+>>> # Fails fast if required env vars are missing
+>>> settings = RuntimeSettings()  # Raises ConfigurationError if required vars missing
+>>> assert settings.search_api_url is not None
+"""
+
+from __future__ import annotations
+
+from typing import Final
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from kgfoundry_common.errors import ConfigurationError
+from kgfoundry_common.navmap_types import NavMap
+
+__all__ = [
+    "FaissConfig",
+    "ObservabilityConfig",
+    "RuntimeSettings",
+    "SearchConfig",
+    "SparseEmbeddingConfig",
+]
+
+__navmap__: Final[NavMap] = {
+    "title": "kgfoundry_common.settings",
+    "synopsis": "Typed runtime configuration with fail-fast validation",
+    "exports": __all__,
+    "sections": [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": __all__,
+        },
+    ],
+    "module_meta": {
+        "owner": "@kgfoundry-common",
+        "stability": "stable",
+        "since": "0.1.0",
+    },
+    "symbols": {
+        name: {
+            "owner": "@kgfoundry-common",
+            "stability": "stable",
+            "since": "0.1.0",
+        }
+        for name in __all__
+    },
+}
+
+
+class SearchConfig(BaseSettings):
+    """Search service configuration.
+
+    Parameters
+    ----------
+    api_url : str | None, optional
+        Search API base URL. Required if search features are used.
+        Environment variable: `KGFOUNDRY_SEARCH_API_URL`.
+        Defaults to None.
+    k : int, optional
+        Default number of results to return.
+        Environment variable: `KGFOUNDRY_SEARCH_K`.
+        Defaults to 10.
+    dense_candidates : int, optional
+        Number of dense candidates for hybrid search.
+        Environment variable: `KGFOUNDRY_SEARCH_DENSE_CANDIDATES`.
+        Defaults to 200.
+    sparse_candidates : int, optional
+        Number of sparse candidates for hybrid search.
+        Environment variable: `KGFOUNDRY_SEARCH_SPARSE_CANDIDATES`.
+        Defaults to 200.
+    rrf_k : int, optional
+        Reciprocal Rank Fusion parameter.
+        Environment variable: `KGFOUNDRY_SEARCH_RRF_K`.
+        Defaults to 60.
+    sparse_backend : str, optional
+        Sparse backend type ('lucene' or 'pure').
+        Environment variable: `KGFOUNDRY_SEARCH_SPARSE_BACKEND`.
+        Defaults to 'lucene'.
+    kg_boosts_direct : float, optional
+        Direct KG boost weight.
+        Environment variable: `KGFOUNDRY_SEARCH_KG_BOOSTS_DIRECT`.
+        Defaults to 0.08.
+    kg_boosts_one_hop : float, optional
+        One-hop KG boost weight.
+        Environment variable: `KGFOUNDRY_SEARCH_KG_BOOSTS_ONE_HOP`.
+        Defaults to 0.04.
+    """
+
+    model_config = SettingsConfigDict(env_prefix="KGFOUNDRY_SEARCH_", extra="forbid")
+
+    api_url: str | None = Field(
+        default=None,
+        description="Search API base URL (required if search features are used)",
+    )
+    k: int = Field(default=10, description="Default number of results to return")
+    dense_candidates: int = Field(
+        default=200, description="Number of dense candidates for hybrid search"
+    )
+    sparse_candidates: int = Field(
+        default=200, description="Number of sparse candidates for hybrid search"
+    )
+    rrf_k: int = Field(default=60, description="Reciprocal Rank Fusion parameter")
+    sparse_backend: str = Field(
+        default="lucene", description="Sparse backend type ('lucene' or 'pure')"
+    )
+    kg_boosts_direct: float = Field(default=0.08, description="Direct KG boost weight")
+    kg_boosts_one_hop: float = Field(default=0.04, description="One-hop KG boost weight")
+
+
+class ObservabilityConfig(BaseSettings):
+    """Observability configuration.
+
+    Parameters
+    ----------
+    log_level : str, optional
+        Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL).
+        Environment variable: `KGFOUNDRY_LOG_LEVEL`.
+        Defaults to "INFO".
+    metrics_enabled : bool, optional
+        Enable Prometheus metrics export.
+        Environment variable: `KGFOUNDRY_METRICS_ENABLED`.
+        Defaults to True.
+    traces_enabled : bool, optional
+        Enable OpenTelemetry tracing.
+        Environment variable: `KGFOUNDRY_TRACES_ENABLED`.
+        Defaults to False.
+    metrics_port : int, optional
+        Port for Prometheus metrics endpoint.
+        Environment variable: `KGFOUNDRY_METRICS_PORT`.
+        Defaults to 9090.
+    """
+
+    model_config = SettingsConfigDict(env_prefix="KGFOUNDRY_", extra="forbid")
+
+    log_level: str = Field(
+        default="INFO", description="Logging level (DEBUG, INFO, WARNING, ERROR)"
+    )
+    metrics_enabled: bool = Field(default=True, description="Enable Prometheus metrics export")
+    traces_enabled: bool = Field(default=False, description="Enable OpenTelemetry tracing")
+    metrics_port: int = Field(default=9090, description="Port for Prometheus metrics endpoint")
+
+
+class SparseEmbeddingConfig(BaseSettings):
+    """Sparse embedding configuration.
+
+    Parameters
+    ----------
+    bm25_index_dir : str, optional
+        BM25 index directory path.
+        Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_BM25_INDEX_DIR`.
+        Defaults to './_indices/bm25'.
+    bm25_k1 : float, optional
+        BM25 k1 parameter.
+        Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_BM25_K1`.
+        Defaults to 0.9.
+    bm25_b : float, optional
+        BM25 b parameter.
+        Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_BM25_B`.
+        Defaults to 0.4.
+    splade_index_dir : str, optional
+        SPLADE index directory path.
+        Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_SPLADE_INDEX_DIR`.
+        Defaults to './_indices/splade_impact'.
+    splade_query_encoder : str, optional
+        SPLADE query encoder model name.
+        Environment variable: `KGFOUNDRY_SPARSE_EMBEDDING_SPLADE_QUERY_ENCODER`.
+        Defaults to 'naver/splade-v3-distilbert'.
+    """
+
+    model_config = SettingsConfigDict(env_prefix="KGFOUNDRY_SPARSE_EMBEDDING_", extra="forbid")
+
+    bm25_index_dir: str = Field(default="./_indices/bm25", description="BM25 index directory path")
+    bm25_k1: float = Field(default=0.9, description="BM25 k1 parameter")
+    bm25_b: float = Field(default=0.4, description="BM25 b parameter")
+    splade_index_dir: str = Field(
+        default="./_indices/splade_impact", description="SPLADE index directory path"
+    )
+    splade_query_encoder: str = Field(
+        default="naver/splade-v3-distilbert",
+        description="SPLADE query encoder model name",
+    )
+
+
+class FaissConfig(BaseSettings):
+    """FAISS index configuration.
+
+    Parameters
+    ----------
+    gpu : bool, optional
+        Enable GPU acceleration.
+        Environment variable: `KGFOUNDRY_FAISS_GPU`.
+        Defaults to True.
+    cuvs : bool, optional
+        Enable cuVS support.
+        Environment variable: `KGFOUNDRY_FAISS_CUVS`.
+        Defaults to True.
+    index_factory : str, optional
+        FAISS index factory string.
+        Environment variable: `KGFOUNDRY_FAISS_INDEX_FACTORY`.
+        Defaults to 'OPQ64,IVF8192,PQ64'.
+    nprobe : int, optional
+        Number of probes for IVF indexes.
+        Environment variable: `KGFOUNDRY_FAISS_NPROBE`.
+        Defaults to 64.
+    index_path : str, optional
+        FAISS index file path.
+        Environment variable: `KGFOUNDRY_FAISS_INDEX_PATH`.
+        Defaults to './_indices/faiss/shard_000.idx'.
+    """
+
+    model_config = SettingsConfigDict(env_prefix="KGFOUNDRY_FAISS_", extra="forbid")
+
+    gpu: bool = Field(default=True, description="Enable GPU acceleration")
+    cuvs: bool = Field(default=True, description="Enable cuVS support")
+    index_factory: str = Field(
+        default="OPQ64,IVF8192,PQ64", description="FAISS index factory string"
+    )
+    nprobe: int = Field(default=64, description="Number of probes for IVF indexes")
+    index_path: str = Field(
+        default="./_indices/faiss/shard_000.idx", description="FAISS index file path"
+    )
+
+
+class RuntimeSettings(BaseSettings):
+    """Runtime configuration with typed nested models and fail-fast validation.
+
+    This class loads configuration from environment variables with type validation.
+    Missing required fields raise ConfigurationError with Problem Details metadata.
+
+    Environment Variables
+    ---------------------
+    KGFOUNDRY_SEARCH_API_URL : str, optional
+        Search API base URL (required if search features are used).
+    KGFOUNDRY_SEARCH_K : int, optional
+        Default number of search results (default: 10).
+    KGFOUNDRY_SEARCH_SPARSE_BACKEND : str, optional
+        Sparse backend type ('lucene' or 'pure', default: 'lucene').
+    KGFOUNDRY_SPARSE_EMBEDDING_BM25_INDEX_DIR : str, optional
+        BM25 index directory (default: './_indices/bm25').
+    KGFOUNDRY_FAISS_GPU : bool, optional
+        Enable FAISS GPU acceleration (default: True).
+    KGFOUNDRY_LOG_LEVEL : str, optional
+        Logging level (default: INFO).
+    KGFOUNDRY_METRICS_ENABLED : bool, optional
+        Enable Prometheus metrics (default: True).
+    KGFOUNDRY_TRACES_ENABLED : bool, optional
+        Enable OpenTelemetry tracing (default: False).
+
+    Examples
+    --------
+    >>> import os
+    >>> os.environ["KGFOUNDRY_SEARCH_API_URL"] = "http://localhost:8000"
+    >>> settings = RuntimeSettings()
+    >>> assert settings.search.api_url == "http://localhost:8000"
+
+    Raises
+    ------
+    ConfigurationError
+        If required environment variables are missing or invalid.
+        The error includes Problem Details metadata for structured error handling.
+
+    Notes
+    -----
+    - All nested models use `extra="forbid"` to prevent unknown fields
+    - Settings are validated at instantiation time (fail-fast)
+    - Configuration can be overridden via environment variables or `.env` files
+    """
+
+    model_config = SettingsConfigDict(
+        env_prefix="KGFOUNDRY_",
+        env_nested_delimiter="__",
+        extra="forbid",
+        case_sensitive=False,
+    )
+
+    search: SearchConfig = Field(
+        default_factory=SearchConfig, description="Search service configuration"
+    )  # type: ignore[misc]  # default_factory returns Any
+    observability: ObservabilityConfig = Field(
+        default_factory=ObservabilityConfig, description="Observability configuration"
+    )  # type: ignore[misc]  # default_factory returns Any
+    sparse_embedding: SparseEmbeddingConfig = Field(
+        default_factory=SparseEmbeddingConfig,
+        description="Sparse embedding configuration",
+    )  # type: ignore[misc]  # default_factory returns Any
+    faiss: FaissConfig = Field(default_factory=FaissConfig, description="FAISS index configuration")  # type: ignore[misc]  # default_factory returns Any
+
+    def __init__(self, **kwargs: object) -> None:  # type: ignore[misc]  # BaseSettings accepts Any
+        """Initialize settings with fail-fast validation.
+
+        Parameters
+        ----------
+        **kwargs : object
+            Override values (typically from environment variables).
+
+        Raises
+        ------
+        ConfigurationError
+            If validation fails (missing required fields, invalid types, etc.).
+        """
+        try:
+            super().__init__(**kwargs)  # type: ignore[misc]  # BaseSettings accepts Any
+        except Exception as exc:
+            # Convert Pydantic validation errors to ConfigurationError with Problem Details
+            msg = f"Configuration validation failed: {exc}"
+            raise ConfigurationError(
+                msg,
+                cause=exc,
+                context={"validation_error": str(exc)},
+            ) from exc

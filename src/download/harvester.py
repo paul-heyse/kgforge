@@ -7,10 +7,10 @@ implementation specifics.
 
 from __future__ import annotations
 
-import os
 import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Final
 
 import requests
@@ -73,7 +73,7 @@ class HarvesterConfig:
     out_dir : str, optional
         Describe ``out_dir``.
         Defaults to ``'/data/pdfs'``.
-"""
+    """
 
     openalex_base: str = "https://api.openalex.org"
     unpaywall_base: str = "https://api.unpaywall.org"
@@ -98,7 +98,7 @@ class OpenAccessHarvester:
     config : HarvesterConfig | None, optional
         Describe ``config``.
         Defaults to ``None``.
-        
+
 
     Raises
     ------
@@ -108,7 +108,7 @@ class OpenAccessHarvester:
     Raised when TODO for DownloadError.
     UnsupportedMIMEError
     Raised when TODO for UnsupportedMIMEError.
-"""
+    """
 
     def __init__(
         self,
@@ -131,7 +131,7 @@ class OpenAccessHarvester:
         config : HarvesterConfig | None, optional
             Describe ``config``.
             Defaults to ``None``.
-"""
+        """
         cfg = config or HarvesterConfig()
         self.ua = user_agent
         self.email = contact_email
@@ -139,7 +139,7 @@ class OpenAccessHarvester:
         self.unpaywall = cfg.unpaywall_base.rstrip("/")
         self.pdf_host = (cfg.pdf_host_base or "").rstrip("/")
         self.out_dir = cfg.out_dir
-        os.makedirs(self.out_dir, exist_ok=True)
+        Path(self.out_dir).mkdir(parents=True, exist_ok=True)
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": f"{self.ua} ({self.email})"})
 
@@ -158,28 +158,28 @@ class OpenAccessHarvester:
             Describe ``years``.
         max_works : int
             Describe ``max_works``.
-            
+
 
         Returns
         -------
         list[dict[str, object]]
             Describe return value.
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+
+
+
+
+
+
+
+
+
+
 
         Raises
         ------
         TypeError
         Raised when TODO for TypeError.
-"""
+        """
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
             "topic": topic,
@@ -215,13 +215,13 @@ class OpenAccessHarvester:
         ----------
         work : Mapping[str, object]
             Describe ``work``.
-            
+
 
         Returns
         -------
         str | None
             Describe return value.
-"""
+        """
         direct = self._lookup_direct_pdf(work)
         if direct:
             return direct
@@ -251,13 +251,13 @@ class OpenAccessHarvester:
         ----------
         work : Mapping[str, object]
             Describe ``work``.
-            
+
 
         Returns
         -------
         str | None
             Describe return value.
-"""
+        """
         best = work.get("best_oa_location")
         if isinstance(best, Mapping):
             pdf_url = best.get("pdf_url")
@@ -276,13 +276,13 @@ class OpenAccessHarvester:
         ----------
         locations : object
             Describe ``locations``.
-            
+
 
         Returns
         -------
         str | None
             Describe return value.
-"""
+        """
         if isinstance(locations, (str, bytes)):
             return None
         if not isinstance(locations, Sequence):
@@ -305,13 +305,13 @@ class OpenAccessHarvester:
         ----------
         doi : str
             Describe ``doi``.
-            
+
 
         Returns
         -------
         str | None
             Describe return value.
-"""
+        """
         response = self.session.get(
             f"{self.unpaywall}/v2/{doi}", params={"email": self.email}, timeout=15
         )
@@ -337,18 +337,18 @@ class OpenAccessHarvester:
         ----------
         doi : str
             Describe ``doi``.
-            
+
 
         Returns
         -------
         str | None
             Describe return value.
-"""
+        """
         if not self.pdf_host:
             return None
         return f"{self.pdf_host}/pdf/{doi.replace('/', '_')}.pdf"
 
-    def download_pdf(self, url: str, target_path: str) -> str:
+    def download_pdf(self, url: str, target_path: str | Path) -> str | Path:
         """Describe download pdf.
 
         <!-- auto:docstring-builder v1 -->
@@ -361,22 +361,22 @@ class OpenAccessHarvester:
             Describe ``url``.
         target_path : str
             Describe ``target_path``.
-            
+
 
         Returns
         -------
         str
             Describe return value.
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+
+
+
+
+
+
+
+
+
+
 
         Raises
         ------
@@ -384,7 +384,7 @@ class OpenAccessHarvester:
         Raised when TODO for DownloadError.
         UnsupportedMIMEError
         Raised when TODO for UnsupportedMIMEError.
-"""
+        """
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:
             message = f"Bad status {response.status_code} for {url}"
@@ -393,9 +393,10 @@ class OpenAccessHarvester:
         if not content_type.startswith("application/"):
             message = f"Not a PDF-like content type: {content_type}"
             raise UnsupportedMIMEError(message)
-        with open(target_path, "wb") as file_handle:
+        path_obj = Path(target_path)
+        with path_obj.open("wb") as file_handle:
             file_handle.write(response.content)
-        return target_path
+        return path_obj
 
     def run(self, topic: str, years: str, max_works: int) -> list[Doc]:
         """Describe run.
@@ -412,13 +413,13 @@ class OpenAccessHarvester:
             Describe ``years``.
         max_works : int
             Describe ``max_works``.
-            
+
 
         Returns
         -------
         list[Doc]
             Describe return value.
-"""
+        """
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)
         for work in works:
@@ -427,8 +428,8 @@ class OpenAccessHarvester:
                 continue
             raw_name = work.get("doi") or work.get("id") or str(int(time.time() * 1000))
             filename = f"{str(raw_name).replace('/', '_')}.pdf"
-            destination = os.path.join(self.out_dir, filename)
-            self.download_pdf(pdf_url, destination)
+            destination = Path(self.out_dir) / filename
+            destination = self.download_pdf(pdf_url, destination)
             doc = Doc(
                 id=f"urn:doc:source:openalex:{work.get('id', 'unknown')}",
                 openalex_id=work.get("id"),

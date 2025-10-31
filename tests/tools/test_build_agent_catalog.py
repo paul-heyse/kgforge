@@ -20,7 +20,7 @@ class SupportsSetEnv(Protocol):
         """Set an environment variable for the duration of the test."""
 
 
-@pytest.fixture()
+@pytest.fixture
 def fake_embedding_backend(monkeypatch: pytest.MonkeyPatch) -> None:
     """Provide a deterministic embedding backend for tests."""
 
@@ -46,7 +46,7 @@ def fake_embedding_backend(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(build_agent_catalog, "_load_embedding_model", loader)
 
 
-@pytest.fixture()
+@pytest.fixture
 def repo_root() -> Path:
     """Return the repository root path."""
     return Path(__file__).resolve().parents[2]
@@ -58,6 +58,7 @@ def test_help_succeeds(fake_embedding_backend: None, repo_root: Path) -> None:
     script = repo_root / "tools" / "docs" / "build_agent_catalog.py"
     result = subprocess.run(
         ["uv", "run", "python", str(script), "--help"],
+        check=False,
         cwd=repo_root,
         capture_output=True,
         text=True,
@@ -203,7 +204,6 @@ def test_cli_search_outputs_json(
 
 def test_build_anchors_use_docfacts_end_lineno(tmp_path: Path) -> None:
     """DocFacts ``end_lineno`` metadata should populate anchor ranges."""
-
     module_path = tmp_path / "pkg" / "module.py"
     module_path.parent.mkdir(parents=True, exist_ok=True)
     module_path.write_text(

@@ -13,7 +13,6 @@ FIXTURE = Path("tests/fixtures/agent/catalog_sample.json")
 
 def _create_fixture_paths(base: Path) -> None:
     """Populate placeholder files referenced by the sample catalog."""
-
     for relative in [
         "demo/module.py",
         "site/_build/html/autoapi/src/demo/module/index.html",
@@ -26,7 +25,6 @@ def _create_fixture_paths(base: Path) -> None:
 
 def test_build_analytics_reports_metrics(tmp_path: Path) -> None:
     """Analytics payload should include catalog metrics and zero errors when links exist."""
-
     _create_fixture_paths(tmp_path)
     args = Namespace(
         catalog=FIXTURE,
@@ -43,7 +41,6 @@ def test_build_analytics_reports_metrics(tmp_path: Path) -> None:
 
 def test_write_analytics_increments_build_counter(tmp_path: Path) -> None:
     """Persisted analytics should increment the portal build counter."""
-
     _create_fixture_paths(tmp_path)
     previous = {
         "version": "1.0",
@@ -66,7 +63,6 @@ def test_write_analytics_increments_build_counter(tmp_path: Path) -> None:
 
 def test_build_analytics_flags_missing_links(tmp_path: Path) -> None:
     """Missing files should be surfaced via the broken links summary."""
-
     args = Namespace(
         catalog=FIXTURE,
         output=tmp_path / "analytics.json",

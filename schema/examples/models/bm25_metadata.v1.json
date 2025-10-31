@@ -1,0 +1,30 @@
+{
+  "k1": 0.9,
+  "b": 0.4,
+  "N": 100,
+  "avgdl": 42.5,
+  "df": {
+    "python": 45,
+    "search": 30,
+    "vector": 25
+  },
+  "docs": [
+    {
+      "chunk_id": "chunk:1",
+      "doc_id": "doc:1",
+      "title": "Example Document",
+      "section": "Introduction",
+      "tf": {
+        "python": 3.0,
+        "search": 2.0
+      },
+      "dl": 15.0
+    }
+  ],
+  "field_boosts": {
+    "title": 2.0,
+    "section": 1.2,
+    "body": 1.0
+  }
+}
+

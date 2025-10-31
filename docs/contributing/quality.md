@@ -132,6 +132,43 @@ CLI also produces HTML previews under `docs/_build/drift/` (for example,
 both the manifest and observability payloads so you can jump straight to the
 rendered preview.
 
+### Typed pipeline and schema validation
+
+The docstring builder supports a typed pipeline mode enabled by default via the
+`DOCSTRINGS_TYPED_IR` environment variable. When enabled (default: `1`), the
+builder:
+
+- Validates DocFacts payloads against `docs/_build/schema_docfacts.json`
+- Validates CLI JSON outputs against `schema/tools/docstring_builder_cli.json`
+- Emits RFC 9457 Problem Details payloads on schema violations
+- Uses typed intermediate representations throughout the pipeline
+
+To disable typed validation (for debugging or migration):
+
+```bash
+DOCSTRINGS_TYPED_IR=0 uv run python -m tools.docstring_builder.cli generate
+```
+
+When disabled, schema validation runs in dry-run mode and logs warnings instead
+of aborting. This allows incremental migration while maintaining backward
+compatibility.
+
+### Observability
+
+The builder emits Prometheus metrics and structured logs with correlation IDs:
+
+- **Metrics**: `docbuilder_runs_total`, `docbuilder_plugin_failures_total`,
+  `docbuilder_harvest_duration_seconds`, `docbuilder_policy_duration_seconds`,
+  `docbuilder_render_duration_seconds`, `docbuilder_cli_duration_seconds`
+- **Logs**: Include `correlation_id`, `operation`, `duration_ms`, `symbol_id`,
+  `schema_version` fields when available
+- **Traces**: Optional OpenTelemetry spans for `harvest`, `policy`, `render`,
+  and `cli` operations (requires OTel SDK configuration)
+
+Metrics are exposed via the Prometheus client library and can be scraped by
+observability infrastructure. Structured logs include correlation IDs that
+propagate across subprocess boundaries for end-to-end tracing.
+
 VS Code users can trigger common workflows from `.vscode/tasks.json`:
 
 - **Docstrings: Generate** runs the full regeneration with

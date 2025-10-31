@@ -10,7 +10,6 @@ from tools.docs import build_agent_api
 
 def test_build_spec_contains_required_components() -> None:
     """The generated specification should expose ProblemDetails and Symbol schemas."""
-
     spec = build_agent_api.build_spec()
     assert spec["openapi"] == "3.2.0"
     components = spec["components"]["schemas"]
@@ -22,7 +21,6 @@ def test_build_spec_contains_required_components() -> None:
 
 def test_main_writes_openapi_document(tmp_path: Path) -> None:
     """Running ``main`` should write the OpenAPI document to disk."""
-
     target = tmp_path / "agent_api_openapi.json"
     original = build_agent_api.OUTPUT
     build_agent_api.OUTPUT = target

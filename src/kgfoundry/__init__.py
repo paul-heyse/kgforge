@@ -36,13 +36,13 @@ def _load(name: str) -> object:
     ----------
     name : str
         Describe ``name``.
-        
+
 
     Returns
     -------
     object
         Describe return value.
-"""
+    """
     import importlib
     import sys
 
@@ -62,14 +62,14 @@ def __getattr__(name: str) -> object:
     ----------
     name : str
         Describe `name`.
-        
-        
+
+
 
     Returns
     -------
     object
         Describe return value.
-"""
+    """
     if name not in _ALIASES:
         message = f"module {__name__!r} has no attribute {name!r}"
         raise AttributeError(message) from None
@@ -85,7 +85,7 @@ def __dir__() -> list[str]:
     -------
     list[str]
         Sorted union of exports and implementation attributes.
-"""
+    """
     return sorted(set(__all__))
 
 
@@ -100,7 +100,7 @@ def _ensure_namespace_alias(name: str) -> None:
     ----------
     name : str
         Describe ``name``.
-"""
+    """
     import sys
 
     if f"{__name__}.{name}" not in sys.modules:

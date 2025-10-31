@@ -619,6 +619,10 @@ runtime-evaluated-base-classes = [
     "S101",
     "T20",
 ]
+"**/*.pyi" = ["PIE790"]  # Stub files require ... literals
+"tools/check_new_suppressions.py" = ["T201", "BLE001", "SIM102", "PLR2004"]  # CLI script: print is OK, Exception catch for file I/O
+"tools/generate_pr_summary.py" = ["T201", "BLE001", "C901", "PLR0915", "TRY300", "SIM115"]  # CLI script: print is OK, complexity acceptable
+"src/search_api/bm25_index.py" = ["S608"]  # DuckDB read_parquet() paths from trusted sources (DB queries/config), not user input
 
 [tool.ruff.lint.isort]
 known-first-party = [
@@ -764,3 +768,8 @@ missing-params-action = "error"
 missing-returns-action = "error"
 require-parameters = true
 require-returns = true
+
+[dependency-groups]
+dev = [
+    "libcst>=1.8.5",
+]

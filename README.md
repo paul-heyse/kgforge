@@ -25,7 +25,13 @@ uv venv                       # creates .venv/
 uv sync                       # installs from uv.lock / pyproject
 ```
 
-- `direnv` automatically activates `.venv` and runs `uv sync --frozen`; see `.envrc`.
+For GPU support (FAISS GPU, cuVS, PyTorch, vLLM, etc.):
+```bash
+uv sync --extra gpu            # installs GPU dependencies
+```
+
+- `direnv` automatically activates `.venv` and replays `uv sync` with any extras you've synced.
+  GPU installs drop a marker at `.venv/.uv-extras/gpu`; see `.envrc`.
 - Pre-commit hooks install automatically the first time direnv loads the project.
 - VS Code terminals default to `.venv`; see `.vscode/settings.json`.
 - Secrets live in `.env`; add overrides in `.envrc.local` (gitignored).
@@ -51,6 +57,10 @@ uv sync                       # installs from uv.lock / pyproject
 ## Python & Tooling
 
 - `pyproject.toml`: Python 3.13.9; dependencies pinned minimally; heavy libs listed but commented or optional extras.
+- **Installation**: Base install includes core dependencies. GPU features (FAISS GPU, cuVS, PyTorch, vLLM) require `uv sync --extra gpu`.
+- **Extras**: Set `KGFOUNDRY_UV_EXTRAS=gpu` (comma-separated) or remove `.venv/.uv-extras/gpu`
+  / export `KGFOUNDRY_DISABLE_GPU_EXTRA=1` to opt-out after a CUDA install.
+- **Namespace consolidation**: All public APIs are available under the `kgfoundry.*` namespace (e.g., `from kgfoundry import vectorstore_faiss`). The namespace proxy automatically resolves submodules on first access.
 - Pre-commit with ruff/black/mypy; strict typing by default.
 - Package README generation: `python tools/gen_readmes.py` (see
   [Automated Documentation](README-AUTOMATED-DOCUMENTATION.md#readme-generation-toolsgen_readmespy)
