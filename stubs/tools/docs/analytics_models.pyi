@@ -1,3 +1,4 @@
+# ruff: noqa: N803,N815
 from __future__ import annotations
 
 ANALYTICS_SCHEMA: str

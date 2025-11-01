@@ -2,17 +2,25 @@
 
 from __future__ import annotations
 
+import os
+from collections.abc import Mapping, MutableMapping
 from pathlib import Path
-from typing import Any
 
 __all__ = ["FileResponse", "JSONResponse", "Response"]
 
 class Response:
     """Starlette Response object with precise type annotations."""
 
-    headers: dict[str, str]
+    headers: MutableMapping[str, str]
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        content: bytes | bytearray | memoryview | str | None = None,
+        status_code: int = 200,
+        headers: Mapping[str, str] | None = None,
+        media_type: str | None = None,
+        background: object | None = None,
+    ) -> None:
         """Initialize response."""
         ...
 
@@ -22,7 +30,10 @@ class JSONResponse(Response):
     body: bytes
 
     def __init__(
-        self, content: Any, status_code: int = 200, headers: dict[str, str] | None = None
+        self,
+        content: object,
+        status_code: int = 200,
+        headers: Mapping[str, str] | None = None,
     ) -> None:
         """Initialize JSON response.
 
@@ -44,10 +55,10 @@ class FileResponse(Response):
         self,
         path: str | Path,
         status_code: int = 200,
-        headers: dict[str, str] | None = None,
+        headers: Mapping[str, str] | None = None,
         media_type: str | None = None,
         filename: str | None = None,
-        stat_result: Any | None = None,
+        stat_result: os.stat_result | None = None,
         method: str | None = None,
         content_disposition_type: str = "attachment",
     ) -> None:

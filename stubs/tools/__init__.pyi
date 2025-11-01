@@ -30,7 +30,6 @@ from tools._shared.logging import (
 )
 from tools._shared.metrics import (
     ToolRunObservation,
-    ToolRunResult,
     observe_tool_run,
 )
 from tools._shared.problem_details import (
@@ -45,7 +44,7 @@ from tools._shared.problem_details import (
     tool_missing_problem_details,
     tool_timeout_problem_details,
 )
-from tools._shared.proc import ToolExecutionError, run_tool
+from tools._shared.proc import ToolExecutionError, ToolRunResult, run_tool
 from tools._shared.schema import validate_tools_payload
 from tools._shared.settings import (
     SettingsError,

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from starlette.middleware.base import BaseHTTPMiddleware
 
 __all__ = ["BaseHTTPMiddleware", "Middleware"]
@@ -17,8 +15,8 @@ class Middleware:
     def __init__(
         self,
         middleware_class: type[BaseHTTPMiddleware],
-        *args: Any,
-        **kwargs: Any,
+        *args: object,
+        **kwargs: object,
     ) -> None:
         """Initialize middleware wrapper.
 

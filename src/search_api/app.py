@@ -31,7 +31,7 @@ import json
 import uuid
 from collections.abc import Awaitable, Callable, Mapping
 from pathlib import Path
-from typing import Final
+from typing import Final, cast
 
 import jsonschema
 from fastapi import Depends, FastAPI, Header, HTTPException
@@ -39,6 +39,7 @@ from jsonschema.exceptions import ValidationError as SchemaValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
 from starlette.responses import JSONResponse, Response
+from starlette.types import ASGIApp
 
 from kgfoundry.embeddings_sparse.bm25 import LuceneBM25, PurePythonBM25, get_bm25
 from kgfoundry.embeddings_sparse.splade import get_splade
@@ -128,6 +129,8 @@ class CorrelationIDMiddleware(BaseHTTPMiddleware):
         Defaults to ``None``.
     """
 
+    HEADER_NAME: Final[str] = "X-Correlation-ID"
+
     async def dispatch(
         self,
         request: StarletteRequest,
@@ -149,12 +152,13 @@ class CorrelationIDMiddleware(BaseHTTPMiddleware):
         Response
             Describe return value.
         """
-        correlation_id = request.headers.get("X-Correlation-ID")
+        header_name = self.HEADER_NAME
+        correlation_id = request.headers.get(header_name)
         if not correlation_id:
             correlation_id = str(uuid.uuid4())
         set_correlation_id(correlation_id)
         response = await call_next(request)
-        response.headers["X-Correlation-ID"] = correlation_id
+        response.headers[header_name] = correlation_id
         return response
 
 
@@ -204,7 +208,7 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
             Defaults to None.
             Defaults to ``None``.
         """
-        super().__init__(app)
+        super().__init__(cast(ASGIApp, app))
         self.enabled = enabled
         if schema_path is None:
             # Default to schema/search/search_response.json relative to repo root
@@ -331,22 +335,17 @@ except Exception:
 if settings.search.validate_responses:
     # Create a factory function that returns configured middleware
     def _create_response_validator(app: FastAPI) -> ResponseValidationMiddleware:
-        """Describe  create response validator.
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        """Return response validation middleware configured for ``app``.
 
         Parameters
         ----------
         app : FastAPI
-        Configure the app.
-
+            Application instance that the middleware wraps.
 
         Returns
         -------
         ResponseValidationMiddleware
-        Describe return value.
+            Middleware that enforces response schema validation.
         """
         return ResponseValidationMiddleware(app, enabled=True)
 

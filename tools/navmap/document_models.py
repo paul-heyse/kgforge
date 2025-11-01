@@ -136,11 +136,14 @@ class NavmapDocument(BaseStruct, kw_only=True):
 
     schemaVersion: str = NAVMAP_SCHEMA_VERSION
     schemaId: str = NAVMAP_SCHEMA_ID
-    generatedAt: str = msgspec.field(default_factory=_utc_iso_now)
+    generatedAt: str = cast(str, msgspec.field(default_factory=_utc_iso_now))
     commit: str = "HEAD"
     policyVersion: str = "1"
     linkMode: str = "editor"
-    modules: dict[str, ModuleEntryDocument] = msgspec.field(default_factory=_empty_module_map)
+    modules: dict[str, ModuleEntryDocument] = cast(
+        dict[str, ModuleEntryDocument],
+        msgspec.field(default_factory=_empty_module_map),
+    )
 
     if TYPE_CHECKING:
 

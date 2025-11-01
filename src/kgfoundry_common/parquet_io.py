@@ -11,7 +11,7 @@ import datetime as dt
 from collections.abc import Iterable
 from pathlib import Path
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, Final, NotRequired, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Final, NotRequired, TypedDict
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -541,7 +541,7 @@ def read_table_to_dataframe(
         raise ImportError(msg)
 
     table = read_table(path, schema=schema, validate_schema=validate_schema)
-    return cast(DataFrame, table.to_pandas())
+    return table.to_pandas()
 
 
 # [nav:anchor validate_table_schema]

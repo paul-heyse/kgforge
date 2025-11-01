@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 
-class InvalidContractOptions(Exception):
+class InvalidContractOptions(Exception):  # noqa: N818 - library uses Options suffix
     errors: dict[str, str]
 
 class Contract:

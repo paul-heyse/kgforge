@@ -2,28 +2,30 @@
 
 from __future__ import annotations
 
-from typing import Any
-from urllib.parse import SplitResult
+from collections.abc import Mapping
+
+from starlette.datastructures import URL
+from starlette.types import Receive, Scope, Send
 
 __all__ = ["HTTPConnection", "Request"]
 
 class HTTPConnection:
     """HTTP connection abstraction used by Request objects."""
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, scope: Scope, receive: Receive, send: Send) -> None:
         """Initialize HTTP connection."""
         ...
 
 class Request:
     """Starlette Request object with precise type annotations."""
 
-    headers: dict[str, str]
-    url: SplitResult
-    scope: dict[str, Any]
-    _base_url: SplitResult | None
+    headers: Mapping[str, str]
+    url: URL
+    scope: Scope
+    _base_url: URL | None
     _client: HTTPConnection | None
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, scope: Scope, receive: Receive, send: Send) -> None:
         """Initialize request."""
         ...
 
