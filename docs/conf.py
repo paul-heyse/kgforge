@@ -85,13 +85,17 @@ def get_project_settings(env: Mapping[str, str] | None = None) -> ProjectSetting
     )
 
 
+_BaseModel: type[object] | None
 try:
-    from pydantic import BaseModel as _BaseModel
+    from pydantic import BaseModel as _PydanticBaseModel
 except ModuleNotFoundError:  # pragma: no cover - optional dependency
     _BaseModel = None
+else:
+    _BaseModel = cast(type[object], _PydanticBaseModel)
 
+_auto_docstrings: ModuleType | None
 try:
-    from tools import auto_docstrings as _auto_docstrings
+    from tools import auto_docstrings as _auto_docstrings  # type: ignore[assignment]
 except ModuleNotFoundError:  # pragma: no cover - optional dependency
     _auto_docstrings = None
 
@@ -141,6 +145,16 @@ class GriffeLoaderFactory(Protocol):
 
     def __call__(self, search_paths: Sequence[str]) -> GriffeLoaderInstance:
         """Return a loader configured with the provided search paths."""
+        ...
+
+
+class _AutoDocstringsModule(Protocol):
+    MAGIC_METHOD_EXTENDED_SUMMARIES: Mapping[str, str]
+    STANDARD_METHOD_EXTENDED_SUMMARIES: Mapping[str, str]
+    PYDANTIC_ARTIFACT_SUMMARIES: Mapping[str, str]
+
+    def summarize(self, name: str, kind: str) -> str:
+        """Return a synthesized summary for the provided symbol."""
         ...
 
 
@@ -197,16 +211,18 @@ def _apply_auto_docstring_overrides() -> None:
     if _BaseModel is None or _auto_docstrings is None:
         return
 
+    auto_docstrings = cast(_AutoDocstringsModule, _auto_docstrings)
+
     overrides: dict[str, str] = {}
-    overrides.update(_auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(_auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(_auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
+    overrides.update(auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
 
     for name, extended in overrides.items():
         attr = getattr(_BaseModel, name, None)
         if attr is None:
             continue
-        summary = _auto_docstrings.summarize(name, "function")
+        summary = auto_docstrings.summarize(name, "function")
         doc_text = f"{summary}\n\n{extended}"
         with suppress(
             AttributeError, TypeError
@@ -225,13 +241,15 @@ def _build_autoapi_doc_overrides() -> None:
     if _auto_docstrings is None:
         return
 
+    auto_docstrings = cast(_AutoDocstringsModule, _auto_docstrings)
+
     overrides: dict[str, str] = {}
-    overrides.update(_auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(_auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(_auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
+    overrides.update(auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
 
     for name, extended in overrides.items():
-        summary = _auto_docstrings.summarize(name, "function")
+        summary = auto_docstrings.summarize(name, "function")
         _AUTOAPI_DOC_OVERRIDES[name] = f"{summary}\n\n{extended}"
 
 
@@ -451,12 +469,9 @@ sphinx_gallery_conf = {
 }
 
 # Ensure JSON builder can serialize lru_cache wrappers
-_BaseJSONEncoder = cast(
-    type[json.JSONEncoder], getattr(json_module, "JSONEncoder", json.JSONEncoder)
-)
 
 
-class DocsJSONEncoder(_BaseJSONEncoder):
+class DocsJSONEncoder(json.JSONEncoder):
     """JSON encoder that can serialize ``functools.lru_cache`` wrappers."""
 
     def default(self, o: object) -> object:  # pragma: no cover - exercised in Sphinx build
@@ -467,7 +482,7 @@ class DocsJSONEncoder(_BaseJSONEncoder):
 
 
 # Override JSONEncoder default to render lru_cache wrappers
-setattr(json_module, "JSONEncoder", DocsJSONEncoder)
+json_module.JSONEncoder = DocsJSONEncoder  # type: ignore[attr-defined]
 json.JSONEncoder = DocsJSONEncoder
 
 # --- Build deep links per symbol without importing your code (use Griffe)

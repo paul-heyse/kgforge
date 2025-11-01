@@ -15,15 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from docs._scripts.shared import (  # noqa: PLC2701
-    DocsSettings,
-    GriffeLoader,
-    detect_environment,
-    ensure_sys_paths,
-    load_settings,
-    make_loader,
-    resolve_git_sha,
-)
+from docs._scripts import shared as shared_module  # noqa: E402, PLC2701
 from tools import get_logger, with_fields  # noqa: E402
 
 if TYPE_CHECKING:
@@ -33,8 +25,8 @@ if TYPE_CHECKING:
 else:
     GriffeObject = object
 
-ENV = detect_environment()
-ensure_sys_paths(ENV)
+ENV: shared_module.BuildEnvironment = shared_module.detect_environment()
+shared_module.ensure_sys_paths(ENV)
 ROOT = ENV.root
 SRC = ENV.src
 DOCS_BUILD = ROOT / "docs" / "_build"
@@ -42,7 +34,7 @@ DOCS_BUILD = ROOT / "docs" / "_build"
 LOGGER = get_logger(__name__)
 LOG = with_fields(LOGGER, operation="symbol_index")
 
-SETTINGS: DocsSettings = load_settings()
+SETTINGS: shared_module.DocsSettings = shared_module.load_settings()
 
 NAVMAP_CANDIDATES = [
     DOCS_BUILD / "navmap.json",
@@ -50,7 +42,7 @@ NAVMAP_CANDIDATES = [
     ROOT / "site" / "_build" / "navmap" / "navmap.json",
 ]
 
-loader: GriffeLoader = make_loader(ENV)
+loader: shared_module.GriffeLoader = shared_module.make_loader(ENV)
 
 
 type JSONPrimitive = str | int | float | bool | None
@@ -286,7 +278,7 @@ def _load_test_map() -> JSONObject:
 
 def _current_sha() -> str:
     """Resolve the Git SHA used for GitHub permalinks."""
-    return resolve_git_sha(ENV, SETTINGS, logger=LOGGER)
+    return shared_module.resolve_git_sha(ENV, SETTINGS, logger=LOGGER)
 
 
 def _github_link(file_rel: str, start: int | None, end: int | None) -> str | None:
