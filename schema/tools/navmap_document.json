@@ -212,6 +212,67 @@
         }
       }
     }
-  }
+  },
+  "examples": [
+    {
+      "schemaVersion": "1.0.0",
+      "schemaId": "https://kgfoundry.dev/schema/tools/navmap-document.json",
+      "generatedAt": "2025-01-01T12:00:00+00:00",
+      "commit": "abc123def456",
+      "policyVersion": "1",
+      "linkMode": "editor",
+      "modules": {
+        "kgfoundry.example": {
+          "path": "src/kgfoundry/example.py",
+          "exports": ["ExampleClass", "example_function"],
+          "sections": [
+            {
+              "id": "classes",
+              "symbols": ["ExampleClass"]
+            },
+            {
+              "id": "functions",
+              "symbols": ["example_function"]
+            }
+          ],
+          "sectionLines": {
+            "classes": 10,
+            "functions": 25
+          },
+          "anchors": {
+            "ExampleClass": 10,
+            "example_function": 25
+          },
+          "links": {
+            "source": "vscode-remote://dev-container+abc123/src/kgfoundry/example.py"
+          },
+          "meta": {
+            "ExampleClass": {
+              "owner": "team-alpha",
+              "stability": "stable",
+              "since": "1.0.0"
+            }
+          },
+          "moduleMeta": {
+            "owner": "team-alpha",
+            "stability": "stable"
+          },
+          "tags": ["example", "demo"],
+          "synopsis": "Example module demonstrating navmap structure.",
+          "seeAlso": ["kgfoundry.example2"],
+          "deps": ["kgfoundry.common"]
+        }
+      }
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "schemaId": "https://kgfoundry.dev/schema/tools/navmap-document.json",
+      "generatedAt": "2025-01-01T12:00:00+00:00",
+      "commit": "HEAD",
+      "policyVersion": "1",
+      "linkMode": "github",
+      "modules": {}
+    }
+  ]
 }
 

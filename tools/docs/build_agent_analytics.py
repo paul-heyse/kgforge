@@ -14,10 +14,7 @@ import msgspec
 from msgspec import DecodeError
 from msgspec import json as msgspec_json
 
-if TYPE_CHECKING:
-    from tools import validate_tools_payload as _validate_tools_payload
-else:
-    from tools import validate_tools_payload as _validate_tools_payload
+from tools._shared.schema import validate_tools_payload as _validate_tools_payload
 
 from kgfoundry.agent_catalog.models import load_catalog_payload
 from tools.docs.analytics_models import (

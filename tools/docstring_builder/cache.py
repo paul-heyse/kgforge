@@ -6,13 +6,13 @@ from __future__ import annotations
 import json
 import logging
 import threading
-from collections.abc import Mapping
-from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import TYPE_CHECKING, cast
 
-from tools import validate_tools_payload
+import msgspec
+
+from tools._shared.schema import validate_tools_payload
 
 logger = logging.getLogger(__name__)
 
@@ -20,35 +20,64 @@ DOCSTRING_CACHE_SCHEMA = "docstring_cache.json"
 DOCSTRING_CACHE_SCHEMA_ID = "https://kgfoundry.dev/schema/tools/docstring-cache.json"
 DOCSTRING_CACHE_VERSION = "1.0.0"
 
+if TYPE_CHECKING:
 
-@dataclass(slots=True)
-class CacheEntry:
+    class BaseStruct:
+        """Typed placeholder for :class:`msgspec.Struct` during analysis."""
+
+        def __init__(self, *args: object, **kwargs: object) -> None: ...
+
+        def __init_subclass__(
+            cls,
+            *,
+            kw_only: bool = False,
+            **kwargs: object,
+        ) -> None:
+            """Accept struct keyword-only modifiers for type checking."""
+
+else:
+    BaseStruct = msgspec.Struct
+
+
+def _default_generated_at() -> str:
+    """Return the current UTC timestamp as an ISO-8601 string."""
+    return datetime.now(tz=UTC).isoformat()
+
+
+def _default_entries() -> dict[str, CacheEntry]:
+    """Return an empty entries dict for :class:`CacheDocument`."""
+    return {}
+
+
+class CacheEntry(BaseStruct, kw_only=True):
     """Entry describing a processed file."""
 
     mtime: float
     config_hash: str
 
+    if TYPE_CHECKING:
 
-@dataclass(slots=True)
-class CacheDocument:
+        def __init__(self, *, mtime: float, config_hash: str) -> None: ...
+
+
+class CacheDocument(BaseStruct, kw_only=True):
     """Persisted cache document with schema metadata."""
 
     schemaVersion: str = DOCSTRING_CACHE_VERSION
     schemaId: str = DOCSTRING_CACHE_SCHEMA_ID
-    generatedAt: str = field(default_factory=lambda: datetime.now(tz=UTC).isoformat())
-    entries: dict[str, CacheEntry] = field(default_factory=dict)
+    generatedAt: str = msgspec.field(default_factory=_default_generated_at)
+    entries: dict[str, CacheEntry] = msgspec.field(default_factory=_default_entries)
 
+    if TYPE_CHECKING:
 
-class CacheEntryPayload(TypedDict):
-    mtime: float
-    config_hash: str
-
-
-class CacheDocumentPayload(TypedDict):
-    schemaVersion: str
-    schemaId: str
-    generatedAt: str
-    entries: dict[str, CacheEntryPayload]
+        def __init__(
+            self,
+            *,
+            schemaVersion: str = DOCSTRING_CACHE_VERSION,  # noqa: N803
+            schemaId: str = DOCSTRING_CACHE_SCHEMA_ID,  # noqa: N803
+            generatedAt: str | None = None,  # noqa: N803
+            entries: dict[str, CacheEntry] | None = None,
+        ) -> None: ...
 
 
 class BuilderCache:
@@ -63,7 +92,7 @@ class BuilderCache:
 
         raw_payload = path.read_text(encoding="utf-8")
         try:
-            decoded = json.loads(raw_payload)
+            decoded: object = json.loads(raw_payload)
         except json.JSONDecodeError as exc:
             self._handle_load_error("Invalid cache payload", exc)
             return
@@ -72,16 +101,16 @@ class BuilderCache:
             self._load_legacy_payload(raw_payload)
             return
 
-        payload = cast(CacheDocumentPayload, decoded)
+        payload_dict = cast(dict[str, object], decoded)
         try:
-            validate_tools_payload(_payload_mapping(payload), DOCSTRING_CACHE_SCHEMA)
+            validate_tools_payload(payload_dict, DOCSTRING_CACHE_SCHEMA)
         except Exception as exc:  # noqa: BLE001
             self._handle_load_error("Cache schema validation failed", exc)
             return
 
         try:
-            self._document = _payload_to_document(payload)
-        except (KeyError, TypeError, ValueError) as exc:
+            self._document = cast(CacheDocument, msgspec.convert(payload_dict, type=CacheDocument))
+        except (msgspec.DecodeError, TypeError, ValueError) as exc:
             self._handle_load_error("Cache entry schema mismatch", exc)
 
     def needs_update(self, file_path: Path, config_hash: str) -> bool:
@@ -101,14 +130,19 @@ class BuilderCache:
         key = str(file_path)
         mtime = file_path.stat().st_mtime
         with self._lock:
-            self._document.entries[key] = CacheEntry(mtime=mtime, config_hash=config_hash)
-            self._document.generatedAt = datetime.now(tz=UTC).isoformat()
+            entries = dict(self._document.entries)
+            entries[key] = CacheEntry(mtime=mtime, config_hash=config_hash)
+            self._document = msgspec.structs.replace(
+                self._document,
+                entries=entries,
+                generatedAt=datetime.now(tz=UTC).isoformat(),
+            )
 
     def write(self) -> None:
         """Persist cache entries to disk."""
         with self._lock:
-            payload = _document_to_payload(self._document)
-        validate_tools_payload(_payload_mapping(payload), DOCSTRING_CACHE_SCHEMA)
+            payload = cast(dict[str, object], msgspec.to_builtins(self._document))
+        validate_tools_payload(payload, DOCSTRING_CACHE_SCHEMA)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         encoded = json.dumps(payload, indent=2)
         self.path.write_text(encoded, encoding="utf-8")
@@ -147,17 +181,14 @@ class BuilderCache:
 
         entries: dict[str, CacheEntry] = {}
         for key, value in legacy_entries.items():
-            if not isinstance(value, dict):
-                self._handle_load_error("Legacy cache entry must be a mapping")
-                return
-            mtime = value.get("mtime")
-            config_hash = value.get("config_hash")
-            if not isinstance(mtime, (int, float)) or not isinstance(config_hash, str):
+            mtime_val = value.get("mtime")
+            config_hash_val = value.get("config_hash")
+            if not isinstance(mtime_val, (int, float)) or not isinstance(config_hash_val, str):
                 self._handle_load_error("Legacy cache entry schema mismatch")
                 return
-            entries[key] = CacheEntry(mtime=float(mtime), config_hash=config_hash)
+            entries[key] = CacheEntry(mtime=float(mtime_val), config_hash=config_hash_val)
 
-        payload: CacheDocumentPayload = {
+        payload_dict: dict[str, object] = {
             "schemaVersion": DOCSTRING_CACHE_VERSION,
             "schemaId": DOCSTRING_CACHE_SCHEMA_ID,
             "generatedAt": datetime.now(tz=UTC).isoformat(),
@@ -167,41 +198,77 @@ class BuilderCache:
             },
         }
         try:
-            validate_tools_payload(_payload_mapping(payload), DOCSTRING_CACHE_SCHEMA)
+            validate_tools_payload(payload_dict, DOCSTRING_CACHE_SCHEMA)
         except Exception as exc:  # noqa: BLE001
             self._handle_load_error("Legacy cache schema validation failed", exc)
             return
 
-        self._document = _payload_to_document(payload)
+        try:
+            self._document = cast(CacheDocument, msgspec.convert(payload_dict, type=CacheDocument))
+        except (msgspec.DecodeError, TypeError, ValueError) as exc:
+            self._handle_load_error("Legacy cache conversion failed", exc)
 
 
-def _payload_to_document(payload: CacheDocumentPayload) -> CacheDocument:
-    entries = {
-        key: CacheEntry(mtime=value["mtime"], config_hash=value["config_hash"])
-        for key, value in payload["entries"].items()
-    }
-    return CacheDocument(
-        schemaVersion=payload["schemaVersion"],
-        schemaId=payload["schemaId"],
-        generatedAt=payload["generatedAt"],
-        entries=entries,
-    )
+def from_payload(payload: dict[str, object]) -> CacheDocument:
+    """Convert a payload dictionary to a :class:`CacheDocument`.
+
+    Parameters
+    ----------
+    payload : dict[str, object]
+        Raw payload dictionary (typically from JSON).
+
+    Returns
+    -------
+    CacheDocument
+        Typed document instance.
+
+    Raises
+    ------
+    msgspec.DecodeError
+        If the payload cannot be converted to the expected structure.
+    """
+    validate_tools_payload(payload, DOCSTRING_CACHE_SCHEMA)
+    return cast(CacheDocument, msgspec.convert(payload, type=CacheDocument))
 
 
-def _document_to_payload(document: CacheDocument) -> CacheDocumentPayload:
-    return {
-        "schemaVersion": document.schemaVersion,
-        "schemaId": document.schemaId,
-        "generatedAt": document.generatedAt,
-        "entries": {
-            key: {"mtime": entry.mtime, "config_hash": entry.config_hash}
-            for key, entry in document.entries.items()
-        },
-    }
+def to_payload(document: CacheDocument) -> dict[str, object]:
+    """Convert a :class:`CacheDocument` to a payload dictionary.
+
+    Parameters
+    ----------
+    document : CacheDocument
+        Typed document instance.
+
+    Returns
+    -------
+    dict[str, object]
+        Payload dictionary suitable for JSON serialization.
+    """
+    return cast(dict[str, object], msgspec.to_builtins(document))
 
 
-def _payload_mapping(payload: CacheDocumentPayload) -> Mapping[str, object]:
-    return cast(Mapping[str, object], payload)
+def validate_document(document: CacheDocument) -> None:
+    """Validate a :class:`CacheDocument` against the schema.
+
+    Parameters
+    ----------
+    document : CacheDocument
+        Document to validate.
+
+    Raises
+    ------
+    Exception
+        If validation fails.
+    """
+    payload = to_payload(document)
+    validate_tools_payload(payload, DOCSTRING_CACHE_SCHEMA)
 
 
-__all__ = ["BuilderCache", "CacheDocument", "CacheEntry"]
+__all__ = [
+    "BuilderCache",
+    "CacheDocument",
+    "CacheEntry",
+    "from_payload",
+    "to_payload",
+    "validate_document",
+]

@@ -1,7 +1,8 @@
-from collections.abc import Mapping
 from typing import Any
 
-ProblemDetailsDict = Mapping[str, Any]
+from tools._shared.problem_details import ProblemDetailsDict as _ProblemDetailsDict
+
+ProblemDetailsDict = _ProblemDetailsDict
 
 CLI_ENVELOPE_SCHEMA_ID: str
 CLI_ENVELOPE_SCHEMA_VERSION: str
@@ -14,6 +15,7 @@ CliFileResult = Any
 CliFileStatus = Any
 CliStatus = Any
 
+SettingsError = type[Exception]
 StructuredLoggerAdapter = Any
 ToolExecutionError = type[Exception]
 ToolRunObservation = Any
