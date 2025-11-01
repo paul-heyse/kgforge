@@ -97,5 +97,5 @@
 
 ## 5. Verification Loop
 
-- [ ] 5.1 After completing each tranche of refactors above, run `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, and `uv run mypy --config-file mypy.ini` and ensure that all code blocks you made edits too are error free.
+- [ ] 5.1 After completing each tranche of refactors above, run `uv run ruff check --fix`, `uv run pyrefly check`, and `uv run mypy --config-file mypy.ini` and ensure that all code blocks you made edits too are error free.
 
