@@ -372,9 +372,11 @@ def _build_policy_from_mapping(data: Mapping[str, object]) -> ObservabilityPolic
     traces_data = data.get("traces")
 
     if not isinstance(metric_data, Mapping) or not isinstance(labels_data, Mapping):
-        raise ValueError("Policy overrides must include metric and labels mappings")
+        message = "Policy overrides must include metric and labels mappings"
+        raise TypeError(message)
     if not isinstance(logs_data, Mapping) or not isinstance(traces_data, Mapping):
-        raise ValueError("Policy overrides must include logs and traces mappings")
+        message = "Policy overrides must include logs and traces mappings"
+        raise TypeError(message)
 
     metric = _build_metric_policy(cast(Mapping[str, object], metric_data), DEFAULT_POLICY.metric)
     labels = _build_labels_policy(cast(Mapping[str, object], labels_data), DEFAULT_POLICY.labels)
@@ -393,7 +395,7 @@ def _build_policy_from_mapping(data: Mapping[str, object]) -> ObservabilityPolic
     )
 
 
-def load_policy() -> ObservabilityPolicy:
+def load_policy() -> ObservabilityPolicy:  # noqa: PLR0911
     """Load the observability policy from disk, falling back to defaults on failure."""
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
@@ -435,7 +437,7 @@ def load_policy() -> ObservabilityPolicy:
     )
     try:
         return _build_policy_from_mapping(merged_data)
-    except ValueError as exc:
+    except TypeError as exc:
         with_fields(LOGGER, policy_path=str(POLICY_PATH)).warning(
             "Observability policy overrides are invalid: %s", exc
         )
@@ -594,8 +596,8 @@ def _extract_labels_from_kw(kw_map: dict[str, str]) -> list[str]:
     # common: labelnames=["method","status"], or .labels("method","status")—we only see construction here
     s = kw_map.get("labelnames") or kw_map.get("label_names") or ""
     # naive parse: find quoted tokens
-    names = re.findall(r"[\"']([A-Za-z_][A-Za-z0-9_]*)[\"']", s)
-    return list(dict.fromkeys(names))
+    names: list[str] = re.findall(r"[\"']([A-Za-z_][A-Za-z0-9_]*)[\"']", s)
+    return _dedupe_strings(names)
 
 
 def _infer_unit_from_name(name: str) -> str | None:
@@ -660,6 +662,17 @@ def _recommended_aggregation(mtype: str | None) -> str | None:
     return None
 
 
+def _dedupe_strings(values: Sequence[str]) -> list[str]:
+    """Return ``values`` with duplicates removed, preserving order."""
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for value in values:
+        if value not in seen:
+            seen.add(value)
+            ordered.append(value)
+    return ordered
+
+
 def _is_structured_logging(call: ast.Call, text: str) -> tuple[list[str], bool]:
     """Return (structured_keys, is_structured).
 
@@ -674,7 +687,8 @@ def _is_structured_logging(call: ast.Call, text: str) -> tuple[list[str], bool]:
         if kw.arg == "extra":
             # try to parse dict keys
             src = ast.get_source_segment(text, kw.value) or ""
-            keys += re.findall(r"[\"']([A-Za-z_][A-Za-z0-9_]*)[\"']\s*:", src)
+            extra_keys: list[str] = re.findall(r"[\"']([A-Za-z_][A-Za-z0-9_]*)[\"']\s*:", src)
+            keys.extend(extra_keys)
     # detect f-string or % formatting in arg0 with additional args
     unstructured = False
     if call.args:
@@ -685,7 +699,7 @@ def _is_structured_logging(call: ast.Call, text: str) -> tuple[list[str], bool]:
         # (hard to detect reliably here; we mark as unstructured if there are extra positional args)
         if len(call.args) > 1:
             unstructured = True
-    return (list(dict.fromkeys(keys)), not unstructured)
+    return (_dedupe_strings(keys), not unstructured)
 
 
 # ---------- Lint engine -------------------------------------------------------
@@ -730,12 +744,12 @@ def _lint_metric(policy: ObservabilityPolicy, row: MetricRow) -> list[LintFindin
                 lineno=row.lineno,
             )
         )
-    if policy.metric.require_unit_suffix and row.type in (
+    if policy.metric.require_unit_suffix and row.type in {
         "counter",
         "gauge",
         "histogram",
         "summary",
-    ):
+    }:
         unit = _infer_unit_from_name(row.name)
         if unit is None and row.type != "counter":
             errs.append(
@@ -916,7 +930,7 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     return (text, tree)
 
 
-def scan_file(
+def scan_file(  # noqa: PLR0914
     path: Path, policy: ObservabilityPolicy
 ) -> tuple[list[LogRow], list[MetricRow], list[TraceRow]]:
     """Compute scan file.
@@ -952,8 +966,8 @@ def scan_file(
     for node in ast.walk(tree):
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
             attr = node.func.attr
-            base = getattr(node.func, "value", None)
-            base_name = base.id if isinstance(base, ast.Name) else None
+            base_node = node.func.value
+            base_name = base_node.id if isinstance(base_node, ast.Name) else None
             kwmap = _keywords_map(node, text)
 
             # --- LOGS (stdlib logging.*)
@@ -967,7 +981,7 @@ def scan_file(
                     logger=base_name,
                     level=attr,
                     message_template=msg,
-                    structured_keys=list(dict.fromkeys(keys)),
+                    structured_keys=_dedupe_strings(keys),
                     file=_rel(path),
                     lineno=node.lineno,
                     source_link=_links_for(path, node.lineno),
@@ -1008,8 +1022,9 @@ def scan_file(
             if attr in {"set_attribute", "add_event"} and traces:
                 # attach attributes to the last span in this file list if any
                 seg = ast.get_source_segment(text, node) or ""
-                key = _first_str(node) or ""
-                traces[-1].attributes.append(key or seg[:80])
+                key = _first_str(node)
+                attribute_value = key if key else seg[:80]
+                traces[-1].attributes.append(attribute_value)
 
     return (logs, metrics, traces)
 
@@ -1122,7 +1137,7 @@ def _load_runbooks(policy: ObservabilityPolicy) -> dict[str, str]:
         return {}
 
     try:
-        tax_data_raw = json.loads(tax_text)
+        tax_data_raw: object = json.loads(tax_text)
     except json.JSONDecodeError as exc:
         with_fields(LOGGER, taxonomy=str(tax_path)).warning(
             "Failed to parse error taxonomy JSON: %s", exc
@@ -1132,8 +1147,10 @@ def _load_runbooks(policy: ObservabilityPolicy) -> dict[str, str]:
     if not isinstance(tax_data_raw, Mapping):
         return {}
 
+    tax_data = cast(Mapping[str, object], tax_data_raw)
+
     runbooks: dict[str, str] = {}
-    errors_field = tax_data_raw.get("errors")
+    errors_field = tax_data.get("errors")
     if isinstance(errors_field, Sequence):
         for item in errors_field:
             if not isinstance(item, Mapping):
@@ -1142,7 +1159,8 @@ def _load_runbooks(policy: ObservabilityPolicy) -> dict[str, str]:
             extensions = item.get("extensions")
             if not isinstance(message, str) or not isinstance(extensions, Mapping):
                 continue
-            runbook_value = extensions.get("runbook")
+            extensions_map = cast(Mapping[str, object], extensions)
+            runbook_value = extensions_map.get("runbook")
             if isinstance(runbook_value, str):
                 runbooks[message] = runbook_value
     return runbooks
@@ -1232,8 +1250,7 @@ def main() -> int:
     runbooks = _load_runbooks(policy)
     _apply_runbooks(logs, runbooks)
     _write_outputs(metrics, logs, traces, lints)
-    exit_code = _summarize_exit(metrics, logs, traces, lints)
-    return exit_code
+    return _summarize_exit(metrics, logs, traces, lints)
 
 
 if __name__ == "__main__":

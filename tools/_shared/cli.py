@@ -4,9 +4,9 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Literal, cast
+from typing import TYPE_CHECKING, Literal, cast
 
 import msgspec
 from msgspec import UNSET, Struct, UnsetType, structs
@@ -23,49 +23,82 @@ CLI_ENVELOPE_SCHEMA_VERSION = "1.0.0"
 CLI_ENVELOPE_SCHEMA_ID = "https://kgfoundry.dev/schema/cli-envelope.json"
 
 
-class CliFileResult(Struct, kw_only=True):
-    """Individual file processing result emitted by tooling CLIs."""
+if TYPE_CHECKING:
 
-    path: str
-    status: CliFileStatus
-    message: str | None = None
-    problem: ProblemDetailsDict | UnsetType = UNSET
+    @dataclass(slots=True)
+    class CliFileResult:
+        """Individual file processing result emitted by tooling CLIs."""
+
+        path: str
+        status: CliFileStatus
+        message: str | None = None
+        problem: ProblemDetailsDict | UnsetType = UNSET
+
+    @dataclass(slots=True)
+    class CliErrorEntry:
+        """Error-level entry attached to CLI envelopes."""
+
+        status: CliErrorStatus
+        message: str
+        file: str | None = None
+        problem: ProblemDetailsDict | UnsetType = UNSET
+
+    @dataclass(slots=True)
+    class CliEnvelope:
+        """Typed representation of ``schema/tools/cli_envelope.json``."""
+
+        schemaVersion: str = CLI_ENVELOPE_SCHEMA_VERSION
+        schemaId: str = CLI_ENVELOPE_SCHEMA_ID
+        generatedAt: str = field(default_factory=lambda: datetime.now(tz=UTC).isoformat())
+        status: CliStatus = "success"
+        command: str = ""
+        subcommand: str = ""
+        durationSeconds: float = 0.0
+        files: list[CliFileResult] = field(default_factory=list)
+        errors: list[CliErrorEntry] = field(default_factory=list)
+        problem: ProblemDetailsDict | UnsetType = UNSET
 
 
-class CliErrorEntry(Struct, kw_only=True):
-    """Error-level entry attached to CLI envelopes."""
+else:
 
-    status: CliErrorStatus
-    message: str
-    file: str | None = None
-    problem: ProblemDetailsDict | UnsetType = UNSET
+    class CliFileResult(Struct, kw_only=True):
+        """Individual file processing result emitted by tooling CLIs."""
 
+        path: str
+        status: CliFileStatus
+        message: str | None = None
+        problem: ProblemDetailsDict | UnsetType = UNSET
 
-def _default_generated_at() -> str:
-    return datetime.now(tz=UTC).isoformat()
+    class CliErrorEntry(Struct, kw_only=True):
+        """Error-level entry attached to CLI envelopes."""
 
+        status: CliErrorStatus
+        message: str
+        file: str | None = None
+        problem: ProblemDetailsDict | UnsetType = UNSET
 
-def _default_files() -> list[CliFileResult]:
-    return []
+    def _default_generated_at() -> str:
+        return datetime.now(tz=UTC).isoformat()
 
+    def _default_files() -> list[CliFileResult]:
+        return []
 
-def _default_errors() -> list[CliErrorEntry]:
-    return []
+    def _default_errors() -> list[CliErrorEntry]:
+        return []
 
+    class CliEnvelope(Struct, kw_only=True):
+        """Typed representation of ``schema/tools/cli_envelope.json``."""
 
-class CliEnvelope(Struct, kw_only=True):
-    """Typed representation of ``schema/tools/cli_envelope.json``."""
-
-    schemaVersion: str = CLI_ENVELOPE_SCHEMA_VERSION
-    schemaId: str = CLI_ENVELOPE_SCHEMA_ID
-    generatedAt: str = msgspec.field(default_factory=_default_generated_at)
-    status: CliStatus = "success"
-    command: str = ""
-    subcommand: str = ""
-    durationSeconds: float = 0.0
-    files: list[CliFileResult] = msgspec.field(default_factory=_default_files)
-    errors: list[CliErrorEntry] = msgspec.field(default_factory=_default_errors)
-    problem: ProblemDetailsDict | UnsetType = UNSET
+        schemaVersion: str = CLI_ENVELOPE_SCHEMA_VERSION
+        schemaId: str = CLI_ENVELOPE_SCHEMA_ID
+        generatedAt: str = msgspec.field(default_factory=_default_generated_at)
+        status: CliStatus = "success"
+        command: str = ""
+        subcommand: str = ""
+        durationSeconds: float = 0.0
+        files: list[CliFileResult] = msgspec.field(default_factory=_default_files)
+        errors: list[CliErrorEntry] = msgspec.field(default_factory=_default_errors)
+        problem: ProblemDetailsDict | UnsetType = UNSET
 
 
 def new_cli_envelope(*, command: str, status: CliStatus, subcommand: str = "") -> CliEnvelope:

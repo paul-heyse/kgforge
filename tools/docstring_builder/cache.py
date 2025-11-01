@@ -109,7 +109,7 @@ class BuilderCache:
             return
 
         try:
-            self._document = cast(CacheDocument, msgspec.convert(payload_dict, type=CacheDocument))
+            self._document = msgspec.convert(payload_dict, type=CacheDocument)
         except (msgspec.DecodeError, TypeError, ValueError) as exc:
             self._handle_load_error("Cache entry schema mismatch", exc)
 
@@ -204,7 +204,7 @@ class BuilderCache:
             return
 
         try:
-            self._document = cast(CacheDocument, msgspec.convert(payload_dict, type=CacheDocument))
+            self._document = msgspec.convert(payload_dict, type=CacheDocument)
         except (msgspec.DecodeError, TypeError, ValueError) as exc:
             self._handle_load_error("Legacy cache conversion failed", exc)
 
@@ -228,7 +228,7 @@ def from_payload(payload: dict[str, object]) -> CacheDocument:
         If the payload cannot be converted to the expected structure.
     """
     validate_tools_payload(payload, DOCSTRING_CACHE_SCHEMA)
-    return cast(CacheDocument, msgspec.convert(payload, type=CacheDocument))
+    return msgspec.convert(payload, type=CacheDocument)
 
 
 def to_payload(document: CacheDocument) -> dict[str, object]:

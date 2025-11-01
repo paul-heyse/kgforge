@@ -66,7 +66,6 @@ def raises[TExc: BaseException](
     *,
     match: str | Pattern[str] | None = ...,
 ) -> AbstractContextManager[ExceptionInfo[TExc]]: ...
-
 @overload
 def raises(
     expected_exception: tuple[type[BaseException], ...],
@@ -106,7 +105,6 @@ def importorskip(
     minversion: str | None = ...,
     reason: str | None = ...,
 ) -> ModuleType: ...
-
 def warns(
     expected_warning: type[Warning] | tuple[type[Warning], ...],
     *,
@@ -117,8 +115,9 @@ class _ApproxReturn:
     def __iter__(self) -> Any: ...
 
 @overload
-def approx(expected: float, *, rel: float | None = ..., abs: float | None = ...) -> _ApproxReturn: ...
-
+def approx(
+    expected: float, *, rel: float | None = ..., abs: float | None = ...
+) -> _ApproxReturn: ...
 @overload
 def approx(
     expected: Sequence[float],

@@ -67,8 +67,7 @@ class CatalogStruct:
 
     def model_dump(self) -> dict[str, object]:
         raw = cast(JsonDict, asdict(self))
-        cleaned = _strip_none(raw)
-        return cleaned
+        return _strip_none(raw)
 
 
 @dataclass(slots=True)

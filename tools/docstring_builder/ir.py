@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Literal
+from typing import Literal, cast
 
 from tools.docstring_builder.semantics import SemanticResult
 
@@ -124,7 +124,7 @@ def validate_ir(ir: IRDocstring) -> None:
 
 def serialize_ir(ir: IRDocstring) -> dict[str, object]:
     """Convert an :class:`IRDocstring` into a JSON-serialisable dictionary."""
-    payload = asdict(ir)
+    payload = cast(dict[str, object], asdict(ir))
     payload["ir_version"] = ir.ir_version
     return payload
 

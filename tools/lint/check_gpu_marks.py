@@ -8,14 +8,14 @@ import re
 import sys
 from collections.abc import Iterable
 
-from tools._shared.logging import get_logger
+from tools._shared.logging import get_logger  # noqa: PLC2701
 
 LOGGER = get_logger(__name__)
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 TESTS_ROOT = REPO_ROOT / "tests"
 
-GPU_IMPORT_RE = re.compile(
+GPU_IMPORT_RE: re.Pattern[str] = re.compile(
     r"^\s*(?:from\s+(?P<mod_from>[a-zA-Z0-9_\.]+)\s+import|import\s+(?P<mod_imp>[a-zA-Z0-9_\.]+))",
     re.MULTILINE,
 )
@@ -62,8 +62,15 @@ def iter_test_paths(argv: list[str]) -> Iterable[pathlib.Path]:
 def contains_gpu_import(source: str) -> bool:
     """Return True when the source imports a known GPU module."""
     for match in GPU_IMPORT_RE.finditer(source):
-        module = match.group("mod_from") or match.group("mod_imp") or ""
-        head = module.split(".", 1)[0]
+        mod_from = match.group("mod_from")
+        mod_imp = match.group("mod_imp")
+        if mod_from is not None:
+            module: str = mod_from
+        elif mod_imp is not None:
+            module = mod_imp
+        else:
+            module = ""
+        head: str = module.split(".", 1)[0]
         if module in GPU_MODULE_FULL or head in GPU_MODULE_HEADS:
             return True
     return False

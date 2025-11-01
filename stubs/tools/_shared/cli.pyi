@@ -15,11 +15,29 @@ class CliFileResult:
     message: str | None
     problem: ProblemDetailsDict | None
 
+    def __init__(
+        self,
+        *,
+        path: str,
+        status: CliFileStatus,
+        message: str | None = ...,
+        problem: ProblemDetailsDict | None = ...,
+    ) -> None: ...
+
 class CliErrorEntry:
     status: CliErrorStatus
     message: str
     file: str | None
     problem: ProblemDetailsDict | None
+
+    def __init__(
+        self,
+        *,
+        status: CliErrorStatus,
+        message: str,
+        file: str | None = ...,
+        problem: ProblemDetailsDict | None = ...,
+    ) -> None: ...
 
 class CliEnvelope:
     schemaVersion: str
@@ -32,6 +50,21 @@ class CliEnvelope:
     files: list[CliFileResult]
     errors: list[CliErrorEntry]
     problem: ProblemDetailsDict | None
+
+    def __init__(
+        self,
+        *,
+        schemaVersion: str = ...,
+        schemaId: str = ...,
+        generatedAt: str = ...,
+        status: CliStatus = ...,
+        command: str = ...,
+        subcommand: str = ...,
+        durationSeconds: float = ...,
+        files: list[CliFileResult] | None = ...,
+        errors: list[CliErrorEntry] | None = ...,
+        problem: ProblemDetailsDict | None = ...,
+    ) -> None: ...
 
 @dataclass
 class CliEnvelopeBuilder:

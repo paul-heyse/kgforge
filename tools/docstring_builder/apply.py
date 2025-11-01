@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import cast
+from typing import Protocol, Self, cast, overload
 
 import libcst as cst
 
@@ -30,6 +30,13 @@ def _escape_docstring(text: str, indent: str) -> str:
     return f"{joined}\n"
 
 
+class _SuiteProtocol(Protocol):
+    body: tuple[cst.BaseStatement, ...]
+
+    def with_changes(self, *, body: tuple[cst.BaseStatement, ...]) -> Self:
+        """Return a copy of the suite with ``body`` replaced."""
+
+
 @dataclass(slots=True)
 class _DocstringTransformer(cst.CSTTransformer):
     module_name: str
@@ -46,6 +53,12 @@ class _DocstringTransformer(cst.CSTTransformer):
             pieces = [self.module_name, name]
         return ".".join(piece for piece in pieces if piece)
 
+    @overload
+    def _inject_docstring(self, node: cst.FunctionDef, qname: str) -> cst.FunctionDef: ...
+
+    @overload
+    def _inject_docstring(self, node: cst.ClassDef, qname: str) -> cst.ClassDef: ...
+
     def _inject_docstring(
         self, node: cst.FunctionDef | cst.ClassDef, qname: str
     ) -> cst.FunctionDef | cst.ClassDef:
@@ -58,7 +71,7 @@ class _DocstringTransformer(cst.CSTTransformer):
         expr = cst.Expr(value=literal)
         docstring_stmt: cst.BaseStatement = cst.SimpleStatementLine(body=[expr])
         body = node.body
-        statements = cast(tuple[cst.BaseStatement, ...], body.body)
+        statements: tuple[cst.BaseStatement, ...] = tuple(body.body)
         updated_body: tuple[cst.BaseStatement, ...]
         if statements and isinstance(statements[0], cst.SimpleStatementLine):
             first = statements[0]
@@ -67,7 +80,7 @@ class _DocstringTransformer(cst.CSTTransformer):
                 and isinstance(first.body[0], cst.Expr)
                 and isinstance(first.body[0].value, cst.SimpleString)
             ):
-                current_value = ast.literal_eval(first.body[0].value.value)
+                current_value = cast(str, ast.literal_eval(first.body[0].value.value))
                 if current_value == desired:
                     return node
                 updated_body = (docstring_stmt, *statements[1:])
@@ -78,7 +91,13 @@ class _DocstringTransformer(cst.CSTTransformer):
         if updated_body == statements:
             return node
         self.changed = True
-        return node.with_changes(body=body.with_changes(body=updated_body))
+        suite = cast(_SuiteProtocol, node.body)
+        updated_block = suite.with_changes(body=updated_body)
+        updated_node_raw = node.with_changes(body=updated_block)  # type: ignore[arg-type]  # LibCST stubs lack precise Suite typing
+        updated_node = updated_node_raw
+        if isinstance(updated_node, cst.FunctionDef):
+            return updated_node
+        return updated_node
 
     def visit_ClassDef(self, node: cst.ClassDef) -> bool:  # noqa: N802 - LibCST API contract
         self.namespace.append(node.name.value)
@@ -86,7 +105,7 @@ class _DocstringTransformer(cst.CSTTransformer):
 
     def leave_ClassDef(  # noqa: N802 - LibCST API contract
         self, original_node: cst.ClassDef, updated_node: cst.ClassDef
-    ) -> cst.BaseStatement:
+    ) -> cst.ClassDef:
         qname = self._qualify(original_node.name.value)
         updated = self._inject_docstring(updated_node, qname)
         self.namespace.pop()
@@ -98,7 +117,7 @@ class _DocstringTransformer(cst.CSTTransformer):
 
     def leave_FunctionDef(  # noqa: N802 - LibCST API contract
         self, original_node: cst.FunctionDef, updated_node: cst.FunctionDef
-    ) -> cst.BaseStatement:
+    ) -> cst.FunctionDef:
         qname = self._qualify(original_node.name.value)
         updated = self._inject_docstring(updated_node, qname)
         self.namespace.pop()

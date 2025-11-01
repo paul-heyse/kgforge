@@ -187,7 +187,7 @@ def _load_navmap() -> dict[str, Any]:
     if not NAVMAP.exists():
         return {}
     try:
-        return json.loads(NAVMAP.read_text(encoding="utf-8"))  # type: ignore[no-any-return]
+        return cast(dict[str, Any], json.loads(NAVMAP.read_text(encoding="utf-8")))
     except (json.JSONDecodeError, OSError, UnicodeDecodeError):
         return {}
 
@@ -217,7 +217,7 @@ def _nav_versions(module_name: str, class_name: str, nav: dict[str, Any]) -> dic
 def _placeholder(py_type: object) -> object:
     """Generate lightweight placeholders for basic Python types."""
     origin = getattr(py_type, "__origin__", None)
-    if origin in (list, set, tuple):
+    if origin in {list, set, tuple}:
         return []
     if origin is dict:
         return {}

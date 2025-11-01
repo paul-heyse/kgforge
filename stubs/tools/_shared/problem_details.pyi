@@ -7,7 +7,6 @@ JsonPrimitive = str | int | float | bool | None
 JsonValue = JsonPrimitive | list[JsonValue] | dict[str, JsonValue]
 ProblemDetailsDict = dict[str, JsonValue]
 
-
 def build_problem_details(
     *,
     type: str,
@@ -17,8 +16,6 @@ def build_problem_details(
     instance: str,
     extensions: Mapping[str, JsonValue] | None = ...,
 ) -> ProblemDetailsDict: ...
-
-
 def build_schema_problem_details(
     *,
     error: Exception,
@@ -28,8 +25,6 @@ def build_schema_problem_details(
     instance: str,
     extensions: Mapping[str, JsonValue] | None = ...,
 ) -> ProblemDetailsDict: ...
-
-
 def build_tool_problem_details(
     *,
     category: str,
@@ -40,39 +35,29 @@ def build_tool_problem_details(
     instance_suffix: str,
     extensions: Mapping[str, JsonValue] | None = ...,
 ) -> ProblemDetailsDict: ...
-
-
 def tool_timeout_problem_details(
     command: Sequence[str],
     *,
     timeout: float | None,
 ) -> ProblemDetailsDict: ...
-
-
 def tool_missing_problem_details(
     command: Sequence[str],
     *,
     executable: str,
     detail: str,
 ) -> ProblemDetailsDict: ...
-
-
 def tool_disallowed_problem_details(
     command: Sequence[str],
     *,
     executable: Path,
     allowlist: Sequence[str],
 ) -> ProblemDetailsDict: ...
-
-
 def tool_failure_problem_details(
     command: Sequence[str],
     *,
     returncode: int,
     detail: str,
 ) -> ProblemDetailsDict: ...
-
-
 def problem_from_exception(
     exc: Exception,
     *,
@@ -82,6 +67,4 @@ def problem_from_exception(
     instance: str,
     extensions: Mapping[str, JsonValue] | None = ...,
 ) -> ProblemDetailsDict: ...
-
-
 def render_problem(problem: ProblemDetailsDict) -> str: ...

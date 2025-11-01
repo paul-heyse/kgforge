@@ -6,8 +6,10 @@ from __future__ import annotations
 import argparse
 import ast
 import sys
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
+from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
 from tools._shared.logging import get_logger
 from tools._shared.proc import ToolExecutionError, run_tool
@@ -22,7 +24,14 @@ TARGETS = [
 ]
 
 
-def parse_args() -> argparse.Namespace:
+@dataclass(slots=True)
+class DocstringArgs:
+    """Typed CLI options for the docstring checker."""
+
+    no_todo: bool
+
+
+def parse_args(argv: Sequence[str] | None = None) -> DocstringArgs:
     """Return parsed CLI arguments for the docstring audit helper.
 
     The parser currently exposes a single flag, ``--no-todo``, which toggles the
@@ -34,7 +43,8 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Fail if docstrings contain placeholder text such as 'TODO'.",
     )
-    return parser.parse_args()
+    namespace = parser.parse_args(argv)
+    return DocstringArgs(no_todo=bool(cast(bool, namespace.no_todo)))
 
 
 def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:

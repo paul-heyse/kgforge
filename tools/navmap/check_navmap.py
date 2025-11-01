@@ -12,19 +12,15 @@ from __future__ import annotations
 import ast
 import re
 import sys
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import TypedDict
 
 from packaging.version import InvalidVersion, Version
 
-import tools.navmap.build_navmap as _build_navmap
 from tools import get_logger
-
-_BuildNavmapError = Exception
-
-BuildNavmapError = cast(type[Exception], getattr(_build_navmap, "NavmapError", _BuildNavmapError))
-build_index = cast(Callable[..., dict[str, object]], _build_navmap.build_index)
+from tools.navmap.build_navmap import NavmapError as BuildNavmapError
+from tools.navmap.build_navmap import build_index
 
 LOGGER = get_logger(__name__)
 
@@ -235,7 +231,10 @@ def _dedupe_str_list(items: Sequence[str]) -> list[str]:
 
 def _expand_all_placeholder(exports: Sequence[str]) -> list[ResolvedNavValue]:
     """Return concrete export lists for ``__all__`` placeholders."""
-    return cast(list[ResolvedNavValue], _dedupe_str_list(exports))
+    unique_exports = _dedupe_str_list(exports)
+    resolved: list[ResolvedNavValue] = []
+    resolved.extend(unique_exports)
+    return resolved
 
 
 def _expand_dict_template(template: NavTree, exports: Sequence[str]) -> dict[str, ResolvedNavValue]:
@@ -356,10 +355,10 @@ def _resolve_navmap_literal(
         return {}
     nav_exports = resolved.get("exports")
     if isinstance(nav_exports, list):
-        resolved["exports"] = cast(
-            list[ResolvedNavValue],
-            _dedupe_str_list([item for item in nav_exports if isinstance(item, str)]),
-        )
+        string_exports = [item for item in nav_exports if isinstance(item, str)]
+        resolved_exports: list[ResolvedNavValue] = []
+        resolved_exports.extend(_dedupe_str_list(string_exports))
+        resolved["exports"] = resolved_exports
     return resolved
 
 
