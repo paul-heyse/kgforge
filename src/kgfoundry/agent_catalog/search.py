@@ -19,6 +19,9 @@ import numpy as np
 import numpy.typing as npt
 
 from kgfoundry_common.errors import AgentCatalogSearchError
+
+# Backwards compatibility alias for tooling modules that still import the legacy name.
+CatalogSearchError = AgentCatalogSearchError
 from kgfoundry_common.logging import get_logger, with_fields
 from kgfoundry_common.observability import MetricsProvider, observe_duration
 from search_api.types import (
