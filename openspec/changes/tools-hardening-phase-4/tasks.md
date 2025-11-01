@@ -1,16 +1,16 @@
 ## 1. Governance & Baseline
 
-- [ ] 1.1 Refactor `tools/__init__.py` to import concrete modules directly, define an explicit `__all__`, and add PEP 257-compliant docstrings that reference the exception taxonomy and Problem Details sample payload.
-  - [ ] 1.1.a Replace statements such as `from tools import codemods as codemods` with explicit absolute imports (`from tools import codemods` or `from . import codemods`) to avoid recursive package initialisation; ensure imports are grouped stdlib/third-party/first-party before populating `__all__`.
-  - [ ] 1.1.b Assemble a `PUBLIC_EXPORTS` mapping that enumerates re-exported helpers from `tools._shared`, `tools.docs`, `tools.docstring_builder`, and `tools.navmap`; rebuild `__all__` from this mapping so only intentional symbols are exported.
-  - [ ] 1.1.c Add a module docstring summarising the contract, linking to `schema/examples/tools/problem_details/tool-execution-error.json` (create the example if it does not exist) and `kgfoundry_common.errors` for taxonomy references.
-  - [ ] 1.1.d Ensure every newly re-exported symbol has an inline `typing.Annotated` or descriptive alias when necessary (e.g., `ToolExecutionError = _proc.ToolExecutionError`) so Sphinx/autoapi renders accurate documentation.
-  - [ ] 1.1.e Update `stubs/tools/__init__.pyi` to mirror the curated `__all__`, using precise types from the source modules instead of `Any`.
-- [ ] 1.2 Apply the same restructuring to `tools/docs/__init__.py`, ensuring only supported entry points are exported and documented.
-  - [ ] 1.2.a Switch to explicit imports (`from tools.docs import build_graphs`) and build a sorted `__all__` list that matches runtime exports exactly.
-  - [ ] 1.2.b Add PEP 257 docstrings that describe each exported builder (catalog, portal renderer, analytics) and reference the Problem Details example for failure envelopes.
-  - [ ] 1.2.c Update `stubs/tools/docs/__init__.pyi` to expose the same symbol set with concrete return types (e.g., `def build_agent_catalog(...) -> CatalogBuildResult`).
-  - [ ] 1.2.d Validate that consumers under `tests/tools` and `tools/navmap` import only documented names; adjust call sites if new module boundaries require relocation.
+- [x] 1.1 Refactor `tools/__init__.py` to import concrete modules directly, define an explicit `__all__`, and add PEP 257-compliant docstrings that reference the exception taxonomy and Problem Details sample payload.
+  - [x] 1.1.a Replace statements such as `from tools import codemods as codemods` with explicit absolute imports (`from tools import codemods` or `from . import codemods`) to avoid recursive package initialisation; ensure imports are grouped stdlib/third-party/first-party before populating `__all__`.
+  - [x] 1.1.b Assemble a `PUBLIC_EXPORTS` mapping that enumerates re-exported helpers from `tools._shared`, `tools.docs`, `tools.docstring_builder`, and `tools.navmap`; rebuild `__all__` from this mapping so only intentional symbols are exported.
+  - [x] 1.1.c Add a module docstring summarising the contract, linking to `schema/examples/tools/problem_details/tool-execution-error.json` (create the example if it does not exist) and `kgfoundry_common.errors` for taxonomy references.
+  - [x] 1.1.d Ensure every newly re-exported symbol has an inline `typing.Annotated` or descriptive alias when necessary (e.g., `ToolExecutionError = _proc.ToolExecutionError`) so Sphinx/autoapi renders accurate documentation.
+  - [x] 1.1.e Update `stubs/tools/__init__.pyi` to mirror the curated `__all__`, using precise types from the source modules instead of `Any`.
+- [x] 1.2 Apply the same restructuring to `tools/docs/__init__.py`, ensuring only supported entry points are exported and documented.
+  - [x] 1.2.a Switch to explicit imports (`from tools.docs import build_graphs`) and build a sorted `__all__` list that matches runtime exports exactly.
+  - [x] 1.2.b Add PEP 257 docstrings that describe each exported builder (catalog, portal renderer, analytics) and reference the Problem Details example for failure envelopes.
+  - [x] 1.2.c Update `stubs/tools/docs/__init__.pyi` to expose the same symbol set with concrete return types (e.g., `def build_agent_catalog(...) -> CatalogBuildResult`).
+  - [x] 1.2.d Validate that consumers under `tests/tools` and `tools/navmap` import only documented names; adjust call sites if new module boundaries require relocation.
 - [ ] 1.3 Extract domain-layer orchestrators from oversized adapters such as `tools/docstring_builder/cli.py`, keeping CLI modules thin shims that delegate to pure orchestration modules.
   - [ ] 1.3.a Create a new `tools/docstring_builder/orchestrator.py` module that owns `_execute_pipeline`, `_run`, `_process_file`, docfacts reconciliation, and baseline/git helpers; define typed request/response dataclasses (`DocstringBuildRequest`, `DocstringBuildResult`).
   - [ ] 1.3.b Move input normalisation helpers (`_normalize_input_path`, `_resolve_ignore_patterns`, `_select_files`) into a focused utility module (e.g., `tools/docstring_builder/io.py`) so they can be reused by automation without importing argparse.

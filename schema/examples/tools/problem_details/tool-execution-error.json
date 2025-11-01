@@ -1,0 +1,24 @@
+{
+  "type": "https://kgfoundry.com/problems/tool-execution-error",
+  "title": "Docstring builder failed to execute",
+  "status": 500,
+  "detail": "The docstring builder command exited with status 1.",
+  "instance": "urn:kgfoundry:tools:docstring-builder:run",
+  "extensions": {
+    "operation_id": "00000000-0000-0000-0000-000000000000",
+    "correlation_id": "00000000-0000-0000-0000-000000000000",
+    "tool": "docstring-builder",
+    "command": [
+      "uv",
+      "run",
+      "python",
+      "-m",
+      "tools.docstring_builder.cli",
+      "generate",
+      "--limit",
+      "src/"
+    ],
+    "retry_hint": "Fix the reported syntax errors before retrying the command.",
+    "observed_at": "2025-01-01T00:00:00Z"
+  }
+}
