@@ -436,6 +436,14 @@ class DocfactsReport(TypedDict, total=False):
     validated: bool
 
 
+class ObservabilityReport(TypedDict, total=False):
+    """Observability payload mirrored in CLI results."""
+
+    status: RunStatus
+    errors: list[ErrorReport]
+    driftPreviews: dict[str, str]
+
+
 class CliResult(TypedDict, total=False):
     """Fully-typed structure matching ``schema/tools/docstring_builder_cli.json``."""
 
@@ -455,6 +463,7 @@ class CliResult(TypedDict, total=False):
     inputs: dict[str, InputHash]
     plugins: PluginReport
     docfacts: DocfactsReport
+    observability: ObservabilityReport
     problem: ProblemDetails
 
 
@@ -665,6 +674,7 @@ def build_cli_result_skeleton(status: RunStatus) -> CliResult:
         "cache": {"path": "", "exists": False, "hits": 0, "misses": 0, "mtime": None},
         "inputs": {},
         "plugins": {"enabled": [], "available": [], "disabled": [], "skipped": []},
+        "observability": {"status": status, "errors": []},
     }
     return payload
 
@@ -719,6 +729,7 @@ __all__ = sorted(
         "InputHash",
         "PluginExecutionError",
         "PluginReport",
+        "ObservabilityReport",
         "PolicyReport",
         "PolicyViolationReport",
         "PROBLEM_DETAILS_EXAMPLE",
