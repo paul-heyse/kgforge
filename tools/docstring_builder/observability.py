@@ -77,13 +77,9 @@ except ImportError:
 
     Counter = cast(CounterFactory, _make_noop_metric)
     Histogram = cast(HistogramFactory, _make_noop_metric)
-
-# Assign Counter and Histogram from the real or stub implementations
-if HAVE_PROMETHEUS:
-    # Type narrowing: when HAVE_PROMETHEUS is True, _PromCounter and _PromHistogram are defined
-    # pyrefly: ignore[unbound-name] - variables are bound in the try block when HAVE_PROMETHEUS is True
-    Counter = cast(CounterFactory, _PromCounter)  # pyrefly: ignore[unbound-name]
-    Histogram = cast(HistogramFactory, _PromHistogram)  # pyrefly: ignore[unbound-name]
+else:
+    Counter = cast(CounterFactory, _PromCounter)
+    Histogram = cast(HistogramFactory, _PromHistogram)
 
 # Type alias for registry (instance type, not class type)
 type Registry = CollectorRegistryType
@@ -187,47 +183,46 @@ class DocstringBuilderMetrics:
 
         self.registry = registry
 
-        # pyrefly: ignore[bad-argument-type] - registry type is narrowed by HAVE_PROMETHEUS
         self.runs_total = Counter(  # type: ignore[assignment]
             "docbuilder_runs_total",
             "Total number of docstring builder runs",
             ["status"],
-            registry=registry,  # pyrefly: ignore[bad-argument-type]
+            registry=registry,
         )
 
         self.plugin_failures_total = Counter(  # type: ignore[assignment]
             "docbuilder_plugin_failures_total",
             "Total number of plugin execution failures",
             ["plugin_name", "error_type"],
-            registry=registry,  # pyrefly: ignore[bad-argument-type]
+            registry=registry,
         )
 
         self.harvest_duration_seconds = Histogram(  # type: ignore[assignment]
             "docbuilder_harvest_duration_seconds",
             "Duration of harvest operations in seconds",
             ["status"],
-            registry=registry,  # pyrefly: ignore[bad-argument-type]
+            registry=registry,
         )
 
         self.policy_duration_seconds = Histogram(  # type: ignore[assignment]
             "docbuilder_policy_duration_seconds",
             "Duration of policy engine operations in seconds",
             ["status"],
-            registry=registry,  # pyrefly: ignore[bad-argument-type]
+            registry=registry,
         )
 
         self.render_duration_seconds = Histogram(  # type: ignore[assignment]
             "docbuilder_render_duration_seconds",
             "Duration of rendering operations in seconds",
             ["status"],
-            registry=registry,  # pyrefly: ignore[bad-argument-type]
+            registry=registry,
         )
 
         self.cli_duration_seconds = Histogram(  # type: ignore[assignment]
             "docbuilder_cli_duration_seconds",
             "Duration of CLI operations in seconds",
             ["command", "status"],
-            registry=registry,  # pyrefly: ignore[bad-argument-type]
+            registry=registry,
         )
 
 

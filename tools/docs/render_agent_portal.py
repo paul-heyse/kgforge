@@ -209,7 +209,7 @@ def _render_breadcrumbs(module_name: str) -> str:
     parts = module_name.split(".")
     items: list[str] = []
     for index, part in enumerate(parts, start=1):
-        items.append(  # pyrefly: ignore[bad-argument-type]
+        items.append(
             f'<li><span aria-current="page" data-depth="{index}">{html.escape(part)}</span></li>'
         )
     return '<nav aria-label="Breadcrumb"><ol>' + "".join(items) + "</ol></nav>"

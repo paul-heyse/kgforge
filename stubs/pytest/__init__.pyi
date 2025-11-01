@@ -72,12 +72,6 @@ def raises[TExc: BaseException](
     *,
     match: str | Pattern[str] | None = ...,
 ) -> AbstractContextManager[ExceptionInfo[TExc]]: ...
-@overload
-def raises(
-    expected_exception: tuple[type[BaseException], ...],
-    *,
-    match: str | Pattern[str] | None = ...,
-) -> AbstractContextManager[ExceptionInfo[BaseException]]: ...
 
 class UsageError(Exception): ...
 

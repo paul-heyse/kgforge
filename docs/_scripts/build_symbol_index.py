@@ -1,56 +1,48 @@
-"""Overview of build symbol index.
-
-This module bundles build symbol index logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
-"""
+"""Generate the JSON symbol index and reverse lookups consumed by the docs site."""
 
 from __future__ import annotations
 
-import importlib
 import json
-import os
-import subprocess
+import logging
 import sys
 from collections import defaultdict
 from collections.abc import Iterable, Mapping, MutableMapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from types import ModuleType
-from typing import TYPE_CHECKING, Any, cast
-
-if TYPE_CHECKING:
-    from griffe import Object as GriffeObject
-else:
-    GriffeObject = object  # type: ignore[misc, assignment]
-
-griffe_module = importlib.import_module("griffe")
-loader_module: ModuleType | None
-try:
-    loader_module = importlib.import_module("griffe.loader")
-except ModuleNotFoundError:
-    loader_module = None
-Object = cast(Any, griffe_module.Object)
-default_loader = griffe_module.GriffeLoader
-GriffeLoader = cast(
-    Any,
-    loader_module.GriffeLoader if loader_module is not None else default_loader,
-)
+from typing import TYPE_CHECKING, TypedDict, cast
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from docs._scripts.shared import (  # noqa: PLC2701
+    DocsSettings,
+    GriffeLoader,
+    detect_environment,
+    ensure_sys_paths,
+    load_settings,
+    make_loader,
+    resolve_git_sha,
+)
+from tools import get_logger, with_fields  # noqa: E402
+
+if TYPE_CHECKING:
+    from griffe import Object as GriffeRuntimeObject
+
+    GriffeObject = GriffeRuntimeObject
+else:
+    GriffeObject = object
+
+ENV = detect_environment()
+ensure_sys_paths(ENV)
+ROOT = ENV.root
+SRC = ENV.src
 DOCS_BUILD = ROOT / "docs" / "_build"
 
-from tools.detect_pkg import detect_packages, detect_primary  # noqa: E402
+LOGGER = get_logger(__name__)
+LOG = with_fields(LOGGER, operation="symbol_index")
 
-SRC = ROOT / "src"
-ENV_PKGS = os.environ.get("DOCS_PKG")
-LINK_MODE = os.environ.get("DOCS_LINK_MODE", "both").lower()
-GITHUB_ORG = os.environ.get("DOCS_GITHUB_ORG")
-GITHUB_REPO = os.environ.get("DOCS_GITHUB_REPO")
-GITHUB_SHA = os.environ.get("DOCS_GITHUB_SHA")
+SETTINGS: DocsSettings = load_settings()
 
 NAVMAP_CANDIDATES = [
     DOCS_BUILD / "navmap.json",
@@ -58,74 +50,61 @@ NAVMAP_CANDIDATES = [
     ROOT / "site" / "_build" / "navmap" / "navmap.json",
 ]
 
-loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
+loader: GriffeLoader = make_loader(ENV)
+
+
+type JSONPrimitive = str | int | float | bool | None
+type JSONValue = JSONPrimitive | list["JSONValue"] | dict[str, "JSONValue"]
+type SymbolMetadata = dict[str, JSONValue]
+type SourceLinks = dict[str, str]
+type JSONObject = dict[str, JSONValue]
+
+
+class SymbolRow(TypedDict, total=False):
+    """Serialized symbol row emitted in ``symbols.json``."""
+
+    path: str
+    canonical_path: str | None
+    kind: str
+    package: str | None
+    module: str | None
+    file: str | None
+    lineno: int | None
+    endlineno: int | None
+    doc: str
+    signature: str | None
+    is_async: bool
+    is_property: bool
+    owner: str | None
+    stability: str | None
+    since: str | None
+    deprecated_in: str | None
+    section: str | None
+    tested_by: list[str]
+    source_link: SourceLinks
 
 
 @dataclass(slots=True)
 class NavLookup:
-    """Model the NavLookup.
+    """Container for NavMap metadata used during symbol enrichment."""
 
-    Represent the navlookup data structure used throughout the project. The class encapsulates
-    behaviour behind a well-defined interface for collaborating components. Instances are typically
-    created by factories or runtime orchestrators documented nearby.
-    """
-
-    symbol_meta: dict[str, dict[str, Any]]
-    module_meta: dict[str, dict[str, Any]]
+    symbol_meta: dict[str, SymbolMetadata]
+    module_meta: dict[str, SymbolMetadata]
     sections: dict[str, str]
 
 
 def iter_packages() -> list[str]:
-    """Compute iter packages.
-
-    Carry out the iter packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Returns
-    -------
-    List[str]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from docs._scripts.build_symbol_index import iter_packages
-    >>> result = iter_packages()
-    >>> result  # doctest: +ELLIPSIS
-    """
-    if ENV_PKGS:
-        return [pkg.strip() for pkg in ENV_PKGS.split(",") if pkg.strip()]
-    packages = detect_packages()
-    return packages or [detect_primary()]
+    """Return the packages that should be indexed for documentation."""
+    return list(SETTINGS.packages)
 
 
-def safe_attr(node: object, attr: str, default: object | None = None) -> object | None:
-    """Compute safe attr.
-
-    Carry out the safe attr operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    node : typing.Any
-        Description for ``node``.
-    attr : str
-        Description for ``attr``.
-    default : object | None
-        Optional parameter default ``None``. Description for ``default``.
-
-    Returns
-    -------
-    object | None
-        Description of return value.
-
-    Examples
-    --------
-    >>> from docs._scripts.build_symbol_index import safe_attr
-    >>> result = safe_attr(..., ...)
-    >>> result  # doctest: +ELLIPSIS
-    """
+def safe_attr[T](node: object, attr: str, default: T | None = None) -> T | None:
+    """Return ``attr`` from ``node`` while swallowing access errors."""
     try:
-        return getattr(node, attr)
-    except Exception:
+        value = getattr(node, attr)
+    except (AttributeError, RuntimeError):
         return default
+    return cast(T | None, value)
 
 
 def _module_for(path: str | None, kind: str) -> str | None:
@@ -150,8 +129,9 @@ def _package_for(module: str | None, path: str | None) -> str | None:
 def _canonical_path(node: object) -> str | None:
     """Return the canonical path for ``node`` if available."""
     canonical = safe_attr(node, "canonical_path")
-    if isinstance(canonical, Object):
-        return canonical.path
+    path_attr = getattr(canonical, "path", None)
+    if isinstance(path_attr, str):
+        return path_attr
     if canonical is None:
         return None
     return str(canonical)
@@ -188,16 +168,18 @@ def _join_symbol(module: str, symbol: str) -> str:
 def _load_navmap() -> NavLookup:
     """Load the NavMap index if present and return lookup tables."""
     for candidate in NAVMAP_CANDIDATES:
+        if not candidate.exists():
+            continue
         try:
-            if candidate.exists():
-                data = json.loads(candidate.read_text(encoding="utf-8"))
-                return _index_navmap(data)
+            data_raw = json.loads(candidate.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             continue
+        if isinstance(data_raw, Mapping):
+            return _index_navmap(cast(Mapping[str, JSONValue], data_raw))
     return NavLookup(symbol_meta={}, module_meta={}, sections={})
 
 
-def _clean_meta(meta: Mapping[str, Any] | None) -> dict[str, Any]:
+def _clean_meta(meta: Mapping[str, JSONValue] | None) -> SymbolMetadata:
     """Return a copy of ``meta`` with ``None`` entries removed."""
     if not isinstance(meta, Mapping):
         return {}
@@ -206,12 +188,12 @@ def _clean_meta(meta: Mapping[str, Any] | None) -> dict[str, Any]:
 
 def _record_module_defaults(
     module_name: str,
-    payload: Mapping[str, object],
-    module_meta: MutableMapping[str, dict[str, Any]],
-    symbol_meta: MutableMapping[str, dict[str, Any]],
-) -> dict[str, Any]:
+    payload: Mapping[str, JSONValue],
+    module_meta: MutableMapping[str, SymbolMetadata],
+    symbol_meta: MutableMapping[str, SymbolMetadata],
+) -> SymbolMetadata:
     """Extract module-level defaults and prime symbol metadata with them."""
-    defaults = _clean_meta(cast(Mapping[str, object] | None, payload.get("module_meta")))
+    defaults = _clean_meta(cast(Mapping[str, JSONValue] | None, payload.get("module_meta")))
     module_meta[module_name] = defaults
     if defaults:
         symbol_meta.setdefault(module_name, dict(defaults))
@@ -220,8 +202,8 @@ def _record_module_defaults(
 
 def _record_symbol_meta(
     module_name: str,
-    per_symbol_meta: Mapping[str, object] | None,
-    symbol_meta: MutableMapping[str, dict[str, Any]],
+    per_symbol_meta: Mapping[str, JSONValue] | None,
+    symbol_meta: MutableMapping[str, SymbolMetadata],
 ) -> None:
     """Merge per-symbol metadata into the index."""
     if not isinstance(per_symbol_meta, Mapping):
@@ -235,7 +217,7 @@ def _record_symbol_meta(
 
 def _record_sections(
     module_name: str,
-    sections_payload: Sequence[object] | None,
+    sections_payload: Sequence[JSONValue] | None,
     sections: MutableMapping[str, str],
 ) -> None:
     """Associate section ids with fully qualified symbol names."""
@@ -257,41 +239,46 @@ def _record_sections(
             sections[fq_name] = section_id
 
 
-def _index_navmap(data: Mapping[str, object]) -> NavLookup:
+def _index_navmap(data: Mapping[str, JSONValue]) -> NavLookup:
     """Index NavMap metadata for symbol enrichment."""
-    symbol_meta: dict[str, dict[str, Any]] = {}
-    module_meta: dict[str, dict[str, Any]] = {}
+    symbol_meta: dict[str, SymbolMetadata] = {}
+    module_meta: dict[str, SymbolMetadata] = {}
     sections: dict[str, str] = {}
 
-    modules = data.get("modules")
-    if not isinstance(modules, Mapping):
+    modules_value = data.get("modules")
+    if not isinstance(modules_value, Mapping):
         return NavLookup(symbol_meta, module_meta, sections)
+    modules = cast(Mapping[str, JSONValue], modules_value)
 
     for module_name, payload in modules.items():
         if not isinstance(module_name, str) or not isinstance(payload, Mapping):
             continue
 
-        _record_module_defaults(module_name, payload, module_meta, symbol_meta)
+        payload_mapping = cast(Mapping[str, JSONValue], payload)
+
+        _record_module_defaults(module_name, payload_mapping, module_meta, symbol_meta)
         _record_symbol_meta(
-            module_name, cast(Mapping[str, object] | None, payload.get("meta")), symbol_meta
+            module_name,
+            cast(Mapping[str, JSONValue] | None, payload_mapping.get("meta")),
+            symbol_meta,
         )
         _record_sections(
             module_name,
-            cast(Sequence[object] | None, payload.get("sections")),
+            cast(Sequence[JSONValue] | None, payload_mapping.get("sections")),
             sections,
         )
 
     return NavLookup(symbol_meta=symbol_meta, module_meta=module_meta, sections=sections)
 
 
-def _load_test_map() -> dict[str, Any]:
+def _load_test_map() -> JSONObject:
     """Return the optional test map produced earlier in the docs pipeline."""
     test_map_path = DOCS_BUILD / "test_map.json"
     if test_map_path.exists():
         try:
-            data = json.loads(test_map_path.read_text(encoding="utf-8"))
-            if isinstance(data, dict):
-                return data
+            data_raw = json.loads(test_map_path.read_text(encoding="utf-8"))
+            if isinstance(data_raw, dict):
+                return cast(JSONObject, data_raw)
         except json.JSONDecodeError:  # pragma: no cover - defensive
             return {}
     return {}
@@ -299,17 +286,12 @@ def _load_test_map() -> dict[str, Any]:
 
 def _current_sha() -> str:
     """Resolve the Git SHA used for GitHub permalinks."""
-    if GITHUB_SHA:
-        return GITHUB_SHA
-    try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-    except Exception:  # pragma: no cover - fallback for detached states
-        return "HEAD"
+    return resolve_git_sha(ENV, SETTINGS, logger=LOGGER)
 
 
 def _github_link(file_rel: str, start: int | None, end: int | None) -> str | None:
     """Return a commit-stable GitHub permalink if GitHub metadata is configured."""
-    if not (GITHUB_ORG and GITHUB_REPO):
+    if not (SETTINGS.github_org and SETTINGS.github_repo):
         return None
     sha = _current_sha()
     fragment = ""
@@ -317,22 +299,27 @@ def _github_link(file_rel: str, start: int | None, end: int | None) -> str | Non
         fragment = f"#L{start}-L{end}"
     elif start:
         fragment = f"#L{start}"
-    return f"https://github.com/{GITHUB_ORG}/{GITHUB_REPO}/blob/{sha}/{file_rel}{fragment}"
+    return (
+        "https://github.com/"
+        f"{SETTINGS.github_org}/{SETTINGS.github_repo}/blob/{sha}/{file_rel}{fragment}"
+    )
 
 
-def _source_links(file_rel: str | None, start: int | None, end: int | None) -> dict[str, str]:
+def _source_links(file_rel: str | None, start: int | None, end: int | None) -> SourceLinks:
     """Build the source link bundle (editor/github) for a symbol row."""
     if not file_rel:
         return {}
 
-    links: dict[str, str] = {}
+    links: SourceLinks = {}
     abs_path = (ROOT / file_rel).resolve()
     start_line = start or 1
 
-    if LINK_MODE in ("editor", "both"):
+    link_mode = SETTINGS.link_mode
+
+    if link_mode in {"editor", "both"}:
         links["editor"] = f"vscode://file/{abs_path}:{start_line}:1"
 
-    if LINK_MODE in ("github", "both"):
+    if link_mode in {"github", "both"}:
         gh = _github_link(file_rel, start, end)
         if gh:
             links["github"] = gh
@@ -341,15 +328,19 @@ def _source_links(file_rel: str | None, start: int | None, end: int | None) -> d
 
 
 def _meta_value(
-    symbol_meta: Mapping[str, object] | None,
-    module_defaults: Mapping[str, object] | None,
+    symbol_meta: Mapping[str, JSONValue] | None,
+    module_defaults: Mapping[str, JSONValue] | None,
     key: str,
-) -> object | None:
-    """Return the metadata value for ``key`` using symbol overrides then module defaults."""
-    if symbol_meta and key in symbol_meta and symbol_meta[key] is not None:
-        return symbol_meta[key]
-    if module_defaults and key in module_defaults and module_defaults[key] is not None:
-        return module_defaults[key]
+) -> str | None:
+    """Return the string metadata value for ``key`` if present."""
+    if symbol_meta and key in symbol_meta:
+        value = symbol_meta[key]
+        if isinstance(value, str):
+            return value
+    if module_defaults and key in module_defaults:
+        fallback = module_defaults[key]
+        if isinstance(fallback, str):
+            return fallback
     return None
 
 
@@ -427,16 +418,17 @@ def _iter_members(node: object) -> Iterable[GriffeObject]:
     if not isinstance(members_attr, Mapping):
         return ()
     try:
-        return tuple(cast(Iterable[GriffeObject], members_attr.values()))
-    except Exception:  # pragma: no cover - fallback when values() unavailable
+        members_iter = members_attr.values()
+    except AttributeError:  # pragma: no cover - defensive
         return ()
+    return tuple(cast(Iterable[GriffeObject], members_iter))
 
 
 def _row_from_node(
     node: GriffeObject,
     nav: NavLookup,
-    test_map: Mapping[str, object],
-) -> dict[str, Any] | None:
+    test_map: Mapping[str, JSONValue],
+) -> SymbolRow | None:
     """Construct a row describing ``node`` if it has a valid path."""
     path = getattr(node, "path", None)
     if not isinstance(path, str):
@@ -463,7 +455,7 @@ def _row_from_node(
     if not tested_by and canonical:
         tested_by = _normalize_tests(test_map.get(canonical))
 
-    row: dict[str, Any] = {
+    row: SymbolRow = {
         "path": path,
         "canonical_path": canonical,
         "kind": kind,
@@ -487,9 +479,9 @@ def _row_from_node(
     return row
 
 
-def _collect_rows(nav: NavLookup, test_map: Mapping[str, Any]) -> list[dict[str, Any]]:
+def _collect_rows(nav: NavLookup, test_map: Mapping[str, JSONValue]) -> list[SymbolRow]:
     """Traverse packages and return enriched symbol rows."""
-    rows: dict[str, dict[str, Any]] = {}
+    rows: dict[str, SymbolRow] = {}
 
     def _walk(node: GriffeObject) -> None:
         row = _row_from_node(node, nav, test_map)
@@ -508,7 +500,7 @@ def _collect_rows(nav: NavLookup, test_map: Mapping[str, Any]) -> list[dict[str,
 
 
 def _build_reverse_maps(
-    rows: list[dict[str, Any]],
+    rows: list[SymbolRow],
 ) -> tuple[dict[str, list[str]], dict[str, list[str]]]:
     """Build reverse lookup tables keyed by file and module."""
     by_file: dict[str, set[str]] = defaultdict(set)
@@ -546,21 +538,10 @@ def _write_json_if_changed(path: Path, data: object) -> bool:
 
 
 def main() -> int:
-    """Compute main.
+    """Build the symbol index and reverse-lookup artifacts for the docs site."""
+    if not logging.getLogger().handlers:
+        logging.basicConfig(level=logging.INFO)
 
-    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Returns
-    -------
-    int
-        Description of return value.
-
-    Examples
-    --------
-    >>> from docs._scripts.build_symbol_index import main
-    >>> result = main()
-    >>> result  # doctest: +ELLIPSIS
-    """
     nav_lookup = _load_navmap()
     test_map = _load_test_map()
 
@@ -575,14 +556,19 @@ def main() -> int:
     wrote_by_file = _write_json_if_changed(by_file_path, by_file)
     wrote_by_module = _write_json_if_changed(by_module_path, by_module)
 
-    status = []
-    status.append(
-        f"{'Updated' if wrote_symbols else 'Unchanged'} {symbols_path} ({len(rows)} entries)"
+    LOG.info(
+        "Symbol index build complete",
+        extra={
+            "status": "success",
+            "symbols_entries": len(rows),
+            "symbols_updated": wrote_symbols,
+            "by_file_updated": wrote_by_file,
+            "by_module_updated": wrote_by_module,
+            "symbols_path": str(symbols_path),
+            "by_file_path": str(by_file_path),
+            "by_module_path": str(by_module_path),
+        },
     )
-    status.append(f"{'Updated' if wrote_by_file else 'Unchanged'} {by_file_path}")
-    status.append(f"{'Updated' if wrote_by_module else 'Unchanged'} {by_module_path}")
-
-    print("; ".join(status))
     return 0
 
 

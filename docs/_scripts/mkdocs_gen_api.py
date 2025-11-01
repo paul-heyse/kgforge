@@ -1,97 +1,120 @@
-"""Overview of mkdocs gen api.
-
-This module bundles mkdocs gen api logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
-"""
+"""Generate MkDocs API reference pages from the Griffe symbol graph."""
 
 from __future__ import annotations
 
+import importlib
+import logging
 import sys
-from importlib import import_module
+from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Protocol, cast
 
 import mkdocs_gen_files
-
-if TYPE_CHECKING:
-    from griffe import Object as GriffeObject
-else:
-    GriffeObject = object  # type: ignore[misc, assignment]
-
-griffe_module = import_module("griffe")
-Object = cast(Any, griffe_module.Object)
-try:
-    loader_module = import_module("griffe.loader")
-except ModuleNotFoundError:
-    GriffeLoader = cast(Any, griffe_module.GriffeLoader)
-else:
-    GriffeLoader = cast(Any, loader_module.GriffeLoader)
+from tools import get_logger, with_fields
 
 ROOT = Path(__file__).resolve().parents[2]
-SRC = ROOT / "src"
-TOOLS_DIR = ROOT / "tools"
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-if str(TOOLS_DIR) not in sys.path:
-    sys.path.insert(0, str(TOOLS_DIR))
 
-from tools.detect_pkg import detect_packages, detect_primary  # noqa: E402
+if TYPE_CHECKING:
+    from docs._scripts import shared as shared_module
+else:
+    shared_module = importlib.import_module("docs._scripts.shared")
 
-out = Path("api")
-with mkdocs_gen_files.open(out / "index.md", "w") as f:
-    f.write("# API Reference\n")
+DocsSettings = shared_module.DocsSettings
+GriffeLoader = shared_module.GriffeLoader
+detect_environment = shared_module.detect_environment
+ensure_sys_paths = shared_module.ensure_sys_paths
+load_settings = shared_module.load_settings
+make_loader = shared_module.make_loader
+
+
+class GriffeNode(Protocol):
+    """Protocol representing the subset of Griffe objects we rely on."""
+
+    path: str
+    members: Mapping[str, GriffeNode]
+    is_package: bool
+    is_module: bool
+
+
+ENV = detect_environment()
+ensure_sys_paths(ENV)
+ROOT = ENV.root
+
+LOGGER = get_logger(__name__)
+LOG = with_fields(LOGGER, operation="mkdocs_api")
+
+SETTINGS: DocsSettings = load_settings()
+LOADER: GriffeLoader = make_loader(ENV)
 
 
 def iter_packages() -> list[str]:
-    """Compute iter packages.
-
-    Carry out the iter packages operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Returns
-    -------
-    List[str]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from docs._scripts.mkdocs_gen_api import iter_packages
-    >>> result = iter_packages()
-    >>> result  # doctest: +ELLIPSIS
-    """
-    packages = detect_packages()
-    return packages or [detect_primary()]
+    """Return the packages that should receive API documentation pages."""
+    return list(SETTINGS.packages)
 
 
-loader = GriffeLoader(search_paths=[str(SRC if SRC.exists() else ROOT)])
+def _write_index(destination: Path) -> None:
+    """Write the API reference landing page."""
+    with mkdocs_gen_files.open(destination / "index.md", "w") as handle:
+        handle.write("# API Reference\n")
 
 
-def write_node(node: GriffeObject) -> None:
-    """Compute write node.
-
-    Carry out the write node operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
-
-    Parameters
-    ----------
-    node : typing.Any
-        Description for ``node``.
-
-    Examples
-    --------
-    >>> from docs._scripts.mkdocs_gen_api import write_node
-    >>> write_node(...)  # doctest: +ELLIPSIS
-    """
+def _write_node(destination: Path, node: GriffeNode) -> None:
+    """Render a single MkDocs page for ``node``."""
     rel = node.path.replace(".", "/")
-    page = out / rel / "index.md"
-    with mkdocs_gen_files.open(page, "w") as f:
-        f.write(f"# `{node.path}`\n\n::: {node.path}\n")
+    page = destination / rel / "index.md"
+    with mkdocs_gen_files.open(page, "w") as handle:
+        handle.write(f"# `{node.path}`\n\n::: {node.path}\n")
 
 
-for pkg in iter_packages():
-    module = loader.load(pkg)
-    write_node(module)
-    for member in module.members.values():
-        if member.is_package or member.is_module:
-            write_node(member)
+def _documentable_members(node: GriffeNode) -> Iterable[GriffeNode]:
+    """Yield child modules/packages that should receive dedicated pages."""
+    members_attr = getattr(node, "members", {})
+    if not isinstance(members_attr, Mapping):
+        return ()
+    members: list[GriffeNode] = []
+    for member in members_attr.values():
+        if bool(getattr(member, "is_package", False)) or bool(getattr(member, "is_module", False)):
+            members.append(cast(GriffeNode, member))
+    return members
+
+
+def generate_api_reference(
+    loader: GriffeLoader,
+    packages: Sequence[str],
+    *,
+    destination: Path | None = None,
+) -> None:
+    """Generate MkDocs API reference pages for ``packages``."""
+    target = destination if destination is not None else Path("api")
+    _write_index(target)
+
+    for package in packages:
+        module = loader.load(package)
+        _write_node(target, module)
+        for member in _documentable_members(module):
+            _write_node(target, member)
+
+
+def main(packages: Sequence[str] | None = None) -> int:
+    """Entry point for the MkDocs API generator."""
+    if not logging.getLogger().handlers:
+        logging.basicConfig(level=logging.INFO)
+
+    resolved_packages = list(packages or iter_packages())
+    generate_api_reference(LOADER, resolved_packages)
+
+    LOG.info(
+        "Generated MkDocs API reference",
+        extra={
+            "status": "success",
+            "package_count": len(resolved_packages),
+            "destination": "api",
+        },
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

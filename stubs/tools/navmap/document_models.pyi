@@ -7,13 +7,11 @@ NAVMAP_SCHEMA: str
 NAVMAP_SCHEMA_ID: str
 NAVMAP_SCHEMA_VERSION: str
 
-
 class NavSectionDocument:
     id: str
     symbols: list[str]
 
-    def __init__(self, *, id: str, symbols: list[str]) -> None: ...
-
+    def __init__(self, *, id: str, symbols: list[str]) -> None: ...  # noqa: A002 - schema field name
 
 class SymbolMetaDocument:
     owner: str | None
@@ -30,7 +28,6 @@ class SymbolMetaDocument:
         deprecatedIn: str | None = ...,
     ) -> None: ...
 
-
 class ModuleMetaDocument:
     owner: str | None
     stability: str | None
@@ -45,7 +42,6 @@ class ModuleMetaDocument:
         since: str | None = ...,
         deprecatedIn: str | None = ...,
     ) -> None: ...
-
 
 class ModuleEntryDocument:
     path: str
@@ -78,7 +74,6 @@ class ModuleEntryDocument:
         deps: list[str],
     ) -> None: ...
 
-
 class NavmapDocument:
     schemaVersion: str
     schemaId: str
@@ -99,7 +94,6 @@ class NavmapDocument:
         linkMode: str = ...,
         modules: dict[str, ModuleEntryDocument] | None = ...,
     ) -> None: ...
-
 
 def navmap_document_from_index(
     index: NavIndex,

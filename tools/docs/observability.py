@@ -64,13 +64,9 @@ except ImportError:
 
     Counter = cast(CounterFactory, _make_noop_metric)
     Histogram = cast(HistogramFactory, _make_noop_metric)
-
-# Assign Counter and Histogram from the real or stub implementations
-if HAVE_PROMETHEUS:
-    # Type narrowing: when HAVE_PROMETHEUS is True, _PromCounter and _PromHistogram are defined
-    # pyrefly: ignore[unbound-name] - variables are bound in the try block when HAVE_PROMETHEUS is True
-    Counter = cast(CounterFactory, _PromCounter)  # pyrefly: ignore[unbound-name]
-    Histogram = cast(HistogramFactory, _PromHistogram)  # pyrefly: ignore[unbound-name]
+else:
+    Counter = cast(CounterFactory, _PromCounter)
+    Histogram = cast(HistogramFactory, _PromHistogram)
 
 # Type alias for registry (instance type, not class type)
 type Registry = CollectorRegistryType

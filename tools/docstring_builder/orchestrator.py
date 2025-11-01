@@ -116,6 +116,30 @@ METRICS = get_metrics_registry()
 MISSING_MODULE_PATTERNS = ("docs/_build/**",)
 
 
+def _coerce_provenance_payload(data: object) -> DocfactsProvenancePayload | None:
+    """Return a typed DocFacts provenance payload when ``data`` is valid."""
+    if not isinstance(data, dict):
+        return None
+    builder_version = data.get("builderVersion")
+    if not isinstance(builder_version, str):
+        return None
+    config_hash = data.get("configHash")
+    if not isinstance(config_hash, str):
+        return None
+    commit_hash = data.get("commitHash")
+    if not isinstance(commit_hash, str):
+        return None
+    generated_at = data.get("generatedAt")
+    if not isinstance(generated_at, str):
+        return None
+    return DocfactsProvenancePayload(
+        builderVersion=builder_version,
+        configHash=config_hash,
+        commitHash=commit_hash,
+        generatedAt=generated_at,
+    )
+
+
 def _typed_pipeline_enabled() -> bool:
     value = os.environ.get("DOCSTRINGS_TYPED_IR", "1").strip().lower()
     return value not in {"", "0", "false", "no", "off"}
@@ -376,7 +400,7 @@ def _collect_edits(
     return edits, semantics, ir_entries
 
 
-def _handle_docfacts(  # noqa: C901, PLR0911, PLR0912, PLR0914
+def _handle_docfacts(  # noqa: C901, PLR0911, PLR0914
     docfacts: list[DocFact],
     config: BuilderConfig,
     check_mode: bool,
@@ -404,13 +428,7 @@ def _handle_docfacts(  # noqa: C901, PLR0911, PLR0912, PLR0914
             _handle_schema_violation("DocFacts (check)", exc)
             return DocfactsOutcome(ExitStatus.SUCCESS)
         comparison_payload = cast(DocfactsDocumentPayload, json.loads(json.dumps(payload)))
-        existing_provenance_obj = existing_payload.get("provenance")
-        if isinstance(existing_provenance_obj, dict):
-            provenance_existing: DocfactsProvenancePayload | None = cast(
-                DocfactsProvenancePayload, existing_provenance_obj
-            )
-        else:
-            provenance_existing = None
+        provenance_existing = _coerce_provenance_payload(existing_payload.get("provenance"))
         comparison_provenance = comparison_payload["provenance"]
         if provenance_existing is not None:
             commit_hash = comparison_provenance["commitHash"]
