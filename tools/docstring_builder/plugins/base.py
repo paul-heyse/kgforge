@@ -5,7 +5,7 @@ from __future__ import annotations
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import ClassVar, Literal, Protocol, runtime_checkable
+from typing import Literal, Protocol, TypeVar, runtime_checkable
 
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import HarvestResult
@@ -14,6 +14,9 @@ from tools.docstring_builder.semantics import SemanticResult
 
 PluginStage = Literal["harvester", "transformer", "formatter"]
 type DocstringPayload = HarvestResult | SemanticResult | DocstringEdit
+
+InputT_contra = TypeVar("InputT_contra", contravariant=True)
+OutputT_co = TypeVar("OutputT_co", covariant=True)
 
 
 @dataclass(slots=True, frozen=True)
@@ -26,11 +29,19 @@ class PluginContext:
 
 
 @runtime_checkable
-class DocstringBuilderPlugin(Protocol):
-    """Protocol implemented by all docstring builder plugins."""
+class DocstringBuilderPlugin(Protocol[InputT_contra, OutputT_co]):
+    """Generic protocol implemented by all docstring builder plugins.
 
-    name: ClassVar[str]
-    stage: ClassVar[PluginStage]
+    Implementations receive a :class:`PluginContext` and stage-specific
+    payload type before returning an output payload. Plugins SHOULD raise
+    :class:`~tools.docstring_builder.models.PluginExecutionError` (or allow the
+    manager to wrap unexpected exceptions into that error) so failures surface
+    RFC 9457 Problem Details responses consistent with
+    ``schema/examples/tools/problem_details/tool-execution-error.json``.
+    """
+
+    name: str
+    stage: PluginStage
 
     def on_start(self, context: PluginContext) -> None:
         """Run plugin-specific setup before execution begins."""
@@ -40,46 +51,43 @@ class DocstringBuilderPlugin(Protocol):
         """Perform teardown after plugin execution completes."""
         ...
 
-    def apply(self, context: PluginContext, payload: DocstringPayload) -> DocstringPayload:
+    def apply(self, context: PluginContext, payload: InputT_contra) -> OutputT_co:
         """Execute the plugin for ``payload`` and return the processed object."""
         ...
 
 
 @runtime_checkable
-class HarvesterPlugin(DocstringBuilderPlugin, Protocol):
+class HarvesterPlugin(DocstringBuilderPlugin[HarvestResult, HarvestResult], Protocol):
     """Plugins operating on harvested module metadata."""
 
-    stage: ClassVar[Literal["harvester"]]
+    stage: PluginStage
 
-    def apply(  # type: ignore[override]
-        self, context: PluginContext, payload: HarvestResult
-    ) -> HarvestResult:  # pyrefly: ignore[bad-override]  # intentionally narrows type
+    def apply(self, context: PluginContext, payload: HarvestResult) -> HarvestResult:
         """Transform harvested metadata before semantic analysis."""
         ...
 
 
 @runtime_checkable
-class TransformerPlugin(DocstringBuilderPlugin, Protocol):
+class TransformerPlugin(
+    DocstringBuilderPlugin[SemanticResult, SemanticResult],
+    Protocol,
+):
     """Plugins refining semantic analysis results."""
 
-    stage: ClassVar[Literal["transformer"]]
+    stage: PluginStage
 
-    def apply(  # type: ignore[override]
-        self, context: PluginContext, payload: SemanticResult
-    ) -> SemanticResult:  # pyrefly: ignore[bad-override]  # intentionally narrows type
+    def apply(self, context: PluginContext, payload: SemanticResult) -> SemanticResult:
         """Mutate semantic results before rendering."""
         ...
 
 
 @runtime_checkable
-class FormatterPlugin(DocstringBuilderPlugin, Protocol):
+class FormatterPlugin(DocstringBuilderPlugin[DocstringEdit, DocstringEdit], Protocol):
     """Plugins adjusting rendered docstring edits."""
 
-    stage: ClassVar[Literal["formatter"]]
+    stage: PluginStage
 
-    def apply(  # type: ignore[override]
-        self, context: PluginContext, payload: DocstringEdit
-    ) -> DocstringEdit:  # pyrefly: ignore[bad-override]  # intentionally narrows type
+    def apply(self, context: PluginContext, payload: DocstringEdit) -> DocstringEdit:
         """Amend rendered docstring edits prior to writing."""
         ...
 
@@ -96,9 +104,10 @@ class LegacyPluginProtocol(Protocol):
         ...
 
 
-class LegacyPluginAdapter:
+class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayload]):
     """Adapt legacy ``run`` plugins to the typed ``apply`` protocol."""
 
+    name: str
     stage: PluginStage
 
     def __init__(self, plugin: LegacyPluginProtocol) -> None:
@@ -141,10 +150,13 @@ class LegacyPluginAdapter:
 
 __all__ = [
     "DocstringBuilderPlugin",
+    "DocstringPayload",
     "FormatterPlugin",
     "HarvesterPlugin",
+    "InputT_contra",
     "LegacyPluginAdapter",
     "LegacyPluginProtocol",
+    "OutputT_co",
     "PluginContext",
     "PluginStage",
     "TransformerPlugin",
