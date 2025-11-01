@@ -16,7 +16,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TypedDict, cast
 
-from tools import ToolExecutionError, get_logger, run_tool, with_fields
+from tools import ToolExecutionError, ToolRunResult, get_logger, run_tool, with_fields
 
 ROOT = Path(__file__).resolve().parents[2]
 DOCS_BUILD = ROOT / "docs" / "_build"
@@ -210,14 +210,14 @@ def _coerce_symbol_rows(data: object, *, source: str) -> list[SymbolRow]:
 
 def _load_symbol_rows(path: Path) -> list[SymbolRow]:
     """Read ``path`` as UTF-8 JSON and return rows."""
-    raw = json.loads(path.read_text(encoding="utf-8"))
+    raw: object = json.loads(path.read_text(encoding="utf-8"))
     return _coerce_symbol_rows(raw, source=str(path))
 
 
 def _symbols_from_git_blob(blob: str, *, source: str) -> list[SymbolRow]:
     """Parse git blob content into :class:`SymbolRow` entries."""
     try:
-        data = json.loads(blob)
+        data: object = json.loads(blob)
     except json.JSONDecodeError as exc:  # pragma: no cover - defensive
         message = f"{source} does not contain valid JSON"
         raise ValueError(message) from exc
@@ -227,7 +227,7 @@ def _symbols_from_git_blob(blob: str, *, source: str) -> list[SymbolRow]:
 def _git_rev_parse(ref: str) -> str | None:
     """Return ``git rev-parse`` for ``ref`` if possible."""
     try:
-        result = run_tool(["git", "rev-parse", ref], cwd=ROOT, check=True)
+        result: ToolRunResult = run_tool(["git", "rev-parse", ref], cwd=ROOT, check=True)
     except ToolExecutionError:
         return None
     sha = result.stdout.strip()
@@ -246,7 +246,7 @@ def _load_base_snapshot(arg: str) -> tuple[list[SymbolRow], str | None]:
         raise SystemExit(str(exc)) from exc
 
     try:
-        result = run_tool(
+        result: ToolRunResult = run_tool(
             ["git", "show", f"{ref}:docs/_build/symbols.json"],
             cwd=ROOT,
             check=True,
