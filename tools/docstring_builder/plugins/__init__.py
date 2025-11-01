@@ -7,8 +7,9 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from importlib import metadata
 from pathlib import Path
-from typing import cast
+from typing import TypeGuard, TypeVar
 
+from tools._shared.logging import get_logger
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import HarvestResult
 from tools.docstring_builder.models import (
@@ -17,6 +18,7 @@ from tools.docstring_builder.models import (
 )
 from tools.docstring_builder.plugins.base import (
     DocstringBuilderPlugin,
+    DocstringPayload,
     FormatterPlugin,
     HarvesterPlugin,
     LegacyPluginAdapter,
@@ -34,6 +36,16 @@ from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult
 
 ENTRY_POINT_GROUP = "kgfoundry.docstrings.plugins"
+
+_LOGGER = get_logger(__name__)
+
+PayloadT = TypeVar("PayloadT")
+ResultT = TypeVar("ResultT")
+
+type RegisteredPlugin = (
+    HarvesterPlugin | TransformerPlugin | FormatterPlugin | LegacyPluginAdapter
+)
+type PluginFactory = type[DocstringBuilderPlugin[object, object]]
 
 
 class PluginConfigurationError(DocstringBuilderError):
@@ -75,11 +87,8 @@ class PluginManager:
     def apply_harvest(self, file_path: Path, result: HarvestResult) -> HarvestResult:
         """Run harvester plugins sequentially."""
         context = self._context(file_path)
-        updated = result
         with self._lock:
-            for plugin in self.harvesters:
-                updated = cast(HarvestResult, _invoke_apply(plugin, context, updated))
-        return updated
+            return _run_harvest_pipeline(self.harvesters, context, result)
 
     def apply_transformers(
         self, file_path: Path, semantics: Iterable[SemanticResult]
@@ -88,11 +97,10 @@ class PluginManager:
         context = self._context(file_path)
         processed: list[SemanticResult] = []
         for entry in semantics:
-            updated = entry
             with self._lock:
-                for plugin in self.transformers:
-                    updated = cast(SemanticResult, _invoke_apply(plugin, context, updated))
-            processed.append(updated)
+                processed.append(
+                    _run_transformer_pipeline(self.transformers, context, entry)
+                )
         return processed
 
     def apply_formatters(
@@ -102,85 +110,128 @@ class PluginManager:
         context = self._context(file_path)
         processed: list[DocstringEdit] = []
         for entry in edits:
-            updated = entry
             with self._lock:
-                for plugin in self.formatters:
-                    updated = cast(DocstringEdit, _invoke_apply(plugin, context, updated))
-            processed.append(updated)
+                processed.append(
+                    _run_formatter_pipeline(self.formatters, context, entry)
+                )
         return processed
 
     def enabled_plugins(self) -> list[str]:
         """Return the names of active plugins in execution order."""
         return [plugin.name for plugin in self._iter_plugins()]
 
-    def _iter_plugins(self) -> Iterable[DocstringBuilderPlugin]:
+    def _iter_plugins(self) -> Iterable[RegisteredPlugin]:
         yield from self.harvesters
         yield from self.transformers
         yield from self.formatters
 
 
-def _invoke_apply(
-    plugin: DocstringBuilderPlugin,
+def _run_harvest_pipeline(
+    plugins: Iterable[HarvesterPlugin],
     context: PluginContext,
-    payload: HarvestResult | SemanticResult | DocstringEdit,
-) -> (
-    HarvestResult | SemanticResult | DocstringEdit
-):  # pyrefly: ignore[bad-return]  # all paths return or raise
+    payload: HarvestResult,
+) -> HarvestResult:
+    """Execute harvester plugins sequentially for ``payload``."""
+    result = payload
+    for plugin in plugins:
+        result = _invoke_apply(plugin, context, result)
+    return result
+
+
+def _run_transformer_pipeline(
+    plugins: Iterable[TransformerPlugin],
+    context: PluginContext,
+    payload: SemanticResult,
+) -> SemanticResult:
+    """Execute transformer plugins sequentially for ``payload``."""
+    result = payload
+    for plugin in plugins:
+        result = _invoke_apply(plugin, context, result)
+    return result
+
+
+def _run_formatter_pipeline(
+    plugins: Iterable[FormatterPlugin],
+    context: PluginContext,
+    payload: DocstringEdit,
+) -> DocstringEdit:
+    """Execute formatter plugins sequentially for ``payload``."""
+    result = payload
+    for plugin in plugins:
+        result = _invoke_apply(plugin, context, result)
+    return result
+
+
+def _invoke_apply(
+    plugin: DocstringBuilderPlugin[PayloadT, ResultT],
+    context: PluginContext,
+    payload: PayloadT,
+) -> ResultT:
+    """Invoke ``plugin.apply`` with structured error reporting."""
     try:
-        result = plugin.apply(
-            context,
-            cast(HarvestResult | SemanticResult | DocstringEdit, payload),  # type: ignore[redundant-cast]  # cast needed for type narrowing
-        )
-        return cast(HarvestResult | SemanticResult | DocstringEdit, result)  # type: ignore[redundant-cast]  # cast needed for type narrowing
+        return plugin.apply(context, payload)
     except DocstringBuilderError:
         raise
     except Exception as exc:  # pragma: no cover - defensive guard
         message = f"Plugin {plugin.name!r} failed during {plugin.stage} execution"
+        file_path = str(context.file_path) if context.file_path is not None else None
+        _LOGGER.exception(
+            "Plugin execution failed",
+            extra={
+                "operation": "docstring_builder.plugins",
+                "status": "error",
+                "plugin": plugin.name,
+                "stage": plugin.stage,
+                "file_path": file_path,
+            },
+        )
         raise PluginExecutionError(message) from exc
 
 
-def _instantiate_plugin(candidate: object) -> DocstringBuilderPlugin:
-    if isinstance(candidate, LegacyPluginAdapter):
-        return candidate  # type: ignore[return-value]  # LegacyPluginAdapter structurally implements DocstringBuilderPlugin
+def _instantiate_plugin(candidate: object) -> RegisteredPlugin:
     if isinstance(candidate, type):
-        instance = candidate()
-        return _ensure_plugin_instance(instance)
+        return _ensure_plugin_instance(candidate())
     if callable(candidate):
-        instance = candidate()
-        return _ensure_plugin_instance(instance)
-    if isinstance(candidate, DocstringBuilderPlugin):  # pragma: no cover - runtime check
-        return candidate
+        return _ensure_plugin_instance(candidate())
     return _ensure_plugin_instance(candidate)
 
 
-def _ensure_plugin_instance(obj: object) -> DocstringBuilderPlugin:
+def _ensure_plugin_instance(obj: object) -> RegisteredPlugin:
     name = getattr(obj, "name", obj.__class__.__name__)
-    stage = getattr(obj, "stage", None)
-    if stage not in {"harvester", "transformer", "formatter"}:
-        message = f"Plugin {name!r} declares invalid stage {stage!r}"
+    stage_value = getattr(obj, "stage", None)
+    if not _is_valid_stage(stage_value):
+        message = f"Plugin {name!r} declares invalid stage {stage_value!r}"
         raise PluginConfigurationError(message)
-    if isinstance(obj, DocstringBuilderPlugin):  # pragma: no cover - runtime check
-        return cast(DocstringBuilderPlugin, obj)  # type: ignore[redundant-cast]  # cast needed for type narrowing
-    if hasattr(obj, "apply"):
-        return cast(DocstringBuilderPlugin, obj)
-    if hasattr(obj, "run"):
-        legacy = cast(LegacyPluginProtocol, obj)
-        return LegacyPluginAdapter(legacy)  # type: ignore[return-value]  # LegacyPluginAdapter structurally implements DocstringBuilderPlugin
+    if _is_docstring_plugin(obj):  # pragma: no cover - runtime check
+        return obj
+    if _is_legacy_plugin(obj):
+        return LegacyPluginAdapter(obj)
     message = f"Plugin {name!r} must define apply() or run()"
     raise PluginConfigurationError(message)
 
 
-def _register_plugin(manager: PluginManager, plugin: DocstringBuilderPlugin) -> None:
-    stage: PluginStage = plugin.stage
-    if stage == "harvester":
-        manager.harvesters.append(cast(HarvesterPlugin, plugin))
-    elif stage == "transformer":
-        manager.transformers.append(cast(TransformerPlugin, plugin))
-    elif stage == "formatter":
-        manager.formatters.append(cast(FormatterPlugin, plugin))
-    else:  # pragma: no cover - stage already validated earlier  # type: ignore[unreachable]  # defensive check
-        message = f"Unsupported plugin stage: {stage!r}"
+def _register_plugin(manager: PluginManager, plugin: RegisteredPlugin) -> None:
+    if isinstance(plugin, HarvesterPlugin):
+        manager.harvesters.append(plugin)
+    elif isinstance(plugin, TransformerPlugin):
+        manager.transformers.append(plugin)
+    elif isinstance(plugin, FormatterPlugin):
+        manager.formatters.append(plugin)
+    else:  # pragma: no cover - defensive guard
+        message = f"Unsupported plugin stage: {plugin.stage!r}"
         raise PluginConfigurationError(message)
+
+
+def _is_docstring_plugin(candidate: object) -> TypeGuard[RegisteredPlugin]:
+    return isinstance(candidate, (HarvesterPlugin, TransformerPlugin, FormatterPlugin))
+
+
+def _is_legacy_plugin(candidate: object) -> TypeGuard[LegacyPluginProtocol]:
+    return isinstance(candidate, LegacyPluginProtocol)
+
+
+def _is_valid_stage(value: object) -> TypeGuard[PluginStage]:
+    return value in {"harvester", "transformer", "formatter"}
 
 
 def _load_entry_points() -> list[object]:
@@ -200,7 +251,7 @@ def load_plugins(
     *,
     only: Sequence[str] | None = None,
     disable: Sequence[str] | None = None,
-    builtin: Sequence[type[DocstringBuilderPlugin]] | None = None,
+    builtin: Sequence[PluginFactory] | None = None,
 ) -> PluginManager:
     """Discover, filter, and instantiate plugins for the current run."""
     builtin_types: list[object] = [
@@ -251,6 +302,7 @@ def load_plugins(
 
 
 __all__ = [
+    "DocstringPayload",
     "PluginConfigurationError",
     "PluginManager",
     "load_plugins",

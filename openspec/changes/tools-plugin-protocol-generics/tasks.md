@@ -1,10 +1,10 @@
 ## 1. Implementation
-- [ ] **1.1 Formalize the generic plugin contract**
+- [x] **1.1 Formalize the generic plugin contract**
   - [ ] Introduce `TypeVar` pairs (e.g., `InputT`, `OutputT`) in `tools/docstring_builder/plugins/base.py`, redefine `DocstringBuilderPlugin` as `Protocol[InputT, OutputT]`, and specialise `HarvesterPlugin`, `TransformerPlugin`, and `FormatterPlugin` with `HarvestResult`, `SemanticResult`, and `DocstringEdit` respectively.
   - [ ] Ensure every public Protocol/class in `plugins/base.py` carries a PEP 257 docstring with a single-sentence summary, explicit `__all__`, and fully annotated signatures (PEP 695 generics where possible).
   - [ ] Document contract-level exceptions, confirming that plugin failures ultimately surface `PluginExecutionError` consistent with `schema/examples/tools/problem_details/tool-execution-error.json`.
 
-- [ ] **1.2 Rebuild the plugin manager around generics**
+- [x] **1.2 Rebuild the plugin manager around generics**
   - [ ] Refactor `PluginManager` fields and methods in `tools/docstring_builder/plugins/__init__.py` to use the new generic Protocols, eliminating `cast(...)` and `pyrefly` suppressions in `_invoke_apply`, `_ensure_plugin_instance`, and `_register_plugin`.
   - [ ] Introduce helper type aliases or generic functions so stage pipelines remain type-sealed (harvesters return `HarvestResult`, etc.) and keep iteration logic clear and side-effect free.
   - [ ] Hook the module into `tools._shared.logging.get_logger` to emit structured error logs (with plugin name, stage, and file path) when raising `PluginExecutionError`, and ensure a `NullHandler` is attached at import time.
