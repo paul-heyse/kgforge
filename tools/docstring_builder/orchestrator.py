@@ -59,6 +59,7 @@ from tools.docstring_builder.models import (
     CliResult,
     DocfactsDocumentLike,
     DocfactsDocumentPayload,
+    DocfactsProvenancePayload,
     DocfactsReport,
     ErrorReport,
     FileReport,
@@ -66,6 +67,7 @@ from tools.docstring_builder.models import (
     ObservabilityReport,
     PluginReport,
     RunStatus,
+    RunSummary,
     SchemaViolationError,
     StatusCounts,
     build_cli_result_skeleton,
@@ -182,7 +184,7 @@ def _http_status_for_exit(status: ExitStatus) -> int:
             return 400
         case ExitStatus.ERROR:
             return 500
-    return 500  # pragma: no cover - defensive return
+    raise AssertionError(status)
 
 
 @dataclasses.dataclass(slots=True)
@@ -254,7 +256,7 @@ class DocstringBuildResult:
     errors: list[ErrorReport]
     file_reports: list[FileReport]
     observability_payload: Mapping[str, object]
-    cli_payload: Mapping[str, object] | None
+    cli_payload: CliResult | None
     manifest_path: Path | None
     problem_details: ModelProblemDetails | None
     config_selection: ConfigSelection | None
@@ -268,7 +270,7 @@ def build_problem_details(  # noqa: PLR0913
     detail: str,
     *,
     instance: str | None = None,
-    errors: Sequence[Mapping[str, object]] | None = None,
+    errors: Sequence[ErrorReport] | None = None,
 ) -> ModelProblemDetails:
     """Create a RFC 9457 Problem Details payload for CLI failures."""
     problem_dict = build_problem_details_shared(
@@ -286,6 +288,7 @@ def build_problem_details(  # noqa: PLR0913
     }
     return cast(ModelProblemDetails, problem_dict)
 
+
 def _handle_schema_violation(context: str, exc: SchemaViolationError) -> None:
     if TYPED_PIPELINE_ENABLED:
         raise exc
@@ -295,7 +298,8 @@ def _handle_schema_violation(context: str, exc: SchemaViolationError) -> None:
 
 def _git_output(arguments: Sequence[str]) -> str | None:
     """Return stripped stdout for a git command or ``None`` on failure."""
-    adapter = with_fields(LOGGER, command=list(arguments))
+    command_args: list[str] = list(arguments)
+    adapter = with_fields(LOGGER, command=command_args)
     try:
         result = run_tool(arguments, timeout=10.0)
     except ToolExecutionError as exc:  # pragma: no cover - git unavailable
@@ -372,7 +376,7 @@ def _collect_edits(
     return edits, semantics, ir_entries
 
 
-def _handle_docfacts(  # noqa: C901
+def _handle_docfacts(  # noqa: C901, PLR0911, PLR0912
     docfacts: list[DocFact],
     config: BuilderConfig,
     check_mode: bool,
@@ -385,26 +389,35 @@ def _handle_docfacts(  # noqa: C901
             LOGGER.error("DocFacts missing at %s", DOCFACTS_PATH)
             return DocfactsOutcome(ExitStatus.CONFIG, "docfacts missing")
         try:
-            existing = json.loads(DOCFACTS_PATH.read_text(encoding="utf-8"))
+            existing_text = DOCFACTS_PATH.read_text(encoding="utf-8")
+            existing_raw: object = json.loads(existing_text)
         except json.JSONDecodeError:  # pragma: no cover - defensive guard
             LOGGER.exception("DocFacts payload at %s is not valid JSON", DOCFACTS_PATH)
             return DocfactsOutcome(ExitStatus.CONFIG, "docfacts invalid json")
+        if not isinstance(existing_raw, dict):
+            LOGGER.error("DocFacts payload at %s is not a mapping", DOCFACTS_PATH)
+            return DocfactsOutcome(ExitStatus.CONFIG, "docfacts invalid structure")
+        existing_payload = cast(DocfactsDocumentPayload, existing_raw)
         try:
-            validate_docfacts_payload(cast(DocfactsDocumentPayload, existing))
+            validate_docfacts_payload(existing_payload)
         except SchemaViolationError as exc:
             _handle_schema_violation("DocFacts (check)", exc)
             return DocfactsOutcome(ExitStatus.SUCCESS)
-        comparison = json.loads(json.dumps(payload))
-        provenance_existing = existing.get("provenance", {}) if isinstance(existing, dict) else {}
-        if isinstance(comparison, dict):
-            comparison.setdefault("provenance", {})
-            if isinstance(comparison["provenance"], dict):
-                for field in ("commitHash", "generatedAt"):
-                    if field in provenance_existing:
-                        comparison["provenance"][field] = provenance_existing[field]
-        if existing != comparison:
-            before = json.dumps(existing, indent=2, sort_keys=True)
-            after = json.dumps(comparison, indent=2, sort_keys=True)
+        comparison_payload = cast(DocfactsDocumentPayload, json.loads(json.dumps(payload)))
+        existing_provenance_obj = existing_payload.get("provenance")
+        if isinstance(existing_provenance_obj, dict):
+            provenance_existing: DocfactsProvenancePayload | None = existing_provenance_obj
+        else:
+            provenance_existing = None
+        comparison_provenance = comparison_payload["provenance"]
+        if provenance_existing is not None:
+            for field in ("commitHash", "generatedAt"):
+                value = provenance_existing.get(field)
+                if isinstance(value, str):
+                    comparison_provenance[field] = value
+        if existing_payload != comparison_payload:
+            before = json.dumps(existing_payload, indent=2, sort_keys=True)
+            after = json.dumps(comparison_payload, indent=2, sort_keys=True)
             write_html_diff(before, after, DOCFACTS_DIFF_PATH, "DocFacts drift")
             diff_rel = DOCFACTS_DIFF_PATH.relative_to(REPO_ROOT)
             LOGGER.error("DocFacts drift detected; run update mode to refresh (see %s)", diff_rel)
@@ -426,14 +439,19 @@ def _load_docfacts_from_disk() -> dict[str, DocFact]:
     if not DOCFACTS_PATH.exists():
         return {}
     try:
-        raw = json.loads(DOCFACTS_PATH.read_text(encoding="utf-8"))
+        raw_text = DOCFACTS_PATH.read_text(encoding="utf-8")
+        raw: object = json.loads(raw_text)
     except json.JSONDecodeError:
         LOGGER.warning("DocFacts cache is not valid JSON; ignoring existing data.")
         return {}
     entries: dict[str, DocFact] = {}
     payload_items: Iterable[Mapping[str, object]]
     if isinstance(raw, Mapping):
-        payload_items = [item for item in raw.get("entries", []) if isinstance(item, Mapping)]
+        entries_field: object = raw.get("entries", [])
+        if isinstance(entries_field, Sequence) and not isinstance(entries_field, (str, bytes)):
+            payload_items = [item for item in entries_field if isinstance(item, Mapping)]
+        else:
+            payload_items = []
     elif isinstance(raw, list):  # pragma: no cover - legacy fallback
         payload_items = [item for item in raw if isinstance(item, Mapping)]
     else:  # pragma: no cover - defensive guard
@@ -537,8 +555,12 @@ def _ordered_outcomes(  # noqa: PLR0913, PLR0917
                 )
             ordered.append((index, candidate, outcome))
 
-    for _, candidate, outcome in sorted(ordered, key=lambda item: item[0]):
+    for _, candidate, outcome in sorted(ordered, key=_ordered_index):
         yield candidate, outcome
+
+
+def _ordered_index(item: tuple[int, Path, FileOutcome]) -> int:
+    return item[0]
 
 
 def _process_file(  # noqa: C901, PLR0911
@@ -667,10 +689,14 @@ def _process_file(  # noqa: C901, PLR0911
         ir=ir_entries,
     )
 
+
 def _print_failure_summary(payload: Mapping[str, object]) -> None:  # noqa: C901
     """Emit a concise summary to stderr when the CLI exits non-zero."""
     summary_obj = payload.get("summary")
-    summary = summary_obj if isinstance(summary_obj, Mapping) else {}
+    if isinstance(summary_obj, Mapping):
+        summary: Mapping[str, object] = summary_obj
+    else:
+        summary = {}
 
     errors_obj = payload.get("errors")
     if isinstance(errors_obj, Sequence):
@@ -721,7 +747,7 @@ def _print_failure_summary(payload: Mapping[str, object]) -> None:  # noqa: C901
         LOGGER.error(line)
 
 
-def render_cli_result(result: DocstringBuildResult) -> Mapping[str, object] | None:
+def render_cli_result(result: DocstringBuildResult) -> CliResult | None:
     """Return the CLI payload for JSON output when available."""
     return result.cli_payload
 
@@ -740,41 +766,53 @@ def load_builder_config(
     config, selection = load_config_with_selection(override)
     return config, selection
 
-def _initial_summary(subcommand: str) -> dict[str, object]:
-    return {
+
+def _initial_summary(subcommand: str) -> RunSummary:
+    summary: RunSummary = {
         "considered": 0,
         "processed": 0,
         "skipped": 0,
         "changed": 0,
         "duration_seconds": 0.0,
-        "status_counts": {},
+        "status_counts": {
+            "success": 0,
+            "violation": 0,
+            "config": 0,
+            "error": 0,
+        },
         "cache_hits": 0,
         "cache_misses": 0,
         "subcommand": subcommand,
         "docfacts_checked": False,
     }
+    return summary
 
 
 def _build_observability_payload(
     *,
     status: ExitStatus,
-    summary: Mapping[str, object],
-    errors: Sequence[Mapping[str, object]],
+    summary: RunSummary,
+    errors: Sequence[ErrorReport],
     selection: ConfigSelection | None,
 ) -> dict[str, object]:
+    limited_errors = list(errors)[:OBSERVABILITY_MAX_ERRORS]
+    cache_hits_value = summary.get("cache_hits")
+    cache_misses_value = summary.get("cache_misses")
+    cache_hits = cache_hits_value if isinstance(cache_hits_value, int) else 0
+    cache_misses = cache_misses_value if isinstance(cache_misses_value, int) else 0
     payload: dict[str, object] = {
         "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
         "status": STATUS_LABELS[status],
         "summary": summary,
-        "errors": list(errors)[:OBSERVABILITY_MAX_ERRORS],
+        "errors": limited_errors,
     }
     if selection is not None:
         payload["config"] = {"path": str(selection.path), "source": selection.source}
     payload["cache"] = {
         "path": str(CACHE_PATH),
         "exists": CACHE_PATH.exists(),
-        "hits": summary.get("cache_hits", 0),
-        "misses": summary.get("cache_misses", 0),
+        "hits": cache_hits,
+        "misses": cache_misses,
     }
     return payload
 
@@ -796,7 +834,15 @@ def _build_error_result(
         }
     ]
     summary = _initial_summary(subcommand)
-    summary["status_counts"] = {STATUS_LABELS[status]: 1}
+    status_counts_block = summary["status_counts"]
+    if status is ExitStatus.SUCCESS:
+        status_counts_block["success"] += 1
+    elif status is ExitStatus.VIOLATION:
+        status_counts_block["violation"] += 1
+    elif status is ExitStatus.CONFIG:
+        status_counts_block["config"] += 1
+    else:
+        status_counts_block["error"] += 1
     observability_payload = _build_observability_payload(
         status=status,
         summary=summary,
@@ -814,6 +860,7 @@ def _build_error_result(
         problem_details=problem,
         config_selection=selection,
     )
+
 
 def _run_pipeline(  # noqa: C901, PLR0912, PLR0914, PLR0915
     files: Iterable[Path],
@@ -861,14 +908,16 @@ def _run_pipeline(  # noqa: C901, PLR0912, PLR0914, PLR0915
         )
     except PluginConfigurationError:
         logger.exception("Plugin configuration error", extra={"operation": "plugin_load"})
-        return _build_error_result(ExitStatus.CONFIG, request, "Plugin configuration error", selection=selection)
-    try:
-        policy_settings = load_policy_settings(
-            REPO_ROOT, cli_overrides=request.policy_overrides
+        return _build_error_result(
+            ExitStatus.CONFIG, request, "Plugin configuration error", selection=selection
         )
+    try:
+        policy_settings = load_policy_settings(REPO_ROOT, cli_overrides=request.policy_overrides)
     except PolicyConfigurationError:
         logger.exception("Policy configuration error", extra={"operation": "policy_load"})
-        return _build_error_result(ExitStatus.CONFIG, request, "Policy configuration error", selection=selection)
+        return _build_error_result(
+            ExitStatus.CONFIG, request, "Policy configuration error", selection=selection
+        )
 
     try:  # noqa: PLR1702
         policy_engine = PolicyEngine(policy_settings)
@@ -1005,9 +1054,6 @@ def _run_pipeline(  # noqa: C901, PLR0912, PLR0914, PLR0915
             "config": status_counts.get(ExitStatus.CONFIG, 0),
             "error": status_counts.get(ExitStatus.ERROR, 0),
         }
-        status_counts_map: dict[str, int] = {
-            STATUS_LABELS[key]: value for key, value in status_counts.items() if value
-        }
         cache_payload: CacheSummary = {
             "path": str(CACHE_PATH),
             "exists": CACHE_PATH.exists(),
@@ -1120,13 +1166,13 @@ def _run_pipeline(  # noqa: C901, PLR0912, PLR0914, PLR0915
             json.dumps(manifest_payload, indent=2, sort_keys=True), encoding="utf-8"
         )
 
-        summary = {
+        summary: RunSummary = {
             "considered": len(files_list),
             "processed": processed_count,
             "skipped": skipped_count,
             "changed": changed_count,
             "duration_seconds": duration,
-            "status_counts": status_counts_map,
+            "status_counts": status_counts_full,
             "cache_hits": cache_hits,
             "cache_misses": cache_misses,
             "subcommand": invoked,
@@ -1158,7 +1204,6 @@ def _run_pipeline(  # noqa: C901, PLR0912, PLR0914, PLR0915
         )
 
         cli_result: CliResult | None = None
-        cli_payload: Mapping[str, object] | None = None
         if request.json_output:
             cli_result = build_cli_result_skeleton(_status_from_exit(exit_status))
             cli_result["command"] = request.command or ""
@@ -1236,14 +1281,13 @@ def _run_pipeline(  # noqa: C901, PLR0912, PLR0914, PLR0915
 
         if cli_result is not None:
             validate_cli_output(cli_result)
-            cli_payload = cli_result
 
         return DocstringBuildResult(
             exit_status=exit_status,
             errors=errors,
             file_reports=file_reports,
             observability_payload=observability_payload,
-            cli_payload=cli_payload,
+            cli_payload=cli_result,
             manifest_path=MANIFEST_PATH,
             problem_details=problem_details_payload,
             config_selection=selection,

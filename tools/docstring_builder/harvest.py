@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import inspect
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, cast
+from typing import Literal, Protocol, TypeGuard, cast, runtime_checkable
 
 import libcst as cst
 
@@ -20,20 +20,80 @@ except (ModuleNotFoundError, AttributeError) as exc:  # pragma: no cover - runti
     message = "Griffe is required to run the docstring builder. Install the optional dependency via ``uv sync``."
     raise RuntimeError(message) from exc
 
-if TYPE_CHECKING:
-    from griffe import Class as GriffeClass
-    from griffe import Function as GriffeFunction
-    from griffe import GriffeLoader as GriffeLoaderType
-    from griffe import Module as GriffeModule
-    from griffe import Object as GriffeObject
-else:  # pragma: no cover - typing fallback when ``griffe`` is absent at runtime
-    GriffeClass = GriffeFunction = GriffeModule = GriffeObject = GriffeLoaderType = object
 
-Class = cast(type[GriffeClass], _GRIFFE_API.class_type)
-Function = cast(type[GriffeFunction], _GRIFFE_API.function_type)
-Module = cast(type[GriffeModule], _GRIFFE_API.module_type)
-Object = cast(type[GriffeObject], _GRIFFE_API.object_type)
-GriffeLoader = cast(type[GriffeLoaderType], _GRIFFE_API.loader_type)
+@runtime_checkable
+class GriffeDocstringLike(Protocol):
+    value: str
+
+
+@runtime_checkable
+class GriffeParameterLike(Protocol):
+    name: str
+    kind: object
+    annotation: object | None
+    default: object | None
+
+
+@runtime_checkable
+class GriffeFunctionLike(Protocol):
+    name: str
+    docstring: GriffeDocstringLike | None
+    lineno: int | None
+    endlineno: int | None
+    col_offset: int | None
+    parameters: Sequence[GriffeParameterLike]
+    decorators: Sequence[object]
+    return_annotation: object | None
+    returns: object | None
+    is_async: bool
+    is_generator: bool
+
+
+@runtime_checkable
+class GriffeClassLike(Protocol):
+    name: str
+    docstring: GriffeDocstringLike | None
+    lineno: int | None
+    endlineno: int | None
+    col_offset: int | None
+    members: Mapping[str, object]
+    decorators: Sequence[object]
+    is_async: bool
+    is_generator: bool
+
+
+@runtime_checkable
+class GriffeModuleLike(Protocol):
+    name: str
+    members: Mapping[str, object]
+
+
+class GriffeLoaderInstanceLike(Protocol):
+    def load(self, module_name: str) -> GriffeModuleLike: ...
+
+    def load_module(self, module_name: str) -> GriffeModuleLike: ...
+
+
+class GriffeLoaderFactoryLike(Protocol):
+    def __call__(self, *, search_paths: Sequence[str]) -> GriffeLoaderInstanceLike: ...
+
+
+ClassType = cast(type, _GRIFFE_API.class_type)
+FunctionType = cast(type, _GRIFFE_API.function_type)
+ModuleType = cast(type, _GRIFFE_API.module_type)
+GriffeLoaderFactory = cast(GriffeLoaderFactoryLike, _GRIFFE_API.loader_type)
+
+
+def _is_griffe_class(obj: object) -> TypeGuard[GriffeClassLike]:
+    return isinstance(obj, ClassType)
+
+
+def _is_griffe_function(obj: object) -> TypeGuard[GriffeFunctionLike]:
+    return isinstance(obj, FunctionType)
+
+
+def _is_griffe_module(obj: object) -> TypeGuard[GriffeModuleLike]:
+    return isinstance(obj, ModuleType)
 
 
 _KIND_LOOKUP: dict[str, inspect._ParameterKind] = {
@@ -47,13 +107,35 @@ _KIND_LOOKUP: dict[str, inspect._ParameterKind] = {
 }
 
 
+def _safe_getattr(value: object, attr: str) -> object | None:
+    try:
+        attr_value = cast(object, getattr(value, attr))
+    except AttributeError:  # pragma: no cover - defensive fallback
+        return None
+    return attr_value
+
+
+def _extract_string_attribute(value: object, attr: str) -> str | None:
+    candidate = _safe_getattr(value, attr)
+    if isinstance(candidate, str):
+        return candidate
+    return None
+
+
+def _docstring_value(docstring: GriffeDocstringLike | None) -> str | None:
+    if docstring is None:
+        return None
+    value = _extract_string_attribute(docstring, "value")
+    return value if value is not None else None
+
+
 def _normalize_parameter_kind(value: object) -> inspect._ParameterKind:
     """Coerce ``griffe`` parameter kinds into :class:`inspect._ParameterKind`."""
     if isinstance(value, inspect._ParameterKind):
         return value
-    name = getattr(value, "name", None)
-    token = name if isinstance(name, str) else getattr(value, "value", None)
-    key = str(token or value).replace("-", "_").lower()
+    name = _extract_string_attribute(value, "name")
+    token_source = name if name is not None else _safe_getattr(value, "value")
+    key = str(token_source if token_source is not None else value).replace("-", "_").lower()
     return _KIND_LOOKUP.get(key, inspect._ParameterKind.POSITIONAL_OR_KEYWORD)
 
 
@@ -118,37 +200,30 @@ def _module_name(root: Path, file_path: Path) -> str:
     return ".".join(parts)
 
 
-def _load_module(module_name: str, search_paths: list[str]) -> GriffeModule:
-    loader: GriffeLoaderType = GriffeLoader(search_paths=search_paths)
-    load_candidate = getattr(loader, "load_module", None)
-    load_fn: Callable[[str], GriffeModule]
+def _load_module(module_name: str, search_paths: Sequence[str]) -> GriffeModuleLike:
+    loader = GriffeLoaderFactory(search_paths=tuple(search_paths))
+    load_candidate = cast(Callable[[str], object] | None, getattr(loader, "load_module", None))
     if callable(load_candidate):
-        load_fn = cast(Callable[[str], GriffeModule], load_candidate)
+        load_fn: Callable[[str], object] = load_candidate
     else:
-        load_fn = cast(Callable[[str], GriffeModule], loader.load)
+        load_fallback = cast(Callable[[str], object] | None, getattr(loader, "load", None))
+        if not callable(load_fallback):  # pragma: no cover - defensive fallback
+            message = "Griffe loader is missing a callable 'load' method"
+            raise SymbolResolutionError(message)
+        load_fn = load_fallback
     try:
-        return load_fn(module_name)
+        module = load_fn(module_name)
     except ModuleNotFoundError as exc:
         if module_name.endswith(".__init__"):
             package_name = module_name.rsplit(".", 1)[0]
-            return load_fn(package_name)
-        message = f"Unable to load module '{module_name}'"
-        raise SymbolResolutionError(message) from exc
-
-
-def _safe_getattr(value: object, attr: str) -> object | None:
-    try:
-        attr_value = getattr(value, attr)
-    except AttributeError:  # pragma: no cover - defensive fallback
-        return None
-    return cast(object, attr_value)
-
-
-def _extract_string_attribute(value: object, attr: str) -> str | None:
-    candidate = _safe_getattr(value, attr)
-    if isinstance(candidate, str):
-        return candidate
-    return None
+            module = load_fn(package_name)
+        else:
+            message = f"Unable to load module '{module_name}'"
+            raise SymbolResolutionError(message) from exc
+    if not _is_griffe_module(module):  # pragma: no cover - defensive fallback
+        message = f"Griffe loader returned unsupported module type for '{module_name}'"
+        raise SymbolResolutionError(message)
+    return module
 
 
 def _expr_to_str(value: object | None) -> str | None:
@@ -158,8 +233,9 @@ def _expr_to_str(value: object | None) -> str | None:
         return value
     as_string = _safe_getattr(value, "as_string")
     if callable(as_string):
+        as_string_callable = cast(Callable[[], object], as_string)
         try:
-            candidate = as_string()
+            candidate = as_string_callable()
         except (TypeError, ValueError):  # pragma: no cover - defensive fallback
             candidate = None
         if isinstance(candidate, str):
@@ -198,7 +274,7 @@ def _decorator_names(decorators: Iterable[object]) -> list[str]:
     return names
 
 
-def _iter_parameters(function: GriffeFunction) -> Iterator[ParameterHarvest]:
+def _iter_parameters(function: GriffeFunctionLike) -> Iterator[ParameterHarvest]:
     for param in function.parameters:
         yield ParameterHarvest(
             name=param.name,
@@ -209,19 +285,20 @@ def _iter_parameters(function: GriffeFunction) -> Iterator[ParameterHarvest]:
 
 
 def _collect_symbols(
-    obj: GriffeObject,
+    obj: object,
     module_name: str,
     file_path: Path,
     config: BuilderConfig,
     prefix: list[str] | None = None,
 ) -> Iterator[SymbolHarvest]:
     prefix = prefix or []
-    if isinstance(obj, Class):
+    if _is_griffe_class(obj):
         qname = ".".join([module_name, *prefix, obj.name])
-        docstring = obj.docstring.value if obj.docstring else None
+        docstring = _docstring_value(obj.docstring)
         owned = (docstring and config.ownership_marker in docstring) or docstring is None
         if qname in config.package_settings.opt_out:
             owned = False
+        col_offset = obj.col_offset if obj.col_offset is not None else 0
         yield SymbolHarvest(
             qname=qname,
             module=module_name,
@@ -233,23 +310,22 @@ def _collect_symbols(
             filepath=file_path,
             lineno=obj.lineno or 1,
             end_lineno=obj.endlineno,
-            col_offset=getattr(obj, "col_offset", 0) or 0,
-            decorators=_decorator_names(getattr(obj, "decorators", [])),
-            is_async=bool(getattr(obj, "is_async", False)),
-            is_generator=bool(getattr(obj, "is_generator", False)),
+            col_offset=col_offset,
+            decorators=_decorator_names(tuple(obj.decorators)),
+            is_async=obj.is_async,
+            is_generator=obj.is_generator,
         )
         yield from _walk_members(obj, module_name, file_path, config, [*prefix, obj.name])
         return
-    if isinstance(obj, Function):
+    if _is_griffe_function(obj):
         qname = ".".join([module_name, *prefix, obj.name])
         parameters = list(_iter_parameters(obj))
-        docstring = obj.docstring.value if obj.docstring else None
+        docstring = _docstring_value(obj.docstring)
         owned = (docstring and config.ownership_marker in docstring) or docstring is None
         if qname in config.package_settings.opt_out:
             owned = False
-        return_annotation_obj = getattr(obj, "return_annotation", None) or getattr(
-            obj, "returns", None
-        )
+        return_annotation_obj = obj.return_annotation or obj.returns
+        col_offset = obj.col_offset if obj.col_offset is not None else 0
         yield SymbolHarvest(
             qname=qname,
             module=module_name,
@@ -261,18 +337,18 @@ def _collect_symbols(
             filepath=file_path,
             lineno=obj.lineno or 1,
             end_lineno=obj.endlineno,
-            col_offset=getattr(obj, "col_offset", 0) or 0,
-            decorators=_decorator_names(getattr(obj, "decorators", [])),
-            is_async=bool(getattr(obj, "is_async", False)),
-            is_generator=bool(getattr(obj, "is_generator", False)),
+            col_offset=col_offset,
+            decorators=_decorator_names(tuple(obj.decorators)),
+            is_async=obj.is_async,
+            is_generator=obj.is_generator,
         )
         return
-    if isinstance(obj, Module):
+    if _is_griffe_module(obj):
         yield from _walk_members(obj, module_name, file_path, config, prefix)
 
 
 def _walk_members(
-    obj: GriffeModule | GriffeClass,
+    obj: GriffeModuleLike | GriffeClassLike,
     module_name: str,
     file_path: Path,
     config: BuilderConfig,
@@ -283,7 +359,7 @@ def _walk_members(
         yield from _collect_symbols(member, module_name, file_path, config, prefix)
 
 
-class _IndexVisitor(cst.CSTVisitor):
+class _IndexCollector(cst.CSTTransformer):
     def __init__(self, module_name: str) -> None:
         self.module_name = module_name
         self.namespace: list[str] = []
@@ -299,8 +375,12 @@ class _IndexVisitor(cst.CSTVisitor):
         self.namespace.append(node.name.value)
         return True
 
-    def leave_ClassDef(self, _original_node: cst.ClassDef) -> None:  # noqa: N802
+    def leave_ClassDef(  # noqa: N802 - LibCST API contract
+        self, original_node: cst.ClassDef, updated_node: cst.ClassDef
+    ) -> cst.ClassDef:
+        del original_node
         self.namespace.pop()
+        return updated_node
 
     def visit_FunctionDef(self, node: cst.FunctionDef) -> bool:  # noqa: N802 - LibCST API contract
         qname = self._qualify(node.name.value)
@@ -308,15 +388,19 @@ class _IndexVisitor(cst.CSTVisitor):
         self.namespace.append(node.name.value)
         return True
 
-    def leave_FunctionDef(self, _original_node: cst.FunctionDef) -> None:  # noqa: N802
+    def leave_FunctionDef(  # noqa: N802 - LibCST API contract
+        self, original_node: cst.FunctionDef, updated_node: cst.FunctionDef
+    ) -> cst.FunctionDef:
+        del original_node
         self.namespace.pop()
+        return updated_node
 
 
 def _build_cst_index(module_name: str, file_path: Path) -> dict[str, cst.CSTNode]:
     module = cst.parse_module(file_path.read_text(encoding="utf-8"))
-    visitor = _IndexVisitor(module_name)
-    module.visit(visitor)
-    return visitor.index
+    collector = _IndexCollector(module_name)
+    module.visit(collector)
+    return collector.index
 
 
 def harvest_file(file_path: Path, config: BuilderConfig, repo_root: Path) -> HarvestResult:

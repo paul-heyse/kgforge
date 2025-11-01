@@ -1,49 +1,52 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any
+from typing import Any, TypeVar
 
-class UnsetType: ...
+T = TypeVar("T")
+
+class Struct:
+    """Lightweight structural base class used for msgspec models."""
+
+    def __init_subclass__(
+        cls,
+        *,
+        array_like: bool | None = None,
+        frozen: bool | None = None,
+        gc: bool | None = None,
+        kw_only: bool | None = None,
+    ) -> None: ...
+
+class UnsetType:
+    """Sentinel for omitted struct fields."""
 
 UNSET: UnsetType
 
+def to_builtins(obj: Any, *, str_keys: bool | None = None) -> Any: ...
 def field(
     *,
-    default: Any | None = ...,
+    default: Any = ...,
     default_factory: Callable[[], Any] | None = ...,
-    name: str | None = None,
+    name: str | None = ...,
+    alias: str | None = ...,
 ) -> Any: ...
-
-class Struct:
-    __struct_fields__: tuple[str, ...]
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
-    def __init_subclass__(cls, **kwargs: Any) -> None: ...
-
-def to_builtins(
-    obj: Any,
-    *,
-    str_keys: bool = False,
-    builtin_types: tuple[type[Any], ...] | None = None,
-    enc_hook: Callable[[Any], Any] | None = None,
-    order: str | None = None,
-) -> Any: ...
-def convert(obj: Any, type: Any, *, strict: bool = True, from_attributes: bool = False) -> Any: ...
 
 class _StructsModule:
-    def replace(self, obj: Any, /, **changes: Any) -> Any: ...
+    def replace(self, obj: T, /, **changes: Any) -> T: ...
 
 structs: _StructsModule
 
-def json_decode(data: bytes, *, type: Any | None = ...) -> Any: ...
-def json_encode(obj: Any) -> bytes: ...
-
 class _JsonModule:
-    def decode(self, data: bytes, *, type: Any | None = ...) -> Any: ...
-    def encode(self, obj: Any) -> bytes: ...
+    def encode(self, obj: Any, *, enc_hook: Any | None = None) -> bytes: ...
+    def decode(
+        self, data: bytes | bytearray | memoryview | str, *, type: type[T] | None = None
+    ) -> T: ...
+    def schema(self, obj: Any) -> Any: ...
 
 json: _JsonModule
 
-class MsgspecError(Exception): ...
-class DecodeError(MsgspecError): ...
-class ValidationError(DecodeError): ...
+class StructError(Exception): ...
+class DecodeError(StructError): ...
+class ValidationError(StructError): ...
+
+def convert(obj: Any, *, type: type[T] | None = ...) -> T: ...

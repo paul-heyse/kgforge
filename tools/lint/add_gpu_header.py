@@ -6,7 +6,7 @@ from __future__ import annotations
 import pathlib
 import re
 
-from tools._shared.logging import get_logger
+from tools._shared.logging import get_logger  # noqa: PLC2701
 
 LOGGER = get_logger(__name__)
 
@@ -27,7 +27,7 @@ pytestmark = [
 
 """
 
-GPU_IMPORT_RE = re.compile(
+GPU_IMPORT_RE: re.Pattern[str] = re.compile(
     r"^\s*(?:from\s+(?P<mod_from>[a-zA-Z0-9_\.]+)\s+import|import\s+(?P<mod_imp>[a-zA-Z0-9_\.]+))",
     re.MULTILINE,
 )
@@ -54,8 +54,15 @@ GPU_MODULE_FULL: set[str] = {
 def contains_gpu_import(source: str) -> bool:
     """Return True when the source imports a known GPU module."""
     for match in GPU_IMPORT_RE.finditer(source):
-        module = match.group("mod_from") or match.group("mod_imp") or ""
-        head = module.split(".", 1)[0]
+        mod_from = match.group("mod_from")
+        mod_imp = match.group("mod_imp")
+        if mod_from is not None:
+            module: str = mod_from
+        elif mod_imp is not None:
+            module = mod_imp
+        else:
+            module = ""
+        head: str = module.split(".", 1)[0]
         if module in GPU_MODULE_FULL or head in GPU_MODULE_HEADS:
             return True
     return False
@@ -73,10 +80,10 @@ def insert_header(source: str) -> str:
     while index < len(lines):
         line = lines[index]
         stripped = line.strip()
-        if stripped.startswith("#!") or stripped.startswith("# -*-") or stripped.startswith("#"):
+        if stripped.startswith(("#!", "# -*-", "#")):
             index += 1
             continue
-        if stripped == "":
+        if not stripped:
             index += 1
             continue
         break

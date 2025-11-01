@@ -18,7 +18,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Final, NoReturn, Protocol, cast
+from typing import Final, NoReturn, Protocol, assert_never, cast
 from urllib.parse import urlparse
 
 from tools._shared.logging import get_logger, with_fields
@@ -473,14 +473,18 @@ class ReadmeConfig:
             packages = tuple(iter_packages())
         link_mode = LinkMode(cast(str, namespace.link_mode))
         editor = EditorMode(cast(str, namespace.editor))
+        fail_on_metadata_miss = bool(cast(bool, namespace.fail_on_metadata_miss))
+        dry_run = bool(cast(bool, namespace.dry_run))
+        verbose = bool(cast(bool, namespace.verbose))
+        run_doctoc = bool(cast(bool, namespace.run_doctoc))
         return cls(
             packages=packages,
             link_mode=link_mode,
             editor=editor,
-            fail_on_metadata_miss=bool(namespace.fail_on_metadata_miss),
-            dry_run=bool(namespace.dry_run),
-            verbose=bool(namespace.verbose),
-            run_doctoc=bool(namespace.run_doctoc),
+            fail_on_metadata_miss=fail_on_metadata_miss,
+            dry_run=dry_run,
+            verbose=verbose,
+            run_doctoc=run_doctoc,
         )
 
 
@@ -596,15 +600,18 @@ _TEST_CATALOG = _build_test_catalog(_load_json(TESTMAP_PATH))
 def parse_config(argv: Sequence[str] | None = None) -> ReadmeConfig:
     """Parse CLI arguments and environment overrides into a :class:`ReadmeConfig`."""
     parser = argparse.ArgumentParser(description="Generate per-package README files.")
-    parser.add_argument("--packages", default=os.getenv("DOCS_PKG", ""))
+    packages_default: str = os.getenv("DOCS_PKG", "") or ""
+    link_mode_default: str = os.getenv("DOCS_LINK_MODE", "both") or "both"
+    editor_default: str = os.getenv("DOCS_EDITOR", "vscode") or "vscode"
+    parser.add_argument("--packages", default=packages_default)
     parser.add_argument(
         "--link-mode",
-        default=os.getenv("DOCS_LINK_MODE", "both"),
+        default=link_mode_default,
         choices=["github", "editor", "both"],
     )
     parser.add_argument(
         "--editor",
-        default=os.getenv("DOCS_EDITOR", "vscode"),
+        default=editor_default,
         choices=["vscode", "relative"],
     )
     parser.add_argument("--fail-on-metadata-miss", action="store_true", default=False)
@@ -729,8 +736,7 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: EditorMode) -> str | N
         except ValueError:
             rel = abs_path
         return f"./{rel.as_posix()}:{lineno}:1"
-    message = f"Unsupported editor mode: {editor_mode}"
-    raise ValueError(message)
+    assert_never(editor_mode)
 
 
 def _is_exception(node: GriffeObjectLike) -> bool:
@@ -748,6 +754,11 @@ def _is_exception(node: GriffeObjectLike) -> bool:
 
 
 KINDS = {"module", "package", "class", "function"}
+
+
+def _child_path(node: GriffeObjectLike) -> str:
+    """Return the path attribute for ``node`` ensuring str typing."""
+    return node.path
 
 
 def bucket_for(node: GriffeObjectLike) -> str:
@@ -823,11 +834,11 @@ def write_readme(node: GriffeObjectLike, cfg: ReadmeConfig) -> bool:
     buckets: dict[str, list[str]] = {
         name: [] for name in ("Modules", "Classes", "Functions", "Exceptions", "Other")
     }
-    children = [
+    children: list[GriffeObjectLike] = [
         child for child in iter_public_members(node) if child.kind and child.kind.value in KINDS
     ]
 
-    for child in sorted(children, key=lambda child: child.path):
+    for child in sorted(children, key=_child_path):
         line = render_line(child, pkg_dir, cfg)
         if line:
             buckets[bucket_for(child)].append(line)
@@ -981,16 +992,17 @@ def main(argv: Sequence[str] | None = None) -> None:
 
         if cfg.fail_on_metadata_miss and missing_meta:
             detail = "Public symbols are missing owner or stability metadata"
+            extensions_payload: dict[str, JsonValue] = {
+                "packages": cast(JsonValue, list(cfg.packages)),
+                "symbols": cast(JsonValue, sorted(missing_meta)),
+            }
             problem = build_problem_details(
                 type="https://kgfoundry.dev/problems/readme-metadata-missing",
                 title="Missing badge metadata",
                 status=422,
                 detail=detail,
                 instance="urn:tool:gen-readmes:missing-metadata",
-                extensions={
-                    "packages": list(cfg.packages),
-                    "symbols": sorted(missing_meta),
-                },
+                extensions=extensions_payload,
             )
             _raise_missing_metadata(detail, problem)
 

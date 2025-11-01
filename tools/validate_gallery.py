@@ -11,7 +11,8 @@ import sys
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final
+from re import Pattern
+from typing import Final, cast
 
 from tools._shared.logging import get_logger
 
@@ -22,10 +23,10 @@ UNDERLINE_TOLERANCE = 1
 MIN_LINES_WITH_UNDERLINE: Final[int] = 2
 BLANK_LINE_INDEX: Final[int] = 2
 
-TITLE_UNDERLINE_PATTERN = re.compile(r"^(?P<char>=)\1*$")
-CUSTOM_LABEL_PATTERN = re.compile(r"(?m)^\.\.\s+_gallery_[\w-]+:\s*$")
-TAGS_PATTERN = re.compile(r"(?m)^\.\.\s+tags::\s*")
-CONSTRAINTS_HEADER_PATTERN = re.compile(
+TITLE_UNDERLINE_PATTERN: Final[Pattern[str]] = re.compile(r"^(?P<char>=)\1*$")
+CUSTOM_LABEL_PATTERN: Final[Pattern[str]] = re.compile(r"(?m)^\.\.\s+_gallery_[\w-]+:\s*$")
+TAGS_PATTERN: Final[Pattern[str]] = re.compile(r"(?m)^\.\.\s+tags::\s*")
+CONSTRAINTS_HEADER_PATTERN: Final[Pattern[str]] = re.compile(
     r"(?m)^Constraints\s*\n(?P<rule>[-=~`'^\"]{3,})\s*$",
 )
 
@@ -65,6 +66,16 @@ class ValidationResult:
 
 class GalleryValidationError(RuntimeError):
     """Raised when parsing or validation cannot proceed for a gallery example."""
+
+
+@dataclass(slots=True)
+class GalleryOptions:
+    """CLI options extracted from argument parsing."""
+
+    examples_dir: Path
+    strict: bool
+    verbose: bool
+    fix: bool
 
 
 def validate_title_format(docstring: str) -> tuple[bool, str]:
@@ -118,7 +129,7 @@ def check_custom_labels(docstring: str) -> list[str]:
     Sphinx-Gallery generates its own anchors; any ``.. _gallery_*:`` labels
     should be removed to avoid duplicates.
     """
-    return CUSTOM_LABEL_PATTERN.findall(docstring)
+    return cast(list[str], CUSTOM_LABEL_PATTERN.findall(docstring))
 
 
 def _has_tags_directive(docstring: str) -> bool:
@@ -132,7 +143,12 @@ def _has_tags_directive(docstring: str) -> bool:
 def _has_constraints_section(docstring: str) -> bool:
     """Return ``True`` if a ``Constraints`` section header is present."""
     match = CONSTRAINTS_HEADER_PATTERN.search(docstring)
-    return bool(match and set(match.group("rule")) == {"-"})
+    if not match:
+        return False
+    rule = match.group("rule")
+    if not isinstance(rule, str):
+        return False
+    return set(rule) == {"-"}
 
 
 def _load_docstring(path: Path) -> str | None:
@@ -242,7 +258,7 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
     return exit_code
 
 
-def _parse_args(argv: list[str]) -> argparse.Namespace:
+def _parse_args(argv: list[str]) -> GalleryOptions:
     """Parse CLI arguments."""
     parser = argparse.ArgumentParser(
         description="Validate Sphinx-Gallery example docstrings for kgfoundry.",
@@ -268,20 +284,30 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         action="store_true",
         help="Reserved for future automatic fixes.",
     )
-    return parser.parse_args(argv)
+    parsed = parser.parse_args(argv)
+    examples_dir = cast(Path, parsed.examples_dir)
+    strict_flag = bool(cast(bool, parsed.strict))
+    verbose_flag = bool(cast(bool, parsed.verbose))
+    fix_flag = bool(cast(bool, parsed.fix))
+    return GalleryOptions(
+        examples_dir=examples_dir,
+        strict=strict_flag,
+        verbose=verbose_flag,
+        fix=fix_flag,
+    )
 
 
 def _run_from_cli(argv: list[str]) -> int:
     """Entry point used by ``if __name__ == '__main__'`` guard."""
-    args = _parse_args(argv)
-    if args.fix:
+    options = _parse_args(argv)
+    if options.fix:
         LOGGER.warning("Automatic fixing is not implemented yet.")
         return 2
-    examples_dir = args.examples_dir.resolve()
+    examples_dir = options.examples_dir.resolve()
     if not examples_dir.exists():
         LOGGER.error("Examples directory not found: %s", examples_dir)
         return 2
-    return main(examples_dir, strict=args.strict, verbose=args.verbose)
+    return main(examples_dir, strict=options.strict, verbose=options.verbose)
 
 
 if __name__ == "__main__":  # pragma: no cover - CLI invocation

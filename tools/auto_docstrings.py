@@ -17,6 +17,7 @@ from tools.docstring_builder.legacy import (
     parameters_for,
     summarize,
 )
+from tools.docstring_builder.models import DocstringIRParameter
 
 STANDARD_METHOD_EXTENDED_SUMMARIES = _legacy._STANDARD_METHOD_EXTENDED_SUMMARIES
 
@@ -38,7 +39,7 @@ def normalize_qualified_name(name: str) -> str:
 
 def required_sections(  # noqa: PLR0913
     kind: str,
-    parameters: list[_legacy.ParameterInfo],
+    parameters: list[DocstringIRParameter],
     returns: str | None,
     raises: list[str],
     *,

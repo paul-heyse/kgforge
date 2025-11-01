@@ -1,4 +1,4 @@
-# ruff: noqa: N815
+# ruff: noqa: N815, PLR0913
 """Navmap document models aligned with ``schema/tools/navmap_document.json``."""
 
 from __future__ import annotations
@@ -42,7 +42,7 @@ class NavSectionDocument(BaseStruct, kw_only=True):
 
     if TYPE_CHECKING:
 
-        def __init__(self, *, id: str, symbols: list[str]) -> None: ...
+        def __init__(self, *, id: str, symbols: list[str]) -> None: ...  # noqa: A002
 
 
 class SymbolMetaDocument(BaseStruct, kw_only=True):

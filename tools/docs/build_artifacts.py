@@ -6,9 +6,10 @@ import os
 import sys
 from pathlib import Path
 
+from tools._shared.logging import get_logger, with_fields
+from tools._shared.proc import ToolExecutionError, run_tool
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
 
 
 def _pythonpath_env() -> dict[str, str]:
@@ -23,9 +24,6 @@ def _pythonpath_env() -> dict[str, str]:
     }
     return env
 
-
-from tools._shared.logging import get_logger, with_fields
-from tools._shared.proc import ToolExecutionError, run_tool
 
 LOGGER = get_logger(__name__)
 
@@ -104,9 +102,13 @@ def _run_step(name: str, command: list[str], message: str) -> int:
         )
         if result.returncode != 0:
             if result.stdout:
-                print(result.stdout, file=sys.stderr)
+                log_adapter.error(
+                    "[artifacts] %s stdout captured", name, extra={"stdout": result.stdout}
+                )
             if result.stderr:
-                print(result.stderr, file=sys.stderr)
+                log_adapter.error(
+                    "[artifacts] %s stderr captured", name, extra={"stderr": result.stderr}
+                )
             log_adapter.error(
                 "[artifacts] %s failed (exit %d)",
                 name,

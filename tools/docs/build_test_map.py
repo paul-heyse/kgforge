@@ -16,7 +16,7 @@ import sys
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from pathlib import Path
-from typing import Any, Final
+from typing import Any, Final, cast
 
 from tools._shared.logging import get_logger
 
@@ -62,7 +62,7 @@ FAIL_ON_UNTESTED = os.getenv("TESTMAP_FAIL_ON_UNTESTED", "0") == "1"
 def _load_json(path: Path) -> JSONValue | None:
     """Return JSON data from ``path`` or ``None`` if the file is unreadable."""
     try:
-        return json.loads(path.read_text(encoding="utf-8"))  # type: ignore[no-any-return]
+        return cast(JSONValue, json.loads(path.read_text(encoding="utf-8")))
     except (OSError, json.JSONDecodeError):
         return None
 

@@ -11,10 +11,10 @@ and emit Problem Details envelopes consistent with
 from __future__ import annotations
 
 import logging
-from collections.abc import Mapping
+from collections.abc import Mapping, MutableMapping
 from importlib import import_module
 from types import MappingProxyType, ModuleType
-from typing import Final
+from typing import TYPE_CHECKING, Final, cast
 
 from ._shared.cli import (
     CLI_ENVELOPE_SCHEMA_ID,
@@ -62,6 +62,10 @@ from ._shared.validation import (
     resolve_path,
 )
 
+if TYPE_CHECKING:
+    from . import codemods, docs, docstring_builder, gen_readmes, generate_pr_summary, navmap
+    from .docs import build_agent_api, build_agent_catalog
+
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 _PUBLIC_EXPORTS: dict[str, object] = {
@@ -76,11 +80,11 @@ _PUBLIC_EXPORTS: dict[str, object] = {
     "CliStatus": CliStatus,
     "ProblemDetailsDict": ProblemDetailsDict,
     "SettingsError": SettingsError,
-    "StructuredLoggerAdapter": StructuredLoggerAdapter,
+    "StructuredLoggerAdapter": cast(object, StructuredLoggerAdapter),
     "ToolExecutionError": ToolExecutionError,
     "ToolRunObservation": ToolRunObservation,
     "ToolRunResult": ToolRunResult,
-    "ToolRuntimeSettings": ToolRuntimeSettings,
+    "ToolRuntimeSettings": cast(object, ToolRuntimeSettings),
     "ValidationError": ValidationError,
     "build_problem_details": build_problem_details,
     "build_schema_problem_details": build_schema_problem_details,
@@ -121,18 +125,68 @@ _MODULE_EXPORTS: dict[str, str] = {
 
 MODULE_EXPORTS: Final[Mapping[str, str]] = MappingProxyType(_MODULE_EXPORTS)
 
-__all__: list[str] = sorted({*PUBLIC_EXPORTS.keys(), *MODULE_EXPORTS.keys()})
+__all__: tuple[str, ...] = (
+    "CLI_ENVELOPE_SCHEMA_ID",
+    "CLI_ENVELOPE_SCHEMA_VERSION",
+    "CliEnvelope",
+    "CliEnvelopeBuilder",
+    "CliErrorEntry",
+    "CliErrorStatus",
+    "CliFileResult",
+    "CliFileStatus",
+    "CliStatus",
+    "ProblemDetailsDict",
+    "SettingsError",
+    "StructuredLoggerAdapter",
+    "ToolExecutionError",
+    "ToolRunObservation",
+    "ToolRunResult",
+    "ToolRuntimeSettings",
+    "ValidationError",
+    "build_agent_api",
+    "build_agent_catalog",
+    "build_problem_details",
+    "build_schema_problem_details",
+    "build_tool_problem_details",
+    "codemods",
+    "docs",
+    "docstring_builder",
+    "gen_readmes",
+    "generate_pr_summary",
+    "get_logger",
+    "get_runtime_settings",
+    "logging",
+    "navmap",
+    "new_cli_envelope",
+    "observe_tool_run",
+    "problem_from_exception",
+    "render_cli_envelope",
+    "render_problem",
+    "require_directory",
+    "require_file",
+    "resolve_path",
+    "run_tool",
+    "tool_disallowed_problem_details",
+    "tool_failure_problem_details",
+    "tool_missing_problem_details",
+    "tool_timeout_problem_details",
+    "validate_cli_envelope",
+    "validate_tools_payload",
+    "with_fields",
+)
 
 
 def __getattr__(name: str) -> ModuleType:
     if name in MODULE_EXPORTS:
         module = import_module(MODULE_EXPORTS[name])
-        globals()[name] = module
-        _PUBLIC_EXPORTS[name] = module
+        namespace = cast(MutableMapping[str, object], globals())
+        namespace[name] = module
+        _PUBLIC_EXPORTS[name] = cast(object, module)
         return module
     message = f"module 'tools' has no attribute {name!r}"
     raise AttributeError(message)
 
 
 def __dir__() -> list[str]:
-    return sorted({*globals(), *MODULE_EXPORTS.keys()})
+    namespace = cast(MutableMapping[str, object], globals())
+    return sorted({*namespace, *MODULE_EXPORTS.keys()})

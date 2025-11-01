@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import sys
 from collections.abc import Callable, Iterable, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 
 from tools._shared.logging import get_logger
@@ -174,16 +175,50 @@ def main(
 
 def _build_arg_parser() -> argparse.ArgumentParser:
     """Return the CLI parser for the import-linter generator."""
-    parser = argparse.ArgumentParser(description="Generate .importlinter contracts for tooling packages")
+    parser = argparse.ArgumentParser(
+        description="Generate .importlinter contracts for tooling packages"
+    )
     parser.add_argument("--root-package", dest="root_package", default="tools")
     parser.add_argument("--output", dest="output", type=Path)
     parser.add_argument("--root-dir", dest="root_dir", type=Path)
-    parser.add_argument("--check", action="store_true", help="Run import-linter after writing the config")
+    parser.add_argument(
+        "--check", action="store_true", help="Run import-linter after writing the config"
+    )
     return parser
 
 
+@dataclass(slots=True)
+class ImportLinterArgs:
+    """Typed CLI arguments for the import-linter generator."""
+
+    root_package: str
+    output: Path | None
+    root_dir: Path | None
+    check: bool
+
+
+class _CLIArguments(argparse.Namespace):
+    root_package: str
+    output: Path | None
+    root_dir: Path | None
+    check: bool
+
+
+def _parse_args(argv: Sequence[str] | None = None) -> ImportLinterArgs:
+    """Return typed arguments parsed from ``argv``."""
+    parser = _build_arg_parser()
+    namespace = _CLIArguments()
+    parser.parse_args(argv, namespace=namespace)
+    return ImportLinterArgs(
+        root_package=namespace.root_package,
+        output=namespace.output,
+        root_dir=namespace.root_dir,
+        check=namespace.check,
+    )
+
+
 if __name__ == "__main__":
-    arguments = _build_arg_parser().parse_args()
+    arguments = _parse_args()
     main(
         root_package=arguments.root_package,
         output_path=arguments.output,

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import textwrap
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
@@ -11,6 +12,7 @@ from typing import cast
 from tools.docstring_builder.apply import apply_edits
 from tools.docstring_builder.config import DEFAULT_MARKER
 from tools.docstring_builder.harvest import HarvestResult
+from tools.docstring_builder.models import DocstringIRParameter, ParameterKind
 from tools.docstring_builder.overrides import (
     _STANDARD_METHOD_EXTENDED_SUMMARIES,
     DEFAULT_MAGIC_METHOD_FALLBACK,
@@ -35,29 +37,6 @@ from tools.docstring_builder.schema import DocstringEdit
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SRC_ROOT = REPO_ROOT / "src"
-
-
-@dataclass(slots=True)
-class ParameterInfo:
-    """Structure describing a callable parameter for docstring emission."""
-
-    name: str
-    annotation: str | None
-    default: str | None
-    kind: str
-    required: bool
-
-    @property
-    def display_name(self) -> str:
-        if self.kind == "vararg":
-            return f"*{self.name}"
-        if self.kind == "kwarg":
-            return f"**{self.name}"
-        return self.name
-
-    @property
-    def is_variadic(self) -> bool:
-        return self.kind in {"vararg", "kwarg"}
 
 
 @dataclass(slots=True)
@@ -104,6 +83,18 @@ class _SymbolCollector(ast.NodeVisitor):
         self.namespace.pop()
 
 
+def _display_name_for(kind: ParameterKind, name: str) -> str:
+    if kind == "var_positional":
+        return f"*{name}"
+    if kind == "var_keyword":
+        return f"**{name}"
+    return name
+
+
+def _is_variadic_parameter(parameter: DocstringIRParameter) -> bool:
+    return parameter.kind in {"var_positional", "var_keyword"}
+
+
 def annotation_to_text(annotation: ast.AST | None) -> str | None:
     """Convert an annotation node to source text."""
     if annotation is None:
@@ -111,7 +102,8 @@ def annotation_to_text(annotation: ast.AST | None) -> str | None:
     try:
         return ast.unparse(annotation)
     except AttributeError:  # pragma: no cover - Python <3.9 fallback
-        return getattr(annotation, "id", None)
+        fallback: object = getattr(annotation, "id", None)
+        return fallback if isinstance(fallback, str) else None
 
 
 def _default_to_text(default: ast.AST | None) -> str | None:
@@ -120,57 +112,67 @@ def _default_to_text(default: ast.AST | None) -> str | None:
     try:
         return ast.unparse(default)
     except AttributeError:  # pragma: no cover - Python <3.9 fallback
-        return getattr(default, "id", None)
+        fallback: object = getattr(default, "id", None)
+        return fallback if isinstance(fallback, str) else None
 
 
-def parameters_for(node: ast.AST) -> list[ParameterInfo]:
+def _make_parameter(
+    arg: ast.arg,
+    default: ast.AST | None,
+    *,
+    kind: ParameterKind,
+) -> DocstringIRParameter:
+    annotation_text = annotation_to_text(arg.annotation)
+    default_text = _default_to_text(default)
+    is_variadic = kind in {"var_positional", "var_keyword"}
+    optional = default is not None and not is_variadic
+    return DocstringIRParameter(
+        name=arg.arg,
+        display_name=_display_name_for(kind, arg.arg),
+        kind=kind,
+        annotation=annotation_text,
+        default=default_text,
+        optional=optional,
+        description="",
+    )
+
+
+def parameters_for(node: ast.AST) -> list[DocstringIRParameter]:
     """Return parameter metadata for function or method nodes."""
     if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         return []
-    params: list[ParameterInfo] = []
+    params: list[DocstringIRParameter] = []
     arguments = node.args
 
     def handle_parameters(
         items: list[ast.arg],
-        defaults: list[ast.expr | None],
+        defaults: Sequence[ast.expr | None],
         *,
-        kind: str,
+        kind: ParameterKind,
     ) -> None:
         padding = len(items) - len(defaults)
         padded_defaults: list[ast.AST | None] = [None] * padding
         padded_defaults.extend(cast(ast.AST | None, default) for default in defaults)
-        for arg, default in zip(items, padded_defaults, strict=True):
-            params.append(
-                ParameterInfo(
-                    name=arg.arg,
-                    annotation=annotation_to_text(arg.annotation),
-                    default=_default_to_text(default),
-                    kind=kind,
-                    required=default is None and kind not in {"kwarg", "vararg"},
-                )
-            )
+        for arg, default_value in zip(items, padded_defaults, strict=True):
+            params.append(_make_parameter(arg, default_value, kind=kind))
 
-    handle_parameters(arguments.posonlyargs, [], kind="positional")
-    handle_parameters(arguments.args, list(arguments.defaults), kind="positional")
-    if arguments.vararg:
+    handle_parameters(arguments.posonlyargs, [], kind="positional_only")
+    handle_parameters(arguments.args, list(arguments.defaults), kind="positional_or_keyword")
+    if arguments.vararg is not None:
         params.append(
-            ParameterInfo(
-                name=arguments.vararg.arg,
-                annotation=annotation_to_text(arguments.vararg.annotation),
-                default=None,
-                kind="vararg",
-                required=False,
+            _make_parameter(
+                arguments.vararg,
+                None,
+                kind="var_positional",
             )
         )
-    handle_parameters(arguments.kwonlyargs, list(arguments.kw_defaults), kind="kw-only")
-    if arguments.kwarg:
+    handle_parameters(arguments.kwonlyargs, list(arguments.kw_defaults), kind="keyword_only")
+    if arguments.kwarg is not None:
         params.append(
-            ParameterInfo(
-                name=arguments.kwarg.arg,
-                annotation=annotation_to_text(arguments.kwarg.annotation),
-                default=None,
-                kind="kwarg",
-                required=False,
+            _make_parameter(
+                arguments.kwarg,
+                None,
+                kind="var_keyword",
             )
         )
     return params
@@ -214,7 +216,7 @@ def _wrap_text(text: str) -> list[str]:
 
 def _required_sections(  # noqa: PLR0913
     kind: str,
-    parameters: list[ParameterInfo],
+    parameters: Sequence[DocstringIRParameter],
     returns: str | None,
     raises: list[str],
     *,
@@ -238,7 +240,7 @@ def _required_sections(  # noqa: PLR0913
 def build_examples(  # noqa: PLR0913
     module_name: str,
     name: str,
-    parameters: list[ParameterInfo],
+    parameters: Sequence[DocstringIRParameter],
     include_import: bool,
     *,
     is_async: bool = False,
@@ -252,11 +254,11 @@ def build_examples(  # noqa: PLR0913
     call_parts: list[str] = []
     trailing_parts: list[str] = []
     for param in parameters:
-        if param.kind == "vararg":
+        if param.kind == "var_positional":
             trailing_parts.append(f"*{param.name}")
-        elif param.kind == "kwarg":
+        elif param.kind == "var_keyword":
             trailing_parts.append(f"**{param.name}")
-        elif param.required:
+        elif not param.optional:
             call_parts.append("...")
     call_parts.extend(trailing_parts)
     call_fragment = ", ".join(call_parts)
@@ -348,12 +350,14 @@ def _is_pydantic_artifact(name: str) -> bool:
     return overrides_is_pydantic_artifact(name)
 
 
-def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
+def build_docstring(
+    kind: str, node: ast.FunctionDef | ast.AsyncFunctionDef, module_name: str
+) -> list[str]:
     """Build a NumPy style docstring as a list of lines."""
-    name = getattr(node, "name", "")
+    name = node.name
     is_public = not name.startswith("_")
     params = parameters_for(node)
-    returns_text = annotation_to_text(getattr(node, "returns", None))
+    returns_text = annotation_to_text(node.returns)
     raises = detect_raises(node)
     summary = summarize(kind, name)
     extended = extended_summary(kind, name, module_name, node)
@@ -373,9 +377,12 @@ def build_docstring(kind: str, node: ast.AST, module_name: str) -> list[str]:
         lines.append("----------")
         for param in params:
             annotation = param.annotation or "Any"
-            optional = ", optional" if not param.required and not param.is_variadic else ""
-            default = f", by default {param.default}" if param.default not in {None, "..."} else ""
-            lines.append(f"{param.display_name} : {annotation}{optional}{default}")
+            optional_flag = param.optional and not _is_variadic_parameter(param)
+            optional_suffix = ", optional" if optional_flag else ""
+            default_suffix = (
+                f", by default {param.default}" if param.default not in {None, "..."} else ""
+            )
+            lines.append(f"{param.display_name} : {annotation}{optional_suffix}{default_suffix}")
             lines.append(f"    Description for ``{param.name}``.")
 
     if returns_value:
@@ -436,6 +443,8 @@ def process_file(file_path: Path) -> bool:
     edits: list[DocstringEdit] = []
     for symbol in collector.symbols:
         if symbol.kind != "function":
+            continue
+        if not isinstance(symbol.node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             continue
         doc = symbol.docstring or ""
         if doc and DEFAULT_MARKER not in doc:
