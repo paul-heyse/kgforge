@@ -20,403 +20,56 @@ targets when regenerating documentation artifacts.
 from __future__ import annotations
 
 import argparse
-import concurrent.futures
-import dataclasses
-import datetime
-import enum
-import hashlib
-import importlib
 import json
 import logging
-import os
 import sys
-import time
-from collections import Counter
-from collections.abc import Callable, Iterable, Mapping, Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import cast
 
 import yaml
 
-from tools._shared.logging import get_logger, with_fields
-from tools._shared.problem_details import build_problem_details as build_problem_details_shared
-from tools._shared.proc import ToolExecutionError, run_tool
-from tools.docstring_builder import BUILDER_VERSION
-from tools.docstring_builder.apply import apply_edits
+from tools._shared.logging import get_logger
 from tools.docstring_builder.cache import BuilderCache
-from tools.docstring_builder.config import (
-    BuilderConfig,
-    ConfigSelection,
-    load_config_with_selection,
+from tools.docstring_builder.harvest import harvest_file
+from tools.docstring_builder.io import (
+    default_since_revision,
+    select_files,
 )
-from tools.docstring_builder.docfacts import (
-    DOCFACTS_VERSION,
-    DocFact,
-    DocfactsProvenance,
-    build_docfacts,
-    build_docfacts_document,
-    validate_docfacts_payload,
-    write_docfacts,
+from tools.docstring_builder.ir import write_schema
+from tools.docstring_builder.orchestrator import (
+    DocstringBuildRequest,
+    DocstringBuildResult,
+    ExitStatus,
+    InvalidPathError,
+    load_builder_config,
+    render_cli_result,
+    render_failure_summary,
+    run_docstring_builder,
 )
-from tools.docstring_builder.harvest import HarvestResult, harvest_file, iter_target_files
-from tools.docstring_builder.ir import IR_VERSION, IRDocstring, build_ir, validate_ir, write_schema
-from tools.docstring_builder.models import (
-    CacheSummary,
-    DocfactsDocumentLike,
-    DocfactsDocumentPayload,
-    DocfactsReport,
-    ErrorReport,
-    FileReport,
-    InputHash,
-    ProblemDetails,
-    RunStatus,
-    SchemaViolationError,
-    StatusCounts,
-    build_cli_result_skeleton,
-    build_docfacts_document_payload,
-    validate_cli_output,
+from tools.docstring_builder.paths import (
+    CACHE_PATH,
+    REPO_ROOT,
+    REQUIRED_PYTHON_MAJOR,
+    REQUIRED_PYTHON_MINOR,
 )
-from tools.docstring_builder.normalizer import normalize_docstring
-from tools.docstring_builder.observability import (
-    get_correlation_id,
-    get_metrics_registry,
-    record_operation_metrics,
-)
-from tools.docstring_builder.plugins import (
-    PluginConfigurationError,
-    PluginManager,
-    load_plugins,
-)
-from tools.docstring_builder.policy import (
-    PolicyConfigurationError,
-    PolicyEngine,
-    load_policy_settings,
-)
-from tools.docstring_builder.render import render_docstring
-from tools.docstring_builder.schema import DocstringEdit
-from tools.docstring_builder.semantics import SemanticResult, build_semantic_schemas
-from tools.drift_preview import DocstringDriftEntry, write_docstring_drift, write_html_diff
+from tools.docstring_builder.policy import PolicyConfigurationError, load_policy_settings
 from tools.stubs.drift_check import run as run_stub_drift
 
 LOGGER = get_logger(__name__)
-METRICS = get_metrics_registry()
-REPO_ROOT = Path(__file__).resolve().parents[2]
-CACHE_PATH = REPO_ROOT / ".cache" / "docstring_builder.json"
-DOCFACTS_PATH = REPO_ROOT / "docs" / "_build" / "docfacts.json"
-MANIFEST_PATH = REPO_ROOT / "docs" / "_build" / "docstrings_manifest.json"
-OBSERVABILITY_PATH = REPO_ROOT / "docs" / "_build" / "observability_docstrings.json"
-DRIFT_DIR = REPO_ROOT / "docs" / "_build" / "drift"
-DOCFACTS_DIFF_PATH = DRIFT_DIR / "docfacts.html"
-NAVMAP_DIFF_PATH = DRIFT_DIR / "navmap.html"
-SCHEMA_DIFF_PATH = DRIFT_DIR / "schema.html"
-DOCSTRINGS_DIFF_PATH = DRIFT_DIR / "docstrings.html"
-OBSERVABILITY_MAX_ERRORS = 20
-REQUIRED_PYTHON_MAJOR = 3
-REQUIRED_PYTHON_MINOR = 13
-DEFAULT_IGNORE_PATTERNS = [
-    "tests/e2e/**",
-    "tests/mock_servers/**",
-    "tests/tools/**",
-    "docs/_scripts/**",
-    "docs/conf.py",
-    "src/__init__.py",
-]
-MISSING_MODULE_PATTERNS = ["docs/_build/**"]
-
-
-def _typed_pipeline_enabled() -> bool:
-    value = os.environ.get("DOCSTRINGS_TYPED_IR", "1").strip().lower()
-    return value not in {"", "0", "false", "no", "off"}
-
-
-TYPED_PIPELINE_ENABLED = _typed_pipeline_enabled()
-
-
 CommandHandler = Callable[[argparse.Namespace], int]
 
 
-class ExitStatus(enum.IntEnum):
-    """Standardised exit codes for CLI subcommands."""
-
-    SUCCESS = 0
-    VIOLATION = 1
-    CONFIG = 2
-    ERROR = 3
-
-
-STATUS_LABELS = {
-    ExitStatus.SUCCESS: "success",
-    ExitStatus.VIOLATION: "violation",
-    ExitStatus.CONFIG: "config",
-    ExitStatus.ERROR: "error",
-}
-
-EXIT_SUCCESS = int(ExitStatus.SUCCESS)
-EXIT_VIOLATION = int(ExitStatus.VIOLATION)
-EXIT_CONFIG = int(ExitStatus.CONFIG)
-EXIT_ERROR = int(ExitStatus.ERROR)
-
-
-_EXIT_TO_RUN_STATUS: dict[ExitStatus, RunStatus] = {
-    ExitStatus.SUCCESS: RunStatus.SUCCESS,
-    ExitStatus.VIOLATION: RunStatus.VIOLATION,
-    ExitStatus.CONFIG: RunStatus.CONFIG,
-    ExitStatus.ERROR: RunStatus.ERROR,
-}
-
-
-def _status_from_exit(status: ExitStatus) -> RunStatus:
-    return _EXIT_TO_RUN_STATUS.get(status, RunStatus.ERROR)
-
-
-def _status_from_label(label: str) -> RunStatus:
-    lowered = label.lower()
-    match lowered:
-        case "success":
-            return RunStatus.SUCCESS
-        case "violation":
-            return RunStatus.VIOLATION
-        case "config":
-            return RunStatus.CONFIG
-        case "error":
-            return RunStatus.ERROR
-        case "warn" | "autofix":
-            return RunStatus.VIOLATION
-        case _:
-            return RunStatus.ERROR
-
-
-def _http_status_for_exit(status: ExitStatus) -> int:
-    match status:
-        case ExitStatus.SUCCESS:
-            return 200
-        case ExitStatus.VIOLATION:
-            return 422
-        case ExitStatus.CONFIG:
-            return 400
-        case ExitStatus.ERROR:
-            return 500
-    return 500  # type: ignore[unreachable]  # defensive return
-
-
-def _build_problem_details(
-    status: ExitStatus,
-    errors: Sequence[ErrorReport],
-    *,
-    command: str,
-    subcommand: str,
-) -> ProblemDetails | None:
-    """Build Problem Details for CLI failures using shared helper."""
-    if status is ExitStatus.SUCCESS:
-        return None
-    detail = errors[0]["message"] if errors else f"Run exited with {STATUS_LABELS[status]}"
-    instance = f"urn:docbuilder:{datetime.datetime.now(datetime.UTC).isoformat()}"
-    problem_dict = build_problem_details_shared(
-        type="https://kgfoundry.dev/problems/docbuilder/run-failed",
-        title="Docstring builder run failed",
-        status=_http_status_for_exit(status),
-        detail=detail,
-        instance=instance,
-        extensions=None,  # We'll add extensions separately to match schema
-    )
-    # Schema requires extensions to be nested under "extensions" key, not top-level
-    problem_dict["extensions"] = {
-        "command": command,
-        "subcommand": subcommand,
-        "errorCount": len(errors),
-    }
-    return cast(ProblemDetails, problem_dict)
-
-
-def _handle_schema_violation(context: str, exc: SchemaViolationError) -> None:
-    if TYPED_PIPELINE_ENABLED:
-        raise exc
-    log_extra = {"problem": exc.problem} if exc.problem else None
-    LOGGER.warning("%s validation failed: %s", context, exc, extra=log_extra)
-
-
-class InvalidPathError(ValueError):
-    """Raised when a user-supplied path falls outside the allowed workspace."""
-
-
-@dataclasses.dataclass(slots=True)
-class ProcessingOptions:
-    """Runtime options controlling how a file is processed."""
-
-    command: str
-    force: bool
-    ignore_missing: bool
-    missing_patterns: tuple[str, ...]
-    skip_docfacts: bool
-    baseline: str | None = None
-
-
-@dataclasses.dataclass(slots=True)
-class FileOutcome:
-    """Result of processing a single file."""
-
-    status: ExitStatus
-    docfacts: list[DocFact]
-    preview: str | None
-    changed: bool
-    skipped: bool
-    message: str | None = None
-    cache_hit: bool = False
-    semantics: list[SemanticResult] = dataclasses.field(default_factory=list)
-    ir: list[IRDocstring] = dataclasses.field(default_factory=list)
-
-
-@dataclasses.dataclass(slots=True)
-class DocfactsOutcome:
-    """Outcome of reconciling DocFacts artifacts."""
-
-    status: ExitStatus
-    message: str | None = None
-
-
-_DEFAULT_PROVENANCE_TIMESTAMP = "1970-01-01T00:00:00Z"
-
-
-def _git_output(arguments: Sequence[str]) -> str | None:
-    """Return stripped stdout for a git command or ``None`` on failure."""
-    adapter = with_fields(LOGGER, command=list(arguments))
-    try:
-        result = run_tool(arguments, timeout=10.0)
-    except ToolExecutionError as exc:  # pragma: no cover - git unavailable
-        adapter.debug("git invocation failed: %s", exc)
-        return None
-    if result.returncode != 0:
-        adapter.debug("git returned non-zero exit code: %s", result.returncode)
-        return None
-    output = result.stdout.strip()
-    return output or None
-
-
-def _resolve_commit_hash() -> str:
-    command = ["git", "-C", str(REPO_ROOT), "rev-parse", "HEAD"]
-    return _git_output(command) or "unknown"
-
-
-def _resolve_commit_timestamp(commit_hash: str) -> str:
-    if not commit_hash or commit_hash == "unknown":
-        return _DEFAULT_PROVENANCE_TIMESTAMP
-    command = ["git", "-C", str(REPO_ROOT), "show", "-s", "--format=%cI", commit_hash]
-    return _git_output(command) or _DEFAULT_PROVENANCE_TIMESTAMP
-
-
-def _build_docfacts_provenance(config: BuilderConfig) -> DocfactsProvenance:
-    commit_hash = _resolve_commit_hash()
-    generated_at = _resolve_commit_timestamp(commit_hash)
-    return DocfactsProvenance(
-        builder_version=BUILDER_VERSION,
-        config_hash=config.config_hash,
-        commit_hash=commit_hash,
-        generated_at=generated_at,
-    )
-
-
-def _module_to_path(module: str) -> Path | None:
-    if not module:
-        return None
-    parts = module.split(".")
-    relative = Path("src", *parts)
-    file_candidate = REPO_ROOT / relative
-    if file_candidate.suffix:
-        # Already points to a concrete file (e.g., pkg.module).
-        return file_candidate
-    file_path = file_candidate.with_suffix(".py")
-    if file_path.exists():
-        return file_path
-    package_init = file_candidate / "__init__.py"
-    if package_init.exists():
-        return package_init
-    return file_path
-
-
-def _module_name_from_path(path: Path) -> str:
-    """Derive a dotted module name from ``path`` relative to the repository root."""
-    rel = path.relative_to(REPO_ROOT)
-    parts = rel.with_suffix("").parts
-    if parts and parts[0] in {"src", "tools", "docs"}:
-        parts = parts[1:]
-    return ".".join(parts)
-
-
-def _read_baseline_version(baseline: str, path: Path) -> str | None:
-    """Return the file contents for ``path`` from ``baseline`` when available."""
-    if not baseline:
-        return None
-    candidate = Path(baseline)
-    relative = path.relative_to(REPO_ROOT)
-    if candidate.exists():
-        base_path = candidate / relative if candidate.is_dir() else candidate
-        try:
-            return base_path.read_text(encoding="utf-8")
-        except FileNotFoundError:
-            return None
-    command = [
-        "git",
-        "-C",
-        str(REPO_ROOT),
-        "show",
-        f"{baseline}:{relative.as_posix()}",
-    ]
-    try:
-        result = run_tool(command, timeout=10.0)
-    except ToolExecutionError as exc:  # pragma: no cover - git missing
-        LOGGER.debug(
-            "Unable to read %s from baseline %s: %s",
-            relative,
-            baseline,
-            exc,
-        )
-        return None
-    if result.returncode != 0:
-        LOGGER.debug(
-            "Unable to read %s from baseline %s: %s",
-            relative,
-            baseline,
-            result.stderr,
-        )
-        return None
-    return result.stdout
-
-
-def _resolve_ignore_patterns(config: BuilderConfig) -> list[str]:
-    patterns = list(DEFAULT_IGNORE_PATTERNS)
-    for pattern in config.ignore:
-        if pattern not in patterns:
-            patterns.append(pattern)
-    return patterns
-
-
-def _normalize_input_path(raw: str) -> Path:
-    """Resolve ``raw`` into an absolute path within the repository."""
-    candidate = Path(raw).expanduser()
-    if not candidate.is_absolute():
-        candidate = REPO_ROOT / candidate
-    try:
-        resolved = candidate.resolve(strict=True)
-    except FileNotFoundError as exc:  # pragma: no cover - defensive guard
-        message = f"Path '{raw}' does not exist"
-        raise InvalidPathError(message) from exc
-    try:
-        resolved.relative_to(REPO_ROOT)
-    except ValueError as exc:
-        message = f"Path '{raw}' escapes the repository root"
-        raise InvalidPathError(message) from exc
-    if not resolved.is_file() or resolved.suffix != ".py":
-        message = f"Path '{raw}' must reference a Python source file"
-        raise InvalidPathError(message)
-    return resolved
-
-
-def _load_config(args: argparse.Namespace) -> tuple[BuilderConfig, ConfigSelection]:
-    """Load builder configuration honouring CLI/environment precedence."""
-    override = getattr(args, "config_path", None)
-    config, selection = load_config_with_selection(override)
-    args.config_selection = selection
-    return config, selection
+def _parse_plugin_names(values: Sequence[str] | None) -> tuple[str, ...]:
+    names: list[str] = []
+    if not values:
+        return tuple(names)
+    for raw in values:
+        for chunk in raw.split(","):
+            name = chunk.strip()
+            if name:
+                names.append(name)
+    return tuple(names)
 
 
 def _parse_policy_overrides(values: Sequence[str] | None) -> dict[str, str]:
@@ -436,1023 +89,97 @@ def _parse_policy_overrides(values: Sequence[str] | None) -> dict[str, str]:
     return overrides
 
 
-def _hash_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    digest.update(path.read_bytes())
-    return digest.hexdigest()
-
-
-def _parse_plugin_names(values: Sequence[str] | None) -> list[str]:
-    names: list[str] = []
-    if not values:
-        return names
-    for raw in values:
-        for chunk in raw.split(","):
-            name = chunk.strip()
-            if name:
-                names.append(name)
-    return names
-
-
-def _dependents_for(path: Path) -> set[Path]:
-    dependents: set[Path] = set()
-    if path.name == "__init__.py":
-        for candidate in path.parent.glob("*.py"):
-            if candidate != path and candidate.is_file():
-                dependents.add(candidate.resolve())
-    else:
-        init_file = (path.parent / "__init__.py").resolve()
-        if init_file.exists():
-            dependents.add(init_file)
-    return dependents
-
-
-def _select_files(config: BuilderConfig, args: argparse.Namespace) -> Iterable[Path]:  # noqa: C901
-    if getattr(args, "paths", None):
-        return [_normalize_input_path(raw) for raw in args.paths]
-
-    files: list[Path] = []
-    for path in iter_target_files(config, REPO_ROOT):
-        try:
-            resolved = path.resolve(strict=True)
-        except FileNotFoundError:  # pragma: no cover - stale glob entry
-            continue
-        try:
-            resolved.relative_to(REPO_ROOT)
-        except ValueError:
-            LOGGER.warning("Ignoring path outside repository: %s", resolved)
-            continue
-        if _should_ignore(resolved, config):
-            continue
-        files.append(resolved)
-
-    if args.module:
-        module_prefix = args.module
-        files = [
-            candidate
-            for candidate in files
-            if _module_name_from_path(candidate).startswith(module_prefix)
-        ]
-    if args.since:
-        changed = set(_changed_files_since(args.since))
-        files = [path for path in files if str(path.relative_to(REPO_ROOT)) in changed]
-    candidates = [file_path for file_path in files if not _should_ignore(file_path, config)]
-    if getattr(args, "changed_only", False) or args.since or getattr(args, "paths", None):
-        expanded: dict[Path, None] = {candidate.resolve(): None for candidate in candidates}
-        for candidate in list(expanded.keys()):
-            for dependent in _dependents_for(candidate):
-                if not _should_ignore(dependent, config):
-                    expanded.setdefault(dependent, None)
-        candidates = sorted(expanded.keys())
-    return candidates
-
-
-def _matches_patterns(path: Path, patterns: Iterable[str]) -> bool:
-    try:
-        rel = path.relative_to(REPO_ROOT)
-    except ValueError:  # pragma: no cover - defensive guard
-        rel = path
-    return any(rel.match(pattern) for pattern in patterns)
-
-
-def _should_ignore(path: Path, config: BuilderConfig) -> bool:
-    rel = path.relative_to(REPO_ROOT)
-    patterns = _resolve_ignore_patterns(config)
-    for pattern in patterns:
-        if rel.match(pattern):
-            LOGGER.debug("Skipping %s because it matches ignore pattern %s", rel, pattern)
-            return True
-    return False
-
-
-def _changed_files_since(revision: str) -> set[str]:
-    cmd = ["git", "-C", str(REPO_ROOT), "diff", "--name-only", revision, "HEAD", "--"]
-    try:
-        result = run_tool(cmd, timeout=20.0)
-    except ToolExecutionError as exc:  # pragma: no cover - git missing
-        LOGGER.warning("git diff failed: %s", exc)
-        return set()
-    if result.returncode != 0:
-        LOGGER.warning("git diff failed: %s", result.stderr.strip())
-        return set()
-    return {line.strip() for line in result.stdout.splitlines() if line.strip()}
-
-
 def _legacy_command_from_flags(args: argparse.Namespace) -> str | None:
     for attr, command in (
-        ("diff", "check"),
-        ("flag_check", "check"),
         ("flag_update", "update"),
+        ("flag_check", "check"),
         ("flag_harvest", "harvest"),
+        ("flag_diff", "diff"),
     ):
         if getattr(args, attr, False):
             return command
-    if getattr(args, "since", "") or getattr(args, "module", ""):
-        return "update"
-    if getattr(args, "all", False) or getattr(args, "force", False):
-        return "update"
     return None
 
 
 def _assign_command(args: argparse.Namespace) -> None:
-    """Normalise legacy flags and attach the appropriate handler."""
-    if getattr(args, "all", False):
-        args.force = True
-    if getattr(args, "flag_diff", False):
-        args.diff = True
-        args.flag_check = True
-    if getattr(args, "subcommand", None) and not hasattr(args, "invoked_subcommand"):
-        args.invoked_subcommand = args.subcommand
-    if getattr(args, "func", None):
+    if hasattr(args, "func") and callable(args.func):
         return
-
-    for attr, handler in (
-        ("flag_harvest", _command_harvest),
+    handlers: tuple[tuple[str, CommandHandler], ...] = (
         ("flag_update", _command_update),
         ("flag_check", _command_check),
-    ):
+        ("flag_harvest", _command_harvest),
+        ("flag_diff", _command_diff),
+    )
+    for attr, handler in handlers:
         if getattr(args, attr, False):
-            args.func = cast(CommandHandler, handler)
+            args.func = handler
             args.invoked_subcommand = attr.removeprefix("flag_")
             return
-
     legacy_command = _legacy_command_from_flags(args)
     if legacy_command is not None:
-        legacy_handler: CommandHandler = LEGACY_COMMAND_HANDLERS[legacy_command]
-        args.func = cast(
-            CommandHandler,
-            getattr(sys.modules[__name__], legacy_handler.__name__),
-        )
+        args.func = LEGACY_COMMAND_HANDLERS[legacy_command]
         args.invoked_subcommand = legacy_command
 
 
-def _collect_edits(
-    result: HarvestResult,
-    config: BuilderConfig,
-    plugin_manager: PluginManager | None,
+def _build_request(
+    args: argparse.Namespace,
     *,
-    format_only: bool = False,
-) -> tuple[list[DocstringEdit], list[SemanticResult], list[IRDocstring]]:
-    semantics = build_semantic_schemas(result, config)
-    if plugin_manager is not None:
-        semantics = plugin_manager.apply_transformers(result.filepath, semantics)
-    edits: list[DocstringEdit] = []
-    ir_entries: list[IRDocstring] = []
-    for entry in semantics:
-        ir_entry = build_ir(entry)
-        validate_ir(ir_entry)
-        ir_entries.append(ir_entry)
-        text: str | None
-        if config.normalize_sections:
-            normalized = normalize_docstring(entry.symbol, config.ownership_marker)
-            if normalized is not None:
-                text = normalized
-            elif format_only:
-                continue
-            else:
-                text = render_docstring(
-                    entry.schema,
-                    config.ownership_marker,
-                    include_signature=config.render_signature,
-                )
-        else:
-            text = render_docstring(
-                entry.schema,
-                config.ownership_marker,
-                include_signature=config.render_signature,
-            )
-        edits.append(DocstringEdit(qname=entry.symbol.qname, text=text))
-    if plugin_manager is not None:
-        edits = plugin_manager.apply_formatters(result.filepath, edits)
-    return edits, semantics, ir_entries
-
-
-def _handle_docfacts(  # noqa: C901
-    docfacts: list[DocFact],
-    config: BuilderConfig,
-    check_mode: bool,
-) -> DocfactsOutcome:
-    provenance = _build_docfacts_provenance(config)
-    document = build_docfacts_document(docfacts, provenance, DOCFACTS_VERSION)
-    payload = build_docfacts_document_payload(cast(DocfactsDocumentLike, document))
-    if check_mode:
-        if not DOCFACTS_PATH.exists():
-            LOGGER.error("DocFacts missing at %s", DOCFACTS_PATH)
-            return DocfactsOutcome(ExitStatus.CONFIG, "docfacts missing")
-        try:
-            existing = json.loads(DOCFACTS_PATH.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:  # pragma: no cover - defensive guard
-            LOGGER.exception("DocFacts payload at %s is not valid JSON", DOCFACTS_PATH)
-            return DocfactsOutcome(ExitStatus.CONFIG, "docfacts invalid json")
-        try:
-            validate_docfacts_payload(cast(DocfactsDocumentPayload, existing))
-        except SchemaViolationError as exc:
-            _handle_schema_violation("DocFacts (check)", exc)
-            return DocfactsOutcome(ExitStatus.SUCCESS)
-        comparison = json.loads(json.dumps(payload))
-        provenance_existing = existing.get("provenance", {}) if isinstance(existing, dict) else {}
-        if isinstance(comparison, dict):
-            comparison.setdefault("provenance", {})
-            if isinstance(comparison["provenance"], dict):
-                for field in ("commitHash", "generatedAt"):
-                    if field in provenance_existing:
-                        comparison["provenance"][field] = provenance_existing[field]
-        if existing != comparison:
-            before = json.dumps(existing, indent=2, sort_keys=True)
-            after = json.dumps(comparison, indent=2, sort_keys=True)
-            write_html_diff(before, after, DOCFACTS_DIFF_PATH, "DocFacts drift")
-            diff_rel = DOCFACTS_DIFF_PATH.relative_to(REPO_ROOT)
-            LOGGER.error("DocFacts drift detected; run update mode to refresh (see %s)", diff_rel)
-            return DocfactsOutcome(ExitStatus.VIOLATION, "docfacts drift")
-        DOCFACTS_DIFF_PATH.unlink(missing_ok=True)
-        return DocfactsOutcome(ExitStatus.SUCCESS)
-    written_payload = write_docfacts(DOCFACTS_PATH, document, validate=TYPED_PIPELINE_ENABLED)
-    if not TYPED_PIPELINE_ENABLED:
-        try:
-            validate_docfacts_payload(written_payload)
-        except SchemaViolationError as exc:
-            _handle_schema_violation("DocFacts (update)", exc)
-    DOCFACTS_DIFF_PATH.unlink(missing_ok=True)
-    return DocfactsOutcome(ExitStatus.SUCCESS)
-
-
-def _load_docfacts_from_disk() -> dict[str, DocFact]:
-    """Load previously generated DocFacts entries keyed by qualified name."""
-    if not DOCFACTS_PATH.exists():
-        return {}
+    command: str,
+    subcommand: str,
+) -> DocstringBuildRequest:
+    explicit_paths = tuple(getattr(args, "paths", []) or [])
+    policy_override_values = getattr(args, "policy_override", None)
     try:
-        raw = json.loads(DOCFACTS_PATH.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        LOGGER.warning("DocFacts cache is not valid JSON; ignoring existing data.")
-        return {}
-    entries: dict[str, DocFact] = {}
-    payload_items: Iterable[Mapping[str, object]]
-    if isinstance(raw, Mapping):
-        payload_items = [item for item in raw.get("entries", []) if isinstance(item, Mapping)]
-    elif isinstance(raw, list):  # pragma: no cover - legacy fallback
-        payload_items = [item for item in raw if isinstance(item, Mapping)]
-    else:  # pragma: no cover - defensive guard
-        return {}
-    for item in payload_items:
-        fact = DocFact.from_mapping(item)
-        if fact is None:
-            continue
-        entries[fact.qname] = fact
-    return entries
-
-
-def _load_docfact_state() -> tuple[dict[str, DocFact], dict[str, Path]]:
-    """Load docfact entries along with best-effort source mapping."""
-    entries = _load_docfacts_from_disk()
-    sources: dict[str, Path] = {}
-    for qname, fact in entries.items():
-        candidate: Path | None = None
-        if fact.filepath:
-            candidate_path = (REPO_ROOT / fact.filepath).resolve()
-            if candidate_path.exists():
-                candidate = candidate_path
-        if candidate is None:
-            candidate = _module_to_path(fact.module)
-        if candidate is not None:
-            sources[qname] = candidate
-    return entries, sources
-
-
-def _record_docfacts(
-    facts: Iterable[DocFact],
-    file_path: Path,
-    entries: dict[str, DocFact],
-    sources: dict[str, Path],
-) -> None:
-    for fact in facts:
-        entries[fact.qname] = fact
-        sources[fact.qname] = file_path
-
-
-def _filter_docfacts_for_output(
-    entries: dict[str, DocFact], sources: dict[str, Path], config: BuilderConfig
-) -> list[DocFact]:
-    filtered: list[DocFact] = []
-    for qname, fact in entries.items():
-        source = sources.get(qname)
-        if source is None and fact.filepath:
-            candidate = (REPO_ROOT / fact.filepath).resolve()
-            if candidate.exists():
-                source = candidate
-        if source is None:
-            source = _module_to_path(fact.module)
-        if source is not None and _should_ignore(source, config):
-            LOGGER.debug("Dropping docfact %s due to ignore rules", qname)
-            continue
-        filtered.append(fact)
-    return filtered
-
-
-def _default_since_revision() -> str | None:
-    """Return a sensible default revision for ``--changed-only`` runs."""
-    candidates = [
-        ["git", "-C", str(REPO_ROOT), "merge-base", "HEAD", "origin/main"],
-        ["git", "-C", str(REPO_ROOT), "rev-parse", "HEAD~1"],
-    ]
-    for cmd in candidates:
-        try:
-            result = run_tool(cmd, timeout=10.0)
-        except ToolExecutionError:
-            continue
-        if result.returncode == 0:
-            revision = result.stdout.strip()
-            if revision:
-                return revision
-    return None
-
-
-def _process_file(  # noqa: C901, PLR0911
-    file_path: Path,
-    config: BuilderConfig,
-    cache: BuilderCache,
-    options: ProcessingOptions,
-    plugin_manager: PluginManager | None,
-) -> FileOutcome:
-    """Harvest, render, and apply docstrings for a single file."""
-    command = options.command
-    is_update = command in {"update", "fmt"}
-    is_check = command == "check"
-    docfacts: list[DocFact] = []
-    preview: str | None = None
-    changed = False
-    skipped = False
-    message: str | None = None
-    if (
-        command != "harvest"
-        and not options.force
-        and not cache.needs_update(file_path, config.config_hash)
-    ):
-        LOGGER.debug("Skipping %s; cache is fresh", file_path)
-        skipped = True
-        message = "cache fresh"
-        return FileOutcome(
-            ExitStatus.SUCCESS,
-            docfacts,
-            preview,
-            changed,
-            skipped,
-            message,
-            cache_hit=True,
-        )
-    try:
-        with record_operation_metrics("harvest", status="success"):
-            result = harvest_file(file_path, config, REPO_ROOT)
-        if plugin_manager is not None:
-            result = plugin_manager.apply_harvest(file_path, result)
-    except ModuleNotFoundError as exc:
-        relative = file_path.relative_to(REPO_ROOT)
-        message = f"missing dependency: {exc}"
-        if options.ignore_missing and _matches_patterns(file_path, options.missing_patterns):
-            LOGGER.info("Skipping %s due to missing dependency: %s", relative, exc)
-            return FileOutcome(
-                ExitStatus.SUCCESS,
-                docfacts,
-                preview,
-                False,
-                True,
-                message,
-            )
-        LOGGER.exception("Failed to harvest %s", relative)
-        return FileOutcome(
-            ExitStatus.CONFIG,
-            docfacts,
-            preview,
-            changed,
-            skipped,
-            message,
-        )
-    except Exception as exc:  # pragma: no cover - runtime defensive handling
-        LOGGER.exception("Failed to harvest %s", file_path)
-        return FileOutcome(
-            ExitStatus.ERROR,
-            docfacts,
-            preview,
-            changed,
-            skipped,
-            str(exc),
-        )
-
-    edits, semantics, ir_entries = _collect_edits(
-        result,
-        config,
-        plugin_manager,
-        format_only=command == "fmt",
-    )
-    if command == "harvest":
-        docfacts = build_docfacts(semantics)
-        return FileOutcome(
-            ExitStatus.SUCCESS,
-            docfacts,
-            preview,
-            changed,
-            skipped,
-            message,
-            semantics=list(semantics),
-            ir=ir_entries,
-        )
-
-    if not semantics:
-        if is_update:
-            cache.update(file_path, config.config_hash)
-        message = "no managed symbols"
-        return FileOutcome(
-            ExitStatus.SUCCESS,
-            docfacts,
-            preview,
-            changed,
-            skipped,
-            message,
-            semantics=list(semantics),
-            ir=ir_entries,
-        )
-
-    changed, preview = apply_edits(result, edits, write=is_update)
-    status = ExitStatus.SUCCESS
-    if is_check and changed:
-        relative = file_path.relative_to(REPO_ROOT)
-        LOGGER.error("Docstrings out of date in %s", relative)
-        status = ExitStatus.VIOLATION
-        message = "docstrings drift"
-    if is_update:
-        cache.update(file_path, config.config_hash)
-    docfacts = build_docfacts(semantics)
-    return FileOutcome(
-        status,
-        docfacts,
-        preview,
-        changed,
-        skipped,
-        message,
-        semantics=list(semantics),
-        ir=ir_entries,
-    )
-
-
-def _print_failure_summary(payload: Mapping[str, object]) -> None:  # noqa: C901
-    """Emit a concise summary to stderr when the CLI exits non-zero."""
-    summary_obj = payload.get("summary")
-    summary = summary_obj if isinstance(summary_obj, Mapping) else {}
-
-    errors_obj = payload.get("errors")
-    if isinstance(errors_obj, Sequence):
-        error_entries = [entry for entry in errors_obj if isinstance(entry, Mapping)]
-    else:
-        error_entries = []
-
-    def _coerce_int(value: object) -> int:
-        if isinstance(value, bool):
-            return int(value)
-        if isinstance(value, (int, float)):
-            return int(value)
-        return 0
-
-    def _coerce_str(value: object, fallback: str) -> str:
-        if isinstance(value, str):
-            return value
-        if value is None:
-            return fallback
-        return str(value)
-
-    considered = _coerce_int(summary.get("considered"))
-    processed = _coerce_int(summary.get("processed"))
-    changed = _coerce_int(summary.get("changed"))
-
-    status_counts_obj = summary.get("status_counts")
-    if isinstance(status_counts_obj, Mapping):
-        status_counts = {str(key): _coerce_int(value) for key, value in status_counts_obj.items()}
-    else:
-        status_counts = {}
-
-    lines = [
-        "[SUMMARY] Docstring builder reported issues.",
-        f"  Considered files: {considered}",
-        f"  Processed files: {processed}",
-        f"  Changed files: {changed}",
-        f"  Status counts: {status_counts}",
-        f"  Observability log: {OBSERVABILITY_PATH}",
-    ]
-    if error_entries:
-        lines.append("  Top errors:")
-        for entry in error_entries[:5]:
-            file_name = _coerce_str(entry.get("file"), "<unknown>")
-            status = _coerce_str(entry.get("status"), "unknown")
-            message = _coerce_str(entry.get("message"), "no additional details")
-            lines.append(f"    - {file_name}: {status} ({message})")
-    for line in lines:
-        LOGGER.error(line)
-
-
-def _run(  # noqa: C901, PLR0912, PLR0915
-    files: Iterable[Path], args: argparse.Namespace, config: BuilderConfig
-) -> int:
-    correlation_id = get_correlation_id()
-    command = args.command or "unknown"
-    subcommand = str(
-        getattr(args, "invoked_subcommand", getattr(args, "subcommand", command)) or command
-    )
-    logger = with_fields(
-        LOGGER, correlation_id=correlation_id, command=command, subcommand=subcommand
-    )
-
-    cache = BuilderCache(CACHE_PATH)
-    docfact_entries, docfact_sources = _load_docfact_state()
-    is_update = args.command == "update"
-    is_check = args.command == "check"
-    start = time.perf_counter()
-    files_list = list(files)
-    status_counts: Counter[ExitStatus] = Counter()
-    processed_count = 0
-    skipped_count = 0
-    changed_count = 0
-    cache_hits = 0
-    cache_misses = 0
-    errors: list[ErrorReport] = []
-    file_reports: list[FileReport] = []
-    docstring_diffs: list[DocstringDriftEntry] = []
-    options = ProcessingOptions(
-        command=args.command or "",
-        force=args.force,
+        policy_overrides = _parse_policy_overrides(policy_override_values)
+    except PolicyConfigurationError as exc:
+        raise SystemExit(str(exc)) from exc
+    return DocstringBuildRequest(
+        command=command,
+        subcommand=subcommand,
+        module=(args.module or "") or None,
+        since=(args.since or "") or None,
+        changed_only=getattr(args, "changed_only", False),
+        explicit_paths=explicit_paths,
+        force=getattr(args, "force", False),
+        diff=getattr(args, "diff", False),
         ignore_missing=getattr(args, "ignore_missing", False),
-        missing_patterns=tuple(MISSING_MODULE_PATTERNS),
         skip_docfacts=getattr(args, "skip_docfacts", False),
-        baseline=getattr(args, "baseline", "") or None,
+        json_output=getattr(args, "json_output", False),
+        jobs=getattr(args, "jobs", 1) or 1,
+        baseline=(getattr(args, "baseline", "") or None),
+        only_plugins=_parse_plugin_names(getattr(args, "only_plugin", None)),
+        disable_plugins=_parse_plugin_names(getattr(args, "disable_plugin", None)),
+        policy_overrides=policy_overrides,
+        llm_summary=getattr(args, "llm_summary", False),
+        llm_dry_run=getattr(args, "llm_dry_run", False),
+        normalize_sections=subcommand == "fmt",
+        invoked_subcommand=subcommand,
     )
-    try:
-        plugin_manager = load_plugins(
-            config,
-            REPO_ROOT,
-            only=_parse_plugin_names(getattr(args, "only_plugin", None)),
-            disable=_parse_plugin_names(getattr(args, "disable_plugin", None)),
-        )
-    except PluginConfigurationError:
-        logger.exception("Plugin configuration error", extra={"operation": "plugin_load"})
-        return int(ExitStatus.CONFIG)
-    try:
-        cli_policy_overrides = _parse_policy_overrides(getattr(args, "policy_override", None))
-    except PolicyConfigurationError:
-        logger.exception("Policy override error", extra={"operation": "policy_override"})
-        return int(ExitStatus.CONFIG)
-    try:
-        policy_settings = load_policy_settings(REPO_ROOT, cli_overrides=cli_policy_overrides)
-    except PolicyConfigurationError:
-        logger.exception("Policy configuration error", extra={"operation": "policy_load"})
-        return int(ExitStatus.CONFIG)
-
-    try:
-        policy_engine = PolicyEngine(policy_settings)
-        all_ir: list[IRDocstring] = []
-        docfacts_checked = False
-        docfacts_result: DocfactsOutcome | None = None
-        docfacts_payload_text: str | None = None
-
-        jobs = getattr(args, "jobs", 1) or 1
-        if jobs <= 0:
-            jobs = max(1, os.cpu_count() or 1)
-
-        outcomes = _ordered_outcomes(
-            files_list,
-            jobs,
-            config,
-            cache,
-            options,
-            plugin_manager,
-        )
-
-        for file_path, outcome in outcomes:
-            status_counts[outcome.status] += 1
-            if outcome.skipped:
-                skipped_count += 1
-            else:
-                processed_count += 1
-            if outcome.changed:
-                changed_count += 1
-            if outcome.cache_hit:
-                cache_hits += 1
-            else:
-                cache_misses += 1
-            if (
-                is_check
-                and outcome.changed
-                and args.diff
-                and not getattr(args, "json_output", False)
-            ):
-                sys.stdout.write(outcome.preview or "")
-            if outcome.status is not ExitStatus.SUCCESS:
-                rel = str(file_path.relative_to(REPO_ROOT))
-                errors.append(
-                    {
-                        "file": rel,
-                        "status": _status_from_exit(outcome.status),
-                        "message": outcome.message or "",
-                    }
-                )
-            _record_docfacts(outcome.docfacts, file_path, docfact_entries, docfact_sources)
-            if outcome.semantics:
-                policy_engine.record(outcome.semantics)
-            all_ir.extend(outcome.ir)
-            if getattr(args, "json_output", False):
-                rel_path = str(file_path.relative_to(REPO_ROOT))
-                file_report: FileReport = {
-                    "path": rel_path,
-                    "status": _status_from_exit(outcome.status),
-                    "changed": outcome.changed,
-                    "skipped": outcome.skipped,
-                    "cacheHit": outcome.cache_hit,
-                }
-                if outcome.message:
-                    file_report["message"] = outcome.message
-                if outcome.preview:
-                    file_report["preview"] = outcome.preview
-                if options.baseline:
-                    file_report["baseline"] = options.baseline
-                file_reports.append(file_report)
-            if options.baseline:
-                baseline_text = _read_baseline_version(options.baseline, file_path)
-                if baseline_text is not None:
-                    if outcome.preview is not None:
-                        current_text = outcome.preview
-                    else:
-                        try:
-                            current_text = file_path.read_text(encoding="utf-8")
-                        except FileNotFoundError:
-                            current_text = ""
-                    if baseline_text != current_text:
-                        docstring_diffs.append(
-                            DocstringDriftEntry(
-                                path=str(file_path.relative_to(REPO_ROOT)),
-                                before=baseline_text,
-                                after=current_text,
-                            )
-                        )
-
-        if args.command in {"update", "check"} and not options.skip_docfacts:
-            filtered = _filter_docfacts_for_output(docfact_entries, docfact_sources, config)
-            docfacts_result = _handle_docfacts(filtered, config, check_mode=is_check)
-            docfacts_checked = True
-            status_counts[docfacts_result.status] += 1
-            if docfacts_result.status is not ExitStatus.SUCCESS:
-                errors.append(
-                    {
-                        "file": "<docfacts>",
-                        "status": _status_from_exit(docfacts_result.status),
-                        "message": docfacts_result.message or "",
-                    }
-                )
-            else:
-                try:
-                    docfacts_payload_text = DOCFACTS_PATH.read_text(encoding="utf-8")
-                except FileNotFoundError:
-                    docfacts_payload_text = None
-        if is_update:
-            cache.write()
-
-        policy_report = policy_engine.finalize()
-        for violation in policy_report.violations:
-            errors.append(
-                {
-                    "file": violation.symbol,
-                    "status": _status_from_label(str(violation.action)),
-                    "message": violation.message,
-                }
-            )
-            if violation.fatal:
-                status_counts[ExitStatus.VIOLATION] += 1
-
-        duration = time.perf_counter() - start
-        exit_status = max(
-            (status for status, count in status_counts.items() if count), default=ExitStatus.SUCCESS
-        )
-        status_label = STATUS_LABELS[exit_status]
-        METRICS.cli_duration_seconds.labels(command=command, status=status_label).observe(duration)
-        METRICS.runs_total.labels(status=status_label).inc()
-        status_counts.setdefault(ExitStatus.SUCCESS, 0)
-        status_counts_full: StatusCounts = {
-            "success": status_counts.get(ExitStatus.SUCCESS, 0),
-            "violation": status_counts.get(ExitStatus.VIOLATION, 0),
-            "config": status_counts.get(ExitStatus.CONFIG, 0),
-            "error": status_counts.get(ExitStatus.ERROR, 0),
-        }
-        status_counts_map: dict[str, int] = {
-            STATUS_LABELS[key]: value for key, value in status_counts.items() if value
-        }
-        cache_payload: CacheSummary = {
-            "path": str(CACHE_PATH),
-            "exists": CACHE_PATH.exists(),
-            "mtime": None,
-            "hits": cache_hits,
-            "misses": cache_misses,
-        }
-        input_hashes: dict[str, InputHash] = {}
-        for path in files_list:
-            rel = str(path.relative_to(REPO_ROOT))
-            if path.exists():
-                input_hashes[rel] = {
-                    "hash": _hash_file(path),
-                    "mtime": datetime.datetime.fromtimestamp(
-                        path.stat().st_mtime, tz=datetime.UTC
-                    ).isoformat(),
-                }
-            else:
-                input_hashes[rel] = {"hash": "", "mtime": None}
-
-        dependency_map = {
-            str(path.relative_to(REPO_ROOT)): [
-                str(dependent.relative_to(REPO_ROOT)) for dependent in _dependents_for(path)
-            ]
-            for path in files_list
-        }
-
-        write_docstring_drift(docstring_diffs, DOCSTRINGS_DIFF_PATH)
-        if options.baseline and docfacts_payload_text and not DOCFACTS_DIFF_PATH.exists():
-            baseline_docfacts = _read_baseline_version(options.baseline, DOCFACTS_PATH)
-            if baseline_docfacts is not None and baseline_docfacts != docfacts_payload_text:
-                write_html_diff(
-                    baseline_docfacts,
-                    docfacts_payload_text,
-                    DOCFACTS_DIFF_PATH,
-                    "DocFacts baseline drift",
-                )
-
-        invoked = str(
-            getattr(args, "invoked_subcommand", getattr(args, "subcommand", args.command)) or ""
-        )
-        manifest_payload: dict[str, object] = {
-            "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
-            "command": args.command,
-            "subcommand": invoked,
-            "options": {
-                "module": args.module,
-                "since": args.since,
-                "force": args.force,
-                "changed_only": getattr(args, "changed_only", False),
-                "skip_docfacts": options.skip_docfacts,
-            },
-            "counts": {
-                "considered": len(files_list),
-                "processed": processed_count,
-                "skipped": skipped_count,
-                "changed": changed_count,
-            },
-            "status_counts": status_counts_map,
-            "config_hash": config.config_hash,
-            "docfacts_checked": docfacts_checked,
-            "cache": cache_payload,
-            "processed_files": [str(path.relative_to(REPO_ROOT)) for path in files_list],
-            "duration_seconds": duration,
-            "inputs": input_hashes,
-            "plugins": {
-                "enabled": plugin_manager.enabled_plugins(),
-                "available": plugin_manager.available,
-                "disabled": plugin_manager.disabled,
-                "skipped": plugin_manager.skipped,
-            },
-            "dependencies": dependency_map,
-        }
-        diff_links = {}
-        for label, path in (
-            ("docfacts", DOCFACTS_DIFF_PATH),
-            ("docstrings", DOCSTRINGS_DIFF_PATH),
-            ("navmap", NAVMAP_DIFF_PATH),
-            ("schema", SCHEMA_DIFF_PATH),
-        ):
-            if path.exists():
-                diff_links[label] = str(path.relative_to(REPO_ROOT))
-        if diff_links:
-            manifest_payload["drift_previews"] = diff_links
-        schema_path = REPO_ROOT / "docs" / "_build" / "schema_docstrings.json"
-        previous_schema = schema_path.read_text(encoding="utf-8") if schema_path.exists() else ""
-        write_schema(schema_path)
-        current_schema = schema_path.read_text(encoding="utf-8")
-        if previous_schema and previous_schema != current_schema:
-            write_html_diff(previous_schema, current_schema, SCHEMA_DIFF_PATH, "Schema drift")
-        else:
-            SCHEMA_DIFF_PATH.unlink(missing_ok=True)
-        manifest_payload["ir"] = {
-            "version": IR_VERSION,
-            "schema": str(schema_path.relative_to(REPO_ROOT)),
-            "count": len(all_ir),
-            "symbols": [entry.symbol_id for entry in all_ir],
-        }
-        manifest_payload["policy"] = {
-            "coverage": policy_report.coverage,
-            "threshold": policy_report.threshold,
-            "violations": [
-                {
-                    "rule": violation.rule,
-                    "symbol": violation.symbol,
-                    "action": violation.action,
-                    "message": violation.message,
-                }
-                for violation in policy_report.violations
-            ],
-        }
-        if CACHE_PATH.exists():
-            cache_payload["mtime"] = datetime.datetime.fromtimestamp(
-                CACHE_PATH.stat().st_mtime, tz=datetime.UTC
-            ).isoformat()
-        selection = getattr(args, "config_selection", None)
-        if isinstance(selection, ConfigSelection):
-            manifest_payload["config_source"] = {
-                "path": str(selection.path),
-                "source": selection.source,
-            }
-        MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
-        MANIFEST_PATH.write_text(
-            json.dumps(manifest_payload, indent=2, sort_keys=True), encoding="utf-8"
-        )
-
-        observability_payload: dict[str, object] = {
-            "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
-            "status": STATUS_LABELS[exit_status],
-            "summary": {
-                "considered": len(files_list),
-                "processed": processed_count,
-                "skipped": skipped_count,
-                "changed": changed_count,
-                "duration_seconds": duration,
-                "status_counts": status_counts_map,
-                "cache_hits": cache_hits,
-                "cache_misses": cache_misses,
-                "subcommand": invoked,
-            },
-            "errors": errors[:OBSERVABILITY_MAX_ERRORS],
-        }
-        if isinstance(selection, ConfigSelection):
-            observability_payload["config"] = {
-                "path": str(selection.path),
-                "source": selection.source,
-            }
-        observability_payload["cache"] = {
-            "path": str(CACHE_PATH),
-            "exists": CACHE_PATH.exists(),
-            "hits": cache_hits,
-            "misses": cache_misses,
-        }
-        observability_payload["policy"] = {
-            "coverage": policy_report.coverage,
-            "threshold": policy_report.threshold,
-            "violations": len(policy_report.violations),
-            "fatal_violations": sum(1 for violation in policy_report.violations if violation.fatal),
-        }
-        if diff_links:
-            observability_payload["drift_previews"] = diff_links
-        OBSERVABILITY_PATH.parent.mkdir(parents=True, exist_ok=True)
-        OBSERVABILITY_PATH.write_text(
-            json.dumps(observability_payload, indent=2, sort_keys=True),
-            encoding="utf-8",
-        )
-        if exit_status is not ExitStatus.SUCCESS:
-            _print_failure_summary(observability_payload)
-
-        if getattr(args, "json_output", False):
-            cli_result = build_cli_result_skeleton(_status_from_exit(exit_status))
-            cli_result["command"] = args.command or ""
-            cli_result["subcommand"] = invoked
-            cli_result["durationSeconds"] = duration
-            cli_result["files"] = file_reports
-            cli_result["errors"] = errors
-            summary = cli_result["summary"]
-            summary["considered"] = len(files_list)
-            summary["processed"] = processed_count
-            summary["skipped"] = skipped_count
-            summary["changed"] = changed_count
-            summary["status_counts"] = status_counts_full
-            summary["docfacts_checked"] = docfacts_checked
-            summary["cache_hits"] = cache_hits
-            summary["cache_misses"] = cache_misses
-            summary["duration_seconds"] = duration
-            summary["subcommand"] = invoked
-            cli_result["policy"] = {
-                "coverage": policy_report.coverage,
-                "threshold": policy_report.threshold,
-                "violations": [
-                    {
-                        "rule": violation.rule,
-                        "symbol": violation.symbol,
-                        "action": str(violation.action),
-                        "message": violation.message,
-                    }
-                    for violation in policy_report.violations
-                ],
-            }
-            cli_result["cache"] = cache_payload
-            cli_result["inputs"] = input_hashes
-            cli_result["plugins"] = {
-                "enabled": plugin_manager.enabled_plugins(),
-                "available": plugin_manager.available,
-                "disabled": plugin_manager.disabled,
-                "skipped": plugin_manager.skipped,
-            }
-            docfacts_validated = (
-                docfacts_checked
-                and docfacts_result is not None
-                and docfacts_result.status is ExitStatus.SUCCESS
-            )
-            docfacts_report: DocfactsReport = {
-                "path": str(DOCFACTS_PATH.relative_to(REPO_ROOT)),
-                "version": DOCFACTS_VERSION,
-                "validated": docfacts_validated,
-            }
-            if DOCFACTS_DIFF_PATH.exists():
-                docfacts_report["diff"] = str(DOCFACTS_DIFF_PATH.relative_to(REPO_ROOT))
-            cli_result["docfacts"] = docfacts_report
-            if options.baseline:
-                cli_result["baseline"] = options.baseline
-            problem = _build_problem_details(
-                exit_status,
-                errors,
-                command=args.command or "",
-                subcommand=invoked,
-            )
-            if problem is not None:
-                cli_result["problem"] = problem
-            try:
-                validate_cli_output(cli_result)
-            except SchemaViolationError as exc:
-                _handle_schema_violation("CLI output", exc)
-            sys.stdout.write(json.dumps(cli_result, indent=2, sort_keys=True) + "\n")
-
-        return int(exit_status)
-    finally:
-        plugin_manager.finish()
 
 
-def _ordered_outcomes(
-    files: Sequence[Path],
-    jobs: int,
-    config: BuilderConfig,
-    cache: BuilderCache,
-    options: ProcessingOptions,
-    plugin_manager: PluginManager,
-) -> Iterable[tuple[Path, FileOutcome]]:
-    if jobs <= 1:
-        for candidate in files:
-            yield (
-                candidate,
-                _process_file(
-                    candidate,
-                    config,
-                    cache,
-                    options,
-                    plugin_manager,
-                ),
-            )
+def _emit_json(result: DocstringBuildResult) -> None:
+    payload = render_cli_result(result)
+    if payload is None:
         return
+    json.dump(payload, sys.stdout, indent=2, sort_keys=True)
+    sys.stdout.write("\n")
 
-    futures: list[tuple[int, Path, concurrent.futures.Future[FileOutcome]]] = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as executor:
-        for index, candidate in enumerate(files):
-            future = executor.submit(
-                _process_file,
-                candidate,
-                config,
-                cache,
-                options,
-                plugin_manager,
-            )
-            futures.append((index, candidate, future))
 
-        ordered: list[tuple[int, Path, FileOutcome]] = []
-        for index, candidate, future in futures:
-            try:
-                outcome = future.result()
-            except Exception as exc:  # pragma: no cover - defensive guard
-                LOGGER.exception("Processing failed for %s", candidate)
-                outcome = FileOutcome(
-                    ExitStatus.ERROR,
-                    [],
-                    None,
-                    False,
-                    False,
-                    str(exc),
-                )
-            ordered.append((index, candidate, outcome))
-
-    for _, candidate, outcome in sorted(ordered, key=lambda item: item[0]):
-        yield candidate, outcome
+def _emit_diffs(result: DocstringBuildResult) -> None:
+    for _, preview in result.diff_previews:
+        sys.stdout.write(preview)
 
 
 def _execute_pipeline(args: argparse.Namespace, subcommand: str, command: str) -> int:
-    config, _ = _load_config(args)
-    if getattr(args, "llm_summary", False):
-        config.llm_summary_mode = "apply"
-    elif getattr(args, "llm_dry_run", False):
-        config.llm_summary_mode = "dry-run"
-    if subcommand == "fmt":
-        config.normalize_sections = True
-    try:
-        files = _select_files(config, args)
-    except InvalidPathError:
-        LOGGER.exception("Invalid path supplied to docstring builder")
-        return EXIT_CONFIG
-    args.command = command
-    args.invoked_subcommand = subcommand
-    return _run(files, args, config)
+    request = _build_request(args, command=command, subcommand=subcommand)
+    config_override = getattr(args, "config_path", None)
+    result = run_docstring_builder(request, config_override=config_override)
+    if request.diff and not request.json_output:
+        _emit_diffs(result)
+    if request.json_output:
+        _emit_json(result)
+    render_failure_summary(result)
+    return int(result.exit_status)
 
 
 def _command_generate(args: argparse.Namespace) -> int:
@@ -1499,30 +226,34 @@ def _command_harvest(args: argparse.Namespace) -> int:
 
 
 def _command_list(args: argparse.Namespace) -> int:
-    config, _ = _load_config(args)
+    config, _ = load_builder_config(getattr(args, "config_path", None))
     try:
-        files = _select_files(config, args)
+        files = select_files(
+            config,
+            module=(args.module or "") or None,
+            since=(args.since or "") or None,
+            changed_only=getattr(args, "changed_only", False),
+            explicit_paths=getattr(args, "paths", None),
+        )
     except InvalidPathError:
         LOGGER.exception("Invalid path supplied to docstring builder list")
-        return EXIT_CONFIG
+        return int(ExitStatus.CONFIG)
     for file_path in files:
         result = harvest_file(file_path, config, REPO_ROOT)
         for symbol in result.symbols:
             if symbol.owned:
                 sys.stdout.write(f"{symbol.qname}\n")
-    return EXIT_SUCCESS
+    return int(ExitStatus.SUCCESS)
 
 
 def _command_clear_cache(_: argparse.Namespace) -> int:
-    """Remove any cached docstring builder metadata."""
     BuilderCache(CACHE_PATH).clear()
     LOGGER.info("Cleared docstring builder cache at %s", CACHE_PATH)
-    return EXIT_SUCCESS
+    return int(ExitStatus.SUCCESS)
 
 
 def _command_schema(args: argparse.Namespace) -> int:
-    """Generate the docstring IR schema to the requested path."""
-    _load_config(args)  # ensure config selection is recorded for manifesting/debugging
+    load_builder_config(getattr(args, "config_path", None))
     output = getattr(args, "output", None)
     if output:
         target = Path(output)
@@ -1534,12 +265,11 @@ def _command_schema(args: argparse.Namespace) -> int:
     write_schema(target)
     rel = target.relative_to(REPO_ROOT)
     LOGGER.info("Schema written to %s", rel)
-    return EXIT_SUCCESS
+    return int(ExitStatus.SUCCESS)
 
 
-def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PLR0915
-    """Run environment and configuration diagnostics."""
-    _, selection = _load_config(args)
+def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PLR0914, PLR0915
+    _, selection = load_builder_config(getattr(args, "config_path", None))
     LOGGER.info("[DOCTOR] Active config: %s (%s)", selection.path, selection.source)
     issues: list[str] = []
     try:
@@ -1565,7 +295,7 @@ def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PL
 
         for module_name in ("griffe", "libcst"):
             try:
-                importlib.import_module(module_name)
+                __import__(module_name)
             except ModuleNotFoundError as exc:
                 issues.append(f"Optional dependency '{module_name}' not importable: {exc}.")
 
@@ -1597,7 +327,6 @@ def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PL
             docs_artifacts_idx = _index("docs: regenerate artifacts")
             navmap_idx = _index("navmap-check")
             pyrefly_idx = _index("pyrefly-check")
-
             if (
                 doc_builder_idx is not None
                 and docs_artifacts_idx is not None
@@ -1641,11 +370,11 @@ def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PL
                         exception.expires_on.isoformat(),
                         exception.justification or "no justification provided",
                     )
-    except Exception:  # pragma: no cover - defensive guard
+    except Exception:  # pragma: no cover
         LOGGER.exception("Doctor encountered an unexpected error.")
-        return EXIT_ERROR
+        return int(ExitStatus.ERROR)
 
-    drift_status = EXIT_SUCCESS
+    drift_status = int(ExitStatus.SUCCESS)
     if getattr(args, "stubs", False):
         LOGGER.info("[DOCTOR] Running stub drift check...")
         drift_status = run_stub_drift()
@@ -1658,23 +387,23 @@ def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PL
         LOGGER.error("[DOCTOR] Configuration issues detected:")
         for item in issues:
             LOGGER.error("  - %s", item)
-        return EXIT_CONFIG
+        return int(ExitStatus.CONFIG)
 
     if drift_status != 0:
-        return EXIT_CONFIG
+        return int(ExitStatus.CONFIG)
 
     LOGGER.info("Docstring builder environment looks good.")
-    return EXIT_SUCCESS
+    return int(ExitStatus.SUCCESS)
 
 
-LEGACY_COMMAND_HANDLERS: dict[str, Callable[[argparse.Namespace], int]] = {
+LEGACY_COMMAND_HANDLERS: dict[str, CommandHandler] = {
     "update": _command_update,
     "check": _command_check,
     "harvest": _command_harvest,
 }
 
 
-def build_parser() -> argparse.ArgumentParser:  # noqa: PLR0915
+def build_parser() -> argparse.ArgumentParser:  # noqa: PLR0914, PLR0915
     """Build the top-level argument parser for the docstring builder CLI."""
     parser = argparse.ArgumentParser(prog="docstring-builder")
     parser.add_argument(
@@ -1724,23 +453,11 @@ def build_parser() -> argparse.ArgumentParser:  # noqa: PLR0915
         help="Preview LLM summary rewrites without mutating files.",
     )
     parser.add_argument(
-        "--policy",
-        dest="policy_override",
+        "--policy-override",
         action="append",
+        dest="policy_override",
         default=[],
-        help="Override policy settings, e.g. coverage=0.95,missing-returns=warn",
-    )
-    parser.add_argument(
-        "--jobs",
-        type=int,
-        default=1,
-        help="Number of worker threads to use for processing (default: 1)",
-    )
-    parser.add_argument(
-        "--json",
-        dest="json_output",
-        action="store_true",
-        help="Emit machine-readable results to stdout",
+        help="Override policy settings (key=value, repeat or comma-separate)",
     )
     parser.add_argument(
         "--baseline",
@@ -1748,7 +465,21 @@ def build_parser() -> argparse.ArgumentParser:  # noqa: PLR0915
         default="",
     )
     parser.add_argument(
-        "--all", action="store_true", help="Process all files, ignoring cache entries"
+        "--jobs",
+        type=int,
+        default=1,
+        help="Number of worker threads for processing",
+    )
+    parser.add_argument(
+        "--skip-docfacts",
+        action="store_true",
+        help="Skip DocFacts reconciliation",
+    )
+    parser.add_argument(
+        "--json-output",
+        action="store_true",
+        dest="json_output",
+        help="Emit JSON summary payload to stdout",
     )
     parser.add_argument(
         "--update",
@@ -1858,7 +589,7 @@ def main(argv: list[str] | None = None) -> int:
     _assign_command(args)
     logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
     if getattr(args, "changed_only", False) and not args.since:
-        revision = _default_since_revision()
+        revision = default_since_revision()
         if revision:
             args.since = revision
             LOGGER.info("--changed-only resolved to %s", revision)
@@ -1873,5 +604,5 @@ def main(argv: list[str] | None = None) -> int:
     return handler(args)
 
 
-if __name__ == "__main__":  # pragma: no cover - CLI entrypoint
+if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(main())
