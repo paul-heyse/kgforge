@@ -6,7 +6,6 @@ import importlib
 import inspect
 from collections.abc import Callable, Mapping
 from types import ModuleType
-from typing import cast
 
 from tools.docstring_builder.harvest import SymbolHarvest
 from tools.docstring_builder.models import (
@@ -82,7 +81,7 @@ def resolve_callable(symbol: SymbolHarvest) -> Callable[..., object]:
         message = f"Resolved object for {symbol.qname} is not callable"
         raise SignatureIntrospectionError(message)
     # Type narrowing: obj is callable at runtime
-    return cast(Callable[..., object], obj)  # pyrefly: ignore[redundant-cast]
+    return obj
 
 
 def signature_and_hints(

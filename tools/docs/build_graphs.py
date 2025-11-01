@@ -15,16 +15,14 @@ import json
 import os
 import shutil
 import sys
+import tempfile
 import time
 import warnings
 from collections.abc import Iterator, Mapping, Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
-from tempfile import (
-    NamedTemporaryFile,
-    mkdtemp,  # pyrefly: ignore[missing-module-attribute]
-)
+from tempfile import NamedTemporaryFile
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, cast
 
@@ -1495,7 +1493,7 @@ def _prepare_staging(pkg: str, fmt: str) -> StagePaths:
     >>> _prepare_staging(...)
     """
     imports_out, uml_out = _final_output_paths(pkg, fmt)
-    staging_dir = Path(mkdtemp(prefix=f"{pkg}-"))
+    staging_dir = Path(tempfile.mkdtemp(prefix=f"{pkg}-"))
     return StagePaths(
         staging_dir=staging_dir,
         staged_imports=staging_dir / imports_out.name,

@@ -9,24 +9,100 @@
 This file is robust to different repo shapes (``src/<pkg>`` or ``<pkg>`` at root).
 """
 
+from __future__ import annotations
+
 import collections
 import importlib
 import inspect
 import json
+import logging
 import os
 import re
-import subprocess
 import sys
 from collections.abc import Callable, Mapping, Sequence
+from contextlib import suppress
+from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Protocol, cast
+from typing import Final, Protocol, cast
 
 import certifi
 from docutils import nodes
 from docutils.parsers.rst import Directive
 from sphinx.application import Sphinx
 from tools.griffe_utils import resolve_griffe
+
+LOGGER = logging.getLogger(__name__)
+LOGGER.addHandler(logging.NullHandler())
+
+
+@dataclass(frozen=True, slots=True)
+class ProjectSettings:
+    """Strongly typed project configuration derived from environment variables."""
+
+    project_name: str
+    author: str
+    link_mode: str
+    editor: str
+    github_org: str
+    github_repo: str
+    github_sha: str | None
+
+
+PROBLEM_DETAILS_SAMPLE: Final[dict[str, str | int]] = {
+    "type": "https://kgfoundry.dev/docs/problems/link-resolution",
+    "title": "Unable to resolve symbol location",
+    "status": 500,
+    "detail": "Griffe could not resolve the requested module or member.",
+    "instance": "urn:kgfoundry:docs:linkcode:unresolved",
+}
+
+
+def get_project_settings(env: Mapping[str, str] | None = None) -> ProjectSettings:
+    """Return strongly typed project settings derived from environment variables."""
+    source = env if env is not None else os.environ
+    project_name = source.get("PROJECT_NAME", "kgfoundry")
+    author = source.get("PROJECT_AUTHOR", "kgfoundry Maintainers")
+    link_mode = source.get("DOCS_LINK_MODE", "editor").lower()
+    editor = source.get("DOCS_EDITOR", "vscode").lower()
+    github_org = source.get("DOCS_GITHUB_ORG", "your-org")
+    github_repo = source.get("DOCS_GITHUB_REPO", "your-repo")
+    github_sha = source.get("DOCS_GITHUB_SHA")
+    if link_mode not in {"editor", "github"}:
+        LOGGER.warning("Unsupported DOCS_LINK_MODE '%s', defaulting to 'editor'", link_mode)
+        link_mode = "editor"
+    if editor not in {"vscode", "pycharm"}:
+        LOGGER.warning("Unsupported DOCS_EDITOR '%s', defaulting to 'vscode'", editor)
+        editor = "vscode"
+    return ProjectSettings(
+        project_name=project_name,
+        author=author,
+        link_mode=link_mode,
+        editor=editor,
+        github_org=github_org,
+        github_repo=github_repo,
+        github_sha=github_sha,
+    )
+
+
+try:
+    from pydantic import BaseModel as _BaseModel
+except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    _BaseModel = None
+
+try:
+    from tools import auto_docstrings as _auto_docstrings
+except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    _auto_docstrings = None
+
+try:
+    griffe_exceptions = importlib.import_module("griffe.exceptions")
+except ModuleNotFoundError:  # pragma: no cover - griffe < 0.32
+    GriffeLoadingError = RuntimeError
+else:
+    GriffeLoadingError = cast(
+        type[Exception], getattr(griffe_exceptions, "LoadingError", RuntimeError)
+    )
 
 astroid_builder = importlib.import_module("astroid.builder")
 astroid_manager = importlib.import_module("astroid.manager")
@@ -49,7 +125,7 @@ class GriffeNode(Protocol):
     filepath: Path | str | None
     lineno: int | None
     endlineno: int | None
-    members: Mapping[str, "GriffeNode"] | None
+    members: Mapping[str, GriffeNode] | None
 
 
 class GriffeLoaderInstance(Protocol):
@@ -69,8 +145,9 @@ class GriffeLoaderFactory(Protocol):
 
 
 # --- Project metadata (override via env if you like)
-project = os.environ.get("PROJECT_NAME", "kgfoundry")
-author = os.environ.get("PROJECT_AUTHOR", "kgfoundry Maintainers")
+SETTINGS = get_project_settings()
+project = SETTINGS.project_name
+author = SETTINGS.author
 
 # --- Paths
 DOCS_DIR = Path(__file__).resolve().parent
@@ -102,43 +179,39 @@ if TOOLS_DIR.exists() and str(TOOLS_DIR) not in sys.path:
 
 try:
     from tools.detect_pkg import detect_packages, detect_primary
-except Exception:  # pragma: no cover - fallback when tooling unavailable
+except ImportError:  # pragma: no cover - fallback when tooling unavailable
 
     def detect_packages() -> list[str]:
         """Return empty package list when tooling is unavailable."""
+        LOGGER.debug("tools.detect_pkg.detect_packages unavailable; returning empty list")
         return []
 
     def detect_primary() -> str:
         """Return fallback package name when tooling is unavailable."""
+        LOGGER.debug("tools.detect_pkg.detect_primary unavailable; returning detected package")
         return PKG
 
 
 def _apply_auto_docstring_overrides() -> None:
     """Inject extended summaries for Pydantic helpers and magic methods."""
-    try:
-        from pydantic import BaseModel
-    except Exception:  # pragma: no cover - docs build without Pydantic
-        return
-    try:
-        from tools import auto_docstrings
-    except Exception:  # pragma: no cover - tooling missing
+    if _BaseModel is None or _auto_docstrings is None:
         return
 
     overrides: dict[str, str] = {}
-    overrides.update(auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
+    overrides.update(_auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(_auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(_auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
 
     for name, extended in overrides.items():
-        attr = getattr(BaseModel, name, None)
+        attr = getattr(_BaseModel, name, None)
         if attr is None:
             continue
-        summary = auto_docstrings.summarize(name, "function")
+        summary = _auto_docstrings.summarize(name, "function")
         doc_text = f"{summary}\n\n{extended}"
-        try:
+        with suppress(
+            AttributeError, TypeError
+        ):  # pragma: no cover - descriptor without doc support
             attr.__doc__ = doc_text
-        except (AttributeError, TypeError):  # pragma: no cover - descriptor without doc support
-            continue
 
 
 _AUTOAPI_DOC_OVERRIDES: dict[str, str] = {}
@@ -149,18 +222,16 @@ def _build_autoapi_doc_overrides() -> None:
     if _AUTOAPI_DOC_OVERRIDES:
         return
 
-    try:
-        from tools import auto_docstrings
-    except Exception:  # pragma: no cover - tooling missing
+    if _auto_docstrings is None:
         return
 
     overrides: dict[str, str] = {}
-    overrides.update(auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
+    overrides.update(_auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(_auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(_auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
 
     for name, extended in overrides.items():
-        summary = auto_docstrings.summarize(name, "function")
+        summary = _auto_docstrings.summarize(name, "function")
         _AUTOAPI_DOC_OVERRIDES[name] = f"{summary}\n\n{extended}"
 
 
@@ -302,14 +373,14 @@ autoapi_ignore: list[str] = [
 def _autoapi_parse_file(
     self: AutoapiParser, file_path: str, condition: Callable[[str], bool]
 ) -> object:  # pragma: no cover - compatibility shim
-    directory, filename = os.path.split(file_path)
+    path = Path(file_path)
     module_parts: collections.deque[str] = collections.deque()
-    if filename not in {"__init__.py", "__init__.pyi"}:
-        module_parts.append(os.path.splitext(filename)[0])
-    while directory and condition(directory):
-        directory, module_part = os.path.split(directory)
-        if module_part:
-            module_parts.appendleft(module_part)
+    if path.name not in {"__init__.py", "__init__.pyi"}:
+        module_parts.append(path.stem)
+    parent = path.parent
+    while str(parent) and condition(str(parent)):
+        module_parts.appendleft(parent.name)
+        parent = parent.parent
 
     module_name = ".".join(module_parts)
     manager = astroid_manager.AstroidManager()
@@ -380,21 +451,24 @@ sphinx_gallery_conf = {
 }
 
 # Ensure JSON builder can serialize lru_cache wrappers
-json_encoder_cls = cast(
+_BaseJSONEncoder = cast(
     type[json.JSONEncoder], getattr(json_module, "JSONEncoder", json.JSONEncoder)
 )
-_json_default = json_encoder_cls.default
 
 
-def _json_safe_default(self: json.JSONEncoder, obj: object) -> object:  # pragma: no cover
-    if obj.__class__.__name__ == "_lru_cache_wrapper":
-        return repr(obj)
-    return _json_default(self, obj)
+class DocsJSONEncoder(_BaseJSONEncoder):
+    """JSON encoder that can serialize ``functools.lru_cache`` wrappers."""
+
+    def default(self, o: object) -> object:  # pragma: no cover - exercised in Sphinx build
+        """Return a JSON-safe representation for cache wrappers and delegates to super."""
+        if o.__class__.__name__ == "_lru_cache_wrapper":
+            return repr(o)
+        return super().default(o)
 
 
 # Override JSONEncoder default to render lru_cache wrappers
-json_encoder_cls.default = _json_safe_default  # type: ignore[assignment]
-json.JSONEncoder.default = _json_safe_default  # type: ignore[assignment]
+setattr(json_module, "JSONEncoder", DocsJSONEncoder)
+json.JSONEncoder = DocsJSONEncoder
 
 # --- Build deep links per symbol without importing your code (use Griffe)
 griffe_api = resolve_griffe()
@@ -412,7 +486,16 @@ def _get_root(module: str | None) -> GriffeNode | None:
     if top not in _MODULE_CACHE:
         try:
             _MODULE_CACHE[top] = _loader.load(top)
-        except Exception:
+        except (GriffeLoadingError, ModuleNotFoundError, FileNotFoundError, OSError) as exc:
+            problem_details = {
+                **PROBLEM_DETAILS_SAMPLE,
+                "detail": f"Griffe failed to load module '{top}': {exc}",
+            }
+            LOGGER.warning(
+                "Failed to load module '%s' for linkcode lookup",
+                top,
+                extra={"problem_details": problem_details},
+            )
             _MODULE_CACHE[top] = None
     return _MODULE_CACHE[top]
 
@@ -461,22 +544,34 @@ def _lookup(module: str | None, fullname: str | None) -> tuple[str, int, int] | 
 # Link modes:
 #   DOCS_LINK_MODE=editor (default): vscode://file/<abs>:line:col
 #   DOCS_LINK_MODE=github: https://github.com/<org>/<repo>/blob/<sha>/<rel>#Lstart-Lend
-LINK_MODE = os.environ.get("DOCS_LINK_MODE", "editor").lower()
-EDITOR = os.environ.get("DOCS_EDITOR", "vscode")
+LINK_MODE = SETTINGS.link_mode
+EDITOR = SETTINGS.editor
 
 
 def _git_sha() -> str:
+    git_dir = ROOT / ".git"
+    head_path = git_dir / "HEAD"
     try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=str(ROOT), text=True
-        ).strip()
-    except Exception:
-        return os.environ.get("DOCS_GITHUB_SHA", "main")
+        head_contents = head_path.read_text(encoding="utf-8").strip()
+    except FileNotFoundError:
+        return SETTINGS.github_sha or "main"
+
+    if head_contents.startswith("ref: "):
+        ref = head_contents.removeprefix("ref: ").strip()
+        ref_path = git_dir / ref
+        with suppress(FileNotFoundError):
+            ref_contents = ref_path.read_text(encoding="utf-8").strip()
+            if ref_contents:
+                return ref_contents
+        return SETTINGS.github_sha or "main"
+    if head_contents:
+        return head_contents
+    return SETTINGS.github_sha or "main"
 
 
 def _github_url(relpath: str, start: int, end: int | None) -> str:
-    org = os.environ.get("DOCS_GITHUB_ORG", "your-org")
-    repo = os.environ.get("DOCS_GITHUB_REPO", "your-repo")
+    org = SETTINGS.github_org
+    repo = SETTINGS.github_repo
     sha = _git_sha()
     rng = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{org}/{repo}/blob/{sha}/{relpath}{rng}"
@@ -490,6 +585,15 @@ def linkcode_resolve(domain: str, info: Mapping[str, str | None]) -> str | None:
     fullname = info.get("fullname", "")
     res = _lookup(module_name, fullname)
     if not res:
+        LOGGER.debug(
+            "linkcode resolution failed",
+            extra={
+                "problem_details": {
+                    **PROBLEM_DETAILS_SAMPLE,
+                    "detail": f"Unable to resolve {module_name}.{fullname}",
+                }
+            },
+        )
         return None
     abs_path, start, end = res
     if LINK_MODE == "github":
@@ -543,6 +647,8 @@ class GalleryTagsDirective(Directive):
 
     def run(self) -> list[nodes.Node]:
         """Return an empty node list so Sphinx accepts ``.. tags::`` blocks."""
+        if self.content:
+            LOGGER.debug("tags directive content ignored", extra={"tags": list(self.content)})
         return []
 
 
