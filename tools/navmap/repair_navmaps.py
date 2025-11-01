@@ -34,10 +34,13 @@ SRC = REPO / "src"
 
 try:
     import tools.navmap.build_navmap as _navmap_builder
-except ModuleNotFoundError:  # pragma: no cover - fallback for direct execution
-    if str(REPO) not in sys.path:
-        sys.path.insert(0, str(REPO))
-    import tools.navmap.build_navmap as _navmap_builder
+except ModuleNotFoundError as exc:  # pragma: no cover - clearer guidance for packaging installs
+    message = (
+        "tools.navmap.repair_navmaps requires the tooling optional extra. "
+        "Install with `pip install kgfoundry[tools]` (or `pip install -e .[tools]` in development) "
+        "before invoking this script."
+    )
+    raise ModuleNotFoundError(message) from exc
 
 ModuleInfo = _navmap_builder.ModuleInfo
 _collect_module = _navmap_builder._collect_module

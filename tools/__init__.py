@@ -1,7 +1,8 @@
 """Curated public API for KGFoundry tooling.
 
-The exports in this module provide stable entry points for automation. Runtime failures
-follow :mod:`kgfoundry_common.errors` and emit Problem Details envelopes consistent with
+Install the optional extra ``kgfoundry[tools]`` to access these helpers when the
+project is consumed as a wheel. Runtime failures follow :mod:`kgfoundry_common.errors`
+and emit Problem Details envelopes consistent with
 ``schema/examples/tools/problem_details/tool-execution-error.json``.
 """
 
@@ -10,8 +11,9 @@ follow :mod:`kgfoundry_common.errors` and emit Problem Details envelopes consist
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
 from importlib import import_module
-from types import ModuleType
+from types import MappingProxyType, ModuleType
 from typing import Final
 
 from ._shared.cli import (
@@ -62,7 +64,7 @@ from ._shared.validation import (
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-PUBLIC_EXPORTS: Final[dict[str, object]] = {
+_PUBLIC_EXPORTS: dict[str, object] = {
     "CLI_ENVELOPE_SCHEMA_ID": CLI_ENVELOPE_SCHEMA_ID,
     "CLI_ENVELOPE_SCHEMA_VERSION": CLI_ENVELOPE_SCHEMA_VERSION,
     "CliEnvelope": CliEnvelope,
@@ -104,7 +106,9 @@ PUBLIC_EXPORTS: Final[dict[str, object]] = {
     "with_fields": with_fields,
 }
 
-MODULE_EXPORTS: Final[dict[str, str]] = {
+PUBLIC_EXPORTS: Final[Mapping[str, object]] = MappingProxyType(_PUBLIC_EXPORTS)
+
+_MODULE_EXPORTS: dict[str, str] = {
     "build_agent_api": "tools.docs.build_agent_api",
     "build_agent_catalog": "tools.docs.build_agent_catalog",
     "codemods": "tools.codemods",
@@ -115,6 +119,8 @@ MODULE_EXPORTS: Final[dict[str, str]] = {
     "navmap": "tools.navmap",
 }
 
+MODULE_EXPORTS: Final[Mapping[str, str]] = MappingProxyType(_MODULE_EXPORTS)
+
 __all__: list[str] = sorted({*PUBLIC_EXPORTS.keys(), *MODULE_EXPORTS.keys()})
 
 
@@ -122,7 +128,7 @@ def __getattr__(name: str) -> ModuleType:
     if name in MODULE_EXPORTS:
         module = import_module(MODULE_EXPORTS[name])
         globals()[name] = module
-        PUBLIC_EXPORTS[name] = module
+        _PUBLIC_EXPORTS[name] = module
         return module
     message = f"module 'tools' has no attribute {name!r}"
     raise AttributeError(message)

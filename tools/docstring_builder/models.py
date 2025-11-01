@@ -26,7 +26,6 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
-from functools import lru_cache
 from pathlib import Path
 from typing import Final, Literal, Protocol, TypedDict, cast
 
@@ -467,18 +466,20 @@ class CliResult(TypedDict, total=False):
     problem: ProblemDetails
 
 
-@lru_cache(maxsize=1)
+_DOCFACTS_VALIDATOR: Final[Draft202012Validator] = Draft202012Validator(
+    cast(dict[str, JsonValue], json.loads(_DOCFACTS_SCHEMA_PATH.read_text(encoding="utf-8")))
+)
+_CLI_VALIDATOR: Final[Draft202012Validator] = Draft202012Validator(
+    cast(dict[str, JsonValue], json.loads(_CLI_SCHEMA_PATH.read_text(encoding="utf-8")))
+)
+
+
 def _load_docfacts_validator() -> Draft202012Validator:
-    schema_text = _DOCFACTS_SCHEMA_PATH.read_text(encoding="utf-8")
-    schema_data = cast(dict[str, JsonValue], json.loads(schema_text))
-    return Draft202012Validator(schema_data)
+    return _DOCFACTS_VALIDATOR
 
 
-@lru_cache(maxsize=1)
 def _load_cli_validator() -> Draft202012Validator:
-    schema_text = _CLI_SCHEMA_PATH.read_text(encoding="utf-8")
-    schema_data = cast(dict[str, JsonValue], json.loads(schema_text))
-    return Draft202012Validator(schema_data)
+    return _CLI_VALIDATOR
 
 
 def validate_docfacts_payload(payload: DocfactsDocumentPayload) -> None:
@@ -680,11 +681,14 @@ def build_cli_result_skeleton(status: RunStatus) -> CliResult:
 
 
 def _json_pointer_from(error: ValidationError) -> str | None:
-    raw_path = getattr(error, "absolute_path", ())
-    if isinstance(raw_path, Sequence):
-        tokens = [str(part) for part in raw_path if part is not None]
-        if tokens:
-            return "/" + "/".join(tokens)
+    raw_path = cast(Sequence[object], getattr(error, "absolute_path", ()))
+    tokens: list[str] = []
+    for part in raw_path:
+        if part is None:
+            continue
+        tokens.append(str(part))
+    if tokens:
+        return "/" + "/".join(tokens)
     return None
 
 

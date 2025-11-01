@@ -80,7 +80,7 @@ Despite the tools suite passing Ruff and partial pyrefly checks, structural gaps
 
 ## Rollout & Verification
 - Implement subsections sequentially (exports → layering → typing → observability → security) to keep PR size manageable.
-- After each subsection, run the verification loop: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`, `uv run pytest -q`, `make artifacts && git diff --exit-code`, `python tools/check_new_suppressions.py src`, `python tools/check_imports.py`, `uv run pip-audit`.
+- After each subsection, run the verification loop: `uv run ruff check --fix`, `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`, `uv run pytest -q`, `make artifacts && git diff --exit-code`, `python tools/check_new_suppressions.py src`, `python tools/check_imports.py`, `uv run pip-audit`.
 - Record before/after metrics (Prometheus counters/histograms) and type-check error counts in the PR summary.
 - Communicate any breaking API changes via SemVer bumps and deprecation notes in README/docs.
 

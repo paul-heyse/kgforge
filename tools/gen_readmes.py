@@ -13,7 +13,6 @@ import json
 import os
 import re
 import shutil
-import sys
 import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -27,9 +26,15 @@ from tools._shared.problem_details import ProblemDetailsDict, build_problem_deta
 from tools._shared.proc import ToolExecutionError, run_tool
 
 ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-from tools.griffe_utils import GriffeAPI, resolve_griffe  # noqa: E402
+
+try:
+    from tools.griffe_utils import GriffeAPI, resolve_griffe
+except ModuleNotFoundError as exc:  # pragma: no cover - clearer guidance for packaging installs
+    message = (
+        "tools.gen_readmes requires the tooling optional extra. Install with "
+        "`pip install kgfoundry[tools]` or `pip install -e .[tools]` when developing."
+    )
+    raise ModuleNotFoundError(message) from exc
 
 LOGGER = get_logger(__name__)
 
@@ -105,6 +110,7 @@ class LoaderInstance(Protocol):
 
     def load(self, name: str) -> GriffeObjectLike:
         """Return the object graph for the package identified by ``name``."""
+        ...
 
 
 class LoaderFactory(Protocol):
@@ -112,6 +118,7 @@ class LoaderFactory(Protocol):
 
     def __call__(self, *, search_paths: Sequence[str]) -> LoaderInstance:
         """Return a loader bound to ``search_paths``."""
+        ...
 
 
 from tools.detect_pkg import detect_packages, detect_primary  # noqa: E402

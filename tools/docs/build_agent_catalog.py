@@ -16,6 +16,7 @@ import re
 import sys
 import tokenize
 from collections.abc import Iterable, Mapping, Sequence
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any, TypeVar, cast
 
@@ -29,6 +30,7 @@ from kgfoundry.agent_catalog.search import (
     EmbeddingModelProtocol,
     SearchDocument,
     SearchOptions,
+    SearchRequest,
     SearchResult,
     VectorArray,
     load_faiss,
@@ -50,6 +52,10 @@ from tools.docs.catalog_models import (
     SymbolRecord,
 )
 from tools.docs.errors import CatalogBuildError
+
+type CatalogPayload = Mapping[
+    str, bool | dict[str, object] | float | int | list[object] | str | None
+]
 
 STD_LIB_MODULES = set(sys.stdlib_module_names)
 TRIGRAM_LENGTH = 3
@@ -452,7 +458,7 @@ class AgentCatalogBuilder:
             candidate_pool=self.search_candidates,
             lexical_fields=list(LEXICAL_FIELDS),
         )
-        search_payload = {
+        search_payload: dict[str, object] = {
             "alpha": search_config.alpha,
             "candidate_pool": search_config.candidate_pool,
             "lexical_fields": list(search_config.lexical_fields),
@@ -610,20 +616,19 @@ class AgentCatalogBuilder:
             return None
         symbols.sort(key=lambda record: record.qname)
         module_imports = analyzer.module_imports()
-        calls = []
+        calls: list[dict[str, object]] = []
         for caller, targets in analyzer.call_edges.items():
             if caller not in self._symbol_records:
                 continue
             for callee in sorted(targets):
-                calls.append(
-                    {
-                        "caller": caller,
-                        "callee": callee,
-                        "confidence": "static",
-                    }
-                )
+                call_entry: dict[str, object] = {
+                    "caller": caller,
+                    "callee": callee,
+                    "confidence": "static",
+                }
+                calls.append(call_entry)
         calls.sort(key=lambda entry: (entry["caller"], entry["callee"]))
-        graph = {"imports": module_imports, "calls": calls}
+        graph: dict[str, object] = {"imports": module_imports, "calls": calls}
         return ModuleRecord(
             name=module_name.rsplit(".", maxsplit=1)[-1],
             qualified=module_name,
@@ -727,7 +732,7 @@ class AgentCatalogBuilder:
         name_arity = self._compute_name_arity(node, scope)
         nearest_text = self._nearest_text(analyzer, node)
         symbol_id = self._compute_symbol_id(qname, node)
-        remap = [
+        remap: list[dict[str, object]] = [
             {
                 "symbol_id": symbol_id,
                 "cst_fingerprint": fingerprint,
@@ -1013,14 +1018,24 @@ class AgentCatalogBuilder:
         callees: dict[str, set[str]] = collections.defaultdict(set)
         for package in packages:
             for module in package.modules:
-                for edge in module.graph["calls"]:
-                    caller = edge["caller"]
-                    callee = edge["callee"]
+                edges = module.graph.get("calls")
+                if not isinstance(edges, Sequence):
+                    continue
+                for edge in edges:
+                    if not isinstance(edge, Mapping):
+                        continue
+                    caller = edge.get("caller")
+                    callee = edge.get("callee")
+                    if not isinstance(caller, str) or not isinstance(callee, str):
+                        continue
                     callers[callee].add(caller)
                     callees[caller].add(callee)
         for qname, record in self._symbol_records.items():
-            record.change_impact.callers = sorted(callers.get(qname, []))
-            record.change_impact.callees = sorted(callees.get(qname, []))
+            change_impact = record.change_impact
+            if change_impact is None:
+                continue
+            change_impact.callers = sorted(callers.get(qname, []))
+            change_impact.callees = sorted(callees.get(qname, []))
 
     def _collect_search_documents(self, packages: Sequence[PackageRecord]) -> list[SearchDocument]:
         documents: list[SearchDocument] = []
@@ -1043,14 +1058,17 @@ class AgentCatalogBuilder:
         symbol: SymbolRecord,
     ) -> SearchDocument:
         summary, docstring = _extract_docfacts_text(symbol.docfacts)
+        hints = symbol.agent_hints or AgentHints()
+        metrics = symbol.metrics or Metrics()
+        anchors = symbol.anchors or Anchors()
         text_parts = [
             symbol.qname,
             module.qualified,
             package.name,
             summary,
             docstring,
-            " ".join(symbol.agent_hints.intent_tags),
-            " ".join(symbol.agent_hints.tests_to_run),
+            " ".join(hints.intent_tags),
+            " ".join(hints.tests_to_run),
         ]
         normalized_text = " ".join(part for part in text_parts if part)
         tokens = collections.Counter(_tokenize(normalized_text))
@@ -1060,12 +1078,12 @@ class AgentCatalogBuilder:
             module=module.qualified,
             qname=symbol.qname,
             kind=symbol.kind,
-            stability=symbol.metrics.stability,
-            deprecated=symbol.metrics.deprecated,
+            stability=metrics.stability,
+            deprecated=metrics.deprecated,
             summary=summary,
             docstring=docstring,
-            anchor_start=symbol.anchors.start_line,
-            anchor_end=symbol.anchors.end_line,
+            anchor_start=anchors.start_line,
+            anchor_end=anchors.end_line,
             text=normalized_text,
             tokens=tokens,
         )
@@ -1193,9 +1211,13 @@ class AgentCatalogBuilder:
         if self._packages_snapshot:
             packages_override = json.loads(json.dumps(self._packages_snapshot))
         elif catalog_dict.get("packages"):
-            packages_override = catalog_dict.get("packages", [])
+            raw_packages = catalog_dict.get("packages", [])
+            if isinstance(raw_packages, list):
+                packages_override = [
+                    cast(dict[str, Any], entry) for entry in raw_packages if isinstance(entry, dict)
+                ]
         write_sqlite_catalog(
-            catalog_dict,
+            cast(CatalogPayload, catalog_dict),
             sqlite_target,
             packages_override=packages_override,
         )
@@ -1391,10 +1413,9 @@ def search_catalog(
     options: SearchOptions | None = None,
 ) -> list[SearchResult]:
     """Execute hybrid lexical/vector search against the catalog."""
+    request = SearchRequest(repo_root=repo_root, query=query, k=k)
     try:
-        return catalog_search.search_catalog(
-            catalog, repo_root=repo_root, query=query, k=k, options=options
-        )
+        return catalog_search.search_catalog(catalog, request=request, options=options)
     except CatalogSearchError as exc:
         raise CatalogBuildError(str(exc)) from exc
 
@@ -1467,7 +1488,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             sys.stderr.write(f"error: {exc}\n")
             return 1
         logger.info("Search results: %d", len(results))
-        sys.stdout.write(json.dumps([result.model_dump() for result in results], indent=2) + "\n")
+        sys.stdout.write(json.dumps([asdict(result) for result in results], indent=2) + "\n")
         return 0
     try:
         catalog = builder.build()

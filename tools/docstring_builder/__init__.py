@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from importlib import import_module
+from typing import cast
 
 from tools.docstring_builder import cache as cache
 from tools.docstring_builder import cli as cli
@@ -37,8 +39,11 @@ __all__ = [
 ]
 
 
+CliMain = Callable[[list[str] | None], int]
+
+
 def main(argv: list[str] | None = None) -> int:
     """Dispatch to the CLI entry point without eagerly importing it."""
     cli_module = import_module("tools.docstring_builder.cli")
-    cli_main = cli_module.main
+    cli_main = cast(CliMain, cli_module.main)
     return cli_main(argv)

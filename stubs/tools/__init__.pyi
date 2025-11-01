@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import logging as _logging
+from collections.abc import Mapping
 from types import ModuleType
 from typing import Final
 
@@ -69,7 +70,8 @@ build_agent_api: ModuleType
 build_agent_catalog: ModuleType
 gen_readmes: ModuleType
 
-PUBLIC_EXPORTS: Final[dict[str, object]]
+PUBLIC_EXPORTS: Final[Mapping[str, object]]
+MODULE_EXPORTS: Final[Mapping[str, str]]
 
 __all__ = sorted(
     [

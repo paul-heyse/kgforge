@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
-from typing import Any
+from typing import cast, overload
 
 __all__ = [
     "AgentCatalog",
@@ -24,11 +24,40 @@ def _now_iso() -> str:
     return datetime.now(tz=UTC).isoformat(timespec="seconds")
 
 
-def _strip_none(value: Any) -> Any:
+JsonDict = dict[str, object]
+JsonList = list[object]
+
+
+@overload
+def _strip_none(value: JsonDict) -> JsonDict:  # pragma: no cover - runtime dispatch
+    ...
+
+
+@overload
+def _strip_none(value: JsonList) -> JsonList:  # pragma: no cover - runtime dispatch
+    ...
+
+
+@overload
+def _strip_none(value: object) -> object:  # pragma: no cover - runtime dispatch
+    ...
+
+
+def _strip_none(value: object) -> object:
     if isinstance(value, dict):
-        return {k: _strip_none(v) for k, v in value.items() if v is not None}
+        sanitized: JsonDict = {}
+        for key, raw_val in value.items():
+            if not isinstance(key, str) or raw_val is None:
+                continue
+            sanitized[key] = _strip_none(raw_val)
+        return sanitized
     if isinstance(value, list):
-        return [_strip_none(item) for item in value]
+        sanitized_list: JsonList = []
+        for item in value:
+            if item is None:
+                continue
+            sanitized_list.append(_strip_none(item))
+        return sanitized_list
     return value
 
 
@@ -37,8 +66,9 @@ class CatalogStruct:
     """Base class providing a ``model_dump`` helper."""
 
     def model_dump(self) -> dict[str, object]:
-        raw = asdict(self)
-        return _strip_none(raw)
+        raw = cast(JsonDict, asdict(self))
+        cleaned = _strip_none(raw)
+        return cleaned
 
 
 @dataclass(slots=True)

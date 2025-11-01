@@ -69,7 +69,10 @@ def _format_union_type(
     elif origin in {list, set, dict, tuple}:
         parts = [format_annotation(arg, module_globals) or "Any" for arg in args]
         inner_str = ", ".join(parts)
-        formatted = f"{origin.__name__}[{inner_str}]"
+        origin_name = getattr(origin, "__name__", None)
+        if origin_name is None:
+            return None
+        formatted = f"{origin_name}[{inner_str}]"
     elif origin is Annotated:
         base, *_ = args
         formatted = format_annotation(base, module_globals)
@@ -133,7 +136,10 @@ def _format_collection_type(
         return None
     parts = [format_annotation(arg, module_globals) or "Any" for arg in args]
     inner = ", ".join(parts)
-    return f"{origin.__name__}[{inner}]"
+    origin_name = getattr(origin, "__name__", None)
+    if origin_name is None:
+        return None
+    return f"{origin_name}[{inner}]"
 
 
 def _format_generic_type(

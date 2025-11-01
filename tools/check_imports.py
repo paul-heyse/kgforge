@@ -5,11 +5,14 @@ from __future__ import annotations
 
 import argparse
 import sys
-from pathlib import Path
 from typing import cast
 
-if __package__ in {None, ""}:
-    sys.path.append(str(Path(__file__).resolve().parents[1]))
+if __package__ in {None, ""}:  # pragma: no cover - invoked via script entry instead of module
+    message = (
+        "Run this command via `python -m tools.check_imports` or install kgfoundry[tools] "
+        "so the tooling package is importable."
+    )
+    raise RuntimeError(message)
 
 from tools import architecture
 from tools._shared.cli import CliEnvelope, CliEnvelopeBuilder, CliStatus, render_cli_envelope

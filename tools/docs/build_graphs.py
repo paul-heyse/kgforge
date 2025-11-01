@@ -144,6 +144,15 @@ pydot: ModuleType | None = _optional_import("pydot")
 nx: ModuleType | None = _optional_import("networkx")
 yaml = _optional_import("yaml")
 
+
+def _require_pydot() -> ModuleType:
+    """Return the imported :mod:`pydot` module, raising if unavailable."""
+    if pydot is None:
+        message = "pydot is required for graph rendering"
+        raise RuntimeError(message)
+    return pydot
+
+
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 OUT = ROOT / "docs" / "_build" / "graphs"
@@ -672,6 +681,7 @@ def _add_graph_nodes(
     threshold: float,
 ) -> None:
     """Populate ``dot_graph`` with styled nodes extracted from ``graph``."""
+    pydot_module = _require_pydot()
     for node in sorted(graph.nodes()):
         layer = pkg2layer.get(node, "unknown")
         color = LAYER_PALETTE.get(layer, DEFAULT_LAYER_COLOR)
@@ -679,7 +689,7 @@ def _add_graph_nodes(
             EDGE_HIGHLIGHT_WIDTH if centrality.get(node, 0.0) >= threshold else EDGE_NORMAL_WIDTH
         )
         dot_graph.add_node(
-            pydot.Node(
+            pydot_module.Node(
                 node,
                 color=color,
                 penwidth=penwidth,
@@ -696,6 +706,7 @@ def _add_graph_edges(
     cycle_edges: set[tuple[str, str]],
 ) -> None:
     """Populate ``dot_graph`` with styled edges extracted from ``graph``."""
+    pydot_module = _require_pydot()
     for src, dst, _ in graph.edges(data=True):
         layer_u = pkg2layer.get(src, "unknown")
         layer_v = pkg2layer.get(dst, "unknown")
@@ -704,7 +715,9 @@ def _add_graph_edges(
         penwidth = EDGE_HIGHLIGHT_WIDTH if in_cycle else EDGE_NORMAL_WIDTH
         label = f"{layer_u}→{layer_v}" if layer_u != layer_v else ""
         dot_graph.add_edge(
-            pydot.Edge(src, dst, color=edge_color, penwidth=penwidth, fontsize="8", label=label)
+            pydot_module.Edge(
+                src, dst, color=edge_color, penwidth=penwidth, fontsize="8", label=label
+            )
         )
 
 
@@ -1201,16 +1214,13 @@ def style_and_render(
     RuntimeError
         If the required rendering dependencies are unavailable.
     """
-    if pydot is None:
-        message = "pydot is required for rendering graphs"
-        raise RuntimeError(message)
-
+    pydot_module = _require_pydot()
     pkg2layer = _coerce_mapping(layers.get("packages"))
     centrality = cast(dict[str, float], analysis.get("centrality", {}))
     threshold = _centrality_threshold(centrality, 0.80)
     cycle_edges = _extract_cycle_edges(cast(CycleList, analysis.get("cycles", [])))
 
-    dot_graph: PydotDot = pydot.Dot(graph_type="digraph", rankdir="LR")
+    dot_graph: PydotDot = pydot_module.Dot(graph_type="digraph", rankdir="LR")
     _add_graph_nodes(dot_graph, graph, pkg2layer, centrality, threshold)
     _add_graph_edges(dot_graph, graph, pkg2layer, cycle_edges)
 
