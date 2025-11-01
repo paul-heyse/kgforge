@@ -3,17 +3,17 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from typing import Any
 
 from starlette.requests import Request
 from starlette.responses import Response
+from starlette.types import ASGIApp
 
 __all__ = ["BaseHTTPMiddleware"]
 
 class BaseHTTPMiddleware:
     """Base HTTP middleware with precise type annotations."""
 
-    def __init__(self, app: Any) -> None:
+    def __init__(self, app: ASGIApp) -> None:
         """Initialize middleware.
 
         Parameters

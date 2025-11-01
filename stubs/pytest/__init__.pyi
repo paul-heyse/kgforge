@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import AbstractContextManager
 from re import Pattern
 from types import ModuleType, TracebackType
@@ -62,7 +62,13 @@ class ExceptionInfo[TExc: BaseException]:
 
 @overload
 def raises[TExc: BaseException](
-    expected_exception: type[TExc] | tuple[type[TExc], ...],
+    expected_exception: type[TExc],
+    *,
+    match: str | Pattern[str] | None = ...,
+) -> AbstractContextManager[ExceptionInfo[TExc]]: ...
+@overload
+def raises[TExc: BaseException](
+    expected_exception: tuple[type[TExc], ...],
     *,
     match: str | Pattern[str] | None = ...,
 ) -> AbstractContextManager[ExceptionInfo[TExc]]: ...
@@ -112,7 +118,7 @@ def warns(
 ) -> AbstractContextManager[list[WarningMessage]]: ...
 
 class _ApproxReturn:
-    def __iter__(self) -> Any: ...
+    def __iter__(self) -> Iterator[float]: ...
 
 @overload
 def approx(

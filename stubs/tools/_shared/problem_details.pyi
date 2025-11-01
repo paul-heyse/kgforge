@@ -9,7 +9,7 @@ ProblemDetailsDict = dict[str, JsonValue]
 
 def build_problem_details(
     *,
-    type: str,
+    type: str,  # noqa: A002 - matches RFC 9457 nomenclature
     title: str,
     status: int,
     detail: str,
@@ -19,7 +19,7 @@ def build_problem_details(
 def build_schema_problem_details(
     *,
     error: Exception,
-    type: str,
+    type: str,  # noqa: A002 - matches RFC 9457 nomenclature
     title: str,
     status: int,
     instance: str,
@@ -61,7 +61,7 @@ def tool_failure_problem_details(
 def problem_from_exception(
     exc: Exception,
     *,
-    type: str,
+    type: str,  # noqa: A002 - matches RFC 9457 nomenclature
     title: str,
     status: int,
     instance: str,

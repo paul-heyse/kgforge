@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any
+from collections.abc import Mapping
 
+from requests import Response
 from starlette.testclient import TestClient as StarletteTestClient
+from starlette.types import ASGIApp
 
 __all__ = ["TestClient"]
 
@@ -16,12 +18,12 @@ class TestClient(StarletteTestClient):
 
     def __init__(
         self,
-        app: Any,  # FastAPI application instance
+        app: ASGIApp,
         base_url: str = "http://test",
         raise_server_exceptions: bool = True,
         root_path: str = "",
         backend: str = "asyncio",
-        backend_options: dict[str, Any] | None = None,
+        backend_options: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize test client.
 
@@ -45,55 +47,55 @@ class TestClient(StarletteTestClient):
     def get(
         self,
         url: str,
-        **kwargs: Any,
-    ) -> Any:  # Returns Response-like object
+        **kwargs: object,
+    ) -> Response:
         """Make GET request."""
         ...
 
     def post(
         self,
         url: str,
-        **kwargs: Any,
-    ) -> Any:  # Returns Response-like object
+        **kwargs: object,
+    ) -> Response:
         """Make POST request."""
         ...
 
     def put(
         self,
         url: str,
-        **kwargs: Any,
-    ) -> Any:  # Returns Response-like object
+        **kwargs: object,
+    ) -> Response:
         """Make PUT request."""
         ...
 
     def delete(
         self,
         url: str,
-        **kwargs: Any,
-    ) -> Any:  # Returns Response-like object
+        **kwargs: object,
+    ) -> Response:
         """Make DELETE request."""
         ...
 
     def patch(
         self,
         url: str,
-        **kwargs: Any,
-    ) -> Any:  # Returns Response-like object
+        **kwargs: object,
+    ) -> Response:
         """Make PATCH request."""
         ...
 
     def options(
         self,
         url: str,
-        **kwargs: Any,
-    ) -> Any:  # Returns Response-like object
+        **kwargs: object,
+    ) -> Response:
         """Make OPTIONS request."""
         ...
 
     def head(
         self,
         url: str,
-        **kwargs: Any,
-    ) -> Any:  # Returns Response-like object
+        **kwargs: object,
+    ) -> Response:
         """Make HEAD request."""
         ...

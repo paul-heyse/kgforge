@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
-from typing import Any
+
+from pandas import DataFrame
 
 class DataType: ...
 
@@ -21,14 +22,14 @@ class Table:
     @classmethod
     def from_pylist(
         cls,
-        rows: Sequence[Mapping[str, Any]] | Sequence[Any],
+        rows: Sequence[Mapping[str, object]] | Sequence[object],
         schema: Schema | None = ...,
     ) -> Table: ...
-    def to_pandas(self) -> Any: ...
+    def to_pandas(self) -> DataFrame: ...
     @property
     def num_rows(self) -> int: ...
 
-def field(name: str, type: DataType, nullable: bool = ...) -> Field: ...
+def field(name: str, type: DataType, nullable: bool = ...) -> Field: ...  # noqa: A002 - public API uses `type`
 def schema(
     fields: Iterable[Field] | Iterable[tuple[str, DataType]] | Mapping[str, DataType],
 ) -> Schema: ...

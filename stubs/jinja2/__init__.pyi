@@ -15,6 +15,6 @@ class Environment:
         undefined: type[Undefined] | None = None,
         trim_blocks: bool | None = None,
         lstrip_blocks: bool | None = None,
-        globals: Mapping[str, object] | None = None,
+        globals: Mapping[str, object] | None = None,  # noqa: A002 - matches Jinja2 API
     ) -> None: ...
     def from_string(self, source: str) -> Template: ...

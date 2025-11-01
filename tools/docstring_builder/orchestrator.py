@@ -376,7 +376,7 @@ def _collect_edits(
     return edits, semantics, ir_entries
 
 
-def _handle_docfacts(  # noqa: C901, PLR0911, PLR0912
+def _handle_docfacts(  # noqa: C901, PLR0911, PLR0912, PLR0914
     docfacts: list[DocFact],
     config: BuilderConfig,
     check_mode: bool,
@@ -406,15 +406,27 @@ def _handle_docfacts(  # noqa: C901, PLR0911, PLR0912
         comparison_payload = cast(DocfactsDocumentPayload, json.loads(json.dumps(payload)))
         existing_provenance_obj = existing_payload.get("provenance")
         if isinstance(existing_provenance_obj, dict):
-            provenance_existing: DocfactsProvenancePayload | None = existing_provenance_obj
+            provenance_existing: DocfactsProvenancePayload | None = cast(
+                DocfactsProvenancePayload, existing_provenance_obj
+            )
         else:
             provenance_existing = None
         comparison_provenance = comparison_payload["provenance"]
         if provenance_existing is not None:
-            for field in ("commitHash", "generatedAt"):
-                value = provenance_existing.get(field)
-                if isinstance(value, str):
-                    comparison_provenance[field] = value
+            commit_hash = comparison_provenance["commitHash"]
+            generated_at = comparison_provenance["generatedAt"]
+            existing_commit = provenance_existing.get("commitHash")
+            if isinstance(existing_commit, str):
+                commit_hash = existing_commit
+            existing_generated = provenance_existing.get("generatedAt")
+            if isinstance(existing_generated, str):
+                generated_at = existing_generated
+            comparison_payload["provenance"] = DocfactsProvenancePayload(
+                builderVersion=comparison_provenance["builderVersion"],
+                configHash=comparison_provenance["configHash"],
+                commitHash=commit_hash,
+                generatedAt=generated_at,
+            )
         if existing_payload != comparison_payload:
             before = json.dumps(existing_payload, indent=2, sort_keys=True)
             after = json.dumps(comparison_payload, indent=2, sort_keys=True)

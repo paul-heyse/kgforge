@@ -35,6 +35,7 @@ class _SuiteProtocol(Protocol):
 
     def with_changes(self, *, body: tuple[cst.BaseStatement, ...]) -> Self:
         """Return a copy of the suite with ``body`` replaced."""
+        ...
 
 
 @dataclass(slots=True)

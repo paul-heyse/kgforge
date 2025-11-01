@@ -65,8 +65,11 @@ class CacheDocument(BaseStruct, kw_only=True):
 
     schemaVersion: str = DOCSTRING_CACHE_VERSION
     schemaId: str = DOCSTRING_CACHE_SCHEMA_ID
-    generatedAt: str = msgspec.field(default_factory=_default_generated_at)
-    entries: dict[str, CacheEntry] = msgspec.field(default_factory=_default_entries)
+    generatedAt: str = cast(str, msgspec.field(default_factory=_default_generated_at))
+    entries: dict[str, CacheEntry] = cast(
+        dict[str, CacheEntry],
+        msgspec.field(default_factory=_default_entries),
+    )
 
     if TYPE_CHECKING:
 
