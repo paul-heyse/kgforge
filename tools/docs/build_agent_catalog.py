@@ -6,7 +6,6 @@ import argparse
 import ast
 import collections
 import copy
-import dataclasses
 import datetime as dt
 import hashlib
 import importlib
@@ -17,7 +16,6 @@ import re
 import sys
 import tokenize
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, TypeVar, cast
 
@@ -38,136 +36,20 @@ from kgfoundry.agent_catalog.search import (
 from kgfoundry.agent_catalog.sqlite import write_sqlite_catalog
 from tools._shared.logging import get_logger, with_fields
 from tools._shared.proc import ToolExecutionError, run_tool
+from tools.docs.catalog_models import (
+    AgentCatalog,
+    AgentHints,
+    Anchors,
+    ChangeImpact,
+    LinkPolicy,
+    Metrics,
+    ModuleRecord,
+    PackageRecord,
+    Quality,
+    SemanticIndexMetadata,
+    SymbolRecord,
+)
 from tools.docs.errors import CatalogBuildError
-
-
-@dataclass
-class LinkPolicy:
-    """Link policy configuration used for catalog anchor templates."""
-
-    mode: str
-    editor_template: str
-    github_template: str
-    github: dict[str, str] | None = None
-
-
-@dataclass
-class Anchors:
-    """Anchor metadata for a symbol."""
-
-    start_line: int | None
-    end_line: int | None
-    cst_fingerprint: str | None
-    remap_order: list[dict[str, Any]]
-
-
-@dataclass
-class Quality:
-    """Quality signals for a symbol."""
-
-    mypy_status: str
-    ruff_rules: list[str]
-    pydoclint_parity: bool | None
-    docstring_coverage: float | None
-    doctest_status: str
-
-
-@dataclass
-class Metrics:
-    """Metric summary for a symbol."""
-
-    complexity: float | None
-    loc: int | None
-    last_modified: str | None
-    codeowners: list[str]
-    stability: str | None
-    deprecated: bool
-
-
-@dataclass
-class AgentHints:
-    """Agent hint bundle for downstream consumers."""
-
-    intent_tags: list[str] = field(default_factory=list)
-    safe_ops: list[str] = field(default_factory=list)
-    tests_to_run: list[str] = field(default_factory=list)
-    perf_budgets: list[str] = field(default_factory=list)
-    breaking_change_notes: list[str] = field(default_factory=list)
-
-
-@dataclass
-class SemanticIndexMetadata:
-    """Metadata describing the persisted semantic index artifacts."""
-
-    index: str
-    mapping: str
-    model: str
-    dimension: int
-    count: int
-
-
-@dataclass
-class ChangeImpact:
-    """Change impact metadata per symbol."""
-
-    callers: list[str] = field(default_factory=list)
-    callees: list[str] = field(default_factory=list)
-    tests: list[dict[str, Any]] = field(default_factory=list)
-    codeowners: list[str] = field(default_factory=list)
-    churn_last_n: int = 0
-
-
-@dataclass
-class SymbolRecord:
-    """Serializable representation of a symbol."""
-
-    qname: str
-    kind: str
-    symbol_id: str
-    docfacts: dict[str, Any] | None
-    anchors: Anchors
-    quality: Quality
-    metrics: Metrics
-    agent_hints: AgentHints
-    change_impact: ChangeImpact
-    exemplars: list[dict[str, Any]] = field(default_factory=list)
-
-
-@dataclass
-class ModuleRecord:
-    """Serializable representation of a module and its symbols."""
-
-    name: str
-    qualified: str
-    source: dict[str, str]
-    pages: dict[str, str | None]
-    imports: list[str]
-    symbols: list[SymbolRecord]
-    graph: dict[str, Any]
-
-
-@dataclass
-class PackageRecord:
-    """Serializable representation of a package."""
-
-    name: str
-    modules: list[ModuleRecord]
-
-
-@dataclass
-class AgentCatalog:
-    """Top-level agent catalog representation."""
-
-    version: str
-    generated_at: str
-    repo: dict[str, str]
-    link_policy: dict[str, Any]
-    artifacts: dict[str, str]
-    packages: list[PackageRecord]
-    shards: dict[str, Any] | None = None
-    semantic_index: SemanticIndexMetadata | None = None
-    search: catalog_search.SearchConfig | None = None
-
 
 STD_LIB_MODULES = set(sys.stdlib_module_names)
 TRIGRAM_LENGTH = 3
@@ -562,13 +444,18 @@ class AgentCatalogBuilder:
         repo_sha = self._resolve_repo_sha()
         generated_at = dt.datetime.now(tz=dt.UTC).isoformat()
         packages = self._collect_packages()
-        self._packages_snapshot = [dataclasses.asdict(pkg) for pkg in packages]
+        self._packages_snapshot = [pkg.model_dump() for pkg in packages]
         self._apply_call_graph(packages)
         semantic_index = self._build_semantic_index(packages)
-        link_policy_dict = {
-            key: value
-            for key, value in dataclasses.asdict(link_policy).items()
-            if value is not None
+        search_config = catalog_search.SearchConfig(
+            alpha=self.search_alpha,
+            candidate_pool=self.search_candidates,
+            lexical_fields=list(LEXICAL_FIELDS),
+        )
+        search_payload = {
+            "alpha": search_config.alpha,
+            "candidate_pool": search_config.candidate_pool,
+            "lexical_fields": list(search_config.lexical_fields),
         }
         artifacts = {
             key: self._relative_string(self._resolve_artifact_path(path))
@@ -579,20 +466,15 @@ class AgentCatalogBuilder:
             artifacts["semantic_mapping"] = semantic_index.mapping
         sqlite_target = self._resolve_artifact_path(self.sqlite_path)
         artifacts["catalog_sqlite"] = self._relative_string(sqlite_target)
-        search_config = catalog_search.SearchConfig(
-            alpha=self.search_alpha,
-            candidate_pool=self.search_candidates,
-            lexical_fields=list(LEXICAL_FIELDS),
-        )
         catalog = AgentCatalog(
             version=self.args.version,
             generated_at=generated_at,
             repo={"sha": repo_sha, "root": str(self.repo_root)},
-            link_policy=link_policy_dict,
+            link_policy=link_policy,
             artifacts=artifacts,
             packages=packages,
             semantic_index=semantic_index,
-            search=search_config,
+            search=search_payload,
         )
         self._maybe_shard(catalog)
         return catalog
@@ -1272,7 +1154,7 @@ class AgentCatalogBuilder:
         shard_dir.mkdir(parents=True, exist_ok=True)
         shard_entries = []
         for package in catalog.packages:
-            package_dict = dataclasses.asdict(package)
+            package_dict = package.model_dump()
             shard_path = shard_dir / f"{package.name}.json"
             shard_path.write_text(json.dumps(package_dict, indent=2), encoding="utf-8")
             shard_entries.append(
@@ -1292,7 +1174,7 @@ class AgentCatalogBuilder:
 
     def write(self, catalog: AgentCatalog, path: Path, schema: Path) -> None:
         """Write the catalog and validate against the schema."""
-        catalog_dict = dataclasses.asdict(catalog)
+        catalog_dict = catalog.model_dump()
         output_path = self._resolve_artifact_path(path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(json.dumps(catalog_dict, indent=2), encoding="utf-8")
@@ -1585,9 +1467,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             sys.stderr.write(f"error: {exc}\n")
             return 1
         logger.info("Search results: %d", len(results))
-        sys.stdout.write(
-            json.dumps([dataclasses.asdict(result) for result in results], indent=2) + "\n"
-        )
+        sys.stdout.write(json.dumps([result.model_dump() for result in results], indent=2) + "\n")
         return 0
     try:
         catalog = builder.build()
