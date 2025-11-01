@@ -11,17 +11,17 @@
   - [x] 1.2.b Add PEP 257 docstrings that describe each exported builder (catalog, portal renderer, analytics) and reference the Problem Details example for failure envelopes.
   - [x] 1.2.c Update `stubs/tools/docs/__init__.pyi` to expose the same symbol set with concrete return types (e.g., `def build_agent_catalog(...) -> CatalogBuildResult`).
   - [x] 1.2.d Validate that consumers under `tests/tools` and `tools/navmap` import only documented names; adjust call sites if new module boundaries require relocation.
-- [ ] 1.3 Extract domain-layer orchestrators from oversized adapters such as `tools/docstring_builder/cli.py`, keeping CLI modules thin shims that delegate to pure orchestration modules.
-  - [ ] 1.3.a Create a new `tools/docstring_builder/orchestrator.py` module that owns `_execute_pipeline`, `_run`, `_process_file`, docfacts reconciliation, and baseline/git helpers; define typed request/response dataclasses (`DocstringBuildRequest`, `DocstringBuildResult`).
-  - [ ] 1.3.b Move input normalisation helpers (`_normalize_input_path`, `_resolve_ignore_patterns`, `_select_files`) into a focused utility module (e.g., `tools/docstring_builder/io.py`) so they can be reused by automation without importing argparse.
-  - [ ] 1.3.c Rewrite `tools/docstring_builder/cli.py` to build the argument parser, map subcommands to orchestrator entry points, and format CLI envelopes only—no direct filesystem or subprocess calls.
-  - [ ] 1.3.d Update module-level constants (e.g., `CACHE_PATH`, `DOCFACTS_PATH`) to live in a dedicated `tools/docstring_builder/paths.py` so orchestrator tests can substitute paths without patching globals.
-  - [ ] 1.3.e Ensure CLI adapters return `ExitStatus` values produced by orchestrator results; refactor JSON output/Problem Details rendering into a helper (`render_cli_result`) housed alongside the orchestrator.
-- [ ] 1.4 Update `tools/make_importlinter.py` contracts so adapter layers cannot import back into domain or shared internals, enforcing the new layering.
-  - [ ] 1.4.a Extend `_build_template` to emit explicit layered contracts for `tools.docstring_builder` (`adapters > orchestrator > domain > shared`), `tools.docs`, and `tools.navmap` packages.
-  - [ ] 1.4.b Modify `main()` so it can write multiple contracts (one per package) into `.importlinter`, including sections that forbid adapter modules from importing `_shared` internals directly.
-  - [ ] 1.4.c Add a thin wrapper under `tools/lint/` or `Makefile` to run `python tools/make_importlinter.py --check`, ensuring CI enforces the new contracts.
-  - [ ] 1.4.d Update `stubs/tools/make_importlinter.pyi` (if present) or create one so mypy recognises the new function signatures.
+- [x] 1.3 Extract domain-layer orchestrators from oversized adapters such as `tools/docstring_builder/cli.py`, keeping CLI modules thin shims that delegate to pure orchestration modules.
+  - [x] 1.3.a Create a new `tools/docstring_builder/orchestrator.py` module that owns `_execute_pipeline`, `_run`, `_process_file`, docfacts reconciliation, and baseline/git helpers; define typed request/response dataclasses (`DocstringBuildRequest`, `DocstringBuildResult`).
+  - [x] 1.3.b Move input normalisation helpers (`_normalize_input_path`, `_resolve_ignore_patterns`, `_select_files`) into a focused utility module (e.g., `tools/docstring_builder/io.py`) so they can be reused by automation without importing argparse.
+  - [x] 1.3.c Rewrite `tools/docstring_builder/cli.py` to build the argument parser, map subcommands to orchestrator entry points, and format CLI envelopes only—no direct filesystem or subprocess calls.
+  - [x] 1.3.d Update module-level constants (e.g., `CACHE_PATH`, `DOCFACTS_PATH`) to live in a dedicated `tools/docstring_builder/paths.py` so orchestrator tests can substitute paths without patching globals.
+  - [x] 1.3.e Ensure CLI adapters return `ExitStatus` values produced by orchestrator results; refactor JSON output/Problem Details rendering into a helper (`render_cli_result`) housed alongside the orchestrator.
+- [x] 1.4 Update `tools/make_importlinter.py` contracts so adapter layers cannot import back into domain or shared internals, enforcing the new layering.
+  - [x] 1.4.a Extend `_build_template` to emit explicit layered contracts for `tools.docstring_builder` (`adapters > orchestrator > domain > shared`), `tools.docs`, and `tools.navmap` packages.
+  - [x] 1.4.b Modify `main()` so it can write multiple contracts (one per package) into `.importlinter`, including sections that forbid adapter modules from importing `_shared` internals directly.
+  - [x] 1.4.c Add a thin wrapper under `tools/lint/` or `Makefile` to run `python tools/make_importlinter.py --check`, ensuring CI enforces the new contracts.
+  - [x] 1.4.d Update `stubs/tools/make_importlinter.pyi` (if present) or create one so mypy recognises the new function signatures.
 
 ## 2. Type Safety & Data Contracts
 
