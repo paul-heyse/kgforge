@@ -60,6 +60,31 @@
           "config_hash": "sha256:deadbeef"
         }
       }
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "schemaId": "https://kgfoundry.dev/schema/tools/docstring-cache.json",
+      "generatedAt": "2025-01-01T12:00:00+00:00",
+      "entries": {}
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "schemaId": "https://kgfoundry.dev/schema/tools/docstring-cache.json",
+      "generatedAt": "2025-01-01T12:00:00+00:00",
+      "entries": {
+        "/workspace/src/module1.py": {
+          "mtime": 1735665600.0,
+          "config_hash": "sha256:abc123"
+        },
+        "/workspace/src/module2.py": {
+          "mtime": 1735665700.0,
+          "config_hash": "sha256:abc123"
+        },
+        "/workspace/src/module3.py": {
+          "mtime": 1735665800.0,
+          "config_hash": "sha256:def456"
+        }
+      }
     }
   ]
 }

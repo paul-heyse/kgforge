@@ -1,5 +1,17 @@
-from typing import Any
+from __future__ import annotations
 
-CliEnvelopeBuilder = Any
+from dataclasses import dataclass
+from pathlib import Path
 
-repair_navmap_metadata: Any
+from tools.navmap.build_navmap import ModuleInfo
+
+@dataclass(frozen=True)
+class RepairResult:
+    """Aggregate outcome for repairing a single module."""
+
+    module: Path
+    messages: list[str]
+    changed: bool
+    applied: bool
+
+def repair_module(info: ModuleInfo, apply: bool = False) -> RepairResult: ...

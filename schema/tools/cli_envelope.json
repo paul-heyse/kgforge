@@ -155,5 +155,65 @@
         }
       }
     }
-  }
+  },
+  "examples": [
+    {
+      "schemaVersion": "1.0.0",
+      "schemaId": "https://kgfoundry.dev/schema/cli-envelope.json",
+      "generatedAt": "2025-01-01T12:00:00+00:00",
+      "status": "success",
+      "command": "build_agent_catalog",
+      "subcommand": "",
+      "durationSeconds": 2.5,
+      "files": [],
+      "errors": []
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "schemaId": "https://kgfoundry.dev/schema/cli-envelope.json",
+      "generatedAt": "2025-01-01T12:00:00+00:00",
+      "status": "violation",
+      "command": "check_imports",
+      "subcommand": "",
+      "durationSeconds": 0.8,
+      "files": [
+        {
+          "path": "src/kgfoundry/example.py",
+          "status": "violation",
+          "message": "Import violation detected"
+        }
+      ],
+      "errors": [
+        {
+          "status": "violation",
+          "message": "Module 'tools' imports from 'src'",
+          "file": "tools/example.py"
+        }
+      ]
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "schemaId": "https://kgfoundry.dev/schema/cli-envelope.json",
+      "generatedAt": "2025-01-01T12:00:00+00:00",
+      "status": "error",
+      "command": "build_navmap",
+      "subcommand": "",
+      "durationSeconds": 0.1,
+      "files": [],
+      "errors": [
+        {
+          "status": "error",
+          "message": "Failed to parse module",
+          "file": "src/kgfoundry/broken.py"
+        }
+      ],
+      "problem": {
+        "type": "https://kgfoundry.dev/problems/tool-execution-error",
+        "title": "Tool execution failed",
+        "status": 500,
+        "detail": "Command 'build_navmap' failed with exit code 1",
+        "instance": "/tools/build_navmap"
+      }
+    }
+  ]
 }
