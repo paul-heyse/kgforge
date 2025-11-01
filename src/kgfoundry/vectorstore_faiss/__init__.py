@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import cast
 
 import vectorstore_faiss as _module
-from kgfoundry._namespace_proxy import (
+from kgfoundry.tooling_bridge import (
     namespace_attach,
     namespace_dir,
     namespace_exports,
@@ -22,34 +22,10 @@ if hasattr(_module, "__path__"):
 
 
 def __getattr__(name: str) -> object:
-    """Document   getattr  .
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Provide a fallback for unknown attribute lookups. This special method integrates the class with Python&#39;s data model so instances behave consistently with the language expectations.
-
-    Parameters
-    ----------
-    name : str
-        Configure the name.
-
-
-    Returns
-    -------
-    object
-        Describe return value.
-    """
+    """Return ``name`` from the proxied ``vectorstore_faiss`` module."""
     return namespace_getattr(_module, name)
 
 
 def __dir__() -> list[str]:
-    """Return the combined attribute listing.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Returns
-    -------
-    inspect._empty
-        Sorted union of exports and implementation attributes.
-    """
+    """Return the combined attribute listing exposed by the namespace bridge."""
     return namespace_dir(_module, __all__)

@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -120,7 +120,14 @@ def render_schema(
     schema_id: str | None = None,
 ) -> dict[str, object]:
     """Return a JSON Schema (draft 2020-12) for ``model``."""
-    schema = cast(dict[str, object], msgspec_json.schema(model))
+    schema_fn = cast(
+        Callable[[type[msgspec.Struct]], dict[str, object]] | None,
+        getattr(msgspec_json, "schema", None),
+    )
+    if schema_fn is None:  # pragma: no cover - defensive guard for optional dependency
+        msg = "msgspec>=0.19 with the optional JSON schema extras is required"
+        raise RuntimeError(msg)
+    schema = schema_fn(model)
     if "$schema" not in schema:
         schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
     if schema_id is not None:

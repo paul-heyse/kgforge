@@ -93,6 +93,7 @@ class LegacyPluginProtocol(Protocol):
 
     def run(self, context: PluginContext, payload: DocstringPayload) -> DocstringPayload:
         """Execute the legacy plugin implementation."""
+        ...
 
 
 class LegacyPluginAdapter:

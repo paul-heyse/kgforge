@@ -8,6 +8,7 @@ import os
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import cast
 
 try:  # Python 3.11+
     import tomllib
@@ -77,13 +78,16 @@ class BuilderConfig:
         return hashlib.sha256(blob).hexdigest()
 
 
-def _load_toml(path: Path) -> dict[str, object]:
+TomlMapping = dict[str, object]
+
+
+def _load_toml(path: Path) -> TomlMapping:
     if not path.exists():
         LOGGER.debug("docstring_builder config missing at %s", path)
         return {}
     LOGGER.debug("Loading docstring builder config from %s", path)
     with path.open("rb") as stream:
-        return tomllib.load(stream)
+        return cast(TomlMapping, tomllib.load(stream))
 
 
 def _as_list(value: object) -> list[str]:
@@ -98,22 +102,24 @@ def _as_list(value: object) -> list[str]:
 
 
 def _package_settings_from(data: Mapping[str, object]) -> PackageSettings:
-    packages_raw = data.get("packages", {}) or {}
-    packages = packages_raw if isinstance(packages_raw, Mapping) else {}
-    summary_verbs_raw = packages.get("summary_verbs", {}) or {}
-    summary_verbs = (
-        {str(key): str(value) for key, value in summary_verbs_raw.items()}
-        if isinstance(summary_verbs_raw, Mapping)
-        else {}
+    packages_value = data.get("packages")
+    packages_mapping = (
+        cast(Mapping[str, object], packages_value) if isinstance(packages_value, Mapping) else {}
     )
-    opt_out_values = _as_list(packages.get("opt_out")) if isinstance(packages, Mapping) else []
+    summary_verbs_raw = packages_mapping.get("summary_verbs")
+    if isinstance(summary_verbs_raw, Mapping):
+        summary_verbs = {str(key): str(value) for key, value in summary_verbs_raw.items()}
+    else:
+        summary_verbs = {}
+    opt_out_values = _as_list(packages_mapping.get("opt_out")) if packages_mapping else []
     return PackageSettings(
         summary_verbs=summary_verbs, opt_out={str(item) for item in opt_out_values}
     )
 
 
 def _bool_option(data: Mapping[str, object], key: str, default: bool = False) -> bool:
-    return bool(data.get(key, default))
+    raw_value = data.get(key, default)
+    return bool(raw_value)
 
 
 def load_config(path: Path | None = None) -> BuilderConfig:

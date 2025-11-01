@@ -21,7 +21,7 @@ The tools package still experiences recursive imports, implicit public APIs, and
   - Centralise input sanitisation through helpers like `require_workspace_file` / `validate_allowed_url`, rejecting traversal or unsafe schemes before orchestration occurs.
   - Introduce `tools._shared.security` wrappers for `uv run pip-audit` and secret scans, replacing unsafe YAML/JSON loading with schema-backed helpers in `tools._shared.serialization`.
 - **Verification Loop**
-  - After each refactor tranche, execute the canonical gate sequence: run `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, and `uv run mypy --config-file mypy.ini` and confirm that all code blocks you made edits to are error free. 
+  - After each refactor tranche, execute the canonical gate sequence: run `uv run ruff check --fix`, `uv run pyrefly check`, and `uv run mypy --config-file mypy.ini` and confirm that all code blocks you made edits to are error free. 
 
 ## Impact
 

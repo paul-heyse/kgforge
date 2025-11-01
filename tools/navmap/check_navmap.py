@@ -12,25 +12,25 @@ from __future__ import annotations
 import ast
 import re
 import sys
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import TypedDict, cast
 
 from packaging.version import InvalidVersion, Version
 
+import tools.navmap.build_navmap as _build_navmap
 from tools import get_logger
-from tools.navmap.build_navmap import NavmapError as BuildNavmapError
-from tools.navmap.build_navmap import build_index
+
+_BuildNavmapError = Exception
+
+BuildNavmapError = cast(type[Exception], getattr(_build_navmap, "NavmapError", _BuildNavmapError))
+build_index = cast(Callable[..., dict[str, object]], _build_navmap.build_index)
 
 LOGGER = get_logger(__name__)
 
 REPO = Path(__file__).resolve().parents[2]
 SRC = REPO / "src"
 INDEX = REPO / "site" / "_build" / "navmap" / "navmap.json"
-
-# Ensure repository root is importable for round-trip checks.
-if str(REPO) not in sys.path:
-    sys.path.insert(0, str(REPO))
 
 # Regexes
 SECTION_RE = re.compile(r"^\s*#\s*\[nav:section\s+([a-z0-9]+(?:-[a-z0-9]+)*)\]\s*$")

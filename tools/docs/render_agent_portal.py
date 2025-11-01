@@ -87,10 +87,13 @@ def _collect_module_hints(symbols: Iterable[SymbolModel]) -> dict[str, list[str]
     tests: set[str] = set()
     notes: set[str] = set()
     for symbol in symbols:
-        tags.update(symbol.agent_hints.intent_tags or [])
-        safe_ops.update(symbol.agent_hints.safe_ops or [])
-        tests.update(symbol.agent_hints.tests_to_run or [])
-        notes.update(symbol.agent_hints.breaking_change_notes or [])
+        hints = symbol.agent_hints
+        if hints is None:
+            continue
+        tags.update(hints.intent_tags or [])
+        safe_ops.update(hints.safe_ops or [])
+        tests.update(hints.tests_to_run or [])
+        notes.update(hints.breaking_change_notes or [])
     return {
         "intent_tags": sorted(tags),
         "safe_ops": sorted(safe_ops),
@@ -180,19 +183,18 @@ def _render_exemplars(module: ModuleModel) -> str:
     exemplars = []
     for symbol in module.symbols:
         for exemplar in symbol.exemplars:
-            snippet = exemplar.get("snippet", "")
+            snippet_value = exemplar.get("snippet", "")
+            snippet = str(snippet_value)
+            title_value = exemplar.get("title", symbol.qname)
+            title = str(title_value)
             exemplars.append(
-                """
+                f"""
                 <article class="exemplar">
-                  <h4>{title}</h4>
-                  <pre><code>{snippet}</code></pre>
-                  <button type="button" class="copy-exemplar" data-snippet="{raw}">Insert exemplar</button>
+                  <h4>{html.escape(title)}</h4>
+                  <pre><code>{html.escape(snippet)}</code></pre>
+                  <button type="button" class="copy-exemplar" data-snippet="{html.escape(snippet, quote=True)}">Insert exemplar</button>
                 </article>
-                """.format(
-                    title=html.escape(exemplar.get("title", symbol.qname)),
-                    snippet=html.escape(snippet),
-                    raw=html.escape(snippet, quote=True),
-                )
+                """
             )
             if len(exemplars) >= MAX_EXEMPLARS:
                 break
@@ -205,7 +207,7 @@ def _render_exemplars(module: ModuleModel) -> str:
 
 def _render_breadcrumbs(module_name: str) -> str:
     parts = module_name.split(".")
-    items = []
+    items: list[str] = []
     for index, part in enumerate(parts, start=1):
         items.append(  # pyrefly: ignore[bad-argument-type]
             f'<li><span aria-current="page" data-depth="{index}">{html.escape(part)}</span></li>'
@@ -411,14 +413,16 @@ def _render_feedback() -> str:
 
 def render_portal(client: AgentCatalogClient, output_path: Path) -> None:
     """Render the Agent Portal HTML artifact to ``output_path``."""
-    artifacts = client.catalog.artifacts
+    artifacts = {
+        key: value for key, value in client.catalog.artifacts.items() if isinstance(value, str)
+    }
     quick_links = _render_quick_links(artifacts)
-    package_sections = []
+    package_sections: list[str] = []
     cache_dir = _cache_directory(output_path)
     used: set[CacheKey] = set()
     for package in client.list_packages():
         modules = client.list_modules(package.name)
-        package_sections.append(  # pyrefly: ignore[bad-argument-type]
+        package_sections.append(
             _render_package(package.name, modules, cache_dir=cache_dir, used=used)
         )
     packages_markup = "\n".join(package_sections)

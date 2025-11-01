@@ -455,6 +455,14 @@ catalogctl-mcp = "kgfoundry.agent_catalog.mcp:main"
 
 
 [project.optional-dependencies]
+tools = [
+    "build>=1.2.2",
+    "prometheus-client>=0.23.1",
+    "opentelemetry-api>=1.24.0",
+    "opentelemetry-sdk>=1.24.0",
+    "msgspec>=0.19.0",
+    "pyyaml>=6",
+]
 gpu = [
     "cython>=3.2.0b1",
     "nvidia-cublas",
@@ -516,7 +524,16 @@ gpu = [
 
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/kgfoundry"]
+packages = ["src/kgfoundry", "src/kgfoundry_common", "tools"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src",
+    "tools",
+    "pyproject.toml",
+    "README.md",
+    "LICENSE",
+]
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -628,6 +645,7 @@ runtime-evaluated-base-classes = [
 "tools/check_new_suppressions.py" = ["T201", "BLE001", "SIM102", "PLR2004"]  # CLI script: print is OK, Exception catch for file I/O
 "tools/generate_pr_summary.py" = ["T201", "BLE001", "C901", "PLR0915", "TRY300", "SIM115"]  # CLI script: print is OK, complexity acceptable
 "src/search_api/bm25_index.py" = ["S608"]  # DuckDB read_parquet() paths from trusted sources (DB queries/config), not user input
+"src/kgfoundry/tooling_bridge.py" = ["PLC2701", "TID251"]
 
 [tool.ruff.lint.isort]
 known-first-party = [
@@ -650,6 +668,9 @@ known-first-party = [
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"kgfoundry._namespace_proxy" = { msg = "Import kgfoundry.tooling_bridge instead." }
 
 [tool.ruff.lint.flake8-import-conventions.aliases]
 numpy = "np"

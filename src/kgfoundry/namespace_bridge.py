@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from kgfoundry._namespace_proxy import (
+from kgfoundry.tooling_bridge import (
     namespace_attach,
     namespace_dir,
     namespace_exports,
