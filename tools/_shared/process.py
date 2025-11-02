@@ -20,11 +20,6 @@ from importlib import import_module
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-_subprocess_module = import_module("subprocess")
-CompletedProcess = _subprocess_module.CompletedProcess
-TimeoutExpired = _subprocess_module.TimeoutExpired
-_run_subprocess = _subprocess_module.run
-
 from tools._shared.logging import StructuredLoggerAdapter, get_logger
 from tools._shared.metrics import ToolRunObservation, observe_tool_run
 from tools._shared.problem_details import (
@@ -36,6 +31,11 @@ from tools._shared.problem_details import (
     tool_timeout_problem_details,
 )
 from tools._shared.settings import ToolRuntimeSettings, get_runtime_settings
+
+_subprocess_module = import_module("subprocess")
+CompletedProcess = _subprocess_module.CompletedProcess
+TimeoutExpired = _subprocess_module.TimeoutExpired
+_run_subprocess = _subprocess_module.run
 
 Command = Sequence[str]
 Environment = Mapping[str, str]

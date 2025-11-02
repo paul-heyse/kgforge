@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Iterator, Mapping, Sequence
+from types import ModuleType
+
+DEFAULT_EXCLUSIONS: tuple[str, ...]
 
 class Identifier:  # pragma: no cover - stub only
     identifier: str
@@ -20,3 +23,24 @@ class EvaluableArchitecture:  # pragma: no cover - stub only
         sources: Iterable[object],
         targets: Iterable[object],
     ) -> ModuleDependencies: ...
+
+def get_evaluable_architecture(
+    root_path: str,
+    module_path: str,
+    exclusions: tuple[str, ...] = ...,
+    exclude_external_libraries: bool = ...,
+    level_limit: int | None = ...,
+    regex_exclusions: tuple[str, ...] | None = ...,
+    external_exclusions: tuple[str, ...] | None = ...,
+    regex_external_exclusions: tuple[str, ...] | None = ...,
+) -> EvaluableArchitecture: ...
+def get_evaluable_architecture_for_module_objects(
+    root_module: ModuleType,
+    module: ModuleType,
+    exclusions: tuple[str, ...] = ...,
+    exclude_external_libraries: bool = ...,
+    level_limit: int | None = ...,
+    regex_exclusions: tuple[str, ...] | None = ...,
+    external_exclusions: tuple[str, ...] | None = ...,
+    regex_external_exclusions: tuple[str, ...] | None = ...,
+) -> EvaluableArchitecture: ...

@@ -1,5 +1,5 @@
 from __future__ import annotations
 
-from . import lucene as lucene
+from pyserini.index import lucene as lucene
 
 __all__ = ["lucene"]

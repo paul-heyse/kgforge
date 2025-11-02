@@ -23,12 +23,12 @@ from __future__ import annotations
 
 import io
 import logging
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from importlib import import_module
 from pathlib import Path
 from typing import Final, Protocol, cast
 
-from tools import ToolExecutionError, run_tool
+from tools import ToolExecutionError, get_process_runner, run_tool
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ _Popen = _subprocess_module.Popen
 TimeoutExpired = cast(type[TimeoutError], _subprocess_module.TimeoutExpired)
 
 
-class TextProcess(Protocol):
+class _TextProcess(Protocol):
     """Protocol describing the streaming process surface we expose."""
 
     stdin: io.TextIOBase | None
@@ -58,6 +58,9 @@ class TextProcess(Protocol):
     def terminate(self) -> None: ...
 
     def kill(self) -> None: ...
+
+
+TextProcess = _TextProcess
 
 
 class SubprocessTimeoutError(TimeoutError):
@@ -241,14 +244,13 @@ def spawn_text_process(
         msg = "Command must contain at least one argument"
         raise ToolExecutionError(msg, command=[])
 
-    allowlist = AllowListEnforcer()
-    environment = SanitisedEnvironment()
+    runner = get_process_runner()
 
-    executable = allowlist.resolve(command[0], command)
+    executable = runner.allowlist.resolve(command[0], command)
     final_command = (str(executable), *command[1:])
-    sanitised_env = environment.build(env)
+    sanitised_env = runner.environment.build(env)
 
-    process = cast(
+    return cast(
         TextProcess,
         _Popen(  # type: ignore[call-arg]
             final_command,
@@ -260,7 +262,6 @@ def spawn_text_process(
             env=dict(sanitised_env),
         ),
     )
-    return process
 
 
 __all__ = [
