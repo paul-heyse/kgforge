@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check for new type ignores and noqa directives without TICKET: tags.
 
-This script scans source files for new `# type: ignore` or `# noqa` directives
+This script scans source files for new `# type-ignore` or `# noqa` directives
 that don't include a `TICKET:` tag. It fails the build if untracked suppressions
 are found, enforcing zero-tolerance for unmanaged suppressions.
 
@@ -134,7 +134,7 @@ def main() -> int:
             )
 
     LOGGER.error("Fix: Add TICKET: <ticket-id> to each suppression line.")
-    LOGGER.error("Example: # type: ignore[misc]  # TICKET: ABC-123  # numpy dtype contains Any")
+    LOGGER.error("Example: # type-ignore[misc]  # TICKET: ABC-123  # numpy dtype contains Any")
 
     return 1
 

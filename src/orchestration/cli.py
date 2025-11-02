@@ -9,17 +9,29 @@ from __future__ import annotations
 import contextlib
 import json
 import logging
-from collections.abc import Mapping, Sequence
+import warnings
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, cast
+from uuid import uuid4
 
 import numpy as np
 import typer
+from jsonschema import Draft202012Validator, ValidationError
 from numpy.typing import NDArray
 
 from kgfoundry.embeddings_sparse.bm25 import get_bm25
+from kgfoundry_common.errors import IndexBuildError
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.problem_details import ProblemDetails, build_problem_details, render_problem
+from kgfoundry_common.schema_helpers import load_schema
+from kgfoundry_common.types import JsonValue
+from kgfoundry_common.vector_types import (
+    VectorBatch,
+    VectorValidationError,
+    coerce_vector_batch,
+)
 from orchestration import safe_pickle
 
 if TYPE_CHECKING:
@@ -215,69 +227,105 @@ def _build_bm25_index(config: BM25BuildConfig) -> None:
         raise RuntimeError(msg) from exc
 
 
-def _load_vectors_from_json(vectors_path: str) -> tuple[list[str], NDArray]:  # type: ignore[type-arg]
-    """Load and parse vectors from JSON file.
+_VECTOR_SCHEMA_PATH = (
+    Path(__file__).resolve().parents[2] / "schema/vector-ingestion/vector-batch.v1.schema.json"
+)
+_VECTOR_SCHEMA_ID = "https://kgfoundry.dev/schema/vector-ingestion/vector-batch.v1.json"
+_VECTOR_PROBLEM_TYPE = "https://kgfoundry.dev/problems/vector-ingestion/invalid-payload"
+_VECTOR_SCHEMA_ERROR_LIMIT = 5
+_VECTOR_VALIDATOR_CACHE: dict[str, Draft202012Validator] = {}
 
-    Parameters
-    ----------
-    vectors_path : str
-        Path to JSON file with vector data.
 
-    Returns
-    -------
-    tuple[list[str], NDArray]
-        Tuple of (vector_ids, vectors_array).
+def _vector_batch_validator() -> Draft202012Validator:
+    """Return a cached JSON Schema validator for vector ingestion payloads."""
+    validator = _VECTOR_VALIDATOR_CACHE.get("validator")
+    if validator is None:
+        schema = load_schema(_VECTOR_SCHEMA_PATH)
+        validator = Draft202012Validator(cast(dict[str, object], schema))
+        _VECTOR_VALIDATOR_CACHE["validator"] = validator
+    return validator
 
-    Raises
-    ------
-    FileNotFoundError
-        If file not found.
-    json.JSONDecodeError
-        If JSON is invalid.
-    TypeError
-        If data format is unexpected.
-    ValueError
-        If vectors are empty or malformed.
-    """
-    with Path(vectors_path).open(encoding="utf-8") as fh:
-        raw_vecs: object = json.load(fh)
 
-    if not isinstance(raw_vecs, Sequence) or isinstance(raw_vecs, (str, bytes)):
-        msg = "Dense vectors dataset must be a sequence of objects"
+def _error_sort_key(error: ValidationError) -> tuple[str, ...]:
+    """Build a sortable key for JSON Schema validation errors."""
+    return tuple(str(part) for part in error.path)
+
+
+def _validate_vector_payload(payload: object) -> None:
+    """Validate vector ingestion payloads against the canonical schema."""
+    validator = _vector_batch_validator()
+    errors = sorted(validator.iter_errors(payload), key=_error_sort_key)
+    if not errors:
+        return
+
+    messages: list[str] = []
+    for error in errors[:_VECTOR_SCHEMA_ERROR_LIMIT]:
+        location = "/".join(str(part) for part in error.absolute_path) or "<root>"
+        messages.append(f"{location}: {error.message}")
+
+    if len(errors) > _VECTOR_SCHEMA_ERROR_LIMIT:
+        remaining = len(errors) - _VECTOR_SCHEMA_ERROR_LIMIT
+        messages.append(f"... {remaining} additional validation errors")
+
+    raise VectorValidationError(messages[0], errors=messages)
+
+
+def _build_vector_problem_details(
+    *,
+    detail: str,
+    correlation_id: str,
+    vector_path: str,
+    errors: Sequence[str],
+    instance: str,
+) -> ProblemDetails:
+    """Create Problem Details payload for vector ingestion failures."""
+    problem_extensions: dict[str, JsonValue] = {
+        "schema_id": _VECTOR_SCHEMA_ID,
+        "vector_path": vector_path,
+        "correlation_id": correlation_id,
+        "validation_errors": list(errors),
+    }
+
+    return build_problem_details(
+        problem_type=_VECTOR_PROBLEM_TYPE,
+        title="Vector payload failed validation",
+        status=422,
+        detail=detail,
+        instance=instance,
+        extensions=problem_extensions,
+    )
+
+
+def load_vector_batch_from_json(vectors_path: str) -> VectorBatch:
+    """Load and validate dense vectors from JSON file."""
+    vectors_file = Path(vectors_path)
+    if not vectors_file.exists():
+        msg = f"Vectors file not found: {vectors_path}"
+        raise FileNotFoundError(msg)
+
+    with vectors_file.open("r", encoding="utf-8") as file_obj:
+        payload: object = json.load(file_obj)
+
+    if not isinstance(payload, Sequence):
+        msg = "Dense vectors payload must be a sequence of mapping objects"
         raise TypeError(msg)
 
-    keys: list[str] = []
-    rows: list[list[float]] = []
+    _validate_vector_payload(payload)
+    records = cast(Iterable[Mapping[str, object]], payload)
+    return coerce_vector_batch(records)
 
-    for entry in raw_vecs:
-        if not isinstance(entry, Mapping):
-            continue
-        key_obj = entry.get("key")
-        vector_obj = entry.get("vector")
-        if not isinstance(key_obj, str) or not isinstance(vector_obj, Sequence):
-            continue
 
-        vector_row: list[float] = []
-        try:
-            for value in vector_obj:
-                if isinstance(value, (int, float)):
-                    vector_row.append(float(value))
-                else:
-                    break
-            else:
-                # Loop completed normally (all values were convertible)
-                if vector_row:
-                    keys.append(key_obj)
-                    rows.append(vector_row)
-        except (TypeError, ValueError):
-            continue
-
-    if not keys:
-        msg = "Dense vectors dataset is empty or malformed"
-        raise ValueError(msg)
-
-    vectors: NDArray = np.asarray(rows, dtype=np.float32)  # type: ignore[type-arg]
-    return keys, vectors  # type: ignore[misc]
+def _load_vectors_from_json(vectors_path: str) -> tuple[list[str], NDArray[np.float32]]:
+    """Provide legacy tuple output while delegating to vector batch loader."""
+    warnings.warn(
+        "orchestration.cli._load_vectors_from_json is deprecated; use load_vector_batch_from_json",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    batch = load_vector_batch_from_json(vectors_path)
+    ids = [str(vector_id) for vector_id in batch.ids]
+    matrix = np.asarray(batch.matrix, dtype=np.float32)
+    return ids, matrix
 
 
 def _prepare_index_directory(index_path: str) -> None:
@@ -407,9 +455,12 @@ def index_faiss(
         metric=metric,
     )
 
+    correlation_id = uuid4().hex
+    instance_uri = f"urn:orchestration:index-faiss:{correlation_id}"
+
     try:
         _prepare_index_directory(config.index_path)
-        keys, vectors = _load_vectors_from_json(config.dense_vectors)  # type: ignore[misc]
+        batch = load_vector_batch_from_json(config.dense_vectors)
 
         logger.info(
             "Building FAISS index",
@@ -417,27 +468,63 @@ def index_faiss(
                 "operation": "index_faiss",
                 "factory": config.factory,
                 "metric": config.metric,
-                "vectors": len(keys),
+                "vectors": batch.count,
+                "dimension": batch.dimension,
+                "correlation_id": correlation_id,
             },
         )
 
-        # Store vectors and keys using pickle (temporary; pending full FAISS integration)
         index_data = {
-            "keys": keys,
-            "vectors": vectors,  # type: ignore[misc]
+            "keys": list(batch.ids),
+            "vectors": batch.matrix,
             "factory": config.factory,
             "metric": config.metric,
         }
-        with Path(config.index_path).open("wb") as f:
-            safe_pickle.dump(index_data, f)
+        with Path(config.index_path).open("wb") as file_obj:
+            safe_pickle.dump(index_data, file_obj)
 
-        logger.info("Index saved successfully", extra={"path": config.index_path})
+        logger.info(
+            "Index saved successfully",
+            extra={
+                "operation": "index_faiss",
+                "path": config.index_path,
+                "correlation_id": correlation_id,
+            },
+        )
         typer.echo(f"FAISS index vectors stored at {config.index_path}")
+
+    except VectorValidationError as exc:
+        logger.exception(
+            "Vector validation failed",
+            extra={
+                "operation": "index_faiss",
+                "error": type(exc).__name__,
+                "correlation_id": correlation_id,
+            },
+        )
+        problem = _build_vector_problem_details(
+            detail=str(exc),
+            correlation_id=correlation_id,
+            vector_path=config.dense_vectors,
+            errors=exc.errors,
+            instance=instance_uri,
+        )
+        typer.echo(render_problem(problem), err=True)
+        index_error = IndexBuildError(
+            "Vector payload failed validation",
+            cause=exc,
+            context={"problem": problem, "correlation_id": correlation_id},
+        )
+        raise typer.Exit(code=1) from index_error
 
     except (TypeError, json.JSONDecodeError, FileNotFoundError) as exc:
         logger.exception(
             "Vector loading failed",
-            extra={"operation": "index_faiss", "error": type(exc).__name__},
+            extra={
+                "operation": "index_faiss",
+                "error": type(exc).__name__,
+                "correlation_id": correlation_id,
+            },
         )
         typer.echo(f"Error loading vectors: {exc}", err=True)
         raise typer.Exit(code=1) from exc
@@ -445,7 +532,11 @@ def index_faiss(
     except (OSError, ValueError, RuntimeError) as exc:
         logger.exception(
             "Index save failed",
-            extra={"operation": "index_faiss", "error": type(exc).__name__},
+            extra={
+                "operation": "index_faiss",
+                "error": type(exc).__name__,
+                "correlation_id": correlation_id,
+            },
         )
         typer.echo(f"Error saving index: {exc}", err=True)
         raise typer.Exit(code=1) from exc

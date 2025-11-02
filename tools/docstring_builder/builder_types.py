@@ -1,0 +1,177 @@
+"""Core types and helpers for the docstring builder pipeline.
+
+This module centralises the shared dataclasses and enums that describe the
+docstring builder request/response lifecycle.  Keeping these definitions in a
+single location prevents circular imports between orchestration helpers and the
+CLI entry points while providing typed utilities for status conversion and
+Problem Details emission.
+"""
+
+from __future__ import annotations
+
+import enum
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from tools.docstring_builder.config import ConfigSelection
+from tools.docstring_builder.models import (
+    CliResult,
+    ErrorReport,
+    FileReport,
+    RunStatus,
+)
+from tools.docstring_builder.models import (
+    ProblemDetails as ModelProblemDetails,
+)
+from tools.docstring_builder.models import (
+    build_problem_details as _build_model_problem_details,
+)
+
+
+class ExitStatus(enum.IntEnum):
+    """Standardised exit codes for CLI subcommands."""
+
+    SUCCESS = 0
+    VIOLATION = 1
+    CONFIG = 2
+    ERROR = 3
+
+
+STATUS_LABELS: dict[ExitStatus, str] = {
+    ExitStatus.SUCCESS: "success",
+    ExitStatus.VIOLATION: "violation",
+    ExitStatus.CONFIG: "config",
+    ExitStatus.ERROR: "error",
+}
+
+
+EXIT_SUCCESS = int(ExitStatus.SUCCESS)
+EXIT_VIOLATION = int(ExitStatus.VIOLATION)
+EXIT_CONFIG = int(ExitStatus.CONFIG)
+EXIT_ERROR = int(ExitStatus.ERROR)
+
+_EXIT_TO_RUN_STATUS: dict[ExitStatus, RunStatus] = {
+    ExitStatus.SUCCESS: RunStatus.SUCCESS,
+    ExitStatus.VIOLATION: RunStatus.VIOLATION,
+    ExitStatus.CONFIG: RunStatus.CONFIG,
+    ExitStatus.ERROR: RunStatus.ERROR,
+}
+
+
+def _status_from_exit(status: ExitStatus) -> RunStatus:
+    """Translate an :class:`ExitStatus` into the CLI ``RunStatus`` enum."""
+    return _EXIT_TO_RUN_STATUS.get(status, RunStatus.ERROR)
+
+
+def _status_from_label(label: str) -> RunStatus:
+    """Translate a status label string into ``RunStatus``."""
+    lowered = label.lower()
+    match lowered:
+        case "success":
+            return RunStatus.SUCCESS
+        case "violation" | "warn" | "autofix":
+            return RunStatus.VIOLATION
+        case "config":
+            return RunStatus.CONFIG
+        case "error":
+            return RunStatus.ERROR
+        case _:
+            return RunStatus.ERROR
+
+
+def _http_status_for_exit(status: ExitStatus) -> int:
+    """Map an :class:`ExitStatus` to an HTTP Problem Details status."""
+    match status:
+        case ExitStatus.SUCCESS:
+            return 200
+        case ExitStatus.VIOLATION:
+            return 422
+        case ExitStatus.CONFIG:
+            return 400
+        case ExitStatus.ERROR:
+            return 500
+    raise AssertionError(status)
+
+
+@dataclass(slots=True)
+class DocstringBuildRequest:
+    """Typed request describing a docstring builder run."""
+
+    command: str
+    subcommand: str
+    module: str | None = None
+    since: str | None = None
+    changed_only: bool = False
+    explicit_paths: tuple[str, ...] = ()
+    force: bool = False
+    diff: bool = False
+    ignore_missing: bool = False
+    skip_docfacts: bool = False
+    json_output: bool = False
+    jobs: int = 1
+    baseline: str | None = None
+    only_plugins: tuple[str, ...] = ()
+    disable_plugins: tuple[str, ...] = ()
+    policy_overrides: Mapping[str, str] = field(default_factory=dict)
+    llm_summary: bool = False
+    llm_dry_run: bool = False
+    normalize_sections: bool = False
+    invoked_subcommand: str | None = None
+
+
+@dataclass(slots=True)
+class DocstringBuildResult:
+    """Structured result produced by a docstring builder run."""
+
+    exit_status: ExitStatus
+    errors: list[ErrorReport]
+    file_reports: list[FileReport]
+    observability_payload: Mapping[str, object]
+    cli_payload: CliResult | None
+    manifest_path: Path | None
+    problem_details: ModelProblemDetails | None
+    config_selection: ConfigSelection | None
+    diff_previews: list[tuple[Path, str]] = field(default_factory=list)
+
+
+def build_problem_details(
+    status: ExitStatus,
+    command: str,
+    subcommand: str,
+    detail: str,
+    *,
+    instance: str | None = None,
+    errors: Sequence[ErrorReport] | None = None,
+) -> ModelProblemDetails:
+    """Create an RFC 9457 Problem Details payload for CLI failures."""
+    problem_dict = _build_model_problem_details(
+        type="https://kgfoundry.dev/problems/docbuilder/run-failed",
+        title="Docstring builder run failed",
+        status=_http_status_for_exit(status),
+        detail=detail,
+        instance=instance or "",
+        extensions=None,
+    )
+    problem_dict["extensions"] = {
+        "command": command,
+        "subcommand": subcommand,
+        "errorCount": len(errors) if errors is not None else 0,
+    }
+    return problem_dict
+
+
+__all__ = [
+    "EXIT_CONFIG",
+    "EXIT_ERROR",
+    "EXIT_SUCCESS",
+    "EXIT_VIOLATION",
+    "STATUS_LABELS",
+    "DocstringBuildRequest",
+    "DocstringBuildResult",
+    "ExitStatus",
+    "_http_status_for_exit",
+    "_status_from_exit",
+    "_status_from_label",
+    "build_problem_details",
+]

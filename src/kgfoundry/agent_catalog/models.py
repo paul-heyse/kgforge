@@ -6,9 +6,9 @@ import json
 import logging
 from collections.abc import Iterable
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-from pydantic import BaseModel, Field, TypeAdapter
+from pydantic import BaseModel, Field
 
 from kgfoundry.agent_catalog.sqlite import load_catalog_from_sqlite, sqlite_candidates
 from kgfoundry_common.errors import CatalogLoadError
@@ -615,6 +615,17 @@ def _load_shard_packages(
     return packages
 
 
+# Provide typed access to Pydantic's ``model_validate`` without propagating
+# ``Any`` into callers when type checking.
+if TYPE_CHECKING:  # pragma: no cover - typing only
+
+    def _model_validate_catalog(payload: dict[str, JsonValue]) -> AgentCatalogModel: ...
+else:  # pragma: no cover - runtime behaviour
+
+    def _model_validate_catalog(payload: dict[str, JsonValue]) -> AgentCatalogModel:
+        return AgentCatalogModel.model_validate(payload)
+
+
 def load_catalog_model(path: Path, *, load_shards: bool = True) -> AgentCatalogModel:
     """Return a validated catalog model from the JSON artifact.
 
@@ -650,8 +661,7 @@ def load_catalog_model(path: Path, *, load_shards: bool = True) -> AgentCatalogM
         AgentCatalogModel
             Validated catalog model instance.
         """
-        adapter = TypeAdapter(AgentCatalogModel)
-        return adapter.validate_python(payload)
+        return _model_validate_catalog(payload)
 
     for candidate in sqlite_candidates(path):
         if candidate.exists():

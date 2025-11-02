@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, NotRequired, TypedDict, cast
 
@@ -66,6 +67,15 @@ _EMPTY_GITHUB_POLICY: GithubLinkPolicy = cast(GithubLinkPolicy, {})
 def _coerce_str(value: object, default: str = "") -> str:
     """Return *value* if it is a string; otherwise return *default*."""
     return value if isinstance(value, str) else default
+
+
+@dataclass(slots=True)
+class _SymbolAnchorContext:
+    """Resolved source location data for rendering anchor links."""
+
+    absolute_path: Path
+    relative_path: Path
+    line: int
 
 
 DEFAULT_EDITOR_TEMPLATE = "vscode://file/{path}:{line}"
@@ -430,50 +440,91 @@ class AgentCatalogClient:
             Describe return value.
         """
         symbol = self._require_symbol(symbol_id)
-        module_name = symbol.qname.rsplit(".", 1)[0] if "." in symbol.qname else symbol.qname
+        module_name = _module_name_from_qname(symbol.qname)
         module = self._require_module(module_name)
-        source_path = module.source.get("path")
-        if not source_path:
-            message = "Symbol source path missing from catalog"
-            raise AgentCatalogClientError(message)
-        start_line = symbol.anchors.start_line or 1
 
+        location = _resolve_symbol_anchor_context(symbol, module, self.repo_root)
         raw_policy = cast(JsonObject | None, self._catalog.link_policy)
         policy = _normalize_link_policy(raw_policy)
-        editor_template = _coerce_str(policy.get("editor_template"), _DEFAULT_EDITOR_TEMPLATE)
-        github_template = _coerce_str(policy.get("github_template"), _DEFAULT_GITHUB_TEMPLATE)
-        rel_path = Path(source_path)
-        if rel_path.is_absolute():
-            rel_path = rel_path.relative_to(self.repo_root)
-        editor_vars = _SafeFormatDict({"path": str(self.repo_root / rel_path), "line": start_line})
-        try:
-            editor_link = editor_template.format_map(editor_vars)
-        except Exception as exc:
-            message = "Invalid editor_template in catalog link_policy"
-            raise AgentCatalogClientError(message) from exc
-
-        github_policy = policy["github"] if "github" in policy else _EMPTY_GITHUB_POLICY
-        github_vars = _SafeFormatDict(
-            {
-                "org": _coerce_str(github_policy.get("org")),
-                "repo": _coerce_str(github_policy.get("repo")),
-                "sha": _coerce_str(github_policy.get("sha")),
-                "path": str(rel_path),
-                "line": start_line,
-            }
-        )
-        try:
-            github_link = github_template.format_map(github_vars)
-        except Exception as exc:
-            message = "Invalid github_template in catalog link_policy"
-            raise AgentCatalogClientError(message) from exc
-        return {"editor": editor_link, "github": github_link}
+        return _build_anchor_links(policy, location)
 
 
 __all__ = [
     "AgentCatalogClient",
     "AgentCatalogClientError",
 ]
+
+
+def _module_name_from_qname(qname: str) -> str:
+    if "." in qname:
+        return qname.rsplit(".", 1)[0]
+    return qname
+
+
+def _resolve_symbol_anchor_context(
+    symbol: SymbolModel,
+    module: ModuleModel,
+    repo_root: Path,
+) -> _SymbolAnchorContext:
+    source_payload = module.source if isinstance(module.source, Mapping) else {}
+    raw_path = source_payload.get("path") if isinstance(source_payload, Mapping) else None
+    if not isinstance(raw_path, str) or not raw_path:
+        message = "Symbol source path missing from catalog"
+        raise AgentCatalogClientError(message)
+
+    resolved_path = Path(raw_path)
+    if resolved_path.is_absolute():
+        absolute_path = resolved_path
+        try:
+            relative_path = resolved_path.relative_to(repo_root)
+        except ValueError as exc:  # pragma: no cover - defensive guard
+            message = f"Symbol source path {resolved_path} is outside repo root {repo_root}"
+            raise AgentCatalogClientError(message) from exc
+    else:
+        relative_path = resolved_path
+        absolute_path = repo_root / relative_path
+
+    start_line = symbol.anchors.start_line
+    line_number = start_line if isinstance(start_line, int) and start_line > 0 else 1
+    return _SymbolAnchorContext(
+        absolute_path=absolute_path, relative_path=relative_path, line=line_number
+    )
+
+
+def _format_anchor_template(
+    template: str, context: Mapping[str, object], error_message: str
+) -> str:
+    render_context = _SafeFormatDict({key: str(value) for key, value in context.items()})
+    try:
+        return template.format_map(render_context)
+    except Exception as exc:  # pragma: no cover - formatting issues are exceptional
+        raise AgentCatalogClientError(error_message) from exc
+
+
+def _build_anchor_links(policy: LinkPolicy, location: _SymbolAnchorContext) -> dict[str, str]:
+    editor_template = _coerce_str(policy.get("editor_template"), _DEFAULT_EDITOR_TEMPLATE)
+    github_template = _coerce_str(policy.get("github_template"), _DEFAULT_GITHUB_TEMPLATE)
+
+    editor_link = _format_anchor_template(
+        editor_template,
+        {"path": str(location.absolute_path), "line": location.line},
+        "Invalid editor_template in catalog link_policy",
+    )
+
+    github_policy = policy.get("github", _EMPTY_GITHUB_POLICY)
+    github_link = _format_anchor_template(
+        github_template,
+        {
+            "org": _coerce_str(github_policy.get("org")),
+            "repo": _coerce_str(github_policy.get("repo")),
+            "sha": _coerce_str(github_policy.get("sha")),
+            "path": str(location.relative_path),
+            "line": location.line,
+        },
+        "Invalid github_template in catalog link_policy",
+    )
+
+    return {"editor": editor_link, "github": github_link}
 
 
 def _normalize_link_policy(raw_policy: JsonObject | None) -> LinkPolicy:

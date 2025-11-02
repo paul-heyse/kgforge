@@ -17,10 +17,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from pytestarch import LayeredArchitecture, get_evaluable_architecture
-from pytestarch.pytestarch import EvaluableArchitecture  # type: ignore[attr-defined]
+from pytestarch.pytestarch import EvaluableArchitecture
 from pytestarch.query_language import layered_architecture_rule
 
-ModuleNameFilter = layered_architecture_rule.ModuleNameFilter  # type: ignore[attr-defined]
+ModuleNameFilter = layered_architecture_rule.ModuleNameFilter
 
 TOOLS_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = TOOLS_ROOT.parent

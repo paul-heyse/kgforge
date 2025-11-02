@@ -16,9 +16,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tools.docstring_builder.builder_types import ExitStatus
 from tools.docstring_builder.io import read_baseline_version
 from tools.docstring_builder.models import ErrorReport, FileReport, RunStatus
-from tools.docstring_builder.orchestrator import ExitStatus
 from tools.docstring_builder.paths import REPO_ROOT
 from tools.docstring_builder.pipeline_types import FileOutcome, ProcessingOptions
 from tools.drift_preview import DocstringDriftEntry

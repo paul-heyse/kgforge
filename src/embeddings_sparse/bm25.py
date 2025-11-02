@@ -313,7 +313,8 @@ class PurePythonBM25:
         msg = f"Index metadata not found at {metadata_path} or {legacy_path}"
         raise FileNotFoundError(msg)
 
-    def _load_legacy_payload(self, legacy_path: Path) -> dict[str, JsonValue]:
+    @staticmethod
+    def _load_legacy_payload(legacy_path: Path) -> dict[str, JsonValue]:
         with legacy_path.open("rb") as handle:
             try:
                 payload = load_unsigned_legacy(handle)
@@ -351,7 +352,8 @@ class PurePythonBM25:
         self.N = int(n_val) if isinstance(n_val, (int, float)) else 0
         self.avgdl = float(avgdl_val) if isinstance(avgdl_val, (int, float)) else 0.0
 
-    def _build_docs_from_metadata(self, data: Mapping[str, JsonValue]) -> dict[str, BM25Doc]:
+    @staticmethod
+    def _build_docs_from_metadata(data: Mapping[str, JsonValue]) -> dict[str, BM25Doc]:
         docs_data_raw = data.get("docs", [])
         if isinstance(docs_data_raw, list) and docs_data_raw:
             docs: dict[str, BM25Doc] = {}

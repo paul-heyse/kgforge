@@ -11,42 +11,28 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import Callable, Iterable
+from collections.abc import Iterable
 from pathlib import Path
-from typing import TypeVar, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import pytest
 import typer
-from _pytest.logging import LogCaptureFixture
 
-# Import CLI commands at module level (suppress import-not-at-top for conditional imports)
-try:
-    from orchestration.cli import index_bm25, index_faiss
-except ImportError:
-    index_bm25 = None  # type: ignore[assignment]
-    index_faiss = None  # type: ignore[assignment]
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from _pytest.logging import LogCaptureFixture
+else:  # pragma: no cover - runtime alias for type checking convenience
+    LogCaptureFixture = Any
 
-TFunc = TypeVar("TFunc", bound=Callable[..., object])
-
-
-def parametrize_backend(func: Callable[..., object]) -> Callable[..., object]:
-    """Typed wrapper over pytest.mark.parametrize for backend values."""
-    decorator = pytest.mark.parametrize(
-        "backend",
-        ["lucene", "pure"],
-        ids=["lucene_backend", "pure_backend"],
-    )
-    return cast(Callable[..., object], decorator(func))
+pytest.importorskip("orchestration.cli")
+from orchestration.cli import index_bm25, index_faiss
 
 
 class TestIndexBM25Idempotency:
     """Verify BM25 indexing is idempotent."""
 
-    @parametrize_backend
     def test_index_bm25_identical_on_retry(
         self,
         temp_index_dir: Path,
-        backend: str,
         caplog: LogCaptureFixture,
     ) -> None:
         """Verify BM25 index is identical when created twice.
@@ -55,19 +41,9 @@ class TestIndexBM25Idempotency:
         ----------
         temp_index_dir : Path
             Temporary directory for test artifacts.
-        backend : str
-            BM25 backend ("lucene" or "pure").
         caplog : LogCaptureFixture
             Pytest fixture for log capture.
         """
-        if index_bm25 is None:
-            pytest.skip("orchestration.cli not available")
-            return
-        assert index_bm25 is not None
-
-        caplog.set_level(logging.INFO)
-
-        # Create test chunk data
         chunks_file = temp_index_dir / "chunks.json"
         chunks_data = [
             {"chunk_id": "c1", "title": "Doc 1", "section": "Intro", "text": "Hello world"},
@@ -75,31 +51,34 @@ class TestIndexBM25Idempotency:
         ]
         chunks_file.write_text(json.dumps(chunks_data))
 
-        # First run
-        index_dir_1 = temp_index_dir / "index_1"
-        index_bm25(
-            chunks_parquet=str(chunks_file),
-            backend=backend,
-            index_dir=str(index_dir_1),
-        )
+        for backend in ("lucene", "pure"):
+            caplog.clear()
+            caplog.set_level(logging.INFO)
 
-        # Verify index was created
-        assert index_dir_1.exists()
+            index_dir_1 = temp_index_dir / f"index_{backend}_1"
+            index_bm25(
+                chunks_parquet=str(chunks_file),
+                backend=backend,
+                index_dir=str(index_dir_1),
+            )
 
-        # Second run (idempotent)
-        index_dir_2 = temp_index_dir / "index_2"
-        index_bm25(
-            chunks_parquet=str(chunks_file),
-            backend=backend,
-            index_dir=str(index_dir_2),
-        )
+            assert index_dir_1.exists()
 
-        # Both should exist
-        assert index_dir_1.exists()
-        assert index_dir_2.exists()
+            index_dir_2 = temp_index_dir / f"index_{backend}_2"
+            index_bm25(
+                chunks_parquet=str(chunks_file),
+                backend=backend,
+                index_dir=str(index_dir_2),
+            )
 
-        # Verify structured logs indicate operation
-        assert any(record.__dict__.get("operation") == "index_bm25" for record in caplog.records)
+            assert index_dir_1.exists()
+            assert index_dir_2.exists()
+
+            found_operation = any(
+                cast(str | None, getattr(record, "operation", None)) == "index_bm25"
+                for record in caplog.records
+            )
+            assert found_operation
 
 
 class TestIndexFAISSIdempotency:
@@ -119,11 +98,6 @@ class TestIndexFAISSIdempotency:
         caplog : LogCaptureFixture
             Pytest fixture for log capture.
         """
-        if index_faiss is None:
-            pytest.skip("orchestration.cli not available")
-            return
-        assert index_faiss is not None
-
         caplog.set_level(logging.INFO)
 
         # Create test vector data
@@ -156,7 +130,11 @@ class TestIndexFAISSIdempotency:
         assert index_path_2.exists()
 
         # Verify structured logs indicate operation
-        assert any(record.__dict__.get("operation") == "index_faiss" for record in caplog.records)
+        found_operation = any(
+            cast(str | None, getattr(record, "operation", None)) == "index_faiss"
+            for record in caplog.records
+        )
+        assert found_operation
 
 
 class TestIndexingErrorHandling:
@@ -176,10 +154,6 @@ class TestIndexingErrorHandling:
         caplog : LogCaptureFixture
             Pytest fixture for log capture.
         """
-        if index_bm25 is None:
-            pytest.skip("orchestration.cli not available")
-            return
-
         caplog.set_level(logging.ERROR)
 
         with pytest.raises(FileNotFoundError, match="nonexistent"):
@@ -209,16 +183,12 @@ class TestIndexingErrorHandling:
         monkeypatch : pytest.MonkeyPatch
             Fixture used to capture Problem Details output from ``typer.echo``.
         """
-        if index_faiss is None:
-            pytest.skip("orchestration.cli not available")
-            return
-        assert index_faiss is not None
-
         caplog.set_level(logging.ERROR)
 
         # Create malformed vector data
         vectors_file = temp_index_dir / "bad_vectors.json"
-        vectors_file.write_text(json.dumps({"not": "a list"}))
+        bad_payload: dict[str, object] = {"not": "a list"}
+        vectors_file.write_text(json.dumps(bad_payload))
 
         # Capture Problem Details emission
         messages: list[tuple[str, bool]] = []
@@ -239,8 +209,12 @@ class TestIndexingErrorHandling:
 
         payload_str, is_err = messages[-1]
         assert is_err is True
-        problem = cast(dict[str, object], json.loads(payload_str))
-        errors_field = cast(dict[str, object], problem.get("errors", {}))
+        problem_raw: object = json.loads(payload_str)
+        assert isinstance(problem_raw, dict)
+        problem = cast(dict[str, object], problem_raw)
+        errors_raw = problem.get("errors")
+        assert isinstance(errors_raw, dict)
+        errors_field: dict[str, object] = {str(key): value for key, value in errors_raw.items()}
 
         assert (
             problem.get("type") == "https://kgfoundry.dev/problems/vector-ingestion/invalid-payload"
