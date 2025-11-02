@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-from typing import Any
+from collections.abc import Sequence
 
 from prometheus_client.registry import CollectorRegistry
-
 
 class _MetricBase:
     def labels(self, *labelvalues: str, **labelkwargs: str) -> _MetricBase: ...
@@ -23,13 +21,35 @@ class Counter(_MetricBase):
         subsystem: str | None = ...,
         unit: str | None = ...,
         registry: CollectorRegistry | None = ...,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> None:
         ...
 
     def labels(self, *labelvalues: str, **labelkwargs: str) -> Counter: ...
 
     def inc(self, amount: float = ...) -> None: ...
+
+
+class Gauge(_MetricBase):
+    """Prometheus gauge metric."""
+
+    def __init__(
+        self,
+        name: str,
+        documentation: str,
+        labelnames: Sequence[str] | None = ...,
+        *,
+        namespace: str | None = ...,
+        subsystem: str | None = ...,
+        unit: str | None = ...,
+        registry: CollectorRegistry | None = ...,
+        **kwargs: object,
+    ) -> None:
+        ...
+
+    def labels(self, *labelvalues: str, **labelkwargs: str) -> Gauge: ...
+
+    def set(self, value: float) -> None: ...
 
 
 class Histogram(_MetricBase):
@@ -46,7 +66,7 @@ class Histogram(_MetricBase):
         subsystem: str | None = ...,
         unit: str | None = ...,
         registry: CollectorRegistry | None = ...,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> None:
         ...
 
@@ -63,5 +83,3 @@ def generate_latest(registry: CollectorRegistry | None = ...) -> bytes: ...
 
 
 REGISTRY: CollectorRegistry
-
-
