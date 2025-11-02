@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import sys
 from collections.abc import Callable, Sequence
 from contextlib import suppress
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, Protocol, cast
 
-from tools import get_logger
+from tools import StructuredLoggerAdapter, get_logger, with_fields
 from tools.detect_pkg import detect_packages, detect_primary
 from tools.griffe_utils import resolve_griffe
 
@@ -50,6 +52,8 @@ class DocsSettings:
     github_org: str | None
     github_repo: str | None
     github_sha: str | None
+    docs_build_dir: Path
+    navmap_candidates: tuple[Path, ...]
 
 
 class GriffeLoader(Protocol):
@@ -70,6 +74,7 @@ class WarningLogger(Protocol):
 _LOADER_FACTORY = cast(Callable[[Sequence[str]], GriffeLoader], resolve_griffe().loader_type)
 
 
+@lru_cache(maxsize=1)
 def detect_environment() -> BuildEnvironment:
     """Return filesystem locations relevant to docs tooling."""
     root = Path(__file__).resolve().parents[2]
@@ -86,8 +91,11 @@ def ensure_sys_paths(env: BuildEnvironment) -> None:
             sys.path.insert(0, path_str)
 
 
+@lru_cache(maxsize=1)
 def load_settings() -> DocsSettings:
     """Return docs settings derived from environment variables."""
+    env = detect_environment()
+
     env_pkgs = os.environ.get("DOCS_PKG")
     if env_pkgs:
         packages = tuple(pkg.strip() for pkg in env_pkgs.split(",") if pkg.strip())
@@ -101,12 +109,21 @@ def load_settings() -> DocsSettings:
         LOGGER.warning("Unsupported DOCS_LINK_MODE '%s'; defaulting to 'both'", link_mode_raw)
         link_mode = "both"
 
+    docs_build_dir = env.root / "docs" / "_build"
+    navmap_candidates: tuple[Path, ...] = (
+        docs_build_dir / "navmap.json",
+        docs_build_dir / "navmap" / "navmap.json",
+        env.root / "site" / "_build" / "navmap" / "navmap.json",
+    )
+
     return DocsSettings(
         packages=packages,
         link_mode=link_mode,
         github_org=os.environ.get("DOCS_GITHUB_ORG"),
         github_repo=os.environ.get("DOCS_GITHUB_REPO"),
         github_sha=os.environ.get("DOCS_GITHUB_SHA"),
+        docs_build_dir=docs_build_dir,
+        navmap_candidates=navmap_candidates,
     )
 
 
@@ -151,3 +168,22 @@ def resolve_git_sha(
         return "HEAD"
 
     return head_contents or "HEAD"
+
+
+def make_logger(
+    operation: str,
+    *,
+    artifact: str | None = None,
+    logger: logging.Logger | StructuredLoggerAdapter | None = None,
+) -> StructuredLoggerAdapter:
+    """Return a structured logger adapter enriched with docs metadata."""
+    base_logger: logging.Logger | StructuredLoggerAdapter
+    if logger is not None:
+        base_logger = logger
+    else:
+        base_logger = get_logger(f"docs.{operation}")
+
+    fields: dict[str, object] = {"operation": operation}
+    if artifact is not None:
+        fields["artifact"] = artifact
+    return with_fields(base_logger, **fields)
