@@ -169,7 +169,6 @@ class TestNamespaceHelpers:
         from kgfoundry._namespace_proxy import namespace_exports
 
         module = types.ModuleType("test_module")
-        # Explicitly type hints for list/function assignments before setting on module
         all_exports: list[str] = ["public_func", "public_class"]
 
         def _public_func() -> None:

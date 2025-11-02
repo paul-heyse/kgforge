@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
+from tools.docstring_builder.builder_types import LoggerLike
 from tools.docstring_builder.pipeline_types import ErrorEnvelope
 
 
@@ -25,7 +25,7 @@ class RunSummarySnapshot:
 class FailureSummaryRenderer:
     """Emit structured failure summaries for CLI output."""
 
-    logger: logging.LoggerAdapter | logging.Logger
+    logger: LoggerLike
 
     def render(self, summary: RunSummarySnapshot, errors: Sequence[ErrorEnvelope]) -> None:
         """Render a structured summary when the run does not succeed."""
@@ -40,7 +40,7 @@ class FailureSummaryRenderer:
         lines.append(f"  Observability log: {summary.observability_path}")
         lines.append("  Top errors:")
         for entry in errors[:5]:
-            status_label = getattr(entry.status, "value", str(entry.status))
+            status_label = str(entry.status.value)
             lines.append(
                 f"    - {entry.file}: {status_label} ({entry.message or 'no additional details'})"
             )

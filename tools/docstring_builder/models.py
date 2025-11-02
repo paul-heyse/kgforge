@@ -31,7 +31,7 @@ from typing import Final, Literal, Protocol, TypedDict, cast
 
 from jsonschema import Draft202012Validator, ValidationError
 
-from tools.shared.problem_details import build_schema_problem_details
+from tools._shared.problem_details import build_schema_problem_details
 
 JsonPrimitive = str | int | float | bool | None
 JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]

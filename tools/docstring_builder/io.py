@@ -7,11 +7,11 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
+from tools._shared.logging import get_logger
+from tools._shared.proc import ToolExecutionError, run_tool
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import iter_target_files
 from tools.docstring_builder.paths import REPO_ROOT
-from tools.shared.logging import get_logger
-from tools.shared.proc import ToolExecutionError, run_tool
 
 LOGGER = get_logger(__name__)
 

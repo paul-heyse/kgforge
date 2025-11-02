@@ -11,15 +11,16 @@ Version: 1.0
 
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tools._shared.logging import get_logger, with_fields
 from tools.docstring_builder.builder_types import (
     DocstringBuildRequest,
     DocstringBuildResult,
     ExitStatus,
+    LoggerLike,
 )
 from tools.docstring_builder.config import BuilderConfig, ConfigSelection
 from tools.docstring_builder.observability import get_correlation_id
@@ -36,12 +37,10 @@ from tools.docstring_builder.policy import (
     PolicyEngine,
     load_policy_settings,
 )
-from tools.shared.logging import get_logger, with_fields
 
 if TYPE_CHECKING:
-    from tools.docstring_builder.plugins import PluginManager
+    pass
 
-LoggerLike = logging.LoggerAdapter[logging.Logger] | logging.Logger
 MISSING_MODULE_PATTERNS = ("docs/_build/**",)
 LOGGER = get_logger(__name__)
 

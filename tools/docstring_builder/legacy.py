@@ -235,12 +235,8 @@ def _wrap_text(text: str) -> list[str]:
 
 def _format_parameter_entry(param: DocstringIRParameter) -> tuple[str, str]:
     annotation = param.annotation or "Any"
-    optional_suffix = (
-        ", optional" if param.optional and not _is_variadic_parameter(param) else ""
-    )
-    default_suffix = (
-        f", by default {param.default}" if param.default not in {None, "..."} else ""
-    )
+    optional_suffix = ", optional" if param.optional and not _is_variadic_parameter(param) else ""
+    default_suffix = f", by default {param.default}" if param.default not in {None, "..."} else ""
     header = f"{param.display_name} : {annotation}{optional_suffix}{default_suffix}"
     body = f"    Description for ``{param.name}``."
     return header, body

@@ -5,7 +5,6 @@ from __future__ import annotations
 import concurrent.futures
 import datetime
 import json
-import logging
 import os
 import time
 from collections import Counter
@@ -19,6 +18,7 @@ from tools.docstring_builder.builder_types import (
     DocstringBuildRequest,
     DocstringBuildResult,
     ExitStatus,
+    LoggerLike,
 )
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.config import BuilderConfig, ConfigSelection
@@ -90,15 +90,13 @@ if TYPE_CHECKING:
             request: DocstringBuildRequest,
             detail: str,
             *,
-            instance: str | None = ...,
+            instance: str | None = ...,  # Protocol stub body (required for TYPE_CHECKING)
             errors: Sequence[ErrorReport] | None = ...,
         ) -> ModelProblemDetails:
             """Return a Problem Details payload for the supplied context."""
+            ...  # Protocol stub body (required for TYPE_CHECKING)
 else:
-    from collections.abc import Callable as ProblemDetailsBuilder
-
-
-LoggerLike = logging.LoggerAdapter[logging.Logger] | logging.Logger
+    ProblemDetailsBuilder = Callable
 
 
 @dataclass(slots=True)

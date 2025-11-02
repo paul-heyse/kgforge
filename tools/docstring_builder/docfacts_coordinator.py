@@ -8,13 +8,14 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from typing import cast
 
+from tools.docstring_builder.builder_types import LoggerLike
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.docfacts import (
     DOCFACTS_VERSION,
     DocFact,
+    DocfactsDocument,
     DocfactsProvenance,
     build_docfacts_document,
-    build_docfacts_document_payload,
     validate_docfacts_payload,
     write_docfacts,
 )
@@ -22,6 +23,7 @@ from tools.docstring_builder.models import (
     DocfactsDocumentLike,
     DocfactsDocumentPayload,
     SchemaViolationError,
+    build_docfacts_document_payload,
 )
 from tools.docstring_builder.paths import DOCFACTS_DIFF_PATH, DOCFACTS_PATH, REPO_ROOT
 from tools.docstring_builder.pipeline_types import DocfactsResult
@@ -58,9 +60,7 @@ class DocfactsCoordinator:
     handle_schema_violation: Callable[[str, SchemaViolationError], None]
     typed_pipeline_enabled: bool
     check_mode: bool = False
-    logger: logging.LoggerAdapter | logging.Logger = field(
-        default_factory=lambda: logging.getLogger(__name__)
-    )
+    logger: LoggerLike = field(default_factory=lambda: logging.getLogger(__name__))
 
     def reconcile(self, docfacts: list[DocFact]) -> DocfactsResult:
         """Reconcile DocFacts artifacts for the current run."""
@@ -125,7 +125,7 @@ class DocfactsCoordinator:
 
     def _update_payload(
         self,
-        document: DocfactsDocumentLike,
+        document: DocfactsDocument,
         _payload: DocfactsDocumentPayload,
     ) -> DocfactsResult:
         """Write DocFacts payload and validate when required."""

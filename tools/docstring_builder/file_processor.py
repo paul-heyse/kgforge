@@ -6,8 +6,9 @@ import logging
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import cast
 
-from tools.docstring_builder.builder_types import ExitStatus
+from tools.docstring_builder.builder_types import ExitStatus, LoggerLike
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.docfacts import DocFact, build_docfacts
@@ -27,7 +28,7 @@ try:  # pragma: no cover - optional dependency at runtime
 except ModuleNotFoundError:  # pragma: no cover - defensive guard for optional import
     _PARSER_SYNTAX_ERRORS: tuple[type[BaseException], ...] = ()
 else:
-    _PARSER_SYNTAX_ERRORS = (_ParserSyntaxError,)
+    _PARSER_SYNTAX_ERRORS = cast(tuple[type[BaseException], ...], (_ParserSyntaxError,))
 
 _HARVEST_ERRORS: tuple[type[BaseException], ...] = (
     *_PARSER_SYNTAX_ERRORS,
@@ -61,9 +62,7 @@ class FileProcessor:
     options: ProcessingOptions
     collect_edits: CollectEditsCallable
     plugin_manager: PluginManager | None = None
-    logger: logging.LoggerAdapter[logging.Logger] | logging.Logger = field(
-        default_factory=lambda: logging.getLogger(__name__)
-    )
+    logger: LoggerLike = field(default_factory=lambda: logging.getLogger(__name__))
 
     def process(self, file_path: Path) -> FileOutcome:
         """Harvest, render, and apply docstrings for a single file."""

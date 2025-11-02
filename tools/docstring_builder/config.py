@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import cast
 
-from tools.shared.logging import get_logger
+from tools._shared.logging import get_logger
 
 LOGGER = get_logger(__name__)
 

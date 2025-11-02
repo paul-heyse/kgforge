@@ -84,8 +84,7 @@ class _DocstringTransformer(cst.CSTTransformer):
         if updated_body == statements:
             return node
         self.changed = True
-        suite = cast(cst.BaseSuite, node.body)
-        updated_block = suite.with_changes(body=updated_body)
+        updated_block = cst.Suite(body=updated_body)
         updated_node = cast(cst.CSTNode, node.with_changes(body=updated_block))
         if isinstance(updated_node, cst.FunctionDef):
             return updated_node
