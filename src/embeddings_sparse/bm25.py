@@ -7,6 +7,7 @@ implementation specifics.
 
 from __future__ import annotations
 
+import importlib
 import logging
 import math
 import re
@@ -514,13 +515,14 @@ class LuceneBM25:
         Raised when Pyserini or Lucene is unavailable.
         """
         try:
-            from pyserini.index.lucene import LuceneIndexer  # noqa: PLC0415
-        except ImportError as exc:
+            lucene_module = importlib.import_module("pyserini.index.lucene")
+            lucene_indexer_cls = lucene_module.LuceneIndexer
+        except (ImportError, AttributeError) as exc:
             message = "Pyserini/Lucene not available"
             logger.exception("Failed to import LuceneIndexer")
             raise RuntimeError(message) from exc
         Path(self.index_dir).mkdir(parents=True, exist_ok=True)
-        indexer = cast(LuceneIndexerProtocol, LuceneIndexer(self.index_dir))
+        indexer = cast(LuceneIndexerProtocol, lucene_indexer_cls(self.index_dir))
         for doc_id, fields in docs_iterable:
             # combine fields with boosts in a "contents" field for simplicity
             title = fields.get("title", "")
@@ -544,13 +546,14 @@ class LuceneBM25:
         if self._searcher is not None:
             return
         try:
-            from pyserini.search.lucene import LuceneSearcher  # noqa: PLC0415
-        except ImportError as exc:  # pragma: no cover - defensive for optional dep
+            lucene_search_module = importlib.import_module("pyserini.search.lucene")
+            lucene_searcher_cls = lucene_search_module.LuceneSearcher
+        except (ImportError, AttributeError) as exc:  # pragma: no cover - defensive for optional dep
             message = "Pyserini not available for BM25 search"
             logger.exception("Failed to import LuceneSearcher")
             raise RuntimeError(message) from exc
 
-        searcher = cast(LuceneSearcherProtocol, LuceneSearcher(self.index_dir))
+        searcher = cast(LuceneSearcherProtocol, lucene_searcher_cls(self.index_dir))
         searcher.set_bm25(self.k1, self.b)
         self._searcher = searcher
 

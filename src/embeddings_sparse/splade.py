@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import base64
 import binascii
+import importlib
 import logging
 import math
 import re
@@ -525,12 +526,13 @@ class LuceneImpactIndex:
         if self._searcher is not None:
             return
         try:
-            from pyserini.search.lucene import LuceneImpactSearcher  # noqa: PLC0415
+            lucene_search_module = importlib.import_module("pyserini.search.lucene")
+            lucene_impact_searcher_cls = lucene_search_module.LuceneImpactSearcher
         except (ImportError, AttributeError) as exc:  # pragma: no cover - optional dependency
             message = "Pyserini not available for SPLADE impact search"
             logger.exception("Failed to import LuceneImpactSearcher")
             raise RuntimeError(message) from exc
-        searcher = LuceneImpactSearcher(self.index_dir, query_encoder=self.query_encoder)
+        searcher = lucene_impact_searcher_cls(self.index_dir, query_encoder=self.query_encoder)
         self._searcher = cast(LuceneImpactSearcherProtocol, searcher)
 
     def ensure_available(self) -> None:

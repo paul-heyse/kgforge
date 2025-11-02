@@ -46,6 +46,7 @@ __all__ = [
     "build_tool_problem_details",
     "problem_from_exception",
     "render_problem",
+    "tool_digest_mismatch_problem_details",
     "tool_disallowed_problem_details",
     "tool_failure_problem_details",
     "tool_missing_problem_details",
@@ -248,6 +249,37 @@ def tool_disallowed_problem_details(
                 "executable": str(executable),
                 "allowlist": list(allowlist),
             },
+        )
+    )
+
+
+def tool_digest_mismatch_problem_details(
+    command: Sequence[str],
+    *,
+    executable: Path,
+    expected_digest: str,
+    actual_digest: str | None,
+    reason: str,
+) -> ProblemDetailsDict:
+    """Return Problem Details describing an executable digest verification failure."""
+    extensions: dict[str, JsonValue] = {
+        "executable": str(executable),
+        "expectedDigest": expected_digest,
+        "reason": reason,
+    }
+    if actual_digest is not None:
+        extensions["actualDigest"] = actual_digest
+    return build_tool_problem_details(
+        ToolProblemDetailsParams(
+            category="tool-exec-digest-mismatch",
+            command=command,
+            status=403,
+            title="Executable digest verification failed",
+            detail=(
+                "Executable digest does not match the expected value configured in TOOLS_EXEC_DIGESTS"
+            ),
+            instance_suffix="digest-mismatch",
+            extensions=extensions,
         )
     )
 

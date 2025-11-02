@@ -1,9 +1,0 @@
-from __future__ import annotations
-
-def decode(
-    data: bytes | bytearray | memoryview | str,
-    *,
-    target_type: type[object] | None = ...,
-) -> object: ...
-def encode(obj: object, *, indent: int | None = ...) -> bytes: ...
-def schema(model: type[object]) -> dict[str, object]: ...

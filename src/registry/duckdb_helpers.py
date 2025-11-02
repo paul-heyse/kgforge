@@ -6,10 +6,10 @@ import time
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Final
+from typing import Any, Final, cast
 
 import duckdb
-from duckdb import DuckDBPyConnection, DuckDBPyRelation
+from duckdb import DuckDBPyConnection
 
 from kgfoundry_common.errors import RegistryError
 from kgfoundry_common.logging import get_logger, with_fields
@@ -220,7 +220,7 @@ def execute(
     params: Params = None,
     *,
     options: DuckDBQueryOptions | None = None,
-) -> DuckDBPyRelation:
+) -> DuckDBPyConnection:
     """Execute a DuckDB query with parameter binding, logging, and metrics.
 
     <!-- auto:docstring-builder v1 -->
@@ -240,7 +240,7 @@ def execute(
 
     Returns
     -------
-    DuckDBPyRelation
+    DuckDBPyConnection
         Describe return value.
     """
     opts = _coerce_options(options, operation="duckdb.execute")
@@ -299,7 +299,7 @@ def fetch_all(
     params: Params = None,
     *,
     options: DuckDBQueryOptions | None = None,
-) -> list[tuple[Any, ...]]:
+) -> list[tuple[object, ...]]:
     """Execute a query and return all rows as a list of tuples.
 
     <!-- auto:docstring-builder v1 -->
@@ -319,8 +319,9 @@ def fetch_all(
 
     Returns
     -------
-    list[tuple[Any, ...]]
+    list[tuple[object, ...]]
         Describe return value.
+
     """
     relation = execute(
         conn,
@@ -328,7 +329,9 @@ def fetch_all(
         params,
         options=_coerce_options(options, operation="duckdb.fetch_all"),
     )
-    return relation.fetchall()
+    raw_rows = cast(list[tuple[object, ...]], relation.fetchall())
+    typed_rows: list[tuple[object, ...]] = [tuple(row) for row in raw_rows]
+    return typed_rows
 
 
 def fetch_one(
@@ -337,7 +340,7 @@ def fetch_one(
     params: Params = None,
     *,
     options: DuckDBQueryOptions | None = None,
-) -> tuple[Any, ...] | None:
+) -> tuple[object, ...] | None:
     """Execute a query and return the first row or None.
 
     <!-- auto:docstring-builder v1 -->
@@ -357,7 +360,7 @@ def fetch_one(
 
     Returns
     -------
-    tuple[Any, ...] | NoneType
+    tuple[object, ...] | None
         Describe return value.
     """
     relation = execute(
@@ -366,7 +369,10 @@ def fetch_one(
         params,
         options=_coerce_options(options, operation="duckdb.fetch_one"),
     )
-    return relation.fetchone()
+    raw_row = cast(tuple[object, ...] | None, relation.fetchone())
+    if raw_row is None:
+        return None
+    return tuple(raw_row)
 
 
 def validate_identifier(

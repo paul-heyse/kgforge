@@ -7,8 +7,9 @@ import json
 import os
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
+from importlib import import_module
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from tools._shared.logging import get_logger, with_fields
 from tools._shared.proc import ToolExecutionError, run_tool
@@ -72,6 +73,19 @@ from tools.docstring_builder.render import render_docstring
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult, build_semantic_schemas
 from tools.docstring_builder.version import BUILDER_VERSION
+
+if TYPE_CHECKING:
+    from tools.docstring_builder.orchestration.context_builder import (
+        PipelineContextBuilder as PipelineContextBuilderType,
+    )
+else:  # pragma: no cover - runtime fallback preserves import laziness
+    PipelineContextBuilderType = type[object]
+
+
+def _load_pipeline_context_builder() -> type[PipelineContextBuilderType]:
+    module = import_module("tools.docstring_builder.orchestration.context_builder")
+    return cast(type[PipelineContextBuilderType], module.PipelineContextBuilder)
+
 
 _LOGGER = get_logger(__name__)
 METRICS = get_metrics_registry()
@@ -467,13 +481,10 @@ def _run_pipeline(
     config: BuilderConfig,
     selection: ConfigSelection | None,
 ) -> DocstringBuildResult:
-    from tools.docstring_builder.orchestration.context_builder import (  # noqa: PLC0415
-        PipelineContextBuilder,
-    )
-
     files_list = list(files)
 
-    context_builder = PipelineContextBuilder(request, config, selection, files_list)
+    context_builder_cls = _load_pipeline_context_builder()
+    context_builder = context_builder_cls(request, config, selection, files_list)
     build_result = context_builder.build()
     if isinstance(build_result, DocstringBuildResult):
         return build_result

@@ -24,9 +24,9 @@ Examples
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Final, Protocol, TypedDict
+from typing import TYPE_CHECKING, Any, Final, Protocol, TypedDict, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -47,6 +47,7 @@ __all__ = [
     "VectorArray",
     "VectorSearchResult",
     "VectorSearchResultTypedDict",
+    "wrap_faiss_module",
 ]
 
 __navmap__: Final[NavMap] = {
@@ -281,28 +282,8 @@ class FaissModuleProtocol(Protocol):
     METRIC_L2: int
     """Constant for L2 distance metric (used with index_factory)."""
 
-    def IndexFlatIP(self, dimension: int) -> FaissIndexProtocol:  # noqa: N802
-        """Create a flat inner-product index.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        dimension : int
-            Vector dimension (must match training/query vectors).
-
-        Returns
-        -------
-        FaissIndexProtocol
-            A flat (exact) index supporting inner-product search.
-
-        Notes
-        -----
-        - Flat indexes provide exact search but are slower for large datasets
-        - Suitable for small-to-medium corpora (< 1M vectors)
-        - No training required before adding vectors
-        """
-        ...
+    IndexFlatIP: Callable[[int], FaissIndexProtocol]
+    """Create a flat inner-product index."""
 
     def index_factory(self, dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
         """Create an index from a factory string.
@@ -330,27 +311,8 @@ class FaissModuleProtocol(Protocol):
         """
         ...
 
-    def IndexIDMap2(self, index: FaissIndexProtocol) -> FaissIndexProtocol:  # noqa: N802
-        """Wrap an index with 64-bit ID mapping.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        index : FaissIndexProtocol
-            Base index to wrap.
-
-        Returns
-        -------
-        FaissIndexProtocol
-            Index with ID mapping support (supports add_with_ids).
-
-        Notes
-        -----
-        - Use IndexIDMap2 for large corpora requiring 64-bit IDs
-        - Wrapped index supports add_with_ids(vectors, ids) method
-        """
-        ...
+    IndexIDMap2: Callable[[FaissIndexProtocol], FaissIndexProtocol]
+    """Wrap an index with 64-bit ID mapping."""
 
     def write_index(self, index: FaissIndexProtocol, path: str) -> None:
         """Persist an index to disk.
@@ -395,23 +357,8 @@ class FaissModuleProtocol(Protocol):
         """
         ...
 
-    def normalize_L2(self, vectors: VectorArray) -> None:  # noqa: N802
-        """Normalize vectors to unit length in-place.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        vectors : tuple[int, ...] | np.float32
-            Array to normalize (modified in-place).
-
-        Notes
-        -----
-        - Normalization is required for inner-product search
-        - Operation is destructive (modifies input array)
-        - Zero vectors are handled gracefully (no division by zero)
-        """
-        ...
+    normalize_L2: Callable[[VectorArray], None]
+    """Normalize vectors to unit length in-place."""
 
 
 class GpuResourcesProtocol(Protocol):
@@ -787,3 +734,72 @@ class AgentSearchResponse(TypedDict, total=True):
 
     metadata: Mapping[str, JsonValue]
     """Response metadata (alpha, backend, query_info, etc.)."""
+
+
+class _FaissModuleAdapter(FaissModuleProtocol):
+    """Adapter that exposes PEP 8 method names for FAISS modules."""
+
+    def __init__(self, module: object) -> None:
+        self._module = module
+
+    @property
+    def metric_inner_product(self) -> int:
+        module = cast(Any, self._module)
+        return cast(int, module.METRIC_INNER_PRODUCT)
+
+    @property
+    def metric_l2(self) -> int:
+        module = cast(Any, self._module)
+        return cast(int, module.METRIC_L2)
+
+    def index_flat_ip(self, dimension: int) -> FaissIndexProtocol:
+        module = cast(Any, self._module)
+        return cast(FaissIndexProtocol, module.IndexFlatIP(dimension))
+
+    def index_factory(self, dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
+        module = cast(Any, self._module)
+        return cast(
+            FaissIndexProtocol,
+            module.index_factory(dimension, factory_string, metric),
+        )
+
+    def index_id_map2(self, index: FaissIndexProtocol) -> FaissIndexProtocol:
+        module = cast(Any, self._module)
+        return cast(FaissIndexProtocol, module.IndexIDMap2(index))
+
+    def write_index(self, index: FaissIndexProtocol, path: str) -> None:
+        module = cast(Any, self._module)
+        module.write_index(index, path)
+
+    def read_index(self, path: str) -> FaissIndexProtocol:
+        module = cast(Any, self._module)
+        return cast(FaissIndexProtocol, module.read_index(path))
+
+    def normalize_l2(self, vectors: VectorArray) -> None:
+        module = cast(Any, self._module)
+        module.normalize_L2(vectors)
+
+    def __getattr__(self, name: str) -> object:
+        return getattr(self._module, name)
+
+
+def wrap_faiss_module(module: object) -> FaissModuleProtocol:
+    """Return a :class:`FaissModuleProtocol` with PEP 8 method names."""
+    required_attributes = (
+        "index_flat_ip",
+        "index_factory",
+        "index_id_map2",
+        "write_index",
+        "read_index",
+        "normalize_l2",
+    )
+    if all(hasattr(module, attribute) for attribute in required_attributes):
+        return cast(FaissModuleProtocol, module)
+    return cast(FaissModuleProtocol, _FaissModuleAdapter(module))
+
+
+setattr(_FaissModuleAdapter, "METRIC_INNER_PRODUCT", _FaissModuleAdapter.metric_inner_product)
+setattr(_FaissModuleAdapter, "METRIC_L2", _FaissModuleAdapter.metric_l2)
+setattr(_FaissModuleAdapter, "IndexFlatIP", _FaissModuleAdapter.index_flat_ip)
+setattr(_FaissModuleAdapter, "IndexIDMap2", _FaissModuleAdapter.index_id_map2)
+setattr(_FaissModuleAdapter, "normalize_L2", _FaissModuleAdapter.normalize_l2)

@@ -121,11 +121,22 @@ class PathlibTransformer(cst.CSTTransformer):
         self.changes: list[str] = []
         self.needs_pathlib_import = False
 
-    def visit_Import(self, node: cst.Import) -> None:  # noqa: N802
+    def on_visit(self, node: cst.CSTNode) -> bool:
         """Track if pathlib import already exists."""
-        for alias in node.names:
-            if isinstance(alias.name, cst.Name) and alias.name.value == "pathlib":
-                self.needs_pathlib_import = True
+        if isinstance(node, cst.Import):
+            for alias in node.names:
+                if isinstance(alias.name, cst.Name) and alias.name.value == "pathlib":
+                    self.needs_pathlib_import = True
+        return True
+
+    def leave_call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.BaseExpression:
+        """Apply call rewrites when exiting a Call node."""
+        replacement = self._transform_call(original_node)
+        return replacement if replacement is not None else updated_node
+
+    def leave_with(self, original_node: cst.With, updated_node: cst.With) -> cst.BaseStatement:
+        """Apply context-manager rewrites when exiting a With node."""
+        return self._transform_with(original_node, updated_node)
 
     def _transform_makedirs(self, node: cst.Call) -> cst.BaseExpression | None:
         if not (
@@ -211,25 +222,21 @@ class PathlibTransformer(cst.CSTTransformer):
             attr=cst.Name("parent"),
         )
 
-    def leave_Call(  # noqa: N802
-        self, original_node: cst.Call, updated_node: cst.Call
-    ) -> cst.BaseExpression:
-        """Transform function calls to pathlib equivalents."""
+    def _transform_call(self, node: cst.Call) -> cst.BaseExpression | None:
+        """Return rewritten call expression when a pathlib substitution exists."""
         for transformer in (
             self._transform_makedirs,
             self._transform_path_join,
             self._transform_exists,
             self._transform_dirname,
         ):
-            replacement = transformer(original_node)
+            replacement = transformer(node)
             if replacement is not None:
                 return replacement
+        return None
 
-        return updated_node
-
-    def leave_With(self, original_node: cst.With, updated_node: cst.With) -> cst.With:  # noqa: N802
-        """Transform open(os.path.join(...)) patterns."""
-        # Handle open(os.path.join(...)) → Path(...).open()
+    def _transform_with(self, original_node: cst.With, updated_node: cst.With) -> cst.With:
+        """Rewrite ``with`` blocks wrapping ``open(os.path.join(...))`` patterns."""
         for index, (original_item, updated_item) in enumerate(
             zip(original_node.items, updated_node.items, strict=True)
         ):
@@ -263,23 +270,21 @@ class PathlibTransformer(cst.CSTTransformer):
 
             remaining_args: tuple[cst.Arg, ...] = ()
             if isinstance(updated_item.item, cst.Call):
-                remaining_args = tuple(updated_item.item.args[1:])
+                call_args = cast(
+                    tuple[cst.Arg, ...],
+                    tuple(updated_item.item.args),
+                )
+                remaining_args = call_args[1:]
 
             new_open_call = cst.Call(
-                func=cst.Attribute(
-                    value=path_expr,
-                    attr=cst.Name("open"),
-                ),
+                func=cst.Attribute(value=path_expr, attr=cst.Name("open")),
                 args=remaining_args,
             )
-
-            new_items = list(updated_node.items)
-            new_items[index] = cst.WithItem(
-                item=new_open_call,
-                asname=updated_item.asname,
-            )
-            return updated_node.with_changes(items=tuple(new_items))
-
+            new_item = updated_item.with_changes(item=new_open_call)
+            updated_items: list[cst.WithItem] = list(updated_node.items)
+            updated_items[index] = new_item
+            new_items_tuple: tuple[cst.WithItem, ...] = tuple(updated_items)
+            return updated_node.with_changes(items=new_items_tuple)
         return updated_node
 
 
@@ -343,9 +348,10 @@ def ensure_pathlib_import(
     if _module_has_pathlib(module):
         return module
 
-    new_body = list(module.body)
+    new_body: list[cst.BaseStatement] = list(module.body)
     new_body.insert(_insertion_index(module), _pathlib_import_statement())
-    return module.with_changes(body=tuple(new_body))
+    new_body_tuple: tuple[cst.BaseStatement, ...] = tuple(new_body)
+    return module.with_changes(body=new_body_tuple)
 
 
 def transform_file(file_path: Path, dry_run: bool = False) -> list[str]:

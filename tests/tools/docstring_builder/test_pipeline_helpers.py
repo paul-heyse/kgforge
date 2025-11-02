@@ -6,12 +6,21 @@ import logging
 from dataclasses import dataclass, field
 
 import pytest
+from tools.docstring_builder.builder_types import ExitStatus
+from tools.docstring_builder.docfacts import DocFact
+from tools.docstring_builder.failure_summary import FailureSummaryRenderer, RunSummarySnapshot
+from tools.docstring_builder.metrics import MetricsRecorder
+from tools.docstring_builder.models import RunStatus
+from tools.docstring_builder.paths import OBSERVABILITY_PATH
+from tools.docstring_builder.pipeline_types import ErrorEnvelope, FileOutcome
+
+
 @dataclass(slots=True)
 class _HistogramStub:
     labels_called: list[dict[str, object]] = field(default_factory=list)
     observed: list[float] = field(default_factory=list)
 
-    def labels(self, **labels: object) -> "_HistogramStub":
+    def labels(self, **labels: object) -> _HistogramStub:
         self.labels_called.append(labels)
         return self
 
@@ -24,19 +33,12 @@ class _CounterStub:
     labels_called: list[dict[str, object]] = field(default_factory=list)
     increments: list[float] = field(default_factory=list)
 
-    def labels(self, **labels: object) -> "_CounterStub":
+    def labels(self, **labels: object) -> _CounterStub:
         self.labels_called.append(labels)
         return self
 
     def inc(self, value: float = 1.0) -> None:
         self.increments.append(value)
-from tools.docstring_builder.builder_types import ExitStatus
-from tools.docstring_builder.docfacts import DocFact
-from tools.docstring_builder.failure_summary import FailureSummaryRenderer, RunSummarySnapshot
-from tools.docstring_builder.metrics import MetricsRecorder
-from tools.docstring_builder.models import RunStatus
-from tools.docstring_builder.paths import OBSERVABILITY_PATH
-from tools.docstring_builder.pipeline_types import ErrorEnvelope, FileOutcome
 
 
 def _empty_docfacts() -> list[DocFact]:
@@ -45,7 +47,6 @@ def _empty_docfacts() -> list[DocFact]:
 
 def _captured_messages(caplog: pytest.LogCaptureFixture) -> list[str]:
     """Return captured log messages from the caplog fixture."""
-
     return [record.getMessage() for record in caplog.records]
 
 

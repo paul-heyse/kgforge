@@ -123,8 +123,20 @@ class ToolRuntimeSettings(BaseSettings):
             "neato",
             "pydeps",
             "pyreverse",
+            "echo",
+            "ls",
+            "pwd",
+            "sleep",
+            "false",
         ),
         description="Glob patterns for executables allowed to run via tools._shared.proc",
+    )
+    exec_digests: dict[str, str] = Field(
+        default_factory=dict,
+        description=(
+            "Optional SHA256 digests keyed by absolute executable path or basename. "
+            "When present the resolved executable must match the configured digest before execution."
+        ),
     )
     metrics_enabled: bool = Field(
         default=True,
@@ -156,6 +168,29 @@ class ToolRuntimeSettings(BaseSettings):
         message = "exec_allowlist must be a comma-separated string or sequence"
         raise TypeError(message)
 
+    @field_validator("exec_digests", mode="before")
+    @classmethod
+    def _normalise_exec_digests(cls, value: object) -> dict[str, str]:
+        if value is None:
+            return {}
+        if isinstance(value, Mapping):
+            return {
+                str(key): str(val).strip().lower() for key, val in value.items() if str(val).strip()
+            }
+        if isinstance(value, str):
+            entries: dict[str, str] = {}
+            for token in value.split(","):
+                if not token.strip():
+                    continue
+                if "=" not in token:
+                    message = "exec_digests entries must be in 'key=sha256' format when provided as a string"
+                    raise ValueError(message)
+                key, digest = token.split("=", 1)
+                entries[key.strip()] = digest.strip().lower()
+            return entries
+        message = "exec_digests must be a mapping or comma-separated 'key=sha256' string"
+        raise TypeError(message)
+
     def is_allowed(self, executable: Path) -> bool:
         """Return ``True`` when ``executable`` matches the configured allow list.
 
@@ -177,6 +212,18 @@ class ToolRuntimeSettings(BaseSettings):
             if fnmatch(candidate, pattern):
                 return True
         return False
+
+    def expected_digest_for(self, executable: Path) -> str | None:
+        """Return the expected SHA256 digest for ``executable`` when configured."""
+        digest_map = self.exec_digests
+        if not digest_map:
+            return None
+
+        absolute_key = executable.as_posix()
+        digest = digest_map.get(absolute_key)
+        if digest is not None:
+            return digest
+        return digest_map.get(executable.name)
 
 
 def get_runtime_settings() -> ToolRuntimeSettings:

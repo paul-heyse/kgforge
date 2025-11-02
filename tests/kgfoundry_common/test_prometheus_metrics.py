@@ -11,7 +11,7 @@ Verify:
 from __future__ import annotations
 
 import logging
-from typing import Final, cast
+from typing import Final
 
 import pytest
 from _pytest.logging import LogCaptureFixture
@@ -61,7 +61,8 @@ def _get_first_metric_samples(registry: CollectorRegistry) -> list[Sample]:
         Samples from first metric.
     """
     metric = next(iter(registry.collect()))
-    return cast(list[Sample], metric.samples)
+    samples: list[Sample] = list(metric.samples)
+    return samples
 
 
 class TestCounterMetrics:

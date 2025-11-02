@@ -173,16 +173,16 @@ class SpladeIndex:
     ) -> str | None:
         if override:
             return override
-        dataset = connection.execute(
+        dataset: tuple[object, ...] | None = connection.execute(
             "SELECT parquet_root FROM datasets WHERE kind='chunks' ORDER BY created_at DESC LIMIT 1"
         ).fetchone()
-        if not dataset:
+        if dataset is None:
             return None
-        root = dataset[0]
-        if not isinstance(root, str):
-            msg = f"Invalid parquet_root type: {type(root)}"
+        root_obj = dataset[0]
+        if not isinstance(root_obj, str):
+            msg = f"Invalid parquet_root type: {type(root_obj)}"
             raise TypeError(msg)
-        return root
+        return root_obj
 
     @staticmethod
     def _read_chunk_rows(

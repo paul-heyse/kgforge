@@ -2,6 +2,7 @@
 
 # pylint: disable=protected-access
 
+from collections.abc import Sequence
 from pathlib import Path
 
 from tools.docstring_builder import legacy as _legacy
@@ -39,22 +40,30 @@ def normalize_qualified_name(name: str) -> str:
     return _legacy._normalize_qualified_name(name)
 
 
-def required_sections(  # noqa: PLR0913
+def required_sections(
     kind: str,
-    parameters: list[DocstringIRParameter],
+    parameters: Sequence[DocstringIRParameter],
     returns: str | None,
-    raises: list[str],
-    *,
-    name: str,
-    is_public: bool,
+    raises: Sequence[str],
+    **options: object,
 ) -> list[str]:
     """Return the ordered docstring sections required for the provided symbol metadata."""
+    name = options.pop("name", None)
+    is_public_raw = options.pop("is_public", None)
+    if options:
+        unexpected = ", ".join(sorted(options))
+        message = f"Unexpected keyword arguments: {unexpected}"
+        raise TypeError(message)
+    if is_public_raw is None:
+        message = "required_sections() missing required keyword argument: 'is_public'"
+        raise TypeError(message)
+    is_public = bool(is_public_raw)
     _ = name  # Retained for compatibility with legacy signature
     context = _legacy._RequiredSectionsContext(
         kind=kind,
-        parameters=parameters,
+        parameters=list(parameters),
         returns_annotation=returns,
-        raises=raises,
+        raises=list(raises),
         is_public=is_public,
     )
     return _legacy._required_sections(context)

@@ -132,11 +132,10 @@ def is_pydantic_model(obj: object) -> bool:
     >>> result = is_pydantic_model(...)
     >>> result  # doctest: +ELLIPSIS
     """
-    try:
-        from pydantic import BaseModel  # noqa: PLC0415
-    except ImportError:
+    base_model = _load_pydantic_base_model()
+    if base_model is None:
         return False
-    return inspect.isclass(obj) and issubclass(obj, BaseModel) and obj is not BaseModel
+    return inspect.isclass(obj) and issubclass(obj, base_model) and obj is not base_model
 
 
 def is_pandera_model(obj: object) -> bool:
@@ -190,6 +189,17 @@ def _load_navmap() -> dict[str, Any]:
         return cast(dict[str, Any], json.loads(NAVMAP.read_text(encoding="utf-8")))
     except (json.JSONDecodeError, OSError, UnicodeDecodeError):
         return {}
+
+
+def _load_pydantic_base_model() -> type[Any] | None:
+    try:
+        module = importlib.import_module("pydantic")
+    except ImportError:
+        return None
+    base_model = getattr(module, "BaseModel", None)
+    if not isinstance(base_model, type):
+        return None
+    return base_model
 
 
 def _nav_versions(module_name: str, class_name: str, nav: dict[str, Any]) -> dict[str, Any] | None:

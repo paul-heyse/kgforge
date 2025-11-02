@@ -107,7 +107,7 @@ def validate_tools_payload(payload: Mapping[str, object], schema_name: str) -> N
 def validate_struct_payload(payload: Mapping[str, object], model: type[msgspec.Struct]) -> None:
     """Validate ``payload`` against a msgspec struct ``model``."""
     try:
-        msgspec.convert(payload, target_type=model)
+        msgspec.convert(payload, model)
     except (msgspec.ValidationError, msgspec.DecodeError, TypeError, ValueError) as exc:
         msg = f"Payload does not conform to {model.__name__}"
         raise SchemaValidationError(msg) from exc

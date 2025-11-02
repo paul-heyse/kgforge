@@ -15,6 +15,7 @@ from collections.abc import Awaitable, Callable
 from typing import TypeVar, cast
 
 from fastapi import Depends, FastAPI, Request
+from fastapi.params import Depends as DependsMarker
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
 from starlette.responses import Response
@@ -36,6 +37,9 @@ logger = get_logger(__name__)
 
 T = TypeVar("T")
 E = TypeVar("E", bound=Exception)
+
+
+MiddlewareFactory = Callable[..., BaseHTTPMiddleware]
 
 
 async def _await_with_timeout[T](coro: Awaitable[T], timeout: float | None) -> T:
@@ -80,7 +84,7 @@ def typed_dependency[T](
             )
             return result
 
-    marker: Depends[T] = Depends(_instrumented)
+    marker: DependsMarker = Depends(_instrumented)
     return cast(object, marker)
 
 
@@ -131,18 +135,17 @@ def typed_exception_handler(
 
 def typed_middleware(
     app: FastAPI,
-    middleware_class: type[BaseHTTPMiddleware],
-    *,
+    middleware_class: MiddlewareFactory,
+    *factory_args: object,
     name: str,
     timeout: float | None = DEFAULT_TIMEOUT_SECONDS,
     **options: object,
 ) -> None:
     """Register ``middleware_class`` with instrumentation and timeouts."""
-    options_copy = dict(options)
 
     class _InstrumentedMiddleware(BaseHTTPMiddleware):
         def __init__(self, app: ASGIApp) -> None:
-            self._delegate = middleware_class(app, **options_copy)
+            self._delegate = middleware_class(app, *factory_args, **options)
             super().__init__(app)
 
         async def dispatch(
@@ -174,5 +177,7 @@ def typed_middleware(
                 )
                 return response
 
-    _InstrumentedMiddleware.__name__ = middleware_class.__name__
+    name_attr: object = getattr(middleware_class, "__name__", None)
+    original_name = name_attr if isinstance(name_attr, str) else middleware_class.__class__.__name__
+    _InstrumentedMiddleware.__name__ = original_name
     app.add_middleware(_InstrumentedMiddleware)

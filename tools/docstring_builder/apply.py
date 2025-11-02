@@ -3,11 +3,17 @@
 from __future__ import annotations
 
 import ast
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import cast, overload
 
 import libcst as cst
+from libcst import (
+    BaseSmallStatement,
+    BaseStatement,
+    FlattenSentinel,
+    RemovalSentinel,
+)
 
 from tools.docstring_builder.harvest import HarvestResult
 from tools.docstring_builder.schema import DocstringEdit
@@ -62,12 +68,22 @@ class _DocstringTransformer(cst.CSTTransformer):
         desired = _escape_docstring(edit.text, " " * 4 * indent_level)
         literal = cst.SimpleString(f'"""{desired}"""')
         expr = cst.Expr(value=literal)
-        docstring_stmt: cst.BaseStatement = cst.SimpleStatementLine(body=[expr])
+        docstring_stmt = cst.SimpleStatementLine(body=(expr,))
+
         body = node.body
-        statements: tuple[cst.BaseStatement, ...] = tuple(body.body)
-        updated_body: tuple[cst.BaseStatement, ...]
-        if statements and isinstance(statements[0], cst.SimpleStatementLine):
-            first = statements[0]
+        original_statements = cast(Sequence[cst.BaseStatement | BaseSmallStatement], body.body)
+
+        def _as_statement(item: cst.BaseStatement | BaseSmallStatement) -> cst.BaseStatement:
+            if isinstance(item, cst.BaseStatement):
+                return item
+            return cst.SimpleStatementLine(body=(item,))
+
+        existing_statements: list[cst.BaseStatement] = [
+            _as_statement(stmt) for stmt in original_statements
+        ]
+
+        if existing_statements and isinstance(existing_statements[0], cst.SimpleStatementLine):
+            first = existing_statements[0]
             if (
                 first.body
                 and isinstance(first.body[0], cst.Expr)
@@ -76,46 +92,46 @@ class _DocstringTransformer(cst.CSTTransformer):
                 current_value = cast(str, ast.literal_eval(first.body[0].value.value))
                 if current_value == desired:
                     return node
-                updated_body = (docstring_stmt, *statements[1:])
+                new_statements: list[cst.BaseStatement] = [
+                    docstring_stmt,
+                    *existing_statements[1:],
+                ]
             else:
-                updated_body = (docstring_stmt, *statements)
+                new_statements = [docstring_stmt, *existing_statements]
         else:
-            updated_body = (docstring_stmt, *statements)
-        if updated_body == statements:
+            new_statements = [docstring_stmt, *existing_statements]
+
+        if new_statements == existing_statements:
             return node
         self.changed = True
-        updated_block = cst.Suite(body=updated_body)
-        updated_node = cast(cst.CSTNode, node.with_changes(body=updated_block))
-        if isinstance(updated_node, cst.FunctionDef):
-            return updated_node
-        if not isinstance(updated_node, cst.ClassDef):
-            msg = "Unexpected node type after with_changes"
-            raise TypeError(msg)
-        return updated_node
+        new_body = body.with_changes(
+            body=cast(tuple[cst.BaseStatement, ...], tuple(new_statements))
+        )
+        return node.with_changes(body=new_body)
 
-    def visit_ClassDef(self, node: cst.ClassDef) -> bool:  # noqa: N802
+    def visit_classdef(self, node: cst.ClassDef) -> bool:
         self.namespace.append(node.name.value)
         return True
 
-    def leave_ClassDef(  # noqa: N802
-        self, original_node: cst.ClassDef, updated_node: cst.ClassDef
-    ) -> cst.ClassDef:
-        qname = self._qualify(original_node.name.value)
-        updated = self._inject_docstring(updated_node, qname)
+    def leave_classdef(
+        self, _original_node: cst.ClassDef, updated_node: cst.ClassDef
+    ) -> BaseStatement | FlattenSentinel[BaseStatement] | RemovalSentinel:
+        qname = self._qualify(updated_node.name.value)
         self.namespace.pop()
-        return updated
+        transformed = self._inject_docstring(updated_node, qname)
+        return cast(BaseStatement, transformed)
 
-    def visit_FunctionDef(self, node: cst.FunctionDef) -> bool:  # noqa: N802
+    def visit_functiondef(self, node: cst.FunctionDef) -> bool:
         self.namespace.append(node.name.value)
         return True
 
-    def leave_FunctionDef(  # noqa: N802
-        self, original_node: cst.FunctionDef, updated_node: cst.FunctionDef
-    ) -> cst.FunctionDef:
-        qname = self._qualify(original_node.name.value)
-        updated = self._inject_docstring(updated_node, qname)
+    def leave_functiondef(
+        self, _original_node: cst.FunctionDef, updated_node: cst.FunctionDef
+    ) -> BaseStatement | FlattenSentinel[BaseStatement] | RemovalSentinel:
+        qname = self._qualify(updated_node.name.value)
         self.namespace.pop()
-        return updated
+        transformed = self._inject_docstring(updated_node, qname)
+        return cast(BaseStatement, transformed)
 
 
 def apply_edits(

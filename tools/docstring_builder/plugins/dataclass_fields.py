@@ -176,23 +176,23 @@ class DataclassFieldDocPlugin(TransformerPlugin):
         """Release cached field metadata at the end of processing."""
         del self, context
 
-    def apply(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
-        """Populate dataclass parameter metadata for ``result``."""
-        if result.symbol.kind != "class":
-            return result
-        if not self._decorators_indicate_dataclass(result.symbol.decorators):
-            return result
+    def apply(self, context: PluginContext, payload: SemanticResult) -> SemanticResult:
+        """Populate dataclass parameter metadata for ``payload``."""
+        if payload.symbol.kind != "class":
+            return payload
+        if not self._decorators_indicate_dataclass(payload.symbol.decorators):
+            return payload
         file_path = context.file_path
         if file_path is None or not file_path.exists():
-            return result
+            return payload
         field_map = self._cache.get(file_path)
         if field_map is None:
-            field_map = self._collect_fields(file_path, result.symbol.module)
+            field_map = self._collect_fields(file_path, payload.symbol.module)
             self._cache[file_path] = field_map
-        fields = field_map.get(result.symbol.qname)
-        if not fields:
-            return result
-        return self._apply_fields(result, fields)
+        dataclass_fields = field_map.get(payload.symbol.qname)
+        if dataclass_fields is None:
+            return payload
+        return self._apply_fields(payload, dataclass_fields)
 
     @staticmethod
     def _decorators_indicate_dataclass(decorators: list[str]) -> bool:
