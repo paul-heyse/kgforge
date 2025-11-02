@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from datetime import UTC, datetime
-from typing import Final, cast
+from typing import Final, TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -65,6 +64,26 @@ class ModuleEntryDocument(BaseModel):
     deps: list[str]
 
 
+ModuleEntryDocumentType: type[ModuleEntryDocument] = ModuleEntryDocument
+
+
+class ModuleEntryPayload(TypedDict):
+    """Serialized representation of module entry fields using schema aliases."""
+
+    path: str
+    exports: list[str]
+    sections: list[NavSectionDocument]
+    sectionLines: dict[str, int]
+    anchors: dict[str, int]
+    links: dict[str, str]
+    meta: dict[str, SymbolMetaDocument]
+    moduleMeta: ModuleMetaDocument
+    tags: list[str]
+    synopsis: str
+    seeAlso: list[str]
+    deps: list[str]
+
+
 def _utc_iso_now() -> str:
     """Return the current UTC timestamp as an ISO-8601 string."""
     return datetime.now(tz=UTC).isoformat()
@@ -93,12 +112,12 @@ def _symbol_meta_to_document(meta: SymbolMeta) -> SymbolMetaDocument:
     )
 
 
-def _module_meta_to_document(module_meta: Mapping[str, str | None]) -> ModuleMetaDocument:
+def _module_meta_to_document(module_meta: ModuleMeta) -> ModuleMetaDocument:
     return ModuleMetaDocument(
-        owner=module_meta.get("owner"),
-        stability=module_meta.get("stability"),
-        since=module_meta.get("since"),
-        deprecated_in=module_meta.get("deprecated_in"),
+        owner=module_meta.owner,
+        stability=module_meta.stability,
+        since=module_meta.since,
+        deprecated_in=module_meta.deprecated_in,
     )
 
 
@@ -112,30 +131,38 @@ def navmap_document_from_index(
     """Build a :class:`NavmapDocument` from a :class:`NavIndex` instance."""
     modules: dict[str, ModuleEntryDocument] = {}
     for name, entry in index.modules.items():
+        section_models = entry.sections
         sections: list[NavSectionDocument] = [
-            NavSectionDocument(id=section.id, symbols=list(section.symbols))
-            for section in entry.sections
+            NavSectionDocument(id=section.id, symbols=section.symbols.copy())
+            for section in section_models
         ]
         symbol_meta: dict[str, SymbolMetaDocument] = {
             symbol: _symbol_meta_to_document(meta) for symbol, meta in entry.meta.items()
         }
-        module_meta_doc = _module_meta_to_document(
-            cast(Mapping[str, str | None], entry.module_meta.to_dict())
-        )
-        modules[name] = ModuleEntryDocument(
-            path=entry.path,
-            exports=list(entry.exports),
-            sections=sections,
-            section_lines=dict(entry.section_lines),
-            anchors=dict(entry.anchors),
-            links=dict(entry.links),
-            meta=symbol_meta,
-            module_meta=module_meta_doc,
-            tags=list(entry.tags),
-            synopsis=entry.synopsis,
-            see_also=list(entry.see_also),
-            deps=list(entry.deps),
-        )
+        module_meta_doc = _module_meta_to_document(entry.module_meta)
+        exports: list[str] = entry.exports.copy()
+        section_lines: dict[str, int] = entry.section_lines.copy()
+        anchors: dict[str, int] = entry.anchors.copy()
+        links: dict[str, str] = entry.links.copy()
+        tags: list[str] = entry.tags.copy()
+        synopsis: str = entry.synopsis
+        see_also: list[str] = entry.see_also.copy()
+        deps: list[str] = entry.deps.copy()
+        module_payload: ModuleEntryPayload = {
+            "path": entry.path,
+            "exports": exports,
+            "sections": sections,
+            "sectionLines": section_lines,
+            "anchors": anchors,
+            "links": links,
+            "meta": symbol_meta,
+            "moduleMeta": module_meta_doc,
+            "tags": tags,
+            "synopsis": synopsis,
+            "seeAlso": see_also,
+            "deps": deps,
+        }
+        modules[name] = ModuleEntryDocumentType.model_validate(module_payload)
 
     return NavmapDocument(
         commit=commit,

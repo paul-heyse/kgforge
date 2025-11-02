@@ -13,9 +13,11 @@ from __future__ import annotations
 import time
 import uuid
 from contextlib import contextmanager
-from typing import TYPE_CHECKING
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, cast
 
-from tools.shared.prometheus import (
+from tools._shared.logging import get_logger, with_fields
+from tools._shared.prometheus import (
     CollectorRegistry,
     CounterLike,
     HistogramLike,
@@ -26,6 +28,9 @@ from tools.shared.prometheus import (
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
+
+_LOGGER = get_logger(__name__)
 
 
 class NavmapMetrics:
@@ -58,67 +63,76 @@ class NavmapMetrics:
         registry : CollectorRegistry | None, optional
             Prometheus registry (defaults to default registry).
         """
-        resolved_registry = registry if registry is not None else get_default_registry()
-        self.registry = resolved_registry
+        resolved = (
+            registry if registry is not None else cast(CollectorRegistry, get_default_registry())
+        )
+        self.registry = resolved
 
         self.build_runs_total = build_counter(
             "navmap_build_runs_total",
             "Total number of navmap build operations",
             ["status"],
-            registry=resolved_registry,
+            registry=resolved,
         )
 
         self.check_runs_total = build_counter(
             "navmap_check_runs_total",
             "Total number of navmap check operations",
             ["status"],
-            registry=resolved_registry,
+            registry=resolved,
         )
 
         self.repair_runs_total = build_counter(
             "navmap_repair_runs_total",
             "Total number of navmap repair operations",
             ["status"],
-            registry=resolved_registry,
+            registry=resolved,
         )
 
         self.migrate_runs_total = build_counter(
             "navmap_migrate_runs_total",
             "Total number of navmap migrate operations",
             ["status"],
-            registry=resolved_registry,
+            registry=resolved,
         )
 
         self.build_duration_seconds = build_histogram(
             "navmap_build_duration_seconds",
             "Duration of navmap build operations in seconds",
             ["status"],
-            registry=resolved_registry,
+            registry=resolved,
         )
 
         self.check_duration_seconds = build_histogram(
             "navmap_check_duration_seconds",
             "Duration of navmap check operations in seconds",
             ["status"],
-            registry=resolved_registry,
+            registry=resolved,
         )
 
         self.repair_duration_seconds = build_histogram(
             "navmap_repair_duration_seconds",
             "Duration of navmap repair operations in seconds",
             ["status"],
-            registry=resolved_registry,
+            registry=resolved,
         )
 
         self.migrate_duration_seconds = build_histogram(
             "navmap_migrate_duration_seconds",
             "Duration of navmap migrate operations in seconds",
             ["status"],
-            registry=resolved_registry,
+            registry=resolved,
         )
 
 
-_METRICS_REGISTRY: NavmapMetrics | None = None
+@dataclass(slots=True)
+class _NavmapMetricsCache:
+    """Internal cache for navmap metrics singleton."""
+
+    registry: NavmapMetrics | None = None
+
+
+_METRICS_CACHE = _NavmapMetricsCache()
 
 
 def get_metrics_registry() -> NavmapMetrics:
@@ -134,10 +148,9 @@ def get_metrics_registry() -> NavmapMetrics:
     >>> metrics = get_metrics_registry()
     >>> metrics.build_runs_total.labels(status="success").inc()
     """
-    global _METRICS_REGISTRY
-    if _METRICS_REGISTRY is None:
-        _METRICS_REGISTRY = NavmapMetrics()
-    return _METRICS_REGISTRY
+    if _METRICS_CACHE.registry is None:
+        _METRICS_CACHE.registry = NavmapMetrics()
+    return _METRICS_CACHE.registry
 
 
 def get_correlation_id() -> str:
@@ -188,25 +201,37 @@ def record_operation_metrics(
         correlation_id = get_correlation_id()
 
     metrics = get_metrics_registry()
+    log_adapter = with_fields(
+        _LOGGER,
+        operation=operation,
+        correlation_id=correlation_id,
+    )
     start_time = time.monotonic()
+    final_status = status
 
     try:
         yield
     except Exception:
-        status = "error"
+        final_status = "error"
         raise
     finally:
         duration = time.monotonic() - start_time
 
         if operation == "build":
-            metrics.build_runs_total.labels(status=status).inc()
-            metrics.build_duration_seconds.labels(status=status).observe(duration)
+            metrics.build_runs_total.labels(status=final_status).inc()
+            metrics.build_duration_seconds.labels(status=final_status).observe(duration)
         elif operation == "check":
-            metrics.check_runs_total.labels(status=status).inc()
-            metrics.check_duration_seconds.labels(status=status).observe(duration)
+            metrics.check_runs_total.labels(status=final_status).inc()
+            metrics.check_duration_seconds.labels(status=final_status).observe(duration)
         elif operation == "repair":
-            metrics.repair_runs_total.labels(status=status).inc()
-            metrics.repair_duration_seconds.labels(status=status).observe(duration)
+            metrics.repair_runs_total.labels(status=final_status).inc()
+            metrics.repair_duration_seconds.labels(status=final_status).observe(duration)
         elif operation == "migrate":
-            metrics.migrate_runs_total.labels(status=status).inc()
-            metrics.migrate_duration_seconds.labels(status=status).observe(duration)
+            metrics.migrate_runs_total.labels(status=final_status).inc()
+            metrics.migrate_duration_seconds.labels(status=final_status).observe(duration)
+
+        with_fields(
+            log_adapter,
+            status=final_status,
+            duration_seconds=duration,
+        ).info("Navmap operation completed")

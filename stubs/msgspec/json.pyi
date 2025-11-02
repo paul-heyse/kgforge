@@ -1,0 +1,9 @@
+from __future__ import annotations
+
+from typing import Any, TypeVar
+
+T = TypeVar("T")
+
+def decode(data: bytes | bytearray | memoryview | str, *, type: type[T] | None = ...) -> T: ...
+def encode(obj: Any, *, indent: int | None = ...) -> bytes: ...
+def schema(model: type[Any]) -> dict[str, Any]: ...

@@ -18,6 +18,8 @@ Examples
 >>> assert "tool-failure" in json_str
 """
 
+# pylint: disable=redefined-builtin
+
 from __future__ import annotations
 
 import json
@@ -46,7 +48,7 @@ JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
 ProblemDetailsDict = dict[str, JsonValue]
 
 
-def build_problem_details(
+def build_problem_details(  # noqa: PLR0913
     *,
     type: str,  # noqa: A002
     title: str,
@@ -115,7 +117,7 @@ def _json_pointer_from(error: object) -> str | None:
     return None
 
 
-def build_schema_problem_details(
+def build_schema_problem_details(  # noqa: PLR0913
     *,
     error: Exception,
     type: str,  # noqa: A002
@@ -149,7 +151,7 @@ def build_schema_problem_details(
     return problem
 
 
-def build_tool_problem_details(
+def build_tool_problem_details(  # noqa: PLR0913
     *,
     category: str,
     command: Sequence[str],
@@ -259,7 +261,7 @@ def tool_failure_problem_details(
     )
 
 
-def problem_from_exception(
+def problem_from_exception(  # noqa: PLR0913
     exc: Exception,
     *,
     type: str,  # noqa: A002

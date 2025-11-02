@@ -20,8 +20,8 @@ from pathlib import Path
 from types import ModuleType
 from typing import Literal, cast
 
-from tools.shared.logging import StructuredLoggerAdapter, get_logger, with_fields
-from tools.shared.proc import ToolExecutionError, run_tool
+from tools._shared.logging import StructuredLoggerAdapter, get_logger, with_fields
+from tools._shared.proc import ToolExecutionError, run_tool
 
 LOGGER: StructuredLoggerAdapter = get_logger(__name__)
 
@@ -393,8 +393,9 @@ def _build_policy_from_mapping(data: Mapping[str, object]) -> ObservabilityPolic
 
 def load_policy() -> ObservabilityPolicy:
     """Load the observability policy from disk, falling back to defaults on failure."""
+    policy = DEFAULT_POLICY
     if yaml is None or not POLICY_PATH.exists():
-        return DEFAULT_POLICY
+        return policy
 
     try:
         text = POLICY_PATH.read_text(encoding="utf-8")
@@ -402,7 +403,7 @@ def load_policy() -> ObservabilityPolicy:
         with_fields(LOGGER, policy_path=str(POLICY_PATH)).warning(
             "Failed to read observability policy: %s", exc
         )
-        return DEFAULT_POLICY
+        return policy
 
     try:
         overrides_raw: object = yaml.safe_load(text)
@@ -415,29 +416,29 @@ def load_policy() -> ObservabilityPolicy:
             with_fields(LOGGER, policy_path=str(POLICY_PATH)).warning(
                 "Failed to parse observability policy YAML: %s", exc
             )
-            return DEFAULT_POLICY
+            return policy
         raise
 
     if overrides_raw is None:
-        return DEFAULT_POLICY
+        return policy
     if not isinstance(overrides_raw, Mapping):
         with_fields(LOGGER, policy_path=str(POLICY_PATH)).warning(
             "Observability policy override must be a mapping, got %s",
             type(overrides_raw).__name__,
         )
-        return DEFAULT_POLICY
+        return policy
 
     merged_data = _deep_merge_dicts(
         cast(Mapping[str, object], asdict(DEFAULT_POLICY)),
         cast(Mapping[str, object], overrides_raw),
     )
     try:
-        return _build_policy_from_mapping(merged_data)
+        policy = _build_policy_from_mapping(merged_data)
     except TypeError as exc:
         with_fields(LOGGER, policy_path=str(POLICY_PATH)).warning(
             "Observability policy overrides are invalid: %s", exc
         )
-        return DEFAULT_POLICY
+    return policy
 
 
 # ---------- Data models -------------------------------------------------------
@@ -919,8 +920,9 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     return (text, tree)
 
 
-def scan_file(
-    path: Path, policy: ObservabilityPolicy
+def scan_file(  # noqa: PLR0914 - function collects multiple artefact lists in a single pass
+    path: Path,
+    policy: ObservabilityPolicy,
 ) -> tuple[list[LogRow], list[MetricRow], list[TraceRow]]:
     """Compute scan file.
 

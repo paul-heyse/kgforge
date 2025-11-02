@@ -9,6 +9,18 @@ from __future__ import annotations
 import json
 from typing import cast
 
+
+def _empty_source_link() -> dict[str, str]:
+    """Return a fresh, typed source link mapping."""
+
+    return {}
+
+
+def _empty_reverse_map() -> dict[str, tuple[str, ...]]:
+    """Return a fresh, typed reverse lookup mapping."""
+
+    return {}
+
 import pytest
 from docs.types.artifacts import (
     ArtifactValidationError,

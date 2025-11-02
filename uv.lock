@@ -6,9 +6,6 @@ resolution-markers = [
     "python_full_version < '3.14' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'",
 ]
 
-[options]
-prerelease-mode = "allow"
-
 [[package]]
 name = "accelerate"
 version = "1.11.0"
@@ -2748,6 +2745,7 @@ dependencies = [
     { name = "bioregistry" },
     { name = "black", extra = ["jupyter"] },
     { name = "boto3" },
+    { name = "build" },
     { name = "certifi" },
     { name = "docformatter" },
     { name = "docling-core" },
@@ -2781,6 +2779,7 @@ dependencies = [
     { name = "mkdocs-material" },
     { name = "mkdocs-section-index" },
     { name = "mkdocstrings", extra = ["python"] },
+    { name = "msgspec" },
     { name = "mypy" },
     { name = "mypy-extensions" },
     { name = "myst-nb" },
@@ -2791,6 +2790,8 @@ dependencies = [
     { name = "numpy" },
     { name = "numpydoc" },
     { name = "numpydoc-validation" },
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-sdk" },
     { name = "pandera" },
     { name = "pip-audit" },
     { name = "platformdirs" },
@@ -3217,6 +3218,7 @@ requires-dist = [
     { name = "bioregistry", specifier = ">=0.12.43" },
     { name = "black", extras = ["jupyter"], specifier = ">=25.9.0" },
     { name = "boto3" },
+    { name = "build", specifier = ">=1.2.2" },
     { name = "build", marker = "extra == 'tools'", specifier = ">=1.2.2" },
     { name = "certifi", specifier = ">=2025.10.5" },
     { name = "compressed-tensors", marker = "extra == 'gpu'" },
@@ -3268,6 +3270,7 @@ requires-dist = [
     { name = "mkdocs-material" },
     { name = "mkdocs-section-index" },
     { name = "mkdocstrings", extras = ["python"] },
+    { name = "msgspec", specifier = ">=0.19.0" },
     { name = "msgspec", marker = "extra == 'tools'", specifier = ">=0.19.0" },
     { name = "mypy", specifier = ">=1.11.0" },
     { name = "mypy-extensions", specifier = ">=1.0.0" },
@@ -3301,7 +3304,9 @@ requires-dist = [
     { name = "openai", marker = "extra == 'gpu'" },
     { name = "openai-harmony", marker = "extra == 'gpu'" },
     { name = "openai-whisper", marker = "extra == 'gpu'" },
+    { name = "opentelemetry-api", specifier = ">=1.24.0" },
     { name = "opentelemetry-api", marker = "extra == 'tools'", specifier = ">=1.24.0" },
+    { name = "opentelemetry-sdk", specifier = ">=1.24.0" },
     { name = "opentelemetry-sdk", marker = "extra == 'tools'", specifier = ">=1.24.0" },
     { name = "pandera", specifier = ">=0.20.0" },
     { name = "pip-audit", specifier = ">=2.9.0" },

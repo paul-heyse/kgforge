@@ -373,7 +373,7 @@ class BM25Index:
         serialize_json(payload, schema_path, path_obj)
 
     @classmethod
-    def load(cls, path: str) -> BM25Index:
+    def load(cls, path: str) -> BM25Index:  # noqa: PLR0912
         """Load BM25 index metadata from JSON with schema validation and checksum verification.
 
         <!-- auto:docstring-builder v1 -->

@@ -5,9 +5,13 @@ Tests are organized in classes for logical grouping and test isolation.
 
 from __future__ import annotations
 
+from collections.abc import Callable, Sequence
+
+import numpy as np
 import pytest
 
 from kgfoundry.agent_catalog.search import (
+    EmbeddingModelProtocol,
     SearchOptions,
     build_default_search_options,
     build_embedding_aware_search_options,
@@ -15,18 +19,21 @@ from kgfoundry.agent_catalog.search import (
     make_search_document,
 )
 from kgfoundry_common.errors import AgentCatalogSearchError
+from search_api.types import VectorArray
 
 
-@pytest.fixture  # type: ignore[misc]
-def mock_embedding_loader() -> object:  # type: ignore[misc]
+@pytest.fixture
+def mock_embedding_loader() -> Callable[[str], EmbeddingModelProtocol]:
     """Fixture providing a mock embedding model loader."""
 
-    class MockEmbeddingModel:
+    class MockEmbeddingModel(EmbeddingModelProtocol):
         """Mock embedding model implementing EmbeddingModelProtocol."""
 
-        def encode(self, sentences: list[str], **_kwargs: object) -> list[list[float]]:
+        def encode(self, sentences: Sequence[str], **_kwargs: object) -> VectorArray:
             """Mock encode method returning dummy embeddings."""
-            return [[0.1] * 10 for _ in sentences]
+            if not sentences:
+                return np.zeros((0, 10), dtype=np.float32)
+            return np.full((len(sentences), 10), 0.1, dtype=np.float32)
 
     def loader(_name: str) -> MockEmbeddingModel:
         return MockEmbeddingModel()
@@ -59,43 +66,45 @@ class TestBuildDefaultSearchOptions:
         assert opts.candidate_pool == 50
         assert opts.alpha == 0.6
 
-    @pytest.mark.parametrize(  # type: ignore[misc]
+    @pytest.mark.parametrize(
         "alpha",
         [-0.1, 1.1, -1.0, 2.0],
     )
-    def test_alpha_validation_rejects_out_of_range(self, alpha: float) -> None:  # type: ignore[misc]
+    def test_alpha_validation_rejects_out_of_range(self, alpha: float) -> None:
         """Test that alpha outside [0.0, 1.0] raises AgentCatalogSearchError."""
         with pytest.raises(AgentCatalogSearchError) as exc_info:
             build_default_search_options(alpha=alpha)
         assert "alpha must be in [0.0, 1.0]" in str(exc_info.value)
 
-    @pytest.mark.parametrize(  # type: ignore[misc]
+    @pytest.mark.parametrize(
         "alpha",
         [0.0, 0.5, 1.0],
     )
-    def test_alpha_validation_accepts_in_range(self, alpha: float) -> None:  # type: ignore[misc]
+    def test_alpha_validation_accepts_in_range(self, alpha: float) -> None:
         """Test that alpha in [0.0, 1.0] is accepted."""
         opts = build_default_search_options(alpha=alpha)
         assert opts.alpha == alpha
 
-    @pytest.mark.parametrize(  # type: ignore[misc]
+    @pytest.mark.parametrize(
         "pool",
         [-1, -10],
     )
-    def test_candidate_pool_validation_rejects_negative(self, pool: int) -> None:  # type: ignore[misc]
+    def test_candidate_pool_validation_rejects_negative(self, pool: int) -> None:
         """Test that negative candidate pool raises AgentCatalogSearchError."""
         with pytest.raises(AgentCatalogSearchError) as exc_info:
             build_default_search_options(candidate_pool=pool)
         assert "candidate_pool must be non-negative" in str(exc_info.value)
 
-    def test_all_parameters(self, mock_embedding_loader: object) -> None:
+    def test_all_parameters(
+        self, mock_embedding_loader: Callable[[str], EmbeddingModelProtocol]
+    ) -> None:
         """Test that all parameters can be set."""
         opts = build_default_search_options(
             alpha=0.7,
             candidate_pool=200,
             batch_size=64,
             embedding_model="test-model",
-            model_loader=mock_embedding_loader,  # type: ignore[arg-type]
+            model_loader=mock_embedding_loader,
         )
         assert opts.alpha == 0.7
         assert opts.candidate_pool == 200
@@ -119,7 +128,7 @@ class TestBuildFacetedSearchOptions:
         opts = build_faceted_search_options(facets={})
         assert opts.facets == {}
 
-    @pytest.mark.parametrize(  # type: ignore[misc]
+    @pytest.mark.parametrize(
         "invalid_facets",
         [
             {"invalid_key": "value"},
@@ -127,7 +136,7 @@ class TestBuildFacetedSearchOptions:
             {"unknown": "facet"},
         ],
     )
-    def test_invalid_facet_keys_rejected(self, invalid_facets: dict[str, str]) -> None:  # type: ignore[misc]
+    def test_invalid_facet_keys_rejected(self, invalid_facets: dict[str, str]) -> None:
         """Test that unrecognized facet keys are rejected."""
         with pytest.raises(AgentCatalogSearchError) as exc_info:
             build_faceted_search_options(facets=invalid_facets)
@@ -160,33 +169,39 @@ class TestBuildFacetedSearchOptions:
 class TestBuildEmbeddingAwareSearchOptions:
     """Tests for build_embedding_aware_search_options helper factory."""
 
-    def test_embedding_model_and_loader_required(self, mock_embedding_loader: object) -> None:
+    def test_embedding_model_and_loader_required(
+        self, mock_embedding_loader: Callable[[str], EmbeddingModelProtocol]
+    ) -> None:
         """Test that embedding_model and model_loader are required."""
         opts = build_embedding_aware_search_options(
             embedding_model="all-MiniLM-L6-v2",
-            model_loader=mock_embedding_loader,  # type: ignore[arg-type]
+            model_loader=mock_embedding_loader,
         )
         assert opts.embedding_model == "all-MiniLM-L6-v2"
         assert opts.model_loader is mock_embedding_loader
         assert opts.alpha == 0.6  # defaults
 
-    def test_optional_facets_with_embedding(self, mock_embedding_loader: object) -> None:
+    def test_optional_facets_with_embedding(
+        self, mock_embedding_loader: Callable[[str], EmbeddingModelProtocol]
+    ) -> None:
         """Test that facets can be combined with embedding options."""
         facets = {"kind": "class"}
         opts = build_embedding_aware_search_options(
             embedding_model="model",
-            model_loader=mock_embedding_loader,  # type: ignore[arg-type]
+            model_loader=mock_embedding_loader,
             facets=facets,
         )
         assert opts.facets == facets
         assert opts.embedding_model == "model"
 
-    def test_invalid_facets_with_embedding_rejected(self, mock_embedding_loader: object) -> None:
+    def test_invalid_facets_with_embedding_rejected(
+        self, mock_embedding_loader: Callable[[str], EmbeddingModelProtocol]
+    ) -> None:
         """Test that invalid facets are rejected even with embedding."""
         with pytest.raises(AgentCatalogSearchError) as exc_info:
             build_embedding_aware_search_options(
                 embedding_model="model",
-                model_loader=mock_embedding_loader,  # type: ignore[arg-type]
+                model_loader=mock_embedding_loader,
                 facets={"bad_key": "val"},
             )
         assert "Invalid facet keys" in str(exc_info.value)
@@ -288,14 +303,16 @@ class TestMakeSearchDocument:
 class TestSearchOptionsRoundTrip:
     """Tests for round-trip consistency of SearchOptions."""
 
-    def test_options_are_valid_after_build(self, mock_embedding_loader: object) -> None:
+    def test_options_are_valid_after_build(
+        self, mock_embedding_loader: Callable[[str], EmbeddingModelProtocol]
+    ) -> None:
         """Test that built options are valid SearchOptions instances."""
         opts1 = build_default_search_options(alpha=0.7)
         opts2 = build_faceted_search_options(facets={"package": "test"})
 
         opts3 = build_embedding_aware_search_options(
             embedding_model="model",
-            model_loader=mock_embedding_loader,  # type: ignore[arg-type]
+            model_loader=mock_embedding_loader,
         )
 
         # All should be SearchOptions instances

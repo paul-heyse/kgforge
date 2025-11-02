@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
-from functools import lru_cache
 from pathlib import Path
 from typing import TypedDict, cast
 
@@ -36,8 +35,9 @@ from kgfoundry_common.types import JsonPrimitive, JsonValue
 
 JsonObject = dict[str, JsonValue]
 
-# JSON Schema type (from jsonschema stubs: Mapping[str, object])
-JsonSchema = Mapping[str, object]
+# JSON Schema type for cached schema objects
+JsonSchema = dict[str, object]
+
 
 __all__ = [
     "JsonObject",
@@ -108,8 +108,10 @@ class ProblemDetailsValidationError(Exception):
         self.validation_errors = validation_errors or []
 
 
-@lru_cache(maxsize=1)
-def _load_schema() -> JsonSchema:
+_SCHEMA_CACHE: dict[str, JsonSchema] = {}
+
+
+def _load_schema_impl() -> JsonSchema:
     """Load and cache the Problem Details schema.
 
     <!-- auto:docstring-builder v1 -->
@@ -143,6 +145,17 @@ def _load_schema() -> JsonSchema:
         raise ProblemDetailsValidationError(msg) from exc
 
     return schema_obj
+
+
+def _load_schema() -> JsonSchema:
+    """Return the cached Problem Details JSON Schema."""
+    cached = _SCHEMA_CACHE.get("problem_details")
+    if cached is not None:
+        return cached
+
+    schema = _load_schema_impl()
+    _SCHEMA_CACHE["problem_details"] = schema
+    return schema
 
 
 def validate_problem_details(payload: Mapping[str, JsonValue]) -> None:

@@ -21,8 +21,8 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Mapping
-from functools import lru_cache
 from pathlib import Path
+from typing import cast
 
 import jsonschema
 from jsonschema.exceptions import SchemaError, ValidationError
@@ -52,8 +52,7 @@ logger = get_logger(__name__)
 _schema_cache: dict[str, dict[str, object]] = {}
 
 
-@lru_cache(maxsize=128)
-def _load_schema_by_path_str(schema_path_str: str) -> dict[str, object]:
+def _load_schema_by_path_str_impl(schema_path_str: str) -> dict[str, object]:
     """Load and parse a JSON Schema file with caching by string path.
 
     This internal helper caches by string path to avoid lru_cache descriptor
@@ -78,10 +77,11 @@ def _load_schema_by_path_str(schema_path_str: str) -> dict[str, object]:
     """
     try:
         schema_text = read_text(Path(schema_path_str))
-        schema_obj = json.loads(schema_text)
-        if not isinstance(schema_obj, dict):
-            msg = f"Schema must be a JSON object at root, got {type(schema_obj).__name__}"
+        schema_raw: object = json.loads(schema_text)
+        if not isinstance(schema_raw, dict):
+            msg = f"Schema must be a JSON object at root, got {type(schema_raw).__name__}"
             raise SchemaValidationError(msg)
+        schema_obj = cast(dict[str, object], schema_raw)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         msg = f"Failed to load schema from {schema_path_str}: {e}"
         raise SchemaValidationError(msg) from e
@@ -118,9 +118,14 @@ def _load_schema_cached(schema_path: Path) -> dict[str, object]:
         msg = f"Schema file not found: {schema_path}"
         raise FileNotFoundError(msg)
 
-    # Convert Path to string for lru_cache (strings are properly hashable)
-    # Delegate to cached helper to avoid descriptor typing issues
-    return _load_schema_by_path_str(str(schema_path.resolve()))
+    schema_key = str(schema_path.resolve())
+    cached = _schema_cache.get(schema_key)
+    if cached is not None:
+        return cached
+
+    schema_obj = _load_schema_by_path_str_impl(schema_key)
+    _schema_cache[schema_key] = schema_obj
+    return schema_obj
 
 
 def validate_payload(payload: Mapping[str, object], schema_path: Path) -> None:

@@ -1,22 +1,65 @@
-"""Public wrapper for :mod:`docs._scripts.shared`."""
+"""Public wrapper for :mod:`docs._scripts.shared` with lazy loading."""
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 from importlib import import_module
-from typing import cast
+from types import ModuleType
+from typing import TYPE_CHECKING, cast
 
-_ORIGINAL = import_module("docs._scripts.shared")
+MODULE_PATH = "docs._scripts.shared"
 
-_PUBLIC_NAMES: tuple[str, ...]
-_original_all: object = getattr(_ORIGINAL, "__all__", None)
-if isinstance(_original_all, Iterable) and not isinstance(_original_all, (str, bytes)):
-    _PUBLIC_NAMES = tuple(str(name) for name in _original_all)
-else:
-    _PUBLIC_NAMES = tuple(name for name in dir(_ORIGINAL) if not name.startswith("_"))
+__all__ = [
+    "BuildEnvironment",
+    "DocsSettings",
+    "GriffeLoader",
+    "LinkMode",
+    "WarningLogger",
+    "build_warning_logger",
+    "detect_environment",
+    "ensure_sys_paths",
+    "load_settings",
+    "make_loader",
+    "make_logger",
+    "resolve_git_sha",
+    "safe_json_deserialize",
+    "safe_json_serialize",
+]
 
-__all__ = _PUBLIC_NAMES
 
-_NAMESPACE: dict[str, object] = globals()
-for _name in __all__:
-    _NAMESPACE[_name] = cast(object, getattr(_ORIGINAL, _name))
+def _load_module() -> ModuleType:
+    module = cast(ModuleType | None, getattr(_load_module, "_cache", None))
+    if module is None:
+        module = import_module(MODULE_PATH)
+        _load_module._cache = module  # type: ignore[attr-defined]
+    return module
+
+
+def __getattr__(name: str) -> object:
+    if name in __all__:
+        module = _load_module()
+        return cast(object, getattr(module, name))
+    message = f"module '{__name__}' has no attribute '{name}'"
+    raise AttributeError(message)
+
+
+def __dir__() -> list[str]:
+    return sorted(__all__)
+
+
+if TYPE_CHECKING:  # pragma: no cover - typing assistance only
+    from docs._scripts import shared as _shared
+
+    BuildEnvironment = _shared.BuildEnvironment
+    DocsSettings = _shared.DocsSettings
+    GriffeLoader = _shared.GriffeLoader
+    LinkMode = _shared.LinkMode
+    WarningLogger = _shared.WarningLogger
+    build_warning_logger = _shared.build_warning_logger
+    detect_environment = _shared.detect_environment
+    ensure_sys_paths = _shared.ensure_sys_paths
+    load_settings = _shared.load_settings
+    make_loader = _shared.make_loader
+    make_logger = _shared.make_logger
+    resolve_git_sha = _shared.resolve_git_sha
+    safe_json_deserialize = _shared.safe_json_deserialize
+    safe_json_serialize = _shared.safe_json_serialize

@@ -6,7 +6,7 @@ from __future__ import annotations
 import pathlib
 import re
 
-from tools.shared.logging import get_logger
+from tools._shared.logging import get_logger  # noqa: PLC2701
 
 LOGGER = get_logger(__name__)
 

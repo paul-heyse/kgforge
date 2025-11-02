@@ -46,8 +46,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-from docs.scripts import shared
-from docs.scripts.validation import validate_against_schema
+from docs._scripts import shared
+from docs._scripts.validation import validate_against_schema
 from docs.types.artifacts import (
     JsonPayload,
     SymbolDeltaPayload,
@@ -61,8 +61,8 @@ from tools import (
     get_logger,
     observe_tool_run,
 )
-from tools.shared.problem_details import ProblemDetailsDict
-from tools.shared.proc import ToolExecutionError
+from tools._shared.problem_details import ProblemDetailsDict
+from tools._shared.proc import ToolExecutionError
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
@@ -257,10 +257,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--artifacts",
         nargs="+",
         type=str,
-        default=["symbols.json", "symbols.delta.json"],  # type: ignore[misc]
+        default=None,
         help="Artifact names to validate (default: all)",
     )
     args = parser.parse_args(argv)
+    artifact_names_from_args: list[str] | None = cast(list[str] | None, args.artifacts)
 
     if not logging.getLogger().handlers:
         logging.basicConfig(level=logging.INFO)
@@ -276,7 +277,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         timeout=None,
     ) as observation:
         failed_count = 0
-        artifact_names: list[str] = args.artifacts
+        artifact_names: list[str] = (
+            artifact_names_from_args
+            if artifact_names_from_args is not None
+            else list(artifacts_to_check.keys())
+        )
 
         for artifact_name in artifact_names:
             if artifact_name not in artifacts_to_check:

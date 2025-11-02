@@ -153,7 +153,7 @@ class _GaugeConstructor(Protocol):
 
 
 class _HistogramConstructor(Protocol):
-    def __call__(
+    def __call__(  # noqa: PLR0913
         self,
         name: str,
         documentation: str,
@@ -300,7 +300,7 @@ def build_gauge(
     )
 
 
-def build_histogram(
+def build_histogram(  # noqa: PLR0913
     name: str,
     documentation: str,
     labelnames: Sequence[str] | None = None,

@@ -11,14 +11,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import pytest
 
-if TYPE_CHECKING:
-    from kgfoundry_common.types import JsonValue
-else:
-    JsonValue = dict  # type: ignore[assignment,misc]
+from kgfoundry_common.types import JsonValue
 
 
 class TestCatalogSchemaRoundTrip:
