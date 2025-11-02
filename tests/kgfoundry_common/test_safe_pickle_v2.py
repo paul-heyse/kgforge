@@ -21,7 +21,7 @@ class TestSignedPickleWrapper:
         return os.urandom(32)
 
     @pytest.fixture
-    def wrapper(self, signing_key: bytes):  # type: ignore[name-defined]
+    def wrapper(self, signing_key: bytes) -> SignedPickleWrapper:
         """Provide a wrapper instance."""
         return SignedPickleWrapper(signing_key)
 
@@ -42,8 +42,8 @@ class TestSignedPickleWrapper:
     )
     def test_dump_and_load_allowed_types(
         self,
-        wrapper,
-        data: object,  # type: ignore[name-defined]
+        wrapper: SignedPickleWrapper,
+        data: object,
     ) -> None:
         """Test that allowed types round-trip correctly."""
         buffer = io.BytesIO()
@@ -54,7 +54,7 @@ class TestSignedPickleWrapper:
 
         assert loaded == data
 
-    def test_signature_verification_success(self, wrapper) -> None:  # type: ignore[name-defined]
+    def test_signature_verification_success(self, wrapper: SignedPickleWrapper) -> None:
         """Test that valid signatures pass verification."""
         data = {"test": "data"}
         buffer = io.BytesIO()
@@ -67,7 +67,7 @@ class TestSignedPickleWrapper:
 
     def test_signature_verification_fails_on_tampering(
         self,
-        wrapper,  # type: ignore[name-defined]
+        wrapper: SignedPickleWrapper,
     ) -> None:
         """Test that tampering with payload is detected."""
         data = {"test": "data"}
@@ -84,7 +84,7 @@ class TestSignedPickleWrapper:
 
     def test_signature_verification_fails_on_truncation(
         self,
-        wrapper,  # type: ignore[name-defined]
+        wrapper: SignedPickleWrapper,
     ) -> None:
         """Test that truncated payload is detected."""
         data = {"test": "data"}
@@ -114,7 +114,7 @@ class TestSignedPickleWrapper:
         with pytest.raises(UnsafeSerializationError, match="signature verification failed"):
             wrapper2.load(buffer)
 
-    def test_disallowed_type_rejected_on_dump(self, wrapper) -> None:  # type: ignore[name-defined]
+    def test_disallowed_type_rejected_on_dump(self, wrapper: SignedPickleWrapper) -> None:
         """Test that disallowed types are rejected during dump."""
 
         class CustomClass:
@@ -155,7 +155,7 @@ class TestSignedPickleWrapper:
 
         assert any("Signing key < 32 bytes" in record.getMessage() for record in caplog.records)
 
-    def test_nested_container_depth_limit(self, wrapper) -> None:  # type: ignore[name-defined]
+    def test_nested_container_depth_limit(self, wrapper: SignedPickleWrapper) -> None:
         """Test that deeply nested structures are rejected."""
         # Create very deeply nested structure
         data: dict[str, object] = {"level": 0}
@@ -186,11 +186,11 @@ class TestPickleRoundTrip:
     """Integration tests for pickle round-tripping."""
 
     @pytest.fixture
-    def wrapper(self):  # type: ignore[name-defined]
+    def wrapper(self) -> SignedPickleWrapper:
         """Provide a wrapper instance."""
         return SignedPickleWrapper(os.urandom(32))
 
-    def test_complex_nested_structure(self, wrapper) -> None:  # type: ignore[name-defined]
+    def test_complex_nested_structure(self, wrapper: SignedPickleWrapper) -> None:
         """Test complex nested structures round-trip."""
         data = {
             "users": [
@@ -209,8 +209,12 @@ class TestPickleRoundTrip:
         wrapper.dump(data, buffer)
 
         buffer.seek(0)
-        loaded = wrapper.load(buffer)
-
+        loaded = cast(dict[str, object], wrapper.load(buffer))
         assert loaded == data
-        assert loaded["users"][0]["name"] == "Alice"
-        assert loaded["metadata"]["config"]["debug"] is False
+
+        users = cast(list[dict[str, object]], loaded["users"])
+        assert users[0]["name"] == "Alice"
+
+        metadata = cast(dict[str, object], loaded["metadata"])
+        config = cast(dict[str, object], metadata["config"])
+        assert config["debug"] is False

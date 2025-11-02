@@ -273,6 +273,22 @@ activate_project_env() {
   ok "Activated project environment (${venv_path})"
 }
 
+ensure_src_pth() {
+  local site_packages
+  site_packages="$(python - <<'PY'
+import sysconfig
+print(sysconfig.get_paths()["purelib"])
+PY
+)"
+  local pth_file="${site_packages}/kgfoundry_src.pth"
+  if [ ! -f "${pth_file}" ] || ! grep -qx "$(pwd)/src" "${pth_file}"; then
+    printf "%s\n" "$(pwd)/src" > "${pth_file}"
+    ok "Ensured ${pth_file} points to src"
+  else
+    ok "${pth_file} already points to src"
+  fi
+}
+
 # ------------- Diagnostics -------------
 print_summary() {
   cat <<EOF
@@ -297,11 +313,13 @@ EOF
 ensure_uv
 ensure_python "${PY_VER_DEFAULT}"
 sync_env
+ok "Editable install complete"
+activate_project_env
 info "Installing project package in editable mode…"
 uv pip install -e .
 ok "Editable install complete"
+ensure_src_pth
 export PYTHONPATH="$(pwd)/src:${PYTHONPATH:-}"
 ok "PYTHONPATH includes src (current: ${PYTHONPATH})"
 generate_path_map
-activate_project_env
 print_summary

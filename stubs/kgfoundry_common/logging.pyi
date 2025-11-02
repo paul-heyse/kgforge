@@ -18,7 +18,6 @@ __all__ = [
     "with_fields",
 ]
 
-
 class LogContextExtra(TypedDict, total=False):
     correlation_id: str
     operation: str
@@ -27,14 +26,10 @@ class LogContextExtra(TypedDict, total=False):
     service: str
     endpoint: str
 
-
 class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str: ...
 
-
-class LoggerAdapter(
-    logging.LoggerAdapter[logging.Logger, MutableMapping[str, object]]
-):
+class LoggerAdapter(logging.LoggerAdapter[logging.Logger, MutableMapping[str, object]]):
     logger: logging.Logger
     extra: MutableMapping[str, object]
 
@@ -73,24 +68,14 @@ class LoggerAdapter(
         **fields: object,
     ) -> None: ...
 
-
 def get_logger(name: str) -> LoggerAdapter: ...
-
-
 def setup_logging(level: int = ...) -> None: ...
-
-
 def set_correlation_id(correlation_id: str | None) -> None: ...
-
-
 def get_correlation_id() -> str | None: ...
-
 
 class CorrelationContext(AbstractContextManager[CorrelationContext]):
     def __init__(self, correlation_id: str | None) -> None: ...
-
     def __enter__(self) -> CorrelationContext: ...
-
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
@@ -98,11 +83,8 @@ class CorrelationContext(AbstractContextManager[CorrelationContext]):
         exc_tb: object,
     ) -> None: ...
 
-
 def with_fields(
     logger: logging.Logger | LoggerAdapter,
     **fields: object,
 ) -> AbstractContextManager[LoggerAdapter]: ...
-
-
 def measure_duration() -> tuple[float, float]: ...

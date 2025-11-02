@@ -7,6 +7,7 @@ import logging
 import sys
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Protocol, cast, runtime_checkable
 
@@ -564,16 +565,10 @@ def generate_index(
     return SymbolIndexArtifacts(rows=rows_sorted, by_file=by_file, by_module=by_module)
 
 
-_GIT_SHA_CACHE: str | None = None
-
-
+@lru_cache(maxsize=1)
 def _git_sha() -> str:
     """Return the Git SHA for permalink construction."""
-
-    global _GIT_SHA_CACHE
-    if _GIT_SHA_CACHE is None:
-        _GIT_SHA_CACHE = shared.resolve_git_sha(ENV, SETTINGS, logger=BASE_LOGGER)
-    return _GIT_SHA_CACHE
+    return shared.resolve_git_sha(ENV, SETTINGS, logger=BASE_LOGGER)
 
 
 def build_github_permalink(file: Path, span: LineSpan) -> str | None:

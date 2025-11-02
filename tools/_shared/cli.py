@@ -6,7 +6,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, Literal
 
 import msgspec
 from msgspec import UNSET, Struct, UnsetType, structs
@@ -119,13 +119,14 @@ def validate_cli_envelope(envelope: CliEnvelope) -> None:
     None
         This function raises if validation fails.
     """
-    payload = cast(dict[str, object], msgspec.to_builtins(envelope))
+    payload: dict[str, object] = msgspec.to_builtins(envelope)
     validate_tools_payload(payload, CLI_ENVELOPE_SCHEMA)
 
 
 def render_cli_envelope(envelope: CliEnvelope, *, indent: int = 2) -> str:
     """Return a JSON string for ``envelope``."""
-    return json.dumps(cast(dict[str, object], msgspec.to_builtins(envelope)), indent=indent)
+    payload: dict[str, object] = msgspec.to_builtins(envelope)
+    return json.dumps(payload, indent=indent)
 
 
 @dataclass(slots=True)

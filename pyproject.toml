@@ -808,7 +808,3 @@ missing-returns-action = "error"
 dev = [
     "libcst>=1.8.5",
 ]
-
-[tool.uv.scripts]
-pytest = { cmd = ["pytest"], env = { "PYTHONPATH" = "src" } }
-test = { cmd = ["pytest", "-q"], env = { "PYTHONPATH" = "src" } }

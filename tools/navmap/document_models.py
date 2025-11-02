@@ -7,7 +7,7 @@ from typing import Final, TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from tools.navmap.models import NavIndex, SymbolMeta
+from tools.navmap.models import ModuleMeta, NavIndex, SymbolMeta
 
 NAVMAP_SCHEMA: Final[str] = "navmap_document.json"
 NAVMAP_SCHEMA_ID: Final[str] = "https://kgfoundry.dev/schema/tools/navmap-document.json"

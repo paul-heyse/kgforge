@@ -9,18 +9,6 @@ from __future__ import annotations
 import json
 from typing import cast
 
-
-def _empty_source_link() -> dict[str, str]:
-    """Return a fresh, typed source link mapping."""
-
-    return {}
-
-
-def _empty_reverse_map() -> dict[str, tuple[str, ...]]:
-    """Return a fresh, typed reverse lookup mapping."""
-
-    return {}
-
 import pytest
 from docs.types.artifacts import (
     ArtifactValidationError,
@@ -35,6 +23,16 @@ from docs.types.artifacts import (
     symbol_index_from_json,
     symbol_index_to_payload,
 )
+
+
+def _empty_source_link() -> dict[str, str]:
+    """Return a fresh, typed source link mapping."""
+    return {}
+
+
+def _empty_reverse_map() -> dict[str, tuple[str, ...]]:
+    """Return a fresh, typed reverse lookup mapping."""
+    return {}
 
 
 class TestLineSpan:
@@ -63,7 +61,7 @@ class TestSymbolIndexRow:
             kind="function",
             doc="A function",
             tested_by=(),
-            source_link={},  # type: ignore[misc]
+            source_link=_empty_source_link(),
         )
         assert row.path == "my.module.func"
         assert row.kind == "function"
@@ -78,7 +76,7 @@ class TestSymbolIndexRow:
             kind="method",
             doc="A method documentation.",
             tested_by=("test_class.py::test_method",),
-            source_link={"github": "https://github.com/..."},  # type: ignore[misc]
+            source_link={"github": "https://github.com/..."},
             canonical_path="pkg.mod.alias",
             module="pkg.mod",
             package="pkg",
@@ -110,15 +108,15 @@ class TestSymbolIndexRoundTrip:
             kind="function",
             doc="Function documentation.",
             tested_by=("test_pkg.py::test_func",),
-            source_link={},  # type: ignore[misc]
+            source_link=_empty_source_link(),
             module="pkg",
             package="pkg",
             file="pkg/__init__.py",
         )
         artifacts = SymbolIndexArtifacts(
             rows=(row,),
-            by_file={"pkg/__init__.py": ("pkg.func",)},  # type: ignore[misc]
-            by_module={"pkg": ("pkg.func",)},  # type: ignore[misc]
+            by_file={"pkg/__init__.py": ("pkg.func",)},
+            by_module={"pkg": ("pkg.func",)},
         )
 
         # Serialize
@@ -141,27 +139,27 @@ class TestSymbolIndexRoundTrip:
                 kind="function",
                 doc="func1 doc",
                 tested_by=(),
-                source_link={},  # type: ignore[misc]
+                source_link=_empty_source_link(),
             ),
             SymbolIndexRow(
                 path="pkg.mod2.func2",
                 kind="function",
                 doc="func2 doc",
                 tested_by=(),
-                source_link={},  # type: ignore[misc]
+                source_link=_empty_source_link(),
             ),
             SymbolIndexRow(
                 path="pkg.Class",
                 kind="class",
                 doc="class doc",
                 tested_by=(),
-                source_link={},  # type: ignore[misc]
+                source_link=_empty_source_link(),
             ),
         ]
         artifacts = SymbolIndexArtifacts(
-            rows=tuple(rows),  # type: ignore[misc]
-            by_file={},  # type: ignore[misc]
-            by_module={},  # type: ignore[misc]
+            rows=tuple(rows),
+            by_file=_empty_reverse_map(),
+            by_module=_empty_reverse_map(),
         )
 
         payload = symbol_index_to_payload(artifacts)
@@ -179,10 +177,14 @@ class TestSymbolIndexRoundTrip:
             kind="function",
             doc="doc",
             tested_by=(),
-            source_link={},  # type: ignore[misc]
+            source_link=_empty_source_link(),
             span=span,
         )
-        artifacts = SymbolIndexArtifacts(rows=(row,), by_file={}, by_module={})  # type: ignore[misc]
+        artifacts = SymbolIndexArtifacts(
+            rows=(row,),
+            by_file=_empty_reverse_map(),
+            by_module=_empty_reverse_map(),
+        )
 
         payload = symbol_index_to_payload(artifacts)
         assert payload[0]["lineno"] == 42
@@ -200,9 +202,13 @@ class TestSymbolIndexRoundTrip:
             kind="function",
             doc="doc",
             tested_by=("test_mod.py::test_func", "integration_tests.py::test_all"),
-            source_link={},  # type: ignore[misc]
+            source_link=_empty_source_link(),
         )
-        artifacts = SymbolIndexArtifacts(rows=(row,), by_file={}, by_module={})  # type: ignore[misc]
+        artifacts = SymbolIndexArtifacts(
+            rows=(row,),
+            by_file=_empty_reverse_map(),
+            by_module=_empty_reverse_map(),
+        )
 
         payload = symbol_index_to_payload(artifacts)
         assert set(cast(list[str], payload[0]["tested_by"])) == {
@@ -238,8 +244,8 @@ class TestSymbolDeltaPayload:
         """Test delta with added, removed, and changed symbols."""
         change = SymbolDeltaChange(
             path="pkg.mod.func",
-            before={"signature": "(x: int)"},  # type: ignore[misc]
-            after={"signature": "(x: int, y: str)"},  # type: ignore[misc]
+            before={"signature": "(x: int)"},
+            after={"signature": "(x: int, y: str)"},
             reasons=("signature_changed",),
         )
         delta = SymbolDeltaPayload(
@@ -262,8 +268,8 @@ class TestSymbolDeltaRoundTrip:
         """Test round-trip serialization of delta."""
         change = SymbolDeltaChange(
             path="pkg.func",
-            before={"kind": "function", "signature": "(x)"},  # type: ignore[misc]
-            after={"kind": "function", "signature": "(x, y)"},  # type: ignore[misc]
+            before={"kind": "function", "signature": "(x)"},
+            after={"kind": "function", "signature": "(x, y)"},
             reasons=("signature_changed", "doc_updated"),
         )
         delta = SymbolDeltaPayload(
@@ -405,9 +411,13 @@ class TestArtifactJSONFormatting:
             kind="function",
             doc="doc",
             tested_by=(),
-            source_link={},  # type: ignore[misc]
+            source_link=_empty_source_link(),
         )
-        artifacts = SymbolIndexArtifacts(rows=(row,), by_file={}, by_module={})  # type: ignore[misc]
+        artifacts = SymbolIndexArtifacts(
+            rows=(row,),
+            by_file=_empty_reverse_map(),
+            by_module=_empty_reverse_map(),
+        )
         payload = symbol_index_to_payload(artifacts)
 
         json_str = json.dumps(payload, indent=2, ensure_ascii=False)
@@ -422,10 +432,14 @@ class TestArtifactJSONFormatting:
             kind="function",
             doc="doc",
             tested_by=(),
-            source_link={},  # type: ignore[misc]
+            source_link=_empty_source_link(),
             section="Ñoño API",
         )
-        artifacts = SymbolIndexArtifacts(rows=(row,), by_file={}, by_module={})  # type: ignore[misc]
+        artifacts = SymbolIndexArtifacts(
+            rows=(row,),
+            by_file=_empty_reverse_map(),
+            by_module=_empty_reverse_map(),
+        )
         payload = symbol_index_to_payload(artifacts)
 
         json_str = json.dumps(payload, indent=2, ensure_ascii=False)

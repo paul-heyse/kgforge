@@ -785,7 +785,7 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, ob
         link_mode=link_mode,
     )
 
-    payload = cast(dict[str, object], msgspec.to_builtins(document))
+    payload: dict[str, object] = msgspec.to_builtins(document)
     validate_tools_payload(payload, NAVMAP_SCHEMA)
 
     out = json_path or INDEX_PATH
