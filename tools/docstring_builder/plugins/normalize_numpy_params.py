@@ -3,32 +3,33 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import ClassVar
 
-from tools.docstring_builder.plugins.base import PluginContext, PluginStage
+from tools.docstring_builder.plugins.base import (
+    PluginContext,
+    PluginStage,
+    TransformerPlugin,
+)
 from tools.docstring_builder.schema import ParameterDoc, ReturnDoc
 from tools.docstring_builder.semantics import SemanticResult
 
 
-class NormalizeNumpyParamsPlugin:
+class NormalizeNumpyParamsPlugin(TransformerPlugin):
     """Ensure parameter descriptions follow a consistent style."""
 
-    name: ClassVar[str] = "normalize_numpy_params"
-    stage: ClassVar[PluginStage] = "transformer"
+    name: str = "normalize_numpy_params"
+    stage: PluginStage = "transformer"
 
-    @staticmethod
-    def on_start(context: PluginContext) -> None:
+    def on_start(self, context: PluginContext) -> None:
         """Reset plugin state before processing begins (no-op)."""
-        del context
+        del self, context
 
-    @staticmethod
-    def on_finish(context: PluginContext) -> None:
+    def on_finish(self, context: PluginContext) -> None:
         """Clean up plugin state after processing completes (no-op)."""
-        del context
+        del self, context
 
-    @staticmethod
-    def apply(context: PluginContext, result: SemanticResult) -> SemanticResult:
+    def apply(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
         """Normalise parameter and return descriptions for ``result``."""
+        del self
         del context
         schema = result.schema
         parameters = [

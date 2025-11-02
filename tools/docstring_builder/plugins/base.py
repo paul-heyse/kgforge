@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal, Protocol, TypeVar, runtime_checkable
+from typing import Literal, Protocol, TypeVar, cast, runtime_checkable
 
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import HarvestResult
@@ -111,26 +112,72 @@ class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayl
     stage: PluginStage
 
     def __init__(self, plugin: LegacyPluginProtocol) -> None:
-        stage = getattr(plugin, "stage", None)
-        if stage not in {"harvester", "transformer", "formatter"}:
-            message = f"Unsupported legacy plugin stage: {stage!r}"
+        stage_candidate: object = getattr(plugin, "stage", None)
+        valid_stages: dict[str, PluginStage] = {
+            "harvester": "harvester",
+            "transformer": "transformer",
+            "formatter": "formatter",
+        }
+        if not isinstance(stage_candidate, str) or stage_candidate not in valid_stages:
+            message = f"Unsupported legacy plugin stage: {stage_candidate!r}"
             raise TypeError(message)
-        self.stage = stage
+        self.stage = valid_stages[stage_candidate]
         self._plugin = plugin
         self._warned = False
-        self.name = getattr(plugin, "name", plugin.__class__.__name__)
+        name_attr: object = getattr(plugin, "name", None)
+        if isinstance(name_attr, str):  # noqa: SIM108
+            resolved_name = name_attr
+        else:
+            resolved_name = plugin.__class__.__name__
+        self.name = resolved_name
+
+    @classmethod
+    def create(cls, plugin: LegacyPluginProtocol, /) -> _AnyLegacyAdapter:
+        """Return a typed adapter for the legacy ``plugin`` instance."""
+        adapter = cls(plugin)
+        if adapter.stage == "harvester":
+            return cls.wrap_harvester(adapter)
+        if adapter.stage == "transformer":
+            return cls.wrap_transformer(adapter)
+        return cls.wrap_formatter(adapter)
+
+    @classmethod
+    def wrap_harvester(cls, adapter: LegacyPluginAdapter, /) -> _LegacyHarvesterAdapter:
+        """Wrap ``adapter`` as a harvester plugin."""
+        if adapter.stage != "harvester":
+            message = f"Expected harvester plugin, received stage {adapter.stage!r}"
+            raise TypeError(message)
+        return _LegacyHarvesterAdapter(adapter)
+
+    @classmethod
+    def wrap_transformer(cls, adapter: LegacyPluginAdapter, /) -> _LegacyTransformerAdapter:
+        """Wrap ``adapter`` as a transformer plugin."""
+        if adapter.stage != "transformer":
+            message = f"Expected transformer plugin, received stage {adapter.stage!r}"
+            raise TypeError(message)
+        return _LegacyTransformerAdapter(adapter)
+
+    @classmethod
+    def wrap_formatter(cls, adapter: LegacyPluginAdapter, /) -> _LegacyFormatterAdapter:
+        """Wrap ``adapter`` as a formatter plugin."""
+        if adapter.stage != "formatter":
+            message = f"Expected formatter plugin, received stage {adapter.stage!r}"
+            raise TypeError(message)
+        return _LegacyFormatterAdapter(adapter)
 
     def on_start(self, context: PluginContext) -> None:
         """Invoke the legacy ``on_start`` hook if present."""
-        hook = getattr(self._plugin, "on_start", None)
+        hook: object = getattr(self._plugin, "on_start", None)
         if callable(hook):
-            hook(context)
+            start_hook = cast(Callable[[PluginContext], object], hook)
+            start_hook(context)
 
     def on_finish(self, context: PluginContext) -> None:
         """Invoke the legacy ``on_finish`` hook if present."""
-        hook = getattr(self._plugin, "on_finish", None)
+        hook: object = getattr(self._plugin, "on_finish", None)
         if callable(hook):
-            hook(context)
+            finish_hook = cast(Callable[[PluginContext], object], hook)
+            finish_hook(context)
 
     def apply(self, context: PluginContext, payload: DocstringPayload) -> DocstringPayload:
         """Delegate to the legacy ``run`` implementation with a warning."""
@@ -146,6 +193,89 @@ class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayl
             stacklevel=3,
         )
         self._warned = True
+
+
+class _LegacyHarvesterAdapter(HarvesterPlugin):
+    """Adapter that narrows ``apply`` to ``HarvestResult`` payloads."""
+
+    stage: PluginStage = "harvester"
+
+    def __init__(self, adapter: LegacyPluginAdapter) -> None:
+        self._adapter = adapter
+        self.name = adapter.name
+
+    def on_start(self, context: PluginContext) -> None:
+        self._adapter.on_start(context)
+
+    def on_finish(self, context: PluginContext) -> None:
+        self._adapter.on_finish(context)
+
+    def apply(self, context: PluginContext, payload: HarvestResult) -> HarvestResult:
+        result = self._adapter.apply(context, payload)
+        if not isinstance(result, HarvestResult):
+            message = (
+                f"Legacy harvester {self.name!r} returned {type(result)!r}; expected HarvestResult"
+            )
+            raise TypeError(message)
+        return result
+
+
+class _LegacyTransformerAdapter(TransformerPlugin):
+    """Adapter that narrows ``apply`` to ``SemanticResult`` payloads."""
+
+    stage: PluginStage = "transformer"
+
+    def __init__(self, adapter: LegacyPluginAdapter) -> None:
+        self._adapter = adapter
+        self.name = adapter.name
+
+    def on_start(self, context: PluginContext) -> None:
+        self._adapter.on_start(context)
+
+    def on_finish(self, context: PluginContext) -> None:
+        self._adapter.on_finish(context)
+
+    def apply(self, context: PluginContext, payload: SemanticResult) -> SemanticResult:
+        result = self._adapter.apply(context, payload)
+        if not isinstance(result, SemanticResult):
+            message = (
+                f"Legacy transformer {self.name!r} returned {type(result)!r}; expected SemanticResult"
+            )
+            raise TypeError(message)
+        return result
+
+
+class _LegacyFormatterAdapter(FormatterPlugin):
+    """Adapter that narrows ``apply`` to ``DocstringEdit`` payloads."""
+
+    stage: PluginStage = "formatter"
+
+    def __init__(self, adapter: LegacyPluginAdapter) -> None:
+        self._adapter = adapter
+        self.name = adapter.name
+
+    def on_start(self, context: PluginContext) -> None:
+        self._adapter.on_start(context)
+
+    def on_finish(self, context: PluginContext) -> None:
+        self._adapter.on_finish(context)
+
+    def apply(self, context: PluginContext, payload: DocstringEdit) -> DocstringEdit:
+        result = self._adapter.apply(context, payload)
+        if not isinstance(result, DocstringEdit):
+            message = (
+                f"Legacy formatter {self.name!r} returned {type(result)!r}; expected DocstringEdit"
+            )
+            raise TypeError(message)
+        return result
+
+
+type _AnyLegacyAdapter = (
+    LegacyPluginAdapter
+    | _LegacyHarvesterAdapter
+    | _LegacyTransformerAdapter
+    | _LegacyFormatterAdapter
+)
 
 
 __all__ = [

@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import ClassVar
 
 from tools._shared.logging import get_logger
-from tools.docstring_builder.plugins.base import PluginContext, PluginStage
+from tools.docstring_builder.plugins.base import (
+    PluginContext,
+    PluginStage,
+    TransformerPlugin,
+)
 from tools.docstring_builder.semantics import SemanticResult
 
 LOGGER = get_logger(__name__)
@@ -14,29 +17,29 @@ LOGGER = get_logger(__name__)
 MIN_WORD_LENGTH = 4
 
 
-class LLMSummaryRewritePlugin:
+class LLMSummaryRewritePlugin(TransformerPlugin):
     """Rewrite summaries into imperative mood based on configured LLM mode."""
 
-    name: ClassVar[str] = "llm_summary_rewriter"
-    stage: ClassVar[PluginStage] = "transformer"
+    name: str = "llm_summary_rewriter"
+    stage: PluginStage = "transformer"
 
-    @staticmethod
-    def on_start(context: PluginContext) -> None:
+    def on_start(self, context: PluginContext) -> None:
         """Prepare plugin state for execution (no-op)."""
-        del context
+        del self, context
 
-    @staticmethod
-    def on_finish(context: PluginContext) -> None:
+    def on_finish(self, context: PluginContext) -> None:
         """Clean up plugin state after execution (no-op)."""
-        del context
+        del self, context
 
-    @staticmethod
-    def apply(context: PluginContext, result: SemanticResult) -> SemanticResult:
+    def apply(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
         """Rewrite the summary text for ``result`` when configured to do so."""
-        mode = getattr(context.config, "llm_summary_mode", "off").lower()
+        del self
+        mode_attr: object = getattr(context.config, "llm_summary_mode", "off")
+        mode = str(mode_attr).lower()
         if mode not in {"apply", "dry-run"}:
             return result
-        summary = result.schema.summary.strip()
+        summary_attr = result.schema.summary
+        summary = str(summary_attr).strip()
         if not summary:
             return result
         if not _needs_rewrite(summary):
