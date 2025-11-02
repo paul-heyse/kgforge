@@ -10,7 +10,7 @@ Tests verify:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import Mock
 
 import pytest
@@ -52,11 +52,14 @@ class TestHttpGetIdempotency:
         mock_http = Mock()
         mock_response = Mock()
         mock_response.status_code = expected_status
-        mock_response.json.return_value: JsonValue = {
-            "status": "success",
-            "data": [{"id": "doc_001", "title": "Test"}],
-            "correlation_id": "req-abc123",
-        }
+        mock_response.json.return_value = cast(
+            JsonValue,
+            {
+                "status": "success",
+                "data": [{"id": "doc_001", "title": "Test"}],
+                "correlation_id": "req-abc123",
+            },
+        )
 
         mock_http.get.return_value = mock_response
 
@@ -94,14 +97,17 @@ class TestHttpGetIdempotency:
         mock_http = Mock()
         mock_response = Mock()
         mock_response.status_code = 404
-        mock_response.json.return_value: JsonValue = {
-            "type": "https://kgfoundry.dev/problems/not-found",
-            "title": "Resource Not Found",
-            "status": 404,
-            "detail": "Symbol 'missing.module.func' not found in catalog",
-            "instance": "urn:request:symbol:missing",
-            "correlation_id": "req-xyz789",
-        }
+        mock_response.json.return_value = cast(
+            JsonValue,
+            {
+                "type": "https://kgfoundry.dev/problems/not-found",
+                "title": "Resource Not Found",
+                "status": 404,
+                "detail": "Symbol 'missing.module.func' not found in catalog",
+                "instance": "urn:request:symbol:missing",
+                "correlation_id": "req-xyz789",
+            },
+        )
 
         mock_http.get.return_value = mock_response
 
@@ -145,11 +151,14 @@ class TestHttpPostIdempotency:
         mock_http = Mock()
         mock_response = Mock()
         mock_response.status_code = 201
-        mock_response.json.return_value: JsonValue = {
-            "id": "created_001",
-            "status": "created",
-            "correlation_id": "req-dup-test",
-        }
+        mock_response.json.return_value = cast(
+            JsonValue,
+            {
+                "id": "created_001",
+                "status": "created",
+                "correlation_id": "req-dup-test",
+            },
+        )
 
         mock_http.post.return_value = mock_response
 
@@ -175,24 +184,30 @@ class TestHttpPostIdempotency:
         # First response: 201 Created
         mock_response_created = Mock()
         mock_response_created.status_code = 201
-        mock_response_created.json.return_value: JsonValue = {
-            "id": "doc_created_123",
-            "status": "created",
-            "correlation_id": "req-first",
-        }
+        mock_response_created.json.return_value = cast(
+            JsonValue,
+            {
+                "id": "doc_created_123",
+                "status": "created",
+                "correlation_id": "req-first",
+            },
+        )
 
         # Second response: 409 Conflict
         mock_response_conflict = Mock()
         mock_response_conflict.status_code = 409
-        mock_response_conflict.json.return_value: JsonValue = {
-            "type": "https://kgfoundry.dev/problems/conflict",
-            "title": "Resource Already Exists",
-            "status": 409,
-            "detail": "Document with ID 'doc_001' already exists",
-            "instance": "urn:request:document:doc_001",
-            "correlation_id": "req-second",
-            "extensions": {"existing_id": "doc_created_123"},
-        }
+        mock_response_conflict.json.return_value = cast(
+            JsonValue,
+            {
+                "type": "https://kgfoundry.dev/problems/conflict",
+                "title": "Resource Already Exists",
+                "status": 409,
+                "detail": "Document with ID 'doc_001' already exists",
+                "instance": "urn:request:document:doc_001",
+                "correlation_id": "req-second",
+                "extensions": {"existing_id": "doc_created_123"},
+            },
+        )
 
         mock_http.post.side_effect = [mock_response_created, mock_response_conflict]
 
@@ -231,22 +246,28 @@ class TestTransientErrorRetries:
         # First call: 500 error
         mock_error_response = Mock()
         mock_error_response.status_code = 500
-        mock_error_response.json.return_value: JsonValue = {
-            "type": "https://kgfoundry.dev/problems/internal-error",
-            "title": "Internal Server Error",
-            "status": 500,
-            "detail": "Unexpected error processing request",
-            "correlation_id": "req-error-1",
-        }
+        mock_error_response.json.return_value = cast(
+            JsonValue,
+            {
+                "type": "https://kgfoundry.dev/problems/internal-error",
+                "title": "Internal Server Error",
+                "status": 500,
+                "detail": "Unexpected error processing request",
+                "correlation_id": "req-error-1",
+            },
+        )
 
         # Second call: 200 success
         mock_success_response = Mock()
         mock_success_response.status_code = 200
-        mock_success_response.json.return_value: JsonValue = {
-            "status": "success",
-            "data": [],
-            "correlation_id": "req-error-1",  # Same correlation ID for tracing
-        }
+        mock_success_response.json.return_value = cast(
+            JsonValue,
+            {
+                "status": "success",
+                "data": [],
+                "correlation_id": "req-error-1",
+            },
+        )
 
         mock_http.get.side_effect = [mock_error_response, mock_success_response]
 
@@ -321,10 +342,13 @@ class TestCorrelationIdPropagation:
         mock_http = Mock()
         mock_response = Mock()
         mock_response.status_code = 200
-        mock_response.json.return_value: JsonValue = {
-            "status": "success",
-            "correlation_id": "req-trace-123",
-        }
+        mock_response.json.return_value = cast(
+            JsonValue,
+            {
+                "status": "success",
+                "correlation_id": "req-trace-123",
+            },
+        )
 
         mock_http.get.return_value = mock_response
 

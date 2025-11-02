@@ -12,7 +12,7 @@ from typing import Final, cast
 from pydantic import BaseModel, ConfigDict, Field
 
 from kgfoundry_common.errors import DeserializationError, SchemaValidationError
-from tools.shared.schema import validate_tools_payload
+from tools._shared.schema import validate_tools_payload
 
 logger = logging.getLogger(__name__)
 

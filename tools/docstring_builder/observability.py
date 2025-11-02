@@ -27,9 +27,9 @@ import sys
 import time
 import uuid
 from contextlib import contextmanager
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
-from tools.shared.prometheus import (
+from tools._shared.prometheus import (
     CollectorRegistry,
     CounterLike,
     HistogramLike,
@@ -71,48 +71,48 @@ class DocstringBuilderMetrics:
             Prometheus registry (defaults to default registry).
         """
         resolved_registry = registry if registry is not None else get_default_registry()
-        self.registry = resolved_registry
+        self.registry = cast(CollectorRegistry, resolved_registry)
 
         self.runs_total = build_counter(
             "docbuilder_runs_total",
             "Total number of docstring builder runs",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.plugin_failures_total = build_counter(
             "docbuilder_plugin_failures_total",
             "Total number of plugin execution failures",
             ["plugin_name", "error_type"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.harvest_duration_seconds = build_histogram(
             "docbuilder_harvest_duration_seconds",
             "Duration of harvest operations in seconds",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.policy_duration_seconds = build_histogram(
             "docbuilder_policy_duration_seconds",
             "Duration of policy engine operations in seconds",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.render_duration_seconds = build_histogram(
             "docbuilder_render_duration_seconds",
             "Duration of rendering operations in seconds",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.cli_duration_seconds = build_histogram(
             "docbuilder_cli_duration_seconds",
             "Duration of CLI operations in seconds",
             ["command", "status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
 
@@ -132,7 +132,7 @@ def get_metrics_registry() -> DocstringBuilderMetrics:
     >>> metrics = get_metrics_registry()
     >>> metrics.runs_total.labels(status="success").inc()
     """
-    global _METRICS_REGISTRY
+    global _METRICS_REGISTRY  # noqa: PLW0603
     if _METRICS_REGISTRY is None:
         _METRICS_REGISTRY = DocstringBuilderMetrics()
     return _METRICS_REGISTRY

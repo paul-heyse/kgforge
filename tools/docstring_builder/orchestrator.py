@@ -4,17 +4,21 @@ from __future__ import annotations
 
 import datetime
 import json
-import logging
 import os
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
+from tools._shared.logging import get_logger, with_fields
+from tools._shared.proc import ToolExecutionError, run_tool
 from tools.docstring_builder.builder_types import (
     STATUS_LABELS,
     DocstringBuildRequest,
     DocstringBuildResult,
     ExitStatus,
+    LoggerLike,
+    StatusCounts,
     build_problem_details,
     status_from_exit,
 )
@@ -68,10 +72,6 @@ from tools.docstring_builder.render import render_docstring
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult, build_semantic_schemas
 from tools.docstring_builder.version import BUILDER_VERSION
-from tools.shared.logging import get_logger, with_fields
-from tools.shared.proc import ToolExecutionError, run_tool
-
-LoggerLike = logging.LoggerAdapter[logging.Logger] | logging.Logger
 
 _LOGGER = get_logger(__name__)
 METRICS = get_metrics_registry()
@@ -368,7 +368,7 @@ def render_failure_summary(result: DocstringBuildResult) -> None:
         considered = int(summary_obj.get("considered", 0))
         processed = int(summary_obj.get("processed", 0))
         changed = int(summary_obj.get("changed", 0))
-        status_counts = summary_obj.get("status_counts", {})
+        status_counts: object = summary_obj.get("status_counts", {})
     else:
         considered = processed = changed = 0
         status_counts = {}
@@ -409,20 +409,20 @@ def _build_error_result(
     errors: list[ErrorReport] = [
         {"file": "<command>", "status": status_from_exit(status), "message": detail}
     ]
-    status_counts: dict[str, int] = {
+    status_counts_dict: dict[str, int] = {
         "success": 0,
         "violation": 0,
         "config": 0,
         "error": 0,
     }
-    status_counts[STATUS_LABELS[status]] += 1
+    status_counts_dict[STATUS_LABELS[status]] += 1
     summary: RunSummary = {
         "considered": 0,
         "processed": 0,
         "skipped": 0,
         "changed": 0,
         "duration_seconds": 0.0,
-        "status_counts": status_counts,
+        "status_counts": cast(StatusCounts, status_counts_dict),
         "cache_hits": 0,
         "cache_misses": 0,
         "subcommand": subcommand,
@@ -483,7 +483,7 @@ def _run_pipeline(
 
     def build_problem_details_wrapper(
         status: ExitStatus,
-        req: DocstringBuildRequest,
+        request: DocstringBuildRequest,
         detail: str,
         *,
         instance: str | None = None,
@@ -491,7 +491,7 @@ def _run_pipeline(
     ) -> ModelProblemDetails:
         return build_problem_details(
             status,
-            req,
+            request,
             detail,
             instance=instance,
             errors=errors,
@@ -540,7 +540,7 @@ def run_docstring_builder(
     config_override: str | None = None,
 ) -> DocstringBuildResult:
     """Execute the docstring builder for ``request`` and return a structured result."""
-    config, selection = load_builder_config(config_override)
+    config, config_selection = load_builder_config(config_override)
     if request.llm_summary:
         config.llm_summary_mode = "apply"
     elif request.llm_dry_run:
@@ -561,9 +561,9 @@ def run_docstring_builder(
             ExitStatus.CONFIG,
             request,
             "Invalid path supplied to docstring builder",
-            selection=selection,
+            selection=config_selection,
         )
-    return _run_pipeline(files, request, config, selection)
+    return _run_pipeline(files, request, config, config_selection)
 
 
 __all__ = [

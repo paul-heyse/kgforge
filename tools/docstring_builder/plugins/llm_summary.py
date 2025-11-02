@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from dataclasses import replace
 
+from tools._shared.logging import get_logger
 from tools.docstring_builder.plugins.base import (
     PluginContext,
     PluginStage,
     TransformerPlugin,
 )
 from tools.docstring_builder.semantics import SemanticResult
-from tools.shared.logging import get_logger
 
 LOGGER = get_logger(__name__)
 

@@ -10,21 +10,28 @@ Problem Details emission.
 from __future__ import annotations
 
 import enum
+import logging
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import TypeAlias, cast
 
+from kgfoundry_common.logging import LoggerAdapter
+from tools._shared.problem_details import build_problem_details as _build_problem_details
 from tools.docstring_builder.config import ConfigSelection
 from tools.docstring_builder.models import (
     CliResult,
     ErrorReport,
     FileReport,
     RunStatus,
+    StatusCounts,
 )
 from tools.docstring_builder.models import (
     ProblemDetails as ModelProblemDetails,
 )
-from tools.shared.problem_details import build_problem_details as _build_problem_details
+
+LoggerLike: TypeAlias = LoggerAdapter | logging.Logger  # noqa: UP040
+"""Type alias for logger parameters: accepts both StructuredLoggerAdapter and stdlib Logger."""
 
 
 class ExitStatus(enum.IntEnum):
@@ -157,7 +164,7 @@ def build_problem_details(
         "subcommand": subcommand,
         "errorCount": len(errors) if errors is not None else 0,
     }
-    return problem_dict
+    return cast(ModelProblemDetails, problem_dict)
 
 
 __all__ = [
@@ -169,6 +176,8 @@ __all__ = [
     "DocstringBuildRequest",
     "DocstringBuildResult",
     "ExitStatus",
+    "LoggerLike",
+    "StatusCounts",
     "build_problem_details",
     "http_status_for_exit",
     "status_from_exit",

@@ -10,6 +10,7 @@ from importlib import metadata
 from pathlib import Path
 from typing import TypeGuard, TypeVar, cast
 
+from tools._shared.logging import get_logger
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import HarvestResult
 from tools.docstring_builder.models import (
@@ -34,7 +35,6 @@ from tools.docstring_builder.plugins.normalize_numpy_params import (
 )
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult
-from tools.shared.logging import get_logger
 
 ENTRY_POINT_GROUP = "kgfoundry.docstrings.plugins"
 

@@ -29,6 +29,7 @@ from typing import cast
 
 import yaml
 
+from tools._shared.logging import get_logger
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.harvest import harvest_file
 from tools.docstring_builder.io import (
@@ -55,7 +56,6 @@ from tools.docstring_builder.paths import (
     REQUIRED_PYTHON_MINOR,
 )
 from tools.docstring_builder.policy import PolicyConfigurationError, load_policy_settings
-from tools.shared.logging import get_logger
 from tools.stubs.drift_check import run as run_stub_drift
 
 LOGGER = get_logger(__name__)
@@ -553,7 +553,7 @@ LEGACY_COMMAND_HANDLERS: dict[str, CommandHandler] = {
 
 def _apply_cli_arguments(parser: argparse.ArgumentParser) -> None:
     for option_names, options in CLI_ARGUMENT_DEFINITIONS:
-        parser.add_argument(*option_names, **options)
+        parser.add_argument(*option_names, **options)  # type: ignore[arg-type]
 
 
 def _add_llm_arguments(parser: argparse.ArgumentParser) -> None:

@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import os
 import pickle  # noqa: S403 - legacy payloads required for regression tests
+from typing import cast
 
 import pytest
 
@@ -157,11 +158,11 @@ class TestSignedPickleWrapper:
     def test_nested_container_depth_limit(self, wrapper) -> None:  # type: ignore[name-defined]
         """Test that deeply nested structures are rejected."""
         # Create very deeply nested structure
-        data = {"level": 0}
-        current = data
+        data: dict[str, object] = {"level": 0}
+        current: dict[str, object] = data
         for i in range(150):
             current["nested"] = {"level": i + 1}
-            current = current["nested"]
+            current = cast(dict[str, object], current["nested"])
 
         with pytest.raises(ValueError, match="exceeds maximum depth"):
             wrapper.dump(data, io.BytesIO())

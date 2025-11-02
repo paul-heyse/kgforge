@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
+from kgfoundry_common.prometheus import CounterLike, HistogramLike
 from tools.docstring_builder.builder_types import ExitStatus
 
 
@@ -13,9 +14,11 @@ class _Histogram(Protocol):
 
     def labels(self, **labels: str) -> _Histogram:  # pragma: no cover - third-party binding
         """Return a histogram child with the provided labels."""
+        ...
 
     def observe(self, amount: float) -> None:
         """Record a sample in the histogram."""
+        ...
 
 
 class _Counter(Protocol):
@@ -23,17 +26,19 @@ class _Counter(Protocol):
 
     def labels(self, **labels: str) -> _Counter:  # pragma: no cover - third-party binding
         """Return a counter child with the provided labels."""
+        ...
 
     def inc(self) -> None:
         """Increment the counter by one."""
+        ...
 
 
 @dataclass(slots=True)
 class MetricsRecorder:
     """Record Prometheus metrics for docstring builder runs."""
 
-    cli_duration_seconds: _Histogram
-    runs_total: _Counter
+    cli_duration_seconds: HistogramLike
+    runs_total: CounterLike
 
     def observe_cli_duration(
         self, *, command: str, status: ExitStatus, duration_seconds: float
