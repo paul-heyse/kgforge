@@ -189,73 +189,97 @@ class TestMalformedPayloads:
         """Test that missing path field is rejected."""
         payload = PayloadFactory.malformed_symbol_index(missing_field="path")
         with pytest.raises(ToolExecutionError):
-            validate_against_schema(cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json")
+            validate_against_schema(
+                cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json"
+            )
 
     def test_symbol_index_missing_required_kind(self) -> None:
         """Test that missing kind field is rejected."""
         payload = PayloadFactory.malformed_symbol_index(missing_field="kind")
         with pytest.raises(ToolExecutionError):
-            validate_against_schema(cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json")
+            validate_against_schema(
+                cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json"
+            )
 
     def test_symbol_index_missing_required_doc(self) -> None:
         """Test that missing doc field is rejected."""
         payload = PayloadFactory.malformed_symbol_index(missing_field="doc")
         with pytest.raises(ToolExecutionError):
-            validate_against_schema(cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json")
+            validate_against_schema(
+                cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json"
+            )
 
     def test_symbol_index_missing_required_tested_by(self) -> None:
         """Test that missing tested_by field is rejected."""
         payload = PayloadFactory.malformed_symbol_index(missing_field="tested_by")
         with pytest.raises(ToolExecutionError):
-            validate_against_schema(cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json")
+            validate_against_schema(
+                cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json"
+            )
 
     def test_symbol_index_missing_required_source_link(self) -> None:
         """Test that missing source_link field is rejected."""
         payload = PayloadFactory.malformed_symbol_index(missing_field="source_link")
         with pytest.raises(ToolExecutionError):
-            validate_against_schema(cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json")
+            validate_against_schema(
+                cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json"
+            )
 
     def test_symbol_index_wrong_type_path(self) -> None:
         """Test that wrong type for path is rejected."""
         payload = PayloadFactory.malformed_symbol_index(wrong_type_field="path")
         with pytest.raises(ToolExecutionError):
-            validate_against_schema(cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json")
+            validate_against_schema(
+                cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json"
+            )
 
     def test_symbol_index_wrong_type_tested_by(self) -> None:
         """Test that wrong type for tested_by is rejected."""
         payload = PayloadFactory.malformed_symbol_index(wrong_type_field="tested_by")
         with pytest.raises(ToolExecutionError):
-            validate_against_schema(cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json")
+            validate_against_schema(
+                cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json"
+            )
 
     def test_symbol_index_wrong_type_source_link(self) -> None:
         """Test that wrong type for source_link is rejected."""
         payload = PayloadFactory.malformed_symbol_index(wrong_type_field="source_link")
         with pytest.raises(ToolExecutionError):
-            validate_against_schema(cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json")
+            validate_against_schema(
+                cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json"
+            )
 
     def test_symbol_index_extra_field_rejected(self) -> None:
         """Test that additional properties are rejected (schema: additionalProperties: false)."""
         payload = PayloadFactory.malformed_symbol_index(extra_field=True)
         with pytest.raises(ToolExecutionError):
-            validate_against_schema(cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json")
+            validate_against_schema(
+                cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json"
+            )
 
     def test_symbol_delta_wrong_type_added(self) -> None:
         """Test that wrong type for added field is rejected."""
         payload = PayloadFactory.malformed_symbol_delta(wrong_type_field="added")
         with pytest.raises(ToolExecutionError):
-            validate_against_schema(cast(JsonPayload, payload), DELTA_SCHEMA, artifact="symbols.delta.json")
+            validate_against_schema(
+                cast(JsonPayload, payload), DELTA_SCHEMA, artifact="symbols.delta.json"
+            )
 
     def test_symbol_delta_wrong_type_changed(self) -> None:
         """Test that wrong type for changed field is rejected."""
         payload = PayloadFactory.malformed_symbol_delta(wrong_type_field="changed")
         with pytest.raises(ToolExecutionError):
-            validate_against_schema(cast(JsonPayload, payload), DELTA_SCHEMA, artifact="symbols.delta.json")
+            validate_against_schema(
+                cast(JsonPayload, payload), DELTA_SCHEMA, artifact="symbols.delta.json"
+            )
 
     def test_artifact_validation_error_surfaces_problem_details(self) -> None:
         """Test that ArtifactValidationError surfaces RFC 9457 Problem Details."""
         payload = PayloadFactory.malformed_symbol_index(missing_field="path")
         with pytest.raises(ToolExecutionError) as exc_info:
-            validate_against_schema(cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json")
+            validate_against_schema(
+                cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact="symbols.json"
+            )
         # Verify the error has Problem Details structure
         error = exc_info.value
         assert hasattr(error, "problem")
@@ -330,4 +354,6 @@ class TestByteIdenticalRoundTrip:
 
         # Both should pass schema validation
         validate_against_schema(payload, DELTA_SCHEMA, artifact="symbols.delta.json")
-        validate_against_schema(cast(JsonPayload, reserialized), DELTA_SCHEMA, artifact="symbols.delta.json")
+        validate_against_schema(
+            cast(JsonPayload, reserialized), DELTA_SCHEMA, artifact="symbols.delta.json"
+        )

@@ -22,10 +22,11 @@ hello
 from __future__ import annotations
 
 import logging
-import subprocess  # noqa: S404 - hardened with sanitized Path and timeout enforcement
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Final
+
+from tools import ToolExecutionError, run_tool
 
 logger = logging.getLogger(__name__)
 
@@ -152,48 +153,52 @@ def run_subprocess(
         },
     )
 
+    effective_timeout = float(timeout)
+
     try:
-        result: subprocess.CompletedProcess[str] = (
-            subprocess.run(  # noqa: S603 - inputs sanitized via Path.resolve and cmd list
-                cmd,
-                timeout=timeout,
-                cwd=cwd,
-                env=dict(env) if env else None,
-                check=True,
-                capture_output=True,
-                text=True,
-            )
+        run_result = run_tool(
+            cmd,
+            cwd=cwd,
+            env=dict(env) if env else None,
+            timeout=effective_timeout,
+            check=True,
         )
-    except subprocess.TimeoutExpired as exc:
-        msg = f"Subprocess exceeded timeout of {timeout} seconds: {' '.join(cmd)}"
-        logger.exception(msg, extra={"command": " ".join(cmd), "timeout": timeout})
-        raise SubprocessTimeoutError(msg, command=cmd, timeout_seconds=timeout) from exc
-    except subprocess.CalledProcessError as exc:
-        msg = f"Subprocess failed with exit code {exc.returncode}: {' '.join(cmd)}"
-        stderr_raw: object = exc.stderr
-        stderr_output: str | None
-        if isinstance(stderr_raw, bytes):
-            stderr_output = stderr_raw.decode("utf-8", errors="replace")
-        elif isinstance(stderr_raw, str):
-            stderr_output = stderr_raw
+    except ToolExecutionError as exc:
+        if _is_timeout_error(exc):
+            timeout_seconds = int(effective_timeout)
+            msg = f"Subprocess exceeded timeout of {timeout_seconds} seconds: {' '.join(cmd)}"
+            logger.exception(msg, extra={"command": " ".join(cmd), "timeout": timeout_seconds})
+            raise SubprocessTimeoutError(msg, command=cmd, timeout_seconds=timeout_seconds) from exc
+
+        returncode = exc.returncode
+        stderr_output = exc.stderr or None
+        if returncode is None:
+            message = exc.args[0] if exc.args else "Subprocess execution failed"
         else:
-            stderr_output = None
+            message = f"Subprocess failed with exit code {returncode}: {' '.join(cmd)}"
         logger.exception(
-            msg,
+            message,
             extra={
                 "command": " ".join(cmd),
-                "returncode": exc.returncode,
+                "returncode": returncode,
                 "stderr": stderr_output,
             },
         )
-        raise SubprocessError(msg, returncode=exc.returncode, stderr=stderr_output) from exc
-    except Exception as exc:
+        raise SubprocessError(message, returncode=returncode, stderr=stderr_output) from exc
+    except Exception as exc:  # pragma: no cover - defensive fallback
         msg = f"Unexpected error executing subprocess: {exc}"
         logger.exception(msg, extra={"command": " ".join(cmd)})
         raise SubprocessError(msg) from exc
-    else:
-        logger.debug("Subprocess completed successfully", extra={"returncode": result.returncode})
-        return result.stdout
+
+    logger.debug("Subprocess completed successfully", extra={"returncode": run_result.returncode})
+    return run_result.stdout
+
+
+def _is_timeout_error(error: ToolExecutionError) -> bool:
+    problem_type = (error.problem or {}).get("type") if hasattr(error, "problem") else None
+    if isinstance(problem_type, str) and problem_type.endswith("tool-timeout"):
+        return True
+    return "timed out" in str(error)
 
 
 __all__ = ["SubprocessError", "SubprocessTimeoutError", "run_subprocess"]

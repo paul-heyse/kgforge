@@ -15,7 +15,7 @@ import os
 import re
 import sys
 from collections.abc import Mapping, Sequence
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from types import ModuleType
 from typing import Literal, cast
@@ -502,6 +502,15 @@ class TraceRow:
 
 # ---------- Heuristics & helpers ---------------------------------------------
 
+_LOG_METHODS = {
+    "debug",
+    "info",
+    "warning",
+    "error",
+    "exception",
+    "critical",
+}
+
 _METRIC_CALL_TYPES = {
     # prometheus_client + helpers
     "Counter": "counter",
@@ -920,7 +929,101 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     return (text, tree)
 
 
-def scan_file(  # noqa: PLR0914 - function collects multiple artefact lists in a single pass
+@dataclass(slots=True)
+class _ObservabilityExtractor:
+    text: str
+    path: Path
+    logs: list[LogRow] = field(default_factory=list)
+    metrics: list[MetricRow] = field(default_factory=list)
+    traces: list[TraceRow] = field(default_factory=list)
+
+    def process(self, node: ast.AST) -> None:
+        if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute):
+            return
+        attr = node.func.attr
+        base_node = node.func.value
+        base_name = base_node.id if isinstance(base_node, ast.Name) else None
+        kwmap = _keywords_map(node, self.text)
+        self._collect_log(node, attr, base_name)
+        self._collect_metric(node, attr, base_name, kwmap)
+        self._collect_trace(node, attr)
+
+    def _collect_log(self, node: ast.Call, attr: str, base_name: str | None) -> None:
+        del base_name
+        if attr not in _LOG_METHODS:
+            return
+        message_template = ""
+        if node.args:
+            segment = ast.get_source_segment(self.text, node.args[0])
+            message_template = (segment or "").strip()[:240]
+        keys, _ = _is_structured_logging(node, self.text)
+        log_row = LogRow(
+            logger=self._logger_name(node),
+            level=attr,
+            message_template=message_template,
+            structured_keys=_dedupe_strings(keys),
+            file=_rel(self.path),
+            lineno=node.lineno,
+            source_link=_links_for(self.path, node.lineno),
+        )
+        self.logs.append(log_row)
+
+    def _collect_metric(
+        self,
+        node: ast.Call,
+        attr: str,
+        base_name: str | None,
+        kwmap: dict[str, str],
+    ) -> None:
+        if (
+            base_name not in {"prometheus_client", "metrics", "stats"}
+            and attr not in _METRIC_CALL_TYPES
+        ):
+            return
+        metric_type = _METRIC_CALL_TYPES.get(attr)
+        metric_name = _first_str(node)
+        labels = _extract_labels_from_kw(kwmap)
+        unit = _infer_unit_from_name(metric_name or "") if metric_name else None
+        metric_row = MetricRow(
+            name=metric_name or "<dynamic>",
+            type=metric_type,
+            unit=unit,
+            labels=labels,
+            file=_rel(self.path),
+            lineno=node.lineno,
+            call=(ast.get_source_segment(self.text, node) or "").strip()[:240],
+            recommended_aggregation=_recommended_aggregation(metric_type),
+            source_link=_links_for(self.path, node.lineno),
+        )
+        self.metrics.append(metric_row)
+
+    def _collect_trace(self, node: ast.Call, attr: str) -> None:
+        if attr in {"start_span", "start_as_current_span"}:
+            span_name = _first_str(node)
+            trace_row = TraceRow(
+                span_name=span_name,
+                attributes=[],
+                file=_rel(self.path),
+                lineno=node.lineno,
+                call=(ast.get_source_segment(self.text, node) or "").strip()[:240],
+                source_link=_links_for(self.path, node.lineno),
+            )
+            self.traces.append(trace_row)
+            return
+        if attr in {"set_attribute", "add_event"} and self.traces:
+            segment = ast.get_source_segment(self.text, node) or ""
+            attribute_key = _first_str(node) or segment[:80]
+            self.traces[-1].attributes.append(attribute_key)
+
+    @staticmethod
+    def _logger_name(node: ast.Call) -> str | None:
+        base_node = node.func.value if isinstance(node.func, ast.Attribute) else None
+        if isinstance(base_node, ast.Name):
+            return base_node.id
+        return None
+
+
+def scan_file(
     path: Path,
     policy: ObservabilityPolicy,
 ) -> tuple[list[LogRow], list[MetricRow], list[TraceRow]]:
@@ -950,74 +1053,10 @@ def scan_file(  # noqa: PLR0914 - function collects multiple artefact lists in a
     text, tree = read_ast(path)
     if not text or tree is None:
         return ([], [], [])
-    logs: list[LogRow] = []
-    metrics: list[MetricRow] = []
-    traces: list[TraceRow] = []
-
+    extractor = _ObservabilityExtractor(text=text, path=path)
     for node in ast.walk(tree):
-        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
-            attr = node.func.attr
-            base_node = node.func.value
-            base_name = base_node.id if isinstance(base_node, ast.Name) else None
-            kwmap = _keywords_map(node, text)
-
-            # --- LOGS (stdlib logging.*)
-            if attr in {"debug", "info", "warning", "error", "exception", "critical"}:
-                msg = ""
-                if node.args:
-                    seg = ast.get_source_segment(text, node.args[0])
-                    msg = (seg or "").strip()[:240]
-                keys, _ = _is_structured_logging(node, text)
-                log_row = LogRow(
-                    logger=base_name,
-                    level=attr,
-                    message_template=msg,
-                    structured_keys=_dedupe_strings(keys),
-                    file=_rel(path),
-                    lineno=node.lineno,
-                    source_link=_links_for(path, node.lineno),
-                )
-                logs.append(log_row)
-
-            # --- METRICS (prometheus_client.* or helper factories)
-            if base_name in {"prometheus_client", "metrics", "stats"} or attr in _METRIC_CALL_TYPES:
-                mtype = _METRIC_CALL_TYPES.get(attr)
-                name = _first_str(node)
-                labels = _extract_labels_from_kw(kwmap)
-                unit = _infer_unit_from_name(name or "") if name else None
-                metric_row = MetricRow(
-                    name=name or "<dynamic>",
-                    type=mtype,
-                    unit=unit,
-                    labels=labels,
-                    file=_rel(path),
-                    lineno=node.lineno,
-                    call=(ast.get_source_segment(text, node) or "").strip()[:240],
-                    recommended_aggregation=_recommended_aggregation(mtype),
-                    source_link=_links_for(path, node.lineno),
-                )
-                metrics.append(metric_row)
-
-            # Trace instrumentation (OpenTelemetry)
-            if attr in {"start_span", "start_as_current_span"}:
-                span_name = _first_str(node)
-                trace_row = TraceRow(
-                    span_name=span_name,
-                    attributes=[],
-                    file=_rel(path),
-                    lineno=node.lineno,
-                    call=(ast.get_source_segment(text, node) or "").strip()[:240],
-                    source_link=_links_for(path, node.lineno),
-                )
-                traces.append(trace_row)
-            if attr in {"set_attribute", "add_event"} and traces:
-                # attach attributes to the last span in this file list if any
-                seg = ast.get_source_segment(text, node) or ""
-                key = _first_str(node)
-                attribute_value = key if key else seg[:80]
-                traces[-1].attributes.append(attribute_value)
-
-    return (logs, metrics, traces)
+        extractor.process(node)
+    return (extractor.logs, extractor.metrics, extractor.traces)
 
 
 def _links_for(path: Path, lineno: int) -> dict[str, str]:

@@ -271,7 +271,7 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
 
         # Only validate JSON responses
-        if not isinstance(response, JSONResponse):
+        if response.media_type != "application/json":
             return response
 
         # Only validate /search endpoint responses
@@ -281,8 +281,12 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
         # Extract response body from JSONResponse
         try:
             # JSONResponse has a 'body' property that contains the rendered body
-            body_bytes = response.body
-            response_body: JsonValue = json.loads(body_bytes)
+            body_buffer = response.body
+            if isinstance(body_buffer, memoryview):
+                body_bytes = body_buffer.tobytes()
+            else:
+                body_bytes = bytes(body_buffer)
+            response_body: JsonValue = json.loads(body_bytes.decode("utf-8"))
         except (json.JSONDecodeError, AttributeError) as exc:
             with with_fields(logger, operation="response_validation") as log_adapter:
                 log_adapter.warning(
@@ -313,11 +317,12 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
                 cause=exc,
                 context={"schema_path": str(self.schema_path), "validation_path": str(exc.path)},
             )
-            return JSONResponse(
+            problem_response = JSONResponse(
                 content=problem.to_problem_details(),
                 status_code=500,
                 headers=response.headers,
             )
+            return cast(Response, problem_response)
 
         # Return original response if validation passes
         return response

@@ -1,3 +1,0 @@
-from __future__ import annotations
-
-def replace[T](obj: T, /, **changes: object) -> T: ...

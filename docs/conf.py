@@ -36,16 +36,13 @@ from typing import (
 )
 
 import certifi
-from docs._scripts import shared as docs_shared  # noqa: PLC2701
 from docutils import nodes
 from docutils.parsers.rst import Directive
 from sphinx.application import Sphinx
-from tools import (
-    ProblemDetailsParams,
-    build_problem_details,
-    get_logger,
-)
+from tools import ProblemDetailsParams, build_problem_details, get_logger
 from tools.griffe_utils import resolve_griffe
+
+docs_shared = cast(Any, importlib.import_module("docs._scripts.shared"))
 
 ENV = docs_shared.detect_environment()
 docs_shared.ensure_sys_paths(ENV)

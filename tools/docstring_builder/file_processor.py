@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
+from importlib import import_module
 from pathlib import Path
 from typing import cast
 
@@ -40,6 +41,15 @@ CollectEditsCallable = Callable[
     [HarvestResult, BuilderConfig, PluginManager | None, bool],
     tuple[list[DocstringEdit], list[SemanticResult], list[IRDocstring]],
 ]
+ApplyEditsCallable = Callable[
+    [HarvestResult, Iterable[DocstringEdit], bool],
+    tuple[bool, str | None],
+]
+
+
+def _load_apply_edits() -> ApplyEditsCallable:
+    module = import_module("tools.docstring_builder.apply")
+    return cast(ApplyEditsCallable, module.apply_edits)
 
 
 @dataclass(slots=True)
@@ -249,7 +259,6 @@ class FileProcessor:
         if not edits:
             return changed, preview
 
-        from tools.docstring_builder.apply import apply_edits  # noqa: PLC0415 - break import cycle
-
-        changed, preview = apply_edits(result, list(edits), write=write)
+        apply_edits = _load_apply_edits()
+        changed, preview = apply_edits(result, list(edits), write)
         return changed, preview

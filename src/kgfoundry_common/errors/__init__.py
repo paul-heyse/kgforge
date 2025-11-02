@@ -49,11 +49,13 @@ from kgfoundry_common.navmap_types import NavMap
 # HTTP adapters are optional (require fastapi)
 _http_exports: list[str] = []
 try:
-    from kgfoundry_common.errors.http import (  # noqa: F401
-        problem_details_response,
-        register_problem_details_handler,
+    from kgfoundry_common.errors.http import (
+        problem_details_response as _problem_details_response,
+        register_problem_details_handler as _register_problem_details_handler,
     )
 
+    problem_details_response = _problem_details_response
+    register_problem_details_handler = _register_problem_details_handler
     _http_exports = ["problem_details_response", "register_problem_details_handler"]
 except ImportError:
     pass  # FastAPI not available

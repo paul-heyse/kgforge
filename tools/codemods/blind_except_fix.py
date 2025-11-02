@@ -74,12 +74,18 @@ class BlindExceptTransformer(cst.CSTTransformer):
         super().__init__()
         self.changes: list[str] = []
 
-    def leave_ExceptHandler(  # noqa: N802
+    def leave_excepthandler(
+        self, original_node: cst.ExceptHandler, updated_node: cst.ExceptHandler
+    ) -> cst.ExceptHandler:
+        """Rewrite blind except handlers when exiting traversal."""
+        return self._transform_except(original_node, updated_node)
+
+    def _transform_except(
         self,
         original_node: cst.ExceptHandler,
         updated_node: cst.ExceptHandler,
     ) -> cst.ExceptHandler:
-        """Transform blind except handlers."""
+        """Return an updated exception handler when we detect a blind clause."""
         # Match `except Exception:` or bare `except:`
         is_blind_except = False
 
@@ -106,12 +112,6 @@ class BlindExceptTransformer(cst.CSTTransformer):
             # Create AsName wrapping a Name
             exc_var_name = cst.AsName(name=cst.Name("exc"))
 
-        # Get existing body (unchanged - manual review will add TODOs)
-        body_statements = list(updated_node.body.body)
-
-        # Replace body and ensure exception name
-        new_body = cst.IndentedBlock(body=body_statements)
-
         # Update handler with name if changed
         if (
             updated_node.name != exc_var_name
@@ -119,12 +119,11 @@ class BlindExceptTransformer(cst.CSTTransformer):
             or updated_node.whitespace_after_except is not whitespace_after_except
         ):
             return updated_node.with_changes(
-                body=new_body,
                 name=exc_var_name,
                 type=exc_type,
                 whitespace_after_except=whitespace_after_except,
             )
-        return updated_node.with_changes(body=new_body)
+        return updated_node
 
 
 def transform_file(file_path: Path, dry_run: bool = False) -> list[str]:

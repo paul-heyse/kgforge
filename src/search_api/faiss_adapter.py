@@ -6,7 +6,7 @@ import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, TypeGuard, cast
+from typing import TYPE_CHECKING, ClassVar, Final, TypeGuard, cast
 
 import duckdb
 import numpy as np
@@ -21,6 +21,7 @@ from kgfoundry_common.numpy_typing import (
     normalize_l2,
     topk_indices,
 )
+from registry.duckdb_helpers import fetch_all, fetch_one
 from search_api.faiss_gpu import (
     GpuContext,
     clone_index_to_gpu,
@@ -86,6 +87,14 @@ def _is_faiss_index(candidate: object) -> TypeGuard[FaissIndexProtocol]:
     return True
 
 
+def _as_optional_str(value: object) -> str:
+    if isinstance(value, str):
+        return value
+    if value is None:
+        return ""
+    return str(value)
+
+
 MIN_FACTORY_DIMENSION: Final[int] = 64
 
 try:  # pragma: no cover - optional dependency
@@ -106,7 +115,7 @@ else:
     HAVE_FAISS = True
 
 
-@dataclass(slots=True)
+@dataclass
 class DenseVecs:
     """Dense vector matrix and ID mapping used to seed FAISS indexes."""
 
@@ -114,27 +123,46 @@ class DenseVecs:
     matrix: FloatMatrix
 
 
+@dataclass(slots=True, frozen=True)
+class FaissAdapterConfig:
+    """Configuration options for :class:`FaissAdapter`."""
+
+    factory: str = "OPQ64,IVF8192,PQ64"
+    metric: str = "ip"
+    nprobe: int = 64
+    use_gpu: bool = True
+    use_cuvs: bool = True
+    gpu_devices: Sequence[int] | None = None
+
+
 class FaissAdapter:
     """Build FAISS indexes with optional GPU acceleration and CPU fallback."""
 
-    def __init__(  # noqa: PLR0913 - standard __init__ with configuration options
+    _CONFIG_FIELDS: ClassVar[set[str]] = {
+        "factory",
+        "metric",
+        "nprobe",
+        "use_gpu",
+        "use_cuvs",
+        "gpu_devices",
+    }
+
+    def __init__(
         self,
         db_path: str,
         *,
-        factory: str = "OPQ64,IVF8192,PQ64",
-        metric: str = "ip",
-        nprobe: int = 64,
-        use_gpu: bool = True,
-        use_cuvs: bool = True,
-        gpu_devices: Sequence[int] | None = None,
+        config: FaissAdapterConfig | None = None,
+        **legacy_options: object,
     ) -> None:
         self.db_path = db_path
-        self.factory = factory
-        self.metric = metric
-        self.nprobe = nprobe
-        self.use_gpu = use_gpu
-        self.use_cuvs = use_cuvs
-        self._gpu_devices = tuple(int(device) for device in (gpu_devices or (0,)))
+        resolved_config = self._resolve_config(config, legacy_options)
+        self.factory = resolved_config.factory
+        self.metric = resolved_config.metric
+        self.nprobe = resolved_config.nprobe
+        self.use_gpu = resolved_config.use_gpu
+        self.use_cuvs = resolved_config.use_cuvs
+        devices = resolved_config.gpu_devices or (0,)
+        self._gpu_devices = tuple(int(device) for device in devices)
 
         self.index: FaissIndexProtocol | None = None
         self.idmap: list[str] | None = None
@@ -142,6 +170,72 @@ class FaissAdapter:
 
         self._cpu_matrix: FloatMatrix | None = None
         self._gpu_context: GpuContext | None = None
+
+    @classmethod
+    def _resolve_config(
+        cls, config: FaissAdapterConfig | None, legacy_options: dict[str, object]
+    ) -> FaissAdapterConfig:
+        if config is not None and legacy_options:
+            unexpected = ", ".join(sorted(legacy_options))
+            message = (
+                "FaissAdapter received both 'config' and individual keyword options: "
+                f"{unexpected}"
+            )
+            raise TypeError(message)
+        if config is not None:
+            return config
+
+        unexpected_keys = set(legacy_options) - cls._CONFIG_FIELDS
+        if unexpected_keys:
+            unexpected = ", ".join(sorted(unexpected_keys))
+            message = f"FaissAdapter got unexpected keyword arguments: {unexpected}"
+            raise TypeError(message)
+
+        base = FaissAdapterConfig()
+        if not legacy_options:
+            return base
+
+        options = {
+            field: legacy_options[field]
+            for field in cls._CONFIG_FIELDS
+            if field in legacy_options
+        }
+        factory = options.get("factory", base.factory)
+        if not isinstance(factory, str):
+            raise TypeError("factory must be a string")
+
+        metric = options.get("metric", base.metric)
+        if not isinstance(metric, str):
+            raise TypeError("metric must be a string")
+
+        nprobe = options.get("nprobe", base.nprobe)
+        if not isinstance(nprobe, int):
+            raise TypeError("nprobe must be an integer")
+
+        use_gpu = options.get("use_gpu", base.use_gpu)
+        if not isinstance(use_gpu, bool):
+            raise TypeError("use_gpu must be a boolean")
+
+        use_cuvs = options.get("use_cuvs", base.use_cuvs)
+        if not isinstance(use_cuvs, bool):
+            raise TypeError("use_cuvs must be a boolean")
+
+        gpu_devices_option = options.get("gpu_devices", base.gpu_devices)
+        if gpu_devices_option is not None:
+            if not isinstance(gpu_devices_option, Sequence):
+                raise TypeError("gpu_devices must be a sequence of integers or None")
+            gpu_devices = tuple(int(device) for device in gpu_devices_option)
+        else:
+            gpu_devices = None
+
+        return FaissAdapterConfig(
+            factory=factory,
+            metric=metric,
+            nprobe=nprobe,
+            use_gpu=use_gpu,
+            use_cuvs=use_cuvs,
+            gpu_devices=gpu_devices,
+        )
 
     def build(self) -> None:
         """Build or rebuild the FAISS index from persisted vectors.
@@ -424,20 +518,26 @@ class FaissAdapter:
             return self._load_from_parquet(candidate)
 
         try:
-            record = con.execute(
-                "SELECT parquet_root FROM dense_runs ORDER BY created_at DESC LIMIT 1"
-            ).fetchone()
+            record = fetch_one(
+                con,
+                "SELECT parquet_root FROM dense_runs ORDER BY created_at DESC LIMIT 1",
+            )
         except duckdb.Error as exc:  # pragma: no cover - defensive fallback
             msg = f"Failed to query dense_runs: {exc}"
             raise VectorSearchError(msg) from exc
         finally:
             con.close()
 
-        if not record or not isinstance(record[0], str):
+        if record is None:
+            msg = "dense_runs table is empty"
+            raise VectorSearchError(msg)
+
+        root_candidate = record[0]
+        if not isinstance(root_candidate, str):
             msg = "dense_runs table is empty or malformed"
             raise VectorSearchError(msg)
 
-        return self._load_from_parquet(Path(record[0]))
+        return self._load_from_parquet(Path(root_candidate))
 
     @staticmethod
     def _load_from_parquet(source: Path) -> DenseVecs:
@@ -455,10 +555,11 @@ class FaissAdapter:
 
         con = duckdb.connect(database=":memory:")
         try:
-            rows = con.execute(
+            rows = fetch_all(
+                con,
                 "SELECT chunk_id, vector FROM read_parquet(?, union_by_name=true)",
                 [str(resolved)],
-            ).fetchall()
+            )
         except duckdb.Error as exc:
             msg = f"Failed to load vectors from {resolved}: {exc}"
             raise VectorSearchError(msg) from exc
@@ -469,8 +570,13 @@ class FaissAdapter:
             msg = f"No vectors discovered in {resolved}"
             raise VectorSearchError(msg)
 
-        ids = [str(row[0]) for row in rows]
-        vector_rows = [np.asarray(row[1], dtype=np.float32) for row in rows]
-        matrix = np.vstack(vector_rows)
+        ids: list[str] = []
+        vector_rows: list[FloatArray] = []
+        for chunk_id_val, vector_val in rows:
+            ids.append(_as_optional_str(chunk_id_val))
+            vector_array = np.asarray(vector_val, dtype=np.float32)
+            vector_rows.append(vector_array)
+
+        matrix: FloatMatrix = np.vstack(vector_rows).astype(np.float32, copy=False)
         normalized = normalize_l2(matrix, axis=1)
         return DenseVecs(ids=ids, matrix=normalized)

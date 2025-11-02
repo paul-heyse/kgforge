@@ -11,8 +11,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from tools._shared.logging import get_logger  # noqa: PLC2701
-from tools._shared.proc import ToolExecutionError, run_tool  # noqa: PLC2701
+from tools import ToolExecutionError, get_logger, run_tool
 
 LOGGER = get_logger(__name__)
 

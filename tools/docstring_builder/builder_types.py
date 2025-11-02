@@ -14,10 +14,15 @@ import logging
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TypeAlias, cast
+from typing import cast
 
 from kgfoundry_common.logging import LoggerAdapter
-from tools._shared.problem_details import ProblemDetailsParams, build_problem_details as _build_problem_details
+from tools._shared.problem_details import (
+    ProblemDetailsParams,
+)
+from tools._shared.problem_details import (
+    build_problem_details as _build_problem_details,
+)
 from tools.docstring_builder.config import ConfigSelection
 from tools.docstring_builder.models import (
     CliResult,
@@ -30,7 +35,7 @@ from tools.docstring_builder.models import (
     ProblemDetails as ModelProblemDetails,
 )
 
-LoggerLike: TypeAlias = LoggerAdapter | logging.Logger  # noqa: UP040
+type LoggerLike = LoggerAdapter | logging.Logger
 """Type alias for logger parameters: accepts both StructuredLoggerAdapter and stdlib Logger."""
 
 

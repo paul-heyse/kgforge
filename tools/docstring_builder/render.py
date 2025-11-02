@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 from jinja2 import Environment, StrictUndefined
+from jinja2.runtime import Undefined
 
 if TYPE_CHECKING:
     from jinja2.utils import select_autoescape
@@ -23,11 +24,18 @@ from tools.docstring_builder.schema import DocstringSchema, ParameterDoc
 
 _TEMPLATE = """{{ schema.summary }}\n\n{{ marker }}{% if signature %}\n\nSignature\n---------\n{{ signature }}{% endif %}{% if schema.extended %}\n\n{{ schema.extended }}{% endif %}{% if schema.parameters %}\n\nParameters\n----------\n{% for parameter in schema.parameters %}{{ parameter.display_name or parameter.name }} : {{ parameter.annotation or 'Any' }}{% if parameter.optional %}, optional{% endif %}{% if parameter.default %}, by default {{ parameter.default }}{% endif %}\n    {{ parameter.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.returns %}\n\n{% set has_yields = schema.returns|selectattr('kind', 'equalto', 'yields')|list|length > 0 %}{% if has_yields %}Yields\n------\n{% else %}Returns\n-------\n{% endif %}{% for entry in schema.returns %}{{ entry.annotation or 'Any' }}\n    {{ entry.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.raises %}\n\nRaises\n------\n{% for entry in schema.raises %}{{ entry.exception }}\n    {{ entry.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.notes %}\n\nNotes\n-----\n{% for note in schema.notes %}{{ note }}\n{% endfor %}{% endif %}{% if schema.see_also %}\n\nSee Also\n--------\n{% for link in schema.see_also %}{{ link }}\n{% endfor %}{% endif %}{% if schema.examples %}\n\nExamples\n--------\n{% for example in schema.examples %}{{ example }}\n{% endfor %}{% endif %}"""
 
-_ENV = Environment(  # noqa: S701
-    undefined=StrictUndefined,
-    trim_blocks=False,
-    lstrip_blocks=True,
-)
+
+def _build_environment() -> Environment:
+    undefined_cls = cast(type[Undefined], StrictUndefined)
+    return Environment(
+        undefined=undefined_cls,
+        trim_blocks=False,
+        lstrip_blocks=True,
+        autoescape=select_autoescape(enabled_extensions=(), default=True),
+    )
+
+
+_ENV = _build_environment()
 _TEMPLATE_OBJ = _ENV.from_string(_TEMPLATE)
 
 

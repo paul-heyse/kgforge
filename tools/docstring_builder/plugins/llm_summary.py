@@ -31,44 +31,44 @@ class LLMSummaryRewritePlugin(TransformerPlugin):
         """Clean up plugin state after execution (no-op)."""
         del self, context
 
-    def apply(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
-        """Rewrite the summary text for ``result`` when configured to do so."""
+    def apply(self, context: PluginContext, payload: SemanticResult) -> SemanticResult:
+        """Rewrite the summary text for ``payload`` when configured to do so."""
         del self
         mode_attr: object = getattr(context.config, "llm_summary_mode", "off")
         mode = str(mode_attr).lower()
         if mode not in {"apply", "dry-run"}:
-            return result
-        summary_attr = result.schema.summary
+            return payload
+        summary_attr = payload.schema.summary
         summary = str(summary_attr).strip()
         if not summary:
-            return result
+            return payload
         if not _needs_rewrite(summary):
-            return result
+            return payload
         candidate = _rewrite_summary(summary)
         if mode == "dry-run":
             LOGGER.info(
                 "[LLM] summary dry-run",
                 extra={
                     "operation": "llm_summary",
-                    "symbol": result.symbol.qname,
+                    "symbol": payload.symbol.qname,
                     "mode": mode,
                     "original_summary": summary,
                     "candidate_summary": candidate,
                 },
             )
-            return result
+            return payload
         LOGGER.info(
             "[LLM] summary rewritten",
             extra={
                 "operation": "llm_summary",
-                "symbol": result.symbol.qname,
+                "symbol": payload.symbol.qname,
                 "mode": mode,
                 "original_summary": summary,
                 "candidate_summary": candidate,
             },
         )
-        updated_schema = replace(result.schema, summary=candidate)
-        return replace(result, schema=updated_schema)
+        updated_schema = replace(payload.schema, summary=candidate)
+        return replace(payload, schema=updated_schema)
 
 
 def _needs_rewrite(summary: str) -> bool:

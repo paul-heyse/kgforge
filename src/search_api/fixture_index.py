@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import math
 import re
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Final
@@ -16,6 +17,7 @@ from typing import Final
 import duckdb
 
 from kgfoundry_common.navmap_types import NavMap
+from registry.duckdb_helpers import fetch_all, fetch_one
 
 __all__ = ["FixtureDoc", "FixtureIndex", "tokenize"]
 
@@ -46,6 +48,14 @@ __navmap__: Final[NavMap] = {
 }
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
+
+
+def _as_str(value: object) -> str:
+    if isinstance(value, str):
+        return value
+    if value is None:
+        return ""
+    return str(value)
 
 
 # [nav:anchor tokenize]
@@ -146,7 +156,7 @@ class FixtureIndex:
         self.tf: list[dict[str, int]] = []
         self._load_from_duckdb()
 
-    def _load_from_duckdb(self) -> None:  # noqa: PLR0914
+    def _load_from_duckdb(self) -> None:
         """Describe  load from duckdb.
 
         <!-- auto:docstring-builder v1 -->
@@ -155,59 +165,66 @@ class FixtureIndex:
         protocols, or runtime behaviours that expect instances to participate in the language's data
         model.
         """
-        if not Path(self.db_path).exists():
+        db_file = Path(self.db_path)
+        if not db_file.exists():
             return
-        con = duckdb.connect(self.db_path)
-        try:
-            dataset = con.execute(
-                """
+
+        with duckdb.connect(str(db_file)) as connection:
+            root_path = self._latest_chunks_root(connection)
+            if root_path is None:
+                return
+            for doc in self._iter_fixture_docs(connection, root_path):
+                self.docs.append(doc)
+
+        self._build_lex()
+
+    @staticmethod
+    def _latest_chunks_root(connection: duckdb.DuckDBPyConnection) -> Path | None:
+        dataset_row = fetch_one(
+            connection,
+            """
               SELECT parquet_root FROM datasets
               WHERE kind='chunks'
               ORDER BY created_at DESC
               LIMIT 1
+            """,
+        )
+        if dataset_row is None:
+            return None
+        parquet_root = dataset_row[0]
+        if not isinstance(parquet_root, str):
+            msg = f"Invalid parquet_root type: {type(parquet_root)}"
+            raise TypeError(msg)
+        return Path(parquet_root)
+
+    @staticmethod
+    def _iter_fixture_docs(
+        connection: duckdb.DuckDBPyConnection, root_path: Path
+    ) -> Iterator[FixtureDoc]:
+        parquet_pattern = str(root_path / "*" / "*.parquet")
+        rows: Sequence[tuple[object, ...]] = fetch_all(
+            connection,
             """
-            ).fetchone()
-            if not dataset:
-                return
-            root = dataset[0]
-            if not isinstance(root, str):
-                msg = f"Invalid parquet_root type: {type(root)}"
-                raise TypeError(msg)
-            # Parameterize query - use pathlib for safe path construction
-            root_path = Path(root)
-            parquet_pattern = str(root_path / "*" / "*.parquet")
-            sql = """
                 SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text,
                        coalesce(d.title,'') AS title
                 FROM read_parquet(?, union_by_name=true) AS c
                 LEFT JOIN documents d ON c.doc_id = d.doc_id
-            """
-            rows = con.execute(sql, [parquet_pattern]).fetchall()
-            # Explicitly type DuckDB query results
-            for row in rows:
-                chunk_id_val: object = row[0]
-                doc_id_val: object = row[1]
-                section_val: object = row[2]
-                text_val: object = row[3]
-                title_val: object = row[4]
-                chunk_id: str = str(chunk_id_val)
-                doc_id: str = str(doc_id_val)
-                section: str = str(section_val)
-                text: str = str(text_val)
-                title: str = str(title_val)
-                self.docs.append(
-                    FixtureDoc(
-                        chunk_id=chunk_id,
-                        doc_id=doc_id or "urn:doc:fixture",
-                        title=title or "Fixture",
-                        section=section or "",
-                        text=text or "",
-                    )
-                )
-        finally:
-            con.close()
-
-        self._build_lex()
+            """,
+            [parquet_pattern],
+        )
+        for chunk_id_val, doc_id_val, section_val, text_val, title_val in rows:
+            chunk_id = _as_str(chunk_id_val)
+            doc_id = _as_str(doc_id_val)
+            section = _as_str(section_val)
+            text = _as_str(text_val)
+            title = _as_str(title_val)
+            yield FixtureDoc(
+                chunk_id=chunk_id,
+                doc_id=doc_id or "urn:doc:fixture",
+                title=title or "Fixture",
+                section=section or "",
+                text=text or "",
+            )
 
     def _build_lex(self) -> None:
         """Describe  build lex.

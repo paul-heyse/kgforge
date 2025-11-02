@@ -27,39 +27,41 @@ class NormalizeNumpyParamsPlugin(TransformerPlugin):
         """Clean up plugin state after processing completes (no-op)."""
         del self, context
 
-    def apply(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
-        """Normalise parameter and return descriptions for ``result``."""
+    def apply(self, context: PluginContext, payload: SemanticResult) -> SemanticResult:
+        """Normalise parameter and return descriptions for ``payload``."""
         del self
         del context
-        schema = result.schema
-        parameters = [
-            NormalizeNumpyParamsPlugin._normalize_parameter(parameter)
-            for parameter in schema.parameters
-        ]
+        schema = payload.schema
+        parameters = [NormalizeNumpyParamsPlugin._normalize_parameter(p) for p in schema.parameters]
         returns = [NormalizeNumpyParamsPlugin._normalize_return(entry) for entry in schema.returns]
         if parameters == schema.parameters and returns == schema.returns:
-            return result
+            return payload
         updated_schema = replace(schema, parameters=parameters, returns=returns)
-        return replace(result, schema=updated_schema)
+        return replace(payload, schema=updated_schema)
 
     @staticmethod
-    def _normalize_parameter(parameter: ParameterDoc) -> ParameterDoc:
-        description = parameter.description.strip()
-        if not description or description.lower().startswith("todo"):
-            description = f"Describe `{parameter.name}`."  # pragma: no cover - exercised via tests
-        if not description.endswith("."):
-            description = f"{description}."
-        if description and description[0].islower():
-            description = description[0].upper() + description[1:]
+    def _normalize_sentence(candidate: str, *, fallback: str) -> str:
+        sentence = candidate.strip()
+        if not sentence or sentence.lower().startswith("todo"):
+            sentence = fallback
+        if not sentence.endswith("."):
+            sentence = f"{sentence}."
+        if sentence and sentence[0].islower():
+            sentence = f"{sentence[0].upper()}{sentence[1:]}"
+        return sentence
+
+    @classmethod
+    def _normalize_parameter(cls, parameter: ParameterDoc) -> ParameterDoc:
+        description = cls._normalize_sentence(
+            parameter.description,
+            fallback=f"Describe `{parameter.name}`.",
+        )
         return replace(parameter, description=description)
 
-    @staticmethod
-    def _normalize_return(entry: ReturnDoc) -> ReturnDoc:
-        description = entry.description.strip()
-        if not description or description.lower().startswith("todo"):
-            description = "Describe return value."
-        if not description.endswith("."):
-            description = f"{description}."
-        if description and description[0].islower():
-            description = description[0].upper() + description[1:]
+    @classmethod
+    def _normalize_return(cls, entry: ReturnDoc) -> ReturnDoc:
+        description = cls._normalize_sentence(
+            entry.description,
+            fallback="Describe the returned value.",
+        )
         return replace(entry, description=description)

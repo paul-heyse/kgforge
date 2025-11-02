@@ -23,8 +23,9 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
+from dataclasses import dataclass
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import NoReturn, TypedDict, cast, overload
 
 import jsonschema
 from jsonschema.exceptions import SchemaError, ValidationError
@@ -40,10 +41,12 @@ JsonSchema = dict[str, object]
 
 
 __all__ = [
+    "ExceptionProblemDetailsParams",
     "JsonObject",
     "JsonPrimitive",
     "JsonValue",
     "ProblemDetails",
+    "ProblemDetailsParams",
     "ProblemDetailsValidationError",
     "build_problem_details",
     "problem_from_exception",
@@ -71,6 +74,27 @@ class ProblemDetails(TypedDict, total=False):
     instance: str
     code: str  # NotRequired via total=False
     extensions: dict[str, JsonValue]  # NotRequired via total=False
+
+
+@dataclass(slots=True)
+class ProblemDetailsParams:
+    """Parameters used to construct a Problem Details payload."""
+
+    problem_type: str
+    title: str
+    status: int
+    detail: str
+    instance: str
+    code: str | None = None
+    extensions: Mapping[str, JsonValue] | None = None
+
+
+@dataclass(slots=True)
+class ExceptionProblemDetailsParams:
+    """Parameters describing an exception converted to Problem Details."""
+
+    exception: Exception
+    base: ProblemDetailsParams
 
 
 class ProblemDetailsValidationError(Exception):
@@ -199,16 +223,95 @@ def validate_problem_details(payload: Mapping[str, JsonValue]) -> None:
         raise ProblemDetailsValidationError(msg) from exc
 
 
-def build_problem_details(  # noqa: PLR0913
+def _type_error(message: str) -> NoReturn:
+    raise TypeError(message)
+
+
+def _coerce_problem_details_params(*args: object, **kwargs: object) -> ProblemDetailsParams:
+    if args and isinstance(args[0], ProblemDetailsParams):
+        if len(args) > 1 or kwargs:
+            _type_error("build_problem_details() received unexpected extra arguments")
+        return args[0]
+
+    positional = ("problem_type", "title", "status", "detail", "instance")
+    if len(args) > len(positional):
+        _type_error("build_problem_details() received too many positional arguments")
+
+    values: dict[str, object] = {}
+    for field_name, value in zip(positional, args, strict=False):
+        values[field_name] = value
+
+    remaining_fields = positional[len(args) :]
+    for field_name in remaining_fields:
+        if field_name not in kwargs:
+            _type_error(f"build_problem_details() missing required argument: '{field_name}'")
+        values[field_name] = kwargs.pop(field_name)
+
+    code = kwargs.pop("code", None)
+    extensions = kwargs.pop("extensions", None)
+    if kwargs:
+        unexpected = ", ".join(sorted(kwargs))
+        _type_error(f"build_problem_details() got unexpected keyword arguments: {unexpected}")
+
+    status_value = values["status"]
+    if not isinstance(status_value, int):
+        _type_error("build_problem_details() expected 'status' to be an int")
+    status_int = status_value
+
+    return ProblemDetailsParams(
+        problem_type=str(values["problem_type"]),
+        title=str(values["title"]),
+        status=status_int,
+        detail=str(values["detail"]),
+        instance=str(values["instance"]),
+        code=None if code is None else str(code),
+        extensions=cast(Mapping[str, JsonValue] | None, extensions),
+    )
+
+
+def _coerce_exception_params(*args: object, **kwargs: object) -> ExceptionProblemDetailsParams:
+    if args and isinstance(args[0], ExceptionProblemDetailsParams):
+        if len(args) > 1 or kwargs:
+            _type_error("problem_from_exception() received unexpected extra arguments")
+        return args[0]
+
+    if not args:
+        _type_error("problem_from_exception() missing required argument: 'exc'")
+
+    exc_obj = args[0]
+    if not isinstance(exc_obj, Exception):
+        _type_error("problem_from_exception() first argument must be an Exception instance")
+    exc: Exception = exc_obj
+
+    if "detail" in kwargs:
+        _type_error("problem_from_exception() does not accept a 'detail' argument")
+
+    base_args = args[1:]
+    combined_kwargs = dict(kwargs)
+    combined_kwargs["detail"] = str(exc)
+
+    base_params = _coerce_problem_details_params(*base_args, **combined_kwargs)
+    return ExceptionProblemDetailsParams(exception=exc, base=base_params)
+
+
+@overload
+def build_problem_details(params: ProblemDetailsParams) -> ProblemDetails: ...
+
+
+@overload
+def build_problem_details(
     problem_type: str,
     title: str,
     status: int,
     detail: str,
     instance: str,
     *,
-    code: str | None = None,
-    extensions: Mapping[str, JsonValue] | None = None,
-) -> ProblemDetails:
+    code: str | None = ...,
+    extensions: Mapping[str, JsonValue] | None = ...,
+) -> ProblemDetails: ...
+
+
+def build_problem_details(*args: object, **kwargs: object) -> ProblemDetails:
     """Build an RFC 9457 Problem Details payload.
 
     <!-- auto:docstring-builder v1 -->
@@ -218,23 +321,12 @@ def build_problem_details(  # noqa: PLR0913
 
     Parameters
     ----------
-    problem_type : str
-        Type URI identifying the problem (e.g., "https://kgfoundry.dev/problems/tool-failure").
-        Required. Conforms to RFC 3986 URI format.
-    title : str
-        Short summary of the problem.
-    status : int
-        HTTP status code (or equivalent for non-HTTP contexts).
-    detail : str
-        Human-readable explanation of the problem.
-    instance : str
-        URI reference identifying the specific occurrence (e.g., "urn:tool:git:exit-1").
-    code : str | None, optional
-        Machine-readable error code (kgfoundry extension).
-        Defaults to None.
-    extensions : Mapping[str, JsonValue] | None, optional
-        Additional problem-specific fields.
-        Defaults to None.
+    *args : tuple
+        Either a single :class:`ProblemDetailsParams` instance or the positional fields
+        ``(problem_type, title, status, detail, instance)`` in that order.
+    **kwargs : dict[str, object]
+        Optional keyword arguments accepted when the dataclass form is not used. Supports
+        ``code`` and ``extensions`` for the legacy calling style.
 
     Returns
     -------
@@ -259,17 +351,18 @@ def build_problem_details(  # noqa: PLR0913
     >>> assert problem["type"] == "https://kgfoundry.dev/problems/tool-timeout"
     >>> assert problem["status"] == 504
     """
+    params = _coerce_problem_details_params(*args, **kwargs)
     payload: dict[str, object] = {
-        "type": problem_type,
-        "title": title,
-        "status": status,
-        "detail": detail,
-        "instance": instance,
+        "type": params.problem_type,
+        "title": params.title,
+        "status": params.status,
+        "detail": params.detail,
+        "instance": params.instance,
     }
-    if code is not None:
-        payload["code"] = code
-    if extensions:
-        payload["errors"] = dict(extensions)
+    if params.code is not None:
+        payload["code"] = params.code
+    if params.extensions:
+        payload["errors"] = dict(params.extensions)
 
     # Validate against schema (cast since dict[str, object] ⊇ Mapping[str, JsonValue])
     validate_problem_details(cast(Mapping[str, JsonValue], payload))
@@ -277,16 +370,24 @@ def build_problem_details(  # noqa: PLR0913
     return cast(ProblemDetails, payload)
 
 
-def problem_from_exception(  # noqa: PLR0913
+@overload
+def problem_from_exception(params: ExceptionProblemDetailsParams) -> ProblemDetails: ...
+
+
+@overload
+def problem_from_exception(
     exc: Exception,
     problem_type: str,
     title: str,
     status: int,
     instance: str,
     *,
-    code: str | None = None,
-    extensions: Mapping[str, JsonValue] | None = None,
-) -> ProblemDetails:
+    code: str | None = ...,
+    extensions: Mapping[str, JsonValue] | None = ...,
+) -> ProblemDetails: ...
+
+
+def problem_from_exception(*args: object, **kwargs: object) -> ProblemDetails:
     """Build Problem Details from an exception.
 
     <!-- auto:docstring-builder v1 -->
@@ -296,22 +397,12 @@ def problem_from_exception(  # noqa: PLR0913
 
     Parameters
     ----------
-    exc : Exception
-        Exception to convert.
-    problem_type : str
-        Type URI identifying the problem.
-    title : str
-        Short summary of the problem.
-    status : int
-        HTTP status code.
-    instance : str
-        URI reference identifying the specific occurrence.
-    code : str | None, optional
-        Machine-readable error code.
-        Defaults to None.
-    extensions : Mapping[str, JsonValue] | None, optional
-        Additional problem-specific fields.
-        Defaults to None.
+    *args : tuple
+        Either a single :class:`ExceptionProblemDetailsParams` instance or the legacy
+        positional arguments ``(exc, problem_type, title, status, instance)``.
+    **kwargs : dict[str, object]
+        Optional keyword arguments accepted when the dataclass form is not used. Supports
+        ``code`` and ``extensions`` for backward compatibility.
 
     Returns
     -------
@@ -332,26 +423,30 @@ def problem_from_exception(  # noqa: PLR0913
     ...     )
     >>> assert "Invalid input" in problem["detail"]
     """
-    detail = str(exc)
+    params = _coerce_exception_params(*args, **kwargs)
+    exc = params.exception
+    detail = params.base.detail
     exc_type_name = exc.__class__.__name__
     merged_extensions: dict[str, JsonValue] = {
         "exception_type": exc_type_name,
     }
-    if extensions:
-        merged_extensions.update(extensions)
+    if params.base.extensions:
+        merged_extensions.update(dict(params.base.extensions))
 
     # Preserve cause chain if present
     if exc.__cause__ is not None:
         merged_extensions["caused_by"] = exc.__cause__.__class__.__name__
 
     return build_problem_details(
-        problem_type=problem_type,
-        title=title,
-        status=status,
-        detail=detail,
-        instance=instance,
-        code=code,
-        extensions=merged_extensions,
+        ProblemDetailsParams(
+            problem_type=params.base.problem_type,
+            title=params.base.title,
+            status=params.base.status,
+            detail=detail,
+            instance=params.base.instance,
+            code=params.base.code,
+            extensions=merged_extensions,
+        )
     )
 
 

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Mapping
+from dataclasses import dataclass
 from typing import cast
 
 from kgfoundry_common.errors.codes import ErrorCode, get_type_uri
@@ -38,6 +39,7 @@ __all__ = [
     "EmbeddingError",
     "IndexBuildError",
     "KgFoundryError",
+    "KgFoundryErrorConfig",
     "LinkerCalibrationError",
     "Neo4jError",
     "OCRTimeoutError",
@@ -53,6 +55,77 @@ __all__ = [
 ]
 
 
+@dataclass(slots=True)
+class KgFoundryErrorConfig:
+    """Configuration options used when instantiating :class:`KgFoundryError`."""
+
+    code: ErrorCode = ErrorCode.RUNTIME_ERROR
+    http_status: int = 500
+    log_level: int = logging.ERROR
+    cause: Exception | None = None
+    context: Mapping[str, object] | None = None
+
+
+_KNOWN_CONFIG_KEYS = frozenset({"code", "http_status", "log_level", "cause", "context"})
+
+
+def _coerce_error_config(
+    config: KgFoundryErrorConfig | None,
+    legacy_kwargs: dict[str, object],
+) -> KgFoundryErrorConfig:
+    if config is not None:
+        if legacy_kwargs:
+            unexpected = ", ".join(sorted(legacy_kwargs))
+            message = (
+                "KgFoundryError received both 'config' and legacy keyword arguments: "
+                f"{unexpected}"
+            )
+            raise TypeError(message)
+        return config
+
+    unexpected_keys = set(legacy_kwargs) - set(_KNOWN_CONFIG_KEYS)
+    if unexpected_keys:
+        unexpected = ", ".join(sorted(unexpected_keys))
+        message = f"KgFoundryError got unexpected keyword arguments: {unexpected}"
+        raise TypeError(message)
+
+    code = legacy_kwargs.get("code", ErrorCode.RUNTIME_ERROR)
+    http_status = legacy_kwargs.get("http_status", 500)
+    log_level = legacy_kwargs.get("log_level", logging.ERROR)
+    cause = legacy_kwargs.get("cause")
+    context = legacy_kwargs.get("context")
+
+    context_mapping: Mapping[str, object] | None
+    if context is None:
+        context_mapping = None
+    elif isinstance(context, Mapping):
+        context_mapping = context
+    else:
+        message = "context must be a mapping when provided"
+        raise TypeError(message)
+
+    if not isinstance(code, ErrorCode):
+        message = "code must be an instance of ErrorCode"
+        raise TypeError(message)
+    if not isinstance(http_status, int):
+        message = "http_status must be an int"
+        raise TypeError(message)
+    if not isinstance(log_level, int):
+        message = "log_level must be an int"
+        raise TypeError(message)
+    if cause is not None and not isinstance(cause, Exception):
+        message = "cause must be an Exception when provided"
+        raise TypeError(message)
+
+    return KgFoundryErrorConfig(
+        code=code,
+        http_status=http_status,
+        log_level=log_level,
+        cause=cause,
+        context=context_mapping,
+    )
+
+
 class KgFoundryError(Exception):
     """Base exception for all kgfoundry errors.
 
@@ -65,40 +138,30 @@ class KgFoundryError(Exception):
     ----------
     message : str
         Human-readable error message.
-    code : ErrorCode, optional
-        Error code from the registry. Defaults to RUNTIME_ERROR.
-        Defaults to ``<ErrorCode.RUNTIME_ERROR: 'runtime-error'>``.
-    http_status : int, optional
-        HTTP status code for API responses. Defaults to 500.
-        Defaults to ``500``.
-    log_level : int, optional
-        Logging level (logging.ERROR, logging.WARNING, etc.).
-        Defaults to logging.ERROR.
-        Defaults to ``40``.
-    cause : Exception | None, optional
-        Original exception that caused this error. Preserved via __cause__.
+    config : KgFoundryErrorConfig | None, optional
+        Structured configuration for the error including ``code``,
+        ``http_status``, ``log_level``, ``cause`` and ``context``. When
+        omitted these fields fall back to sensible defaults.
         Defaults to ``None``.
-    context : Mapping[str, object] | None, optional
-        Additional context for error reporting.
-        Defaults to ``None``.
+    **legacy_kwargs : dict[str, object]
+        Backwards-compatible keyword arguments mirroring the fields of
+        :class:`KgFoundryErrorConfig`. Cannot be combined with ``config``.
 
     Examples
     --------
     >>> from kgfoundry_common.errors import KgFoundryError, ErrorCode
-    >>> error = KgFoundryError("Operation failed", ErrorCode.RUNTIME_ERROR)
+    >>> error = KgFoundryError("Operation failed", code=ErrorCode.RUNTIME_ERROR)
     >>> assert error.code == ErrorCode.RUNTIME_ERROR
     >>> details = error.to_problem_details(instance="/api/operation")
     >>> assert details["status"] == 500
     """
 
-    def __init__(  # noqa: PLR0913, PLR0917
+    def __init__(
         self,
         message: str,
-        code: ErrorCode = ErrorCode.RUNTIME_ERROR,
-        http_status: int = 500,
-        log_level: int = logging.ERROR,
-        cause: Exception | None = None,
-        context: Mapping[str, object] | None = None,
+        *,
+        config: KgFoundryErrorConfig | None = None,
+        **legacy_kwargs: object,
     ) -> None:
         """Initialize error with structured fields.
 
@@ -108,30 +171,28 @@ class KgFoundryError(Exception):
         ----------
         message : str
             Describe ``message``.
-        code : ErrorCode, optional
-            Describe ``code``.
-            Defaults to ``<ErrorCode.RUNTIME_ERROR: 'runtime-error'>``.
-        http_status : int, optional
-            Describe ``http_status``.
-            Defaults to ``500``.
-        log_level : int, optional
-            Describe ``log_level``.
-            Defaults to ``40``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
+        config : KgFoundryErrorConfig | None, optional
+            Structured configuration for the error surface.
             Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+        legacy_kwargs : dict[str, object]
+            Backwards-compatible keywords mirroring ``config`` fields.
+
+        Examples
+        --------
+        >>> from kgfoundry_common.errors import KgFoundryError, ErrorCode
+        >>> error = KgFoundryError("Operation failed", code=ErrorCode.RUNTIME_ERROR)
+        >>> assert error.code == ErrorCode.RUNTIME_ERROR
+        >>> details = error.to_problem_details(instance="/api/operation")
+        >>> assert details["status"] == 500
         """
-        super().__init__(message)
+        resolved_config = _coerce_error_config(config, dict(legacy_kwargs))
         self.message = message
-        self.code = code
-        self.http_status = http_status
-        self.log_level = log_level
-        self.context = dict(context) if context else {}
-        if cause is not None:
-            self.__cause__ = cause
+        self.code = resolved_config.code
+        self.http_status = resolved_config.http_status
+        self.log_level = resolved_config.log_level
+        self.context = dict(resolved_config.context) if resolved_config.context else {}
+        if resolved_config.cause is not None:
+            self.__cause__ = resolved_config.cause
 
     def to_problem_details(
         self,
@@ -159,7 +220,7 @@ class KgFoundryError(Exception):
 
         Examples
         --------
-        >>> error = KgFoundryError("Not found", ErrorCode.RESOURCE_UNAVAILABLE, http_status=404)
+        >>> error = KgFoundryError("Not found", code=ErrorCode.RESOURCE_UNAVAILABLE, http_status=404)
         >>> details = error.to_problem_details(instance="/api/resource/123")
         >>> assert details["type"] == "https://kgfoundry.dev/problems/resource-unavailable"
         >>> assert details["status"] == 404

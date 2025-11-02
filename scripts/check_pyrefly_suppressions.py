@@ -32,6 +32,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
+
+class _ParsedArgs(argparse.Namespace):
+    paths: list[Path]
+    exit_zero: bool
+
+
 # Pattern to match unmanaged suppressions: type: ignore or pyrefly: ignore
 # without a ticket reference (e.g., "# type: ignore[error-code] - ticket #123")
 SUPPRESSION_PATTERN = re.compile(r"#\s*(?:type:\s*ignore|pyrefly:\s*ignore)(?:\[[\w,-]+\])?")
@@ -74,7 +80,7 @@ class ScanResult:
     issues: dict[Path, list[tuple[int, str]]]
 
 
-def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
+def _parse_args(argv: Sequence[str] | None) -> _ParsedArgs:
     parser = argparse.ArgumentParser(
         description="Check for unmanaged pyrefly and type: ignore suppressions.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -96,7 +102,8 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
         action="store_true",
         help="Exit with code 0 even if suppressions found (dry-run mode)",
     )
-    return parser.parse_args(argv)
+    parsed = parser.parse_args(argv)
+    return cast(_ParsedArgs, parsed)
 
 
 def _iter_python_files(target: Path) -> Iterable[Path]:
@@ -174,7 +181,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     if scan_result.issues:
         _write_issue_report(scan_result.issues)
-        exit_zero: bool = bool(args.exit_zero)
+        exit_zero = args.exit_zero
         return 0 if exit_zero else 1
 
     sys.stdout.write(

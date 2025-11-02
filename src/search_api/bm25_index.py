@@ -21,6 +21,7 @@ from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.safe_pickle_v2 import UnsafeSerializationError, load_unsigned_legacy
 from kgfoundry_common.serialization import deserialize_json, serialize_json
+from registry.duckdb_helpers import fetch_all, fetch_one
 
 __all__ = ["BM25Doc", "BM25Index", "toks"]
 
@@ -51,6 +52,14 @@ __navmap__: Final[NavMap] = {
 }
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
+
+
+def _as_str(value: object) -> str:
+    if isinstance(value, str):
+        return value
+    if value is None:
+        return ""
+    return str(value)
 
 
 # [nav:anchor toks]
@@ -175,42 +184,36 @@ class BM25Index:
         index = cls()
         con = duckdb.connect(db_path)
         try:
-            dataset = con.execute(
+            dataset = fetch_one(
+                con,
                 "SELECT parquet_root FROM datasets "
-                "WHERE kind='chunks' ORDER BY created_at DESC LIMIT 1"
-            ).fetchone()
-            if not dataset:
+                "WHERE kind='chunks' ORDER BY created_at DESC LIMIT 1",
+            )
+            if dataset is None:
                 return index
-            root = dataset[0]
-            if not isinstance(root, str):
-                msg = f"Invalid parquet_root type: {type(root)}"
+            root_obj = dataset[0]
+            if not isinstance(root_obj, str):
+                msg = f"Invalid parquet_root type: {type(root_obj)}"
                 raise TypeError(msg)
             # Parameterize query - use pathlib for safe path construction
-            root_path = Path(root)
+            root_path = Path(root_obj)
             parquet_pattern = str(root_path / "*" / "*.parquet")
             sql = """
                 SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text, coalesce(d.title,'')
                 FROM read_parquet(?, union_by_name=true) AS c
                 LEFT JOIN documents d ON c.doc_id = d.doc_id
             """
-            rows = con.execute(sql, [parquet_pattern]).fetchall()
-            # Explicitly type DuckDB query results
-            typed_rows: list[tuple[str, str, str, str, str]] = []
-            for row in rows:
-                chunk_id_val: object = row[0]
-                doc_id_val: object = row[1]
-                section_val: object = row[2]
-                text_val: object = row[3]
-                title_val: object = row[4]
-                typed_rows.append(
-                    (
-                        str(chunk_id_val),
-                        str(doc_id_val),
-                        str(section_val),
-                        str(text_val),
-                        str(title_val),
-                    )
+            raw_rows = fetch_all(con, sql, [parquet_pattern])
+            typed_rows: list[tuple[str, str, str, str, str]] = [
+                (
+                    _as_str(chunk_id_val),
+                    _as_str(doc_id_val),
+                    _as_str(section_val),
+                    _as_str(text_val),
+                    _as_str(title_val),
                 )
+                for chunk_id_val, doc_id_val, section_val, text_val, title_val in raw_rows
+            ]
         finally:
             con.close()
         index._build(typed_rows)
@@ -297,24 +300,17 @@ class BM25Index:
                        '' AS title
                 FROM read_parquet(?, union_by_name=true)
             """
-            rows = con.execute(sql, [str(resolved_path)]).fetchall()
-            # Explicitly type DuckDB query results
-            typed_rows: list[tuple[str, str, str, str, str]] = []
-            for row in rows:
-                chunk_id_val: object = row[0]
-                doc_id_val: object = row[1]
-                section_val: object = row[2]
-                text_val: object = row[3]
-                title_val: str = ""  # from_parquet returns empty title
-                typed_rows.append(
-                    (
-                        str(chunk_id_val),
-                        str(doc_id_val),
-                        str(section_val),
-                        str(text_val),
-                        title_val,
-                    )
+            rows = fetch_all(con, sql, [str(resolved_path)])
+            typed_rows: list[tuple[str, str, str, str, str]] = [
+                (
+                    _as_str(chunk_id_val),
+                    _as_str(doc_id_val),
+                    _as_str(section_val),
+                    _as_str(text_val),
+                    "",
                 )
+                for chunk_id_val, doc_id_val, section_val, text_val, *_ in rows
+            ]
         finally:
             con.close()
         index._build(typed_rows)
@@ -373,7 +369,7 @@ class BM25Index:
         serialize_json(payload, schema_path, path_obj)
 
     @classmethod
-    def load(cls, path: str) -> BM25Index:  # noqa: PLR0912
+    def load(cls, path: str) -> BM25Index:
         """Load BM25 index metadata from JSON with schema validation and checksum verification.
 
         <!-- auto:docstring-builder v1 -->
@@ -407,35 +403,36 @@ class BM25Index:
         schema_path = (
             Path(__file__).parent.parent.parent / "schema" / "models" / "bm25_metadata.v1.json"
         )
-        try:
-            payload_raw = deserialize_json(path_obj, schema_path)
-            # Type the payload - deserialize_json returns object (JsonValue at runtime)
-            # We validate it's a dict and narrow the type
-            if not isinstance(payload_raw, dict):
-                payload: dict[str, JsonValue] = {}
-            else:
-                # Cast to dict[str, JsonValue] since we validated it's a dict
-                # JsonValue is object at runtime, so this is safe
-                payload = cast(dict[str, JsonValue], payload_raw)
-        except DeserializationError:
-            # Try legacy pickle format for backward compatibility
-            if path_obj.suffix == ".pkl":
-                with path_obj.open("rb") as handle:
-                    try:
-                        legacy_payload_raw: object = load_unsigned_legacy(handle)
-                    except UnsafeSerializationError as legacy_exc:
-                        message = f"Legacy BM25 pickle failed validation: {legacy_exc}"
-                        raise DeserializationError(message) from legacy_exc
-                    if not isinstance(legacy_payload_raw, dict):
-                        payload = {}
-                    else:
-                        # Cast to JsonValue dict since pickle payload structure matches JSON
-                        payload = cast(dict[str, JsonValue], legacy_payload_raw)
-            else:
-                raise
+        payload = cls._load_payload(path_obj, schema_path)
+        return cls._index_from_payload(payload)
 
-        # Extract values from payload with proper type narrowing
-        # JsonValue types are narrowed at runtime via isinstance checks
+    @staticmethod
+    def _coerce_payload(raw: object) -> dict[str, JsonValue]:
+        if not isinstance(raw, dict):
+            return {}
+        return cast(dict[str, JsonValue], raw)
+
+    @classmethod
+    def _load_payload(cls, metadata_path: Path, schema_path: Path) -> dict[str, JsonValue]:
+        try:
+            return cls._coerce_payload(deserialize_json(metadata_path, schema_path))
+        except DeserializationError:
+            if metadata_path.suffix != ".pkl":
+                raise
+            return cls._load_legacy_payload(metadata_path)
+
+    @classmethod
+    def _load_legacy_payload(cls, metadata_path: Path) -> dict[str, JsonValue]:
+        with metadata_path.open("rb") as handle:
+            try:
+                legacy_payload_raw: object = load_unsigned_legacy(handle)
+            except UnsafeSerializationError as legacy_exc:
+                message = f"Legacy BM25 pickle failed validation: {legacy_exc}"
+                raise DeserializationError(message) from legacy_exc
+        return cls._coerce_payload(legacy_payload_raw)
+
+    @classmethod
+    def _index_from_payload(cls, payload: dict[str, JsonValue]) -> BM25Index:
         k1_val = payload.get("k1", 0.9)
         b_val = payload.get("b", 0.4)
         index = cls(
@@ -444,42 +441,49 @@ class BM25Index:
         )
         n_val = payload.get("N", 0)
         avgdl_val = payload.get("avgdl", 0.0)
-        df_val = payload.get("df", {})
         index.N = int(n_val) if isinstance(n_val, (int, float)) else 0
         index.avgdl = float(avgdl_val) if isinstance(avgdl_val, (int, float)) else 0.0
-        # df_val is dict[str, JsonValue], convert to dict[str, int]
-        if isinstance(df_val, dict):
-            index.df = {k: int(v) if isinstance(v, (int, float)) else 0 for k, v in df_val.items()}
-        else:
-            index.df = {}
-        # Convert docs data back to BM25Doc objects
-        docs_data_raw = payload.get("docs", [])
-        docs_data: list[dict[str, JsonValue]] = []
-        if isinstance(docs_data_raw, list):
-            for doc in docs_data_raw:
-                if isinstance(doc, dict):
-                    docs_data.append(doc)
-        # Build BM25Doc objects with type narrowing for each field
-        index.docs = [
-            BM25Doc(
-                chunk_id=(
-                    str(doc.get("chunk_id", "")) if isinstance(doc.get("chunk_id"), str) else ""
-                ),
-                doc_id=str(doc.get("doc_id", "")) if isinstance(doc.get("doc_id"), str) else "",
-                title=str(doc.get("title", "")) if isinstance(doc.get("title"), str) else "",
-                section=str(doc.get("section", "")) if isinstance(doc.get("section"), str) else "",
-                tf=(
-                    cast(dict[str, float], doc.get("tf", {}))
-                    if isinstance(doc.get("tf"), dict)
-                    else {}
-                ),
-                dl=(
-                    float(dl_val) if isinstance(dl_val := doc.get("dl", 0.0), (int, float)) else 0.0
-                ),
-            )
-            for doc in docs_data
-        ]
+
+        df_val = payload.get("df", {})
+        index.df = (
+            {k: int(v) if isinstance(v, (int, float)) else 0 for k, v in df_val.items()}
+            if isinstance(df_val, dict)
+            else {}
+        )
+
+        index.docs = cls._docs_from_payload(payload.get("docs", []))
         return index
+
+    @staticmethod
+    def _docs_from_payload(raw_docs: object) -> list[BM25Doc]:
+        if not isinstance(raw_docs, list):
+            return []
+
+        docs: list[BM25Doc] = []
+        for entry in raw_docs:
+            if not isinstance(entry, dict):
+                continue
+            chunk_id = entry.get("chunk_id", "")
+            doc_id = entry.get("doc_id", "")
+            title = entry.get("title", "")
+            section = entry.get("section", "")
+            tf_value: object = entry.get("tf", {})
+            doc_length = entry.get("dl", 0.0)
+            docs.append(
+                BM25Doc(
+                    chunk_id=str(chunk_id) if isinstance(chunk_id, str) else "",
+                    doc_id=str(doc_id) if isinstance(doc_id, str) else "",
+                    title=str(title) if isinstance(title, str) else "",
+                    section=str(section) if isinstance(section, str) else "",
+                    tf=(cast(dict[str, float], tf_value) if isinstance(tf_value, dict) else {}),
+                    dl=(
+                        float(doc_length)
+                        if isinstance(doc_length, (int, float))
+                        else 0.0
+                    ),
+                )
+            )
+        return docs
 
     def _idf(self, term: str) -> float:
         """Describe  idf.

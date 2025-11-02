@@ -1,3 +1,7 @@
+# ruff: noqa: UP047
+
+"""Typing surface for the curated tooling API."""
+
 from __future__ import annotations
 
 import logging
@@ -10,6 +14,7 @@ from warnings import WarningMessage
 
 T = TypeVar("T")
 TW = TypeVar("TW", bound=BaseException)
+P = ParamSpec("P")
 
 class CaptureResult[T]:
     out: T
@@ -90,16 +95,14 @@ class Item:
 
 def skip(reason: str = ..., *, allow_module_level: bool = ...) -> None: ...
 @overload
-def fixture[P, T](func: Callable[P, T]) -> Callable[P, T]: ...
+def fixture(func: Callable[P, T]) -> Callable[P, T]: ...
 @overload
-def fixture[P, T](
+def fixture(
     *,
     name: str | None = None,
     scope: str | None = None,
     params: Sequence[object] | None = None,
 ) -> Callable[[Callable[P, T]], Callable[P, T]]: ...
-
-P = ParamSpec("P")
 
 class _MarkNamespace:
     def parametrize[

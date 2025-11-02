@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Iterable, Sequence
+from dataclasses import dataclass, field
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Literal, cast
-from dataclasses import dataclass, field
 
 import pytest
 from tools.docstring_builder.builder_types import (
@@ -87,7 +87,6 @@ class _StubDiffManager:
 
     def record_docstring_baseline(self, file_path: Path, preview: str | None) -> None:
         """Record the baseline docstring for diff inspection."""
-
         self.baseline_calls.append((str(file_path), preview))
 
     def finalize_docstring_drift(self) -> None:  # pragma: no cover - no-op
@@ -105,7 +104,7 @@ class _MetricsHistogram:
     labels_called: list[dict[str, object]] = field(default_factory=list)
     observed: list[float] = field(default_factory=list)
 
-    def labels(self, **labels: object) -> "_MetricsHistogram":
+    def labels(self, **labels: object) -> _MetricsHistogram:
         self.labels_called.append(labels)
         return self
 
@@ -118,7 +117,7 @@ class _MetricsCounter:
     labels_called: list[dict[str, object]] = field(default_factory=list)
     increments: list[float] = field(default_factory=list)
 
-    def labels(self, **labels: object) -> "_MetricsCounter":
+    def labels(self, **labels: object) -> _MetricsCounter:
         self.labels_called.append(labels)
         return self
 

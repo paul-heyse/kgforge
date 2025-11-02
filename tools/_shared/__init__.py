@@ -25,12 +25,20 @@ from tools._shared.problem_details import (
     build_tool_problem_details,
     problem_from_exception,
     render_problem,
+    tool_digest_mismatch_problem_details,
     tool_disallowed_problem_details,
     tool_failure_problem_details,
     tool_missing_problem_details,
     tool_timeout_problem_details,
 )
-from tools._shared.proc import ToolExecutionError, ToolRunResult, run_tool
+from tools._shared.proc import (
+    ProcessRunner,
+    ToolExecutionError,
+    ToolRunResult,
+    get_process_runner,
+    run_tool,
+    set_process_runner,
+)
 from tools._shared.schema import get_schema_path, validate_tools_payload
 from tools._shared.settings import SettingsError, ToolRuntimeSettings, get_runtime_settings
 from tools._shared.validation import (
@@ -51,6 +59,7 @@ __all__ = [
     "CliFileStatus",
     "CliStatus",
     "ProblemDetailsDict",
+    "ProcessRunner",
     "SettingsError",
     "StructuredLoggerAdapter",
     "ToolExecutionError",
@@ -62,6 +71,7 @@ __all__ = [
     "build_schema_problem_details",
     "build_tool_problem_details",
     "get_logger",
+    "get_process_runner",
     "get_runtime_settings",
     "get_schema_path",
     "new_cli_envelope",
@@ -73,6 +83,8 @@ __all__ = [
     "require_file",
     "resolve_path",
     "run_tool",
+    "set_process_runner",
+    "tool_digest_mismatch_problem_details",
     "tool_disallowed_problem_details",
     "tool_failure_problem_details",
     "tool_missing_problem_details",

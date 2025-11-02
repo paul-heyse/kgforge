@@ -536,7 +536,7 @@ def api(port: int = 8080) -> None:
         Port to bind to. Defaults to 8080.
     """
     try:
-        import uvicorn  # noqa: PLC0415 - optional dependency, only needed when running API
+        uvicorn_module = importlib.import_module("uvicorn")
     except ImportError as exc:
         typer.echo(
             "uvicorn is required to run the API server",
@@ -544,7 +544,7 @@ def api(port: int = 8080) -> None:
         )
         raise typer.Exit(code=1) from exc
 
-    uvicorn.run("search_api.app:app", host="127.0.0.1", port=port, reload=False)
+    uvicorn_module.run("search_api.app:app", host="127.0.0.1", port=port, reload=False)
 
 
 def _run_e2e_flow() -> list[str]:

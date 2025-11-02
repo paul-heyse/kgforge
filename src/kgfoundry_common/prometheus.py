@@ -26,7 +26,8 @@ Fallback behaviour (no Prometheus import required):
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Protocol, cast
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, NoReturn, Protocol, cast, overload
 
 __all__ = [
     "HAVE_PROMETHEUS",
@@ -34,6 +35,7 @@ __all__ = [
     "CounterLike",
     "GaugeLike",
     "HistogramLike",
+    "HistogramParams",
     "build_counter",
     "build_gauge",
     "build_histogram",
@@ -153,17 +155,19 @@ class _GaugeConstructor(Protocol):
 
 
 class _HistogramConstructor(Protocol):
-    def __call__(  # noqa: PLR0913
-        self,
-        name: str,
-        documentation: str,
-        labelnames: Sequence[str] | None = ...,
-        *,
-        registry: CollectorRegistry | None = ...,
-        buckets: Sequence[float] | None = ...,
-        unit: str | None = ...,
-        **kwargs: object,
-    ) -> HistogramLike: ...
+    def __call__(self, *args: object, **kwargs: object) -> HistogramLike: ...
+
+
+@dataclass(slots=True)
+class HistogramParams:
+    """Configuration for building a histogram metric."""
+
+    name: str
+    documentation: str
+    labelnames: Sequence[str] | None = None
+    buckets: Sequence[float] | None = None
+    registry: CollectorRegistry | None = None
+    unit: str | None = None
 
 
 class _NoopCounter:
@@ -244,6 +248,14 @@ def _labels_or_default(labelnames: Sequence[str] | None) -> Sequence[str]:
     return tuple(labelnames) if labelnames is not None else ()
 
 
+_MAX_HISTOGRAM_POSITIONAL_ARGS = 2
+_DOCUMENTATION_POSITION = 1
+
+
+def _histogram_type_error(message: str) -> NoReturn:
+    raise TypeError(message)
+
+
 def build_counter(
     name: str,
     documentation: str,
@@ -300,35 +312,83 @@ def build_gauge(
     )
 
 
-def build_histogram(  # noqa: PLR0913
+def _coerce_histogram_params(*args: object, **kwargs: object) -> HistogramParams:
+    """Normalize legacy histogram arguments into a :class:`HistogramParams` instance."""
+    if args and isinstance(args[0], HistogramParams):
+        if len(args) > 1 or kwargs:
+            _histogram_type_error("build_histogram() received unexpected extra arguments")
+        return args[0]
+
+    if not args:
+        _histogram_type_error("build_histogram() missing required argument: 'name'")
+
+    if len(args) > _MAX_HISTOGRAM_POSITIONAL_ARGS:
+        _histogram_type_error("build_histogram() received too many positional arguments")
+
+    name = str(args[0])
+    if len(args) > _DOCUMENTATION_POSITION:
+        documentation = str(args[_DOCUMENTATION_POSITION])
+    else:
+        doc = kwargs.pop("documentation", None)
+        if doc is None:
+            _histogram_type_error("build_histogram() missing required argument: 'documentation'")
+        documentation = str(doc)
+
+    labelnames = kwargs.pop("labelnames", None)
+    buckets = kwargs.pop("buckets", None)
+    registry = kwargs.pop("registry", None)
+    unit = kwargs.pop("unit", None)
+    if kwargs:
+        unexpected = ", ".join(sorted(kwargs))
+        _histogram_type_error(f"build_histogram() got unexpected keyword arguments: {unexpected}")
+
+    return HistogramParams(
+        name=name,
+        documentation=documentation,
+        labelnames=cast(Sequence[str] | None, labelnames),
+        buckets=cast(Sequence[float] | None, buckets),
+        registry=cast(CollectorRegistry | None, registry),
+        unit=None if unit is None else str(unit),
+    )
+
+
+@overload
+def build_histogram(params: HistogramParams) -> HistogramLike: ...
+
+
+@overload
+def build_histogram(
     name: str,
     documentation: str,
-    labelnames: Sequence[str] | None = None,
+    labelnames: Sequence[str] | None = ...,
     *,
-    buckets: Sequence[float] | None = None,
-    registry: CollectorRegistry | None = None,
-    unit: str | None = None,
-) -> HistogramLike:
+    buckets: Sequence[float] | None = ...,
+    registry: CollectorRegistry | None = ...,
+    unit: str | None = ...,
+) -> HistogramLike: ...
+
+
+def build_histogram(*args: object, **kwargs: object) -> HistogramLike:
     """Return a histogram metric or a no-op stub."""
     constructor = _HISTOGRAM_CONSTRUCTOR
     if constructor is None:
         return _NoopHistogram()
 
-    if buckets is not None:
-        return constructor(
-            name,
-            documentation,
-            _labels_or_default(labelnames),
-            registry=registry,
-            buckets=tuple(buckets),
-            unit=unit,
-        )
+    params = _coerce_histogram_params(*args, **kwargs)
+    label_tuple = _labels_or_default(params.labelnames)
+    call_kwargs: dict[str, object] = {}
+    if params.registry is not None:
+        call_kwargs["registry"] = params.registry
+    if params.unit is not None:
+        call_kwargs["unit"] = params.unit
+    if params.buckets is not None:
+        call_kwargs["buckets"] = tuple(params.buckets)
+
     return constructor(
-        name,
-        documentation,
-        _labels_or_default(labelnames),
-        registry=registry,
-        unit=unit,
+        params.name,
+        params.documentation,
+        label_tuple,
+        **call_kwargs,
     )
 
 

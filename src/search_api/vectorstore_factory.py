@@ -326,8 +326,8 @@ class FaissVectorstoreFactory:
         _observe_metrics(operation, "success", elapsed)
         return adapter
 
-    def save_index(  # noqa: PLR6301 - instance method for factory lifecycle management
-        self,
+    @staticmethod
+    def save_index(
         adapter: FaissAdapter,
         index_uri: str,
         idmap_uri: str | None = None,

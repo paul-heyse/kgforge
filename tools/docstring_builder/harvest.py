@@ -369,29 +369,27 @@ class _IndexCollector(cst.CSTTransformer):
         pieces = [self.module_name, *self.namespace, name]
         return ".".join(piece for piece in pieces if piece)
 
-    def visit_ClassDef(self, node: cst.ClassDef) -> bool:  # noqa: N802
-        qname = self._qualify(node.name.value)
-        self.index[qname] = node
+    def visit_classdef(self, node: cst.ClassDef) -> bool:
         self.namespace.append(node.name.value)
+        qualified = self._qualify(node.name.value)
+        self.index[qualified] = node
         return True
 
-    def leave_ClassDef(  # noqa: N802
-        self, original_node: cst.ClassDef, updated_node: cst.ClassDef
-    ) -> cst.ClassDef:
-        del original_node
+    def leave_classdef(
+        self, _original_node: cst.ClassDef, updated_node: cst.ClassDef
+    ) -> cst.CSTNode:
         self.namespace.pop()
         return updated_node
 
-    def visit_FunctionDef(self, node: cst.FunctionDef) -> bool:  # noqa: N802
-        qname = self._qualify(node.name.value)
-        self.index[qname] = node
+    def visit_functiondef(self, node: cst.FunctionDef) -> bool:
         self.namespace.append(node.name.value)
+        qualified = self._qualify(node.name.value)
+        self.index[qualified] = node
         return True
 
-    def leave_FunctionDef(  # noqa: N802
-        self, original_node: cst.FunctionDef, updated_node: cst.FunctionDef
-    ) -> cst.FunctionDef:
-        del original_node
+    def leave_functiondef(
+        self, _original_node: cst.FunctionDef, updated_node: cst.FunctionDef
+    ) -> cst.CSTNode:
         self.namespace.pop()
         return updated_node
 

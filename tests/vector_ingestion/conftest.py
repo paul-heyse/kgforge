@@ -33,10 +33,7 @@ def _vector_schema_path() -> Path:
     return _VECTOR_SCHEMA_PATH
 
 
-vector_schema_path = cast(
-    "Callable[[], Path]",
-    pytest.fixture(scope="session")(_vector_schema_path),
-)
+vector_schema_path: Callable[[], Path] = pytest.fixture(scope="session")(_vector_schema_path)
 
 
 def _vector_schema(vector_schema_path: Path) -> dict[str, JsonValue]:
@@ -44,9 +41,8 @@ def _vector_schema(vector_schema_path: Path) -> dict[str, JsonValue]:
     return load_schema(vector_schema_path)
 
 
-vector_schema = cast(
-    "Callable[[Path], dict[str, JsonValue]]",
-    pytest.fixture(scope="session")(_vector_schema),
+vector_schema: Callable[[Path], dict[str, JsonValue]] = pytest.fixture(scope="session")(
+    _vector_schema
 )
 
 
@@ -55,10 +51,9 @@ def _vector_validator(vector_schema: dict[str, JsonValue]) -> Draft202012Validat
     return Draft202012Validator(vector_schema)
 
 
-vector_validator = cast(
-    "Callable[[dict[str, JsonValue]], Draft202012Validator]",
-    pytest.fixture(scope="session")(_vector_validator),
-)
+vector_validator: Callable[[dict[str, JsonValue]], Draft202012Validator] = pytest.fixture(
+    scope="session"
+)(_vector_validator)
 
 
 def _canonical_vector_payload() -> VectorPayload:
@@ -69,10 +64,7 @@ def _canonical_vector_payload() -> VectorPayload:
     ]
 
 
-canonical_vector_payload = cast(
-    "Callable[[], VectorPayload]",
-    pytest.fixture(_canonical_vector_payload),
-)
+canonical_vector_payload: Callable[[], VectorPayload] = pytest.fixture(_canonical_vector_payload)
 
 
 def _inconsistent_dimension_payload() -> VectorPayload:
@@ -83,9 +75,8 @@ def _inconsistent_dimension_payload() -> VectorPayload:
     ]
 
 
-inconsistent_dimension_payload = cast(
-    "Callable[[], VectorPayload]",
-    pytest.fixture(_inconsistent_dimension_payload),
+inconsistent_dimension_payload: Callable[[], VectorPayload] = pytest.fixture(
+    _inconsistent_dimension_payload
 )
 
 
@@ -96,21 +87,17 @@ def _non_numeric_payload() -> VectorPayload:
     ]
 
 
-non_numeric_payload = cast(
-    "Callable[[], VectorPayload]",
-    pytest.fixture(_non_numeric_payload),
-)
+non_numeric_payload: Callable[[], VectorPayload] = pytest.fixture(_non_numeric_payload)
 
 
 def _canonical_vector_matrix(canonical_vector_payload: VectorPayload) -> VectorMatrix:
     """Return a numpy matrix representation of the canonical payload."""
-    vectors = [cast("Sequence[float]", record["vector"]) for record in canonical_vector_payload]
+    vectors = [cast(Sequence[float], record["vector"]) for record in canonical_vector_payload]
     return np.asarray(vectors, dtype=np.float32)
 
 
-canonical_vector_matrix = cast(
-    "Callable[[VectorPayload], VectorMatrix]",
-    pytest.fixture(_canonical_vector_matrix),
+canonical_vector_matrix: Callable[[VectorPayload], VectorMatrix] = pytest.fixture(
+    _canonical_vector_matrix
 )
 
 
@@ -122,10 +109,7 @@ def _deterministic_uuid() -> UUID:
     return _DETERMINISTIC_UUID
 
 
-deterministic_uuid = cast(
-    "Callable[[], UUID]",
-    pytest.fixture(_deterministic_uuid),
-)
+deterministic_uuid: Callable[[], UUID] = pytest.fixture(_deterministic_uuid)
 
 
 def _correlation_id_hex(deterministic_uuid: UUID) -> str:
@@ -133,10 +117,7 @@ def _correlation_id_hex(deterministic_uuid: UUID) -> str:
     return deterministic_uuid.hex
 
 
-correlation_id_hex = cast(
-    "Callable[[UUID], str]",
-    pytest.fixture(_correlation_id_hex),
-)
+correlation_id_hex: Callable[[UUID], str] = pytest.fixture(_correlation_id_hex)
 
 
 def _deterministic_uuid_factory(deterministic_uuid: UUID) -> Callable[[], UUID]:
@@ -148,7 +129,6 @@ def _deterministic_uuid_factory(deterministic_uuid: UUID) -> Callable[[], UUID]:
     return _factory
 
 
-deterministic_uuid_factory = cast(
-    "Callable[[UUID], Callable[[], UUID]]",
-    pytest.fixture(_deterministic_uuid_factory),
+deterministic_uuid_factory: Callable[[UUID], Callable[[], UUID]] = pytest.fixture(
+    _deterministic_uuid_factory
 )
