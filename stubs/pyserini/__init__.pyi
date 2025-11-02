@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from types import ModuleType
+from pyserini import index as index
+from pyserini import search as search
 
 __all__ = ["index", "search"]
-
-index: ModuleType = ...
-search: ModuleType = ...

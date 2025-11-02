@@ -77,8 +77,7 @@ def _coerce_error_config(
         if legacy_kwargs:
             unexpected = ", ".join(sorted(legacy_kwargs))
             message = (
-                "KgFoundryError received both 'config' and legacy keyword arguments: "
-                f"{unexpected}"
+                f"KgFoundryError received both 'config' and legacy keyword arguments: {unexpected}"
             )
             raise TypeError(message)
         return config
@@ -220,7 +219,9 @@ class KgFoundryError(Exception):
 
         Examples
         --------
-        >>> error = KgFoundryError("Not found", code=ErrorCode.RESOURCE_UNAVAILABLE, http_status=404)
+        >>> error = KgFoundryError(
+        ...     "Not found", code=ErrorCode.RESOURCE_UNAVAILABLE, http_status=404
+        ... )
         >>> details = error.to_problem_details(instance="/api/resource/123")
         >>> assert details["type"] == "https://kgfoundry.dev/problems/resource-unavailable"
         >>> assert details["status"] == 404

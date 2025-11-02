@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from types import ModuleType
+from . import lucene as lucene
 
 __all__ = ["lucene"]
-
-lucene: ModuleType = ...

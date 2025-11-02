@@ -33,8 +33,10 @@ from kgfoundry_common.numpy_typing import (
     FloatMatrix,
     FloatVector,
     IntVector,
-    normalize_l2,
     topk_indices,
+)
+from kgfoundry_common.numpy_typing import (
+    normalize_l2 as _normalize_l2_array,
 )
 from kgfoundry_common.observability import MetricsProvider
 from orchestration.safe_pickle import dump as safe_pickle_dump
@@ -44,6 +46,7 @@ from search_api.types import (
     FaissModuleProtocol,
     IndexArray,
     VectorArray,
+    wrap_faiss_module,
 )
 
 logger = get_logger(__name__)
@@ -830,8 +833,8 @@ class _SimpleFaissModule:
     """
 
     # FAISS metric constants
-    METRIC_INNER_PRODUCT: int = 1
-    METRIC_L2: int = 0
+    metric_inner_product: int = 1
+    metric_l2: int = 0
 
     @staticmethod
     def _create_flat_index(dimension: int) -> _SimpleFaissIndex:
@@ -850,7 +853,7 @@ class _SimpleFaissModule:
         raise AgentCatalogSearchError(message)
 
     @staticmethod
-    def IndexFlatIP(dimension: int) -> FaissIndexProtocol:  # noqa: N802
+    def index_flat_ip(dimension: int) -> FaissIndexProtocol:
         """Create a flat inner-product index.
 
         <!-- auto:docstring-builder v1 -->
@@ -895,7 +898,7 @@ class _SimpleFaissModule:
         return cast(FaissIndexProtocol, _SimpleFaissModule._create_flat_index(dimension))
 
     @staticmethod
-    def IndexIDMap2(index: FaissIndexProtocol) -> FaissIndexProtocol:  # noqa: N802
+    def index_id_map2(index: FaissIndexProtocol) -> FaissIndexProtocol:
         """Wrap an index with 64-bit ID mapping.
 
         <!-- auto:docstring-builder v1 -->
@@ -988,7 +991,7 @@ class _SimpleFaissModule:
         return cast(FaissIndexProtocol, fallback)
 
     @staticmethod
-    def normalize_L2(vectors: VectorArray) -> None:  # noqa: N802
+    def normalize_l2(vectors: VectorArray) -> None:
         """Normalize vectors to unit length in-place.
 
         <!-- auto:docstring-builder v1 -->
@@ -998,7 +1001,7 @@ class _SimpleFaissModule:
         vectors : tuple[int, ...] | np.float32
             Array to normalize (modified in-place).
         """
-        normalized = normalize_l2(np.asarray(vectors, dtype=np.float32, order="C"), axis=1)
+        normalized = _normalize_l2_array(np.asarray(vectors, dtype=np.float32, order="C"), axis=1)
         np.copyto(vectors, normalized)
 
 
@@ -1032,7 +1035,7 @@ def _simple_faiss_module() -> FaissModuleProtocol:
     FaissModuleProtocol
         Describe return value.
     """
-    return cast(FaissModuleProtocol, _SimpleFaissModule())
+    return _simple_faiss_module()
 
 
 def load_faiss(purpose: str) -> FaissModuleProtocol:
@@ -1066,7 +1069,11 @@ def load_faiss(purpose: str) -> FaissModuleProtocol:
         except ImportError as exc:  # pragma: no cover - runtime guard
             failures.append(f"{module_name}: {exc}")
             continue
-        if hasattr(module, "IndexFlatIP") and hasattr(module, "write_index"):
+        has_index_builder = hasattr(module, "IndexFlatIP") or hasattr(module, "index_flat_ip")
+        has_id_map = hasattr(module, "IndexIDMap2") or hasattr(module, "index_id_map2")
+        has_writer = hasattr(module, "write_index")
+        if has_index_builder and has_id_map and has_writer:
+            adapted = wrap_faiss_module(module)
             logger.debug(
                 "Using FAISS module '%s' for %s",
                 module_name,
@@ -1078,7 +1085,7 @@ def load_faiss(purpose: str) -> FaissModuleProtocol:
                     "purpose": purpose,
                 },
             )
-            return cast(FaissModuleProtocol, module)
+            return adapted
         failures.append(f"{module_name}: missing required attributes")
 
     failure_text = "; ".join(failures) if failures else "no candidates attempted"
@@ -1100,7 +1107,7 @@ def load_faiss(purpose: str) -> FaissModuleProtocol:
             "failures": failures,
         },
     )
-    return _simple_faiss_module()
+    return wrap_faiss_module(_SimpleFaissModule())
 
 
 def _tokenize(text: str) -> list[str]:
@@ -1788,7 +1795,7 @@ def compute_vector_scores(
     """
     inputs = _prepare_vector_search_inputs(options, context)
     query_embedding = _encode_query(inputs.model, query, batch_size=inputs.batch_size)
-    query_normalized = normalize_l2(query_embedding, axis=1)
+    query_normalized = _normalize_l2_array(query_embedding, axis=1)
     distances, indices = inputs.index.search(query_normalized, inputs.candidate_limit)
     return _scores_from_indices(distances, indices, inputs.row_lookup)
 

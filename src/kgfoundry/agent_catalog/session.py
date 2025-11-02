@@ -16,7 +16,6 @@ high-level API for invoking catalog operations.
 from __future__ import annotations
 
 import json
-import subprocess  # noqa: S404 - trusted command executed without shell
 import sys
 from collections.abc import Iterable
 from pathlib import Path
@@ -27,6 +26,7 @@ from typing import cast
 from kgfoundry_common.errors import CatalogSessionError
 from kgfoundry_common.logging import get_logger, with_fields
 from kgfoundry_common.problem_details import JsonValue
+from kgfoundry_common.subprocess_utils import TextProcess, TimeoutExpired, spawn_text_process
 
 JsonObject = dict[str, JsonValue]
 
@@ -88,7 +88,7 @@ class CatalogSession:
             self._command.extend(["--catalog", str(catalog)])
         if repo_root is not None:
             self._command.extend(["--repo-root", str(repo_root)])
-        self._process: subprocess.Popen[str] | None = None
+        self._process: TextProcess | None = None
         self._lock = Lock()
         self._next_id = 1
 
@@ -109,7 +109,7 @@ class CatalogSession:
             "tools.agent_catalog.catalogctl_mcp",
         ]
 
-    def _ensure_process(self) -> subprocess.Popen[str]:
+    def _ensure_process(self) -> TextProcess:
         """Spawn the stdio server process if required.
 
         <!-- auto:docstring-builder v1 -->
@@ -125,13 +125,7 @@ class CatalogSession:
             ) as log_adapter:
                 log_adapter.debug("Starting catalog session")
                 try:
-                    self._process = subprocess.Popen(  # noqa: S603 - trusted command
-                        self._command,
-                        stdin=subprocess.PIPE,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
-                        text=True,
-                    )
+                    self._process = spawn_text_process(self._command)
                     log_adapter.info("Session spawned successfully", extra={"status": "success"})
                 except OSError as exc:
                     log_adapter.exception("Failed to spawn session", exc_info=exc)
@@ -144,7 +138,7 @@ class CatalogSession:
         return self._process
 
     @staticmethod
-    def _write_payload(process: subprocess.Popen[str], payload: JsonObject) -> None:
+    def _write_payload(process: Popen[str], payload: JsonObject) -> None:
         """Write a JSON payload to the process stdin.
 
         <!-- auto:docstring-builder v1 -->
@@ -164,7 +158,7 @@ class CatalogSession:
         stdin.flush()
 
     @staticmethod
-    def _read_response(process: subprocess.Popen[str]) -> JsonObject:
+    def _read_response(process: Popen[str]) -> JsonObject:
         """Read and decode a JSON-RPC response from stdout.
 
         <!-- auto:docstring-builder v1 -->
@@ -579,7 +573,7 @@ class CatalogSession:
         process.terminate()
         try:
             process.wait(timeout=2)
-        except subprocess.TimeoutExpired:  # pragma: no cover - defensive guard
+        except TimeoutExpired:  # pragma: no cover - defensive guard
             process.kill()
         self._process = None
 

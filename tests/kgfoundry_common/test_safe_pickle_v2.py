@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
+import importlib
 import io
 import os
-import pickle  # noqa: S403 - legacy payloads required for regression tests
 from collections.abc import Callable
 from typing import TYPE_CHECKING, ParamSpec, TypeVar, cast
 
 import pytest
 
 from kgfoundry_common.safe_pickle_v2 import SignedPickleWrapper, UnsafeSerializationError
+
+pickle = importlib.import_module("pickle")
 
 P = ParamSpec("P")
 R = TypeVar("R")

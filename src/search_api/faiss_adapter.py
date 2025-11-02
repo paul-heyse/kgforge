@@ -175,59 +175,49 @@ class FaissAdapter:
     def _resolve_config(
         cls, config: FaissAdapterConfig | None, legacy_options: dict[str, object]
     ) -> FaissAdapterConfig:
-        if config is not None and legacy_options:
-            unexpected = ", ".join(sorted(legacy_options))
-            message = (
-                "FaissAdapter received both 'config' and individual keyword options: "
-                f"{unexpected}"
-            )
-            raise TypeError(message)
+        cls._ensure_config_not_mixed(config, legacy_options)
         if config is not None:
             return config
 
-        unexpected_keys = set(legacy_options) - cls._CONFIG_FIELDS
-        if unexpected_keys:
-            unexpected = ", ".join(sorted(unexpected_keys))
-            message = f"FaissAdapter got unexpected keyword arguments: {unexpected}"
-            raise TypeError(message)
-
-        base = FaissAdapterConfig()
+        cls._validate_legacy_keys(legacy_options)
         if not legacy_options:
-            return base
+            return FaissAdapterConfig()
+        return cls._config_from_legacy_options(legacy_options)
 
+    @classmethod
+    def _ensure_config_not_mixed(
+        cls, config: FaissAdapterConfig | None, legacy_options: dict[str, object]
+    ) -> None:
+        if config is None or not legacy_options:
+            return
+        unexpected = ", ".join(sorted(legacy_options))
+        message = (
+            f"FaissAdapter received both 'config' and individual keyword options: {unexpected}"
+        )
+        raise TypeError(message)
+
+    @classmethod
+    def _validate_legacy_keys(cls, legacy_options: dict[str, object]) -> None:
+        unexpected_keys = set(legacy_options) - cls._CONFIG_FIELDS
+        if not unexpected_keys:
+            return
+        unexpected = ", ".join(sorted(unexpected_keys))
+        message = f"FaissAdapter got unexpected keyword arguments: {unexpected}"
+        raise TypeError(message)
+
+    @classmethod
+    def _config_from_legacy_options(cls, legacy_options: dict[str, object]) -> FaissAdapterConfig:
+        base = FaissAdapterConfig()
         options = {
-            field: legacy_options[field]
-            for field in cls._CONFIG_FIELDS
-            if field in legacy_options
+            field: legacy_options[field] for field in cls._CONFIG_FIELDS if field in legacy_options
         }
-        factory = options.get("factory", base.factory)
-        if not isinstance(factory, str):
-            raise TypeError("factory must be a string")
-
-        metric = options.get("metric", base.metric)
-        if not isinstance(metric, str):
-            raise TypeError("metric must be a string")
-
-        nprobe = options.get("nprobe", base.nprobe)
-        if not isinstance(nprobe, int):
-            raise TypeError("nprobe must be an integer")
-
-        use_gpu = options.get("use_gpu", base.use_gpu)
-        if not isinstance(use_gpu, bool):
-            raise TypeError("use_gpu must be a boolean")
-
-        use_cuvs = options.get("use_cuvs", base.use_cuvs)
-        if not isinstance(use_cuvs, bool):
-            raise TypeError("use_cuvs must be a boolean")
-
+        factory = cls._coerce_str(options.get("factory", base.factory), "factory")
+        metric = cls._coerce_str(options.get("metric", base.metric), "metric")
+        nprobe = cls._coerce_int(options.get("nprobe", base.nprobe), "nprobe")
+        use_gpu = cls._coerce_bool(options.get("use_gpu", base.use_gpu), "use_gpu")
+        use_cuvs = cls._coerce_bool(options.get("use_cuvs", base.use_cuvs), "use_cuvs")
         gpu_devices_option = options.get("gpu_devices", base.gpu_devices)
-        if gpu_devices_option is not None:
-            if not isinstance(gpu_devices_option, Sequence):
-                raise TypeError("gpu_devices must be a sequence of integers or None")
-            gpu_devices = tuple(int(device) for device in gpu_devices_option)
-        else:
-            gpu_devices = None
-
+        gpu_devices = cls._coerce_gpu_devices(gpu_devices_option)
         return FaissAdapterConfig(
             factory=factory,
             metric=metric,
@@ -236,6 +226,36 @@ class FaissAdapter:
             use_cuvs=use_cuvs,
             gpu_devices=gpu_devices,
         )
+
+    @staticmethod
+    def _coerce_str(value: object, name: str) -> str:
+        if isinstance(value, str):
+            return value
+        message = f"{name} must be a string"
+        raise TypeError(message)
+
+    @staticmethod
+    def _coerce_int(value: object, name: str) -> int:
+        if isinstance(value, int):
+            return value
+        message = f"{name} must be an integer"
+        raise TypeError(message)
+
+    @staticmethod
+    def _coerce_bool(value: object, name: str) -> bool:
+        if isinstance(value, bool):
+            return value
+        message = f"{name} must be a boolean"
+        raise TypeError(message)
+
+    @staticmethod
+    def _coerce_gpu_devices(value: object) -> tuple[int, ...] | None:
+        if value is None:
+            return None
+        if not isinstance(value, Sequence):
+            message = "gpu_devices must be a sequence of integers or None"
+            raise TypeError(message)
+        return tuple(int(device) for device in value)
 
     def build(self) -> None:
         """Build or rebuild the FAISS index from persisted vectors.
@@ -264,7 +284,7 @@ class FaissAdapter:
 
             cpu_index = faiss_module.index_factory(dimension, factory, metric_type)
 
-            faiss_module.normalize_L2(vectors.matrix)
+            faiss_module.normalize_l2(vectors.matrix)
             cpu_index.train(vectors.matrix)
 
             id_array = cast(IntVector, np.arange(len(vectors.ids), dtype=np.int64))
@@ -490,9 +510,9 @@ class FaissAdapter:
         """
         metric = self.metric.lower()
         if metric == "ip":
-            return module.METRIC_INNER_PRODUCT
+            return module.metric_inner_product
         if metric == "l2":
-            return module.METRIC_L2
+            return module.metric_l2
         msg = f"Unsupported FAISS metric: {self.metric}"
         raise ValueError(msg)
 

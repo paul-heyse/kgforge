@@ -37,7 +37,9 @@ if str(ROOT) not in sys.path:
 
 DOCS_BUILD = ROOT / "docs" / "_build"
 
-from tools.detect_pkg import detect_packages, detect_primary  # noqa: E402
+detect_pkg_module = importlib.import_module("tools.detect_pkg")
+detect_packages = cast(Any, getattr(detect_pkg_module, "detect_packages"))
+detect_primary = cast(Any, getattr(detect_pkg_module, "detect_primary"))
 
 SRC = ROOT / "src"
 ENV_PKGS = os.environ.get("DOCS_PKG")

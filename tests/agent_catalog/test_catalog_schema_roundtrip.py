@@ -10,11 +10,12 @@ Tests verify:
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any
 
 import pytest
 
+from kgfoundry_common.problem_details import ProblemDetailsDict
 from kgfoundry_common.types import JsonValue
 
 
@@ -129,7 +130,7 @@ class TestProblemDetailsValidation:
 
     def test_problem_details_with_extensions(
         self,
-        problem_details_loader: Any,  # noqa: ANN401 - pytest fixture typing limitation
+        problem_details_loader: Callable[[str], ProblemDetailsDict],
     ) -> None:
         """Verify Problem Details can include extension fields.
 

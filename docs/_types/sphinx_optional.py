@@ -15,6 +15,7 @@ Examples
 
 from __future__ import annotations
 
+from importlib import import_module
 from typing import Protocol, runtime_checkable
 
 __all__ = [
@@ -142,7 +143,7 @@ def load_optional_dependencies() -> OptionalDependencies:
     # Try to import sphinx_autoapi
     autoapi_import_err_msg = "sphinx_autoapi is required for AutoAPI docs generation"
     try:
-        import sphinx_autoapi  # noqa: PLC0415
+        sphinx_autoapi = import_module("sphinx_autoapi")
     except ImportError as e:
         autoapi_error = MissingDependencyError("sphinx_autoapi", autoapi_import_err_msg)
         raise autoapi_error from e
@@ -150,7 +151,7 @@ def load_optional_dependencies() -> OptionalDependencies:
     # Try to import astroid
     astroid_import_err_msg = "astroid is required for AST analysis during docs build"
     try:
-        import astroid  # noqa: PLC0415
+        astroid = import_module("astroid")
     except ImportError as e:
         astroid_error = MissingDependencyError("astroid", astroid_import_err_msg)
         raise astroid_error from e

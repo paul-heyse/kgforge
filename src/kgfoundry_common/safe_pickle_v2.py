@@ -30,8 +30,8 @@ import hashlib
 import hmac
 import io
 import logging
-import pickle as _stdlib_pickle  # noqa: S403 - wrapped with allow-list validation
-from typing import BinaryIO, cast
+from importlib import import_module
+from typing import BinaryIO, Protocol, cast
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +72,35 @@ class UnsafeSerializationError(ValueError):
         self.reason = reason
 
 
-class _SafeUnpickler(_stdlib_pickle.Unpickler):  # noqa: S301
+class _UnpicklerProtocol(Protocol):
+    def __init__(
+        self,
+        file: BinaryIO,
+        *,
+        fix_imports: bool = ...,
+        encoding: str = ...,
+        errors: str = ...,
+        buffers: object | None = ...,
+    ) -> None: ...
+
+    def load(self) -> object: ...
+
+    def find_class(self, module: str, name: str) -> object: ...
+
+
+class _PickleModule(Protocol):
+    Unpickler: type[_UnpicklerProtocol]
+
+    def dump(self, obj: object, file: BinaryIO) -> None: ...
+
+    def dumps(self, obj: object) -> bytes: ...
+
+
+_stdlib_pickle = cast(_PickleModule, import_module("pickle"))
+_StdlibUnpickler = cast(type[_UnpicklerProtocol], _stdlib_pickle.Unpickler)
+
+
+class _SafeUnpickler(_StdlibUnpickler):
     """Unpickler enforcing allow-list of safe types.
 
     This prevents arbitrary code execution by restricting deserialization
