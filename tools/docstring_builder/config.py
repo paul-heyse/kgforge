@@ -5,15 +5,11 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import tomllib
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import cast
-
-try:  # Python 3.11+
-    import tomllib
-except ModuleNotFoundError:  # pragma: no cover - fallback for environments without tomllib
-    import tomli as tomllib  # type: ignore[import-not-found, no-redef]
 
 from tools.shared.logging import get_logger
 

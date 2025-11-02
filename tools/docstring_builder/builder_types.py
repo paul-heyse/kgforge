@@ -24,9 +24,7 @@ from tools.docstring_builder.models import (
 from tools.docstring_builder.models import (
     ProblemDetails as ModelProblemDetails,
 )
-from tools.docstring_builder.models import (
-    build_problem_details as _build_model_problem_details,
-)
+from tools.shared.problem_details import build_problem_details as _build_problem_details
 
 
 class ExitStatus(enum.IntEnum):
@@ -59,12 +57,12 @@ _EXIT_TO_RUN_STATUS: dict[ExitStatus, RunStatus] = {
 }
 
 
-def _status_from_exit(status: ExitStatus) -> RunStatus:
+def status_from_exit(status: ExitStatus) -> RunStatus:
     """Translate an :class:`ExitStatus` into the CLI ``RunStatus`` enum."""
     return _EXIT_TO_RUN_STATUS.get(status, RunStatus.ERROR)
 
 
-def _status_from_label(label: str) -> RunStatus:
+def status_from_label(label: str) -> RunStatus:
     """Translate a status label string into ``RunStatus``."""
     lowered = label.lower()
     match lowered:
@@ -80,7 +78,7 @@ def _status_from_label(label: str) -> RunStatus:
             return RunStatus.ERROR
 
 
-def _http_status_for_exit(status: ExitStatus) -> int:
+def http_status_for_exit(status: ExitStatus) -> int:
     """Map an :class:`ExitStatus` to an HTTP Problem Details status."""
     match status:
         case ExitStatus.SUCCESS:
@@ -137,18 +135,19 @@ class DocstringBuildResult:
 
 def build_problem_details(
     status: ExitStatus,
-    command: str,
-    subcommand: str,
+    request: DocstringBuildRequest,
     detail: str,
     *,
     instance: str | None = None,
     errors: Sequence[ErrorReport] | None = None,
 ) -> ModelProblemDetails:
     """Create an RFC 9457 Problem Details payload for CLI failures."""
-    problem_dict = _build_model_problem_details(
+    command = request.command or "unknown"
+    subcommand = request.invoked_subcommand or request.subcommand or command
+    problem_dict = _build_problem_details(
         type="https://kgfoundry.dev/problems/docbuilder/run-failed",
         title="Docstring builder run failed",
-        status=_http_status_for_exit(status),
+        status=http_status_for_exit(status),
         detail=detail,
         instance=instance or "",
         extensions=None,
@@ -170,8 +169,8 @@ __all__ = [
     "DocstringBuildRequest",
     "DocstringBuildResult",
     "ExitStatus",
-    "_http_status_for_exit",
-    "_status_from_exit",
-    "_status_from_label",
     "build_problem_details",
+    "http_status_for_exit",
+    "status_from_exit",
+    "status_from_label",
 ]

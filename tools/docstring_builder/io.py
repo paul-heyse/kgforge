@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Iterable, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 
 from tools.docstring_builder.config import BuilderConfig
@@ -26,6 +27,16 @@ DEFAULT_IGNORE_PATTERNS: list[str] = [
 
 class InvalidPathError(ValueError):
     """Raised when a user-supplied path falls outside the allowed workspace."""
+
+
+@dataclass(slots=True)
+class SelectionCriteria:
+    """Selection filters for docstring builder file discovery."""
+
+    module: str | None = None
+    since: str | None = None
+    changed_only: bool = False
+    explicit_paths: Sequence[str] | None = None
 
 
 def resolve_ignore_patterns(config: BuilderConfig) -> list[str]:
@@ -151,19 +162,15 @@ def default_since_revision(*, repo_root: Path = REPO_ROOT) -> str | None:
     return None
 
 
-def select_files(
-    config: BuilderConfig,
+def _resolve_explicit_paths(
+    explicit_paths: Sequence[str],
     *,
-    module: str | None = None,
-    since: str | None = None,
-    changed_only: bool = False,
-    explicit_paths: Sequence[str] | None = None,
-    repo_root: Path = REPO_ROOT,
+    repo_root: Path,
 ) -> list[Path]:
-    """Return the set of candidate files based on CLI-style selection options."""
-    if explicit_paths:
-        return [normalize_input_path(raw, repo_root=repo_root) for raw in explicit_paths]
+    return [normalize_input_path(raw, repo_root=repo_root) for raw in explicit_paths]
 
+
+def _discover_target_files(config: BuilderConfig, *, repo_root: Path) -> list[Path]:
     files: list[Path] = []
     for path in iter_target_files(config, repo_root):
         try:
@@ -178,29 +185,71 @@ def select_files(
         if should_ignore(resolved, config, repo_root=repo_root):
             continue
         files.append(resolved)
+    return files
 
-    if module:
-        files = [
-            candidate
-            for candidate in files
-            if module_name_from_path(candidate, repo_root=repo_root).startswith(module)
-        ]
-    if since:
-        changed = set(changed_files_since(since, repo_root=repo_root))
-        files = [path for path in files if str(path.relative_to(repo_root)) in changed]
-    candidates = [
-        file_path
-        for file_path in files
-        if not should_ignore(file_path, config, repo_root=repo_root)
+
+def _filter_by_module(
+    files: Iterable[Path],
+    module: str | None,
+    *,
+    repo_root: Path,
+) -> list[Path]:
+    if not module:
+        return list(files)
+    return [
+        candidate
+        for candidate in files
+        if module_name_from_path(candidate, repo_root=repo_root).startswith(module)
     ]
-    if changed_only or since:
-        expanded: dict[Path, None] = {candidate.resolve(): None for candidate in candidates}
-        for candidate in list(expanded.keys()):
-            for dependent in dependents_for(candidate):
-                if not should_ignore(dependent, config, repo_root=repo_root):
-                    expanded.setdefault(dependent, None)
-        candidates = sorted(expanded.keys())
-    return candidates
+
+
+def _filter_by_revision(
+    files: Iterable[Path],
+    since: str | None,
+    *,
+    repo_root: Path,
+) -> list[Path]:
+    if not since:
+        return list(files)
+    changed = set(changed_files_since(since, repo_root=repo_root))
+    if not changed:
+        return []
+    return [path for path in files if str(path.relative_to(repo_root)) in changed]
+
+
+def _expand_dependencies(
+    candidates: Iterable[Path],
+    config: BuilderConfig,
+    *,
+    repo_root: Path,
+) -> list[Path]:
+    expanded: dict[Path, None] = {candidate.resolve(): None for candidate in candidates}
+    for candidate in list(expanded.keys()):
+        for dependent in dependents_for(candidate):
+            if not should_ignore(dependent, config, repo_root=repo_root):
+                expanded.setdefault(dependent, None)
+    return sorted(expanded.keys())
+
+
+def select_files(
+    config: BuilderConfig,
+    criteria: SelectionCriteria | None = None,
+    *,
+    repo_root: Path = REPO_ROOT,
+) -> list[Path]:
+    """Return the set of candidate files based on CLI-style selection options."""
+    options = criteria or SelectionCriteria()
+    if options.explicit_paths:
+        return _resolve_explicit_paths(options.explicit_paths, repo_root=repo_root)
+
+    files = _discover_target_files(config, repo_root=repo_root)
+    filtered = _filter_by_module(files, options.module, repo_root=repo_root)
+    filtered = _filter_by_revision(filtered, options.since, repo_root=repo_root)
+
+    if options.changed_only or options.since:
+        return _expand_dependencies(filtered, config, repo_root=repo_root)
+
+    return sorted(filtered)
 
 
 def hash_file(path: Path) -> str:
@@ -253,6 +302,7 @@ def read_baseline_version(baseline: str, path: Path, *, repo_root: Path = REPO_R
 __all__ = [
     "DEFAULT_IGNORE_PATTERNS",
     "InvalidPathError",
+    "SelectionCriteria",
     "changed_files_since",
     "default_since_revision",
     "dependents_for",

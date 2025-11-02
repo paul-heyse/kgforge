@@ -85,8 +85,6 @@ class SearchOptionsOverrides(TypedDict, total=False):
     alpha: float
     candidate_pool: int
     batch_size: int
-    embedding_model: str
-    model_loader: Callable[[str], "EmbeddingModelProtocol"]
 
 
 class SearchDocumentPayload(TypedDict):
@@ -109,6 +107,16 @@ class SearchDocumentPayload(TypedDict):
     anchor_end: int | None
     text: str
     tokens: collections.Counter[str]
+    row: int
+
+
+class SearchDocumentOverrides(TypedDict, total=False):
+    stability: str | None
+    deprecated: bool
+    summary: str | None
+    docstring: str | None
+    anchor_start: int | None
+    anchor_end: int | None
     row: int
 
 
@@ -343,9 +351,7 @@ def _validate_facets(facets: Mapping[str, str]) -> None:
     invalid_keys = set(facets.keys()) - _ALLOWED_FACET_KEYS
     if not invalid_keys:
         return
-    message = (
-        f"Invalid facet keys: {sorted(invalid_keys)}. Allowed: {sorted(_ALLOWED_FACET_KEYS)}"
-    )
+    message = f"Invalid facet keys: {sorted(invalid_keys)}. Allowed: {sorted(_ALLOWED_FACET_KEYS)}"
     raise AgentCatalogSearchError(
         message,
         context={
@@ -360,25 +366,16 @@ def build_faceted_search_options(
     facets: Mapping[str, str],
     **overrides: Unpack[SearchOptionsOverrides],
 ) -> SearchOptions:
-    """Build SearchOptions with facet filtering validation.
-
-    This helper applies strict facet key validation before construction,
-    ensuring only recognized facets are used. Useful for CLI/client search.
+    """Build `SearchOptions` with strict facet validation.
 
     Parameters
     ----------
     facets : Mapping[str, str]
         Facet filters (package, module, kind, stability).
-    alpha : float | None, optional
-        Hybrid search weighting. Defaults to 0.6.
-    candidate_pool : int | None, optional
-        Candidate pool size. Defaults to 100.
-    batch_size : int | None, optional
-        Embedding batch size. Defaults to 32.
-    embedding_model : str | None, optional
-        Embedding model name/path.
-    model_loader : Callable | None, optional
-        Model loader factory.
+    **overrides : SearchOptionsOverrides
+        Optional overrides forwarded to :func:`build_default_search_options`.
+        Supports ``alpha``, ``candidate_pool``, ``batch_size``, ``embedding_model``,
+        and ``model_loader`` keyword arguments.
 
     Returns
     -------
@@ -389,11 +386,6 @@ def build_faceted_search_options(
     ------
     AgentCatalogSearchError
         If any facet key is not in the allow-list.
-
-    Examples
-    --------
-    >>> opts = build_faceted_search_options(facets={"package": "kgfoundry", "kind": "class"})
-    >>> assert opts.facets == {"package": "kgfoundry", "kind": "class"}
     """
     # Validate facet keys against allow-list
     _validate_facets(facets)
@@ -407,64 +399,33 @@ def build_embedding_aware_search_options(
     *,
     embedding_model: str,
     model_loader: Callable[[str], EmbeddingModelProtocol],
-    alpha: float | None = None,
-    candidate_pool: int | None = None,
-    batch_size: int | None = None,
     facets: Mapping[str, str] | None = None,
+    **overrides: Unpack[SearchOptionsOverrides],
 ) -> SearchOptions:
-    """Build SearchOptions with explicit embedding model and loader.
-
-    This helper is used when vector search components must be explicitly
-    wired, ensuring no implicit None defaults for model/loader.
+    """Build `SearchOptions` with explicit embedding configuration.
 
     Parameters
     ----------
     embedding_model : str
-        Required: embedding model name/path.
+        Embedding model identifier (required).
     model_loader : Callable
-        Required: factory to load embedding models.
-    alpha : float | None, optional
-        Hybrid search weighting. Defaults to 0.6.
-    candidate_pool : int | None, optional
-        Candidate pool size. Defaults to 100.
-    batch_size : int | None, optional
-        Embedding batch size. Defaults to 32.
+        Factory callable that loads the embedding model (required).
     facets : Mapping[str, str] | None, optional
-        Optional facet filters.
+        Optional facet filters; validated when provided.
+    **overrides : SearchOptionsOverrides
+        Additional overrides forwarded to :func:`build_default_search_options`.
+        Useful for setting ``alpha``, ``candidate_pool``, or ``batch_size``.
 
     Returns
     -------
     SearchOptions
-        Fully configured options for vector-aware search.
-
-    Raises
-    ------
-    AgentCatalogSearchError
-        If facet keys are invalid.
-
-    Examples
-    --------
-    >>> def loader(name: str) -> EmbeddingModelProtocol:
-    ...     return mock_model  # In real code, load the model
-    >>> opts = build_embedding_aware_search_options(
-    ...     embedding_model="all-MiniLM-L6-v2",
-    ...     model_loader=loader,
-    ... )
-    >>> assert opts.embedding_model == "all-MiniLM-L6-v2"
-    >>> assert opts.model_loader is not None
+        Validated options with embedding awareness configured.
     """
-    overrides: SearchOptionsOverrides = {
-        "embedding_model": embedding_model,
-        "model_loader": model_loader,
-    }
-    if alpha is not None:
-        overrides["alpha"] = alpha
-    if candidate_pool is not None:
-        overrides["candidate_pool"] = candidate_pool
-    if batch_size is not None:
-        overrides["batch_size"] = batch_size
-
-    options = build_default_search_options(**overrides)
+    options = build_default_search_options(
+        embedding_model=embedding_model,
+        model_loader=model_loader,
+        **overrides,
+    )
     if facets is not None:
         _validate_facets(facets)
         options.facets = dict(facets)
@@ -478,13 +439,7 @@ def make_search_document(
     module: str,
     qname: str,
     kind: str,
-    stability: str | None = None,
-    deprecated: bool = False,
-    summary: str | None = None,
-    docstring: str | None = None,
-    anchor_start: int | None = None,
-    anchor_end: int | None = None,
-    row: int = -1,
+    **overrides: Unpack[SearchDocumentOverrides],
 ) -> SearchDocument:
     """Create a validated SearchDocument with all required fields populated.
 
@@ -508,16 +463,10 @@ def make_search_document(
         Stability level (e.g., "stable", "experimental"). Defaults to None.
     deprecated : bool, optional
         Whether the symbol is deprecated. Defaults to False.
-    summary : str | None, optional
-        One-line summary from docstring. Defaults to None.
-    docstring : str | None, optional
-        Full docstring text. Defaults to None.
-    anchor_start : int | None, optional
-        Source file start line. Defaults to None.
-    anchor_end : int | None, optional
-        Source file end line. Defaults to None.
-    row : int, optional
-        Row index in semantic embedding matrix. Defaults to -1.
+    overrides : SearchDocumentOverrides, optional
+        Additional fields such as ``summary``, ``docstring``, ``stability``,
+        ``deprecated``, anchor positions, and row index. Defaults applied when
+        keys are omitted.
 
     Returns
     -------
@@ -538,8 +487,10 @@ def make_search_document(
     >>> assert doc.package == "kgfoundry"
     """
     # Normalize and strip whitespace from string fields
-    normalized_summary = summary.strip() if summary else None
-    normalized_docstring = docstring.strip() if docstring else None
+    summary_value = overrides.get("summary")
+    docstring_value = overrides.get("docstring")
+    normalized_summary = summary_value.strip() if summary_value else None
+    normalized_docstring = docstring_value.strip() if docstring_value else None
     normalized_qname = qname.strip()
 
     # Build text for lexical search: concatenate normalized fields
@@ -561,15 +512,15 @@ def make_search_document(
         module=module,
         qname=normalized_qname,
         kind=kind,
-        stability=stability,
-        deprecated=deprecated,
+        stability=overrides.get("stability"),
+        deprecated=overrides.get("deprecated", False),
         summary=normalized_summary,
         docstring=normalized_docstring,
-        anchor_start=anchor_start,
-        anchor_end=anchor_end,
+        anchor_start=overrides.get("anchor_start"),
+        anchor_end=overrides.get("anchor_end"),
         text=normalized_text,
         tokens=tokens,
-        row=row,
+        row=overrides.get("row", -1),
     )
 
 
@@ -701,6 +652,17 @@ class VectorSearchContext:
     k: int
     candidate_ids: set[str]
     row_to_document: Mapping[int, SearchDocument]
+
+
+@dataclass(slots=True)
+class _VectorSearchInputs:
+    """Resolved components needed to perform FAISS vector search."""
+
+    model: EmbeddingModelProtocol
+    batch_size: int
+    index: FaissIndexProtocol
+    candidate_limit: int
+    row_lookup: Mapping[int, SearchDocument]
 
 
 @dataclass(slots=True)
@@ -872,6 +834,22 @@ class _SimpleFaissModule:
     METRIC_L2: int = 0
 
     @staticmethod
+    def _create_flat_index(dimension: int) -> _SimpleFaissIndex:
+        if dimension <= 0:
+            message = f"Index dimension must be positive, got {dimension}"
+            raise AgentCatalogSearchError(message)
+        return _SimpleFaissIndex(dimension)
+
+    @staticmethod
+    def _ensure_simple_index(index: FaissIndexProtocol) -> _SimpleFaissIndex:
+        if isinstance(index, _SimpleFaissIndex):
+            return index
+        message = (
+            f"Simple module can only operate on _SimpleFaissIndex instances, got {type(index)}"
+        )
+        raise AgentCatalogSearchError(message)
+
+    @staticmethod
     def IndexFlatIP(dimension: int) -> FaissIndexProtocol:  # noqa: N802
         """Create a flat inner-product index.
 
@@ -887,7 +865,7 @@ class _SimpleFaissModule:
         FaissIndexProtocol
             Flat index instance.
         """
-        return cast(FaissIndexProtocol, _SimpleFaissIndex(dimension))
+        return cast(FaissIndexProtocol, _SimpleFaissModule._create_flat_index(dimension))
 
     @staticmethod
     def index_factory(dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
@@ -914,7 +892,7 @@ class _SimpleFaissModule:
         """
         del factory_string, metric
         # Simple implementation ignores factory configuration and always returns flat index
-        return cast(FaissIndexProtocol, _SimpleFaissIndex(dimension))
+        return cast(FaissIndexProtocol, _SimpleFaissModule._create_flat_index(dimension))
 
     @staticmethod
     def IndexIDMap2(index: FaissIndexProtocol) -> FaissIndexProtocol:  # noqa: N802
@@ -934,8 +912,7 @@ class _SimpleFaissModule:
         FaissIndexProtocol
             Index with ID mapping (same instance in simple implementation).
         """
-        # Simple implementation doesn't support ID mapping, return as-is
-        return index
+        return cast(FaissIndexProtocol, _SimpleFaissModule._ensure_simple_index(index))
 
     @staticmethod
     def write_index(index: FaissIndexProtocol, path: str) -> None:
@@ -950,12 +927,10 @@ class _SimpleFaissModule:
         path : str
             File path for the persisted index.
         """
-        if not isinstance(index, _SimpleFaissIndex):
-            message = f"Simple module can only write _SimpleFaissIndex instances, got {type(index)}"
-            raise AgentCatalogSearchError(message)
+        simple_index = _SimpleFaissModule._ensure_simple_index(index)
         payload = {
-            "dimension": index.dimension,
-            "vectors": index._vectors,
+            "dimension": simple_index.dimension,
+            "vectors": simple_index._vectors,
         }
         with Path(path).open("wb") as handle:
             safe_pickle_dump(payload, handle)
@@ -1728,6 +1703,63 @@ def _encode_query(
     return np.asarray(embeddings, dtype=np.float32, order="C")
 
 
+def _extract_semantic_metadata(raw_meta: CatalogMapping) -> PrimitiveMapping:
+    return cast(
+        PrimitiveMapping,
+        {
+            key: value
+            for key, value in raw_meta.items()
+            if isinstance(value, (str, int, float, bool, type(None)))
+        },
+    )
+
+
+def _load_faiss_index(index_path: Path) -> FaissIndexProtocol:
+    module = load_faiss("vector search")
+    return module.read_index(str(index_path))
+
+
+def _prepare_vector_search_inputs(
+    options: SearchOptions,
+    context: VectorSearchContext,
+) -> _VectorSearchInputs:
+    semantic_meta = _extract_semantic_metadata(context.semantic_meta)
+    _, model = _resolve_embedding_model(options, semantic_meta)
+    batch_size = options.batch_size or _DEFAULT_BATCH_SIZE
+    index = _load_faiss_index(context.index_path)
+    return _VectorSearchInputs(
+        model=model,
+        batch_size=batch_size,
+        index=index,
+        candidate_limit=context.candidate_limit,
+        row_lookup=context.row_to_document,
+    )
+
+
+def _scores_from_indices(
+    distances: FloatMatrix,
+    indices: IntVector,
+    row_lookup: Mapping[int, SearchDocument],
+) -> dict[str, float]:
+    if distances.size == 0 or indices.size == 0:
+        return {}
+
+    query_rows = np.asarray(indices[0, :], dtype=np.int64, order="C")
+    score_rows = np.asarray(distances[0, :], dtype=np.float32, order="C")
+    row_sequence = cast(Sequence[int], query_rows.tolist())
+    score_sequence = cast(Sequence[float], score_rows.tolist())
+    row_list: list[int] = [int(value) for value in row_sequence]
+    score_list: list[float] = [float(value) for value in score_sequence]
+    scores: dict[str, float] = {}
+    for row_id, score in zip(row_list, score_list, strict=False):
+        if row_id < 0:
+            continue
+        document = row_lookup.get(row_id)
+        if document is not None:
+            scores[document.symbol_id] = float(score)
+    return scores
+
+
 def compute_vector_scores(
     query: str,
     options: SearchOptions,
@@ -1754,39 +1786,50 @@ def compute_vector_scores(
     AgentCatalogSearchError
         If vector encoding or search fails.
     """
-    semantic_meta: PrimitiveMapping = cast(
-        PrimitiveMapping,
-        {
-            k: v
-            for k, v in context.semantic_meta.items()
-            if isinstance(v, (str, int, float, bool, type(None)))
-        },
-    )
-    _, model = _resolve_embedding_model(options, semantic_meta)
-    batch_size = options.batch_size or 32
-
-    query_embedding = _encode_query(model, query, batch_size=batch_size)
+    inputs = _prepare_vector_search_inputs(options, context)
+    query_embedding = _encode_query(inputs.model, query, batch_size=inputs.batch_size)
     query_normalized = normalize_l2(query_embedding, axis=1)
+    distances, indices = inputs.index.search(query_normalized, inputs.candidate_limit)
+    return _scores_from_indices(distances, indices, inputs.row_lookup)
 
-    faiss_module = load_faiss("vector search")
-    faiss_index: FaissIndexProtocol = faiss_module.read_index(str(context.index_path))
 
-    distances, indices = faiss_index.search(query_normalized, context.candidate_limit)
+def _build_vector_search_context(
+    catalog: Mapping[str, JsonLike],
+    request: SearchRequest,
+    lexical_candidates: Sequence[SearchDocument],
+    candidate_limit: int,
+    documents: Sequence[SearchDocument],
+) -> VectorSearchContext | None:
+    semantic_index_meta = _resolve_semantic_index_metadata(catalog, request.repo_root)
+    if semantic_index_meta is None:
+        return None
 
-    scores: dict[str, float] = {}
-    if distances.size > 0 and indices.size > 0:
-        query_row: IntVector = np.asarray(indices[0, :], dtype=np.int64, order="C")
-        query_distances: FloatVector = np.asarray(distances[0, :], dtype=np.float32, order="C")
-        row_indices = cast(list[int], query_row.tolist())
-        distance_values = cast(list[float], query_distances.tolist())
-        for row_id_int, distance in zip(row_indices, distance_values, strict=False):
-            if row_id_int < 0:  # sentinel value from FAISS
-                continue
-            if row_id_int in context.row_to_document:
-                document = context.row_to_document[row_id_int]
-                scores[document.symbol_id] = float(distance)
+    semantic_meta, index_path, mapping_path = semantic_index_meta
+    _, mapping_payload = _load_row_lookup(mapping_path)
 
-    return scores
+    return VectorSearchContext(
+        semantic_meta=semantic_meta,
+        mapping_payload=mapping_payload,
+        index_path=index_path,
+        documents=lexical_candidates,
+        candidate_limit=candidate_limit,
+        k=request.k,
+        candidate_ids={doc.symbol_id for doc in lexical_candidates},
+        row_to_document={doc.row: doc for doc in documents if doc.row >= 0},
+    )
+
+
+def _compute_vector_scores_safe(
+    query: str,
+    options: SearchOptions,
+    context: VectorSearchContext | None,
+) -> dict[str, float]:
+    if context is None:
+        return {}
+    try:
+        return compute_vector_scores(query, options, context)
+    except AgentCatalogSearchError:
+        return {}
 
 
 def search_catalog(
@@ -1851,30 +1894,15 @@ def search_catalog(
     )
 
     lexical_candidates = select_lexical_candidates(lexical_scores, documents, candidate_limit)
+    vector_context = _build_vector_search_context(
+        catalog,
+        request,
+        lexical_candidates,
+        candidate_limit,
+        documents,
+    )
+    vector_scores = _compute_vector_scores_safe(request.query, opts, vector_context)
 
-    # Attempt to load vector scores from semantic index if available
-    vector_scores: dict[str, float] = {}
-    try:
-        semantic_index_meta = _resolve_semantic_index_metadata(catalog, request.repo_root)
-        if semantic_index_meta is not None:
-            semantic_meta, index_path, mapping_path = semantic_index_meta
-            _, mapping_payload = _load_row_lookup(mapping_path)
-
-            context = VectorSearchContext(
-                semantic_meta=semantic_meta,
-                mapping_payload=mapping_payload,
-                index_path=index_path,
-                documents=lexical_candidates,
-                candidate_limit=candidate_limit,
-                k=request.k,
-                candidate_ids={doc.symbol_id for doc in lexical_candidates},
-                row_to_document={doc.row: doc for doc in documents if doc.row >= 0},
-            )
-            vector_scores = compute_vector_scores(request.query, opts, context)
-    except AgentCatalogSearchError:
-        pass  # Fall back to lexical-only scores
-
-    # Build and score results
     results: list[SearchResult] = []
     facets = opts.facets or {}
     for doc in lexical_candidates:

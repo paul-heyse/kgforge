@@ -1512,11 +1512,14 @@ def _normalize_ast(node: ast.AST) -> str:
     return ast.dump(cleaned, include_attributes=False)
 
 
+_PARENT_ATTR = "parent"
+
+
 def _attach_parents(tree: ast.AST) -> None:
     """Attach parent references to AST nodes for method detection."""
     for parent in ast.walk(tree):
         for child in ast.iter_child_nodes(parent):
-            child.parent = parent  # type: ignore[attr-defined]
+            setattr(child, _PARENT_ATTR, parent)
 
 
 DocNode = TypeVar("DocNode", ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)

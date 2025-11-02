@@ -41,6 +41,7 @@ from tools.shared.logging import get_logger, with_fields
 if TYPE_CHECKING:
     from tools.docstring_builder.plugins import PluginManager
 
+LoggerLike = logging.LoggerAdapter[logging.Logger] | logging.Logger
 MISSING_MODULE_PATTERNS = ("docs/_build/**",)
 LOGGER = get_logger(__name__)
 
@@ -90,7 +91,7 @@ class PipelineContextBuilder:
         self,
     ) -> (
         tuple[
-            logging.LoggerAdapter[logging.Logger] | logging.Logger,
+            LoggerLike,
             PluginManager | None,
             PolicyEngine,
             ProcessingOptions,
@@ -137,7 +138,7 @@ class PipelineContextBuilder:
 
     def _build_logger(
         self,
-    ) -> logging.LoggerAdapter[logging.Logger] | logging.Logger:
+    ) -> LoggerLike:
         """Build correlation-aware logger for the pipeline run.
 
         Returns

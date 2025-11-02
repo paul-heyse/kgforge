@@ -11,6 +11,7 @@ import time
 from collections import Counter
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
+from operator import itemgetter
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -22,9 +23,8 @@ from tools.docstring_builder.builder_types import (
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.config import BuilderConfig, ConfigSelection
 from tools.docstring_builder.diff_manager import DiffManager
-from tools.docstring_builder.docfacts import DocFact
+from tools.docstring_builder.docfacts import DOCFACTS_VERSION, DocFact
 from tools.docstring_builder.docfacts_coordinator import DocfactsCoordinator
-from tools.docstring_builder.failure_summary import FailureSummaryRenderer, RunSummarySnapshot
 from tools.docstring_builder.file_processor import FileProcessor
 from tools.docstring_builder.io import dependents_for, hash_file
 from tools.docstring_builder.ir import IRDocstring
@@ -43,7 +43,6 @@ from tools.docstring_builder.models import (
     build_cli_result_skeleton,
     validate_cli_output,
 )
-from tools.docstring_builder.docfacts import DOCFACTS_VERSION
 from tools.docstring_builder.paths import (
     CACHE_PATH,
     DOCFACTS_DIFF_PATH,
@@ -60,8 +59,46 @@ from tools.docstring_builder.pipeline_types import (
 from tools.docstring_builder.plugins import PluginManager
 from tools.docstring_builder.policy import PolicyEngine, PolicyReport
 
+
+def _coerce_int(value: object) -> int:
+    """Return ``value`` coerced to ``int`` when possible."""
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return int(value)
+    if isinstance(value, str):
+        try:
+            return int(value)
+        except ValueError:  # pragma: no cover - defensive path
+            return 0
+    return 0
+
+
 if TYPE_CHECKING:
+    from typing import Protocol
+
     from tools.docstring_builder.models import ProblemDetails as ModelProblemDetails
+
+    class ProblemDetailsBuilder(Protocol):
+        """Callable signature for building Problem Details envelopes."""
+
+        def __call__(
+            self,
+            status: ExitStatus,
+            request: DocstringBuildRequest,
+            detail: str,
+            *,
+            instance: str | None = ...,
+            errors: Sequence[ErrorReport] | None = ...,
+        ) -> ModelProblemDetails:
+            """Return a Problem Details payload for the supplied context."""
+else:
+    from collections.abc import Callable as ProblemDetailsBuilder
+
+
+LoggerLike = logging.LoggerAdapter[logging.Logger] | logging.Logger
 
 
 @dataclass(slots=True)
@@ -112,13 +149,10 @@ class PipelineConfig:
     policy_engine: PolicyEngine
     metrics: MetricsRecorder
     diff_manager: DiffManager
-    failure_renderer: FailureSummaryRenderer
-    logger: logging.LoggerAdapter[logging.Logger] | logging.Logger
+    logger: LoggerLike
     status_from_exit: Callable[[ExitStatus], RunStatus]
     status_labels: Mapping[ExitStatus, str]
-    build_problem_details: Callable[
-        [ExitStatus, str, str, str, Sequence[ErrorReport] | None], ModelProblemDetails
-    ]
+    build_problem_details: ProblemDetailsBuilder
     success_status: ExitStatus
     violation_status: ExitStatus
     config_status: ExitStatus
@@ -244,7 +278,7 @@ class PipelineRunner:
                     )
                 ordered.append((index, candidate, outcome))
 
-        for _, candidate, outcome in sorted(ordered, key=lambda item: item[0]):  # type: ignore[misc]
+        for _, candidate, outcome in sorted(ordered, key=itemgetter(0)):
             yield candidate, outcome
 
     def _maybe_reconcile_docfacts(self, state: PipelineState) -> None:
@@ -370,10 +404,6 @@ class PipelineRunner:
     ) -> DocstringBuildResult:
         """Assemble the final result from accumulated state."""
         command = self._cfg.request.command or "unknown"
-        status_label = self._cfg.status_labels.get(exit_status, "error")
-        invoked = str(
-            self._cfg.request.invoked_subcommand or self._cfg.request.subcommand or command
-        )
 
         cache_summary = self._build_cache_summary(state)
         if self._cfg.request.command == "update":
@@ -430,12 +460,18 @@ class PipelineRunner:
         )
         problem_details: ModelProblemDetails | None = None
         if exit_status is not self._cfg.success_status:
+            invoked = (
+                self._cfg.request.invoked_subcommand
+                or self._cfg.request.subcommand
+                or self._cfg.request.command
+            )
+            status_label = self._cfg.status_labels.get(exit_status, "error")
             problem_details = self._cfg.build_problem_details(
                 exit_status,
-                command,
-                invoked,
+                self._cfg.request,
                 f"Docstring builder exited with status {status_label}",
-                errors_payload,
+                instance=(f"urn:cli:docbuilder:{command}:{invoked}" if invoked else None),
+                errors=errors_payload,
             )
             if cli_result is not None:
                 cli_result["problem"] = problem_details
@@ -446,20 +482,6 @@ class PipelineRunner:
         docfacts_report = self._build_docfacts_report(state.docfacts_checked)
         if cli_result is not None and docfacts_report is not None:
             cli_result["docfacts"] = docfacts_report
-
-        run_summary_snapshot = RunSummarySnapshot(
-            considered=len(files_list),
-            processed=state.processed_count,
-            changed=state.changed_count,
-            status_counts={
-                "success": state.status_counts.get(self._cfg.success_status, 0),
-                "violation": state.status_counts.get(self._cfg.violation_status, 0),
-                "config": state.status_counts.get(self._cfg.config_status, 0),
-                "error": state.status_counts.get(self._cfg.error_status, 0),
-            },
-            observability_path=OBSERVABILITY_PATH,
-        )
-        self._cfg.failure_renderer.render(run_summary_snapshot, state.errors)
 
         return DocstringBuildResult(
             exit_status=exit_status,
@@ -549,8 +571,8 @@ class PipelineRunner:
             "cache": {
                 "path": str(CACHE_PATH),
                 "exists": CACHE_PATH.exists(),
-                "hits": int(summary.get("cache_hits", 0)),
-                "misses": int(summary.get("cache_misses", 0)),
+                "hits": _coerce_int(summary.get("cache_hits", 0)),
+                "misses": _coerce_int(summary.get("cache_misses", 0)),
             },
             "policy": {
                 "coverage": policy_report.coverage,

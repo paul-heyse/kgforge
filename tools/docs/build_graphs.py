@@ -45,9 +45,16 @@ if TYPE_CHECKING:
 
     DiGraph = nx_mod.DiGraph[Any]
     PydotDot = pydot_mod.Dot
-else:  # pragma: no cover - type-checking aid
-    DiGraph = object  # type: ignore[assignment]
-    PydotDot = object  # type: ignore[assignment]
+else:  # pragma: no cover - runtime fallback when optional deps missing
+    DiGraph = Any
+    PydotDot = Any
+
+try:  # pragma: no cover - optional dependency
+    from yaml import YAMLError as YamlError
+except (ModuleNotFoundError, ImportError):
+
+    class YamlError(Exception):
+        """Fallback error used when PyYAML is unavailable."""
 
 
 def _optional_import(name: str) -> ModuleType | None:
@@ -1126,9 +1133,9 @@ def collapse_to_packages(dot_path: Path) -> DiGraph:
 
     graphs = pydot.graph_from_dot_file(str(dot_path))
     pd_obj = graphs[0] if isinstance(graphs, list) else graphs
-    pd_graph = cast("PydotDot", pd_obj)
-    directed = cast("DiGraph", nx.drawing.nx_pydot.from_pydot(pd_graph).to_directed())
-    collapsed = nx.DiGraph()
+    pd_graph = cast(PydotDot, pd_obj)
+    directed = cast(DiGraph, nx.drawing.nx_pydot.from_pydot(pd_graph).to_directed())
+    collapsed: DiGraph = cast(DiGraph, nx.DiGraph())
 
     module_names = {node: _module_label(node, data) for node, data in directed.nodes(data=True)}
 
@@ -1142,7 +1149,7 @@ def collapse_to_packages(dot_path: Path) -> DiGraph:
             continue
         weight = collapsed.get_edge_data(pkg_src, pkg_dst, {}).get("weight", 0) + 1
         collapsed.add_edge(pkg_src, pkg_dst, weight=weight)
-    return collapsed  # type: ignore[no-any-return]
+    return collapsed
 
 
 def analyze_graph(graph: DiGraph, layers: LayerConfig) -> AnalysisResult:
@@ -1982,7 +1989,7 @@ def _load_layers_config(path: str) -> LayerConfig:
         raise SharedValidationError(message)
     try:
         data = yaml.safe_load(file_path.read_text())
-    except yaml.YAMLError as exc:  # type: ignore[attr-defined]
+    except YamlError as exc:
         message = f"Layers config '{file_path}' is not valid YAML"
         raise SharedValidationError(message) from exc
     if not isinstance(data, Mapping):

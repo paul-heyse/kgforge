@@ -9,17 +9,14 @@ from __future__ import annotations
 import contextlib
 import json
 import logging
-import warnings
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Final, cast
 from uuid import uuid4
 
-import numpy as np
 import typer
 from jsonschema import Draft202012Validator, ValidationError
-from numpy.typing import NDArray
 
 from kgfoundry.embeddings_sparse.bm25 import get_bm25
 from kgfoundry_common.errors import IndexBuildError
@@ -313,19 +310,6 @@ def load_vector_batch_from_json(vectors_path: str) -> VectorBatch:
     _validate_vector_payload(payload)
     records = cast(Iterable[Mapping[str, object]], payload)
     return coerce_vector_batch(records)
-
-
-def _load_vectors_from_json(vectors_path: str) -> tuple[list[str], NDArray[np.float32]]:
-    """Provide legacy tuple output while delegating to vector batch loader."""
-    warnings.warn(
-        "orchestration.cli._load_vectors_from_json is deprecated; use load_vector_batch_from_json",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    batch = load_vector_batch_from_json(vectors_path)
-    ids = [str(vector_id) for vector_id in batch.ids]
-    matrix = np.asarray(batch.matrix, dtype=np.float32)
-    return ids, matrix
 
 
 def _prepare_index_directory(index_path: str) -> None:
