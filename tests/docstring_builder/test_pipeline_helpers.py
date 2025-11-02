@@ -3,16 +3,50 @@
 from __future__ import annotations
 
 import logging
-from typing import cast
-from unittest import mock
+from dataclasses import dataclass, field
 
 import pytest
+@dataclass(slots=True)
+class _HistogramStub:
+    labels_called: list[dict[str, object]] = field(default_factory=list)
+    observed: list[float] = field(default_factory=list)
+
+    def labels(self, **labels: object) -> "_HistogramStub":
+        self.labels_called.append(labels)
+        return self
+
+    def observe(self, value: float) -> None:
+        self.observed.append(value)
+
+
+@dataclass(slots=True)
+class _CounterStub:
+    labels_called: list[dict[str, object]] = field(default_factory=list)
+    increments: list[float] = field(default_factory=list)
+
+    def labels(self, **labels: object) -> "_CounterStub":
+        self.labels_called.append(labels)
+        return self
+
+    def inc(self, value: float = 1.0) -> None:
+        self.increments.append(value)
 from tools.docstring_builder.builder_types import ExitStatus
+from tools.docstring_builder.docfacts import DocFact
 from tools.docstring_builder.failure_summary import FailureSummaryRenderer, RunSummarySnapshot
 from tools.docstring_builder.metrics import MetricsRecorder
 from tools.docstring_builder.models import RunStatus
 from tools.docstring_builder.paths import OBSERVABILITY_PATH
 from tools.docstring_builder.pipeline_types import ErrorEnvelope, FileOutcome
+
+
+def _empty_docfacts() -> list[DocFact]:
+    return []
+
+
+def _captured_messages(caplog: pytest.LogCaptureFixture) -> list[str]:
+    """Return captured log messages from the caplog fixture."""
+
+    return [record.getMessage() for record in caplog.records]
 
 
 class TestFailureSummaryRenderer:
@@ -46,7 +80,7 @@ class TestFailureSummaryRenderer:
             ErrorEnvelope(file="bar.py", status=RunStatus.ERROR, message="harvest failed"),
         ]
         renderer.render(summary, errors)
-        messages = cast(list[str], getattr(caplog, "messages", []))
+        messages = _captured_messages(caplog)
         assert any("[SUMMARY]" in message for message in messages)
 
     def test_render_truncates_top_errors(self, caplog: pytest.LogCaptureFixture) -> None:
@@ -64,7 +98,7 @@ class TestFailureSummaryRenderer:
             for i in range(10)
         ]
         renderer.render(summary, errors)
-        messages = cast(list[str], getattr(caplog, "messages", []))
+        messages = _captured_messages(caplog)
         output = "\n".join(messages)
         assert output.count("file_") == 5  # Only top 5
 
@@ -74,14 +108,10 @@ class TestMetricsRecorder:
 
     def test_observe_cli_duration(self) -> None:
         """Should record duration and increment counter."""
-        mock_hist = mock.Mock()
-        mock_counter = mock.Mock()
-        mock_hist_child = mock.Mock()
-        mock_counter_child = mock.Mock()
-        mock_hist.labels.return_value = mock_hist_child
-        mock_counter.labels.return_value = mock_counter_child
+        histogram = _HistogramStub()
+        counter = _CounterStub()
 
-        recorder = MetricsRecorder(cli_duration_seconds=mock_hist, runs_total=mock_counter)
+        recorder = MetricsRecorder(cli_duration_seconds=histogram, runs_total=counter)
 
         recorder.observe_cli_duration(
             command="check",
@@ -89,10 +119,10 @@ class TestMetricsRecorder:
             duration_seconds=1.5,
         )
 
-        mock_hist.labels.assert_called_once_with(command="check", status="success")
-        mock_hist_child.observe.assert_called_once_with(1.5)
-        mock_counter.labels.assert_called_once_with(status="success")
-        mock_counter_child.inc.assert_called_once()
+        assert histogram.labels_called == [{"command": "check", "status": "success"}]
+        assert histogram.observed == [1.5]
+        assert counter.labels_called == [{"status": "success"}]
+        assert counter.increments == [1.0]
 
 
 class TestErrorEnvelope:
@@ -118,7 +148,7 @@ class TestFileOutcomeTracking:
         """FileOutcome should have sensible defaults."""
         outcome = FileOutcome(
             status=ExitStatus.SUCCESS,
-            docfacts=[],
+            docfacts=_empty_docfacts(),
             preview=None,
             changed=False,
             skipped=False,

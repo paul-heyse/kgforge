@@ -15,6 +15,7 @@ from typing import Final, cast
 from kgfoundry_common.errors import RegistryError
 from kgfoundry_common.navmap_types import NavMap
 from registry import duckdb_helpers
+from registry.duckdb_helpers import DuckDBQueryOptions
 
 __all__ = ["apply", "main"]
 
@@ -78,8 +79,10 @@ def apply(db: str, migrations_dir: str) -> None:
                         con,
                         statement,
                         params=None,
-                        require_parameterized=False,
-                        operation=f"registry.migrate.{migration.stem}",
+                        options=DuckDBQueryOptions(
+                            operation=f"registry.migrate.{migration.stem}",
+                            require_parameterized=False,
+                        ),
                     )
                 except RegistryError as err:
                     message = err.message.lower()

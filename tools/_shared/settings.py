@@ -19,7 +19,12 @@ from pydantic import Field, ValidationError, field_validator
 from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from tools._shared.problem_details import JsonValue, ProblemDetailsDict, build_problem_details
+from tools._shared.problem_details import (
+    JsonValue,
+    ProblemDetailsDict,
+    ProblemDetailsParams,
+    build_problem_details,
+)
 
 __all__: Final[list[str]] = [
     "SettingsError",
@@ -84,12 +89,14 @@ def load_settings[SettingsT: BaseSettings](
             "settings_class": settings_name,
         }
         problem = build_problem_details(
-            type="https://kgfoundry.dev/problems/tool-settings-invalid",
-            title="Invalid tooling settings",
-            status=500,
-            detail="Failed to load tooling configuration",
-            instance=f"urn:tool-settings:{settings_name}:invalid",
-            extensions=extensions,
+            ProblemDetailsParams(
+                type="https://kgfoundry.dev/problems/tool-settings-invalid",
+                title="Invalid tooling settings",
+                status=500,
+                detail="Failed to load tooling configuration",
+                instance=f"urn:tool-settings:{settings_name}:invalid",
+                extensions=extensions,
+            )
         )
         message = "Failed to load tooling settings"
         raise SettingsError(message, problem=problem, errors=error_dicts) from exc

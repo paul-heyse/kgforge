@@ -12,9 +12,12 @@ import uuid
 from collections.abc import Mapping
 from typing import Final
 
+import duckdb
+
 from kgfoundry_common.models import Doc, DoctagsAsset
 from kgfoundry_common.navmap_types import NavMap
 from registry import duckdb_helpers
+from registry.duckdb_helpers import DuckDBQueryOptions
 
 __all__ = ["DuckDBRegistry"]
 
@@ -87,7 +90,7 @@ class DuckDBRegistry:
             Describe return value.
         """
         dataset_id = str(uuid.uuid4())
-        duckdb_helpers.execute(
+        _execute_with_operation(
             self.con,
             (
                 "INSERT INTO datasets("
@@ -114,7 +117,7 @@ class DuckDBRegistry:
             Describe ``rows``.
         """
         del rows
-        duckdb_helpers.execute(
+        _execute_with_operation(
             self.con,
             "UPDATE datasets SET parquet_root=? WHERE dataset_id=?",
             [parquet_root, dataset_id],
@@ -131,7 +134,7 @@ class DuckDBRegistry:
         dataset_id : str
             Describe ``dataset_id``.
         """
-        duckdb_helpers.execute(
+        _execute_with_operation(
             self.con,
             "DELETE FROM datasets WHERE dataset_id=?",
             [dataset_id],
@@ -166,7 +169,7 @@ class DuckDBRegistry:
             Describe return value.
         """
         run_id = str(uuid.uuid4())
-        duckdb_helpers.execute(
+        _execute_with_operation(
             self.con,
             (
                 "INSERT INTO runs("
@@ -195,7 +198,7 @@ class DuckDBRegistry:
         """
         _ = success  # placeholder until success flag/notes are persisted
         _ = notes
-        duckdb_helpers.execute(
+        _execute_with_operation(
             self.con,
             "UPDATE runs SET finished_at=now() WHERE run_id=?",
             [run_id],
@@ -213,7 +216,7 @@ class DuckDBRegistry:
             Describe ``docs``.
         """
         for doc in docs:
-            duckdb_helpers.execute(
+            _execute_with_operation(
                 self.con,
                 (
                     "INSERT OR REPLACE INTO documents("
@@ -250,7 +253,7 @@ class DuckDBRegistry:
             Describe ``assets``.
         """
         for asset in assets:
-            duckdb_helpers.execute(
+            _execute_with_operation(
                 self.con,
                 (
                     "INSERT OR REPLACE INTO doctags("
@@ -282,7 +285,7 @@ class DuckDBRegistry:
         payload : str | object
             Describe ``payload``.
         """
-        duckdb_helpers.execute(
+        _execute_with_operation(
             self.con,
             (
                 "INSERT INTO pipeline_events("
@@ -309,7 +312,7 @@ class DuckDBRegistry:
         message : str
             Describe ``message``.
         """
-        duckdb_helpers.execute(
+        _execute_with_operation(
             self.con,
             (
                 "INSERT INTO incidents("
@@ -319,3 +322,17 @@ class DuckDBRegistry:
             [event, subject_id, error_class, message],
             operation="registry.duckdb.incident",
         )
+
+
+def _execute_with_operation(
+    conn: duckdb.DuckDBPyConnection,
+    sql: str,
+    params: duckdb_helpers.Params,
+    operation: str,
+) -> None:
+    duckdb_helpers.execute(
+        conn,
+        sql,
+        params,
+        options=DuckDBQueryOptions(operation=operation),
+    )

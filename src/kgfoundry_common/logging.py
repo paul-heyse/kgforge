@@ -225,6 +225,7 @@ if TYPE_CHECKING:
     class _LoggerAdapterBase(logging.LoggerAdapter):  # pragma: no cover - typing helper
         logger: logging.Logger
         extra: Mapping[str, object] | None
+
 else:
     _LoggerAdapterBase = logging.LoggerAdapter
 

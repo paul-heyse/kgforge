@@ -11,11 +11,40 @@ Verify:
 from __future__ import annotations
 
 import logging
-from typing import Any, cast
+from typing import Final, cast
 
 import pytest
-from prometheus_client import CollectorRegistry, Counter, Histogram
-from prometheus_client.metrics_core import Sample
+from _pytest.logging import LogCaptureFixture
+from prometheus_client import Counter, Histogram
+from prometheus_client.registry import CollectorRegistry
+from prometheus_client.samples import Sample
+
+COUNTER_CASES: Final[tuple[tuple[str, str, int], ...]] = (
+    ("search", "success", 1),
+    ("index", "success", 2),
+    ("delete", "error", 1),
+    ("search", "error", 3),
+)
+COUNTER_CASE_IDS: Final[tuple[str, ...]] = (
+    "search_success",
+    "index_multiple",
+    "delete_error",
+    "search_error_multi",
+)
+
+HISTOGRAM_DURATIONS: Final[tuple[float, ...]] = (0.001, 0.01, 0.1, 1.0, 10.0)
+HISTOGRAM_DURATION_IDS: Final[tuple[str, ...]] = ("1ms", "10ms", "100ms", "1s", "10s")
+
+ERROR_TYPE_CASES: Final[tuple[tuple[str, type[Exception]], ...]] = (
+    ("ValueError", ValueError),
+    ("TimeoutError", TimeoutError),
+    ("RuntimeError", RuntimeError),
+)
+ERROR_TYPE_IDS: Final[tuple[str, ...]] = (
+    "value_error",
+    "timeout_error",
+    "runtime_error",
+)
 
 
 def _get_first_metric_samples(registry: CollectorRegistry) -> list[Sample]:
@@ -28,7 +57,7 @@ def _get_first_metric_samples(registry: CollectorRegistry) -> list[Sample]:
 
     Returns
     -------
-    list[Any]
+    list[Sample]
         Samples from first metric.
     """
     metric = next(iter(registry.collect()))
@@ -101,13 +130,8 @@ class TestCounterMetrics:
 
     @pytest.mark.parametrize(
         ("operation", "status", "expected_count"),
-        [
-            ("search", "success", 1),
-            ("index", "success", 2),
-            ("delete", "error", 1),
-            ("search", "error", 3),
-        ],
-        ids=["search_success", "index_multiple", "delete_error", "search_error_multi"],
+        COUNTER_CASES,
+        ids=COUNTER_CASE_IDS,
     )
     def test_counter_by_operation_and_status(
         self,
@@ -215,14 +239,8 @@ class TestHistogramMetrics:
 
     @pytest.mark.parametrize(
         "duration",
-        [
-            0.001,
-            0.01,
-            0.1,
-            1.0,
-            10.0,
-        ],
-        ids=["1ms", "10ms", "100ms", "1s", "10s"],
+        HISTOGRAM_DURATIONS,
+        ids=HISTOGRAM_DURATION_IDS,
     )
     def test_histogram_across_ranges(
         self,
@@ -265,7 +283,7 @@ class TestMetricsOnErrorPaths:
     def test_error_counter_on_exception(
         self,
         prometheus_registry: CollectorRegistry,
-        caplog: Any,  # noqa: ANN401 - pytest fixture typing limitation
+        caplog: LogCaptureFixture,
     ) -> None:
         """Verify error counter increments when exception occurs.
 
@@ -308,12 +326,8 @@ class TestMetricsOnErrorPaths:
 
     @pytest.mark.parametrize(
         ("error_type", "error_class"),
-        [
-            ("ValueError", ValueError),
-            ("TimeoutError", TimeoutError),
-            ("RuntimeError", RuntimeError),
-        ],
-        ids=["value_error", "timeout_error", "runtime_error"],
+        ERROR_TYPE_CASES,
+        ids=ERROR_TYPE_IDS,
     )
     def test_error_counter_by_type(
         self,

@@ -18,6 +18,7 @@ from duckdb import DuckDBPyConnection
 from kgfoundry_common.models import Doc, DoctagsAsset
 from kgfoundry_common.navmap_types import NavMap
 from registry import duckdb_helpers
+from registry.duckdb_helpers import DuckDBQueryOptions
 
 __all__ = ["DuckDBRegistryHelper"]
 
@@ -45,6 +46,20 @@ __navmap__: Final[NavMap] = {
         },
     },
 }
+
+
+def _execute_with_operation(
+    conn: DuckDBPyConnection,
+    sql: str,
+    params: duckdb_helpers.Params,
+    operation: str,
+) -> None:
+    duckdb_helpers.execute(
+        conn,
+        sql,
+        params,
+        options=DuckDBQueryOptions(operation=operation),
+    )
 
 
 # [nav:anchor DuckDBRegistryHelper]
@@ -120,7 +135,7 @@ class DuckDBRegistryHelper:
         """
         run_id = str(uuid.uuid4())
         with closing(self._connect()) as con:
-            duckdb_helpers.execute(
+            _execute_with_operation(
                 con,
                 (
                     "INSERT INTO runs "
@@ -150,14 +165,14 @@ class DuckDBRegistryHelper:
             Defaults to ``None``.
         """
         with closing(self._connect()) as con:
-            duckdb_helpers.execute(
+            _execute_with_operation(
                 con,
                 "UPDATE runs SET finished_at=CURRENT_TIMESTAMP WHERE run_id=?",
                 [run_id],
                 operation="registry.helper.close_run.finish",
             )
             payload: dict[str, object] = {"success": success, "notes": notes or ""}
-            duckdb_helpers.execute(
+            _execute_with_operation(
                 con,
                 "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
                 [
@@ -190,7 +205,7 @@ class DuckDBRegistryHelper:
         """
         dataset_id = str(uuid.uuid4())
         with closing(self._connect()) as con:
-            duckdb_helpers.execute(
+            _execute_with_operation(
                 con,
                 (
                     "INSERT INTO datasets "
@@ -219,14 +234,14 @@ class DuckDBRegistryHelper:
             Describe ``rows``.
         """
         with closing(self._connect()) as con:
-            duckdb_helpers.execute(
+            _execute_with_operation(
                 con,
                 "UPDATE datasets SET parquet_root=? WHERE dataset_id=?",
                 [parquet_root, dataset_id],
                 operation="registry.helper.commit_dataset.update",
             )
             payload: dict[str, object] = {"rows": rows, "root": parquet_root}
-            duckdb_helpers.execute(
+            _execute_with_operation(
                 con,
                 "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
                 [
@@ -251,13 +266,13 @@ class DuckDBRegistryHelper:
             Describe ``dataset_id``.
         """
         with closing(self._connect()) as con:
-            duckdb_helpers.execute(
+            _execute_with_operation(
                 con,
                 "DELETE FROM datasets WHERE dataset_id=?",
                 [dataset_id],
                 operation="registry.helper.rollback_dataset.delete",
             )
-            duckdb_helpers.execute(
+            _execute_with_operation(
                 con,
                 "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
                 [str(uuid.uuid4()), "DatasetRolledBack", dataset_id, "{}"],
@@ -280,7 +295,7 @@ class DuckDBRegistryHelper:
             for doc in docs:
                 authors_list = list(doc.authors) if doc.authors is not None else []
                 authors_json = json.dumps(authors_list)
-                duckdb_helpers.execute(
+                _execute_with_operation(
                     con,
                     """INSERT OR REPLACE INTO documents
                 (doc_id, openalex_id, doi, arxiv_id, pmcid, title, authors,
@@ -318,9 +333,13 @@ class DuckDBRegistryHelper:
         """
         with closing(self._connect()) as con:
             for asset in assets:
-                duckdb_helpers.execute(
+                _execute_with_operation(
                     con,
-                    "INSERT OR REPLACE INTO doctags VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)",
+                    (
+                        "INSERT OR REPLACE INTO doctags("
+                        "doc_id, doctags_uri, pages, vlm_model, vlm_revision, avg_logprob, created_at"
+                        ") VALUES (?, ?, ?, ?, ?, ?, now())"
+                    ),
                     [
                         asset.doc_id,
                         asset.doctags_uri,
@@ -350,7 +369,7 @@ class DuckDBRegistryHelper:
         """
         with closing(self._connect()) as con:
             payload_dict: dict[str, object] = dict(payload)
-            duckdb_helpers.execute(
+            _execute_with_operation(
                 con,
                 "INSERT INTO pipeline_events VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
                 [str(uuid.uuid4()), event_name, subject_id, json.dumps(payload_dict)],

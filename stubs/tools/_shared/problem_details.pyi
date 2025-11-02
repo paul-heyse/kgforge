@@ -7,33 +7,61 @@ JsonPrimitive = str | int | float | bool | None
 JsonValue = JsonPrimitive | list[JsonValue] | dict[str, JsonValue]
 ProblemDetailsDict = dict[str, JsonValue]
 
+class ProblemDetailsParams:
+    def __init__(
+        self,
+        *,
+        type: str,
+        title: str,
+        status: int,
+        detail: str,
+        instance: str,
+        extensions: Mapping[str, JsonValue] | None = ...,
+    ) -> None: ...
+
+
+class SchemaProblemDetailsParams:
+    def __init__(
+        self,
+        *,
+        base: ProblemDetailsParams,
+        error: Exception,
+        extensions: Mapping[str, JsonValue] | None = ...,
+    ) -> None: ...
+
+
+class ToolProblemDetailsParams:
+    def __init__(
+        self,
+        *,
+        category: str,
+        command: Sequence[str],
+        status: int,
+        title: str,
+        detail: str,
+        instance_suffix: str,
+        extensions: Mapping[str, JsonValue] | None = ...,
+    ) -> None: ...
+
+
+class ExceptionProblemDetailsParams:
+    def __init__(
+        self,
+        *,
+        base: ProblemDetailsParams,
+        exception: Exception,
+        extensions: Mapping[str, JsonValue] | None = ...,
+    ) -> None: ...
+
+
 def build_problem_details(
-    *,
-    type: str,  # noqa: A002 - matches RFC 9457 nomenclature
-    title: str,
-    status: int,
-    detail: str,
-    instance: str,
-    extensions: Mapping[str, JsonValue] | None = ...,
+    params: ProblemDetailsParams,
 ) -> ProblemDetailsDict: ...
 def build_schema_problem_details(
-    *,
-    error: Exception,
-    type: str,  # noqa: A002 - matches RFC 9457 nomenclature
-    title: str,
-    status: int,
-    instance: str,
-    extensions: Mapping[str, JsonValue] | None = ...,
+    params: SchemaProblemDetailsParams,
 ) -> ProblemDetailsDict: ...
 def build_tool_problem_details(
-    *,
-    category: str,
-    command: Sequence[str],
-    status: int,
-    title: str,
-    detail: str,
-    instance_suffix: str,
-    extensions: Mapping[str, JsonValue] | None = ...,
+    params: ToolProblemDetailsParams,
 ) -> ProblemDetailsDict: ...
 def tool_timeout_problem_details(
     command: Sequence[str],
@@ -59,12 +87,6 @@ def tool_failure_problem_details(
     detail: str,
 ) -> ProblemDetailsDict: ...
 def problem_from_exception(
-    exc: Exception,
-    *,
-    type: str,  # noqa: A002 - matches RFC 9457 nomenclature
-    title: str,
-    status: int,
-    instance: str,
-    extensions: Mapping[str, JsonValue] | None = ...,
+    params: ExceptionProblemDetailsParams,
 ) -> ProblemDetailsDict: ...
 def render_problem(problem: ProblemDetailsDict) -> str: ...

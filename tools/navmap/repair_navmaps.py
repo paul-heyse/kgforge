@@ -21,6 +21,7 @@ from typing import cast
 from tools import (
     CliEnvelope,
     CliEnvelopeBuilder,
+    ProblemDetailsParams,
     build_problem_details,
     get_logger,
     render_cli_envelope,
@@ -498,14 +499,16 @@ def _build_json_envelope(
         if not apply:
             builder.set_problem(
                 build_problem_details(
-                    type="https://kgfoundry.dev/problems/navmap-repair-needed",
-                    title="Navmap repair needed",
-                    status=422,
-                    detail=(
-                        f"Found {len(messages)} issue(s) requiring repair. Re-run with --apply to write fixes."
-                    ),
-                    instance="urn:navmap:repair:issues-detected",
-                    extensions={"issue_count": len(messages), "apply_required": True},
+                    ProblemDetailsParams(
+                        type="https://kgfoundry.dev/problems/navmap-repair-needed",
+                        title="Navmap repair needed",
+                        status=422,
+                        detail=(
+                            f"Found {len(messages)} issue(s) requiring repair. Re-run with --apply to write fixes."
+                        ),
+                        instance="urn:navmap:repair:issues-detected",
+                        extensions={"issue_count": len(messages), "apply_required": True},
+                    )
                 )
             )
 
@@ -531,12 +534,14 @@ def _build_error_envelope(exc: Exception, duration: float) -> CliEnvelope:
     )
     builder.set_problem(
         build_problem_details(
-            type="https://kgfoundry.dev/problems/navmap-repair-error",
-            title="Navmap repair failed",
-            status=500,
-            detail=str(exc),
-            instance="urn:navmap:repair:error",
-            extensions={"exception_type": exc.__class__.__name__},
+            ProblemDetailsParams(
+                type="https://kgfoundry.dev/problems/navmap-repair-error",
+                title="Navmap repair failed",
+                status=500,
+                detail=str(exc),
+                instance="urn:navmap:repair:error",
+                extensions={"exception_type": exc.__class__.__name__},
+            )
         )
     )
     return builder.finish(duration_seconds=duration)

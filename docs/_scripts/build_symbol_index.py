@@ -14,6 +14,7 @@ from typing import Protocol, cast, runtime_checkable
 from docs._scripts import shared
 from docs._scripts.validation import validate_against_schema
 from tools import (
+    ProblemDetailsParams,
     StructuredLoggerAdapter,
     build_problem_details,
     get_logger,
@@ -633,11 +634,13 @@ def safe_attr(node: object, attr: str, default: object | None = None) -> object 
 
 def _emit_problem(problem: ProblemDetailsDict | None, *, default_message: str) -> None:
     payload = problem or build_problem_details(
-        type="https://kgfoundry.dev/problems/docs-symbol-index",
-        title="Symbol index build failed",
-        status=500,
-        detail=default_message,
-        instance="urn:docs:symbol-index:unknown",
+        ProblemDetailsParams(
+            type="https://kgfoundry.dev/problems/docs-symbol-index",
+            title="Symbol index build failed",
+            status=500,
+            detail=default_message,
+            instance="urn:docs:symbol-index",
+        )
     )
     sys.stderr.write(render_problem(payload) + "\n")
 
@@ -721,12 +724,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         ) as exc:
             observation.failure("exception", returncode=1)
             problem = build_problem_details(
-                type="https://kgfoundry.dev/problems/docs-symbol-index",
-                title="Symbol index build failed",
-                status=500,
-                detail=str(exc),
-                instance="urn:docs:symbol-index:unexpected-error",
-                extensions={"packages": list(packages)},
+                ProblemDetailsParams(
+                    type="https://kgfoundry.dev/problems/docs-symbol-index",
+                    title="Symbol index build failed",
+                    status=500,
+                    detail=str(exc),
+                    instance="urn:docs:symbol-index:unexpected-error",
+                    extensions={"packages": list(packages)},
+                )
             )
             _emit_problem(problem, default_message=str(exc))
             return 1

@@ -7,7 +7,7 @@ from collections.abc import Iterable, Sequence
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Literal, cast
-from unittest.mock import Mock
+from dataclasses import dataclass, field
 
 import pytest
 from tools.docstring_builder.builder_types import (
@@ -85,7 +85,9 @@ class _StubDiffManager:
         self.baseline_calls: list[tuple[str, str | None]] = []
         self.recorded_docfacts: list[str | None] = []
 
-    def record_docstring_baseline(self, file_path, preview) -> None:  # pragma: no cover - no-op
+    def record_docstring_baseline(self, file_path: Path, preview: str | None) -> None:
+        """Record the baseline docstring for diff inspection."""
+
         self.baseline_calls.append((str(file_path), preview))
 
     def finalize_docstring_drift(self) -> None:  # pragma: no cover - no-op
@@ -98,14 +100,36 @@ class _StubDiffManager:
         return {}
 
 
+@dataclass(slots=True)
+class _MetricsHistogram:
+    labels_called: list[dict[str, object]] = field(default_factory=list)
+    observed: list[float] = field(default_factory=list)
+
+    def labels(self, **labels: object) -> "_MetricsHistogram":
+        self.labels_called.append(labels)
+        return self
+
+    def observe(self, value: float) -> None:
+        self.observed.append(value)
+
+
+@dataclass(slots=True)
+class _MetricsCounter:
+    labels_called: list[dict[str, object]] = field(default_factory=list)
+    increments: list[float] = field(default_factory=list)
+
+    def labels(self, **labels: object) -> "_MetricsCounter":
+        self.labels_called.append(labels)
+        return self
+
+    def inc(self, value: float = 1.0) -> None:
+        self.increments.append(value)
+
+
 def _build_metrics_recorder() -> MetricsRecorder:
-    hist = Mock()
-    counter = Mock()
-    hist_child = Mock()
-    counter_child = Mock()
-    hist.labels.return_value = hist_child
-    counter.labels.return_value = counter_child
-    return MetricsRecorder(cli_duration_seconds=hist, runs_total=counter)
+    histogram = _MetricsHistogram()
+    counter = _MetricsCounter()
+    return MetricsRecorder(cli_duration_seconds=histogram, runs_total=counter)
 
 
 def _build_pipeline_config(
@@ -115,11 +139,15 @@ def _build_pipeline_config(
     docfacts_status: DocfactsStatus = "success",
     docfacts_message: str | None = None,
 ) -> PipelineConfig:
-    cache = cast(BuilderCache, SimpleNamespace(write=lambda: None))
-    file_processor = cast(
-        FileProcessor,
-        SimpleNamespace(process=lambda _path: file_outcomes[0]),
-    )
+    def _write_cache() -> None:
+        return None
+
+    cache = cast(BuilderCache, SimpleNamespace(write=_write_cache))
+
+    def _process_file(_path: Path) -> FileOutcome:
+        return file_outcomes[0]
+
+    file_processor = cast(FileProcessor, SimpleNamespace(process=_process_file))
 
     def coordinator_factory(check_mode: bool) -> DocfactsCoordinator:
         status = docfacts_status if check_mode else "success"
@@ -162,11 +190,14 @@ def _build_pipeline_config(
     )
 
 
-def test_pipeline_runner_collects_diff_previews(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_pipeline_runner_collects_diff_previews(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     request = DocstringBuildRequest(command="check", subcommand="check", diff=True)
     outcome = FileOutcome(
         status=ExitStatus.VIOLATION,
-        docfacts=[],
+        docfacts=_empty_docfacts(),
         preview="diff output",
         changed=True,
         skipped=False,
@@ -192,12 +223,13 @@ def test_pipeline_runner_collects_diff_previews(tmp_path, monkeypatch: pytest.Mo
 
 
 def test_pipeline_runner_records_docfacts_violation(
-    tmp_path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     request = DocstringBuildRequest(command="check", subcommand="check")
     outcome = FileOutcome(
         status=ExitStatus.SUCCESS,
-        docfacts=[],
+        docfacts=_empty_docfacts(),
         preview=None,
         changed=False,
         skipped=False,

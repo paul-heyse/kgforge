@@ -4,6 +4,16 @@ from collections.abc import Sequence
 
 from prometheus_client.registry import CollectorRegistry
 
+__all__ = [
+    "REGISTRY",
+    "CollectorRegistry",
+    "Counter",
+    "Gauge",
+    "Histogram",
+    "generate_latest",
+    "start_http_server",
+]
+
 class _MetricBase:
     def labels(self, *labelvalues: str, **labelkwargs: str) -> _MetricBase: ...
 

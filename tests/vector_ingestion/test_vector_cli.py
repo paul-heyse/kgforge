@@ -6,18 +6,14 @@ import json
 import logging
 from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import cast
 from uuid import UUID
 
 import pytest
+from _pytest.logging import LogCaptureFixture
 from typer.testing import CliRunner
 
 from orchestration.cli import app
-
-if TYPE_CHECKING:  # pragma: no cover - typing only
-    from _pytest.logging import LogCaptureFixture
-else:  # pragma: no cover - runtime alias for type checking convenience
-    LogCaptureFixture = object
 
 
 def _filter_index_records(
@@ -50,7 +46,7 @@ def _parse_problem(stderr: str) -> dict[str, object]:
 
     problem_raw: object = json.loads(json_line)
     assert isinstance(problem_raw, dict)
-    return cast("dict[str, object]", problem_raw)
+    return cast(dict[str, object], problem_raw)
 
 
 def test_index_faiss_cli_success(
@@ -102,7 +98,8 @@ def test_index_faiss_cli_problem_details(
     monkeypatch.setattr("orchestration.cli.uuid4", deterministic_uuid_factory)
 
     vectors_path = tmp_path / "invalid_vectors.json"
-    vectors_path.write_text(json.dumps([{"key": "", "vector": [0.1, 0.2]}]), encoding="utf-8")
+    invalid_vectors: list[dict[str, object]] = [{"key": "", "vector": [0.1, 0.2]}]
+    vectors_path.write_text(json.dumps(invalid_vectors), encoding="utf-8")
 
     index_path = tmp_path / "faiss-invalid.idx"
 
@@ -126,7 +123,7 @@ def test_index_faiss_cli_problem_details(
     assert problem.get("status") == 422
     extensions_obj = problem.get("extensions")
     assert isinstance(extensions_obj, dict)
-    extensions = cast("dict[str, object]", extensions_obj)
+    extensions = cast(dict[str, object], extensions_obj)
     assert (
         extensions.get("schema_id")
         == "https://kgfoundry.dev/schema/vector-ingestion/vector-batch.v1.json"

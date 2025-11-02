@@ -1474,7 +1474,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.search_query:
         try:
             facets = _parse_facet_args(args.search_facet)
-            catalog_path = builder._resolve_artifact_path(args.output)  # pylint: disable=protected-access
+            catalog_path = builder._resolve_artifact_path(
+                args.output
+            )  # pylint: disable=protected-access
             catalog_data = load_catalog(catalog_path, load_shards=True)
             options = (
                 build_faceted_search_options(

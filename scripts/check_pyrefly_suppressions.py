@@ -27,7 +27,8 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
@@ -65,26 +66,15 @@ def check_file(path: Path) -> list[tuple[int, str]]:
     return unmanaged
 
 
-def main(argv: Sequence[str] | None = None) -> int:  # noqa: C901, PLR0912
-    """Scan Python source files for unmanaged type suppressions.
+@dataclass
+class ScanResult:
+    """Summary of scanned files and any unmanaged suppressions discovered."""
 
-    Parameters
-    ----------
-    argv : Sequence[str] | None, optional
-        Command-line arguments. If None, sys.argv[1:] is used.
+    files_scanned: int
+    issues: dict[Path, list[tuple[int, str]]]
 
-    Returns
-    -------
-    int
-        Exit code: 0 if no issues, 1 if suppressions found, 2 on error.
 
-    Examples
-    --------
-    >>> # Scan current directory recursively
-    >>> exit_code = main(["src/"])
-    >>> exit_code
-    0
-    """
+def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Check for unmanaged pyrefly and type: ignore suppressions.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -106,62 +96,90 @@ def main(argv: Sequence[str] | None = None) -> int:  # noqa: C901, PLR0912
         action="store_true",
         help="Exit with code 0 even if suppressions found (dry-run mode)",
     )
+    return parser.parse_args(argv)
 
-    args = parser.parse_args(argv)
 
-    all_issues: dict[Path, list[tuple[int, str]]] = {}
+def _iter_python_files(target: Path) -> Iterable[Path]:
+    if target.is_file():
+        if target.suffix == ".py":
+            yield target
+        return
+    yield from sorted(target.rglob("*.py"))
+
+
+def _scan_targets(paths: Sequence[Path]) -> ScanResult:
+    issues: dict[Path, list[tuple[int, str]]] = {}
     files_scanned = 0
-
-    for target in cast(list[Path], args.paths):
+    for target in paths:
         resolved = target.resolve()
-
         if not resolved.exists():
-            print(f"error: path not found: {target}", file=sys.stderr)  # noqa: T201
-            return 2
-
-        if resolved.is_file():
-            if resolved.suffix != ".py":
-                continue
+            message = f"path not found: {target}"
+            raise FileNotFoundError(message)
+        for py_file in _iter_python_files(resolved):
             files_scanned += 1
             try:
-                issues = check_file(resolved)
-                if issues:
-                    all_issues[resolved] = issues
+                unmanaged = check_file(py_file)
             except ValueError as exc:
-                print(f"error: {exc}", file=sys.stderr)  # noqa: T201
-                return 2
-        elif resolved.is_dir():
-            for py_file in sorted(resolved.rglob("*.py")):
-                files_scanned += 1
-                try:
-                    issues = check_file(py_file)
-                    if issues:
-                        all_issues[py_file] = issues
-                except ValueError as exc:
-                    print(f"error: {exc}", file=sys.stderr)  # noqa: T201
-                    return 2
+                raise ValueError(str(exc)) from exc
+            if unmanaged:
+                issues[py_file] = unmanaged
+    return ScanResult(files_scanned=files_scanned, issues=issues)
 
-    if all_issues:
-        print(  # noqa: T201
-            f"error: found {len(all_issues)} files with unmanaged suppressions:\n",
-            file=sys.stderr,
-        )
-        for file_path, issues in all_issues.items():
-            print(f"\n{file_path}:", file=sys.stderr)  # noqa: T201
-            for line_num, line_content in issues:
-                print(  # noqa: T201
-                    f"  {line_num:4d}: {line_content}",
-                    file=sys.stderr,
-                )
-        print(  # noqa: T201
-            "\nRemedy: Add a ticket reference to each suppression.\n"
-            "Example: # type: ignore[misc] - ticket #456",
-            file=sys.stderr,
-        )
-        exit_zero: bool = cast(bool, args.exit_zero)
+
+def _write_issue_report(issues: dict[Path, list[tuple[int, str]]]) -> None:
+    sys.stderr.write(
+        f"error: found {len(issues)} files with unmanaged suppressions:\n\n",
+    )
+    for file_path, entries in issues.items():
+        sys.stderr.write(f"{file_path}:\n")
+        for line_num, content in entries:
+            sys.stderr.write(f"  {line_num:4d}: {content}\n")
+        sys.stderr.write("\n")
+    sys.stderr.write(
+        "Remedy: Add a ticket reference to each suppression."
+        "\nExample: # type: ignore[misc] - ticket #456\n",
+    )
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    """Scan Python source files for unmanaged type suppressions.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None, optional
+        Command-line arguments. If None, sys.argv[1:] is used.
+
+    Returns
+    -------
+    int
+        Exit code: 0 if no issues, 1 if suppressions found, 2 on error.
+
+    Examples
+    --------
+    >>> # Scan current directory recursively
+    >>> exit_code = main(["src/"])
+    >>> exit_code
+    0
+    """
+    args = _parse_args(argv)
+
+    try:
+        scan_result = _scan_targets(cast(Sequence[Path], args.paths))
+    except FileNotFoundError as exc:
+        sys.stderr.write(f"error: {exc}\n")
+        return 2
+    except ValueError as exc:
+        sys.stderr.write(f"error: {exc}\n")
+        return 2
+
+    if scan_result.issues:
+        _write_issue_report(scan_result.issues)
+        exit_zero: bool = bool(args.exit_zero)
         return 0 if exit_zero else 1
 
-    print(f"✓ All {files_scanned} Python files clean (no unmanaged suppressions)")  # noqa: T201
+    sys.stdout.write(
+        f"✓ All {scan_result.files_scanned} Python files clean (no unmanaged suppressions)\n",
+    )
     return 0
 
 

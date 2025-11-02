@@ -21,10 +21,21 @@ from kgfoundry_common.logging import (
     with_fields,
 )
 
+
+def parse_log_record(raw: str) -> dict[str, object]:
+    parsed: object = json.loads(raw)
+    if not isinstance(parsed, dict):
+        message = "Expected dict payload from JsonFormatter output"
+        raise TypeError(message)
+    parsed_dict: dict[str, object] = parsed
+    return parsed_dict
+
+
 def expect_str(mapping: Mapping[str, object], key: str) -> str:
     value = mapping[key]
     if not isinstance(value, str):
-        raise AssertionError(f"Expected str for {key}, got {type(value)!r}")
+        message = f"Expected str for {key}, got {type(value)!r}"
+        raise TypeError(message)
     return value
 
 
@@ -50,17 +61,12 @@ def test_format_with_structured_fields() -> None:
     )
     formatted = formatter.format(record)
 
-    parsed = json.loads(formatted)
-    assert isinstance(parsed, dict)
-    message = parsed.get("message")
-    operation = parsed.get("operation")
-    status = parsed.get("status")
-    level = parsed.get("level")
+    parsed = parse_log_record(formatted)
+    message = expect_str(parsed, "message")
+    operation = expect_str(parsed, "operation")
+    status = expect_str(parsed, "status")
+    level = expect_str(parsed, "level")
 
-    assert isinstance(message, str)
-    assert isinstance(operation, str)
-    assert isinstance(status, str)
-    assert isinstance(level, str)
     assert message == "Test message"
     assert operation == "test_op"
     assert status == "success"
@@ -85,10 +91,8 @@ def test_correlation_id_from_context() -> None:
             None,
         )
         formatted = formatter.format(record)
-        parsed = json.loads(formatted)
-        assert isinstance(parsed, dict)
-        correlation_value = parsed.get("correlation_id")
-        assert isinstance(correlation_value, str)
+        parsed = parse_log_record(formatted)
+        correlation_value = expect_str(parsed, "correlation_id")
         assert correlation_value == "req-123"
     finally:
         set_correlation_id(None)
