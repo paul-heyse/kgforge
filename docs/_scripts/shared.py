@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 import os
 import sys
 from collections.abc import Callable, Sequence
@@ -61,6 +60,13 @@ class GriffeLoader(Protocol):
         ...
 
 
+class WarningLogger(Protocol):
+    """Logger interface supporting ``warning`` calls."""
+
+    def warning(self, msg: str, *args: object, **kwargs: object) -> None:
+        """Log a warning message."""
+
+
 _LOADER_FACTORY = cast(Callable[[Sequence[str]], GriffeLoader], resolve_griffe().loader_type)
 
 
@@ -114,7 +120,7 @@ def resolve_git_sha(
     env: BuildEnvironment,
     settings: DocsSettings,
     *,
-    logger: logging.Logger | logging.LoggerAdapter,
+    logger: WarningLogger,
 ) -> str:
     """Return the Git SHA used when rendering GitHub permalinks."""
     if settings.github_sha:
