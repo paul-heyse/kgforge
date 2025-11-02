@@ -13,7 +13,7 @@ import collections
 import importlib
 import json
 import os
-import pickle
+import pickle  # noqa: S403 - required for backward-compatible index persistence
 import re
 import warnings
 from collections.abc import Callable, Mapping, Sequence
@@ -25,14 +25,14 @@ from typing import Protocol, cast
 import numpy as np
 
 from kgfoundry_common.errors import AgentCatalogSearchError
-from kgfoundry_common.logging import get_logger, with_fields
+from kgfoundry_common.logging import get_logger
 from kgfoundry_common.numpy_typing import (
     FloatMatrix,
+    FloatVector,
     IntVector,
     normalize_l2,
     topk_indices,
 )
-from kgfoundry_common.observability import MetricsProvider, observe_duration
 from search_api.types import (
     FaissIndexProtocol,
     FaissModuleProtocol,
@@ -41,13 +41,6 @@ from search_api.types import (
 )
 
 logger = get_logger(__name__)
-
-__all__ = [
-    "SearchOptions",
-    "SearchRequest",
-    "compute_vector_scores",
-    "search_catalog",
-]
 
 JsonLike = str | int | float | bool | list[object] | dict[str, object] | None
 CatalogMapping = Mapping[str, JsonLike]
@@ -279,6 +272,16 @@ class VectorSearchContext:
     candidate_limit: int
     k: int
     candidate_ids: set[str]
+    row_to_document: Mapping[int, SearchDocument]
+
+
+@dataclass(slots=True)
+class PreparedSearchArtifacts:
+    """Documents and optional semantic metadata extracted from the catalog."""
+
+    documents: list[SearchDocument]
+    semantic_meta: tuple[CatalogMapping, Path, Path] | None
+    mapping_payload: CatalogMapping | None
 
 
 _FAISS_ENV_OVERRIDE = "KGF_FAISS_MODULE"
@@ -396,25 +399,26 @@ class _SimpleFaissIndex(FaissIndexProtocol):
         AgentCatalogSearchError
             Raised when message.
         """
-        queries = np.asarray(vectors, dtype=np.float32, order="C")
+        queries: FloatMatrix = np.asarray(vectors, dtype=np.float32, order="C")
         if queries.ndim != EMBEDDING_MATRIX_RANK or queries.shape[1] != self.dimension:
             message = "Query vector dimension does not match index configuration"
             raise AgentCatalogSearchError(message)
         query_count = queries.shape[0]
-        distances = np.zeros((query_count, k), dtype=np.float32)
-        indices = -np.ones((query_count, k), dtype=np.int64)
+        distances: FloatMatrix = np.zeros((query_count, k), dtype=np.float32)
+        indices: IntVector = -np.ones((query_count, k), dtype=np.int64)
         if self._vectors.size == 0:
             return distances, indices
-        similarity = (queries @ self._vectors.T).astype(np.float32, copy=False)
-        if similarity.ndim != EMBEDDING_MATRIX_RANK:
+        similarity_matrix: FloatMatrix = cast(FloatMatrix, queries @ self._vectors.T)
+        if similarity_matrix.ndim != EMBEDDING_MATRIX_RANK:
             message = "Unexpected similarity matrix shape"
             raise AgentCatalogSearchError(message)
-        top_k = min(k, similarity.shape[1])
-        for row_idx, row in enumerate(similarity):
-            top_indices = topk_indices(row, top_k)
-            distances[row_idx, :top_k] = row[top_indices].astype(np.float32, copy=False)
-            indices[row_idx, :top_k] = top_indices.astype(np.int64, copy=False)
-        return cast(FloatMatrix, distances), cast(IntVector, indices)
+        top_k = min(k, similarity_matrix.shape[1])
+        for row_idx in range(similarity_matrix.shape[0]):
+            scores_row = cast(FloatVector, similarity_matrix[row_idx])
+            top_indices = topk_indices(scores_row, top_k)
+            distances[row_idx, :top_k] = scores_row[top_indices]
+            indices[row_idx, :top_k] = top_indices
+        return distances, indices
 
 
 class _SimpleFaissModule:
@@ -475,7 +479,8 @@ class _SimpleFaissModule:
         FaissIndexProtocol
             Flat index instance.
         """
-        # Simple implementation ignores factory_string and always returns flat index
+        del factory_string, metric
+        # Simple implementation ignores factory configuration and always returns flat index
         return cast(FaissIndexProtocol, _SimpleFaissIndex(dimension))
 
     @staticmethod
@@ -578,7 +583,7 @@ class _SimpleFaissModule:
         np.copyto(vectors, normalized)
 
 
-@cache
+@cache  # type: ignore[misc]
 def _simple_faiss_module() -> FaissModuleProtocol:
     """Return a cached NumPy-based FAISS shim for local usage.
 
@@ -980,34 +985,17 @@ def prepare_query_tokens(query: str) -> collections.Counter[str]:
 
 
 def resolve_search_parameters(
-    search_config: PrimitiveMapping,
+    search_config: CatalogMapping | None,
     options: SearchOptions,
     document_count: int,
     k: int,
 ) -> tuple[float, int]:
-    """Derive the alpha weight and candidate pool size for search.
+    """Return the `(alpha_value, candidate_limit)` pair for catalog search."""
+    config = search_config or {}
 
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    catalog_search : str | str | int | float | bool | NoneType
-        Describe ``catalog_search``.
-    options : SearchOptions
-        Describe ``options``.
-    document_count : int
-        Describe ``document_count``.
-    k : int
-        Describe ``k``.
-
-    Returns
-    -------
-    tuple[float, int]
-        Describe return value.
-    """
     alpha_value = options.alpha
     if alpha_value is None:
-        alpha_candidate = search_config.get("alpha")
+        alpha_candidate = config.get("alpha")
         if isinstance(alpha_candidate, (int, float)):
             alpha_value = float(alpha_candidate)
     if alpha_value is None:
@@ -1016,7 +1004,7 @@ def resolve_search_parameters(
 
     candidate_value = options.candidate_pool
     if candidate_value is None:
-        pool_value = search_config.get("candidate_pool")
+        pool_value = config.get("candidate_pool")
         if isinstance(pool_value, int) and pool_value > 0:
             candidate_value = pool_value
     if candidate_value is None:
@@ -1264,462 +1252,7 @@ def _encode_query(
     *,
     batch_size: int,
 ) -> FloatMatrix:
-    """Return normalized embeddings for ``query`` using ``model``.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    model : EmbeddingModelProtocol
-        Describe ``model``.
-    query : str
-        Describe ``query``.
-    batch_size : int
-        Describe ``batch_size``.
-
-    Returns
-    -------
-    tuple[int, ...] | np.float32
-        Describe return value.
-    """
-    try:
-        encoded = model.encode(
-            [query],
-            batch_size=batch_size,
-            show_progress_bar=False,
-            convert_to_numpy=True,
-            normalize_embeddings=True,
-        )
-    except Exception as exc:  # pragma: no cover - defensive guard
-        message = f"Embedding model failed to encode query: {exc}"
-        raise AgentCatalogSearchError(message, cause=exc) from exc
-    encoded_array = np.asarray(encoded, dtype=np.float32, order="C")
-    return normalize_l2(encoded_array, axis=1)
-
-
-def _scores_from_index(
-    distances: VectorArray,
-    indices: IndexArray,
-    context: VectorSearchContext,
-) -> dict[str, float]:
-    """Map FAISS search outputs to candidate symbol scores.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    distances : tuple[int, ...] | np.float32
-        Describe ``distances``.
-    indices : tuple[int, ...] | np.int64
-        Describe ``indices``.
-    context : VectorSearchContext
-        Describe ``context``.
-
-    Returns
-    -------
-    dict[str, float]
-        Describe return value.
-    """
-    distance_matrix = np.asarray(distances, dtype=np.float32, order="C")
-    index_matrix = np.asarray(indices, dtype=np.int64, order="C")
-    for idx, distance_row in enumerate(distance_matrix):
-        for rank, score in enumerate(distance_row):
-            row_index = int(index_matrix[idx, rank])
-            if row_index < 0:
-                continue
-            document = context.row_to_document.get(row_index)
-            if document is None or document.symbol_id not in context.candidate_ids:
-                continue
-            vector_scores[document.symbol_id] = float(score)  # type: ignore[misc]
-    return vector_scores
-
-
-def compute_vector_scores(
-    query: str,
-    options: SearchOptions,
-    context: VectorSearchContext,
-) -> dict[str, float]:
-    """Return vector similarity scores for ``query`` and the candidate set.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    query : str
-        Describe ``query``.
-    options : SearchOptions
-        Describe ``options``.
-    context : VectorSearchContext
-        Describe ``context``.
-
-    Returns
-    -------
-    dict[str, float]
-        Describe return value.
-    """
-    _, model = _resolve_embedding_model(options, context.semantic_meta)  # type: ignore[arg-type]
-    batch_size = options.batch_size or 32
-    query_vector = _encode_query(model, query, batch_size=batch_size)
-    faiss_module = load_faiss("perform semantic search")
-    index = faiss_module.read_index(str(context.index_path))
-    distances, indices = index.search(query_vector, context.k)
-    return _scores_from_index(distances, indices, context)
-
-
-def merge_scores(
-    documents: Mapping[str, SearchDocument],
-    candidate_ids: set[str],
-    lexical_scores: Mapping[str, float],
-    vector_scores: Mapping[str, float],
-    alpha_value: float,
-) -> list[SearchResult]:
-    """Combine lexical/vector scores into ranked ``SearchResult`` records.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    documents : str | SearchDocument
-        Describe ``documents``.
-    candidate_ids : set[str]
-        Describe ``candidate_ids``.
-    lexical_scores : str | float
-        Describe ``lexical_scores``.
-    vector_scores : str | float
-        Describe ``vector_scores``.
-    alpha_value : float
-        Describe ``alpha_value``.
-
-    Returns
-    -------
-    list[SearchResult]
-        Describe return value.
-    """
-    results: list[SearchResult] = []
-    max_lexical = max(lexical_scores.get(symbol_id, 0.0) for symbol_id in candidate_ids) or 1.0
-    for symbol_id in candidate_ids:
-        document = documents[symbol_id]
-        lexical_raw = lexical_scores.get(symbol_id, 0.0)
-        lexical_norm = lexical_raw / max_lexical if max_lexical > 0 else 0.0
-        vector_raw = vector_scores.get(symbol_id, -1.0)
-        vector_norm = 0.0
-        if vector_raw > -1.0:
-            vector_norm = max(min((vector_raw + 1.0) / 2.0, 1.0), 0.0)
-        combined = alpha_value * vector_norm + (1.0 - alpha_value) * lexical_norm
-        results.append(
-            SearchResult(
-                symbol_id=symbol_id,
-                score=combined,
-                lexical_score=lexical_norm,
-                vector_score=vector_norm,
-                package=document.package,
-                module=document.module,
-                qname=document.qname,
-                kind=document.kind,
-                stability=document.stability,
-                deprecated=document.deprecated,
-                summary=document.summary,
-                docstring=document.docstring,
-                anchor={"start_line": document.anchor_start, "end_line": document.anchor_end},
-            )
-        )
-    results.sort(
-        key=lambda item: (
-            item.score,
-            item.lexical_score,
-            item.vector_score,
-            item.qname,
-        ),
-        reverse=True,
-    )
-    return results
-
-
-def _prepare_search_documents(
-    catalog: CatalogMapping,
-    repo_root: Path,
-    facets: Mapping[str, str],
-) -> tuple[
-    list[SearchDocument],
-    tuple[CatalogMapping, Path, Path] | None,
-    CatalogMapping | None,
-]:
-    """Prepare and filter documents from catalog.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    catalog : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
-        Describe ``catalog``.
-    repo_root : Path
-        Describe ``repo_root``.
-    facets : str | str
-        Describe ``facets``.
-
-    Returns
-    -------
-    tuple[list[SearchDocument], tuple[str | str | int | float | bool | NoneType | list[object] | dict[str, object], Path, Path] | NoneType, str | str | int | float | bool | NoneType | list[object] | dict[str, object] | NoneType]
-        Filtered documents, semantic metadata info (if available), and mapping payload.
-    """
-    semantic_meta_info = _resolve_semantic_index_metadata(catalog, repo_root)
-    row_lookup: dict[str, int] | None = None
-    mapping_payload: CatalogMapping | None = None
-    if semantic_meta_info is not None:
-        _, _, mapping_path = semantic_meta_info
-        row_lookup, mapping_payload = _load_row_lookup(mapping_path)
-
-    documents = documents_from_catalog(catalog, row_lookup=row_lookup)
-    if facets:
-        documents = [doc for doc in documents if document_matches_facets(doc, facets)]
-    return documents, semantic_meta_info, mapping_payload
-
-
-def _perform_lexical_search(
-    query: str,
-    documents: list[SearchDocument],
-    candidate_limit: int,
-) -> tuple[dict[str, float], set[str], dict[str, SearchDocument]]:
-    """Perform lexical search and return scores, candidate IDs, and document lookup.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    query : str
-        Describe ``query``.
-    documents : list[SearchDocument]
-        Describe ``documents``.
-    candidate_limit : int
-        Describe ``candidate_limit``.
-
-    Returns
-    -------
-    tuple[dict[str, float], set[str], dict[str, SearchDocument]]
-        Lexical scores, candidate symbol IDs, and document lookup map.
-    """
-    query_tokens = prepare_query_tokens(query)
-    lexical_scores = compute_lexical_scores(query_tokens, documents, query)
-    lexical_candidates = select_lexical_candidates(lexical_scores, documents, candidate_limit)
-    candidate_ids: set[str] = {doc.symbol_id for doc in lexical_candidates}
-    doc_by_id = {doc.symbol_id: doc for doc in documents}
-    return lexical_scores, candidate_ids, doc_by_id
-
-
-@dataclass(slots=True)
-class VectorSearchParams:
-    """Parameters for vector search operation.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    semantic_meta_info : tuple[str | str | int | float | bool | NoneType | list[object] | dict[str, object], Path, Path]
-        Describe ``semantic_meta_info``.
-    mapping_payload : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
-        Describe ``mapping_payload``.
-    documents : list[SearchDocument]
-        Describe ``documents``.
-    candidate_limit : int
-        Describe ``candidate_limit``.
-    k : int
-        Describe ``k``.
-    candidate_ids : set[str]
-        Describe ``candidate_ids``.
-    """
-
-    semantic_meta_info: tuple[CatalogMapping, Path, Path]
-    mapping_payload: CatalogMapping
-    documents: list[SearchDocument]
-    candidate_limit: int
-    k: int
-    candidate_ids: set[str]
-
-
-def _perform_vector_search(
-    query: str,
-    options: SearchOptions,
-    params: VectorSearchParams,
-) -> tuple[dict[str, float], float]:
-    """Perform vector search and return scores and alpha value.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    query : str
-        Describe ``query``.
-    options : SearchOptions
-        Describe ``options``.
-    params : VectorSearchParams
-        Describe ``params``.
-
-    Returns
-    -------
-    tuple[dict[str, float], float]
-        Vector similarity scores and alpha blending value.
-    """
-    semantic_meta, index_path, _ = params.semantic_meta_info
-    row_to_document = {doc.row: doc for doc in params.documents if doc.row >= 0}
-    context = VectorSearchContext(
-        semantic_meta=semantic_meta,
-        mapping_payload=params.mapping_payload,
-        index_path=index_path,
-        documents=params.documents,
-        candidate_limit=params.candidate_limit,
-        k=params.k,
-        candidate_ids=params.candidate_ids,
-        row_to_document=row_to_document,
-    )
-    try:
-        vector_scores = compute_vector_scores(query, options, context)
-    except AgentCatalogSearchError:
-        return {}, 0.0
-    else:
-        return vector_scores, 0.0
-
-
-@dataclass(slots=True)
-class SearchRequest:
-    """Request parameters for catalog search.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    repo_root : Path
-        Describe ``repo_root``.
-    query : str
-        Describe ``query``.
-    k : int, optional
-        Describe ``k``.
-        Defaults to ``10``.
-    """
-
-    repo_root: Path
-    query: str
-    k: int = 10
-
-
-def search_catalog(
-    catalog: CatalogMapping,
-    *,
-    request: SearchRequest,
-    options: SearchOptions | None = None,
-    metrics: MetricsProvider | None = None,
-) -> list[SearchResult]:
-    """Execute hybrid lexical/vector search against the catalog.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    catalog : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
-        Catalog payload containing packages, modules, symbols, and optional semantic_index metadata.
-    request : SearchRequest
-        Search request containing repo_root, query, and k parameters.
-    options : SearchOptions | NoneType, optional
-        Optional search parameters (alpha, facets, embedding_model, etc.). Defaults to None.
-        Defaults to ``None``.
-    metrics : MetricsProvider | NoneType, optional
-        Metrics provider for recording search duration and counts. Defaults to None (uses default).
-        Defaults to ``None``.
-
-    Returns
-    -------
-    list[SearchResult]
-        Ranked search results with combined lexical/vector scores.
-
-    Raises
-    ------
-    AgentCatalogSearchError
-        Raised when search fails due to invalid input, missing artifacts, or model errors.
-    """
-    active_metrics = metrics or MetricsProvider.default()
-    active_options = options or SearchOptions()
-    trimmed_query = request.query.strip()
-    k = request.k
-    if not trimmed_query:
-        message = "Search query must not be empty"
-        raise AgentCatalogSearchError(message, context={"query": request.query})
-
-    with (
-        with_fields(
-            logger,
-            operation="search_catalog",
-            status="started",
-            k=k,
-            query_length=len(trimmed_query),
-        ) as log_adapter,
-        observe_duration(active_metrics, "search", component="agent_catalog") as obs,
-    ):
-        try:
-            facets = active_options.facets or {}
-            documents, semantic_meta_info, mapping_payload = _prepare_search_documents(
-                catalog, request.repo_root, facets
-            )
-            if not documents:
-                log_adapter.info(
-                    "Search completed with no documents matching facets",
-                    extra={"status": "success", "result_count": 0},
-                )
-                obs.success()
-                return []
-            catalog_search = catalog.get("search")
-            search_config: PrimitiveMapping = (
-                cast(PrimitiveMapping, catalog_search)
-                if isinstance(catalog_search, Mapping)
-                else {}
-            )
-            alpha_value, candidate_limit = resolve_search_parameters(
-                search_config, active_options, len(documents), k
-            )
-
-            lexical_scores, candidate_ids, doc_by_id = _perform_lexical_search(
-                trimmed_query, documents, candidate_limit
-            )
-            if not candidate_ids:
-                log_adapter.info(
-                    "Search completed with no lexical candidates",
-                    extra={"status": "success", "result_count": 0},
-                )
-                obs.success()
-                return []
-            vector_scores: dict[str, float] = {}
-            if semantic_meta_info is not None and mapping_payload is not None:
-                params = VectorSearchParams(
-                    semantic_meta_info=semantic_meta_info,
-                    mapping_payload=mapping_payload,
-                    documents=documents,
-                    candidate_limit=candidate_limit,
-                    k=k,
-                    candidate_ids=candidate_ids,
-                )
-                vector_scores, alpha_value = _perform_vector_search(
-                    trimmed_query, active_options, params
-                )
-            else:
-                alpha_value = 0.0
-
-            results = merge_scores(
-                doc_by_id, candidate_ids, lexical_scores, vector_scores, alpha_value
-            )
-            final_results = results[:k]
-            obs.success()
-            log_adapter.info(
-                "Search completed successfully",
-                extra={
-                    "status": "success",
-                    "result_count": len(final_results),
-                    "alpha": alpha_value,
-                },
-            )
-        except AgentCatalogSearchError:
-            obs.error()
-            raise
-        except Exception as exc:
-            obs.error()
-            message = f"Unexpected error during catalog search: {exc}"
-            raise AgentCatalogSearchError(message, cause=exc) from exc
-        else:
-            return final_results
+    """Return a single-row embedding matrix for ``query``."""
+    sentences = [query]
+    embeddings = model.encode(sentences, batch_size=batch_size)
+    return np.asarray(embeddings, dtype=np.float32, order="C")

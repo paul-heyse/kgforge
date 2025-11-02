@@ -12,15 +12,33 @@ from collections.abc import Callable, Mapping
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import TYPE_CHECKING, Protocol, TypedDict, cast
 
 from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.client import AgentCatalogClient, AgentCatalogClientError
-from kgfoundry.agent_catalog.search import SearchOptions, SearchRequest, SearchResult
 from kgfoundry.agent_catalog.sqlite import sqlite_candidates
 from kgfoundry_common.errors import AgentCatalogSearchError
 from kgfoundry_common.logging import get_logger, set_correlation_id, with_fields
 from kgfoundry_common.problem_details import JsonValue
+
+
+class _SearchModule(Protocol):
+    SearchOptions: type
+    SearchRequest: type
+    SearchResult: type
+    MetricsProvider: type
+    search_catalog: Callable[..., list[object]]
+
+
+catalog_search = cast(_SearchModule, catalog_search)
+
+
+if TYPE_CHECKING:
+    pass
+
+
+if TYPE_CHECKING:
+    pass
 
 CommandHandler = Callable[[AgentCatalogClient, argparse.Namespace], None]
 
@@ -152,7 +170,7 @@ def _render_error(message: str, problem: dict[str, JsonValue] | None = None) -> 
         sys.stderr.write(f"{message}\n")
 
 
-def _search_result_to_dict(result: SearchResult) -> dict[str, JsonValue]:
+def _search_result_to_dict(result: catalog_search.SearchResult) -> dict[str, JsonValue]:
     """Convert SearchResult dataclass to VectorSearchResultTypedDict-compatible dict.
 
     <!-- auto:docstring-builder v1 -->
@@ -559,10 +577,10 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
             log_adapter.exception("Search failed", exc_info=exc)
             return
 
-        options = SearchOptions(facets=facets)
+        options = catalog_search.SearchOptions(facets=facets)
         query: str = args.query
         k: int = args.k
-        request = SearchRequest(
+        request = catalog_search.SearchRequest(
             repo_root=client.repo_root,
             query=query,
             k=max(1, k),
@@ -579,6 +597,7 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
                 ),
                 request=request,
                 options=options,
+                metrics=catalog_search.MetricsProvider.default(),
             )
             duration = time.perf_counter() - start_time
             if use_envelope:
@@ -645,8 +664,8 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
     ) as log_adapter:
         query: str = args.query
         k: int = args.k
-        options = SearchOptions(candidate_pool=max(10, k))
-        request = SearchRequest(
+        options = catalog_search.SearchOptions(candidate_pool=max(10, k))
+        request = catalog_search.SearchRequest(
             repo_root=client.repo_root,
             query=query,
             k=max(1, k),
@@ -663,6 +682,7 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
                 ),
                 request=request,
                 options=options,
+                metrics=catalog_search.MetricsProvider.default(),
             )
             duration = time.perf_counter() - start_time
             if use_envelope:

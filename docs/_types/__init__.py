@@ -1,16 +1,18 @@
-"""Typed models and facades for documentation artifact pipeline.
+"""Internal typed models for documentation artifacts.
 
-This package provides:
+This private package exports authoritative models for documentation artifact
+pipelines. Models are built on Pydantic V2 BaseModel for full type safety,
+self-documenting schemas, and built-in validation.
 
-- **artifacts**: Authoritative msgspec models for symbol index, delta, and reverse-lookup artifacts.
-- **griffe**: Runtime-checkable protocols and loader facades for Griffe integration.
-- **sphinx_optional**: Typed facades for optional Sphinx dependencies (Astroid, AutoAPI).
+Sub-modules:
 
-Examples
---------
->>> from docs._types.artifacts import symbol_index_from_json, symbol_index_to_payload
->>> from docs._types.griffe import build_facade
->>> from docs._types.sphinx_optional import load_optional_dependencies
+- **artifacts**: Authoritative Pydantic models for symbol index, delta, and
+  reverse-lookup artifacts. These models are frozen (immutable) and include
+  field validators for defensive validation.
+- **griffe**: Runtime-checkable protocols and typed facade for Griffe
+  integration (optional dependency).
+- **sphinx_optional**: Typed facades for optional Sphinx/Astroid dependencies
+  with graceful handling of missing imports.
 """
 
 from __future__ import annotations
