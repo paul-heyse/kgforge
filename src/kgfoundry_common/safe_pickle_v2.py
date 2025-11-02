@@ -103,8 +103,7 @@ class _SafeUnpickler(_stdlib_pickle.Unpickler):  # noqa: S301
         if full_name not in _ALLOWED_TYPES:
             msg = f"Deserialization blocked: {full_name} not in allow-list"
             raise UnsafeSerializationError(msg, reason="disallowed_type")
-        result = cast(type[object], super().find_class(module, name))
-        return result
+        return cast(type[object], super().find_class(module, name))
 
 
 def _load_with_allow_list(file_obj: io.BytesIO) -> object:
@@ -125,15 +124,16 @@ def _load_with_allow_list(file_obj: io.BytesIO) -> object:
     UnsafeSerializationError
         If pickle contains disallowed types.
     """
+    unpickler = _SafeUnpickler(file_obj)
     try:
-        unpickler = _SafeUnpickler(file_obj)
         loaded: object = unpickler.load()
-        return loaded
     except UnsafeSerializationError:
         raise
     except Exception as exc:
         msg = f"Pickle deserialization failed: {exc}"
         raise UnsafeSerializationError(msg, reason="parse_error") from exc
+    else:
+        return loaded
 
 
 def _validate_object(obj: object, depth: int = 0) -> None:

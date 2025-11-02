@@ -14,6 +14,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tools.docstring_builder.builder_types import (
+    DocstringBuildRequest,
+    DocstringBuildResult,
+    ExitStatus,
+)
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.config import BuilderConfig, ConfigSelection
 from tools.docstring_builder.diff_manager import DiffManager
@@ -38,13 +43,10 @@ from tools.docstring_builder.models import (
     build_cli_result_skeleton,
     validate_cli_output,
 )
-from tools.docstring_builder.orchestrator import (
-    DocstringBuildRequest,
-    DocstringBuildResult,
-    ExitStatus,
-)
+from tools.docstring_builder.docfacts import DOCFACTS_VERSION
 from tools.docstring_builder.paths import (
     CACHE_PATH,
+    DOCFACTS_DIFF_PATH,
     DOCFACTS_PATH,
     OBSERVABILITY_MAX_ERRORS,
     OBSERVABILITY_PATH,
@@ -77,6 +79,7 @@ class PipelineState:
     all_ir: list[IRDocstring] = field(default_factory=list)
     docfacts_checked: bool = False
     docfacts_payload_text: str | None = None
+    diff_previews: list[tuple[Path, str]] = field(default_factory=list)
 
 
 @dataclass(slots=True, frozen=True)
@@ -190,6 +193,14 @@ class PipelineRunner:
                 self._cfg.policy_engine.record(outcome.semantics)
             state.all_ir.extend(outcome.ir)
 
+            if (
+                self._cfg.request.command == "check"
+                and self._cfg.request.diff
+                and outcome.changed
+                and outcome.preview is not None
+            ):
+                state.diff_previews.append((file_path, outcome.preview))
+
             if self._cfg.request.json_output:
                 state.file_reports.append(self._build_file_report(file_path, outcome))
 
@@ -294,10 +305,12 @@ class PipelineRunner:
         """Map DocFacts status string to ExitStatus enum."""
         if status == "success":
             return self._cfg.success_status
-        if status == "failure":
-            return self._cfg.error_status
-        if status == "skipped":
+        if status in {"violation", "failure"}:
+            return self._cfg.violation_status
+        if status == "config":
             return self._cfg.config_status
+        if status == "error":
+            return self._cfg.error_status
         return self._cfg.error_status
 
     def _build_file_report(self, file_path: Path, outcome: FileOutcome) -> FileReport:
@@ -362,7 +375,7 @@ class PipelineRunner:
             self._cfg.request.invoked_subcommand or self._cfg.request.subcommand or command
         )
 
-        cache_summary = self._build_cache_summary()
+        cache_summary = self._build_cache_summary(state)
         if self._cfg.request.command == "update":
             self._cfg.cache.write()
 
@@ -457,19 +470,19 @@ class PipelineRunner:
             manifest_path=manifest_path,
             problem_details=problem_details,
             config_selection=self._cfg.selection,
-            diff_previews=[],
+            diff_previews=state.diff_previews,
         )
 
     @staticmethod
-    def _build_cache_summary() -> CacheSummary:
+    def _build_cache_summary(state: PipelineState) -> CacheSummary:
         """Build the cache summary for the manifest."""
         exists = CACHE_PATH.exists()
         summary: CacheSummary = {
             "path": str(CACHE_PATH),
             "exists": exists,
             "mtime": None,
-            "hits": 0,
-            "misses": 0,
+            "hits": state.cache_hits,
+            "misses": state.cache_misses,
         }
         if exists:
             summary["mtime"] = datetime.datetime.fromtimestamp(
@@ -536,8 +549,8 @@ class PipelineRunner:
             "cache": {
                 "path": str(CACHE_PATH),
                 "exists": CACHE_PATH.exists(),
-                "hits": 0,
-                "misses": 0,
+                "hits": int(summary.get("cache_hits", 0)),
+                "misses": int(summary.get("cache_misses", 0)),
             },
             "policy": {
                 "coverage": policy_report.coverage,
@@ -630,9 +643,9 @@ class PipelineRunner:
             return None
         report: DocfactsReport = {
             "path": str(DOCFACTS_PATH.relative_to(REPO_ROOT)),
-            "version": "unknown",
-            "validated": False,
+            "version": DOCFACTS_VERSION,
+            "validated": DOCFACTS_PATH.exists(),
         }
-        if DOCFACTS_PATH.exists():
-            report["validated"] = True
+        if DOCFACTS_DIFF_PATH.exists():
+            report["diff"] = str(DOCFACTS_DIFF_PATH.relative_to(REPO_ROOT))
         return report

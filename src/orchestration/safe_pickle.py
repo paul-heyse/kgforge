@@ -80,8 +80,7 @@ class SafeUnpickler(_stdlib_pickle.Unpickler):  # noqa: S301 - wrapped with allo
         if full_name not in _ALLOWED_TYPES:
             msg = f"Pickle deserialization blocked: {full_name} not in allow-list"
             raise UnsafePickleError(msg, type_name=full_name)
-        result = cast(type[object], super().find_class(module, name))
-        return result
+        return cast(type[object], super().find_class(module, name))
 
 
 def dump(obj: object, file: BinaryIO) -> None:

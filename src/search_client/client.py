@@ -124,10 +124,10 @@ class SupportsHttp(Protocol):
         ----------
         url : str
             Describe ``url``.
-        *args : object
-            Describe ``args``.
-        **kwargs : object
-            Describe ``kwargs``.
+        timeout : float | tuple[float | None, float | None] | None, optional
+            Request timeout (seconds or connect/read tuple). Defaults to ``None``.
+        headers : Mapping[str, str] | None, optional
+            HTTP headers to include with the request. Defaults to ``None``.
 
         Returns
         -------
@@ -152,10 +152,12 @@ class SupportsHttp(Protocol):
         ----------
         url : str
             Describe ``url``.
-        *args : object
-            Describe ``args``.
-        **kwargs : object
-            Describe ``kwargs``.
+        json : JsonValue | None, optional
+            JSON payload to include in the request body. Defaults to ``None``.
+        headers : Mapping[str, str] | None, optional
+            HTTP headers to include with the request. Defaults to ``None``.
+        timeout : float | tuple[float | None, float | None] | None, optional
+            Request timeout (seconds or connect/read tuple). Defaults to ``None``.
 
         Returns
         -------
@@ -199,10 +201,10 @@ class RequestsHttp(SupportsHttp):
         ----------
         url : str
             Describe ``url``.
-        *args : object
-            Describe ``args``.
-        **kwargs : object
-            Describe ``kwargs``.
+        timeout : float | tuple[float | None, float | None] | None, optional
+            Request timeout in seconds or connect/read tuple. Defaults to ``None``.
+        headers : Mapping[str, str] | None, optional
+            Headers to include with the request. Defaults to ``None``.
 
         Returns
         -------
@@ -228,10 +230,12 @@ class RequestsHttp(SupportsHttp):
         ----------
         url : str
             Describe ``url``.
-        *args : object
-            Describe ``args``.
-        **kwargs : object
-            Describe ``kwargs``.
+        json : JsonValue | None, optional
+            JSON body to send with the request. Defaults to ``None``.
+        headers : Mapping[str, str] | None, optional
+            Headers to include with the request. Defaults to ``None``.
+        timeout : float | tuple[float | None, float | None] | None, optional
+            Request timeout in seconds or connect/read tuple. Defaults to ``None``.
 
         Returns
         -------
@@ -366,11 +370,7 @@ class KGFoundryClient:
         requests.HTTPError
         Raised when the API responds with a non-success status code.
         """
-        filters_payload: dict[str, JsonValue]
-        if filters is None:
-            filters_payload = {}
-        else:
-            filters_payload = {key: value for key, value in filters.items()}
+        filters_payload: dict[str, JsonValue] = filters.copy() if filters is not None else {}
         payload: dict[str, JsonValue] = {
             "query": query,
             "k": k,

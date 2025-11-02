@@ -7,6 +7,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from tools.docstring_builder.builder_types import ExitStatus
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.docfacts import DocFact, build_docfacts
@@ -15,7 +16,6 @@ from tools.docstring_builder.io import matches_patterns
 from tools.docstring_builder.ir import IRDocstring
 from tools.docstring_builder.models import DocstringBuilderError
 from tools.docstring_builder.observability import record_operation_metrics
-from tools.docstring_builder.orchestrator import ExitStatus
 from tools.docstring_builder.paths import REPO_ROOT
 from tools.docstring_builder.pipeline_types import FileOutcome, ProcessingOptions
 from tools.docstring_builder.plugins import PluginManager

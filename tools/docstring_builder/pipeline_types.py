@@ -6,10 +6,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
 
+from tools.docstring_builder.builder_types import ExitStatus
 from tools.docstring_builder.docfacts import DocFact
 from tools.docstring_builder.ir import IRDocstring
 from tools.docstring_builder.models import ErrorReport, RunStatus
-from tools.docstring_builder.orchestrator import ExitStatus
 from tools.docstring_builder.semantics import SemanticResult
 
 

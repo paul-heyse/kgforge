@@ -8,6 +8,7 @@ for implementation specifics.
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Final
@@ -45,6 +46,7 @@ __navmap__: Final[NavMap] = {
 }
 
 TOKEN = re.compile(r"[A-Za-z0-9]+")
+PARQUET_ROW_WIDTH: Final = 4
 
 
 # [nav:anchor tok]
@@ -152,60 +154,70 @@ class SpladeIndex:
         self._load(chunks_dataset_root)
 
     def _load(self, chunks_root: str | None) -> None:
-        """Describe  load.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-
-        Parameters
-        ----------
-        chunks_root : str | NoneType
-            Describe ``chunks_root``.
-        """
-        _ = chunks_root  # optional override currently unused
         if not Path(self.db_path).exists():
             return
-        con = duckdb.connect(self.db_path)
+
+        connection: duckdb.DuckDBPyConnection = duckdb.connect(self.db_path)
         try:
-            dataset = con.execute(
-                "SELECT parquet_root FROM datasets "
-                "WHERE kind='chunks' ORDER BY created_at DESC LIMIT 1"
-            ).fetchone()
-            if dataset:
-                root = dataset[0]
-                if not isinstance(root, str):
-                    msg = f"Invalid parquet_root type: {type(root)}"
-                    raise ValueError(msg)
-                # Parameterize query - use pathlib for safe path construction
-                root_path = Path(root)
-                parquet_pattern = str(root_path / "*" / "*.parquet")
-                sql = """
-                    SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text
-                    FROM read_parquet(?, union_by_name=true) AS c
-                """
-                rows = con.execute(sql, [parquet_pattern]).fetchall()
-                # Explicitly type DuckDB query results
-                for row in rows:
-                    chunk_id_val: object = row[0]
-                    doc_id_val: object = row[1]
-                    section_val: object = row[2]
-                    text_val: object = row[3]
-                    chunk_id: str = str(chunk_id_val)
-                    doc_id: str = str(doc_id_val)
-                    section: str = str(section_val)
-                    text: str = str(text_val)
-                    self.docs.append(
-                        SpladeDoc(
-                            chunk_id=chunk_id,
-                            doc_id=doc_id or "urn:doc:fixture",
-                            section=section,
-                            text=text or "",
-                        )
-                    )
+            root = self._resolve_chunks_root(connection, chunks_root)
+            rows = self._read_chunk_rows(connection, root) if root is not None else []
         finally:
-            con.close()
+            connection.close()
+
+        self._populate_docs(rows)
+        self._recompute_document_frequencies()
+
+    @staticmethod
+    def _resolve_chunks_root(
+        connection: duckdb.DuckDBPyConnection, override: str | None
+    ) -> str | None:
+        if override:
+            return override
+        dataset = connection.execute(
+            "SELECT parquet_root FROM datasets WHERE kind='chunks' ORDER BY created_at DESC LIMIT 1"
+        ).fetchone()
+        if not dataset:
+            return None
+        root = dataset[0]
+        if not isinstance(root, str):
+            msg = f"Invalid parquet_root type: {type(root)}"
+            raise TypeError(msg)
+        return root
+
+    @staticmethod
+    def _read_chunk_rows(
+        connection: duckdb.DuckDBPyConnection, root: str
+    ) -> list[tuple[object, object, object, object]]:
+        root_path = Path(root)
+        parquet_pattern = str(root_path / "*" / "*.parquet")
+        sql = """
+            SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text
+            FROM read_parquet(?, union_by_name=true) AS c
+        """
+        raw_rows: Sequence[tuple[object, ...]] = connection.execute(
+            sql, [parquet_pattern]
+        ).fetchall()
+        typed_rows: list[tuple[object, object, object, object]] = []
+        for row in raw_rows:
+            if len(row) < PARQUET_ROW_WIDTH:
+                continue
+            chunk_id_val, doc_id_val, section_val, text_val = row[:PARQUET_ROW_WIDTH]
+            typed_rows.append((chunk_id_val, doc_id_val, section_val, text_val))
+        return typed_rows
+
+    def _populate_docs(self, rows: list[tuple[object, object, object, object]]) -> None:
+        for chunk_id_val, doc_id_val, section_val, text_val in rows:
+            doc = SpladeDoc(
+                chunk_id=str(chunk_id_val),
+                doc_id=str(doc_id_val) or "urn:doc:fixture",
+                section=str(section_val),
+                text=str(text_val) or "",
+            )
+            self.docs.append(doc)
+
+    def _recompute_document_frequencies(self) -> None:
         self.N = len(self.docs)
+        self.df.clear()
         for doc in self.docs:
             for term in set(tok(doc.text)):
                 self.df[term] = self.df.get(term, 0) + 1

@@ -23,7 +23,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
-from typing import Protocol, TypedDict, cast
+from typing import Protocol, TypedDict, Unpack, cast
 
 import numpy as np
 
@@ -77,6 +77,16 @@ class SearchOptionsPayload(TypedDict, total=False):
     model_loader: Callable[[str], EmbeddingModelProtocol]
     embedding_model: str
     batch_size: int
+
+
+class SearchOptionsOverrides(TypedDict, total=False):
+    """Optional overrides for search option helper factories."""
+
+    alpha: float
+    candidate_pool: int
+    batch_size: int
+    embedding_model: str
+    model_loader: Callable[[str], "EmbeddingModelProtocol"]
 
 
 class SearchDocumentPayload(TypedDict):
@@ -329,14 +339,26 @@ def build_default_search_options(
     )
 
 
+def _validate_facets(facets: Mapping[str, str]) -> None:
+    invalid_keys = set(facets.keys()) - _ALLOWED_FACET_KEYS
+    if not invalid_keys:
+        return
+    message = (
+        f"Invalid facet keys: {sorted(invalid_keys)}. Allowed: {sorted(_ALLOWED_FACET_KEYS)}"
+    )
+    raise AgentCatalogSearchError(
+        message,
+        context={
+            "invalid_keys": sorted(invalid_keys),
+            "allowed_keys": sorted(_ALLOWED_FACET_KEYS),
+        },
+    )
+
+
 def build_faceted_search_options(
     *,
     facets: Mapping[str, str],
-    alpha: float | None = None,
-    candidate_pool: int | None = None,
-    batch_size: int | None = None,
-    embedding_model: str | None = None,
-    model_loader: Callable[[str], EmbeddingModelProtocol] | None = None,
+    **overrides: Unpack[SearchOptionsOverrides],
 ) -> SearchOptions:
     """Build SearchOptions with facet filtering validation.
 
@@ -374,27 +396,9 @@ def build_faceted_search_options(
     >>> assert opts.facets == {"package": "kgfoundry", "kind": "class"}
     """
     # Validate facet keys against allow-list
-    invalid_keys = set(facets.keys()) - _ALLOWED_FACET_KEYS
-    if invalid_keys:
-        message = (
-            f"Invalid facet keys: {sorted(invalid_keys)}. Allowed: {sorted(_ALLOWED_FACET_KEYS)}"
-        )
-        raise AgentCatalogSearchError(
-            message,
-            context={
-                "invalid_keys": sorted(invalid_keys),
-                "allowed_keys": sorted(_ALLOWED_FACET_KEYS),
-            },
-        )
+    _validate_facets(facets)
 
-    # Build options with facets
-    opts = build_default_search_options(
-        alpha=alpha,
-        candidate_pool=candidate_pool,
-        batch_size=batch_size,
-        embedding_model=embedding_model,
-        model_loader=model_loader,
-    )
+    opts = build_default_search_options(**overrides)
     opts.facets = dict(facets)
     return opts
 
@@ -449,27 +453,22 @@ def build_embedding_aware_search_options(
     >>> assert opts.embedding_model == "all-MiniLM-L6-v2"
     >>> assert opts.model_loader is not None
     """
-    if facets:
-        # Validate facet keys
-        invalid_keys = set(facets.keys()) - _ALLOWED_FACET_KEYS
-        if invalid_keys:
-            message = f"Invalid facet keys: {sorted(invalid_keys)}. Allowed: {sorted(_ALLOWED_FACET_KEYS)}"
-            raise AgentCatalogSearchError(
-                message,
-                context={
-                    "invalid_keys": sorted(invalid_keys),
-                    "allowed_keys": sorted(_ALLOWED_FACET_KEYS),
-                },
-            )
+    overrides: SearchOptionsOverrides = {
+        "embedding_model": embedding_model,
+        "model_loader": model_loader,
+    }
+    if alpha is not None:
+        overrides["alpha"] = alpha
+    if candidate_pool is not None:
+        overrides["candidate_pool"] = candidate_pool
+    if batch_size is not None:
+        overrides["batch_size"] = batch_size
 
-    return SearchOptions(
-        alpha=alpha if alpha is not None else _DEFAULT_ALPHA,
-        candidate_pool=candidate_pool if candidate_pool is not None else _DEFAULT_CANDIDATE_POOL,
-        batch_size=batch_size if batch_size is not None else _DEFAULT_BATCH_SIZE,
-        embedding_model=embedding_model,
-        model_loader=model_loader,
-        facets=dict(facets) if facets else None,
-    )
+    options = build_default_search_options(**overrides)
+    if facets is not None:
+        _validate_facets(facets)
+        options.facets = dict(facets)
+    return options
 
 
 def make_search_document(
@@ -1776,13 +1775,11 @@ def compute_vector_scores(
 
     scores: dict[str, float] = {}
     if distances.size > 0 and indices.size > 0:
-        query_row = cast(IntVector, np.asarray(indices[0, :], dtype=np.int64, order="C"))
-        query_distances = cast(
-            FloatVector, np.asarray(distances[0, :], dtype=np.float32, order="C")
-        )
+        query_row: IntVector = np.asarray(indices[0, :], dtype=np.int64, order="C")
+        query_distances: FloatVector = np.asarray(distances[0, :], dtype=np.float32, order="C")
         row_indices = cast(list[int], query_row.tolist())
         distance_values = cast(list[float], query_distances.tolist())
-        for row_id_int, distance in zip(row_indices, distance_values):
+        for row_id_int, distance in zip(row_indices, distance_values, strict=False):
             if row_id_int < 0:  # sentinel value from FAISS
                 continue
             if row_id_int in context.row_to_document:

@@ -6,10 +6,10 @@ import logging
 from unittest import mock
 
 import pytest
+from tools.docstring_builder.builder_types import ExitStatus
 from tools.docstring_builder.failure_summary import FailureSummaryRenderer, RunSummarySnapshot
 from tools.docstring_builder.metrics import MetricsRecorder
 from tools.docstring_builder.models import RunStatus
-from tools.docstring_builder.orchestrator import ExitStatus
 from tools.docstring_builder.paths import OBSERVABILITY_PATH
 from tools.docstring_builder.pipeline_types import ErrorEnvelope, FileOutcome
 

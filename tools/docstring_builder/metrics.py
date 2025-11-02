@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-from tools.docstring_builder.orchestrator import ExitStatus
+from tools.docstring_builder.builder_types import ExitStatus
 
 
 class _Histogram(Protocol):

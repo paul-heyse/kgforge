@@ -16,16 +16,16 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from tools.docstring_builder.config import BuilderConfig, ConfigSelection
-from tools.docstring_builder.models import DocstringBuildResult
-from tools.docstring_builder.observability import get_correlation_id
-from tools.docstring_builder.orchestrator import (
+from tools.docstring_builder.builder_types import (
     DocstringBuildRequest,
+    DocstringBuildResult,
     ExitStatus,
-    ProcessingOptions,
-    _build_error_result,
 )
+from tools.docstring_builder.config import BuilderConfig, ConfigSelection
+from tools.docstring_builder.observability import get_correlation_id
+from tools.docstring_builder.orchestrator import _build_error_result
 from tools.docstring_builder.paths import REPO_ROOT
+from tools.docstring_builder.pipeline_types import ProcessingOptions
 from tools.docstring_builder.plugins import (
     PluginConfigurationError,
     PluginManager,
