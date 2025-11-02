@@ -11,7 +11,7 @@ import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, cast
+from typing import Final, cast
 
 import duckdb
 import numpy as np
@@ -19,23 +19,14 @@ from numpy.typing import NDArray
 
 from kgfoundry_common.errors import IndexBuildError, VectorSearchError
 from kgfoundry_common.navmap_types import NavMap
-
-if TYPE_CHECKING:
-    from search_api.types import (
-        FaissIndexProtocol,
-        FaissModuleProtocol,
-        GpuClonerOptionsProtocol,
-        GpuResourcesProtocol,
-        IndexArray,
-        VectorArray,
-    )
-else:
-    FaissIndexProtocol = object  # type: ignore[assignment, misc]
-    FaissModuleProtocol = object  # type: ignore[assignment, misc]
-    GpuClonerOptionsProtocol = object  # type: ignore[assignment, misc]
-    GpuResourcesProtocol = object  # type: ignore[assignment, misc]
-    IndexArray = NDArray[np.int64]  # type: ignore[misc]
-    VectorArray = NDArray[np.float32]  # type: ignore[misc]
+from search_api.types import (
+    FaissIndexProtocol,
+    FaissModuleProtocol,
+    GpuClonerOptionsProtocol,
+    GpuResourcesProtocol,
+    IndexArray,
+    VectorArray,
+)
 
 __all__ = ["DenseVecs", "FaissAdapter", "VecArray"]
 
@@ -91,7 +82,7 @@ try:
     import faiss as _faiss_module
 
     HAVE_FAISS = True
-    faiss = _faiss_module  # type: ignore[assignment]
+    faiss = cast(FaissModuleProtocol, _faiss_module)
 except (ImportError, ModuleNotFoundError):
     logger.debug("FAISS library not available")
     faiss = None
@@ -100,12 +91,6 @@ except (ImportError, ModuleNotFoundError):
 
 # [nav:anchor VecArray]
 type VecArray = NDArray[np.float32]
-# Import IndexArray and VectorArray from types when available
-if TYPE_CHECKING:
-    from search_api.types import IndexArray, VectorArray
-else:
-    IndexArray = NDArray[np.int64]  # type: ignore[misc]
-    VectorArray = NDArray[np.float32]  # type: ignore[misc]
 
 
 # [nav:anchor DenseVecs]

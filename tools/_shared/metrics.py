@@ -11,129 +11,38 @@ exposed by tooling processes.
 from __future__ import annotations
 
 import time
-from collections.abc import Callable, Iterator, Sequence
+from collections.abc import Iterator, Sequence
 from contextlib import contextmanager, nullcontext
 from dataclasses import dataclass, field
-from importlib import import_module
 from pathlib import Path
-from typing import Final, Protocol, cast
+from typing import Final
 
 from kgfoundry_common.observability import start_span
 from tools._shared.logging import StructuredLoggerAdapter, get_logger, with_fields
+from tools._shared.prometheus import (
+    CounterLike,
+    HistogramLike,
+    build_counter,
+    build_histogram,
+)
 from tools._shared.settings import get_runtime_settings
 
 LOGGER = get_logger(__name__)
 
 
-class CounterLike(Protocol):
-    """Subset of Prometheus counter behaviour used by tooling."""
-
-    def labels(self, **kwargs: object) -> CounterLike: ...
-
-    def inc(self, value: float = 1.0) -> None: ...
-
-
-class HistogramLike(Protocol):
-    """Subset of Prometheus histogram behaviour used by tooling."""
-
-    def labels(self, **kwargs: object) -> HistogramLike: ...
-
-    def observe(self, value: float) -> None: ...
-
-
-class _NoopCounter:
-    """Counter stub used when Prometheus is unavailable."""
-
-    def labels(self, **kwargs: object) -> CounterLike:  # noqa: ARG002
-        _ = self
-        return self
-
-    def inc(self, value: float = 1.0) -> None:  # noqa: ARG002
-        _ = self
-
-
-class _NoopHistogram:
-    """Histogram stub used when Prometheus is unavailable."""
-
-    def labels(self, **kwargs: object) -> HistogramLike:  # noqa: ARG002
-        _ = self
-        return self
-
-    def observe(self, value: float) -> None:  # noqa: ARG002
-        _ = self
-
-
-CounterFactory = Callable[[str, str, Sequence[str]], CounterLike]
-HistogramFactory = Callable[[str, str, Sequence[str]], HistogramLike]
-
-
-def _build_counter_factory() -> CounterFactory | None:
-    try:
-        prometheus = import_module("prometheus_client")
-    except ImportError:  # pragma: no cover - optional dependency
-        return None
-
-    counter_obj: object | None = getattr(prometheus, "Counter", None)
-    if counter_obj is None or not callable(counter_obj):  # pragma: no cover - defensive check
-        return None
-
-    counter_callable = cast(Callable[[str, str, Sequence[str]], object], counter_obj)
-
-    def factory(name: str, documentation: str, labelnames: Sequence[str]) -> CounterLike:
-        return cast(CounterLike, counter_callable(name, documentation, list(labelnames)))
-
-    return factory
-
-
-def _build_histogram_factory() -> HistogramFactory | None:
-    try:
-        prometheus = import_module("prometheus_client")
-    except ImportError:  # pragma: no cover - optional dependency
-        return None
-
-    histogram_obj: object | None = getattr(prometheus, "Histogram", None)
-    if histogram_obj is None or not callable(histogram_obj):  # pragma: no cover - defensive check
-        return None
-
-    histogram_callable = cast(Callable[[str, str, Sequence[str]], object], histogram_obj)
-
-    def factory(name: str, documentation: str, labelnames: Sequence[str]) -> HistogramLike:
-        return cast(HistogramLike, histogram_callable(name, documentation, list(labelnames)))
-
-    return factory
-
-
-_PROM_COUNTER_FACTORY: CounterFactory | None = _build_counter_factory()
-_PROM_HISTOGRAM_FACTORY: HistogramFactory | None = _build_histogram_factory()
-
-
-def _make_counter(name: str, documentation: str, labelnames: Sequence[str]) -> CounterLike:
-    factory = _PROM_COUNTER_FACTORY
-    if factory is None:
-        return _NoopCounter()
-    return factory(name, documentation, labelnames)
-
-
-def _make_histogram(name: str, documentation: str, labelnames: Sequence[str]) -> HistogramLike:
-    factory = _PROM_HISTOGRAM_FACTORY
-    if factory is None:
-        return _NoopHistogram()
-    return factory(name, documentation, labelnames)
-
-
-TOOL_RUNS_TOTAL: CounterLike = _make_counter(
+TOOL_RUNS_TOTAL: CounterLike = build_counter(
     "tool_runs_total",
     "Total tooling subprocess invocations",
     ["tool", "status"],
 )
 
-TOOL_FAILURES_TOTAL: CounterLike = _make_counter(
+TOOL_FAILURES_TOTAL: CounterLike = build_counter(
     "tool_failures_total",
     "Count of tooling subprocess failures grouped by reason",
     ["tool", "reason"],
 )
 
-TOOL_DURATION_SECONDS: HistogramLike = _make_histogram(
+TOOL_DURATION_SECONDS: HistogramLike = build_histogram(
     "tool_duration_seconds",
     "Tooling subprocess duration in seconds",
     ["tool", "status"],

@@ -15,13 +15,6 @@ infer-with-first-use = true
 untyped-def-behavior = "check-and-infer-return-type"
 permissive-ignores = false
 replace-imports-with-any = [
-    "pyserini.index.lucene",
-    "pyserini.search.lucene",
-    "libcuvs",
-    "faiss",
-    "griffe",
-    "mkdocs_gen_files",
-    "libcst",
 ]
 ignore-missing-imports = []
 ignore-missing-source = false

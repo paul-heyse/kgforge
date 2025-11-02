@@ -189,7 +189,7 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(data, default=str)
 
 
-class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]  # pyrefly doesn't support GenericAlias
+class LoggerAdapter(logging.LoggerAdapter[logging.Logger]):
     """Logger adapter that injects structured context fields.
 
     <!-- auto:docstring-builder v1 -->
