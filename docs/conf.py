@@ -6,7 +6,10 @@
 - Viewable source with line numbers (viewcode)
 - JSON builder for machine-readable output
 
-This file is robust to different repo shapes (``src/<pkg>`` or ``<pkg>`` at root).
+This file is robust to different repo shapes (``src/<pkg>`` or ``<pkg>`` at root) and
+coordinates optional tooling dependencies with structured logging/problem details.  Failure
+paths reference ``schema/examples/problem_details/search-missing-index.json`` to keep
+observability consistent across the stack.
 """
 
 from __future__ import annotations
@@ -25,21 +28,29 @@ from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
 from typing import (
-    TYPE_CHECKING,
     Any,
     Final,
     Protocol,
     cast,
+    runtime_checkable,
 )
 
 import certifi
+from docs._scripts import shared as docs_shared  # noqa: PLC2701
 from docutils import nodes
 from docutils.parsers.rst import Directive
 from sphinx.application import Sphinx
+from tools import get_logger
+from tools._shared.problem_details import build_problem_details  # noqa: PLC2701
 from tools.griffe_utils import resolve_griffe
 
-LOGGER = logging.getLogger(__name__)
+ENV = docs_shared.detect_environment()
+docs_shared.ensure_sys_paths(ENV)
+DOCS_SETTINGS = docs_shared.load_settings()
+
+LOGGER = get_logger(__name__)
 LOGGER.addHandler(logging.NullHandler())
+LINKCODE_LOG = docs_shared.make_logger("docs_conf", artifact="linkcode", logger=LOGGER)
 
 
 @dataclass(frozen=True, slots=True)
@@ -62,6 +73,81 @@ PROBLEM_DETAILS_SAMPLE: Final[dict[str, str | int]] = {
     "detail": "Griffe could not resolve the requested module or member.",
     "instance": "urn:kgfoundry:docs:linkcode:unresolved",
 }
+
+
+def _import_required_module(name: str) -> ModuleType:
+    """Import ``name`` or raise a runtime error with context."""
+    try:
+        return importlib.import_module(name)
+    except ModuleNotFoundError as exc:  # pragma: no cover - defensive guard
+        problem = {
+            **PROBLEM_DETAILS_SAMPLE,
+            "detail": f"Required documentation dependency '{name}' is missing",
+            "status": 500,
+        }
+        LOGGER.exception(
+            "Documentation dependency missing",
+            extra={"status": "dependency_missing", "module_name": name, "problem_details": problem},
+        )
+        message = f"Required documentation dependency '{name}' is not installed"
+        raise RuntimeError(message) from exc
+
+
+def _require_attr(module: ModuleType, attr: str) -> object:
+    """Return ``attr`` from ``module`` or raise a runtime error."""
+    try:
+        return getattr(module, attr)
+    except AttributeError as exc:  # pragma: no cover - defensive guard
+        problem = {
+            **PROBLEM_DETAILS_SAMPLE,
+            "detail": f"Module '{module.__name__}' is missing attribute '{attr}'",
+            "status": 500,
+        }
+        LOGGER.exception(
+            "Documentation dependency attribute missing",
+            extra={
+                "status": "dependency_missing",
+                "module_name": module.__name__,
+                "attribute_name": attr,
+                "problem_details": problem,
+            },
+        )
+        message = f"Module '{module.__name__}' missing required attribute '{attr}'"
+        raise RuntimeError(message) from exc
+
+
+@runtime_checkable
+class _AutoDocstringsModule(Protocol):
+    MAGIC_METHOD_EXTENDED_SUMMARIES: Mapping[str, str]
+    STANDARD_METHOD_EXTENDED_SUMMARIES: Mapping[str, str]
+    PYDANTIC_ARTIFACT_SUMMARIES: Mapping[str, str]
+
+    def summarize(self, name: str, kind: str) -> str:
+        """Return a synthesized summary for the provided symbol."""
+        ...
+
+
+@runtime_checkable
+class _AstroidManagerProto(Protocol):
+    """Subset of Astroid manager behaviour relied upon by the docs toolchain."""
+
+    def __call__(self, *args: object, **kwargs: object) -> None: ...
+
+
+@runtime_checkable
+class _AstroidBuilderProto(Protocol):
+    """Subset of Astroid builder surface used when parsing modules."""
+
+    def __init__(self, manager: _AstroidManagerProto | None = None) -> None: ...
+
+    def file_build(self, file_path: str, module_name: str) -> object: ...
+
+
+@runtime_checkable
+class _AutoapiParserProto(Protocol):
+    """Protocol describing the AutoAPI parser contract used in this module."""
+
+    def parse(self, node: object) -> object: ...
 
 
 def get_project_settings(env: Mapping[str, str] | None = None) -> ProjectSettings:
@@ -117,24 +203,19 @@ else:
     else:
         GriffeLoadingError = RuntimeError
 
-if TYPE_CHECKING:
-    from astroid.builder import AstroidBuilder as _AstroidBuilder
-    from astroid.manager import AstroidManager as _AstroidManager
-    from autoapi._parser import Parser as _AutoapiParser
-else:  # pragma: no cover - only used for typing
-    _AstroidBuilder = object
-    _AstroidManager = object
-    _AutoapiParser = object
+astroid_builder = _import_required_module("astroid.builder")
+astroid_manager = _import_required_module("astroid.manager")
+autoapi_parser = _import_required_module("autoapi._parser")
+jsonimpl = _import_required_module("sphinxcontrib.serializinghtml.jsonimpl")
+json_module = cast(ModuleType, _require_attr(jsonimpl, "json"))
 
-astroid_builder = importlib.import_module("astroid.builder")
-astroid_manager = importlib.import_module("astroid.manager")
-autoapi_parser = importlib.import_module("autoapi._parser")
-jsonimpl = importlib.import_module("sphinxcontrib.serializinghtml.jsonimpl")
-json_module = cast(ModuleType, jsonimpl.json)
-
-AstroidManagerCls = cast("type[_AstroidManager]", astroid_manager.AstroidManager)
-AstroidBuilderCls = cast("type[_AstroidBuilder]", astroid_builder.AstroidBuilder)
-AutoapiParserCls = cast("type[_AutoapiParser]", autoapi_parser.Parser)
+AstroidManagerCls = cast(
+    type[_AstroidManagerProto], _require_attr(astroid_manager, "AstroidManager")
+)
+AstroidBuilderCls = cast(
+    type[_AstroidBuilderProto], _require_attr(astroid_builder, "AstroidBuilder")
+)
+AutoapiParserCls = cast(type[_AutoapiParserProto], _require_attr(autoapi_parser, "Parser"))
 
 
 class AutoapiParser(Protocol):
@@ -170,16 +251,6 @@ class GriffeLoaderFactory(Protocol):
         ...
 
 
-class _AutoDocstringsModule(Protocol):
-    MAGIC_METHOD_EXTENDED_SUMMARIES: Mapping[str, str]
-    STANDARD_METHOD_EXTENDED_SUMMARIES: Mapping[str, str]
-    PYDANTIC_ARTIFACT_SUMMARIES: Mapping[str, str]
-
-    def summarize(self, name: str, kind: str) -> str:
-        """Return a synthesized summary for the provided symbol."""
-        ...
-
-
 # --- Project metadata (override via env if you like)
 SETTINGS = get_project_settings()
 project = SETTINGS.project_name
@@ -187,9 +258,9 @@ author = SETTINGS.author
 
 # --- Paths
 DOCS_DIR = Path(__file__).resolve().parent
-ROOT = DOCS_DIR.parent
-SRC_DIR = ROOT / "src"
-TOOLS_DIR = ROOT / "tools"
+ROOT = ENV.root
+SRC_DIR = ENV.src
+TOOLS_DIR = ENV.tools_dir
 
 
 def _detect_pkg() -> str:
@@ -208,10 +279,11 @@ def _detect_pkg() -> str:
 
 PKG = os.environ.get("DOCS_PKG", _detect_pkg())
 
-# Sphinx searches sys.path when rendering cross-refs; we do not import the package for API parsing.
-sys.path.insert(0, str(ROOT))
-if TOOLS_DIR.exists() and str(TOOLS_DIR) not in sys.path:
-    sys.path.insert(0, str(TOOLS_DIR))
+# Sphinx searches sys.path when rendering cross-refs; ensure paths are present.
+for candidate in (SRC_DIR, ROOT, TOOLS_DIR):
+    candidate_str = str(candidate)
+    if candidate_str not in sys.path:
+        sys.path.insert(0, candidate_str)
 
 try:
     from tools.detect_pkg import detect_packages, detect_primary
@@ -423,8 +495,8 @@ def _autoapi_parse_file(
         parent = parent.parent
 
     module_name = ".".join(module_parts)
-    manager = cast(_AstroidManager, AstroidManagerCls())
-    builder = cast(_AstroidBuilder, AstroidBuilderCls(manager))
+    manager = cast(_AstroidManagerProto, AstroidManagerCls())
+    builder = cast(_AstroidBuilderProto, AstroidBuilderCls(manager))
     node = builder.file_build(file_path, module_name)
     return self.parse(node)
 
@@ -525,14 +597,21 @@ def _get_root(module: str | None) -> GriffeNode | None:
         try:
             _MODULE_CACHE[top] = _loader.load(top)
         except (GriffeLoadingError, ModuleNotFoundError, FileNotFoundError, OSError) as exc:
-            problem_details = {
-                **PROBLEM_DETAILS_SAMPLE,
-                "detail": f"Griffe failed to load module '{top}': {exc}",
-            }
-            LOGGER.warning(
-                "Failed to load module '%s' for linkcode lookup",
-                top,
-                extra={"problem_details": problem_details},
+            problem_details = build_problem_details(
+                type="https://kgfoundry.dev/problems/docs-linkcode-loader",
+                title="Failed to load module for linkcode lookup",
+                status=500,
+                detail=f"Griffe failed to load module '{top}': {exc}",
+                instance=f"urn:docs:linkcode:loader:{top}",
+                extensions={"module": top},
+            )
+            LINKCODE_LOG.warning(
+                "Failed to load module for linkcode lookup",
+                extra={
+                    "problem_details": problem_details,
+                    "status": "loader_error",
+                    "module_name": top,
+                },
             )
             _MODULE_CACHE[top] = None
     return _MODULE_CACHE[top]
@@ -548,40 +627,51 @@ def _child_member(node: GriffeNode, name: str) -> GriffeNode | None:
     return None
 
 
+def _resolve_members(root: GriffeNode, parts: Sequence[str]) -> GriffeNode | None:
+    """Traverse ``parts`` from ``root`` returning the final node when present."""
+    current = root
+    for part in parts:
+        if not part:
+            continue
+        next_node = _child_member(current, part)
+        if next_node is None:
+            return None
+        current = next_node
+    return current
+
+
 def _lookup(module: str | None, fullname: str | None) -> tuple[str, int, int] | None:
     """Return ``(abs_path, start, end)`` for the requested symbol."""
     root = _get_root(module)
     if root is None:
         return None
-    node: GriffeNode = root
+
+    target = root
     if module:
-        parts = module.split(".")
-        # skip the top-level package name (already in root)
-        for part in parts[1:]:
-            child = _child_member(node, part)
-            if child is None:
-                return None
-            node = child
-    for part in (fullname or "").split("."):
-        if not part:
-            continue
-        child = _child_member(node, part)
-        if child is None:
+        module_parts = module.split(".")
+        target_module = _resolve_members(root, module_parts[1:])
+        if target_module is None:
             return None
-        node = child
-    file_rel_obj = getattr(node, "relative_package_filepath", None)
+        target = target_module
+
+    full_parts = (fullname or "").split(".")
+    resolved = _resolve_members(target, full_parts)
+    if resolved is None:
+        return None
+
+    file_rel_obj = getattr(resolved, "relative_package_filepath", None)
     if isinstance(file_rel_obj, Path):
-        file_rel_str = str(file_rel_obj)
+        file_rel_str = file_rel_obj.as_posix()
     elif isinstance(file_rel_obj, str):
         file_rel_str = file_rel_obj
     else:
         return None
 
-    start_obj = getattr(node, "lineno", None)
+    start_obj = getattr(resolved, "lineno", None)
     if not isinstance(start_obj, int):
         return None
 
-    end_obj = getattr(node, "endlineno", None)
+    end_obj = getattr(resolved, "endlineno", None)
     end_int = end_obj if isinstance(end_obj, int) else start_obj
 
     base = SRC_DIR if SRC_DIR.exists() else ROOT
@@ -592,35 +682,16 @@ def _lookup(module: str | None, fullname: str | None) -> tuple[str, int, int] | 
 # Link modes:
 #   DOCS_LINK_MODE=editor (default): vscode://file/<abs>:line:col
 #   DOCS_LINK_MODE=github: https://github.com/<org>/<repo>/blob/<sha>/<rel>#Lstart-Lend
-LINK_MODE = SETTINGS.link_mode
+LINK_MODE = DOCS_SETTINGS.link_mode
 EDITOR = SETTINGS.editor
 
 
-def _git_sha() -> str:
-    git_dir = ROOT / ".git"
-    head_path = git_dir / "HEAD"
-    try:
-        head_contents = head_path.read_text(encoding="utf-8").strip()
-    except FileNotFoundError:
-        return SETTINGS.github_sha or "main"
-
-    if head_contents.startswith("ref: "):
-        ref = head_contents.removeprefix("ref: ").strip()
-        ref_path = git_dir / ref
-        with suppress(FileNotFoundError):
-            ref_contents = ref_path.read_text(encoding="utf-8").strip()
-            if ref_contents:
-                return ref_contents
-        return SETTINGS.github_sha or "main"
-    if head_contents:
-        return head_contents
-    return SETTINGS.github_sha or "main"
-
-
 def _github_url(relpath: str, start: int, end: int | None) -> str:
-    org = SETTINGS.github_org
-    repo = SETTINGS.github_repo
-    sha = _git_sha()
+    org = DOCS_SETTINGS.github_org or SETTINGS.github_org
+    repo = DOCS_SETTINGS.github_repo or SETTINGS.github_repo
+    if not org or not repo:
+        return ""
+    sha = docs_shared.resolve_git_sha(ENV, DOCS_SETTINGS, logger=LINKCODE_LOG)
     rng = f"#L{start}-L{end}" if end and end >= start else f"#L{start}"
     return f"https://github.com/{org}/{repo}/blob/{sha}/{relpath}{rng}"
 
@@ -633,20 +704,27 @@ def linkcode_resolve(domain: str, info: Mapping[str, str | None]) -> str | None:
     fullname = info.get("fullname", "")
     res = _lookup(module_name, fullname)
     if not res:
-        LOGGER.debug(
+        problem_details = build_problem_details(
+            type="https://kgfoundry.dev/problems/docs-linkcode-resolution",
+            title="Unable to resolve symbol location",
+            status=404,
+            detail=f"Unable to resolve {module_name}.{fullname}",
+            instance=f"urn:docs:linkcode:missing:{module_name}.{fullname}",
+            extensions={"module": module_name, "fullname": fullname},
+        )
+        LINKCODE_LOG.debug(
             "linkcode resolution failed",
             extra={
-                "problem_details": {
-                    **PROBLEM_DETAILS_SAMPLE,
-                    "detail": f"Unable to resolve {module_name}.{fullname}",
-                }
+                "problem_details": problem_details,
+                "status": "linkcode_missing",
             },
         )
         return None
     abs_path, start, end = res
     if LINK_MODE == "github":
         rel = os.path.relpath(abs_path, ROOT)
-        return _github_url(rel, start, end)
+        url = _github_url(rel, start, end)
+        return url or None
     if EDITOR == "vscode":
         return f"vscode://file/{abs_path}:{start}:1"
     if EDITOR == "pycharm":

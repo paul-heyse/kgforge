@@ -3,6 +3,10 @@
 This module provides Prometheus metrics and structured logging helpers for
 documentation generation operations (catalog, graphs, test map, schemas, portal).
 Metrics follow Prometheus naming conventions and include operation/status tags.
+All metrics are instantiated via the typed helpers defined in
+``tools/_shared/observability_facade.md`` so they fall back to no-ops when
+``prometheus_client`` is missing (see the "Eliminate Pyrefly Suppressions"
+scenario in the code-quality spec).
 """
 
 from __future__ import annotations
@@ -10,7 +14,7 @@ from __future__ import annotations
 import time
 import uuid
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 from tools._shared.prometheus import (
     CollectorRegistry,
@@ -18,21 +22,11 @@ from tools._shared.prometheus import (
     HistogramLike,
     build_counter,
     build_histogram,
+    get_default_registry,
 )
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
-
-
-def _resolve_registry(registry: CollectorRegistry | None) -> CollectorRegistry | None:
-    """Return ``registry`` or the global default when Prometheus is available."""
-    if registry is not None:
-        return registry
-    try:  # pragma: no cover - optional dependency guard
-        from prometheus_client import REGISTRY  # noqa: PLC0415
-    except ImportError:
-        return None
-    return cast(CollectorRegistry, REGISTRY)
 
 
 class DocumentationMetrics:
@@ -69,7 +63,7 @@ class DocumentationMetrics:
         registry : CollectorRegistry | None, optional
             Prometheus registry (defaults to default registry).
         """
-        resolved_registry = _resolve_registry(registry)
+        resolved_registry = registry if registry is not None else get_default_registry()
         self.registry = resolved_registry
 
         self.catalog_runs_total = build_counter(

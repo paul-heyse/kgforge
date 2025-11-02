@@ -262,6 +262,11 @@ print("Index should_use_cuvs:", faiss.should_use_cuvs(cfg))  # True → set cfg/
 
 > **Reminder**: the kernels themselves live in the **cuVS** shared libraries; the FAISS wheel holds **dispatch hooks** and dynamic links. Ensure the cuVS loader is invoked at process start.
 
+### Typed helper surfaces & Problem Details
+
+* Python now exposes a typed GPU facade in `search_api.faiss_gpu` plus a lightweight vector helper module (`kgfoundry_common.numpy_typing`) that centralises normalisation and top‑K logic.
+* Service flows emit a dedicated GPU fallback Problem Details example (`schema/examples/problem_details/search-gpu-unavailable.json`) whenever FAISS or cuVS cannot initialise, making the CPU-only degradation explicit for operators.
+
 ---
 
 ## 1) CPU vs GPU vs cuVS — updated capability map (this wheel)

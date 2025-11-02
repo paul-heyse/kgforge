@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import os
-from collections.abc import Mapping, MutableMapping
+from collections.abc import AsyncIterable, Iterable, Mapping, MutableMapping
 from pathlib import Path
 
-__all__ = ["FileResponse", "JSONResponse", "Response"]
+__all__ = ["FileResponse", "JSONResponse", "Response", "StreamingResponse"]
 
 class Response:
     """Starlette Response object with precise type annotations."""
@@ -83,4 +83,18 @@ class FileResponse(Response):
         content_disposition_type : str, optional
             Content-Disposition type. Defaults to "attachment".
         """
+        ...
+
+class StreamingResponse(Response):
+    """Starlette streaming response for iterables or async iterables of bytes."""
+
+    def __init__(
+        self,
+        content: Iterable[bytes] | AsyncIterable[bytes],
+        status_code: int = 200,
+        headers: Mapping[str, str] | None = None,
+        media_type: str | None = None,
+        background: object | None = None,
+    ) -> None:
+        """Initialise streaming response."""
         ...

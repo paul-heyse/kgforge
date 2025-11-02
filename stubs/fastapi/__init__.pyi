@@ -1,24 +1,43 @@
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 from typing import ParamSpec, TypeVar
 
 import fastapi
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
+from starlette.responses import Response
 
-__all__ = ["Depends", "FastAPI", "HTTPException", "Header", "Request"]
+__all__ = ["Depends", "FastAPI", "HTTPException", "Header", "Request", "Response", "Security"]
 
 RouteParams = ParamSpec("RouteParams")
 RouteReturn = TypeVar("RouteReturn")
+DependencyReturn = TypeVar("DependencyReturn")
+ExceptionReturn = TypeVar("ExceptionReturn", bound=Response)
 
-class Depends:
-    """FastAPI dependency injection."""
+class Depends[RouteReturn]:
+    """FastAPI dependency injection marker preserving dependency signature."""
 
     def __init__(
-        self, dependency: Callable[RouteParams, Awaitable[RouteReturn] | RouteReturn]
+        self,
+        dependency: Callable[RouteParams, Awaitable[RouteReturn] | RouteReturn] | None = None,
+        *,
+        use_cache: bool = True,
     ) -> None:
         """Initialize dependency."""
+        ...
+
+class Security[RouteReturn](Depends[RouteReturn]):
+    """FastAPI security dependency marker."""
+
+    def __init__(
+        self,
+        dependency: Callable[RouteParams, Awaitable[RouteReturn] | RouteReturn],
+        scopes: Sequence[str] | None = None,
+        *,
+        use_cache: bool = True,
+    ) -> None:
+        """Initialize security dependency."""
         ...
 
 class Header:
@@ -58,6 +77,14 @@ class FastAPI(fastapi.FastAPI):  # type: ignore[misc]  # FastAPI is a runtime cl
         """
         ...
 
+    def add_exception_handler(
+        self,
+        exc_class_or_status_code: type[Exception] | int,
+        handler: Callable[[Request, Exception], Awaitable[Response] | Response],
+    ) -> None:
+        """Register an exception handler for ``exc_class_or_status_code``."""
+        ...
+
     def get(
         self,
         path: str,
@@ -90,6 +117,14 @@ class FastAPI(fastapi.FastAPI):  # type: ignore[misc]  # FastAPI is a runtime cl
         Returns a decorator that takes a route handler function and returns it unchanged.
         The handler signature is preserved for type checking.
         """
+        ...
+
+    def add_middleware(
+        self,
+        middleware_class: type[BaseHTTPMiddleware],
+        **options: object,
+    ) -> None:
+        """Register ``middleware_class`` with optional configuration ``options``."""
         ...
 
     def middleware(

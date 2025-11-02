@@ -57,6 +57,16 @@ STEPS: list[tuple[str, list[str], str]] = [
         "[testmap] refreshed docs/_build/test_map artefacts",
     ),
     (
+        "symbol-index",
+        [sys.executable, "docs/_scripts/build_symbol_index.py"],
+        "[symbols] generated docs/_build/symbol index artefacts",
+    ),
+    (
+        "symbol-delta",
+        [sys.executable, "docs/_scripts/symbol_delta.py"],
+        "[symbols] computed docs/_build/symbols.delta.json",
+    ),
+    (
         "observability",
         [sys.executable, "tools/docs/scan_observability.py"],
         "[observability] updated docs/_build/configuration snapshots",
@@ -85,6 +95,11 @@ STEPS: list[tuple[str, list[str], str]] = [
         "agent-analytics",
         [sys.executable, "tools/docs/build_agent_analytics.py"],
         "[agent] wrote docs/_build/analytics.json",
+    ),
+    (
+        "docs-validation",
+        [sys.executable, "docs/_scripts/validate_artifacts.py"],
+        "[docs] validated docs/_build JSON artefacts",
     ),
 ]
 

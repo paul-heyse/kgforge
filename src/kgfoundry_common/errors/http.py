@@ -17,6 +17,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from kgfoundry_common.errors.exceptions import KgFoundryError
+from kgfoundry_common.fastapi_helpers import typed_exception_handler
 from kgfoundry_common.logging import get_logger
 from kgfoundry_common.problem_details import ProblemDetails
 
@@ -76,24 +77,14 @@ def problem_details_response(
 
 
 def register_problem_details_handler(app: FastAPI) -> None:
-    """Register FastAPI exception handler for KgFoundryError.
+    """Register FastAPI exception handler for KgFoundryError."""
 
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    app : FastAPI
-        FastAPI application instance.
-
-    Examples
-    --------
-    >>> from fastapi import FastAPI
-    >>> from kgfoundry_common.errors.http import register_problem_details_handler
-    >>> app = FastAPI()
-    >>> register_problem_details_handler(app)
-    """
-
-    @app.exception_handler(KgFoundryError)  # type: ignore[misc]  # Starlette's exception_handler returns Callable[..., object] which mypy flags as containing Any via ...
-    async def kgfoundry_error_handler(request: Request, exc: KgFoundryError) -> JSONResponse:  # type: ignore[misc]  # Decorated function type contains Any from Starlette's Callable[..., object]
-        """Handle KgFoundryError exceptions with Problem Details."""
+    def _handler(request: Request, exc: KgFoundryError) -> JSONResponse:
         return problem_details_response(exc, request=request)
+
+    typed_exception_handler(
+        app,
+        KgFoundryError,
+        _handler,
+        name="kgfoundry_error_handler",
+    )

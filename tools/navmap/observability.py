@@ -2,7 +2,10 @@
 
 This module provides Prometheus metrics and structured logging helpers for
 navmap operations (build, check, repair, migrate). Metrics follow Prometheus
-naming conventions and include operation/status tags.
+naming conventions and include operation/status tags. The metrics originate from
+the typed facade documented in ``tools/_shared/observability_facade.md`` and
+comply with the "Eliminate Pyrefly Suppressions" spec so they become no-ops if
+``prometheus_client`` is not installed.
 """
 
 from __future__ import annotations
@@ -10,7 +13,7 @@ from __future__ import annotations
 import time
 import uuid
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 from tools._shared.prometheus import (
     CollectorRegistry,
@@ -18,21 +21,11 @@ from tools._shared.prometheus import (
     HistogramLike,
     build_counter,
     build_histogram,
+    get_default_registry,
 )
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
-
-
-def _resolve_registry(registry: CollectorRegistry | None) -> CollectorRegistry | None:
-    """Return ``registry`` or the global default when Prometheus is available."""
-    if registry is not None:
-        return registry
-    try:  # pragma: no cover - optional dependency guard
-        from prometheus_client import REGISTRY  # noqa: PLC0415
-    except ImportError:
-        return None
-    return cast(CollectorRegistry, REGISTRY)
 
 
 class NavmapMetrics:
@@ -65,7 +58,7 @@ class NavmapMetrics:
         registry : CollectorRegistry | None, optional
             Prometheus registry (defaults to default registry).
         """
-        resolved_registry = _resolve_registry(registry)
+        resolved_registry = registry if registry is not None else get_default_registry()
         self.registry = resolved_registry
 
         self.build_runs_total = build_counter(

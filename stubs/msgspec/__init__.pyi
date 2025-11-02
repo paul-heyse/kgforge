@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TypeVar
+from typing import TypeVar, overload
 
 T = TypeVar("T")
 
@@ -30,6 +30,33 @@ def field(
     name: str | None = ...,
     alias: str | None = ...,
 ) -> object: ...
+@overload
+def struct(
+    cls: type[T],
+    *,
+    array_like: bool | None = None,
+    frozen: bool | None = None,
+    gc: bool | None = None,
+    kw_only: bool | None = None,
+    tag: object = ...,
+    tag_field: str | None = ...,
+    rename: object = ...,
+    omit_defaults: bool | None = None,
+    slots: bool | None = None,
+) -> type[T]: ...
+@overload
+def struct(
+    *,
+    array_like: bool | None = None,
+    frozen: bool | None = None,
+    gc: bool | None = None,
+    kw_only: bool | None = None,
+    tag: object = ...,
+    tag_field: str | None = ...,
+    rename: object = ...,
+    omit_defaults: bool | None = None,
+    slots: bool | None = None,
+) -> Callable[[type[T]], type[T]]: ...
 
 class _StructsModule:
     def replace(self, obj: T, /, **changes: object) -> T: ...
@@ -47,6 +74,19 @@ class _JsonModule:
         type: type[T] | None = None,  # noqa: A002 - public API uses `type`
     ) -> T: ...
     def schema(self, obj: object) -> object: ...
+
+    class Codec:
+        """JSON codec for deterministic serialization."""
+
+        def encode(
+            self, obj: object, *, enc_hook: Callable[[object], object] | None = None
+        ) -> bytes: ...
+        def decode(
+            self,
+            data: bytes | bytearray | memoryview | str,
+            *,
+            type: type[T] | None = None,  # noqa: A002 - public API uses `type`
+        ) -> T: ...
 
 json: _JsonModule
 

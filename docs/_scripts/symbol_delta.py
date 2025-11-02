@@ -6,21 +6,22 @@ import argparse
 import json
 import logging
 import sys
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-import msgspec
-from docs._scripts import shared
-from docs._scripts.models import (
-    JsonValue,
-    SymbolDeltaChangeModel,
-    SymbolDeltaPayloadModel,
+from docs._scripts import shared  # noqa: PLC2701
+from docs._scripts.validation import validate_against_schema  # noqa: PLC2701
+from tools import (
+    ToolRunResult,
+    build_problem_details,
+    get_logger,
+    observe_tool_run,
+    render_problem,
+    run_tool,
 )
-from docs._scripts.validation import validate_against_schema
-from tools import ToolExecutionError, ToolRunResult, get_logger, run_tool
-from tools._shared.problem_details import build_problem_details, render_problem
+from tools._shared.proc import ToolExecutionError
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
@@ -56,6 +57,22 @@ TRACKED_KEYS = {
     "is_property",
 }
 
+JsonPrimitive = str | int | float | bool | None
+JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
+JsonPayload = Mapping[str, JsonValue] | Sequence[JsonValue] | JsonValue
+ProblemDetailsDict = dict[str, JsonValue]
+
+
+def _validate_git_ref(ref: str) -> str:
+    candidate = ref.strip()
+    if not candidate:
+        message = "Git reference must not be empty"
+        raise ValueError(message)
+    if candidate.startswith("-"):
+        message = "Git reference must not begin with '-'"
+        raise ValueError(message)
+    return candidate
+
 
 @dataclass(frozen=True, slots=True)
 class SymbolRow:
@@ -63,42 +80,95 @@ class SymbolRow:
 
     path: str
     canonical_path: str | None = None
-    signature: JsonValue = None
-    kind: JsonValue = None
-    file: JsonValue = None
-    lineno: JsonValue = None
-    endlineno: JsonValue = None
-    doc: JsonValue = None
-    owner: JsonValue = None
-    stability: JsonValue = None
-    since: JsonValue = None
-    deprecated_in: JsonValue = None
-    section: JsonValue = None
-    package: JsonValue = None
-    module: JsonValue = None
-    tested_by: JsonValue = None
-    is_async: JsonValue = None
-    is_property: JsonValue = None
+    signature: str | None = None
+    kind: str | None = None
+    file: str | None = None
+    lineno: int | None = None
+    endlineno: int | None = None
+    doc: str | None = None
+    owner: str | None = None
+    stability: str | None = None
+    since: str | None = None
+    deprecated_in: str | None = None
+    section: str | None = None
+    package: str | None = None
+    module: str | None = None
+    tested_by: tuple[str, ...] = ()
+    is_async: bool | None = None
+    is_property: bool | None = None
+
+    def to_payload(self) -> dict[str, JsonValue]:
+        return {
+            "path": self.path,
+            "canonical_path": self.canonical_path,
+            "signature": self.signature,
+            "kind": self.kind,
+            "file": self.file,
+            "lineno": self.lineno,
+            "endlineno": self.endlineno,
+            "doc": self.doc,
+            "owner": self.owner,
+            "stability": self.stability,
+            "since": self.since,
+            "deprecated_in": self.deprecated_in,
+            "section": self.section,
+            "package": self.package,
+            "module": self.module,
+            "tested_by": list(self.tested_by),
+            "is_async": self.is_async,
+            "is_property": self.is_property,
+        }
 
     @classmethod
     def from_mapping(cls, payload: Mapping[str, JsonValue]) -> SymbolRow | None:
         path_value = payload.get("path")
         if not isinstance(path_value, str):
             return None
-        fields: dict[str, JsonValue] = {
-            "path": path_value,
-        }
-        for key in TRACKED_KEYS:
-            if key in payload:
-                fields[key] = payload[key]
-        return cls(**fields)  # type: ignore[arg-type]
 
-    def to_dict(self) -> dict[str, JsonValue]:
-        return {
-            key: getattr(self, key)
-            for key in ("path", *sorted(TRACKED_KEYS))
-            if getattr(self, key) is not None
-        }
+        def _str_field(key: str) -> str | None:
+            value = payload.get(key)
+            return value if isinstance(value, str) else None
+
+        def _int_field(key: str) -> int | None:
+            value = payload.get(key)
+            if isinstance(value, int):
+                return value
+            if isinstance(value, float):
+                return int(value)
+            return None
+
+        def _bool_field(key: str) -> bool | None:
+            value = payload.get(key)
+            return value if isinstance(value, bool) else None
+
+        tested_by_value = payload.get("tested_by")
+        if isinstance(tested_by_value, list):
+            tested_by = tuple(str(item) for item in tested_by_value)
+        elif isinstance(tested_by_value, str):
+            tested_by = (tested_by_value,)
+        else:
+            tested_by = ()
+
+        return cls(
+            path=path_value,
+            canonical_path=_str_field("canonical_path"),
+            signature=_str_field("signature"),
+            kind=_str_field("kind"),
+            file=_str_field("file"),
+            lineno=_int_field("lineno"),
+            endlineno=_int_field("endlineno"),
+            doc=_str_field("doc"),
+            owner=_str_field("owner"),
+            stability=_str_field("stability"),
+            since=_str_field("since"),
+            deprecated_in=_str_field("deprecated_in"),
+            section=_str_field("section"),
+            package=_str_field("package"),
+            module=_str_field("module"),
+            tested_by=tested_by,
+            is_async=_bool_field("is_async"),
+            is_property=_bool_field("is_property"),
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -110,13 +180,13 @@ class ChangeEntry:
     after: dict[str, JsonValue]
     reasons: tuple[str, ...]
 
-    def to_model(self) -> SymbolDeltaChangeModel:
-        return SymbolDeltaChangeModel(
-            path=self.path,
-            before=dict(self.before),
-            after=dict(self.after),
-            reasons=list(self.reasons),
-        )
+    def to_payload(self) -> dict[str, JsonValue]:
+        return {
+            "path": self.path,
+            "before": dict(self.before),
+            "after": dict(self.after),
+            "reasons": list(self.reasons),
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -129,17 +199,14 @@ class SymbolDeltaPayload:
     removed: tuple[str, ...]
     changed: tuple[ChangeEntry, ...]
 
-    def to_model(self) -> SymbolDeltaPayloadModel:
-        return SymbolDeltaPayloadModel(
-            base_sha=self.base_sha,
-            head_sha=self.head_sha,
-            added=list(self.added),
-            removed=list(self.removed),
-            changed=[entry.to_model() for entry in self.changed],
-        )
-
     def to_payload(self) -> dict[str, JsonValue]:
-        return msgspec.to_builtins(self.to_model(), builtin_types=dict)
+        return {
+            "base_sha": self.base_sha,
+            "head_sha": self.head_sha,
+            "added": list(self.added),
+            "removed": list(self.removed),
+            "changed": [entry.to_payload() for entry in self.changed],
+        }
 
 
 def _coerce_json_value(value: object) -> JsonValue:
@@ -148,29 +215,10 @@ def _coerce_json_value(value: object) -> JsonValue:
     if isinstance(value, (str, int, float, bool)):
         return value
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
-        return [cast(JsonValue, _coerce_json_value(item)) for item in value]
+        return [_coerce_json_value(item) for item in value]
     if isinstance(value, Mapping):
         return {str(k): _coerce_json_value(v) for k, v in value.items()}
     return str(value)
-
-
-def _assign_subset(
-    row: dict[str, JsonValue],
-    payload: Mapping[str, JsonValue],
-    keys: Iterable[str],
-) -> None:
-    for key in keys:
-        if key in payload:
-            row[key] = _coerce_json_value(payload[key])
-
-
-def _validate_git_ref(ref: str) -> str:
-    candidate = ref.strip()
-    if not candidate:
-        raise ValueError("Git reference must not be empty")
-    if candidate.startswith("-"):
-        raise ValueError("Git reference must not begin with '-'")
-    return candidate
 
 
 def _make_symbol_row(payload: Mapping[str, JsonValue]) -> SymbolRow | None:
@@ -179,11 +227,12 @@ def _make_symbol_row(payload: Mapping[str, JsonValue]) -> SymbolRow | None:
 
 def _coerce_symbol_rows(data: object, *, source: str) -> list[SymbolRow]:
     if not isinstance(data, Sequence):
-        raise TypeError(f"{source} is not a JSON array")
+        message = f"{source} is not a JSON array"
+        raise TypeError(message)
     rows: list[SymbolRow] = []
     for entry in data:
         if isinstance(entry, Mapping):
-            candidate = _make_symbol_row(entry)
+            candidate = _make_symbol_row(cast(Mapping[str, JsonValue], entry))
             if candidate is not None:
                 rows.append(candidate)
     return rows
@@ -198,7 +247,8 @@ def _symbols_from_git_blob(blob: str, *, source: str) -> list[SymbolRow]:
     try:
         data: object = json.loads(blob)
     except json.JSONDecodeError as exc:  # pragma: no cover - defensive
-        raise ValueError(f"{source} does not contain valid JSON") from exc
+        message = f"{source} does not contain valid JSON"
+        raise ValueError(message) from exc
     return _coerce_symbol_rows(data, source=source)
 
 
@@ -224,7 +274,8 @@ def _load_base_snapshot(arg: str) -> tuple[list[SymbolRow], str | None]:
     try:
         ref = _validate_git_ref(arg)
     except ValueError as exc:
-        raise SystemExit(str(exc)) from exc
+        message = str(exc)
+        raise SystemExit(message) from exc
 
     try:
         result: ToolRunResult = run_tool(
@@ -268,8 +319,8 @@ def _diff_rows(
         reasons: list[str] = []
         before_subset: dict[str, JsonValue] = {}
         after_subset: dict[str, JsonValue] = {}
-        before_payload = before_row.to_dict()
-        after_payload = after_row.to_dict()
+        before_payload = before_row.to_payload()
+        after_payload = after_row.to_payload()
         for key in sorted(TRACKED_KEYS):
             before_val = before_payload.get(key)
             after_val = after_payload.get(key)
@@ -312,10 +363,9 @@ def _build_delta(
 def write_delta(delta_path: Path, payload: SymbolDeltaPayload) -> bool:
     builtins_payload = payload.to_payload()
     validate_against_schema(
-        builtins_payload,
+        cast(JsonPayload, builtins_payload),
         SYMBOL_DELTA_SCHEMA,
         artifact=delta_path.name,
-        struct_type=SymbolDeltaPayloadModel,
     )
     serialized = json.dumps(builtins_payload, indent=2, ensure_ascii=False) + "\n"
     if delta_path.exists():
@@ -341,7 +391,7 @@ def write_delta(delta_path: Path, payload: SymbolDeltaPayload) -> bool:
     return True
 
 
-def _emit_problem(problem: Mapping[str, JsonValue] | None, *, default_message: str) -> None:
+def _emit_problem(problem: ProblemDetailsDict | None, *, default_message: str) -> None:
     payload = problem or build_problem_details(
         type="https://kgfoundry.dev/problems/docs-symbol-delta",
         title="Symbol delta computation failed",
@@ -362,8 +412,8 @@ def parse_args(argv: Sequence[str] | None) -> DeltaArgs:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--base",
-        required=True,
-        help="Git ref or path to the baseline symbols.json snapshot",
+        default="HEAD~1",
+        help="Git ref or path to the baseline symbols.json snapshot (default: HEAD~1)",
     )
     parser.add_argument(
         "--output",
@@ -371,7 +421,9 @@ def parse_args(argv: Sequence[str] | None) -> DeltaArgs:
         help="Destination delta file",
     )
     namespace = parser.parse_args(argv)
-    return DeltaArgs(base=str(namespace.base), output=str(namespace.output))
+    base_arg = cast(str, getattr(namespace, "base", "HEAD~1"))
+    output_arg = cast(str, getattr(namespace, "output", str(DEFAULT_DELTA_PATH)))
+    return DeltaArgs(base=base_arg, output=output_arg)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -395,7 +447,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         return 1
 
-    with shared.observe_tool_run(["docs-symbol-delta"], cwd=ENV.root, timeout=None) as observation:
+    with observe_tool_run(["docs-symbol-delta"], cwd=ENV.root, timeout=None) as observation:
         try:
             head_rows = _load_symbol_rows(SYMBOLS_PATH)
             base_rows, base_sha = _load_base_snapshot(args.base)
@@ -409,9 +461,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             write_delta(delta_path, payload)
         except ToolExecutionError as exc:
             observation.failure("failure", returncode=1)
-            _emit_problem(exc.problem, default_message=str(exc))
+            _emit_problem(cast(ProblemDetailsDict | None, exc.problem), default_message=str(exc))
             return 1
-        except Exception as exc:  # pragma: no cover - defensive
+        except Exception as exc:  # pragma: no cover - defensive  # noqa: BLE001
             observation.failure("exception", returncode=1)
             problem = build_problem_details(
                 type="https://kgfoundry.dev/problems/docs-symbol-delta",

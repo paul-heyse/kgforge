@@ -18,8 +18,7 @@ from re import Pattern
 from typing import TYPE_CHECKING, Final, Protocol, cast
 
 if TYPE_CHECKING:
-    from pyserini.index.lucene import LuceneIndexer as _LuceneIndexer
-    from pyserini.search.lucene import LuceneSearcher as _LuceneSearcher
+    pass
 
 from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap

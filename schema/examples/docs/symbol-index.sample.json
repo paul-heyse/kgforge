@@ -1,0 +1,29 @@
+[
+  {
+    "path": "kgfoundry.docs.sample.module.function",
+    "canonical_path": "kgfoundry.docs.sample.module.function",
+    "kind": "function",
+    "package": "kgfoundry",
+    "module": "kgfoundry.docs.sample.module",
+    "file": "src/kgfoundry/docs/sample/module.py",
+    "lineno": 42,
+    "endlineno": 58,
+    "doc": "Return a friendly greeting for documentation examples.",
+    "signature": "(name: str, *, excited: bool = False) -> str",
+    "is_async": false,
+    "is_property": false,
+    "owner": "core-docs",
+    "stability": "stable",
+    "since": "v1.2.0",
+    "deprecated_in": null,
+    "section": "api-reference",
+    "tested_by": [
+      "tests/docs/test_sample_module.py::test_function"
+    ],
+    "source_link": {
+      "editor": "vscode://file//workspace/src/kgfoundry/docs/sample/module.py:42:1",
+      "github": "https://github.com/kgfoundry/kgfoundry/blob/0123456789abcdef/src/kgfoundry/docs/sample/module.py#L42-L58"
+    }
+  }
+]
+

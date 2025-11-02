@@ -5,20 +5,22 @@ from __future__ import annotations
 import json
 import logging
 import sys
-from collections import defaultdict
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import Protocol, cast, runtime_checkable
 
-import msgspec
-from docs._scripts import shared
-from docs._scripts.models import JsonValue, SymbolIndexRowModel
-from docs._scripts.validation import validate_against_schema
-from tools import StructuredLoggerAdapter, ToolExecutionError, get_logger
-from tools._shared.metrics import observe_tool_run
-from tools._shared.problem_details import build_problem_details, render_problem
+from docs._scripts import shared  # noqa: PLC2701
+from docs._scripts.validation import validate_against_schema  # noqa: PLC2701
+from tools import (
+    StructuredLoggerAdapter,
+    build_problem_details,
+    get_logger,
+    observe_tool_run,
+    render_problem,
+)
+from tools._shared.proc import ToolExecutionError
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
@@ -36,6 +38,11 @@ BASE_LOGGER = get_logger(__name__)
 SYMBOL_LOG = shared.make_logger("symbol_index", artifact="symbols.json", logger=BASE_LOGGER)
 BY_FILE_LOG = shared.make_logger("symbol_index", artifact="by_file.json", logger=BASE_LOGGER)
 BY_MODULE_LOG = shared.make_logger("symbol_index", artifact="by_module.json", logger=BASE_LOGGER)
+
+JsonPrimitive = str | int | float | bool | None
+JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
+JsonPayload = Mapping[str, JsonValue] | Sequence[JsonValue] | JsonValue
+ProblemDetailsDict = dict[str, JsonValue]
 
 
 @dataclass(frozen=True, slots=True)
@@ -82,29 +89,29 @@ class SymbolIndexRow:
     tested_by: tuple[str, ...]
     source_link: Mapping[str, str]
 
-    def to_model(self) -> SymbolIndexRowModel:
-        """Return a msgspec struct suitable for schema validation."""
-        return SymbolIndexRowModel(
-            path=self.path,
-            canonical_path=self.canonical_path,
-            kind=self.kind,
-            package=self.package,
-            module=self.module,
-            file=self.file,
-            lineno=self.span.start,
-            endlineno=self.span.end,
-            doc=self.doc,
-            signature=self.signature,
-            is_async=self.is_async,
-            is_property=self.is_property,
-            owner=self.owner,
-            stability=self.stability,
-            since=self.since,
-            deprecated_in=self.deprecated_in,
-            section=self.section,
-            tested_by=list(self.tested_by),
-            source_link=dict(self.source_link),
-        )
+    def to_payload(self) -> dict[str, JsonValue]:
+        """Return a JSON-compatible payload for the row."""
+        return {
+            "path": self.path,
+            "canonical_path": self.canonical_path,
+            "kind": self.kind,
+            "package": self.package,
+            "module": self.module,
+            "file": self.file,
+            "lineno": self.span.start,
+            "endlineno": self.span.end,
+            "doc": self.doc,
+            "signature": self.signature,
+            "is_async": self.is_async,
+            "is_property": self.is_property,
+            "owner": self.owner,
+            "stability": self.stability,
+            "since": self.since,
+            "deprecated_in": self.deprecated_in,
+            "section": self.section,
+            "tested_by": list(self.tested_by),
+            "source_link": dict(self.source_link),
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -120,13 +127,20 @@ class SymbolIndexArtifacts:
         return len(self.rows)
 
     def rows_payload(self) -> list[dict[str, JsonValue]]:
-        return [msgspec.to_builtins(row.to_model(), builtin_types=dict) for row in self.rows]
+        return [row.to_payload() for row in self.rows]
 
     def by_file_payload(self) -> dict[str, list[str]]:
         return {key: list(values) for key, values in sorted(self.by_file.items())}
 
     def by_module_payload(self) -> dict[str, list[str]]:
         return {key: list(values) for key, values in sorted(self.by_module.items())}
+
+
+@dataclass(frozen=True, slots=True)
+class SchemaValidation:
+    """Schema validation metadata applied before writing an artifact."""
+
+    schema: Path
 
 
 @runtime_checkable
@@ -149,7 +163,7 @@ class GriffeNode(Protocol):
 def safe_getattr(obj: object, name: str, default: object | None = None) -> object | None:
     """Return ``getattr`` with defensive error handling."""
     try:
-        return getattr(obj, name)
+        return cast(object, getattr(obj, name, default))
     except (AttributeError, RuntimeError):
         return default
 
@@ -299,6 +313,56 @@ def _clean_meta(meta: Mapping[str, JsonValue] | None) -> dict[str, JsonValue]:
     return {key: value for key, value in meta.items() if value is not None}
 
 
+def _record_module_defaults(
+    module_name: str,
+    payload: Mapping[str, JsonValue],
+    module_meta: dict[str, dict[str, JsonValue]],
+    symbol_meta: dict[str, dict[str, JsonValue]],
+) -> dict[str, JsonValue]:
+    defaults = _clean_meta(cast(Mapping[str, JsonValue] | None, payload.get("module_meta")))
+    module_meta[module_name] = defaults
+    if defaults:
+        symbol_meta.setdefault(module_name, dict(defaults))
+    return defaults
+
+
+def _record_symbol_meta(
+    module_name: str,
+    per_symbol_meta: Mapping[str, JsonValue] | None,
+    symbol_meta: dict[str, dict[str, JsonValue]],
+) -> None:
+    if not isinstance(per_symbol_meta, Mapping):
+        return
+    for name, meta in per_symbol_meta.items():
+        if not isinstance(name, str) or not isinstance(meta, Mapping):
+            continue
+        fq_name = _join_symbol(module_name, name)
+        symbol_meta[fq_name] = _clean_meta(meta)
+
+
+def _record_sections(
+    module_name: str,
+    sections_payload: Sequence[JsonValue] | None,
+    sections: dict[str, str],
+) -> None:
+    if sections_payload is None:
+        return
+    for section_obj in sections_payload:
+        if not isinstance(section_obj, Mapping):
+            continue
+        section_id = section_obj.get("id")
+        if not isinstance(section_id, str):
+            continue
+        symbols = section_obj.get("symbols")
+        if not isinstance(symbols, Sequence):
+            continue
+        for symbol in symbols:
+            if not isinstance(symbol, str):
+                continue
+            fq_name = _join_symbol(module_name, symbol)
+            sections[fq_name] = section_id
+
+
 def _navmap_from_payload(data: Mapping[str, JsonValue]) -> NavLookup:
     symbol_meta: dict[str, dict[str, JsonValue]] = {}
     module_meta: dict[str, dict[str, JsonValue]] = {}
@@ -306,43 +370,25 @@ def _navmap_from_payload(data: Mapping[str, JsonValue]) -> NavLookup:
 
     modules_value = data.get("modules")
     if not isinstance(modules_value, Mapping):
-        return NavLookup(symbol_meta=symbol_meta, module_meta=module_meta, sections=sections)
+        return NavLookup.empty()
+    modules_mapping = cast(Mapping[str, JsonValue], modules_value)
 
-    modules_mapping = modules_value
     for module_name, payload in modules_mapping.items():
         if not isinstance(module_name, str) or not isinstance(payload, Mapping):
             continue
-
-        payload_mapping = payload
-        defaults = _clean_meta(
-            cast(Mapping[str, JsonValue] | None, payload_mapping.get("module_meta"))
+        payload_mapping = cast(Mapping[str, JsonValue], payload)
+        _record_module_defaults(module_name, payload_mapping, module_meta, symbol_meta)
+        _record_symbol_meta(
+            module_name,
+            cast(Mapping[str, JsonValue] | None, payload_mapping.get("meta")),
+            symbol_meta,
         )
-        module_meta[module_name] = defaults
-        if defaults:
-            symbol_meta.setdefault(module_name, dict(defaults))
+        _record_sections(
+            module_name,
+            cast(Sequence[JsonValue] | None, payload_mapping.get("sections")),
+            sections,
+        )
 
-        per_symbol_meta = cast(Mapping[str, JsonValue] | None, payload_mapping.get("meta"))
-        if per_symbol_meta:
-            for name, meta in per_symbol_meta.items():
-                if not isinstance(name, str) or not isinstance(meta, Mapping):
-                    continue
-                fq_name = _join_symbol(module_name, name)
-                symbol_meta[fq_name] = _clean_meta(meta)
-
-        sections_payload = cast(Sequence[JsonValue] | None, payload_mapping.get("sections"))
-        if sections_payload:
-            for section in sections_payload:
-                if not isinstance(section, Mapping):
-                    continue
-                section_id = section.get("id")
-                if not isinstance(section_id, str):
-                    continue
-                symbols_value = section.get("symbols")
-                if isinstance(symbols_value, Sequence):
-                    for symbol_name in symbols_value:
-                        if isinstance(symbol_name, str):
-                            fq_name = _join_symbol(module_name, symbol_name)
-                            sections[fq_name] = section_id
     return NavLookup(symbol_meta=symbol_meta, module_meta=module_meta, sections=sections)
 
 
@@ -352,7 +398,7 @@ def load_nav_lookup() -> NavLookup:
         if not candidate.exists():
             continue
         try:
-            payload = json.loads(candidate.read_text(encoding="utf-8"))
+            payload = cast(JsonPayload, json.loads(candidate.read_text(encoding="utf-8")))
         except json.JSONDecodeError as exc:
             BASE_LOGGER.warning(
                 "Failed to parse navmap candidate",
@@ -389,7 +435,7 @@ def load_test_map() -> dict[str, JsonValue]:
     if not path.exists():
         return {}
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = cast(JsonPayload, json.loads(path.read_text(encoding="utf-8")))
     except json.JSONDecodeError as exc:
         SYMBOL_LOG.warning(
             "Failed to parse test_map.json",
@@ -397,14 +443,17 @@ def load_test_map() -> dict[str, JsonValue]:
         )
         return {}
     if isinstance(payload, Mapping):
-        return {str(key): value for key, value in payload.items()}
+        return {
+            str(key): value
+            for key, value in payload.items()
+        }
     return {}
 
 
 def _iter_members(node: GriffeNode) -> Iterable[GriffeNode]:
     members = safe_getattr(node, "members")
     if isinstance(members, Mapping):
-        return tuple(members.values())
+        return tuple(cast(GriffeNode, member) for member in members.values())
     return ()
 
 
@@ -485,10 +534,12 @@ def _collect_rows(
 def _build_reverse_map(
     rows: Sequence[SymbolIndexRow], attribute: str
 ) -> dict[str, tuple[str, ...]]:
-    mapping: dict[str, set[str]] = defaultdict(set)
+    mapping: dict[str, set[str]] = {}
     for row in rows:
-        value = getattr(row, attribute)
+        value = cast(object, getattr(row, attribute))
         if isinstance(value, str):
+            if value not in mapping:
+                mapping[value] = set()
             mapping[value].add(row.path)
     return {key: tuple(sorted(paths)) for key, paths in sorted(mapping.items())}
 
@@ -497,147 +548,4 @@ def generate_index(
     packages: Sequence[str],
     loader: shared.GriffeLoader,
 ) -> SymbolIndexArtifacts:
-    """Produce typed symbol index artifacts for ``packages``."""
-    nav_lookup = load_nav_lookup()
-    test_map = load_test_map()
-    rows: list[SymbolIndexRow] = []
-    for package in packages:
-        root = loader.load(package)
-        rows.extend(_collect_rows(root, nav=nav_lookup, test_map=test_map))
-    rows_sorted = tuple(sorted(rows, key=lambda item: item.path))
-    by_file = _build_reverse_map(rows_sorted, "file")
-    by_module = _build_reverse_map(rows_sorted, "module")
-    return SymbolIndexArtifacts(rows=rows_sorted, by_file=by_file, by_module=by_module)
-
-
-@lru_cache(maxsize=1)
-def _git_sha() -> str:
-    """Return the Git SHA for permalink construction."""
-    return shared.resolve_git_sha(ENV, SETTINGS, logger=BASE_LOGGER)
-
-
-def build_github_permalink(file: Path, span: LineSpan) -> str | None:
-    """Return a commit-stable GitHub permalink for ``file`` when configured."""
-    if not (SETTINGS.github_org and SETTINGS.github_repo):
-        return None
-    sha = _git_sha()
-    fragment = ""
-    if span.start is not None and span.end is not None and span.end >= span.start:
-        fragment = f"#L{span.start}-L{span.end}"
-    elif span.start is not None:
-        fragment = f"#L{span.start}"
-    relative = file.as_posix()
-    return (
-        "https://github.com/"
-        f"{SETTINGS.github_org}/{SETTINGS.github_repo}/blob/{sha}/{relative}{fragment}"
-    )
-
-
-def write_artifact(
-    path: Path,
-    payload: object,
-    *,
-    logger: StructuredLoggerAdapter,
-    artifact: str,
-    schema_path: Path | None = None,
-    struct_type: type[msgspec.Struct] | None = None,
-) -> bool:
-    """Validate (when configured) and write ``payload`` to ``path`` if it changed."""
-    if schema_path is not None:
-        validate_against_schema(payload, schema_path, artifact=artifact, struct_type=struct_type)
-    serialized = json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
-    if path.exists():
-        existing = path.read_text(encoding="utf-8")
-        if existing == serialized:
-            logger.info(
-                "Artifact already up-to-date",
-                extra={"status": "unchanged", "path": str(path)},
-            )
-            return False
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(serialized, encoding="utf-8")
-    logger.info(
-        "Artifact written",
-        extra={"status": "updated", "path": str(path)},
-    )
-    return True
-
-
-def _emit_problem(problem: Mapping[str, JsonValue] | None, *, default_message: str) -> None:
-    payload = problem or build_problem_details(
-        type="https://kgfoundry.dev/problems/docs-symbol-index",
-        title="Symbol index build failed",
-        status=500,
-        detail=default_message,
-        instance="urn:docs:symbol-index:unknown",
-    )
-    sys.stderr.write(render_problem(payload) + "\n")
-
-
-def main() -> int:
-    """Entry point for the symbol index builder."""
-    if not logging.getLogger().handlers:
-        logging.basicConfig(level=logging.INFO)
-
-    packages = list(SETTINGS.packages or ())
-    with observe_tool_run(["docs-symbol-index"], cwd=DOCS_BUILD, timeout=None) as observation:
-        try:
-            artifacts = generate_index(packages, LOADER)
-            rows_payload = artifacts.rows_payload()
-            wrote_symbols = write_artifact(
-                SYMBOLS_PATH,
-                rows_payload,
-                logger=SYMBOL_LOG,
-                artifact="symbols.json",
-                schema_path=SYMBOL_INDEX_SCHEMA,
-                struct_type=SymbolIndexRowModel,
-            )
-            wrote_by_file = write_artifact(
-                BY_FILE_PATH,
-                artifacts.by_file_payload(),
-                logger=BY_FILE_LOG,
-                artifact="by_file.json",
-            )
-            wrote_by_module = write_artifact(
-                BY_MODULE_PATH,
-                artifacts.by_module_payload(),
-                logger=BY_MODULE_LOG,
-                artifact="by_module.json",
-            )
-        except ToolExecutionError as exc:
-            observation.failure("failure", returncode=1)
-            _emit_problem(exc.problem, default_message=str(exc))
-            return 1
-        except Exception as exc:  # pragma: no cover - defensive guard
-            observation.failure("exception", returncode=1)
-            problem = build_problem_details(
-                type="https://kgfoundry.dev/problems/docs-symbol-index",
-                title="Symbol index build failed",
-                status=500,
-                detail=str(exc),
-                instance="urn:docs:symbol-index:unexpected-error",
-                extensions={"packages": packages},
-            )
-            _emit_problem(problem, default_message=str(exc))
-            return 1
-        else:
-            observation.success(0)
-
-    SYMBOL_LOG.info(
-        "Symbol index build complete",
-        extra={
-            "status": "success",
-            "symbols_entries": artifacts.symbol_count,
-            "symbols_updated": wrote_symbols,
-            "by_file_updated": wrote_by_file,
-            "by_module_updated": wrote_by_module,
-            "symbols_path": str(SYMBOLS_PATH),
-            "by_file_path": str(BY_FILE_PATH),
-            "by_module_path": str(BY_MODULE_PATH),
-        },
-    )
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+    """Produce typed symbol index artifacts for ``

@@ -646,6 +646,7 @@ runtime-evaluated-base-classes = [
 "tools/generate_pr_summary.py" = ["T201", "BLE001", "C901", "PLR0915", "TRY300", "SIM115"]  # CLI script: print is OK, complexity acceptable
 "src/search_api/bm25_index.py" = ["S608"]  # DuckDB read_parquet() paths from trusted sources (DB queries/config), not user input
 "src/kgfoundry/tooling_bridge.py" = ["PLC2701", "TID251"]
+"docs/_types/**" = ["PLC2701"]  # docs._types is a special module namespace for typed facades
 
 [tool.ruff.lint.isort]
 known-first-party = [

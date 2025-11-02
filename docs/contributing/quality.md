@@ -46,6 +46,7 @@ an error.
 | Public API signatures or docstrings                | Updates rendered docstrings and `docfacts.json`      | Uses `tools.docstring_builder.cli generate --all`
 | Navigation metadata (`tools/navmap/**`)             | Rebuilds `site/_build/navmap/navmap.json`            | Keeps navmaps/test maps in sync |
 | Observability policies or coverage annotations     | Refreshes observability reports under `docs/_build`  | Fails fast if new lint errors appear |
+| Docs symbol index/delta outputs                    | Rebuilds `docs/_build/symbols*.json` with schema validation | Review `docs/_scripts/validate_artifacts.py` for failure details |
 | Pydantic models / schema exports                   | Writes JSON schema artefacts and drift reports       | Inspect `docs/_build/schema_drift.json` when it changes |
 
 ### Artefact FAQ

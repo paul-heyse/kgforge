@@ -6,6 +6,11 @@ optional Prometheus or OpenTelemetry dependencies are not installed so the
 calling code never needs to guard imports. Metrics are registered once at import
 time using well-known names to make it easy for dashboards to scrape the values
 exposed by tooling processes.
+
+For the authoritative contract (typed metric interfaces, structured logging
+fields, and fallback semantics) see ``tools/_shared/observability_facade.md``
+and the spec scenario documented in
+``openspec/changes/pyrefly-suppression-bust/specs/code-quality/spec.md``.
 """
 
 from __future__ import annotations
