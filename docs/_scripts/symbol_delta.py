@@ -13,6 +13,7 @@ import json
 import logging
 import re
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TypedDict, cast
 
@@ -109,6 +110,14 @@ _STR_FIELDS: tuple[str, ...] = (
 )
 _INT_FIELDS: tuple[str, ...] = ("lineno", "endlineno")
 _BOOL_FIELDS: tuple[str, ...] = ("is_async", "is_property")
+
+
+@dataclass(frozen=True, slots=True)
+class DeltaArgs:
+    """Strongly typed arguments accepted by the delta CLI."""
+
+    base: str
+    output: str
 
 
 def _coerce_json_value(value: object) -> JSONValue:
@@ -356,7 +365,11 @@ def main(argv: list[str] | None = None) -> int:
         default=str(DEFAULT_DELTA_PATH),
         help="Override the destination delta file",
     )
-    args = parser.parse_args(argv)
+    namespace = parser.parse_args(argv)
+    args = DeltaArgs(
+        base=cast(str, namespace.base),
+        output=cast(str, namespace.output),
+    )
 
     delta_path = Path(args.output)
 
