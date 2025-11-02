@@ -5,9 +5,12 @@ from __future__ import annotations
 import ast
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import ClassVar
 
-from tools.docstring_builder.plugins.base import PluginContext, PluginStage
+from tools.docstring_builder.plugins.base import (
+    PluginContext,
+    PluginStage,
+    TransformerPlugin,
+)
 from tools.docstring_builder.schema import ParameterDoc
 from tools.docstring_builder.semantics import SemanticResult
 
@@ -156,24 +159,22 @@ class _DataclassFieldCollector(ast.NodeVisitor):
         self.namespace.pop()
 
 
-class DataclassFieldDocPlugin:
+class DataclassFieldDocPlugin(TransformerPlugin):
     """Populate dataclass parameter documentation from field definitions."""
 
-    name: ClassVar[str] = "dataclass_field_docs"
-    stage: ClassVar[PluginStage] = "transformer"
+    name: str = "dataclass_field_docs"
+    stage: PluginStage = "transformer"
 
     def __init__(self) -> None:
         self._cache: dict[Path, dict[str, list[_FieldInfo]]] = {}
 
-    @staticmethod
-    def on_start(context: PluginContext) -> None:
+    def on_start(self, context: PluginContext) -> None:
         """Reset caches before processing begins."""
-        del context
+        del self, context
 
-    @staticmethod
-    def on_finish(context: PluginContext) -> None:
+    def on_finish(self, context: PluginContext) -> None:
         """Release cached field metadata at the end of processing."""
-        del context
+        del self, context
 
     def apply(self, context: PluginContext, result: SemanticResult) -> SemanticResult:
         """Populate dataclass parameter metadata for ``result``."""
