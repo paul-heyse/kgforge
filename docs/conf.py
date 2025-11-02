@@ -24,7 +24,12 @@ from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Final, Protocol, cast
+from typing import (
+    Any,
+    Final,
+    Protocol,
+    cast,
+)
 
 import certifi
 from docutils import nodes
@@ -85,30 +90,41 @@ def get_project_settings(env: Mapping[str, str] | None = None) -> ProjectSetting
     )
 
 
+_BaseModel: type[object] | None
 try:
-    from pydantic import BaseModel as _BaseModel
+    from pydantic import BaseModel as _PydanticBaseModel
 except ModuleNotFoundError:  # pragma: no cover - optional dependency
     _BaseModel = None
+else:
+    _BaseModel = cast(type[object], _PydanticBaseModel)
 
+_auto_docstrings: ModuleType | None
 try:
     from tools import auto_docstrings as _auto_docstrings
 except ModuleNotFoundError:  # pragma: no cover - optional dependency
     _auto_docstrings = None
 
+GriffeLoadingError: type[Exception]
 try:
     griffe_exceptions = importlib.import_module("griffe.exceptions")
 except ModuleNotFoundError:  # pragma: no cover - griffe < 0.32
     GriffeLoadingError = RuntimeError
 else:
-    GriffeLoadingError = cast(
-        type[Exception], getattr(griffe_exceptions, "LoadingError", RuntimeError)
-    )
+    loading_error: object = getattr(griffe_exceptions, "LoadingError", RuntimeError)
+    if isinstance(loading_error, type) and issubclass(loading_error, Exception):
+        GriffeLoadingError = loading_error
+    else:
+        GriffeLoadingError = RuntimeError
 
 astroid_builder = importlib.import_module("astroid.builder")
 astroid_manager = importlib.import_module("astroid.manager")
 autoapi_parser = importlib.import_module("autoapi._parser")
 jsonimpl = importlib.import_module("sphinxcontrib.serializinghtml.jsonimpl")
 json_module = cast(ModuleType, jsonimpl.json)
+
+AstroidManagerCls = cast("type[_AstroidManager]", astroid_manager.AstroidManager)
+AstroidBuilderCls = cast("type[_AstroidBuilder]", astroid_builder.AstroidBuilder)
+AutoapiParserCls = cast("type[_AutoapiParser]", autoapi_parser.Parser)
 
 
 class AutoapiParser(Protocol):
@@ -141,6 +157,16 @@ class GriffeLoaderFactory(Protocol):
 
     def __call__(self, search_paths: Sequence[str]) -> GriffeLoaderInstance:
         """Return a loader configured with the provided search paths."""
+        ...
+
+
+class _AutoDocstringsModule(Protocol):
+    MAGIC_METHOD_EXTENDED_SUMMARIES: Mapping[str, str]
+    STANDARD_METHOD_EXTENDED_SUMMARIES: Mapping[str, str]
+    PYDANTIC_ARTIFACT_SUMMARIES: Mapping[str, str]
+
+    def summarize(self, name: str, kind: str) -> str:
+        """Return a synthesized summary for the provided symbol."""
         ...
 
 
@@ -197,16 +223,18 @@ def _apply_auto_docstring_overrides() -> None:
     if _BaseModel is None or _auto_docstrings is None:
         return
 
+    auto_docstrings = cast(_AutoDocstringsModule, _auto_docstrings)
+
     overrides: dict[str, str] = {}
-    overrides.update(_auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(_auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(_auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
+    overrides.update(auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
 
     for name, extended in overrides.items():
-        attr = getattr(_BaseModel, name, None)
+        attr: object | None = getattr(_BaseModel, name, None)
         if attr is None:
             continue
-        summary = _auto_docstrings.summarize(name, "function")
+        summary = auto_docstrings.summarize(name, "function")
         doc_text = f"{summary}\n\n{extended}"
         with suppress(
             AttributeError, TypeError
@@ -225,13 +253,15 @@ def _build_autoapi_doc_overrides() -> None:
     if _auto_docstrings is None:
         return
 
+    auto_docstrings = cast(_AutoDocstringsModule, _auto_docstrings)
+
     overrides: dict[str, str] = {}
-    overrides.update(_auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(_auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
-    overrides.update(_auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
+    overrides.update(auto_docstrings.MAGIC_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(auto_docstrings.STANDARD_METHOD_EXTENDED_SUMMARIES)
+    overrides.update(auto_docstrings.PYDANTIC_ARTIFACT_SUMMARIES)
 
     for name, extended in overrides.items():
-        summary = _auto_docstrings.summarize(name, "function")
+        summary = auto_docstrings.summarize(name, "function")
         _AUTOAPI_DOC_OVERRIDES[name] = f"{summary}\n\n{extended}"
 
 
@@ -383,13 +413,14 @@ def _autoapi_parse_file(
         parent = parent.parent
 
     module_name = ".".join(module_parts)
-    manager = astroid_manager.AstroidManager()
-    node = astroid_builder.AstroidBuilder(manager).file_build(file_path, module_name)
+    manager = cast(_AstroidManager, AstroidManagerCls())
+    builder = cast(_AstroidBuilder, AstroidBuilderCls(manager))
+    node = builder.file_build(file_path, module_name)
     return self.parse(node)
 
 
-if "manager" in inspect.signature(astroid_builder.AstroidBuilder.__init__).parameters:
-    autoapi_parser.Parser._parse_file = _autoapi_parse_file
+if "manager" in inspect.signature(AstroidBuilderCls.__init__).parameters:
+    AutoapiParserCls._parse_file = _autoapi_parse_file  # type: ignore[attr-defined]
 
 # Show type hints nicely
 autodoc_typehints = "description"
@@ -451,12 +482,9 @@ sphinx_gallery_conf = {
 }
 
 # Ensure JSON builder can serialize lru_cache wrappers
-_BaseJSONEncoder = cast(
-    type[json.JSONEncoder], getattr(json_module, "JSONEncoder", json.JSONEncoder)
-)
 
 
-class DocsJSONEncoder(_BaseJSONEncoder):
+class DocsJSONEncoder(json.JSONEncoder):
     """JSON encoder that can serialize ``functools.lru_cache`` wrappers."""
 
     def default(self, o: object) -> object:  # pragma: no cover - exercised in Sphinx build
@@ -467,8 +495,8 @@ class DocsJSONEncoder(_BaseJSONEncoder):
 
 
 # Override JSONEncoder default to render lru_cache wrappers
-setattr(json_module, "JSONEncoder", DocsJSONEncoder)
-json.JSONEncoder = DocsJSONEncoder
+cast(Any, json_module).JSONEncoder = DocsJSONEncoder
+cast(Any, json).JSONEncoder = DocsJSONEncoder
 
 # --- Build deep links per symbol without importing your code (use Griffe)
 griffe_api = resolve_griffe()
@@ -502,7 +530,7 @@ def _get_root(module: str | None) -> GriffeNode | None:
 
 def _child_member(node: GriffeNode, name: str) -> GriffeNode | None:
     """Return the member named ``name`` from ``node`` when present."""
-    members = getattr(node, "members", None)
+    members: object | None = getattr(node, "members", None)
     if isinstance(members, Mapping):
         child = members.get(name)
         if child is not None:
@@ -531,14 +559,24 @@ def _lookup(module: str | None, fullname: str | None) -> tuple[str, int, int] | 
         if child is None:
             return None
         node = child
-    file_rel = getattr(node, "relative_package_filepath", None)
-    start = getattr(node, "lineno", None)
-    end = getattr(node, "endlineno", None)
-    if not (file_rel and start):
+    file_rel_obj = getattr(node, "relative_package_filepath", None)
+    if isinstance(file_rel_obj, Path):
+        file_rel_str = str(file_rel_obj)
+    elif isinstance(file_rel_obj, str):
+        file_rel_str = file_rel_obj
+    else:
         return None
+
+    start_obj = getattr(node, "lineno", None)
+    if not isinstance(start_obj, int):
+        return None
+
+    end_obj = getattr(node, "endlineno", None)
+    end_int = end_obj if isinstance(end_obj, int) else start_obj
+
     base = SRC_DIR if SRC_DIR.exists() else ROOT
-    abs_path = base / file_rel
-    return str(abs_path.resolve()), int(start), int(end or start)
+    abs_path = base / file_rel_str
+    return str(abs_path.resolve()), start_obj, end_int
 
 
 # Link modes:

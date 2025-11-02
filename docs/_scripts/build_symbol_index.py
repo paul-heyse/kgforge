@@ -15,15 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from docs._scripts.shared import (  # noqa: PLC2701
-    DocsSettings,
-    GriffeLoader,
-    detect_environment,
-    ensure_sys_paths,
-    load_settings,
-    make_loader,
-    resolve_git_sha,
-)
+from docs._scripts import shared as shared_module  # noqa: E402, PLC2701
 from tools import get_logger, with_fields  # noqa: E402
 
 if TYPE_CHECKING:
@@ -33,8 +25,8 @@ if TYPE_CHECKING:
 else:
     GriffeObject = object
 
-ENV = detect_environment()
-ensure_sys_paths(ENV)
+ENV: shared_module.BuildEnvironment = shared_module.detect_environment()
+shared_module.ensure_sys_paths(ENV)
 ROOT = ENV.root
 SRC = ENV.src
 DOCS_BUILD = ROOT / "docs" / "_build"
@@ -42,7 +34,7 @@ DOCS_BUILD = ROOT / "docs" / "_build"
 LOGGER = get_logger(__name__)
 LOG = with_fields(LOGGER, operation="symbol_index")
 
-SETTINGS: DocsSettings = load_settings()
+SETTINGS: shared_module.DocsSettings = shared_module.load_settings()
 
 NAVMAP_CANDIDATES = [
     DOCS_BUILD / "navmap.json",
@@ -50,7 +42,7 @@ NAVMAP_CANDIDATES = [
     ROOT / "site" / "_build" / "navmap" / "navmap.json",
 ]
 
-loader: GriffeLoader = make_loader(ENV)
+loader: shared_module.GriffeLoader = shared_module.make_loader(ENV)
 
 
 type JSONPrimitive = str | int | float | bool | None
@@ -98,13 +90,13 @@ def iter_packages() -> list[str]:
     return list(SETTINGS.packages)
 
 
-def safe_attr[T](node: object, attr: str, default: T | None = None) -> T | None:
+def safe_attr(node: object, attr: str, default: object | None = None) -> object | None:
     """Return ``attr`` from ``node`` while swallowing access errors."""
     try:
-        value = getattr(node, attr)
+        value: object = getattr(node, attr)
     except (AttributeError, RuntimeError):
         return default
-    return cast(T | None, value)
+    return value
 
 
 def _module_for(path: str | None, kind: str) -> str | None:
@@ -129,11 +121,13 @@ def _package_for(module: str | None, path: str | None) -> str | None:
 def _canonical_path(node: object) -> str | None:
     """Return the canonical path for ``node`` if available."""
     canonical = safe_attr(node, "canonical_path")
-    path_attr = getattr(canonical, "path", None)
-    if isinstance(path_attr, str):
-        return path_attr
     if canonical is None:
         return None
+    path_attr: object | None = getattr(canonical, "path", None)
+    if isinstance(path_attr, str):
+        return path_attr
+    if path_attr is not None:
+        return str(path_attr)
     return str(canonical)
 
 
@@ -171,7 +165,7 @@ def _load_navmap() -> NavLookup:
         if not candidate.exists():
             continue
         try:
-            data_raw = json.loads(candidate.read_text(encoding="utf-8"))
+            data_raw: object = json.loads(candidate.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             continue
         if isinstance(data_raw, Mapping):
@@ -276,7 +270,7 @@ def _load_test_map() -> JSONObject:
     test_map_path = DOCS_BUILD / "test_map.json"
     if test_map_path.exists():
         try:
-            data_raw = json.loads(test_map_path.read_text(encoding="utf-8"))
+            data_raw: object = json.loads(test_map_path.read_text(encoding="utf-8"))
             if isinstance(data_raw, dict):
                 return cast(JSONObject, data_raw)
         except json.JSONDecodeError:  # pragma: no cover - defensive
@@ -286,7 +280,11 @@ def _load_test_map() -> JSONObject:
 
 def _current_sha() -> str:
     """Resolve the Git SHA used for GitHub permalinks."""
-    return resolve_git_sha(ENV, SETTINGS, logger=LOGGER)
+    return shared_module.resolve_git_sha(
+        ENV,
+        SETTINGS,
+        logger=cast(shared_module.WarningLogger, LOGGER),
+    )
 
 
 def _github_link(file_rel: str, start: int | None, end: int | None) -> str | None:
@@ -349,7 +347,7 @@ def _doc_first_paragraph(node: object) -> str:
     doc = safe_attr(node, "docstring")
     if doc is None:
         return ""
-    value = getattr(doc, "value", None)
+    value: object | None = getattr(doc, "value", None)
     if isinstance(value, str):
         text = value.strip()
         if text:
@@ -369,9 +367,9 @@ def _kind_name(node: object) -> str | None:
 
 def _relative_file(node: object) -> str | None:
     """Return a node's relative filename if available."""
-    file_rel_obj = safe_attr(node, "relative_package_filepath") or safe_attr(
-        node, "relative_filepath"
-    )
+    file_rel_obj = safe_attr(node, "relative_package_filepath")
+    if file_rel_obj is None:
+        file_rel_obj = safe_attr(node, "relative_filepath")
     if isinstance(file_rel_obj, Path):
         return str(file_rel_obj)
     return str(file_rel_obj) if isinstance(file_rel_obj, str) else None
@@ -417,11 +415,8 @@ def _iter_members(node: object) -> Iterable[GriffeObject]:
     members_attr = safe_attr(node, "members")
     if not isinstance(members_attr, Mapping):
         return ()
-    try:
-        members_iter = members_attr.values()
-    except AttributeError:  # pragma: no cover - defensive
-        return ()
-    return tuple(cast(Iterable[GriffeObject], members_iter))
+    members_mapping = cast(Mapping[str, GriffeObject], members_attr)
+    return tuple(members_mapping.values())
 
 
 def _row_from_node(
@@ -430,7 +425,7 @@ def _row_from_node(
     test_map: Mapping[str, JSONValue],
 ) -> SymbolRow | None:
     """Construct a row describing ``node`` if it has a valid path."""
-    path = getattr(node, "path", None)
+    path: object | None = getattr(node, "path", None)
     if not isinstance(path, str):
         return None
 
@@ -467,7 +462,7 @@ def _row_from_node(
         "doc": _doc_first_paragraph(node),
         "signature": _string_signature(node),
         "is_async": bool(safe_attr(node, "is_async")),
-        "is_property": kind == "property",
+        "is_property": bool(safe_attr(node, "is_property")),
         "owner": _meta_value(symbol_meta, module_defaults, "owner"),
         "stability": _meta_value(symbol_meta, module_defaults, "stability"),
         "since": _meta_value(symbol_meta, module_defaults, "since"),
