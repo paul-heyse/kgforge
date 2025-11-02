@@ -3,23 +3,21 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from pathlib import Path
 from typing import cast
 
 import pytest
 from docs._scripts.validation import validate_against_schema  # noqa: PLC2701
 from docs._types.artifacts import (
+    JsonPayload,
+    JsonValue,
     symbol_delta_from_json,
     symbol_delta_to_payload,
     symbol_index_from_json,
     symbol_index_to_payload,
 )
 from tools import ToolExecutionError
-
-JsonPrimitive = str | int | float | bool | None
-JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
-JsonPayload = Mapping[str, JsonValue] | Sequence[JsonValue] | JsonValue
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SYMBOL_SCHEMA = REPO_ROOT / "schema/docs/symbol-index.schema.json"
@@ -52,7 +50,7 @@ class TestSymbolIndexValidation:
         reserialized = symbol_index_to_payload(artifacts)
         validate_against_schema(reserialized, SYMBOL_SCHEMA, artifact="symbols.json")
 
-    @pytest.mark.parametrize(
+    @pytest.mark.parametrize(  # type: ignore[misc]
         "field_name",
         [
             "path",
@@ -62,7 +60,7 @@ class TestSymbolIndexValidation:
             "source_link",
         ],
     )
-    def test_symbol_index_required_fields(self, field_name: str) -> None:
+    def test_symbol_index_required_fields(self, field_name: str) -> None:  # type: ignore[misc]
         """Test that required fields are enforced. (3.2.a: parametrised validation)"""
         payload = _load(SYMBOL_EXAMPLE)
         assert isinstance(payload, list)
@@ -70,7 +68,7 @@ class TestSymbolIndexValidation:
         broken = dict(payload_list[0]) if payload_list else {}
         broken.pop(field_name, None)
         with pytest.raises(ToolExecutionError):
-            validate_against_schema([broken], SYMBOL_SCHEMA, artifact="symbols.json")
+            validate_against_schema([broken], SYMBOL_SCHEMA, artifact="symbols.json")  # type: ignore[misc]
 
 
 class TestSymbolDeltaValidation:
@@ -92,7 +90,7 @@ class TestSymbolDeltaValidation:
         """Test that non-object payloads are rejected."""
         with pytest.raises(ToolExecutionError):
             validate_against_schema(
-                ["not", "an", "object"],
+                ["not", "an", "object"],  # type: ignore[misc]
                 DELTA_SCHEMA,
                 artifact="symbols.delta.json",
             )
@@ -283,9 +281,9 @@ class TestByteIdenticalRoundTrip:
         # Normalize whitespace and compare
         original_normalized = json.dumps(original_payload, sort_keys=True, indent=2)
         reserialized_normalized = json.dumps(reserialized, sort_keys=True, indent=2)
-        assert (
-            original_normalized == reserialized_normalized
-        ), "Symbol index round-trip is not byte-identical"
+        assert original_normalized == reserialized_normalized, (
+            "Symbol index round-trip is not byte-identical"
+        )
 
     def test_symbol_delta_round_trip_byte_identical(self) -> None:
         """Test that symbol delta round-trip produces byte-identical JSON.
@@ -304,9 +302,9 @@ class TestByteIdenticalRoundTrip:
         # Normalize whitespace and compare
         original_normalized = json.dumps(original_payload, sort_keys=True, indent=2)
         reserialized_normalized = json.dumps(reserialized, sort_keys=True, indent=2)
-        assert (
-            original_normalized == reserialized_normalized
-        ), "Symbol delta round-trip is not byte-identical"
+        assert original_normalized == reserialized_normalized, (
+            "Symbol delta round-trip is not byte-identical"
+        )
 
     def test_symbol_index_validation_preserves_ordering(self) -> None:
         """Test that codec preserves field ordering from schema examples."""

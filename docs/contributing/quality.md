@@ -55,7 +55,7 @@ Documentation artifacts (symbol index, delta, reverse lookups) are now produced 
 
 **Key modules:**
 
-- `docs._types.artifacts` — authoritative msgspec.Struct models for all artifacts
+- `docs._types.artifacts` — authoritative Pydantic V2 BaseModel definitions for all artifacts
 - `docs._types.griffe` — typed loader facade for Griffe integration
 - `docs._types.sphinx_optional` — typed facades for optional Sphinx dependencies
 - `docs._scripts.validate_artifacts` — validation CLI with Problem Details error reporting
