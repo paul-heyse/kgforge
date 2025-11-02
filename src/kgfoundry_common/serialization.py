@@ -23,7 +23,6 @@ import json
 from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import jsonschema
 from jsonschema.exceptions import SchemaError, ValidationError
@@ -35,12 +34,6 @@ from kgfoundry_common.errors import (
 )
 from kgfoundry_common.fs import atomic_write, read_text, write_text
 from kgfoundry_common.logging import get_logger
-
-if TYPE_CHECKING:
-    from typing import Any
-else:
-    # Runtime: use object for JSON-serializable values (matches jsonschema expectations)
-    Any = object  # type: ignore[assignment, misc]
 
 # JSON Schema type (from jsonschema stubs: Mapping[str, object])
 JsonSchema = Mapping[str, object]
@@ -315,7 +308,7 @@ def serialize_json(
                 "checksum": checksum,
             },
         )
-        return checksum  # noqa: TRY300
+        return checksum
     except FileNotFoundError:
         # Preserve FileNotFoundError for missing schema files
         raise
@@ -324,7 +317,7 @@ def serialize_json(
         raise SerializationError(msg) from exc
 
 
-def deserialize_json(  # noqa: C901, PLR0912
+def deserialize_json(
     data_path: Path,
     schema_path: Path,
     *,
@@ -396,7 +389,7 @@ def deserialize_json(  # noqa: C901, PLR0912
         # Read and parse JSON
         if not data_path.exists():
             msg = f"Data file not found: {data_path}"
-            raise FileNotFoundError(msg)  # noqa: TRY301
+            raise FileNotFoundError(msg)
         json_text = read_text(data_path)
         try:
             obj: object = json.loads(json_text)

@@ -153,7 +153,7 @@ class _GaugeConstructor(Protocol):
 
 
 class _HistogramConstructor(Protocol):
-    def __call__(  # noqa: PLR0913
+    def __call__(
         self,
         name: str,
         documentation: str,
@@ -227,7 +227,9 @@ try:  # pragma: no cover - exercised in environments with Prometheus installed
     from prometheus_client import Counter as _PromCounter
     from prometheus_client import Gauge as _PromGauge
     from prometheus_client import Histogram as _PromHistogram
-    from prometheus_client.registry import CollectorRegistry as _RuntimeCollectorRegistry
+    from prometheus_client.registry import (
+        CollectorRegistry as _RuntimeCollectorRegistry,
+    )
 
 except ImportError:  # pragma: no cover - handled by fallback
     HAVE_PROMETHEUS = False
@@ -300,7 +302,7 @@ def build_gauge(
     )
 
 
-def build_histogram(  # noqa: PLR0913
+def build_histogram(
     name: str,
     documentation: str,
     labelnames: Sequence[str] | None = None,
@@ -313,13 +315,21 @@ def build_histogram(  # noqa: PLR0913
     constructor = _HISTOGRAM_CONSTRUCTOR
     if constructor is None:
         return _NoopHistogram()
-    bucket_values = tuple(buckets) if buckets is not None else None
+
+    if buckets is not None:
+        return constructor(
+            name,
+            documentation,
+            _labels_or_default(labelnames),
+            registry=registry,
+            buckets=tuple(buckets),
+            unit=unit,
+        )
     return constructor(
         name,
         documentation,
         _labels_or_default(labelnames),
         registry=registry,
-        buckets=bucket_values,
         unit=unit,
     )
 

@@ -20,6 +20,7 @@ from typing import Final
 from kgfoundry_common.errors.codes import BASE_TYPE_URI, ErrorCode, get_type_uri
 from kgfoundry_common.errors.exceptions import (
     AgentCatalogSearchError,
+    CatalogLoadError,
     CatalogSessionError,
     ChunkingError,
     ConfigurationError,
@@ -39,6 +40,7 @@ from kgfoundry_common.errors.exceptions import (
     SerializationError,
     SettingsError,
     SpladeOOMError,
+    SymbolAttachmentError,
     UnsupportedMIMEError,
     VectorSearchError,
 )
@@ -47,7 +49,7 @@ from kgfoundry_common.navmap_types import NavMap
 # HTTP adapters are optional (require fastapi)
 _http_exports: list[str] = []
 try:
-    from kgfoundry_common.errors.http import (  # noqa: F401
+    from kgfoundry_common.errors.http import (
         problem_details_response,
         register_problem_details_handler,
     )
@@ -59,6 +61,7 @@ except ImportError:
 __all__ = [
     "AgentCatalogSearchError",
     "BASE_TYPE_URI",
+    "CatalogLoadError",
     "CatalogSessionError",
     "ChunkingError",
     "ConfigurationError",
@@ -79,6 +82,7 @@ __all__ = [
     "SerializationError",
     "SettingsError",
     "SpladeOOMError",
+    "SymbolAttachmentError",
     "UnsupportedMIMEError",
     "VectorSearchError",
     "get_type_uri",

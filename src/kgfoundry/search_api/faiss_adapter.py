@@ -10,9 +10,25 @@ from kgfoundry.namespace_bridge import (
     namespace_dir,
     namespace_getattr,
 )
-from search_api.faiss_adapter import HAVE_FAISS, DenseVecs, FaissAdapter, VecArray
+from search_api.faiss_adapter import (
+    HAVE_FAISS,
+    DenseVecs,
+    FaissAdapter,
+    FloatArray,
+    IntArray,
+    StrArray,
+    VecArray,
+)
 
-__all__ = ["HAVE_FAISS", "DenseVecs", "FaissAdapter", "VecArray"]
+__all__ = [
+    "HAVE_FAISS",
+    "DenseVecs",
+    "FaissAdapter",
+    "FloatArray",
+    "IntArray",
+    "StrArray",
+    "VecArray",
+]
 _namespace = cast(dict[str, object], globals())
 namespace_attach(_module, _namespace, __all__)
 

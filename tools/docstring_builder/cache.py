@@ -76,9 +76,9 @@ class CacheDocument(BaseStruct, kw_only=True):
         def __init__(
             self,
             *,
-            schemaVersion: str = DOCSTRING_CACHE_VERSION,  # noqa: N803
-            schemaId: str = DOCSTRING_CACHE_SCHEMA_ID,  # noqa: N803
-            generatedAt: str | None = None,  # noqa: N803
+            schemaVersion: str = DOCSTRING_CACHE_VERSION,
+            schemaId: str = DOCSTRING_CACHE_SCHEMA_ID,
+            generatedAt: str | None = None,
             entries: dict[str, CacheEntry] | None = None,
         ) -> None: ...
 
@@ -107,7 +107,7 @@ class BuilderCache:
         payload_dict = cast(dict[str, object], decoded)
         try:
             validate_tools_payload(payload_dict, DOCSTRING_CACHE_SCHEMA)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             self._handle_load_error("Cache schema validation failed", exc)
             return
 
@@ -202,7 +202,7 @@ class BuilderCache:
         }
         try:
             validate_tools_payload(payload_dict, DOCSTRING_CACHE_SCHEMA)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             self._handle_load_error("Legacy cache schema validation failed", exc)
             return
 

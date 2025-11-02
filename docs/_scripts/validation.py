@@ -42,6 +42,7 @@ Typical usage in a docs build script::
 from __future__ import annotations
 
 import json
+import logging
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, cast
@@ -50,23 +51,55 @@ from jsonschema import Draft202012Validator
 from jsonschema import exceptions as jsonschema_exceptions
 from tools._shared.problem_details import (
     ProblemDetailsDict,
-    build_schema_problem_details,  # noqa: PLC2701
+    build_schema_problem_details,
 )
-from tools._shared.proc import ToolExecutionError  # noqa: PLC2701
+from tools._shared.proc import ToolExecutionError
 
 JsonPayload = Mapping[str, Any] | Sequence[Any] | str | int | float | bool | None
 
 _VALIDATOR_CACHE: dict[Path, Draft202012Validator] = {}
+_LOGGER = logging.getLogger(__name__)
 
 
 def _get_validator(schema_path: Path) -> Draft202012Validator:
+    """Load and cache a JSON Schema validator for the given schema file.
+
+    Uses standard library json for deserialization with proper error handling.
+
+    Parameters
+    ----------
+    schema_path : Path
+        Path to the JSON Schema file.
+
+    Returns
+    -------
+    Draft202012Validator
+        Cached or newly created validator instance.
+
+    Raises
+    ------
+    ValueError
+        If the schema file cannot be read or parsed.
+    """
     resolved = schema_path.resolve()
     cached = _VALIDATOR_CACHE.get(resolved)
     if cached is not None:
         return cached
 
-    schema_text = resolved.read_text(encoding="utf-8")
-    schema_data = cast(dict[str, object], json.loads(schema_text))
+    try:
+        schema_text = resolved.read_text(encoding="utf-8")
+        schema_data_raw: object = json.loads(schema_text)
+    except (OSError, json.JSONDecodeError) as exc:  # pragma: no cover - I/O error
+        _LOGGER.warning(
+            "Failed to load JSON Schema from %s: %s",
+            resolved,
+            type(exc).__name__,
+            extra={"status": "error", "path": str(resolved)},
+        )
+        message = f"Failed to load JSON Schema from {resolved}"
+        raise ValueError(message) from exc
+
+    schema_data = cast(dict[str, object], schema_data_raw)
     Draft202012Validator.check_schema(schema_data)
     validator = Draft202012Validator(schema_data)
     _VALIDATOR_CACHE[resolved] = validator

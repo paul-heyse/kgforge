@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
 from pathlib import Path
-from typing import NotRequired, TypedDict, cast
+from typing import TYPE_CHECKING, NotRequired, TypedDict, cast
 
 from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.models import (
@@ -16,6 +16,21 @@ from kgfoundry.agent_catalog.models import (
     load_catalog_model,
 )
 from kgfoundry_common.problem_details import JsonObject, JsonValue
+
+if TYPE_CHECKING:
+    from kgfoundry.agent_catalog.search import (
+        SearchOptions,
+        SearchRequest,
+        SearchResult,
+        build_faceted_search_options,
+        search_catalog,
+    )
+else:
+    SearchOptions = catalog_search.SearchOptions
+    SearchRequest = catalog_search.SearchRequest
+    SearchResult = catalog_search.SearchResult
+    search_catalog = catalog_search.search_catalog
+    build_faceted_search_options = catalog_search.build_faceted_search_options
 
 
 class GithubLinkPolicy(TypedDict, total=False):
@@ -356,7 +371,7 @@ class AgentCatalogClient:
         *,
         k: int = 10,
         facets: dict[str, str] | None = None,
-    ) -> list[catalog_search.SearchResult]:
+    ) -> list[SearchResult]:
         """Execute hybrid search against the catalog.
 
         <!-- auto:docstring-builder v1 -->
@@ -374,11 +389,14 @@ class AgentCatalogClient:
 
         Returns
         -------
-        list[catalog_search.SearchResult]
+        list[SearchResult]
             Describe return value.
         """
-        options = catalog_search.SearchOptions(facets=facets)
-        request = catalog_search.SearchRequest(
+        if facets:
+            options = build_faceted_search_options(facets=facets)
+        else:
+            options = catalog_search.SearchOptions()
+        request = SearchRequest(
             repo_root=self.repo_root,
             query=query,
             k=k,
@@ -387,7 +405,7 @@ class AgentCatalogClient:
             Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
             self._catalog.model_dump(),
         )
-        return catalog_search.search_catalog(
+        return search_catalog(
             catalog_payload,
             request=request,
             options=options,

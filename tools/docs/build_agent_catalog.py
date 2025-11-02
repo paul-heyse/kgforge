@@ -33,6 +33,7 @@ from kgfoundry.agent_catalog.search import (
     SearchRequest,
     SearchResult,
     VectorArray,
+    build_default_search_options,
     load_faiss,
 )
 from kgfoundry.agent_catalog.sqlite import write_sqlite_catalog
@@ -645,7 +646,7 @@ class AgentCatalogBuilder:
     def _build_symbol_record(
         self,
         *,
-        module_name: str,  # noqa: ARG002
+        module_name: str,
         qname: str,
         analyzer: ModuleAnalyzer,
         symbol_entry: dict[str, Any] | None,
@@ -1471,7 +1472,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             facets = _parse_facet_args(args.search_facet)
             catalog_path = builder._resolve_artifact_path(args.output)
             catalog_data = load_catalog(catalog_path, load_shards=True)
-            options = SearchOptions(
+            options = build_default_search_options(
                 alpha=float(args.search_alpha),
                 facets=facets,
                 candidate_pool=int(args.search_candidates),

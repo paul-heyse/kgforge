@@ -6,6 +6,4 @@ from typing import TextIO
 
 __all__ = ["open"]
 
-def open(
-    path: str | PathLike[str], mode: str = "w"
-) -> AbstractContextManager[TextIO]: ...  # noqa: A001 - public API reuses builtin name
+def open(path: str | PathLike[str], mode: str = "w") -> AbstractContextManager[TextIO]: ...  # noqa: A001 - public API reuses builtin name

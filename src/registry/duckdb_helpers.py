@@ -205,7 +205,7 @@ def connect(
     return conn
 
 
-def execute(  # noqa: PLR0913
+def execute(
     conn: DuckDBPyConnection,
     sql: str,
     params: Params = None,

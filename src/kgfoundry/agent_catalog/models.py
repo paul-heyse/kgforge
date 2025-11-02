@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from collections.abc import Iterable
 from pathlib import Path
 from typing import cast
@@ -10,7 +11,11 @@ from typing import cast
 from pydantic import BaseModel, Field
 
 from kgfoundry.agent_catalog.sqlite import load_catalog_from_sqlite, sqlite_candidates
+from kgfoundry_common.errors import CatalogLoadError
 from kgfoundry_common.problem_details import JsonValue
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 
 class AnchorsModel(BaseModel):
@@ -477,47 +482,137 @@ def load_catalog_payload(path: Path, *, load_shards: bool = True) -> dict[str, J
     dict[str, object]
         Describe return value.
     """
-    payload_raw: object = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        payload_raw: object = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError as e:
+        msg = f"Catalog file not found: {path}"
+        raise CatalogLoadError(msg, cause=e) from e
+    except json.JSONDecodeError as e:
+        msg = f"Invalid JSON in catalog: {path}"
+        raise CatalogLoadError(msg, cause=e) from e
+
     # json.loads returns object (JsonValue at runtime), narrow to dict
     if not isinstance(payload_raw, dict):
         msg = f"Invalid catalog format: expected dict, got {type(payload_raw)}"
-        raise ValueError(msg)
+        raise CatalogLoadError(msg)
+
     payload: dict[str, JsonValue] = cast(dict[str, JsonValue], payload_raw)
-    shards = payload.get("shards")
-    if load_shards and not payload.get("packages") and isinstance(shards, dict):
-        index_rel = shards.get("index")
-        if isinstance(index_rel, str):
-            index_path = Path(index_rel)
-            if not index_path.is_absolute():
-                index_path = (path.parent / index_path).resolve()
-            index_payload_raw: object = json.loads(index_path.read_text(encoding="utf-8"))
-            if not isinstance(index_payload_raw, dict):
-                msg = f"Invalid index format: expected dict, got {type(index_payload_raw)}"
-                raise ValueError(msg)
-            index_payload: dict[str, JsonValue] = cast(dict[str, JsonValue], index_payload_raw)
-            packages: list[dict[str, JsonValue]] = []
-            packages_raw: JsonValue = index_payload.get("packages", [])
-            if isinstance(packages_raw, list):
-                for entry in packages_raw:
-                    if not isinstance(entry, dict):
-                        continue
-                    # isinstance check narrows type - mypy understands this
-                    entry_dict: dict[str, JsonValue] = entry
-                    shard_path_raw = entry_dict.get("path", "")
-                    if not isinstance(shard_path_raw, str):
-                        continue
-                    shard_path = Path(shard_path_raw)
-                    if not shard_path:
-                        continue
-                    if not shard_path.is_absolute():
-                        shard_path = (index_path.parent / shard_path).resolve()
-                    shard_payload_raw: object = json.loads(shard_path.read_text(encoding="utf-8"))
-                    if not isinstance(shard_payload_raw, dict):
-                        continue
-                    packages.append(cast(dict[str, JsonValue], shard_payload_raw))
-            # Cast packages to JsonValue for assignment to payload dict
-            payload["packages"] = cast(JsonValue, packages)
+
+    if load_shards and not payload.get("packages"):
+        payload = _expand_shards_if_present(path, payload)
+
     return payload
+
+
+def _expand_shards_if_present(
+    base_path: Path, payload: dict[str, JsonValue]
+) -> dict[str, JsonValue]:
+    """Expand shard payloads into the main catalog if shards are present.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    base_path : Path
+        Base path for resolving relative shard paths.
+    payload : dict[str, JsonValue]
+        Payload dict potentially containing shards metadata.
+
+    Returns
+    -------
+    dict[str, JsonValue]
+        Payload with packages field populated from shards if applicable.
+    """
+    shards = payload.get("shards")
+    if not isinstance(shards, dict):
+        return payload
+
+    index_rel = shards.get("index")
+    if not isinstance(index_rel, str):
+        return payload
+
+    index_path = Path(index_rel)
+    if not index_path.is_absolute():
+        index_path = (base_path.parent / index_path).resolve()
+
+    try:
+        index_payload_raw: object = json.loads(index_path.read_text(encoding="utf-8"))
+    except FileNotFoundError as e:
+        msg = f"Shard index file not found: {index_path}"
+        raise CatalogLoadError(msg, cause=e) from e
+    except json.JSONDecodeError as e:
+        msg = f"Invalid JSON in shard index: {index_path}"
+        raise CatalogLoadError(msg, cause=e) from e
+
+    if not isinstance(index_payload_raw, dict):
+        msg = f"Invalid shard index format: expected dict, got {type(index_payload_raw)}"
+        raise CatalogLoadError(msg)
+
+    index_payload: dict[str, JsonValue] = cast(dict[str, JsonValue], index_payload_raw)
+
+    packages = _load_shard_packages(base_path / index_path.parent, index_payload)
+    # Cast packages to JsonValue for assignment to payload dict
+    payload["packages"] = cast(JsonValue, packages)
+
+    return payload
+
+
+def _load_shard_packages(
+    base_path: Path, index_payload: dict[str, JsonValue]
+) -> list[dict[str, JsonValue]]:
+    """Load all package shards referenced in the index payload.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    base_path : Path
+        Base directory for resolving relative shard paths.
+    index_payload : dict[str, JsonValue]
+        Index payload containing list of shard entries.
+
+    Returns
+    -------
+    list[dict[str, JsonValue]]
+        List of loaded shard packages.
+    """
+    packages: list[dict[str, JsonValue]] = []
+    packages_raw: JsonValue = index_payload.get("packages", [])
+
+    if not isinstance(packages_raw, list):
+        return packages
+
+    for entry in packages_raw:
+        if not isinstance(entry, dict):
+            continue
+
+        # isinstance check narrows type - mypy understands this
+        entry_dict: dict[str, JsonValue] = entry
+        shard_path_raw = entry_dict.get("path", "")
+
+        if not isinstance(shard_path_raw, str) or not shard_path_raw:
+            continue
+
+        shard_path = Path(shard_path_raw)
+        if not shard_path.is_absolute():
+            shard_path = (base_path / shard_path).resolve()
+
+        try:
+            shard_payload_raw: object = json.loads(shard_path.read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            logger.warning("Shard package file not found: %s", shard_path)
+            continue
+        except json.JSONDecodeError as e:
+            logger.warning("Invalid JSON in shard package %s: %s", shard_path, e)
+            continue
+
+        if not isinstance(shard_payload_raw, dict):
+            logger.warning("Invalid shard package format (expected dict) at %s", shard_path)
+            continue
+
+        packages.append(cast(dict[str, JsonValue], shard_payload_raw))
+
+    return packages
 
 
 def load_catalog_model(path: Path, *, load_shards: bool = True) -> AgentCatalogModel:
@@ -539,25 +634,33 @@ def load_catalog_model(path: Path, *, load_shards: bool = True) -> AgentCatalogM
         Describe return value.
     """
 
-    # Helper to isolate Pydantic's Any expression from model_validate
-    # The class type itself contains Any, so we wrap the call to isolate it
-    def _validate(
-        model_cls: type[AgentCatalogModel], payload: dict[str, JsonValue]
-    ) -> AgentCatalogModel:
-        # Cast payload to object to satisfy Pydantic's model_validate signature
-        return model_cls.model_validate(cast(object, payload))
+    # Pydantic BaseModel classes contain Any in their type signatures.
+    # We use cast() to explicitly acknowledge this typing limitation while
+    # maintaining runtime safety through schema validation.
+    def _validate_catalog(payload: dict[str, JsonValue]) -> AgentCatalogModel:
+        """Validate and create AgentCatalogModel from payload.
+
+        Parameters
+        ----------
+        payload : dict[str, JsonValue]
+            The catalog payload to validate.
+
+        Returns
+        -------
+        AgentCatalogModel
+            Validated catalog model instance.
+        """
+        # Pydantic model_validate accepts object; cast payload to satisfy signature
+        # Pydantic's BaseModel has Any in its type signature - this is a framework limitation
+        return cast(AgentCatalogModel, AgentCatalogModel.model_validate(cast(object, payload)))  # type: ignore[redundant-cast,misc]
 
     for candidate in sqlite_candidates(path):
         if candidate.exists():
             payload = load_catalog_from_sqlite(candidate)
-            # Pydantic class type contains Any - isolate to helper function call
-            return _validate(
-                AgentCatalogModel,  # type: ignore[misc]  # Pydantic class type contains Any
-                payload,
-            )
+            # Use cast() to acknowledge Pydantic's Any constraints while
+            # maintaining runtime safety through validation
+            return _validate_catalog(payload)
     payload = load_catalog_payload(path, load_shards=load_shards)
-    # Pydantic class type contains Any - isolate to helper function call
-    return _validate(
-        AgentCatalogModel,  # type: ignore[misc]  # Pydantic class type contains Any
-        payload,
-    )
+    # Use cast() to acknowledge Pydantic's Any constraints while
+    # maintaining runtime safety through validation
+    return _validate_catalog(payload)

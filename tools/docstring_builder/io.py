@@ -151,7 +151,7 @@ def default_since_revision(*, repo_root: Path = REPO_ROOT) -> str | None:
     return None
 
 
-def select_files(  # noqa: C901, PLR0913
+def select_files(
     config: BuilderConfig,
     *,
     module: str | None = None,

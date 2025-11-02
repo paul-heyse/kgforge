@@ -121,7 +121,7 @@ class PathlibTransformer(cst.CSTTransformer):
         self.changes: list[str] = []
         self.needs_pathlib_import = False
 
-    def visit_Import(self, node: cst.Import) -> None:  # noqa: N802 (LibCST visitor pattern)
+    def visit_Import(self, node: cst.Import) -> None:
         """Track if pathlib import already exists."""
         for alias in node.names:
             if isinstance(alias.name, cst.Name) and alias.name.value == "pathlib":
@@ -211,9 +211,7 @@ class PathlibTransformer(cst.CSTTransformer):
             attr=cst.Name("parent"),
         )
 
-    def leave_Call(  # noqa: N802 (LibCST visitor pattern)
-        self, original_node: cst.Call, updated_node: cst.Call
-    ) -> cst.BaseExpression:
+    def leave_Call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.BaseExpression:
         """Transform function calls to pathlib equivalents."""
         for transformer in (
             self._transform_makedirs,
@@ -227,9 +225,7 @@ class PathlibTransformer(cst.CSTTransformer):
 
         return updated_node
 
-    def leave_With(  # noqa: N802 (LibCST visitor pattern)
-        self, original_node: cst.With, updated_node: cst.With
-    ) -> cst.With:
+    def leave_With(self, original_node: cst.With, updated_node: cst.With) -> cst.With:
         """Transform open(os.path.join(...)) patterns."""
         # Handle open(os.path.join(...)) → Path(...).open()
         for index, (original_item, updated_item) in enumerate(

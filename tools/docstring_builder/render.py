@@ -15,7 +15,7 @@ else:
         from jinja2.utils import select_autoescape
     except ImportError:
         # Fallback for older jinja2 versions
-        def select_autoescape(**kwargs: object) -> bool:  # noqa: ARG001
+        def select_autoescape(**kwargs: object) -> bool:
             return True
 
 

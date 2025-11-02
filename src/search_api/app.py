@@ -234,7 +234,7 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
                     "Response validation enabled",
                     extra={"schema_path": str(self.schema_path)},
                 )
-            except Exception as exc:  # noqa: BLE001 - defensive guard for schema loading
+            except Exception as exc:
                 logger.warning(
                     "Failed to load response schema, validation disabled",
                     extra={"schema_path": str(self.schema_path), "error": str(exc)},
@@ -367,7 +367,7 @@ try:
         backend=settings.search.sparse_backend,
         index_dir=settings.sparse_embedding.bm25_index_dir,
     )
-except Exception as exc:  # noqa: BLE001 - defensive guard for BM25 loading
+except Exception as exc:
     logger.warning("BM25 index not available: %s", exc, exc_info=True)
 
 try:
@@ -376,7 +376,7 @@ try:
         index_dir=settings.sparse_embedding.splade_index_dir,
         query_encoder=settings.sparse_embedding.splade_query_encoder,
     )
-except Exception as exc:  # noqa: BLE001 - defensive guard for SPLADE loading
+except Exception as exc:
     logger.warning("SPLADE index not available: %s", exc, exc_info=True)
 
 

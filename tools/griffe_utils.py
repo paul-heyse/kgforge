@@ -47,7 +47,7 @@ def resolve_griffe() -> GriffeAPI:
     fall back to the top-level attributes whenever the nested modules are
     unavailable.
     """
-    global _GRIFFE_SINGLETON  # noqa: PLW0603
+    global _GRIFFE_SINGLETON
 
     if _GRIFFE_SINGLETON is not None:
         return _GRIFFE_SINGLETON

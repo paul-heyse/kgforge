@@ -42,7 +42,7 @@ class NavSectionDocument(BaseStruct, kw_only=True):
 
     if TYPE_CHECKING:
 
-        def __init__(self, *, id: str, symbols: list[str]) -> None: ...  # noqa: A002
+        def __init__(self, *, id: str, symbols: list[str]) -> None: ...
 
 
 class SymbolMetaDocument(BaseStruct, kw_only=True):
@@ -61,7 +61,7 @@ class SymbolMetaDocument(BaseStruct, kw_only=True):
             owner: str | None = None,
             stability: str | None = None,
             since: str | None = None,
-            deprecatedIn: str | None = None,  # noqa: N803
+            deprecatedIn: str | None = None,
         ) -> None: ...
 
 
@@ -81,7 +81,7 @@ class ModuleMetaDocument(BaseStruct, kw_only=True):
             owner: str | None = None,
             stability: str | None = None,
             since: str | None = None,
-            deprecatedIn: str | None = None,  # noqa: N803
+            deprecatedIn: str | None = None,
         ) -> None: ...
 
 
@@ -109,14 +109,14 @@ class ModuleEntryDocument(BaseStruct, kw_only=True):
             path: str,
             exports: list[str],
             sections: list[NavSectionDocument],
-            sectionLines: dict[str, int],  # noqa: N803
+            sectionLines: dict[str, int],
             anchors: dict[str, int],
             links: dict[str, str],
             meta: dict[str, SymbolMetaDocument],
-            moduleMeta: ModuleMetaDocument,  # noqa: N803
+            moduleMeta: ModuleMetaDocument,
             tags: list[str],
             synopsis: str,
-            seeAlso: list[str],  # noqa: N803
+            seeAlso: list[str],
             deps: list[str],
         ) -> None: ...
 
@@ -150,12 +150,12 @@ class NavmapDocument(BaseStruct, kw_only=True):
         def __init__(
             self,
             *,
-            schemaVersion: str = NAVMAP_SCHEMA_VERSION,  # noqa: N803
-            schemaId: str = NAVMAP_SCHEMA_ID,  # noqa: N803
-            generatedAt: str | None = None,  # noqa: N803
+            schemaVersion: str = NAVMAP_SCHEMA_VERSION,
+            schemaId: str = NAVMAP_SCHEMA_ID,
+            generatedAt: str | None = None,
             commit: str = "HEAD",
-            policyVersion: str = "1",  # noqa: N803
-            linkMode: str = "editor",  # noqa: N803
+            policyVersion: str = "1",
+            linkMode: str = "editor",
             modules: dict[str, ModuleEntryDocument] | None = None,
         ) -> None: ...
 

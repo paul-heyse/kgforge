@@ -639,6 +639,7 @@ runtime-evaluated-base-classes = [
     "C401",
     "S101",
     "T20",
+    "PLR6301",  # pytest test classes require instance methods for test isolation
 ]
 "**/*.pyi" = ["PIE790"]  # Stub files require ... literals
 "tools/check_new_suppressions.py" = ["T201", "BLE001", "SIM102", "PLR2004"]  # CLI script: print is OK, Exception catch for file I/O
@@ -646,6 +647,7 @@ runtime-evaluated-base-classes = [
 "src/search_api/bm25_index.py" = ["S608"]  # DuckDB read_parquet() paths from trusted sources (DB queries/config), not user input
 "src/kgfoundry/tooling_bridge.py" = ["PLC2701", "TID251"]
 "docs/_types/**" = ["PLC2701"]  # docs._types is a special module namespace for typed facades
+"docs/_scripts/**" = ["PLC2701"]  # docs._scripts is internal tooling; importing from docs._types and tools._shared is expected
 
 [tool.ruff.lint.isort]
 known-first-party = [

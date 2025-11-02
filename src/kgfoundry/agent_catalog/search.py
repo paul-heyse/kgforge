@@ -5,6 +5,10 @@ Vector operations rely on the typed helpers in
 ``kgfoundry_common.numpy_typing`` so that downstream consumers (and mypy) can
 reason about the ndarray shapes involved. The resulting scores conform to the
 ``schema/models/search_result.v1.json`` schema.
+
+Helpers for constructing SearchOptions and SearchDocument ensure consistent
+defaults and early validation of parameters and dependencies. These helpers
+emit RFC 9457 Problem Details on validation failures.
 """
 
 from __future__ import annotations
@@ -13,14 +17,13 @@ import collections
 import importlib
 import json
 import os
-import pickle  # noqa: S403 - required for backward-compatible index persistence
 import re
 import warnings
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
-from typing import Protocol, cast
+from typing import Protocol, TypedDict, cast
 
 import numpy as np
 
@@ -33,6 +36,9 @@ from kgfoundry_common.numpy_typing import (
     normalize_l2,
     topk_indices,
 )
+from kgfoundry_common.observability import MetricsProvider
+from orchestration.safe_pickle import dump as safe_pickle_dump
+from orchestration.safe_pickle import load as safe_pickle_load
 from search_api.types import (
     FaissIndexProtocol,
     FaissModuleProtocol,
@@ -47,7 +53,94 @@ CatalogMapping = Mapping[str, JsonLike]
 PrimitiveMapping = Mapping[str, str | int | float | bool | None]
 
 EMBEDDING_MATRIX_RANK = 2
-WORD_PATTERN = re.compile(r"[A-Za-z0-9_]+")
+WORD_PATTERN: re.Pattern[str] = re.compile(r"[A-Za-z0-9_]+")
+
+# Canonical default values for search options (used by all helpers)
+_DEFAULT_ALPHA = 0.6
+_DEFAULT_CANDIDATE_POOL = 100
+_DEFAULT_BATCH_SIZE = 32
+
+# Allowed facet keys (strict allow-list for early validation)
+_ALLOWED_FACET_KEYS = frozenset(["package", "module", "kind", "stability"])
+
+
+class SearchOptionsPayload(TypedDict, total=False):
+    """Typed payload for SearchOptions configuration.
+
+    This TypedDict defines the complete search options with all optional
+    fields. It aligns with JSON Schema definitions and ensures type safety.
+    """
+
+    alpha: float
+    facets: Mapping[str, str]
+    candidate_pool: int
+    model_loader: Callable[[str], EmbeddingModelProtocol]
+    embedding_model: str
+    batch_size: int
+
+
+class SearchDocumentPayload(TypedDict):
+    """Typed payload for SearchDocument construction.
+
+    This TypedDict ensures all required fields are present and properly typed,
+    providing parity with the JSON Schema definition for search documents.
+    """
+
+    symbol_id: str
+    package: str
+    module: str
+    qname: str
+    kind: str
+    stability: str | None
+    deprecated: bool
+    summary: str | None
+    docstring: str | None
+    anchor_start: int | None
+    anchor_end: int | None
+    text: str
+    tokens: collections.Counter[str]
+    row: int
+
+
+# Public API exports
+__all__ = [
+    "EmbeddingModelProtocol",
+    "MetricsProvider",
+    "PreparedSearchArtifacts",
+    "SearchConfig",
+    "SearchDocument",
+    "SearchDocumentPayload",
+    "SearchOptions",
+    "SearchOptionsPayload",
+    "SearchRequest",
+    "SearchResult",
+    "VectorSearchContext",
+    "build_default_search_options",
+    "build_embedding_aware_search_options",
+    "build_faceted_search_options",
+    "documents_from_catalog",
+    "make_search_document",
+    "search_catalog",
+]
+
+
+@dataclass(slots=True)
+class SearchRequest:
+    """Request parameters for searching the agent catalog.
+
+    Parameters
+    ----------
+    repo_root : Path
+        Repository root for resolving semantic index artifacts.
+    query : str
+        Search query text.
+    k : int
+        Number of results to return.
+    """
+
+    repo_root: Path
+    query: str
+    k: int
 
 
 class EmbeddingModelProtocol(Protocol):
@@ -86,16 +179,6 @@ class EmbeddingModelProtocol(Protocol):
             Describe return value.
         """
         ...
-
-
-LEXICAL_FIELDS = [
-    "qname",
-    "module",
-    "package",
-    "summary",
-    "docstring",
-    "agent_hints.intent_tags",
-]
 
 
 @dataclass(slots=True)
@@ -153,6 +236,335 @@ class SearchOptions:
     model_loader: Callable[[str], EmbeddingModelProtocol] | None = None
     embedding_model: str | None = None
     batch_size: int | None = None
+
+
+def build_default_search_options(
+    *,
+    alpha: float | None = None,
+    candidate_pool: int | None = None,
+    batch_size: int | None = None,
+    embedding_model: str | None = None,
+    model_loader: Callable[[str], EmbeddingModelProtocol] | None = None,
+) -> SearchOptions:
+    """Build default SearchOptions with validated parameters.
+
+    This helper factory ensures consistent defaults across CLI, client, and
+    docs tooling. All parameters are optional and default to canonical values.
+
+    Parameters
+    ----------
+    alpha : float | None, optional
+        Hybrid search weighting (0.0 lexical, 1.0 vector).
+        Defaults to 0.6 if not provided.
+    candidate_pool : int | None, optional
+        Pre-filtering candidate pool size. Must be >= k.
+        Defaults to 100 if not provided.
+    batch_size : int | None, optional
+        Embedding batch size for model encoding.
+        Defaults to 32 if not provided.
+    embedding_model : str | None, optional
+        Name/path of embedding model.
+    model_loader : Callable | None, optional
+        Factory function to load embedding models.
+
+    Returns
+    -------
+    SearchOptions
+        Fully populated options with validated defaults.
+
+    Raises
+    ------
+    AgentCatalogSearchError
+        If alpha is outside [0.0, 1.0] or candidate_pool is negative.
+
+    Examples
+    --------
+    >>> opts = build_default_search_options(alpha=0.5)
+    >>> assert opts.alpha == 0.5
+    >>> assert opts.candidate_pool == 100  # defaults
+    """
+    final_alpha = alpha if alpha is not None else _DEFAULT_ALPHA
+    final_candidate_pool = candidate_pool if candidate_pool is not None else _DEFAULT_CANDIDATE_POOL
+    final_batch_size = batch_size if batch_size is not None else _DEFAULT_BATCH_SIZE
+
+    # Validate alpha range
+    if not 0.0 <= final_alpha <= 1.0:
+        message = f"alpha must be in [0.0, 1.0], got {final_alpha}"
+        raise AgentCatalogSearchError(
+            message,
+            context={"alpha": final_alpha},
+        )
+
+    # Validate candidate pool
+    if final_candidate_pool < 0:
+        message = f"candidate_pool must be non-negative, got {final_candidate_pool}"
+        raise AgentCatalogSearchError(
+            message,
+            context={"candidate_pool": final_candidate_pool},
+        )
+
+    return SearchOptions(
+        alpha=final_alpha,
+        candidate_pool=final_candidate_pool,
+        batch_size=final_batch_size,
+        embedding_model=embedding_model,
+        model_loader=model_loader,
+    )
+
+
+def build_faceted_search_options(
+    *,
+    facets: Mapping[str, str],
+    alpha: float | None = None,
+    candidate_pool: int | None = None,
+    batch_size: int | None = None,
+    embedding_model: str | None = None,
+    model_loader: Callable[[str], EmbeddingModelProtocol] | None = None,
+) -> SearchOptions:
+    """Build SearchOptions with facet filtering validation.
+
+    This helper applies strict facet key validation before construction,
+    ensuring only recognized facets are used. Useful for CLI/client search.
+
+    Parameters
+    ----------
+    facets : Mapping[str, str]
+        Facet filters (package, module, kind, stability).
+    alpha : float | None, optional
+        Hybrid search weighting. Defaults to 0.6.
+    candidate_pool : int | None, optional
+        Candidate pool size. Defaults to 100.
+    batch_size : int | None, optional
+        Embedding batch size. Defaults to 32.
+    embedding_model : str | None, optional
+        Embedding model name/path.
+    model_loader : Callable | None, optional
+        Model loader factory.
+
+    Returns
+    -------
+    SearchOptions
+        Validated options with facets included.
+
+    Raises
+    ------
+    AgentCatalogSearchError
+        If any facet key is not in the allow-list.
+
+    Examples
+    --------
+    >>> opts = build_faceted_search_options(facets={"package": "kgfoundry", "kind": "class"})
+    >>> assert opts.facets == {"package": "kgfoundry", "kind": "class"}
+    """
+    # Validate facet keys against allow-list
+    invalid_keys = set(facets.keys()) - _ALLOWED_FACET_KEYS
+    if invalid_keys:
+        message = (
+            f"Invalid facet keys: {sorted(invalid_keys)}. Allowed: {sorted(_ALLOWED_FACET_KEYS)}"
+        )
+        raise AgentCatalogSearchError(
+            message,
+            context={
+                "invalid_keys": sorted(invalid_keys),
+                "allowed_keys": sorted(_ALLOWED_FACET_KEYS),
+            },
+        )
+
+    # Build options with facets
+    opts = build_default_search_options(
+        alpha=alpha,
+        candidate_pool=candidate_pool,
+        batch_size=batch_size,
+        embedding_model=embedding_model,
+        model_loader=model_loader,
+    )
+    opts.facets = dict(facets)
+    return opts
+
+
+def build_embedding_aware_search_options(
+    *,
+    embedding_model: str,
+    model_loader: Callable[[str], EmbeddingModelProtocol],
+    alpha: float | None = None,
+    candidate_pool: int | None = None,
+    batch_size: int | None = None,
+    facets: Mapping[str, str] | None = None,
+) -> SearchOptions:
+    """Build SearchOptions with explicit embedding model and loader.
+
+    This helper is used when vector search components must be explicitly
+    wired, ensuring no implicit None defaults for model/loader.
+
+    Parameters
+    ----------
+    embedding_model : str
+        Required: embedding model name/path.
+    model_loader : Callable
+        Required: factory to load embedding models.
+    alpha : float | None, optional
+        Hybrid search weighting. Defaults to 0.6.
+    candidate_pool : int | None, optional
+        Candidate pool size. Defaults to 100.
+    batch_size : int | None, optional
+        Embedding batch size. Defaults to 32.
+    facets : Mapping[str, str] | None, optional
+        Optional facet filters.
+
+    Returns
+    -------
+    SearchOptions
+        Fully configured options for vector-aware search.
+
+    Raises
+    ------
+    AgentCatalogSearchError
+        If facet keys are invalid.
+
+    Examples
+    --------
+    >>> def loader(name: str) -> EmbeddingModelProtocol:
+    ...     return mock_model  # In real code, load the model
+    >>> opts = build_embedding_aware_search_options(
+    ...     embedding_model="all-MiniLM-L6-v2",
+    ...     model_loader=loader,
+    ... )
+    >>> assert opts.embedding_model == "all-MiniLM-L6-v2"
+    >>> assert opts.model_loader is not None
+    """
+    if facets:
+        # Validate facet keys
+        invalid_keys = set(facets.keys()) - _ALLOWED_FACET_KEYS
+        if invalid_keys:
+            message = f"Invalid facet keys: {sorted(invalid_keys)}. Allowed: {sorted(_ALLOWED_FACET_KEYS)}"
+            raise AgentCatalogSearchError(
+                message,
+                context={
+                    "invalid_keys": sorted(invalid_keys),
+                    "allowed_keys": sorted(_ALLOWED_FACET_KEYS),
+                },
+            )
+
+    return SearchOptions(
+        alpha=alpha if alpha is not None else _DEFAULT_ALPHA,
+        candidate_pool=candidate_pool if candidate_pool is not None else _DEFAULT_CANDIDATE_POOL,
+        batch_size=batch_size if batch_size is not None else _DEFAULT_BATCH_SIZE,
+        embedding_model=embedding_model,
+        model_loader=model_loader,
+        facets=dict(facets) if facets else None,
+    )
+
+
+def make_search_document(
+    *,
+    symbol_id: str,
+    package: str,
+    module: str,
+    qname: str,
+    kind: str,
+    stability: str | None = None,
+    deprecated: bool = False,
+    summary: str | None = None,
+    docstring: str | None = None,
+    anchor_start: int | None = None,
+    anchor_end: int | None = None,
+    row: int = -1,
+) -> SearchDocument:
+    """Create a validated SearchDocument with all required fields populated.
+
+    This helper centralizes SearchDocument construction, ensuring consistent
+    normalization (whitespace stripping, deterministic token ordering) and
+    providing a typed, documented API for all callers.
+
+    Parameters
+    ----------
+    symbol_id : str
+        Unique symbol identifier (required).
+    package : str
+        Package name (required).
+    module : str
+        Module qualified name (required).
+    qname : str
+        Fully qualified symbol name (required).
+    kind : str
+        Symbol kind (e.g., "class", "function", "module") (required).
+    stability : str | None, optional
+        Stability level (e.g., "stable", "experimental"). Defaults to None.
+    deprecated : bool, optional
+        Whether the symbol is deprecated. Defaults to False.
+    summary : str | None, optional
+        One-line summary from docstring. Defaults to None.
+    docstring : str | None, optional
+        Full docstring text. Defaults to None.
+    anchor_start : int | None, optional
+        Source file start line. Defaults to None.
+    anchor_end : int | None, optional
+        Source file end line. Defaults to None.
+    row : int, optional
+        Row index in semantic embedding matrix. Defaults to -1.
+
+    Returns
+    -------
+    SearchDocument
+        Normalized and validated search document.
+
+    Examples
+    --------
+    >>> doc = make_search_document(
+    ...     symbol_id="py:kgfoundry.search.find_similar",
+    ...     package="kgfoundry",
+    ...     module="kgfoundry.agent_catalog.search",
+    ...     qname="find_similar",
+    ...     kind="function",
+    ...     summary="Find similar symbols in catalog",
+    ... )
+    >>> assert doc.symbol_id == "py:kgfoundry.search.find_similar"
+    >>> assert doc.package == "kgfoundry"
+    """
+    # Normalize and strip whitespace from string fields
+    normalized_summary = summary.strip() if summary else None
+    normalized_docstring = docstring.strip() if docstring else None
+    normalized_qname = qname.strip()
+
+    # Build text for lexical search: concatenate normalized fields
+    text_parts = [
+        normalized_qname,
+        module.strip(),
+        package.strip(),
+        normalized_summary or "",
+        normalized_docstring or "",
+    ]
+    normalized_text = " ".join(part for part in text_parts if part)
+
+    # Tokenize the normalized text for lexical scoring
+    tokens = collections.Counter(_tokenize(normalized_text))
+
+    return SearchDocument(
+        symbol_id=symbol_id,
+        package=package,
+        module=module,
+        qname=normalized_qname,
+        kind=kind,
+        stability=stability,
+        deprecated=deprecated,
+        summary=normalized_summary,
+        docstring=normalized_docstring,
+        anchor_start=anchor_start,
+        anchor_end=anchor_end,
+        text=normalized_text,
+        tokens=tokens,
+        row=row,
+    )
+
+
+LEXICAL_FIELDS = [
+    "qname",
+    "module",
+    "package",
+    "summary",
+    "docstring",
+    "agent_hints.intent_tags",
+]
 
 
 @dataclass(slots=True)
@@ -358,7 +770,7 @@ class _SimpleFaissIndex(FaissIndexProtocol):
         """
         # Simple flat index doesn't require training
 
-    def add_with_ids(self, vectors: VectorArray, ids: IndexArray) -> None:  # noqa: ARG002
+    def add_with_ids(self, vectors: VectorArray, ids: IndexArray) -> None:
         """Add vectors with explicit IDs (not supported by simple index).
 
         <!-- auto:docstring-builder v1 -->
@@ -439,7 +851,7 @@ class _SimpleFaissModule:
     METRIC_L2: int = 0
 
     @staticmethod
-    def IndexFlatIP(dimension: int) -> FaissIndexProtocol:  # noqa: N802
+    def IndexFlatIP(dimension: int) -> FaissIndexProtocol:
         """Create a flat inner-product index.
 
         <!-- auto:docstring-builder v1 -->
@@ -484,7 +896,7 @@ class _SimpleFaissModule:
         return cast(FaissIndexProtocol, _SimpleFaissIndex(dimension))
 
     @staticmethod
-    def IndexIDMap2(index: FaissIndexProtocol) -> FaissIndexProtocol:  # noqa: N802
+    def IndexIDMap2(index: FaissIndexProtocol) -> FaissIndexProtocol:
         """Wrap an index with 64-bit ID mapping.
 
         <!-- auto:docstring-builder v1 -->
@@ -525,7 +937,7 @@ class _SimpleFaissModule:
             "vectors": index._vectors,
         }
         with Path(path).open("wb") as handle:
-            pickle.dump(payload, handle)
+            safe_pickle_dump(payload, handle)
 
     @staticmethod
     def read_index(path: str) -> FaissIndexProtocol:
@@ -542,13 +954,24 @@ class _SimpleFaissModule:
         -------
         FaissIndexProtocol
             Loaded index instance.
+
+        Raises
+        ------
+        AgentCatalogSearchError
+            If the persisted index has an invalid payload format.
         """
         with Path(path).open("rb") as handle:
-            payload_raw: object = pickle.load(handle)  # noqa: S301 - local trusted artifact
+            # Load from trusted local artifact with allow-list validation
+            # (see orchestration.safe_pickle for type restrictions)
+            payload_raw: object = safe_pickle_load(handle)
+
+        # Strict validation: reject if not a dict or has unexpected keys
         if not isinstance(payload_raw, dict):
             message = "Stored semantic index has invalid payload format"
             raise AgentCatalogSearchError(message)
-        payload: dict[str, object] = payload_raw
+
+        # Type-narrowed payload for subsequent operations
+        payload: dict[str, object] = cast(dict[str, object], payload_raw)
         vectors_payload = payload.get("vectors", [])
         vectors = np.asarray(vectors_payload, dtype=np.float32)
         dimension_raw = payload.get("dimension")
@@ -569,7 +992,7 @@ class _SimpleFaissModule:
         return cast(FaissIndexProtocol, fallback)
 
     @staticmethod
-    def normalize_L2(vectors: VectorArray) -> None:  # noqa: N802
+    def normalize_L2(vectors: VectorArray) -> None:
         """Normalize vectors to unit length in-place.
 
         <!-- auto:docstring-builder v1 -->
@@ -583,7 +1006,26 @@ class _SimpleFaissModule:
         np.copyto(vectors, normalized)
 
 
-@cache  # type: ignore[misc]
+def _with_cache(func: Callable[[], FaissModuleProtocol]) -> Callable[[], FaissModuleProtocol]:
+    """Cache a parameterless factory function.
+
+    Wraps functools.cache with proper type annotations to avoid mypy issues
+    with incomplete functools stubs.
+
+    Parameters
+    ----------
+    func : Callable[[], FaissModuleProtocol]
+        Zero-argument factory function.
+
+    Returns
+    -------
+    Callable[[], FaissModuleProtocol]
+        Cached version of the factory function.
+    """
+    return cache(func)
+
+
+@_with_cache
 def _simple_faiss_module() -> FaissModuleProtocol:
     """Return a cached NumPy-based FAISS shim for local usage.
 
@@ -680,7 +1122,8 @@ def _tokenize(text: str) -> list[str]:
     list[str]
         Describe return value.
     """
-    return WORD_PATTERN.findall(text.lower())  # type: ignore[misc]
+    tokens: list[str] = WORD_PATTERN.findall(text.lower())
+    return tokens
 
 
 def _stringify(value: object) -> str | None:
@@ -779,9 +1222,13 @@ def build_document_from_payload(
         Describe return value.
     """
     docfacts_payload = symbol.get("docfacts")
-    summary, docstring = _extract_docfacts_text(
-        docfacts_payload if isinstance(docfacts_payload, Mapping) else None  # type: ignore[arg-type]
+    # Type-narrow docfacts_payload: only pass if it's a Mapping
+    docfacts_input: Mapping[str, JsonLike] | None = (
+        cast(Mapping[str, JsonLike], docfacts_payload)
+        if isinstance(docfacts_payload, Mapping)
+        else None
     )
+    summary, docstring = _extract_docfacts_text(docfacts_input)
     intent_tags, tests_to_run = _extract_agent_hints_payload(symbol)
     qname_value = _stringify(symbol.get("qname")) or symbol_id
     text_parts = [
@@ -1152,11 +1599,12 @@ def _load_row_lookup(
     tuple[dict[str, int], str | str | int | float | bool | NoneType | list[object] | dict[str, object]]
         Describe return value.
     """
-    mapping_payload_raw = json.loads(mapping_path.read_text(encoding="utf-8"))  # type: ignore[misc]
-    if not isinstance(mapping_payload_raw, dict):  # type: ignore[misc]
+    # Load JSON and immediately validate the top-level type
+    mapping_payload_raw: object = json.loads(mapping_path.read_text(encoding="utf-8"))
+    if not isinstance(mapping_payload_raw, dict):
         message = "Semantic mapping file does not contain valid JSON object"
         raise AgentCatalogSearchError(message)
-    # Cast to expected type - JSON can have broader types
+    # Type-narrowed payload for subsequent operations
     mapping_payload: CatalogMapping = cast(
         CatalogMapping,
         mapping_payload_raw,
@@ -1196,8 +1644,9 @@ def _load_sentence_transformer(model_name: str) -> EmbeddingModelProtocol:
     except ImportError as exc:  # pragma: no cover - runtime guard
         message = "sentence-transformers is required for semantic search"
         raise AgentCatalogSearchError(message, cause=exc) from exc
-    factory_raw = getattr(module, "SentenceTransformer", None)  # type: ignore[misc]
-    factory: Callable[[str], object] | None = factory_raw
+    # getattr with default None returns Any; we immediately narrow with callable check
+    factory_raw: object = getattr(module, "SentenceTransformer", None)
+    factory: Callable[[str], object] | None = factory_raw if callable(factory_raw) else None
     if not callable(factory):  # pragma: no cover - defensive guard
         message = "sentence-transformers is missing the SentenceTransformer class"
         raise AgentCatalogSearchError(message)
@@ -1256,3 +1705,183 @@ def _encode_query(
     sentences = [query]
     embeddings = model.encode(sentences, batch_size=batch_size)
     return np.asarray(embeddings, dtype=np.float32, order="C")
+
+
+def compute_vector_scores(
+    query: str,
+    options: SearchOptions,
+    context: VectorSearchContext,
+) -> dict[str, float]:
+    """Compute vector similarity scores for candidates using semantic index.
+
+    Parameters
+    ----------
+    query : str
+        Search query text to encode.
+    options : SearchOptions
+        Search configuration including embedding model and batch size.
+    context : VectorSearchContext
+        Pre-loaded vector search context with index and documents.
+
+    Returns
+    -------
+    dict[str, float]
+        Mapping from symbol_id to vector similarity score.
+
+    Raises
+    ------
+    AgentCatalogSearchError
+        If vector encoding or search fails.
+    """
+    semantic_meta: PrimitiveMapping = cast(
+        PrimitiveMapping,
+        {
+            k: v
+            for k, v in context.semantic_meta.items()
+            if isinstance(v, (str, int, float, bool, type(None)))
+        },
+    )
+    _, model = _resolve_embedding_model(options, semantic_meta)
+    batch_size = options.batch_size or 32
+
+    query_embedding = _encode_query(model, query, batch_size=batch_size)
+    query_normalized = normalize_l2(query_embedding, axis=1)
+
+    faiss_module = load_faiss("vector search")
+    faiss_index: FaissIndexProtocol = faiss_module.read_index(str(context.index_path))
+
+    distances, indices = faiss_index.search(query_normalized, context.candidate_limit)
+
+    scores: dict[str, float] = {}
+    if distances.size > 0 and indices.size > 0:
+        # numpy array indexing returns Any; cast to proper types
+        # This is a limitation of numpy stubs, not a code quality issue
+        query_row: np.ndarray = cast(np.ndarray, indices[0, :])  # type: ignore[type-arg,misc]
+        query_distances: np.ndarray = cast(np.ndarray, distances[0, :])  # type: ignore[type-arg,misc]
+        # zip with strict=False allows different lengths; indices and distances
+        # from FAISS are always same length, but mypy stub doesn't track this
+        for row_idx, distance in zip(query_row, query_distances, strict=False):  # type: ignore[misc]
+            row_id_int = int(row_idx)  # type: ignore[misc]
+            if row_id_int < 0:  # sentinel value from FAISS
+                continue
+            if row_id_int in context.row_to_document:
+                document = context.row_to_document[row_id_int]
+                scores[document.symbol_id] = float(distance)  # type: ignore[misc]
+
+    return scores
+
+
+def search_catalog(
+    catalog: Mapping[str, JsonLike],
+    *,
+    request: SearchRequest,
+    options: SearchOptions | None = None,
+    metrics: MetricsProvider | None = None,
+) -> list[SearchResult]:
+    """Execute hybrid (lexical + vector) search across the agent catalog.
+
+    Combines lexical term matching with semantic vector similarity to rank
+    catalog entries. Uses typed NumPy helpers to ensure shape safety and
+    predictable results.
+
+    Parameters
+    ----------
+    catalog : Mapping[str, JsonLike]
+        Agent catalog payload (from agent_catalog.json).
+    request : SearchRequest
+        Search parameters including query, k (result count), and repo_root.
+    options : SearchOptions, optional
+        Tuning parameters including facets, alpha weighting, model selection.
+    metrics : MetricsProvider, optional
+        Optional observability provider for metrics/logging.
+
+    Returns
+    -------
+    list[SearchResult]
+        Sorted list of top-k search results with combined scores.
+
+    Raises
+    ------
+    AgentCatalogSearchError
+        If catalog parsing, indexing, or search fails.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> from kgfoundry.agent_catalog.search import SearchRequest, search_catalog
+    >>> # Typically used via AgentCatalogClient
+    >>> # This is a conceptual example - real usage requires a valid catalog
+    """
+    if metrics is None:
+        metrics = MetricsProvider.default()
+
+    opts = options or SearchOptions()
+    documents = documents_from_catalog(catalog)
+    lexical_scores = compute_lexical_scores(
+        prepare_query_tokens(request.query), documents, request.query
+    )
+
+    search_config = catalog.get("search")
+    alpha_value, candidate_limit = resolve_search_parameters(
+        cast(
+            CatalogMapping | None,
+            search_config if isinstance(search_config, Mapping) else None,
+        ),
+        opts,
+        len(documents),
+        request.k,
+    )
+
+    lexical_candidates = select_lexical_candidates(lexical_scores, documents, candidate_limit)
+
+    # Attempt to load vector scores from semantic index if available
+    vector_scores: dict[str, float] = {}
+    try:
+        semantic_index_meta = _resolve_semantic_index_metadata(catalog, request.repo_root)
+        if semantic_index_meta is not None:
+            semantic_meta, index_path, mapping_path = semantic_index_meta
+            _, mapping_payload = _load_row_lookup(mapping_path)
+
+            context = VectorSearchContext(
+                semantic_meta=semantic_meta,
+                mapping_payload=mapping_payload,
+                index_path=index_path,
+                documents=lexical_candidates,
+                candidate_limit=candidate_limit,
+                k=request.k,
+                candidate_ids={doc.symbol_id for doc in lexical_candidates},
+                row_to_document={doc.row: doc for doc in documents if doc.row >= 0},
+            )
+            vector_scores = compute_vector_scores(request.query, opts, context)
+    except AgentCatalogSearchError:
+        pass  # Fall back to lexical-only scores
+
+    # Build and score results
+    results: list[SearchResult] = []
+    facets = opts.facets or {}
+    for doc in lexical_candidates:
+        if facets and not document_matches_facets(doc, facets):
+            continue
+
+        lexical_score = lexical_scores.get(doc.symbol_id, 0.0)
+        vector_score = vector_scores.get(doc.symbol_id, 0.0)
+        results.append(
+            SearchResult(
+                symbol_id=doc.symbol_id,
+                score=alpha_value * vector_score + (1.0 - alpha_value) * lexical_score,
+                lexical_score=lexical_score,
+                vector_score=vector_score,
+                package=doc.package,
+                module=doc.module,
+                qname=doc.qname,
+                kind=doc.kind,
+                stability=doc.stability,
+                deprecated=doc.deprecated,
+                summary=doc.summary,
+                docstring=doc.docstring,
+                anchor={"start_line": doc.anchor_start, "end_line": doc.anchor_end},
+            )
+        )
+
+    results.sort(key=lambda r: r.score, reverse=True)
+    return results[: request.k]

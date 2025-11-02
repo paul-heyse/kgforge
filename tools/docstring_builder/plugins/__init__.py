@@ -46,9 +46,7 @@ ResultT = TypeVar("ResultT")
 
 type PluginInstance = DocstringBuilderPlugin[object, object] | LegacyPluginProtocol
 
-type RegisteredPlugin = (
-    HarvesterPlugin | TransformerPlugin | FormatterPlugin | LegacyPluginAdapter
-)
+type RegisteredPlugin = HarvesterPlugin | TransformerPlugin | FormatterPlugin | LegacyPluginAdapter
 type PluginFactory = Callable[[], PluginInstance]
 
 

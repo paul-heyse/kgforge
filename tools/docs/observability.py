@@ -167,7 +167,7 @@ def get_metrics_registry() -> DocumentationMetrics:
     >>> metrics = get_metrics_registry()
     >>> metrics.catalog_runs_total.labels(status="success").inc()
     """
-    global _METRICS_REGISTRY  # noqa: PLW0603
+    global _METRICS_REGISTRY
     if _METRICS_REGISTRY is None:
         _METRICS_REGISTRY = DocumentationMetrics()
     return _METRICS_REGISTRY
