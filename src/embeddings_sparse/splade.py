@@ -17,6 +17,7 @@ from collections import Counter, defaultdict
 from collections.abc import Iterable, Sequence
 from pathlib import Path
 from re import Pattern
+from types import ModuleType
 from typing import TYPE_CHECKING, BinaryIO, Final, Protocol, cast
 
 if TYPE_CHECKING:
@@ -122,7 +123,15 @@ class ImpactHitProtocol(Protocol):
 
 
 class LuceneImpactSearcherProtocol(Protocol):
+    def __init__(self, index_dir: str, *, query_encoder: str | None = None) -> None: ...
+
     def search(self, query: str, k: int) -> Sequence[ImpactHitProtocol]: ...
+
+
+class LuceneImpactSearcherFactory(Protocol):
+    def __call__(
+        self, index_dir: str, *, query_encoder: str | None = None
+    ) -> LuceneImpactSearcherProtocol: ...
 
 
 logger = logging.getLogger(__name__)
@@ -526,14 +535,17 @@ class LuceneImpactIndex:
         if self._searcher is not None:
             return
         try:
-            lucene_search_module = importlib.import_module("pyserini.search.lucene")
-            lucene_impact_searcher_cls = lucene_search_module.LuceneImpactSearcher
+            lucene_search_module: ModuleType = importlib.import_module("pyserini.search.lucene")
+            lucene_impact_searcher_cls = cast(
+                LuceneImpactSearcherFactory,
+                lucene_search_module.LuceneImpactSearcher,
+            )
         except (ImportError, AttributeError) as exc:  # pragma: no cover - optional dependency
             message = "Pyserini not available for SPLADE impact search"
             logger.exception("Failed to import LuceneImpactSearcher")
             raise RuntimeError(message) from exc
         searcher = lucene_impact_searcher_cls(self.index_dir, query_encoder=self.query_encoder)
-        self._searcher = cast(LuceneImpactSearcherProtocol, searcher)
+        self._searcher = searcher
 
     def ensure_available(self) -> None:
         """Ensure the Lucene searcher is initialized and ready for queries."""

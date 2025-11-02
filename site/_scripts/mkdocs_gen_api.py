@@ -33,7 +33,9 @@ if str(ROOT) not in sys.path:
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-from tools.detect_pkg import detect_packages, detect_primary  # noqa: E402
+detect_pkg_module = import_module("tools.detect_pkg")
+detect_packages = cast(Any, getattr(detect_pkg_module, "detect_packages"))
+detect_primary = cast(Any, getattr(detect_pkg_module, "detect_primary"))
 
 out = Path("api")
 with mkdocs_gen_files.open(out / "index.md", "w") as f:

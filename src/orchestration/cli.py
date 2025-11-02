@@ -7,12 +7,14 @@ and running end-to-end pipelines using Prefect orchestration.
 from __future__ import annotations
 
 import contextlib
+import importlib
 import json
 import logging
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, cast
+from types import ModuleType
+from typing import TYPE_CHECKING, Final, Protocol, cast
 from uuid import uuid4
 
 import typer
@@ -32,10 +34,13 @@ from kgfoundry_common.vector_types import (
 from orchestration import safe_pickle
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     # Type signature for e2e_flow: takes no args, returns list of strings
     type _E2EFlow = Callable[[], list[str]]
+
+
+class _UvicornRun(Protocol):
+    def __call__(self, app: str, *, host: str, port: int, reload: bool = False) -> None: ...
+
 
 # Runtime: may be None if Prefect not installed
 _e2e_flow: _E2EFlow | None = None
@@ -536,7 +541,7 @@ def api(port: int = 8080) -> None:
         Port to bind to. Defaults to 8080.
     """
     try:
-        uvicorn_module = importlib.import_module("uvicorn")
+        uvicorn_module: ModuleType = importlib.import_module("uvicorn")
     except ImportError as exc:
         typer.echo(
             "uvicorn is required to run the API server",
@@ -544,7 +549,13 @@ def api(port: int = 8080) -> None:
         )
         raise typer.Exit(code=1) from exc
 
-    uvicorn_module.run("search_api.app:app", host="127.0.0.1", port=port, reload=False)
+    module_attrs = cast(Mapping[str, object], vars(uvicorn_module))
+    run_attr = module_attrs.get("run")
+    if not callable(run_attr):
+        typer.echo("uvicorn.run entry point not available", err=True)
+        raise typer.Exit(code=1)
+    run_server = cast(_UvicornRun, run_attr)
+    run_server("search_api.app:app", host="127.0.0.1", port=port, reload=False)
 
 
 def _run_e2e_flow() -> list[str]:

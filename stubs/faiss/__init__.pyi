@@ -35,7 +35,10 @@ __all__ = [
     "index_factory",
     "index_gpu_to_cpu",
     "knn_gpu",
+    "metric_inner_product",
+    "metric_l2",
     "normalize_L2",
+    "normalize_l2",
     "read_index",
     "read_index_binary",
     "serialize_index",
@@ -257,8 +260,14 @@ class GpuDistanceParams:
 METRIC_INNER_PRODUCT: int
 """Constant for inner-product metric."""
 
+metric_inner_product: int
+"""PEP 8 alias for :data:`METRIC_INNER_PRODUCT`."""
+
 METRIC_L2: int
 """Constant for L2 distance metric."""
+
+metric_l2: int
+"""PEP 8 alias for :data:`METRIC_L2`."""
 
 def index_factory(dimension: int, description: str, metric: int) -> VectorIndex:
     """Create an index from a factory string.
@@ -329,14 +338,12 @@ def index_gpu_to_cpu(index: VectorIndex) -> VectorIndex:
     """
     ...
 
-def normalize_L2(vectors: VectorArray) -> None:  # noqa: N802
-    """Normalize vectors to unit length in-place.
+def normalize_l2(vectors: VectorArray) -> None:
+    """Normalize vectors to unit length in-place."""
+    ...
 
-    Parameters
-    ----------
-    vectors : VectorArray
-        Array to normalize (modified in-place).
-    """
+def normalize_L2(vectors: VectorArray) -> None:  # noqa: N802
+    """CamelCase alias provided by upstream FAISS."""
     ...
 
 def write_index(index: VectorIndex, path: str) -> None:

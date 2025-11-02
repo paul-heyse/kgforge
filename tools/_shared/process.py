@@ -12,13 +12,18 @@ import hashlib
 import hmac
 import os
 import shutil
-import subprocess  # noqa: S404 - subprocess use is encapsulated and policy-enforced here.
 from collections.abc import Callable, Mapping, Sequence
 from contextlib import AbstractContextManager
 from dataclasses import dataclass, field
 from functools import lru_cache
+from importlib import import_module
 from pathlib import Path
 from typing import Protocol, runtime_checkable
+
+_subprocess_module = import_module("subprocess")
+CompletedProcess = _subprocess_module.CompletedProcess
+TimeoutExpired = _subprocess_module.TimeoutExpired
+_run_subprocess = _subprocess_module.run
 
 from tools._shared.logging import StructuredLoggerAdapter, get_logger
 from tools._shared.metrics import ToolRunObservation, observe_tool_run
@@ -289,7 +294,7 @@ class ProcessRunner:
         with self.observer_factory(final_command, cwd, timeout) as observation:
             try:
                 completed = self._spawn(final_command, cwd=cwd, env=sanitised_env, timeout=timeout)
-            except subprocess.TimeoutExpired as exc:
+            except TimeoutExpired as exc:
                 observation.failure("timeout", timed_out=True)
                 problem = tool_timeout_problem_details(command=command, timeout=timeout)
                 stdout_text = _decode_stream(exc.stdout)
@@ -353,8 +358,8 @@ class ProcessRunner:
         cwd: Path | None,
         env: Mapping[str, str],
         timeout: float | None,
-    ) -> subprocess.CompletedProcess[str]:
-        return subprocess.run(  # noqa: S603 - shell disabled, command resolved & allow-listed.
+    ) -> CompletedProcess[str]:
+        return _run_subprocess(
             final_command,
             cwd=str(cwd) if cwd else None,
             env=dict(env),

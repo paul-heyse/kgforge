@@ -21,10 +21,12 @@ hello
 
 from __future__ import annotations
 
+import io
 import logging
 from collections.abc import Mapping
+from importlib import import_module
 from pathlib import Path
-from typing import Final
+from typing import Final, Protocol, cast
 
 from tools import ToolExecutionError, run_tool
 
@@ -34,6 +36,28 @@ logger = logging.getLogger(__name__)
 DEFAULT_TIMEOUT: Final[int] = 300
 MIN_TIMEOUT: Final[int] = 1
 MAX_TIMEOUT: Final[int] = 3600
+
+
+_subprocess_module = import_module("subprocess")
+_PIPE = _subprocess_module.PIPE
+_Popen = _subprocess_module.Popen
+TimeoutExpired = cast(type[TimeoutError], _subprocess_module.TimeoutExpired)
+
+
+class TextProcess(Protocol):
+    """Protocol describing the streaming process surface we expose."""
+
+    stdin: io.TextIOBase | None
+    stdout: io.TextIOBase | None
+    stderr: io.TextIOBase | None
+
+    def poll(self) -> int | None: ...
+
+    def wait(self, timeout: float | None = ...) -> int: ...
+
+    def terminate(self) -> None: ...
+
+    def kill(self) -> None: ...
 
 
 class SubprocessTimeoutError(TimeoutError):
@@ -173,7 +197,7 @@ def run_subprocess(
         returncode = exc.returncode
         stderr_output = exc.stderr or None
         if returncode is None:
-            message = exc.args[0] if exc.args else "Subprocess execution failed"
+            message = str(exc)
         else:
             message = f"Subprocess failed with exit code {returncode}: {' '.join(cmd)}"
         logger.exception(
@@ -201,4 +225,49 @@ def _is_timeout_error(error: ToolExecutionError) -> bool:
     return "timed out" in str(error)
 
 
-__all__ = ["SubprocessError", "SubprocessTimeoutError", "run_subprocess"]
+def spawn_text_process(
+    command: Sequence[str],
+    *,
+    cwd: Path | None = None,
+    env: Mapping[str, str] | None = None,
+) -> TextProcess:
+    """Spawn a long-lived subprocess with hardened command checks.
+
+    The command is resolved through the shared allow-list policy to ensure the
+    executable path is trusted, and the environment is sanitised to drop
+    inherited state that could affect tooling deterministically.
+    """
+    if not command:
+        msg = "Command must contain at least one argument"
+        raise ToolExecutionError(msg, command=[])
+
+    allowlist = AllowListEnforcer()
+    environment = SanitisedEnvironment()
+
+    executable = allowlist.resolve(command[0], command)
+    final_command = (str(executable), *command[1:])
+    sanitised_env = environment.build(env)
+
+    process = cast(
+        TextProcess,
+        _Popen(  # type: ignore[call-arg]
+            final_command,
+            stdin=_PIPE,
+            stdout=_PIPE,
+            stderr=_PIPE,
+            text=True,
+            cwd=str(cwd) if cwd else None,
+            env=dict(sanitised_env),
+        ),
+    )
+    return process
+
+
+__all__ = [
+    "SubprocessError",
+    "SubprocessTimeoutError",
+    "TextProcess",
+    "TimeoutExpired",
+    "run_subprocess",
+    "spawn_text_process",
+]

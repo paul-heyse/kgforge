@@ -1125,7 +1125,7 @@ class AgentCatalogBuilder:
         semantic_dir = (self.repo_root / self.semantic_dir).resolve()
         semantic_dir.mkdir(parents=True, exist_ok=True)
         faiss_module = load_faiss("build the semantic index")
-        index = faiss_module.IndexFlatIP(int(vectors.shape[1]))
+        index = faiss_module.index_flat_ip(int(vectors.shape[1]))
         contiguous_vectors: VectorArray = np.ascontiguousarray(vectors)
         index.add(contiguous_vectors)
         index_path = semantic_dir / "symbols.faiss"

@@ -51,6 +51,8 @@ _http_exports: list[str] = []
 try:
     from kgfoundry_common.errors.http import (
         problem_details_response as _problem_details_response,
+    )
+    from kgfoundry_common.errors.http import (
         register_problem_details_handler as _register_problem_details_handler,
     )
 

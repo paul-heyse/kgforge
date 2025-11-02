@@ -1,12 +1,7 @@
-"""Stub for astroid optional dependency (AST analysis)."""
+"""Stubs for the subset of Astroid types consumed by kgfoundry."""
 
 from __future__ import annotations
 
-class AstroidManager:
-    """Manager for Astroid AST analysis."""
+from astroid.manager import MANAGER, AstroidManager
 
-    def build_from_file(self, path: str) -> object:
-        """Build an AST from a Python source file."""
-        ...
-
-MANAGER: AstroidManager
+__all__ = ["MANAGER", "AstroidManager"]

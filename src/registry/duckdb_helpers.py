@@ -6,7 +6,7 @@ import time
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Final, cast
+from typing import Final, cast
 
 import duckdb
 from duckdb import DuckDBPyConnection

@@ -13,6 +13,7 @@ __all__: tuple[str, ...] = ("JsonPayload", "validate_against_schema")
 
 
 def _load_module() -> ModuleType:
+    """Import and return the lazily loaded validation module."""
     return import_module(MODULE_PATH)
 
 
@@ -35,4 +36,24 @@ def __dir__() -> list[str]:
 
 
 if TYPE_CHECKING:  # pragma: no cover - typing assistance only
-    from docs._scripts.validation import JsonPayload, validate_against_schema  # noqa: PLC2701
+    from collections.abc import Mapping, Sequence
+    from pathlib import Path
+    from typing import Protocol
+
+    JsonPayload = Mapping[str, object] | Sequence[object] | str | int | float | bool | None
+
+    class _Validator(Protocol):
+        def __call__(
+            self,
+            payload: JsonPayload,
+            schema_path: Path,
+            *,
+            artifact: str,
+        ) -> None: ...
+
+    def validate_against_schema(
+        payload: JsonPayload,
+        schema_path: Path,
+        *,
+        artifact: str,
+    ) -> None: ...

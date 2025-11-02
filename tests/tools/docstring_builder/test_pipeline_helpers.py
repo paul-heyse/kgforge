@@ -172,7 +172,8 @@ class TestFileOutcomeTracking:
 class TestStatusMapping:
     """Tests for status value mappings."""
 
-    def test_status_to_label(self, status: RunStatus, label: str) -> None:  # noqa: ARG002
+    def test_status_to_label(self, status: RunStatus, label: str) -> None:
         """Verify status string representation."""
         envelope = ErrorEnvelope(file="test.py", status=status, message="")
         assert envelope.status == status
+        assert str(envelope.status) == label

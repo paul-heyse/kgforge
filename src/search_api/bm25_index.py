@@ -476,11 +476,7 @@ class BM25Index:
                     title=str(title) if isinstance(title, str) else "",
                     section=str(section) if isinstance(section, str) else "",
                     tf=(cast(dict[str, float], tf_value) if isinstance(tf_value, dict) else {}),
-                    dl=(
-                        float(doc_length)
-                        if isinstance(doc_length, (int, float))
-                        else 0.0
-                    ),
+                    dl=(float(doc_length) if isinstance(doc_length, (int, float)) else 0.0),
                 )
             )
         return docs
