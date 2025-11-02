@@ -18,8 +18,7 @@ from tools.docstring_builder import policy as policy
 from tools.docstring_builder import render as render
 from tools.docstring_builder import schema as schema
 from tools.docstring_builder import semantics as semantics
-
-BUILDER_VERSION = "2.0.0"
+from tools.docstring_builder.version import BUILDER_VERSION
 
 __all__ = [
     "BUILDER_VERSION",

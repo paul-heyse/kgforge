@@ -4,18 +4,19 @@ from __future__ import annotations
 
 import datetime
 import json
+import logging
 import os
 from collections.abc import Iterable, Mapping, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 
-from tools.docstring_builder import BUILDER_VERSION
 from tools.docstring_builder.builder_types import (
     STATUS_LABELS,
     DocstringBuildRequest,
     DocstringBuildResult,
     ExitStatus,
-    _status_from_exit,
     build_problem_details,
+    status_from_exit,
 )
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.config import (
@@ -29,11 +30,11 @@ from tools.docstring_builder.docfacts import (
     DocfactsProvenance,
 )
 from tools.docstring_builder.docfacts_coordinator import DocfactsCoordinator
-from tools.docstring_builder.failure_summary import FailureSummaryRenderer
 from tools.docstring_builder.file_processor import FileProcessor
 from tools.docstring_builder.harvest import HarvestResult
 from tools.docstring_builder.io import (
     InvalidPathError,
+    SelectionCriteria,
     module_to_path,
     select_files,
     should_ignore,
@@ -41,8 +42,10 @@ from tools.docstring_builder.io import (
 from tools.docstring_builder.ir import IRDocstring, build_ir, validate_ir
 from tools.docstring_builder.metrics import MetricsRecorder
 from tools.docstring_builder.models import (
+    CliResult,
     DocfactsProvenancePayload,
     ErrorReport,
+    RunSummary,
     SchemaViolationError,
 )
 from tools.docstring_builder.models import (
@@ -59,12 +62,16 @@ from tools.docstring_builder.paths import (
     REPO_ROOT,
 )
 from tools.docstring_builder.pipeline import PipelineConfig, PipelineRunner
+from tools.docstring_builder.pipeline_types import ProcessingOptions
 from tools.docstring_builder.plugins import PluginManager
 from tools.docstring_builder.render import render_docstring
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult, build_semantic_schemas
+from tools.docstring_builder.version import BUILDER_VERSION
 from tools.shared.logging import get_logger, with_fields
 from tools.shared.proc import ToolExecutionError, run_tool
+
+LoggerLike = logging.LoggerAdapter[logging.Logger] | logging.Logger
 
 _LOGGER = get_logger(__name__)
 METRICS = get_metrics_registry()
@@ -154,7 +161,6 @@ def _collect_edits(
     result: HarvestResult,
     config: BuilderConfig,
     plugin_manager: PluginManager | None,
-    *,
     format_only: bool = False,
 ) -> tuple[list[DocstringEdit], list[SemanticResult], list[IRDocstring]]:
     semantics = build_semantic_schemas(result, config)
@@ -270,8 +276,81 @@ def _filter_docfacts_for_output(
     return filtered
 
 
-def _ordered_index(item: tuple[int, Path, FileOutcome]) -> int:
-    return item[0]
+@dataclass(slots=True)
+class _DocfactState:
+    config: BuilderConfig
+    entries: dict[str, DocFact]
+    sources: dict[str, Path]
+
+    def record(self, facts: Iterable[DocFact], file_path: Path) -> None:
+        _record_docfacts(facts, file_path, self.entries, self.sources)
+
+    def filtered(self) -> list[DocFact]:
+        return _filter_docfacts_for_output(self.entries, self.sources, self.config)
+
+
+@dataclass(slots=True)
+class _PipelineDependencies:
+    config: BuilderConfig
+    logger: LoggerLike
+    cache: BuilderCache
+    diff_manager: DiffManager
+    metrics: MetricsRecorder
+    file_processor: FileProcessor
+    docfact_state: _DocfactState
+
+    def record_docfacts(self, facts: Iterable[DocFact], file_path: Path) -> None:
+        self.docfact_state.record(facts, file_path)
+
+    def filter_docfacts(self) -> list[DocFact]:
+        return self.docfact_state.filtered()
+
+    def docfacts_coordinator_factory(self, check_mode: bool) -> DocfactsCoordinator:
+        return DocfactsCoordinator(
+            config=self.config,
+            build_provenance=_build_docfacts_provenance,
+            handle_schema_violation=_handle_schema_violation,
+            typed_pipeline_enabled=TYPED_PIPELINE_ENABLED,
+            check_mode=check_mode,
+            logger=self.logger,
+        )
+
+
+def _build_pipeline_dependencies(
+    config: BuilderConfig,
+    options: ProcessingOptions,
+    plugin_manager: PluginManager | None,
+    logger: LoggerLike,
+) -> _PipelineDependencies:
+    cache = BuilderCache(CACHE_PATH)
+    docfact_entries, docfact_sources = _load_docfact_state()
+    diff_manager = DiffManager(options)
+    metrics = MetricsRecorder(
+        cli_duration_seconds=METRICS.cli_duration_seconds,
+        runs_total=METRICS.runs_total,
+    )
+    file_processor = FileProcessor(
+        config=config,
+        cache=cache,
+        options=options,
+        collect_edits=_collect_edits,
+        plugin_manager=plugin_manager,
+        logger=logger,
+    )
+    docfact_state = _DocfactState(
+        config=config,
+        entries=docfact_entries,
+        sources=docfact_sources,
+    )
+    return _PipelineDependencies(
+        config=config,
+        logger=logger,
+        cache=cache,
+        diff_manager=diff_manager,
+        metrics=metrics,
+        file_processor=file_processor,
+        docfact_state=docfact_state,
+    )
 
 
 def render_cli_result(result: DocstringBuildResult) -> CliResult | None:
@@ -328,30 +407,27 @@ def _build_error_result(
     command = request.command or "unknown"
     subcommand = request.invoked_subcommand or request.subcommand or command
     errors: list[ErrorReport] = [
-        {
-            "file": "<command>",
-            "status": _status_from_exit(status),
-            "message": detail,
-        }
+        {"file": "<command>", "status": status_from_exit(status), "message": detail}
     ]
-    summary = {
+    status_counts: dict[str, int] = {
+        "success": 0,
+        "violation": 0,
+        "config": 0,
+        "error": 0,
+    }
+    status_counts[STATUS_LABELS[status]] += 1
+    summary: RunSummary = {
         "considered": 0,
         "processed": 0,
         "skipped": 0,
         "changed": 0,
         "duration_seconds": 0.0,
-        "status_counts": {
-            "success": 0,
-            "violation": 0,
-            "config": 0,
-            "error": 0,
-        },
+        "status_counts": status_counts,
         "cache_hits": 0,
         "cache_misses": 0,
         "subcommand": subcommand,
         "docfacts_checked": False,
     }
-    summary["status_counts"][STATUS_LABELS[status]] += 1
 
     observability_payload: dict[str, object] = {
         "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
@@ -371,7 +447,7 @@ def _build_error_result(
             "source": selection.source,
         }
 
-    problem = build_problem_details(status, command, subcommand, detail, errors=errors)
+    problem = build_problem_details(status, request, detail, errors=errors)
 
     return DocstringBuildResult(
         exit_status=status,
@@ -391,7 +467,9 @@ def _run_pipeline(
     config: BuilderConfig,
     selection: ConfigSelection | None,
 ) -> DocstringBuildResult:
-    from tools.docstring_builder.orchestration.context_builder import PipelineContextBuilder
+    from tools.docstring_builder.orchestration.context_builder import (  # noqa: PLC0415
+        PipelineContextBuilder,
+    )
 
     files_list = list(files)
 
@@ -401,64 +479,40 @@ def _run_pipeline(
         return build_result
     logger, plugin_manager, policy_engine, options = build_result
 
-    cache = BuilderCache(CACHE_PATH)
-    docfact_entries, docfact_sources = _load_docfact_state()
-    diff_manager = DiffManager(options)
-    metrics = MetricsRecorder(
-        cli_duration_seconds=METRICS.cli_duration_seconds,
-        runs_total=METRICS.runs_total,
-    )
-    file_processor = FileProcessor(
-        config=config,
-        cache=cache,
-        options=options,
-        collect_edits=_collect_edits,
-        plugin_manager=plugin_manager,
-        logger=logger,
-    )
-
-    def record_docfacts(facts: Iterable[DocFact], file_path: Path) -> None:
-        _record_docfacts(facts, file_path, docfact_entries, docfact_sources)
-
-    def filter_docfacts() -> list[DocFact]:
-        return _filter_docfacts_for_output(docfact_entries, docfact_sources, config)
-
-    def docfacts_coordinator_factory(check_mode: bool) -> DocfactsCoordinator:
-        return DocfactsCoordinator(
-            config=config,
-            build_provenance=_build_docfacts_provenance,
-            handle_schema_violation=_handle_schema_violation,
-            typed_pipeline_enabled=TYPED_PIPELINE_ENABLED,
-            check_mode=check_mode,
-            logger=logger,
-        )
+    dependencies = _build_pipeline_dependencies(config, options, plugin_manager, logger)
 
     def build_problem_details_wrapper(
         status: ExitStatus,
-        command: str,
-        subcommand: str,
+        req: DocstringBuildRequest,
         detail: str,
-        errors: Sequence[ErrorReport] | None,
+        *,
+        instance: str | None = None,
+        errors: Sequence[ErrorReport] | None = None,
     ) -> ModelProblemDetails:
-        return build_problem_details(status, command, subcommand, detail, errors=errors)
+        return build_problem_details(
+            status,
+            req,
+            detail,
+            instance=instance,
+            errors=errors,
+        )
 
     pipeline_config = PipelineConfig(
         request=request,
         config=config,
         selection=selection,
         options=options,
-        cache=cache,
-        file_processor=file_processor,
-        record_docfacts=record_docfacts,
-        filter_docfacts=filter_docfacts,
-        docfacts_coordinator_factory=docfacts_coordinator_factory,
+        cache=dependencies.cache,
+        file_processor=dependencies.file_processor,
+        record_docfacts=dependencies.record_docfacts,
+        filter_docfacts=dependencies.filter_docfacts,
+        docfacts_coordinator_factory=dependencies.docfacts_coordinator_factory,
         plugin_manager=plugin_manager,
         policy_engine=policy_engine,
-        metrics=metrics,
-        diff_manager=diff_manager,
-        failure_renderer=FailureSummaryRenderer(logger),
+        metrics=dependencies.metrics,
+        diff_manager=dependencies.diff_manager,
         logger=logger,
-        status_from_exit=_status_from_exit,
+        status_from_exit=status_from_exit,
         status_labels=STATUS_LABELS,
         build_problem_details=build_problem_details_wrapper,
         success_status=ExitStatus.SUCCESS,
@@ -471,7 +525,7 @@ def _run_pipeline(
     result = runner.run(files_list)
 
     if request.command == "update":
-        cache.write()
+        dependencies.cache.write()
 
     if not files_list and request.command == "check" and request.diff:
         DOCSTRINGS_DIFF_PATH.unlink(missing_ok=True)
@@ -494,13 +548,13 @@ def run_docstring_builder(
     if request.normalize_sections:
         config.normalize_sections = True
     try:
-        files = select_files(
-            config,
+        selection = SelectionCriteria(
             module=request.module or None,
             since=request.since or None,
             changed_only=request.changed_only,
             explicit_paths=list(request.explicit_paths) or None,
         )
+        files = select_files(config, selection)
     except InvalidPathError:
         _LOGGER.exception("Invalid path supplied to docstring builder")
         return _build_error_result(

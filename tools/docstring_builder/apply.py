@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Protocol, Self, cast, overload
+from typing import cast, overload
 
 import libcst as cst
 
@@ -28,14 +28,6 @@ def _escape_docstring(text: str, indent: str) -> str:
     ]
     joined = "\n".join([summary, *indented_rest])
     return f"{joined}\n"
-
-
-class _SuiteProtocol(Protocol):
-    body: tuple[cst.BaseStatement, ...]
-
-    def with_changes(self, *, body: tuple[cst.BaseStatement, ...]) -> Self:
-        """Return a copy of the suite with ``body`` replaced."""
-        ...
 
 
 @dataclass(slots=True)
@@ -92,12 +84,14 @@ class _DocstringTransformer(cst.CSTTransformer):
         if updated_body == statements:
             return node
         self.changed = True
-        suite = cast(_SuiteProtocol, node.body)
+        suite = cast(cst.BaseSuite, node.body)
         updated_block = suite.with_changes(body=updated_body)
-        updated_node_raw = node.with_changes(body=updated_block)  # type: ignore[arg-type]  # LibCST stubs lack precise Suite typing
-        updated_node = updated_node_raw
+        updated_node = cast(cst.CSTNode, node.with_changes(body=updated_block))
         if isinstance(updated_node, cst.FunctionDef):
             return updated_node
+        if not isinstance(updated_node, cst.ClassDef):
+            msg = "Unexpected node type after with_changes"
+            raise TypeError(msg)
         return updated_node
 
     def visit_ClassDef(self, node: cst.ClassDef) -> bool:  # noqa: N802

@@ -47,6 +47,25 @@ class _CollectedSymbol:
     docstring: str | None
 
 
+@dataclass(slots=True)
+class _RequiredSectionsContext:
+    kind: str
+    parameters: Sequence[DocstringIRParameter]
+    returns_annotation: str | None
+    raises: Sequence[str]
+    is_public: bool
+
+
+@dataclass(slots=True)
+class _ExampleContext:
+    module_name: str
+    name: str
+    parameters: Sequence[DocstringIRParameter]
+    include_import: bool
+    is_async: bool = False
+    returns_value: bool = True
+
+
 class _SymbolCollector(ast.NodeVisitor):
     """Collect callable and class symbols for docstring generation."""
 
@@ -214,46 +233,42 @@ def _wrap_text(text: str) -> list[str]:
     return wrapped
 
 
-def _required_sections(
-    kind: str,
-    parameters: Sequence[DocstringIRParameter],
-    returns: str | None,
-    raises: list[str],
-    *,
-    name: str,
-    is_public: bool,
-) -> list[str]:
+def _format_parameter_entry(param: DocstringIRParameter) -> tuple[str, str]:
+    annotation = param.annotation or "Any"
+    optional_suffix = (
+        ", optional" if param.optional and not _is_variadic_parameter(param) else ""
+    )
+    default_suffix = (
+        f", by default {param.default}" if param.default not in {None, "..."} else ""
+    )
+    header = f"{param.display_name} : {annotation}{optional_suffix}{default_suffix}"
+    body = f"    Description for ``{param.name}``."
+    return header, body
+
+
+def _required_sections(context: _RequiredSectionsContext) -> list[str]:
     """Return the ordered docstring section headers required for a symbol."""
-    del name
     required: list[str] = []
-    if parameters:
+    if context.parameters:
         required.append("Parameters")
-    if returns and returns != "None":
+    if context.returns_annotation and context.returns_annotation != "None":
         required.append("Returns")
-    if raises:
+    if context.raises:
         required.append("Raises")
-    if kind == "function" and is_public:
+    if context.kind == "function" and context.is_public:
         required.append("Examples")
     return required
 
 
-def build_examples(
-    module_name: str,
-    name: str,
-    parameters: Sequence[DocstringIRParameter],
-    include_import: bool,
-    *,
-    is_async: bool = False,
-    returns_value: bool = True,
-) -> list[str]:
+def build_examples(context: _ExampleContext) -> list[str]:
     """Generate doctest-style examples for a callable."""
     lines: list[str] = []
-    if include_import and module_name:
-        lines.append(f">>> from {module_name} import {name}")
+    if context.include_import and context.module_name:
+        lines.append(f">>> from {context.module_name} import {context.name}")
 
     call_parts: list[str] = []
     trailing_parts: list[str] = []
-    for param in parameters:
+    for param in context.parameters:
         if param.kind == "var_positional":
             trailing_parts.append(f"*{param.name}")
         elif param.kind == "var_keyword":
@@ -262,15 +277,15 @@ def build_examples(
             call_parts.append("...")
     call_parts.extend(trailing_parts)
     call_fragment = ", ".join(call_parts)
-    invocation = f"{name}({call_fragment})" if call_fragment else f"{name}()"
+    invocation = f"{context.name}({call_fragment})" if call_fragment else f"{context.name}()"
 
-    if is_async:
+    if context.is_async:
         lines.append(f">>> result = {invocation}")
         lines.append(">>> result  # doctest: +ELLIPSIS")
         lines.append("...")
         return lines
 
-    if returns_value:
+    if context.returns_value:
         lines.append(f">>> result = {invocation}")
         lines.append(">>> result  # doctest: +ELLIPSIS")
     else:
@@ -364,8 +379,7 @@ def build_docstring(
     is_async = isinstance(node, ast.AsyncFunctionDef)
     returns_value = returns_text not in {None, "None"}
 
-    lines: list[str] = ['"""', summary]
-    lines.append(DEFAULT_MARKER)
+    lines: list[str] = ['"""', summary, DEFAULT_MARKER]
 
     if extended:
         lines.append("")
@@ -375,15 +389,9 @@ def build_docstring(
         lines.append("")
         lines.append("Parameters")
         lines.append("----------")
-        for param in params:
-            annotation = param.annotation or "Any"
-            optional_flag = param.optional and not _is_variadic_parameter(param)
-            optional_suffix = ", optional" if optional_flag else ""
-            default_suffix = (
-                f", by default {param.default}" if param.default not in {None, "..."} else ""
-            )
-            lines.append(f"{param.display_name} : {annotation}{optional_suffix}{default_suffix}")
-            lines.append(f"    Description for ``{param.name}``.")
+        for header, body in (_format_parameter_entry(param) for param in params):
+            lines.append(header)
+            lines.append(body)
 
     if returns_value:
         lines.append("")
@@ -402,12 +410,14 @@ def build_docstring(
 
     if kind == "function" and is_public:
         examples = build_examples(
-            module_name,
-            name,
-            params,
-            True,
-            is_async=is_async,
-            returns_value=returns_value,
+            _ExampleContext(
+                module_name=module_name,
+                name=name,
+                parameters=params,
+                include_import=True,
+                is_async=is_async,
+                returns_value=returns_value,
+            )
         )
         if examples:
             lines.append("")
@@ -492,6 +502,7 @@ __all__ = [
     "PYDANTIC_ARTIFACT_SUMMARIES",
     "QUALIFIED_NAME_OVERRIDES",
     "_STANDARD_METHOD_EXTENDED_SUMMARIES",
+    "_RequiredSectionsContext",
     "_is_magic",
     "_is_pydantic_artifact",
     "_normalize_qualified_name",

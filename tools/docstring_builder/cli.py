@@ -32,6 +32,7 @@ import yaml
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.harvest import harvest_file
 from tools.docstring_builder.io import (
+    SelectionCriteria,
     default_since_revision,
     select_files,
 )
@@ -59,6 +60,94 @@ from tools.stubs.drift_check import run as run_stub_drift
 
 LOGGER = get_logger(__name__)
 CommandHandler = Callable[[argparse.Namespace], int]
+
+
+CLI_ARGUMENT_DEFINITIONS: tuple[tuple[tuple[str, ...], dict[str, object]], ...] = (
+    (("--config",), {"dest": "config_path", "help": "Override the path to docstring_builder.toml"}),
+    (("--module",), {"default": "", "help": "Restrict to module prefix"}),
+    (("--since",), {"default": "", "help": "Only consider files changed since revision"}),
+    (("--force",), {"action": "store_true", "help": "Ignore cache entries"}),
+    (("--diff",), {"action": "store_true", "help": "Show diffs in check mode"}),
+    (
+        ("--ignore-missing",),
+        {
+            "action": "store_true",
+            "help": "Skip modules that raise ModuleNotFoundError (e.g., docs/_build artefacts)",
+        },
+    ),
+    (
+        ("--changed-only",),
+        {
+            "action": "store_true",
+            "help": "Automatically set --since to the latest merge-base for fast checks",
+        },
+    ),
+    (
+        ("--only-plugin",),
+        {
+            "action": "append",
+            "dest": "only_plugin",
+            "default": [],
+            "help": "Enable only the specified plugin names (repeat or comma-separate values)",
+        },
+    ),
+    (
+        ("--disable-plugin",),
+        {
+            "action": "append",
+            "dest": "disable_plugin",
+            "default": [],
+            "help": "Disable the specified plugin names (repeat or comma-separate values)",
+        },
+    ),
+    (
+        ("--policy-override",),
+        {
+            "action": "append",
+            "dest": "policy_override",
+            "default": [],
+            "help": "Override policy settings (key=value, repeat or comma-separate)",
+        },
+    ),
+    (
+        ("--baseline",),
+        {"default": "", "help": "Reference git revision or path for baseline comparisons"},
+    ),
+    (("--jobs",), {"type": int, "default": 1, "help": "Number of worker threads for processing"}),
+    (("--skip-docfacts",), {"action": "store_true", "help": "Skip DocFacts reconciliation"}),
+    (
+        ("--json-output",),
+        {
+            "action": "store_true",
+            "dest": "json_output",
+            "help": "Emit JSON summary payload to stdout",
+        },
+    ),
+    (
+        ("--update",),
+        {"dest": "flag_update", "action": "store_true", "help": "Legacy flag: run in update mode"},
+    ),
+    (
+        ("--check",),
+        {"dest": "flag_check", "action": "store_true", "help": "Legacy flag: run in check mode"},
+    ),
+    (
+        ("--harvest",),
+        {
+            "dest": "flag_harvest",
+            "action": "store_true",
+            "help": "Legacy flag: harvest symbols without writing",
+        },
+    ),
+    (
+        ("--diff-only",),
+        {
+            "dest": "flag_diff",
+            "action": "store_true",
+            "help": "Legacy flag: run check mode and show diffs",
+        },
+    ),
+)
 
 
 def _parse_plugin_names(values: Sequence[str] | None) -> tuple[str, ...]:
@@ -229,13 +318,13 @@ def _command_harvest(args: argparse.Namespace) -> int:
 def _command_list(args: argparse.Namespace) -> int:
     config, _ = load_builder_config(getattr(args, "config_path", None))
     try:
-        files = select_files(
-            config,
+        selection = SelectionCriteria(
             module=(args.module or "") or None,
             since=(args.since or "") or None,
             changed_only=getattr(args, "changed_only", False),
             explicit_paths=getattr(args, "paths", None),
         )
+        files = select_files(config, selection)
     except InvalidPathError:
         LOGGER.exception("Invalid path supplied to docstring builder list")
         return int(ExitStatus.CONFIG)
@@ -269,127 +358,146 @@ def _command_schema(args: argparse.Namespace) -> int:
     return int(ExitStatus.SUCCESS)
 
 
-def _command_doctor(args: argparse.Namespace) -> int:
-    _, selection = load_builder_config(getattr(args, "config_path", None))
-    LOGGER.info("[DOCTOR] Active config: %s (%s)", selection.path, selection.source)
+def _check_python_version() -> list[str]:
+    current = sys.version_info
+    if current.major < REQUIRED_PYTHON_MAJOR or (
+        current.major == REQUIRED_PYTHON_MAJOR and current.minor < REQUIRED_PYTHON_MINOR
+    ):
+        version = f"{current.major}.{current.minor}.{current.micro}"
+        return [f"Python 3.13 or newer required; detected {version}."]
+    return []
+
+
+def _check_mypy_configuration(config_path: Path) -> list[str]:
+    if not config_path.exists():
+        return ["mypy.ini not found; run bootstrap to generate it."]
+    content = config_path.read_text(encoding="utf-8")
+    if "mypy_path = src:stubs" not in content:
+        return ["mypy.ini must set 'mypy_path = src:stubs'."]
+    return []
+
+
+def _check_stub_packages(relative_paths: Sequence[str]) -> list[str]:
     issues: list[str] = []
-    try:
-        current = sys.version_info
-        if current.major < REQUIRED_PYTHON_MAJOR or (
-            current.major == REQUIRED_PYTHON_MAJOR and current.minor < REQUIRED_PYTHON_MINOR
-        ):
-            version = f"{current.major}.{current.minor}.{current.micro}"
-            issues.append(f"Python 3.13 or newer required; detected {version}.")
+    for relative in relative_paths:
+        if not (REPO_ROOT / relative).exists():
+            issues.append(f"Missing stub package at {relative}.")
+    return issues
 
-        mypy_path = REPO_ROOT / "mypy.ini"
-        if mypy_path.exists():
-            content = mypy_path.read_text(encoding="utf-8")
-            if "mypy_path = src:stubs" not in content:
-                issues.append("mypy.ini must set 'mypy_path = src:stubs'.")
-        else:
-            issues.append("mypy.ini not found; run bootstrap to generate it.")
 
-        for relative in ("stubs/griffe", "stubs/libcst", "stubs/mkdocs_gen_files"):
-            path = REPO_ROOT / relative
-            if not path.exists():
-                issues.append(f"Missing stub package at {relative}.")
-
-        for module_name in ("griffe", "libcst"):
-            try:
-                __import__(module_name)
-            except ModuleNotFoundError as exc:
-                issues.append(f"Optional dependency '{module_name}' not importable: {exc}.")
-
-        for directory in (REPO_ROOT / "docs" / "_build", REPO_ROOT / ".cache"):
-            try:
-                directory.mkdir(parents=True, exist_ok=True)
-                probe = directory / ".doctor_probe"
-                probe.write_text("", encoding="utf-8")
-                probe.unlink()
-            except OSError as exc:
-                issues.append(f"Directory {directory} is not writeable: {exc}.")
-
-        precommit_path = REPO_ROOT / ".pre-commit-config.yaml"
-        hook_names: list[str] = []
-        if precommit_path.exists():
-            data = yaml.safe_load(precommit_path.read_text(encoding="utf-8")) or {}
-            for repo in data.get("repos", []):
-                for hook in repo.get("hooks", []):
-                    hook_names.append(hook.get("name") or hook.get("id", ""))
-
-            def _index(name: str) -> int | None:
-                try:
-                    return hook_names.index(name)
-                except ValueError:
-                    issues.append(f"Pre-commit hook '{name}' is missing.")
-                    return None
-
-            doc_builder_idx = _index("docstring-builder (check)")
-            docs_artifacts_idx = _index("docs: regenerate artifacts")
-            navmap_idx = _index("navmap-check")
-            pyrefly_idx = _index("pyrefly-check")
-            if (
-                doc_builder_idx is not None
-                and docs_artifacts_idx is not None
-                and doc_builder_idx > docs_artifacts_idx
-            ):
-                issues.append(
-                    "'docstring-builder (check)' must run before 'docs: regenerate artifacts'."
-                )
-            if (
-                docs_artifacts_idx is not None
-                and navmap_idx is not None
-                and navmap_idx < docs_artifacts_idx
-            ):
-                issues.append("'navmap-check' should run after 'docs: regenerate artifacts'.")
-            if pyrefly_idx is None:
-                issues.append("Add 'pyrefly-check' to pre-commit to validate dependency typing.")
-        else:
-            issues.append(".pre-commit-config.yaml not found; install pre-commit hooks.")
+def _check_optional_dependencies(modules: Sequence[str]) -> list[str]:
+    issues: list[str] = []
+    for module_name in modules:
         try:
-            policy_settings = load_policy_settings(REPO_ROOT)
-        except PolicyConfigurationError as exc:
-            issues.append(f"Unable to load policy settings: {exc}.")
-        else:
+            __import__(module_name)
+        except ModuleNotFoundError as exc:
+            issues.append(f"Optional dependency '{module_name}' not importable: {exc}.")
+    return issues
+
+
+def _check_writable_directories(directories: Sequence[Path]) -> list[str]:
+    issues: list[str] = []
+    for directory in directories:
+        try:
+            directory.mkdir(parents=True, exist_ok=True)
+            probe = directory / ".doctor_probe"
+            probe.write_text("", encoding="utf-8")
+            probe.unlink()
+        except OSError as exc:
+            issues.append(f"Directory {directory} is not writeable: {exc}.")
+    return issues
+
+
+def _extract_precommit_hook_names(config_path: Path) -> list[str]:
+    data = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
+    hook_names: list[str] = []
+    for repo in data.get("repos", []):
+        for hook in repo.get("hooks", []):
+            name = hook.get("name") or hook.get("id", "")
+            if name:
+                hook_names.append(name)
+    return hook_names
+
+
+def _evaluate_precommit_hooks(config_path: Path) -> list[str]:
+    if not config_path.exists():
+        return [".pre-commit-config.yaml not found; install pre-commit hooks."]
+
+    issues: list[str] = []
+    hook_names = _extract_precommit_hook_names(config_path)
+
+    def _index(name: str) -> int | None:
+        try:
+            return hook_names.index(name)
+        except ValueError:
+            issues.append(f"Pre-commit hook '{name}' is missing.")
+            return None
+
+    doc_builder_idx = _index("docstring-builder (check)")
+    docs_artifacts_idx = _index("docs: regenerate artifacts")
+    navmap_idx = _index("navmap-check")
+    pyrefly_idx = _index("pyrefly-check")
+
+    if (
+        doc_builder_idx is not None
+        and docs_artifacts_idx is not None
+        and doc_builder_idx > docs_artifacts_idx
+    ):
+        issues.append("'docstring-builder (check)' must run before 'docs: regenerate artifacts'.")
+    if (
+        docs_artifacts_idx is not None
+        and navmap_idx is not None
+        and navmap_idx < docs_artifacts_idx
+    ):
+        issues.append("'navmap-check' should run after 'docs: regenerate artifacts'.")
+    if pyrefly_idx is None:
+        issues.append("Add 'pyrefly-check' to pre-commit to validate dependency typing.")
+    return issues
+
+
+def _load_policy_settings_with_logging() -> list[str]:
+    try:
+        policy_settings = load_policy_settings(REPO_ROOT)
+    except PolicyConfigurationError as exc:
+        return [f"Unable to load policy settings: {exc}."]
+
+    LOGGER.info(
+        "[DOCTOR] Policy actions: coverage=%s, missing-params=%s, missing-returns=%s, "
+        "missing-examples=%s, summary-mood=%s, dataclass-parity=%s",
+        policy_settings.coverage_action.value,
+        policy_settings.missing_params_action.value,
+        policy_settings.missing_returns_action.value,
+        policy_settings.missing_examples_action.value,
+        policy_settings.summary_mood_action.value,
+        policy_settings.dataclass_parity_action.value,
+    )
+    if policy_settings.exceptions:
+        LOGGER.info("[DOCTOR] Policy exceptions: %s", len(policy_settings.exceptions))
+        for exception in policy_settings.exceptions:
             LOGGER.info(
-                "[DOCTOR] Policy actions: coverage=%s, missing-params=%s, missing-returns=%s, "
-                "missing-examples=%s, summary-mood=%s, dataclass-parity=%s",
-                policy_settings.coverage_action.value,
-                policy_settings.missing_params_action.value,
-                policy_settings.missing_returns_action.value,
-                policy_settings.missing_examples_action.value,
-                policy_settings.summary_mood_action.value,
-                policy_settings.dataclass_parity_action.value,
+                "[DOCTOR]   %s (%s) expires %s: %s",
+                exception.symbol,
+                exception.rule,
+                exception.expires_on.isoformat(),
+                exception.justification or "no justification provided",
             )
-            if policy_settings.exceptions:
-                LOGGER.info("[DOCTOR] Policy exceptions: %s", len(policy_settings.exceptions))
-                for exception in policy_settings.exceptions:
-                    LOGGER.info(
-                        "[DOCTOR]   %s (%s) expires %s: %s",
-                        exception.symbol,
-                        exception.rule,
-                        exception.expires_on.isoformat(),
-                        exception.justification or "no justification provided",
-                    )
-    except (
-        OSError,
-        UnicodeDecodeError,
-        ValueError,
-        yaml.YAMLError,
-        DocstringBuilderError,
-    ):  # pragma: no cover - defensive doctor safeguard
-        LOGGER.exception("Doctor encountered an unexpected error.")
-        return int(ExitStatus.ERROR)
+    return []
 
-    drift_status = int(ExitStatus.SUCCESS)
-    if getattr(args, "stubs", False):
-        LOGGER.info("[DOCTOR] Running stub drift check...")
-        drift_status = run_stub_drift()
-        if drift_status != 0:
-            message = "Stub drift detected; see output above."
-            sys.stdout.write(f"{message}\n")
-            issues.append(message)
 
+def _maybe_run_stub_drift(args: argparse.Namespace, issues: list[str]) -> int:
+    if not getattr(args, "stubs", False):
+        return int(ExitStatus.SUCCESS)
+
+    LOGGER.info("[DOCTOR] Running stub drift check...")
+    drift_status = run_stub_drift()
+    if drift_status != 0:
+        message = "Stub drift detected; see output above."
+        sys.stdout.write(f"{message}\n")
+        issues.append(message)
+    return drift_status
+
+
+def _finalize_doctor(issues: Sequence[str], drift_status: int) -> int:
     if issues:
         LOGGER.error("[DOCTOR] Configuration issues detected:")
         for item in issues:
@@ -403,6 +511,39 @@ def _command_doctor(args: argparse.Namespace) -> int:
     return int(ExitStatus.SUCCESS)
 
 
+def _collect_doctor_checks(args: argparse.Namespace) -> tuple[list[str], int]:
+    issues: list[str] = []
+    issues.extend(_check_python_version())
+    issues.extend(_check_mypy_configuration(REPO_ROOT / "mypy.ini"))
+    issues.extend(_check_stub_packages(("stubs/griffe", "stubs/libcst", "stubs/mkdocs_gen_files")))
+    issues.extend(_check_optional_dependencies(("griffe", "libcst")))
+    issues.extend(
+        _check_writable_directories((REPO_ROOT / "docs" / "_build", REPO_ROOT / ".cache"))
+    )
+    issues.extend(_evaluate_precommit_hooks(REPO_ROOT / ".pre-commit-config.yaml"))
+    issues.extend(_load_policy_settings_with_logging())
+    drift_status = _maybe_run_stub_drift(args, issues)
+    return issues, drift_status
+
+
+def _command_doctor(args: argparse.Namespace) -> int:
+    _, selection = load_builder_config(getattr(args, "config_path", None))
+    LOGGER.info("[DOCTOR] Active config: %s (%s)", selection.path, selection.source)
+    try:
+        issues, drift_status = _collect_doctor_checks(args)
+    except (
+        OSError,
+        UnicodeDecodeError,
+        ValueError,
+        yaml.YAMLError,
+        DocstringBuilderError,
+    ):  # pragma: no cover - defensive doctor safeguard
+        LOGGER.exception("Doctor encountered an unexpected error.")
+        return int(ExitStatus.ERROR)
+
+    return _finalize_doctor(issues, drift_status)
+
+
 LEGACY_COMMAND_HANDLERS: dict[str, CommandHandler] = {
     "update": _command_update,
     "check": _command_check,
@@ -410,42 +551,12 @@ LEGACY_COMMAND_HANDLERS: dict[str, CommandHandler] = {
 }
 
 
-def build_parser() -> argparse.ArgumentParser:
-    """Build the top-level argument parser for the docstring builder CLI."""
-    parser = argparse.ArgumentParser(prog="docstring-builder")
-    parser.add_argument(
-        "--config",
-        dest="config_path",
-        help="Override the path to docstring_builder.toml",
-    )
-    parser.add_argument("--module", help="Restrict to module prefix", default="")
-    parser.add_argument("--since", help="Only consider files changed since revision", default="")
-    parser.add_argument("--force", action="store_true", help="Ignore cache entries")
-    parser.add_argument("--diff", action="store_true", help="Show diffs in check mode")
-    parser.add_argument(
-        "--ignore-missing",
-        action="store_true",
-        help="Skip modules that raise ModuleNotFoundError (e.g., docs/_build artefacts)",
-    )
-    parser.add_argument(
-        "--changed-only",
-        action="store_true",
-        help="Automatically set --since to the latest merge-base for fast checks",
-    )
-    parser.add_argument(
-        "--only-plugin",
-        action="append",
-        dest="only_plugin",
-        default=[],
-        help="Enable only the specified plugin names (repeat or comma-separate values)",
-    )
-    parser.add_argument(
-        "--disable-plugin",
-        action="append",
-        dest="disable_plugin",
-        default=[],
-        help="Disable the specified plugin names (repeat or comma-separate values)",
-    )
+def _apply_cli_arguments(parser: argparse.ArgumentParser) -> None:
+    for option_names, options in CLI_ARGUMENT_DEFINITIONS:
+        parser.add_argument(*option_names, **options)
+
+
+def _add_llm_arguments(parser: argparse.ArgumentParser) -> None:
     llm_group = parser.add_mutually_exclusive_group()
     llm_group.add_argument(
         "--llm-summary",
@@ -459,133 +570,145 @@ def build_parser() -> argparse.ArgumentParser:
         dest="llm_dry_run",
         help="Preview LLM summary rewrites without mutating files.",
     )
-    parser.add_argument(
-        "--policy-override",
-        action="append",
-        dest="policy_override",
-        default=[],
-        help="Override policy settings (key=value, repeat or comma-separate)",
-    )
-    parser.add_argument(
-        "--baseline",
-        help="Reference git revision or path for baseline comparisons",
-        default="",
-    )
-    parser.add_argument(
-        "--jobs",
-        type=int,
-        default=1,
-        help="Number of worker threads for processing",
-    )
-    parser.add_argument(
-        "--skip-docfacts",
-        action="store_true",
-        help="Skip DocFacts reconciliation",
-    )
-    parser.add_argument(
-        "--json-output",
-        action="store_true",
-        dest="json_output",
-        help="Emit JSON summary payload to stdout",
-    )
-    parser.add_argument(
-        "--update",
-        dest="flag_update",
-        action="store_true",
-        help="Legacy flag: run in update mode",
-    )
-    parser.add_argument(
-        "--check",
-        dest="flag_check",
-        action="store_true",
-        help="Legacy flag: run in check mode",
-    )
-    parser.add_argument(
-        "--harvest",
-        dest="flag_harvest",
-        action="store_true",
-        help="Legacy flag: harvest symbols without writing",
-    )
-    parser.add_argument(
-        "--diff-only",
-        dest="flag_diff",
-        action="store_true",
-        help="Legacy flag: run check mode and show diffs",
-    )
-    subparsers = parser.add_subparsers(dest="subcommand")
 
-    def _with_paths(subparser: argparse.ArgumentParser) -> None:
-        subparser.add_argument(
-            "paths",
-            nargs="*",
-            help="Optional Python paths to limit processing",
-        )
 
-    generate = subparsers.add_parser("generate", help="Synchronize managed docstrings and DocFacts")
-    _with_paths(generate)
-    generate.set_defaults(func=_command_generate)
-
-    fix = subparsers.add_parser("fix", help="Apply docstring updates while bypassing the cache")
-    _with_paths(fix)
-    fix.set_defaults(func=_command_fix)
-
-    fmt = subparsers.add_parser(
-        "fmt", help="Normalize existing docstring sections without regenerating content"
+def _add_path_argument(subparser: argparse.ArgumentParser) -> None:
+    subparser.add_argument(
+        "paths",
+        nargs="*",
+        help="Optional Python paths to limit processing",
     )
-    _with_paths(fmt)
-    fmt.set_defaults(func=_command_fmt)
 
-    diff_cmd = subparsers.add_parser("diff", help="Show docstring drift without writing changes")
-    _with_paths(diff_cmd)
-    diff_cmd.set_defaults(func=_command_diff)
 
-    check = subparsers.add_parser("check", help="Validate docstrings without writing")
-    _with_paths(check)
-    check.set_defaults(func=_command_check)
-
-    lint = subparsers.add_parser("lint", help="Alias for check with optional DocFacts skip")
-    _with_paths(lint)
-    lint.add_argument(
+def _configure_lint_subparser(subparser: argparse.ArgumentParser) -> None:
+    subparser.add_argument(
         "--no-docfacts",
         dest="skip_docfacts",
         action="store_true",
         help="Skip DocFacts drift verification for speed",
     )
-    lint.set_defaults(func=_command_lint)
 
-    measure = subparsers.add_parser("measure", help="Run validation and emit observability metrics")
-    _with_paths(measure)
-    measure.set_defaults(func=_command_measure)
 
-    schema = subparsers.add_parser("schema", help="Generate the docstring IR schema JSON")
-    schema.add_argument("--output", help="Optional output path for the schema JSON")
-    schema.set_defaults(func=_command_schema)
+def _configure_schema_subparser(subparser: argparse.ArgumentParser) -> None:
+    subparser.add_argument("--output", help="Optional output path for the schema JSON")
 
-    doctor = subparsers.add_parser(
-        "doctor", help="Diagnose environment, configuration, and optional stubs"
-    )
-    doctor.add_argument(
+
+def _configure_doctor_subparser(subparser: argparse.ArgumentParser) -> None:
+    subparser.add_argument(
         "--stubs",
         action="store_true",
         help="Run the stub drift checker as part of diagnostics",
     )
-    doctor.set_defaults(func=_command_doctor)
 
-    list_cmd = subparsers.add_parser("list", help="List managed docstring symbols")
-    _with_paths(list_cmd)
-    list_cmd.set_defaults(func=_command_list)
 
-    clear = subparsers.add_parser("clear-cache", help="Clear the builder cache")
-    clear.set_defaults(func=_command_clear_cache)
+def _register_subcommand(
+    subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
+    spec: dict[str, object],
+) -> None:
+    name = str(spec["name"])
+    help_text = str(spec.get("help_text", ""))
+    handler = cast(CommandHandler, spec["handler"])
+    include_paths = bool(spec.get("include_paths"))
+    configure = cast(Callable[[argparse.ArgumentParser], None] | None, spec.get("configure"))
 
-    harvest = subparsers.add_parser("harvest", help="Harvest metadata without applying edits")
-    _with_paths(harvest)
-    harvest.set_defaults(func=_command_harvest)
+    subparser = subparsers.add_parser(name, help=help_text)
+    if include_paths:
+        _add_path_argument(subparser)
+    if configure is not None:
+        configure(subparser)
+    subparser.set_defaults(func=handler)
 
-    update = subparsers.add_parser("update", help=argparse.SUPPRESS)
-    _with_paths(update)
-    update.set_defaults(func=_command_update)
 
+SUBCOMMAND_SPECS: tuple[dict[str, object], ...] = (
+    {
+        "name": "generate",
+        "help_text": "Synchronize managed docstrings and DocFacts",
+        "handler": _command_generate,
+        "include_paths": True,
+    },
+    {
+        "name": "fix",
+        "help_text": "Apply docstring updates while bypassing the cache",
+        "handler": _command_fix,
+        "include_paths": True,
+    },
+    {
+        "name": "fmt",
+        "help_text": "Normalize existing docstring sections without regenerating content",
+        "handler": _command_fmt,
+        "include_paths": True,
+    },
+    {
+        "name": "diff",
+        "help_text": "Show docstring drift without writing changes",
+        "handler": _command_diff,
+        "include_paths": True,
+    },
+    {
+        "name": "check",
+        "help_text": "Validate docstrings without writing",
+        "handler": _command_check,
+        "include_paths": True,
+    },
+    {
+        "name": "lint",
+        "help_text": "Alias for check with optional DocFacts skip",
+        "handler": _command_lint,
+        "include_paths": True,
+        "configure": _configure_lint_subparser,
+    },
+    {
+        "name": "measure",
+        "help_text": "Run validation and emit observability metrics",
+        "handler": _command_measure,
+        "include_paths": True,
+    },
+    {
+        "name": "schema",
+        "help_text": "Generate the docstring IR schema JSON",
+        "handler": _command_schema,
+        "configure": _configure_schema_subparser,
+    },
+    {
+        "name": "doctor",
+        "help_text": "Diagnose environment, configuration, and optional stubs",
+        "handler": _command_doctor,
+        "configure": _configure_doctor_subparser,
+    },
+    {
+        "name": "list",
+        "help_text": "List managed docstring symbols",
+        "handler": _command_list,
+        "include_paths": True,
+    },
+    {
+        "name": "clear-cache",
+        "help_text": "Clear the builder cache",
+        "handler": _command_clear_cache,
+    },
+    {
+        "name": "harvest",
+        "help_text": "Harvest metadata without applying edits",
+        "handler": _command_harvest,
+        "include_paths": True,
+    },
+    {
+        "name": "update",
+        "help_text": argparse.SUPPRESS,
+        "handler": _command_update,
+        "include_paths": True,
+    },
+)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Build the top-level argument parser for the docstring builder CLI."""
+    parser = argparse.ArgumentParser(prog="docstring-builder")
+    _apply_cli_arguments(parser)
+    _add_llm_arguments(parser)
+    subparsers = parser.add_subparsers(dest="subcommand")
+    for spec in SUBCOMMAND_SPECS:
+        _register_subcommand(subparsers, spec)
     return parser
 
 

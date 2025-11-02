@@ -11,7 +11,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from os import environ
 from pathlib import Path
-from typing import cast
+from typing import assert_never, cast
 
 from kgfoundry.agent_catalog.search import SearchDocument, documents_from_catalog
 from kgfoundry_common.errors import SymbolAttachmentError
@@ -36,8 +36,7 @@ def _to_search_payload(value: JsonValue) -> SearchPayloadValue:
         return {key: cast(object, _to_search_payload(item)) for key, item in value.items()}
     if isinstance(value, (str, int, float, bool)) or value is None:
         return value
-    msg = f"Unsupported JsonValue type: {type(value)!r}"
-    raise TypeError(msg)
+    assert_never(value)
 
 
 PackagePayload = Mapping[str, JsonValue]
@@ -312,6 +311,20 @@ class _SymbolExtraction:
     lookup: dict[str, str]
 
 
+@dataclass(slots=True)
+class _SqliteRows:
+    """Aggregated row sets for writing the SQLite catalog."""
+
+    metadata: list[tuple[str, str]]
+    packages: list[tuple[str, str]]
+    modules: list[ModuleRow]
+    symbols: list[SymbolRow]
+    anchors: list[AnchorRow]
+    ranking: list[RankingRow]
+    fts: list[FtsRow]
+    calls: list[CallRow]
+
+
 def _collect_symbol_rows(packages: Sequence[PackagePayload]) -> _SymbolExtraction:
     """Aggregate module, symbol, anchor, and ranking rows.
 
@@ -327,80 +340,106 @@ def _collect_symbol_rows(packages: Sequence[PackagePayload]) -> _SymbolExtractio
     _SymbolExtraction
         Describe return value.
     """
-    module_rows: list[ModuleRow] = []
-    symbol_rows: list[SymbolRow] = []
-    anchor_rows: list[AnchorRow] = []
-    ranking_rows: list[RankingRow] = []
-    symbol_lookup: dict[str, str] = {}
+    extraction = _SymbolExtraction([], [], [], [], {})
     for package in packages:
         package_name = _stringify(package.get("name")) or ""
         for module in _iter_modules(package):
-            qualified = _stringify(module.get("qualified")) or _stringify(module.get("name")) or ""
-            module_payload: JsonObject = {
-                "name": module.get("name"),
-                "qualified": qualified,
-                "source": module.get("source"),
-                "pages": module.get("pages"),
-                "imports": module.get("imports"),
-                "graph": module.get("graph"),
-            }
-            module_rows.append((qualified, package_name, _json_dumps(module_payload)))
-            for symbol in _iter_symbols(module):
-                symbol_id = _stringify(symbol.get("symbol_id")) or ""
-                qname_value = _stringify(symbol.get("qname")) or symbol_id
-                if qname_value:
-                    symbol_lookup[qname_value] = symbol_id
-                symbol_payload: JsonObject = {
-                    key: symbol.get(key)
-                    for key in (
-                        "qname",
-                        "kind",
-                        "symbol_id",
-                        "docfacts",
-                        "quality",
-                        "metrics",
-                        "agent_hints",
-                        "change_impact",
-                        "exemplars",
-                    )
-                }
-                symbol_rows.append(
-                    (
-                        symbol_id,
-                        package_name,
-                        qualified,
-                        qname_value,
-                        _stringify(symbol_payload.get("kind")) or "object",
-                        _json_dumps(symbol_payload),
-                    )
-                )
-                anchors = symbol.get("anchors")
-                anchor_payload = anchors if isinstance(anchors, Mapping) else {}
-                anchor_rows.append(
-                    (
-                        symbol_id,
-                        anchor_payload.get("start_line"),
-                        anchor_payload.get("end_line"),
-                        anchor_payload.get("cst_fingerprint"),
-                        _json_dumps(anchor_payload.get("remap_order")),
-                    )
-                )
-                quality = symbol.get("quality")
-                metrics = symbol.get("metrics")
-                change_impact = symbol.get("change_impact")
-                coverage = (
-                    quality.get("docstring_coverage") if isinstance(quality, Mapping) else None
-                )
-                complexity = metrics.get("complexity") if isinstance(metrics, Mapping) else None
-                churn = (
-                    change_impact.get("churn_last_n")
-                    if isinstance(change_impact, Mapping)
-                    else None
-                )
-                stability = metrics.get("stability") if isinstance(metrics, Mapping) else None
-                deprecated = 1 if isinstance(metrics, Mapping) and metrics.get("deprecated") else 0
-                ranking_rows.append((symbol_id, coverage, complexity, churn, stability, deprecated))
-    return _SymbolExtraction(module_rows, symbol_rows, anchor_rows, ranking_rows, symbol_lookup)
+            _accumulate_module_rows(extraction, package_name, module)
+    return extraction
+
+
+def _accumulate_module_rows(
+    extraction: _SymbolExtraction,
+    package_name: str,
+    module: ModulePayload,
+) -> None:
+    qualified = _stringify(module.get("qualified")) or _stringify(module.get("name")) or ""
+    module_payload: JsonObject = {
+        "name": module.get("name"),
+        "qualified": qualified,
+        "source": module.get("source"),
+        "pages": module.get("pages"),
+        "imports": module.get("imports"),
+        "graph": module.get("graph"),
+    }
+    extraction.modules.append((qualified, package_name, _json_dumps(module_payload)))
+    for symbol in _iter_symbols(module):
+        _accumulate_symbol_rows(extraction, package_name, qualified, symbol)
+
+
+def _accumulate_symbol_rows(
+    extraction: _SymbolExtraction,
+    package_name: str,
+    qualified_module: str,
+    symbol: SymbolPayload,
+) -> None:
+    symbol_id = _stringify(symbol.get("symbol_id")) or ""
+    qname_value = _stringify(symbol.get("qname")) or symbol_id
+    if qname_value:
+        extraction.lookup[qname_value] = symbol_id
+    symbol_payload: JsonObject = {
+        key: symbol.get(key)
+        for key in (
+            "qname",
+            "kind",
+            "symbol_id",
+            "docfacts",
+            "quality",
+            "metrics",
+            "agent_hints",
+            "change_impact",
+            "exemplars",
+        )
+    }
+    extraction.symbols.append(
+        (
+            symbol_id,
+            package_name,
+            qualified_module,
+            qname_value,
+            _stringify(symbol_payload.get("kind")) or "object",
+            _json_dumps(symbol_payload),
+        )
+    )
+    _append_anchor_row(extraction, symbol_id, symbol)
+    _append_ranking_row(extraction, symbol_id, symbol)
+
+
+def _append_anchor_row(
+    extraction: _SymbolExtraction,
+    symbol_id: str,
+    symbol: SymbolPayload,
+) -> None:
+    anchors = symbol.get("anchors")
+    anchor_payload = anchors if isinstance(anchors, Mapping) else {}
+    extraction.anchors.append(
+        (
+            symbol_id,
+            anchor_payload.get("start_line"),
+            anchor_payload.get("end_line"),
+            anchor_payload.get("cst_fingerprint"),
+            _json_dumps(anchor_payload.get("remap_order")),
+        )
+    )
+
+
+def _append_ranking_row(
+    extraction: _SymbolExtraction,
+    symbol_id: str,
+    symbol: SymbolPayload,
+) -> None:
+    quality_raw = symbol.get("quality")
+    quality = quality_raw if isinstance(quality_raw, Mapping) else None
+    metrics_raw = symbol.get("metrics")
+    metrics = metrics_raw if isinstance(metrics_raw, Mapping) else None
+    change_impact_raw = symbol.get("change_impact")
+    change_impact = change_impact_raw if isinstance(change_impact_raw, Mapping) else None
+    coverage = quality.get("docstring_coverage") if isinstance(quality, Mapping) else None
+    complexity = metrics.get("complexity") if isinstance(metrics, Mapping) else None
+    churn = change_impact.get("churn_last_n") if isinstance(change_impact, Mapping) else None
+    stability = metrics.get("stability") if isinstance(metrics, Mapping) else None
+    deprecated_flag = 1 if isinstance(metrics, Mapping) and metrics.get("deprecated") else 0
+    extraction.ranking.append((symbol_id, coverage, complexity, churn, stability, deprecated_flag))
 
 
 def _collect_call_rows(
@@ -515,6 +554,46 @@ def _write_many(
         connection.executemany(sql, rows)
 
 
+def _resolve_packages(
+    payload: CatalogPayload,
+    packages_override: Sequence[Mapping[str, JsonValue]] | None,
+) -> list[PackagePayload]:
+    if packages_override is not None:
+        return _coerce_packages(packages_override)
+    return _iter_packages(payload)
+
+
+def _build_search_documents(
+    payload: CatalogPayload,
+    packages: Sequence[PackagePayload],
+) -> list[SearchDocument]:
+    payload_for_docs: JsonObject = dict(payload)
+    payload_for_docs["packages"] = [dict(pkg) for pkg in packages]
+    payload_for_docs_obj: dict[str, SearchPayloadValue] = {
+        key: _to_search_payload(value) for key, value in payload_for_docs.items()
+    }
+    search_payload = cast(SearchPayload, payload_for_docs_obj)
+    return list(documents_from_catalog(search_payload))
+
+
+def _prepare_sqlite_rows(
+    payload: CatalogPayload,
+    packages: Sequence[PackagePayload],
+    documents: Sequence[SearchDocument],
+) -> _SqliteRows:
+    symbol_rows = _collect_symbol_rows(packages)
+    return _SqliteRows(
+        metadata=_build_metadata_rows(payload),
+        packages=_build_package_rows(packages),
+        modules=symbol_rows.modules,
+        symbols=symbol_rows.symbols,
+        anchors=symbol_rows.anchors,
+        ranking=symbol_rows.ranking,
+        fts=_build_fts_rows(documents),
+        calls=_collect_call_rows(packages, symbol_rows.lookup),
+    )
+
+
 def write_sqlite_catalog(
     payload: CatalogPayload,
     path: Path,
@@ -538,33 +617,21 @@ def write_sqlite_catalog(
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists():
         path.unlink()
-    if packages_override is not None:
-        packages = _coerce_packages(packages_override)
-    else:
-        packages = _iter_packages(payload)
-    payload_for_docs: JsonObject = dict(payload)
-    payload_for_docs["packages"] = [dict(pkg) for pkg in packages]
-    payload_for_docs_obj: dict[str, SearchPayloadValue] = {
-        key: _to_search_payload(value) for key, value in payload_for_docs.items()
-    }
-    search_payload = cast(SearchPayload, payload_for_docs_obj)
-    documents = list(documents_from_catalog(search_payload))
-    metadata_rows = _build_metadata_rows(payload)
-    symbol_rows = _collect_symbol_rows(packages)
-    fts_rows = _build_fts_rows(documents)
-    call_rows = _collect_call_rows(packages, symbol_rows.lookup)
+    packages = _resolve_packages(payload, packages_override)
+    documents = _build_search_documents(payload, packages)
+    rows = _prepare_sqlite_rows(payload, packages, documents)
     with _sqlite_connection(path) as connection:
         connection.executescript(DDL)
-        _write_many(connection, "INSERT INTO metadata(key, value) VALUES (?, ?)", metadata_rows)
+        _write_many(connection, "INSERT INTO metadata(key, value) VALUES (?, ?)", rows.metadata)
         _write_many(
             connection,
             "INSERT INTO packages(name, data) VALUES (?, ?)",
-            _build_package_rows(packages),
+            rows.packages,
         )
         _write_many(
             connection,
             "INSERT INTO modules(qualified, package, data) VALUES (?, ?, ?)",
-            symbol_rows.modules,
+            rows.modules,
         )
         _write_many(
             connection,
@@ -572,27 +639,27 @@ def write_sqlite_catalog(
             INSERT INTO symbols(symbol_id, package, module, qname, kind, data)
             VALUES (?, ?, ?, ?, ?, ?)
             """,
-            symbol_rows.symbols,
+            rows.symbols,
         )
         _write_many(
             connection,
             "INSERT INTO anchors(symbol_id, start_line, end_line, cst_fingerprint, remap_order) VALUES (?, ?, ?, ?, ?)",
-            symbol_rows.anchors,
+            rows.anchors,
         )
         _write_many(
             connection,
             "INSERT INTO ranking_features(symbol_id, coverage, complexity, churn, stability, deprecated) VALUES (?, ?, ?, ?, ?, ?)",
-            symbol_rows.ranking,
+            rows.ranking,
         )
         _write_many(
             connection,
             "INSERT INTO symbol_fts(symbol_id, package, module, qname, text) VALUES (?, ?, ?, ?, ?)",
-            fts_rows,
+            rows.fts,
         )
         _write_many(
             connection,
             "INSERT OR IGNORE INTO calls(caller_symbol_id, callee_symbol_id, callee_qname, confidence, kind) VALUES (?, ?, ?, ?, ?)",
-            call_rows,
+            rows.calls,
         )
         connection.commit()
 

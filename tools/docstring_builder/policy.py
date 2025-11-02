@@ -4,16 +4,12 @@ from __future__ import annotations
 
 import datetime as _dt
 import os
+import tomllib
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
 from typing import cast
-
-try:  # Python 3.11+
-    import tomllib
-except ModuleNotFoundError:  # pragma: no cover - fallback for limited environments
-    import tomli as tomllib  # type: ignore[import-not-found, no-redef]
 
 from tools.docstring_builder.plugins.dataclass_fields import collect_dataclass_field_names
 from tools.docstring_builder.semantics import SemanticResult

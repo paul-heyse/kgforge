@@ -1,0 +1,154 @@
+"""Shared fixtures for vector ingestion regression tests.
+
+These fixtures provide canonical payloads, schema validators, and deterministic
+correlation identifiers so the test suite can exercise vector ingestion
+behaviour without repeating setup boilerplate.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Callable, Sequence
+from pathlib import Path
+from typing import Final, cast
+from uuid import UUID
+
+import numpy as np
+import pytest
+from jsonschema import Draft202012Validator
+
+from kgfoundry_common.schema_helpers import load_schema
+from kgfoundry_common.types import JsonValue
+from kgfoundry_common.vector_types import VectorMatrix
+
+type VectorPayload = list[dict[str, object]]
+
+_REPO_ROOT: Final[Path] = Path(__file__).resolve().parents[2]
+_VECTOR_SCHEMA_PATH: Final[Path] = (
+    _REPO_ROOT / "schema" / "vector-ingestion" / "vector-batch.v1.schema.json"
+)
+
+
+def _vector_schema_path() -> Path:
+    """Return the absolute path to the canonical vector batch schema."""
+    return _VECTOR_SCHEMA_PATH
+
+
+vector_schema_path = cast(
+    "Callable[[], Path]",
+    pytest.fixture(scope="session")(_vector_schema_path),
+)
+
+
+def _vector_schema(vector_schema_path: Path) -> dict[str, JsonValue]:
+    """Load the canonical vector batch schema once per test session."""
+    return load_schema(vector_schema_path)
+
+
+vector_schema = cast(
+    "Callable[[Path], dict[str, JsonValue]]",
+    pytest.fixture(scope="session")(_vector_schema),
+)
+
+
+def _vector_validator(vector_schema: dict[str, JsonValue]) -> Draft202012Validator:
+    """Provide a cached JSON Schema validator for vector payloads."""
+    return Draft202012Validator(vector_schema)
+
+
+vector_validator = cast(
+    "Callable[[dict[str, JsonValue]], Draft202012Validator]",
+    pytest.fixture(scope="session")(_vector_validator),
+)
+
+
+def _canonical_vector_payload() -> VectorPayload:
+    """Return a well-formed vector payload used across tests."""
+    return [
+        {"key": "vec-1", "vector": [0.1, 0.2, 0.3]},
+        {"key": "vec-2", "vector": [0.4, 0.5, 0.6]},
+    ]
+
+
+canonical_vector_payload = cast(
+    "Callable[[], VectorPayload]",
+    pytest.fixture(_canonical_vector_payload),
+)
+
+
+def _inconsistent_dimension_payload() -> VectorPayload:
+    """Return a payload containing a ragged vector for negative tests."""
+    return [
+        {"key": "vec-1", "vector": [0.1, 0.2, 0.3]},
+        {"key": "vec-2", "vector": [0.4, 0.5]},
+    ]
+
+
+inconsistent_dimension_payload = cast(
+    "Callable[[], VectorPayload]",
+    pytest.fixture(_inconsistent_dimension_payload),
+)
+
+
+def _non_numeric_payload() -> VectorPayload:
+    """Return a payload with non-numeric entries for validation failures."""
+    return [
+        {"key": "vec-1", "vector": [0.1, "oops", 0.3]},
+    ]
+
+
+non_numeric_payload = cast(
+    "Callable[[], VectorPayload]",
+    pytest.fixture(_non_numeric_payload),
+)
+
+
+def _canonical_vector_matrix(canonical_vector_payload: VectorPayload) -> VectorMatrix:
+    """Return a numpy matrix representation of the canonical payload."""
+    vectors = [cast("Sequence[float]", record["vector"]) for record in canonical_vector_payload]
+    return np.asarray(vectors, dtype=np.float32)
+
+
+canonical_vector_matrix = cast(
+    "Callable[[VectorPayload], VectorMatrix]",
+    pytest.fixture(_canonical_vector_matrix),
+)
+
+
+_DETERMINISTIC_UUID: Final[UUID] = UUID("12345678-1234-5678-1234-567812345678")
+
+
+def _deterministic_uuid() -> UUID:
+    """Return a deterministic UUID for correlation ID tests."""
+    return _DETERMINISTIC_UUID
+
+
+deterministic_uuid = cast(
+    "Callable[[], UUID]",
+    pytest.fixture(_deterministic_uuid),
+)
+
+
+def _correlation_id_hex(deterministic_uuid: UUID) -> str:
+    """Expose the hexadecimal correlation identifier used in tests."""
+    return deterministic_uuid.hex
+
+
+correlation_id_hex = cast(
+    "Callable[[UUID], str]",
+    pytest.fixture(_correlation_id_hex),
+)
+
+
+def _deterministic_uuid_factory(deterministic_uuid: UUID) -> Callable[[], UUID]:
+    """Return a callable that mimics :func:`uuid.uuid4` deterministically."""
+
+    def _factory() -> UUID:
+        return deterministic_uuid
+
+    return _factory
+
+
+deterministic_uuid_factory = cast(
+    "Callable[[UUID], Callable[[], UUID]]",
+    pytest.fixture(_deterministic_uuid_factory),
+)

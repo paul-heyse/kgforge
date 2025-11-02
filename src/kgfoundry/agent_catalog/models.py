@@ -620,6 +620,7 @@ def _load_shard_packages(
 if TYPE_CHECKING:  # pragma: no cover - typing only
 
     def _model_validate_catalog(payload: dict[str, JsonValue]) -> AgentCatalogModel: ...
+
 else:  # pragma: no cover - runtime behaviour
 
     def _model_validate_catalog(payload: dict[str, JsonValue]) -> AgentCatalogModel:

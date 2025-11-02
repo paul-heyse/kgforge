@@ -47,14 +47,14 @@ def required_sections(
     is_public: bool,
 ) -> list[str]:
     """Return the ordered docstring sections required for the provided symbol metadata."""
-    return _legacy._required_sections(
-        kind,
-        parameters,
-        returns,
-        raises,
-        name=name,
+    context = _legacy._RequiredSectionsContext(
+        kind=kind,
+        parameters=parameters,
+        returns_annotation=returns,
+        raises=raises,
         is_public=is_public,
     )
+    return _legacy._required_sections(context)
 
 
 REPO_ROOT = _legacy.REPO_ROOT

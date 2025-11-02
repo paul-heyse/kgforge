@@ -227,9 +227,7 @@ class PathlibTransformer(cst.CSTTransformer):
 
         return updated_node
 
-    def leave_With(  # noqa: N802
-        self, original_node: cst.With, updated_node: cst.With
-    ) -> cst.With:
+    def leave_With(self, original_node: cst.With, updated_node: cst.With) -> cst.With:  # noqa: N802
         """Transform open(os.path.join(...)) patterns."""
         # Handle open(os.path.join(...)) → Path(...).open()
         for index, (original_item, updated_item) in enumerate(

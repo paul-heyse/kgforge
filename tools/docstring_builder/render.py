@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -15,8 +15,8 @@ else:
         from jinja2.utils import select_autoescape
     except ImportError:
         # Fallback for older jinja2 versions
-        def select_autoescape(**_kwargs: object) -> bool:
-            return True
+        def select_autoescape(**_kwargs: object) -> Callable[[str | None], bool]:
+            return lambda _filename=None: True
 
 
 from tools.docstring_builder.schema import DocstringSchema, ParameterDoc
@@ -27,7 +27,7 @@ _ENV = Environment(
     undefined=StrictUndefined,
     trim_blocks=False,
     lstrip_blocks=True,
-    autoescape=select_autoescape(default=True, default_for_string=True),  # type: ignore[call-arg]  # jinja2 stubs may be incomplete
+    autoescape=select_autoescape(default=True, default_for_string=True),
 )
 _TEMPLATE_OBJ = _ENV.from_string(_TEMPLATE)
 

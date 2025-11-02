@@ -553,14 +553,3 @@ def _normalize_link_policy(raw_policy: JsonObject | None) -> LinkPolicy:
             normalized["github"] = github_values
 
     return cast(LinkPolicy, normalized)
-
-
-def _format_template(template: str, context: Mapping[str, object], fallback: str) -> str:
-    """Format a template with graceful fallback on KeyError/ValueError."""
-    safe_context = {key: str(value) for key, value in context.items()}
-    try:
-        return template.format(**safe_context)
-    except KeyError:
-        return fallback
-    except ValueError:
-        return fallback
