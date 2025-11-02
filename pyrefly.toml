@@ -4,7 +4,6 @@ project-excludes = [
     "**/build/",
     "docs/_build/**",
     "site/**",
-    "docs/_types/**",
     "**/.venv/**",
     "**/__pycache__/**",
 ]

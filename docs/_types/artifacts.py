@@ -56,7 +56,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated
+from typing import TYPE_CHECKING, Annotated, cast
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -192,7 +192,8 @@ class SymbolIndexRow(BaseModel):
     def path_not_empty(cls, v: object) -> str:
         """Ensure path is a non-empty string."""
         if not isinstance(v, str) or not v.strip():
-            raise ValueError("path must be a non-empty string")
+            error_msg = "path must be a non-empty string"
+            raise ValueError(error_msg)
         return v
 
     @field_validator("kind", mode="before")
@@ -200,7 +201,8 @@ class SymbolIndexRow(BaseModel):
     def kind_not_empty(cls, v: object) -> str:
         """Ensure kind is a non-empty string."""
         if not isinstance(v, str) or not v.strip():
-            raise ValueError("kind must be a non-empty string")
+            error_msg = "kind must be a non-empty string"
+            raise ValueError(error_msg)
         return v
 
     @field_validator("doc", mode="before")
@@ -208,7 +210,8 @@ class SymbolIndexRow(BaseModel):
     def doc_not_empty(cls, v: object) -> str:
         """Ensure doc is a non-empty string."""
         if not isinstance(v, str) or not v.strip():
-            raise ValueError("doc must be a non-empty string")
+            error_msg = "doc must be a non-empty string"
+            raise ValueError(error_msg)
         return v
 
     @field_validator("tested_by", mode="before")
@@ -267,7 +270,7 @@ class SymbolIndexArtifacts(BaseModel):
         if v is None:
             return ()
         if isinstance(v, (list, tuple)):
-            return tuple(v)  # type: ignore[arg-type]
+            return tuple(v)
         return ()
 
     model_config = {"frozen": True}
@@ -302,7 +305,8 @@ class SymbolDeltaChange(BaseModel):
     def path_not_empty(cls, v: object) -> str:
         """Ensure path is a non-empty string."""
         if not isinstance(v, str) or not v.strip():
-            raise ValueError("path must be a non-empty string")
+            error_msg = "path must be a non-empty string"
+            raise ValueError(error_msg)
         return v
 
     @field_validator("reasons", mode="before")
@@ -368,7 +372,7 @@ class SymbolDeltaPayload(BaseModel):
         if v is None:
             return ()
         if isinstance(v, (list, tuple)):
-            return tuple(v)  # type: ignore[arg-type]
+            return tuple(v)
         return ()
 
     model_config = {"frozen": True}
@@ -488,8 +492,8 @@ def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
             endlineno = item.get("endlineno")
             if lineno is not None or endlineno is not None:
                 span = LineSpan(
-                    start=int(lineno) if lineno is not None else None,
-                    end=int(endlineno) if endlineno is not None else None,
+                    start=int(lineno) if lineno is not None else None,  # type: ignore[arg-type]
+                    end=int(endlineno) if endlineno is not None else None,  # type: ignore[arg-type]
                 )
 
             # Create row with Pydantic validation
@@ -519,7 +523,11 @@ def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
             raise ArtifactValidationError(msg, artifact_name="symbol-index") from e
 
     # Return artifacts with empty lookups (to be populated separately if needed)
-    return SymbolIndexArtifacts(rows=tuple(rows), by_file={}, by_module={})
+    return SymbolIndexArtifacts(
+        rows=cast(tuple[SymbolIndexRow, ...], tuple(rows)),
+        by_file=cast(dict[str, tuple[str, ...]], {}),
+        by_module=cast(dict[str, tuple[str, ...]], {}),
+    )
 
 
 def symbol_index_to_payload(model: SymbolIndexArtifacts) -> list[dict[str, JsonValue]]:
@@ -558,7 +566,7 @@ def symbol_index_to_payload(model: SymbolIndexArtifacts) -> list[dict[str, JsonV
             "canonical_path": row.canonical_path,
             "kind": row.kind,
             "doc": row.doc,
-            "source_link": row.source_link,
+            "source_link": cast(JsonValue, row.source_link),
             "module": row.module,
             "package": row.package,
             "file": row.file,
@@ -568,7 +576,7 @@ def symbol_index_to_payload(model: SymbolIndexArtifacts) -> list[dict[str, JsonV
             "since": row.since,
             "deprecated_in": row.deprecated_in,
             "section": row.section,
-            "tested_by": list(row.tested_by),
+            "tested_by": cast(JsonValue, list(row.tested_by)),
             "is_async": row.is_async,
             "is_property": row.is_property,
         }
@@ -659,18 +667,18 @@ def symbol_delta_to_payload(model: SymbolDeltaPayload) -> dict[str, JsonValue]:
         changed_list.append(
             {
                 "path": change.path,
-                "before": change.before,
-                "after": change.after,
-                "reasons": list(change.reasons),
+                "before": cast(JsonValue, change.before),
+                "after": cast(JsonValue, change.after),
+                "reasons": cast(JsonValue, list(change.reasons)),
             }
         )
 
     return {
         "base_sha": model.base_sha,
         "head_sha": model.head_sha,
-        "added": list(model.added),
-        "removed": list(model.removed),
-        "changed": changed_list,
+        "added": cast(JsonValue, list(model.added)),
+        "removed": cast(JsonValue, list(model.removed)),
+        "changed": cast(JsonValue, changed_list),
     }
 
 
@@ -699,7 +707,7 @@ def load_symbol_index(path: Path) -> SymbolIndexArtifacts:
     >>> # artifacts = load_symbol_index(Path("docs/_build/symbols.json"))
     """
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = cast(JsonPayload, json.loads(path.read_text(encoding="utf-8")))
     except (OSError, json.JSONDecodeError) as e:
         msg = f"Failed to load {path}: {e}"
         raise ArtifactValidationError(msg, artifact_name="symbol-index") from e
@@ -768,7 +776,7 @@ def load_symbol_delta(path: Path) -> SymbolDeltaPayload:
     >>> # delta = load_symbol_delta(Path("docs/_build/symbols.delta.json"))
     """
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = cast(JsonPayload, json.loads(path.read_text(encoding="utf-8")))
     except (OSError, json.JSONDecodeError) as e:
         msg = f"Failed to load {path}: {e}"
         raise ArtifactValidationError(msg, artifact_name="symbol-delta") from e

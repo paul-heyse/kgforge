@@ -29,6 +29,7 @@ from kgfoundry_common.logging import get_logger, with_fields
 from kgfoundry_common.numpy_typing import (
     FloatMatrix,
     IntVector,
+    normalize_l2,
     topk_indices,
 )
 from kgfoundry_common.observability import MetricsProvider, observe_duration
@@ -48,6 +49,9 @@ __all__ = [
     "search_catalog",
 ]
 
+JsonLike = str | int | float | bool | list[object] | dict[str, object] | None
+CatalogMapping = Mapping[str, JsonLike]
+PrimitiveMapping = Mapping[str, str | int | float | bool | None]
 
 EMBEDDING_MATRIX_RANK = 2
 WORD_PATTERN = re.compile(r"[A-Za-z0-9_]+")
@@ -266,40 +270,15 @@ class SearchResult:
 
 @dataclass(slots=True)
 class VectorSearchContext:
-    """Data bundle required for computing vector scores.
+    """Supporting data required to execute a vector search."""
 
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    semantic_meta : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
-        Describe ``semantic_meta``.
-    mapping_payload : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
-        Describe ``mapping_payload``.
-    index_path : Path
-        Describe ``index_path``.
-    documents : SearchDocument
-        Describe ``documents``.
-    candidate_limit : int
-        Describe ``candidate_limit``.
-    k : int
-        Describe ``k``.
-    candidate_ids : set[str]
-        Describe ``candidate_ids``.
-    row_to_document : int | SearchDocument
-        Describe ``row_to_document``.
-    """
-
-    semantic_meta: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
-    mapping_payload: Mapping[
-        str, str | int | float | bool | None | list[object] | dict[str, object]
-    ]
+    semantic_meta: CatalogMapping
+    mapping_payload: CatalogMapping
     index_path: Path
     documents: Sequence[SearchDocument]
     candidate_limit: int
     k: int
     candidate_ids: set[str]
-    row_to_document: Mapping[int, SearchDocument]
 
 
 _FAISS_ENV_OVERRIDE = "KGF_FAISS_MODULE"
@@ -719,27 +698,8 @@ def _stringify(value: object) -> str | None:
     return str(value)
 
 
-def _extract_agent_hints_payload(
-    symbol: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
-) -> tuple[list[str], list[str]]:
-    """Document  extract agent hints payload.
-
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
-
-    Parameters
-    ----------
-    symbol : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
-        Configure the symbol.
-
-    Returns
-    -------
-    tuple[list[str], list[str]]
-        Describe return value.
-    """
+def _extract_agent_hints_payload(symbol: CatalogMapping) -> tuple[list[str], list[str]]:
+    """Return curated ``intent_tags`` and ``tests_to_run`` lists for ``symbol``."""
     intent_tags: list[str] = []
     tests_to_run: list[str] = []
     agent_hints = symbol.get("agent_hints")
@@ -754,26 +714,9 @@ def _extract_agent_hints_payload(
 
 
 def _extract_docfacts_text(
-    docfacts: Mapping[str, str | int | float | bool | None] | None,
+    docfacts: Mapping[str, JsonLike] | None,
 ) -> tuple[str | None, str | None]:
-    """Document  extract docfacts text.
-
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
-
-    Parameters
-    ----------
-    docfacts : str | str | int | float | bool | NoneType | NoneType
-        Indicate whether docfacts.
-
-    Returns
-    -------
-    tuple[str | NoneType, str | NoneType]
-        Describe return value.
-    """
+    """Return summary/docstring text pulled from the ``docfacts`` mapping."""
     summary = None
     docstring = None
     if isinstance(docfacts, Mapping):
@@ -785,26 +728,9 @@ def _extract_docfacts_text(
 
 
 def _extract_anchor_lines(
-    symbol: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+    symbol: CatalogMapping,
 ) -> tuple[int | None, int | None]:
-    """Document  extract anchor lines.
-
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
-
-    Parameters
-    ----------
-    symbol : str | str | int | float | bool | NoneType | list[object] | dict[str, object]
-        Configure the symbol.
-
-    Returns
-    -------
-    tuple[int | NoneType, int | NoneType]
-        Describe return value.
-    """
+    """Return source anchor line numbers for ``symbol`` when present."""
     anchors = symbol.get("anchors")
     start_line: int | None = None
     end_line: int | None = None
@@ -821,7 +747,7 @@ def _extract_anchor_lines(
 def build_document_from_payload(
     package_name: str,
     module_name: str,
-    symbol: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+    symbol: CatalogMapping,
     symbol_id: str,
     row: int,
 ) -> SearchDocument:
@@ -890,12 +816,8 @@ def build_document_from_payload(
 
 
 def iter_symbol_entries(
-    catalog: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
-) -> Sequence[
-    tuple[
-        str, str, Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
-    ]
-]:
+    catalog: CatalogMapping,
+) -> Sequence[tuple[str, str, CatalogMapping]]:
     """Yield ``(package, module, symbol)`` triples from the catalog payload.
 
     <!-- auto:docstring-builder v1 -->
@@ -915,7 +837,7 @@ def iter_symbol_entries(
         tuple[
             str,
             str,
-            Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+            CatalogMapping,
         ]
     ] = []
     if isinstance(packages, list):
@@ -940,7 +862,7 @@ def iter_symbol_entries(
 
 
 def documents_from_catalog(
-    catalog: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+    catalog: CatalogMapping,
     row_lookup: Mapping[str, int] | None = None,
 ) -> list[SearchDocument]:
     """Return search documents extracted from the catalog payload.
@@ -1058,7 +980,7 @@ def prepare_query_tokens(query: str) -> collections.Counter[str]:
 
 
 def resolve_search_parameters(
-    catalog_search: Mapping[str, str | int | float | bool | None],
+    search_config: PrimitiveMapping,
     options: SearchOptions,
     document_count: int,
     k: int,
@@ -1085,7 +1007,7 @@ def resolve_search_parameters(
     """
     alpha_value = options.alpha
     if alpha_value is None:
-        alpha_candidate = catalog_search.get("alpha")
+        alpha_candidate = search_config.get("alpha")
         if isinstance(alpha_candidate, (int, float)):
             alpha_value = float(alpha_candidate)
     if alpha_value is None:
@@ -1094,7 +1016,7 @@ def resolve_search_parameters(
 
     candidate_value = options.candidate_pool
     if candidate_value is None:
-        pool_value = catalog_search.get("candidate_pool")
+        pool_value = search_config.get("candidate_pool")
         if isinstance(pool_value, int) and pool_value > 0:
             candidate_value = pool_value
     if candidate_value is None:
@@ -1176,14 +1098,9 @@ def select_lexical_candidates(
 
 
 def _resolve_semantic_index_metadata(
-    catalog: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+    catalog: CatalogMapping,
     repo_root: Path,
-) -> (
-    tuple[
-        Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]], Path, Path
-    ]
-    | None
-):
+) -> tuple[CatalogMapping, Path, Path] | None:
     """Return semantic index metadata when available, verifying artifacts.
 
     <!-- auto:docstring-builder v1 -->
@@ -1223,10 +1140,8 @@ def _resolve_semantic_index_metadata(
             message, context={"index_path": str(index_path), "mapping_path": str(mapping_path)}
         )
     # Type cast for return - semantic_meta is validated as Mapping above
-    semantic_meta_typed: Mapping[
-        str, str | int | float | bool | None | list[object] | dict[str, object]
-    ] = cast(
-        Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+    semantic_meta_typed: CatalogMapping = cast(
+        CatalogMapping,
         semantic_meta,
     )
     return semantic_meta_typed, index_path, mapping_path
@@ -1234,9 +1149,7 @@ def _resolve_semantic_index_metadata(
 
 def _load_row_lookup(
     mapping_path: Path,
-) -> tuple[
-    dict[str, int], Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
-]:
+) -> tuple[dict[str, int], CatalogMapping]:
     """Return the row lookup mapping and raw payload from ``mapping_path``.
 
     <!-- auto:docstring-builder v1 -->
@@ -1256,10 +1169,8 @@ def _load_row_lookup(
         message = "Semantic mapping file does not contain valid JSON object"
         raise AgentCatalogSearchError(message)
     # Cast to expected type - JSON can have broader types
-    mapping_payload: Mapping[
-        str, str | int | float | bool | None | list[object] | dict[str, object]
-    ] = cast(
-        Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+    mapping_payload: CatalogMapping = cast(
+        CatalogMapping,
         mapping_payload_raw,
     )
     symbols_payload = mapping_payload.get("symbols")
@@ -1313,7 +1224,7 @@ def _load_sentence_transformer(model_name: str) -> EmbeddingModelProtocol:
 
 
 def _resolve_embedding_model(
-    options: SearchOptions, semantic_meta: Mapping[str, str | int | float | bool | None]
+    options: SearchOptions, semantic_meta: PrimitiveMapping
 ) -> tuple[str, EmbeddingModelProtocol]:
     """Return the embedding model name and instance used for vector search.
 
@@ -1525,16 +1436,13 @@ def merge_scores(
 
 
 def _prepare_search_documents(
-    catalog: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+    catalog: CatalogMapping,
     repo_root: Path,
     facets: Mapping[str, str],
 ) -> tuple[
     list[SearchDocument],
-    tuple[
-        Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]], Path, Path
-    ]
-    | None,
-    Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]] | None,
+    tuple[CatalogMapping, Path, Path] | None,
+    CatalogMapping | None,
 ]:
     """Prepare and filter documents from catalog.
 
@@ -1556,9 +1464,7 @@ def _prepare_search_documents(
     """
     semantic_meta_info = _resolve_semantic_index_metadata(catalog, repo_root)
     row_lookup: dict[str, int] | None = None
-    mapping_payload: (
-        Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]] | None
-    ) = None
+    mapping_payload: CatalogMapping | None = None
     if semantic_meta_info is not None:
         _, _, mapping_path = semantic_meta_info
         row_lookup, mapping_payload = _load_row_lookup(mapping_path)
@@ -1622,12 +1528,8 @@ class VectorSearchParams:
         Describe ``candidate_ids``.
     """
 
-    semantic_meta_info: tuple[
-        Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]], Path, Path
-    ]
-    mapping_payload: Mapping[
-        str, str | int | float | bool | None | list[object] | dict[str, object]
-    ]
+    semantic_meta_info: tuple[CatalogMapping, Path, Path]
+    mapping_payload: CatalogMapping
     documents: list[SearchDocument]
     candidate_limit: int
     k: int
@@ -1700,7 +1602,7 @@ class SearchRequest:
 
 
 def search_catalog(
-    catalog: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+    catalog: CatalogMapping,
     *,
     request: SearchRequest,
     options: SearchOptions | None = None,
@@ -1764,8 +1666,8 @@ def search_catalog(
                 obs.success()
                 return []
             catalog_search = catalog.get("search")
-            search_config: Mapping[str, str | int | float | bool | None] = (
-                cast(Mapping[str, str | int | float | bool | None], catalog_search)
+            search_config: PrimitiveMapping = (
+                cast(PrimitiveMapping, catalog_search)
                 if isinstance(catalog_search, Mapping)
                 else {}
             )

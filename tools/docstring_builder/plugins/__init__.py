@@ -102,9 +102,7 @@ class PluginManager:
         processed: list[SemanticResult] = []
         for entry in semantics:
             with self._lock:
-                processed.append(
-                    _run_transformer_pipeline(self.transformers, context, entry)
-                )
+                processed.append(_run_transformer_pipeline(self.transformers, context, entry))
         return processed
 
     def apply_formatters(
@@ -115,9 +113,7 @@ class PluginManager:
         processed: list[DocstringEdit] = []
         for entry in edits:
             with self._lock:
-                processed.append(
-                    _run_formatter_pipeline(self.formatters, context, entry)
-                )
+                processed.append(_run_formatter_pipeline(self.formatters, context, entry))
         return processed
 
     def enabled_plugins(self) -> list[str]:

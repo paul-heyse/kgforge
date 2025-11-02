@@ -11,7 +11,9 @@ class NavSectionDocument:
     id: str
     symbols: list[str]
 
-    def __init__(self, *, id: str, symbols: list[str]) -> None: ...  # noqa: A002 - schema field name
+    def __init__(
+        self, *, id: str, symbols: list[str]
+    ) -> None: ...  # noqa: A002 - schema field name
 
 class SymbolMetaDocument:
     owner: str | None

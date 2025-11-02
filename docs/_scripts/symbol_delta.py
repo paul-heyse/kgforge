@@ -303,7 +303,7 @@ def _diff_rows(
                     path=path,
                     before=before_subset,
                     after=after_subset,
-                    reasons=tuple(reasons),
+                    reasons=cast(tuple[str, ...], tuple(reasons)),
                 )
             )
 

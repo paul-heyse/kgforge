@@ -238,9 +238,7 @@ class _LegacyTransformerAdapter(TransformerPlugin):
     def apply(self, context: PluginContext, payload: SemanticResult) -> SemanticResult:
         result = self._adapter.apply(context, payload)
         if not isinstance(result, SemanticResult):
-            message = (
-                f"Legacy transformer {self.name!r} returned {type(result)!r}; expected SemanticResult"
-            )
+            message = f"Legacy transformer {self.name!r} returned {type(result)!r}; expected SemanticResult"
             raise TypeError(message)
         return result
 
