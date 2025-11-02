@@ -11,18 +11,14 @@ Verify:
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any
+from typing import Any, cast
 
 import pytest
-from prometheus_client import Counter, Histogram
-
-if TYPE_CHECKING:
-    from prometheus_client.core import CollectorRegistry
-else:
-    CollectorRegistry = Any  # type: ignore[misc,assignment]
+from prometheus_client import CollectorRegistry, Counter, Histogram
+from prometheus_client.metrics_core import Sample
 
 
-def _get_first_metric_samples(registry: CollectorRegistry) -> list[Any]:
+def _get_first_metric_samples(registry: CollectorRegistry) -> list[Sample]:
     """Extract first metric's samples from registry.
 
     Parameters
@@ -35,7 +31,8 @@ def _get_first_metric_samples(registry: CollectorRegistry) -> list[Any]:
     list[Any]
         Samples from first metric.
     """
-    return next(iter(registry.collect())).samples  # type: ignore[no-any-return]
+    metric = next(iter(registry.collect()))
+    return cast(list[Sample], metric.samples)
 
 
 class TestCounterMetrics:

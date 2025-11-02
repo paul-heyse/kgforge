@@ -9,6 +9,7 @@ import sys
 from collections.abc import Callable, Sequence
 from contextlib import suppress
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, Protocol, cast
 
@@ -90,19 +91,14 @@ class WarningLogger(Protocol):
 
 _LOADER_FACTORY = cast(Callable[[Sequence[str]], GriffeLoader], resolve_griffe().loader_type)
 
-_ENVIRONMENT_CACHE: BuildEnvironment | None = None
 
-
+@lru_cache(maxsize=1)
 def detect_environment() -> BuildEnvironment:
     """Return filesystem locations relevant to docs tooling."""
-
-    global _ENVIRONMENT_CACHE
-    if _ENVIRONMENT_CACHE is None:
-        root = Path(__file__).resolve().parents[2]
-        src = root / "src"
-        tools_dir = root / "tools"
-        _ENVIRONMENT_CACHE = BuildEnvironment(root=root, src=src, tools_dir=tools_dir)
-    return _ENVIRONMENT_CACHE
+    root = Path(__file__).resolve().parents[2]
+    src = root / "src"
+    tools_dir = root / "tools"
+    return BuildEnvironment(root=root, src=src, tools_dir=tools_dir)
 
 
 def ensure_sys_paths(env: BuildEnvironment) -> None:
@@ -113,46 +109,40 @@ def ensure_sys_paths(env: BuildEnvironment) -> None:
             sys.path.insert(0, path_str)
 
 
-_SETTINGS_CACHE: DocsSettings | None = None
-
-
+@lru_cache(maxsize=1)
 def load_settings() -> DocsSettings:
     """Return docs settings derived from environment variables."""
-    global _SETTINGS_CACHE
-    if _SETTINGS_CACHE is None:
-        env = detect_environment()
+    env = detect_environment()
 
-        env_pkgs = os.environ.get("DOCS_PKG")
-        if env_pkgs:
-            packages = tuple(pkg.strip() for pkg in env_pkgs.split(",") if pkg.strip())
-        else:
-            discovered = detect_packages()
-            packages = tuple(discovered or [detect_primary()])
+    env_pkgs = os.environ.get("DOCS_PKG")
+    if env_pkgs:
+        packages = tuple(pkg.strip() for pkg in env_pkgs.split(",") if pkg.strip())
+    else:
+        discovered = detect_packages()
+        packages = tuple(discovered or [detect_primary()])
 
-        link_mode_raw = os.environ.get("DOCS_LINK_MODE", "both").lower()
-        link_mode = _LINK_MODE_MAP.get(link_mode_raw)
-        if link_mode is None:
-            LOGGER.warning("Unsupported DOCS_LINK_MODE '%s'; defaulting to 'both'", link_mode_raw)
-            link_mode = "both"
+    link_mode_raw = os.environ.get("DOCS_LINK_MODE", "both").lower()
+    link_mode = _LINK_MODE_MAP.get(link_mode_raw)
+    if link_mode is None:
+        LOGGER.warning("Unsupported DOCS_LINK_MODE '%s'; defaulting to 'both'", link_mode_raw)
+        link_mode = "both"
 
-        docs_build_dir = env.root / "docs" / "_build"
-        navmap_candidates: tuple[Path, ...] = (
-            docs_build_dir / "navmap.json",
-            docs_build_dir / "navmap" / "navmap.json",
-            env.root / "site" / "_build" / "navmap" / "navmap.json",
-        )
+    docs_build_dir = env.root / "docs" / "_build"
+    navmap_candidates: tuple[Path, ...] = (
+        docs_build_dir / "navmap.json",
+        docs_build_dir / "navmap" / "navmap.json",
+        env.root / "site" / "_build" / "navmap" / "navmap.json",
+    )
 
-        _SETTINGS_CACHE = DocsSettings(
-            packages=packages,
-            link_mode=link_mode,
-            github_org=os.environ.get("DOCS_GITHUB_ORG"),
-            github_repo=os.environ.get("DOCS_GITHUB_REPO"),
-            github_sha=os.environ.get("DOCS_GITHUB_SHA"),
-            docs_build_dir=docs_build_dir,
-            navmap_candidates=navmap_candidates,
-        )
-
-    return _SETTINGS_CACHE
+    return DocsSettings(
+        packages=packages,
+        link_mode=link_mode,
+        github_org=os.environ.get("DOCS_GITHUB_ORG"),
+        github_repo=os.environ.get("DOCS_GITHUB_REPO"),
+        github_sha=os.environ.get("DOCS_GITHUB_SHA"),
+        docs_build_dir=docs_build_dir,
+        navmap_candidates=navmap_candidates,
+    )
 
 
 def make_loader(env: BuildEnvironment) -> GriffeLoader:

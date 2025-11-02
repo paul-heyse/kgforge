@@ -25,12 +25,9 @@ from prometheus_client.metrics_core import Metric
 from prometheus_client.registry import CollectorRegistry
 from prometheus_client.samples import Sample
 
-repo_root = Path(__file__).parent.parent
-src_path = repo_root / "src"
-if str(src_path) not in sys.path:
-    sys.path.insert(0, str(src_path))
-
 from kgfoundry_common.problem_details import JsonValue
+
+repo_root = Path(__file__).parent.parent
 
 P = ParamSpec("P")
 R = TypeVar("R")

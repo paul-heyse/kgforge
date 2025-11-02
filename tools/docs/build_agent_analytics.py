@@ -104,7 +104,7 @@ def _load_previous(path: Path) -> AgentAnalyticsDocument | None:
     raw = path.read_bytes()
     try:
         document_type: type[AgentAnalyticsDocument] = AgentAnalyticsDocument
-        decoded: AgentAnalyticsDocument = msgspec_json.decode(raw, type=document_type)
+        decoded: AgentAnalyticsDocument = msgspec_json.decode(raw, target_type=document_type)
     except DecodeError:
         try:
             legacy_raw: object = json.loads(raw.decode("utf-8"))
@@ -326,7 +326,7 @@ def build_analytics(args: argparse.Namespace) -> AgentAnalyticsDocument:
 def write_analytics(args: argparse.Namespace) -> None:
     """Persist the analytics document to disk after schema validation."""
     document = build_analytics(args)
-    payload = cast(dict[str, object], msgspec.to_builtins(document))
+    payload: dict[str, object] = msgspec.to_builtins(document)
     validate_tools_payload(payload, ANALYTICS_SCHEMA)
     output = cast(Path, args.output)
     output.parent.mkdir(parents=True, exist_ok=True)

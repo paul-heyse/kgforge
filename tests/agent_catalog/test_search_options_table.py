@@ -10,9 +10,34 @@ Tests verify:
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Final
 
 import pytest
+from _pytest.logging import LogCaptureFixture
+from tests.agent_catalog.conftest import SearchOptionsFactory
+
+SUCCESS_CASES: Final[tuple[tuple[list[str], int, float], ...]] = (
+    (["document", "section"], 1000, 0.5),
+    (["document"], 5000, 0.7),
+    (["document"], 100, 0.3),
+    ([], 1000, 0.5),
+)
+
+SUCCESS_CASE_IDS: Final[tuple[str, ...]] = (
+    "multiple_facets",
+    "large_pool",
+    "small_pool",
+    "no_facets",
+)
+
+MISSING_MODEL_CASES: Final[tuple[tuple[str | None, bool], ...]] = ((None, True), ("", True))
+MISSING_MODEL_IDS: Final[tuple[str, ...]] = ("missing_model", "empty_model")
+
+INVALID_POOL_SIZES: Final[tuple[int, ...]] = (-1, 0)
+INVALID_POOL_IDS: Final[tuple[str, ...]] = ("negative_pool", "zero_pool")
+
+INVALID_ALPHA_VALUES: Final[tuple[float, ...]] = (-0.1, 1.1)
+INVALID_ALPHA_IDS: Final[tuple[str, ...]] = ("below_range", "above_range")
 
 
 class TestSearchOptionsSuccess:
@@ -20,21 +45,16 @@ class TestSearchOptionsSuccess:
 
     @pytest.mark.parametrize(
         ("facets", "candidate_pool", "alpha"),
-        [
-            (["document", "section"], 1000, 0.5),
-            (["document"], 5000, 0.7),
-            (["document"], 100, 0.3),
-            ([], 1000, 0.5),
-        ],
-        ids=["multiple_facets", "large_pool", "small_pool", "no_facets"],
+        SUCCESS_CASES,
+        ids=SUCCESS_CASE_IDS,
     )
     def test_search_options_valid(
         self,
-        search_options_factory: Any,  # noqa: ANN401 - pytest fixture typing limitation
+        search_options_factory: SearchOptionsFactory,
         facets: list[str],
         candidate_pool: int,
         alpha: float,
-        caplog: Any,  # noqa: ANN401 - pytest fixture typing limitation
+        caplog: LogCaptureFixture,
     ) -> None:
         """Verify valid SearchOptions configurations are accepted.
 
@@ -76,18 +96,15 @@ class TestSearchOptionsFailure:
 
     @pytest.mark.parametrize(
         ("embedding_model", "should_fail"),
-        [
-            (None, True),
-            ("", True),
-        ],
-        ids=["missing_model", "empty_model"],
+        MISSING_MODEL_CASES,
+        ids=MISSING_MODEL_IDS,
     )
     def test_search_options_missing_model(
         self,
-        search_options_factory: Any,  # noqa: ANN401 - pytest fixture typing limitation
+        search_options_factory: SearchOptionsFactory,
         embedding_model: str | None,
         should_fail: bool,
-        caplog: Any,  # noqa: ANN401 - pytest fixture typing limitation
+        caplog: LogCaptureFixture,
     ) -> None:
         """Verify missing/empty embedding model raises error.
 
@@ -113,16 +130,13 @@ class TestSearchOptionsFailure:
 
     @pytest.mark.parametrize(
         "pool_size",
-        [
-            -1,
-            0,
-        ],
-        ids=["negative_pool", "zero_pool"],
+        INVALID_POOL_SIZES,
+        ids=INVALID_POOL_IDS,
     )
     def test_search_options_invalid_pool_size(
         self,
         pool_size: int,
-        caplog: Any,  # noqa: ANN401 - pytest fixture typing limitation
+        caplog: LogCaptureFixture,
     ) -> None:
         """Verify invalid candidate pool size raises error.
 
@@ -140,16 +154,13 @@ class TestSearchOptionsFailure:
 
     @pytest.mark.parametrize(
         "alpha",
-        [
-            -0.1,
-            1.1,
-        ],
-        ids=["below_range", "above_range"],
+        INVALID_ALPHA_VALUES,
+        ids=INVALID_ALPHA_IDS,
     )
     def test_search_options_invalid_alpha(
         self,
         alpha: float,
-        caplog: Any,  # noqa: ANN401 - pytest fixture typing limitation
+        caplog: LogCaptureFixture,
     ) -> None:
         """Verify invalid alpha parameter raises error.
 
@@ -171,8 +182,8 @@ class TestSearchOptionsLogging:
 
     def test_search_options_logs_parameters(
         self,
-        search_options_factory: Any,  # noqa: ANN401 - pytest fixture typing limitation
-        caplog: Any,  # noqa: ANN401 - pytest fixture typing limitation
+        search_options_factory: SearchOptionsFactory,
+        caplog: LogCaptureFixture,
     ) -> None:
         """Verify search option creation logs parameters.
 

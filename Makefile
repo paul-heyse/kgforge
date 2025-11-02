@@ -131,3 +131,12 @@ docs-html:
 
 docs-json:
 	$(MAKE) json
+
+uv-pytest:
+	uv run --env PYTHONPATH=src pytest
+
+uv-test:
+	uv run --env PYTHONPATH=src pytest -q
+
+make-test:
+	PYTHONPATH=src $(PYTEST) -q

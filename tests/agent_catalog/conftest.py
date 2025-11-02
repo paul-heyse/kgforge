@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Protocol, TypedDict
 
 import pytest
 
@@ -15,8 +15,26 @@ if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
 
-@pytest.fixture
-def search_options_factory() -> Any:  # noqa: ANN401 - pytest fixture typing limitation
+class SearchOptionsDict(TypedDict):
+    embedding_model: str | None
+    facets: list[str]
+    candidate_pool_size: int
+    alpha: float
+
+
+class SearchOptionsFactory(Protocol):
+    def __call__(
+        self,
+        *,
+        embedding_model: str | None = ...,
+        facets: list[str] | None = ...,
+        candidate_pool_size: int = ...,
+        alpha: float = ...,
+    ) -> SearchOptionsDict: ...
+
+
+@pytest.fixture()
+def search_options_factory() -> SearchOptionsFactory:
     """Create a factory for SearchOptions test cases.
 
     Yields
@@ -30,7 +48,7 @@ def search_options_factory() -> Any:  # noqa: ANN401 - pytest fixture typing lim
         facets: list[str] | None = None,
         candidate_pool_size: int = 1000,
         alpha: float = 0.5,
-    ) -> dict[str, Any]:
+    ) -> SearchOptionsDict:
         """Create SearchOptions dict for testing.
 
         Parameters

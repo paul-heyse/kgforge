@@ -50,7 +50,7 @@ class TestSymbolIndexValidation:
         reserialized = symbol_index_to_payload(artifacts)
         validate_against_schema(reserialized, SYMBOL_SCHEMA, artifact="symbols.json")
 
-    @pytest.mark.parametrize(  # type: ignore[misc]
+    @pytest.mark.parametrize(
         "field_name",
         [
             "path",
@@ -60,7 +60,7 @@ class TestSymbolIndexValidation:
             "source_link",
         ],
     )
-    def test_symbol_index_required_fields(self, field_name: str) -> None:  # type: ignore[misc]
+    def test_symbol_index_required_fields(self, field_name: str) -> None:
         """Test that required fields are enforced as part of scenario 3.2.a."""
         payload = _load(SYMBOL_EXAMPLE)
         assert isinstance(payload, list)
@@ -68,7 +68,7 @@ class TestSymbolIndexValidation:
         broken = dict(payload_list[0]) if payload_list else {}
         broken.pop(field_name, None)
         with pytest.raises(ToolExecutionError):
-            validate_against_schema([broken], SYMBOL_SCHEMA, artifact="symbols.json")  # type: ignore[misc]
+            validate_against_schema([broken], SYMBOL_SCHEMA, artifact="symbols.json")
 
 
 class TestSymbolDeltaValidation:
@@ -90,7 +90,7 @@ class TestSymbolDeltaValidation:
         """Test that non-object payloads are rejected."""
         with pytest.raises(ToolExecutionError):
             validate_against_schema(
-                ["not", "an", "object"],  # type: ignore[misc]
+                ["not", "an", "object"],
                 DELTA_SCHEMA,
                 artifact="symbols.delta.json",
             )

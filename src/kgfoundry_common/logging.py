@@ -19,7 +19,7 @@ import logging
 import sys
 import time
 from collections.abc import Mapping
-from contextlib import AbstractContextManager, contextmanager
+from contextlib import AbstractContextManager
 from types import TracebackType
 from typing import TYPE_CHECKING, Any, Final, TypedDict, cast
 

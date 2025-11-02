@@ -5,7 +5,7 @@ from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import AbstractContextManager
 from re import Pattern
 from types import ModuleType, TracebackType
-from typing import Any, TypeVar, overload
+from typing import ParamSpec, TypeVar, overload
 from warnings import WarningMessage
 
 T = TypeVar("T")
@@ -99,7 +99,23 @@ def fixture[T](
     params: Sequence[object] | None = None,
 ) -> Callable[[Callable[..., T]], Callable[..., T]]: ...
 
-mark: Any
+P = ParamSpec("P")
+
+class _MarkNamespace:
+    def parametrize[
+        T,
+    ](
+        self,
+        argnames: str | Sequence[str],
+        argvalues: Sequence[object],
+        *,
+        ids: Sequence[str] | None = ...,
+        indirect: bool | Sequence[str] | None = ...,
+        scope: str | None = ...,
+        strict: bool | None = ...,
+    ) -> Callable[[Callable[P, T]], Callable[P, T]]: ...
+
+mark: _MarkNamespace
 
 def importorskip(
     name: str,

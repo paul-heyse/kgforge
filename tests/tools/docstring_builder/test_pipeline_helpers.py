@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from typing import cast
 from unittest import mock
 
 import pytest
@@ -45,7 +46,8 @@ class TestFailureSummaryRenderer:
             ErrorEnvelope(file="bar.py", status=RunStatus.ERROR, message="harvest failed"),
         ]
         renderer.render(summary, errors)
-        assert any("[SUMMARY]" in record.getMessage() for record in caplog.records)  # type: ignore[attr-defined,misc]
+        messages = cast(list[str], getattr(caplog, "messages", []))
+        assert any("[SUMMARY]" in message for message in messages)
 
     def test_render_truncates_top_errors(self, caplog: pytest.LogCaptureFixture) -> None:
         """Should only show top 5 errors."""
@@ -62,7 +64,8 @@ class TestFailureSummaryRenderer:
             for i in range(10)
         ]
         renderer.render(summary, errors)
-        output = "\n".join(record.getMessage() for record in caplog.records)  # type: ignore[attr-defined,misc]
+        messages = cast(list[str], getattr(caplog, "messages", []))
+        output = "\n".join(messages)
         assert output.count("file_") == 5  # Only top 5
 
 
@@ -75,8 +78,8 @@ class TestMetricsRecorder:
         mock_counter = mock.Mock()
         mock_hist_child = mock.Mock()
         mock_counter_child = mock.Mock()
-        mock_hist.labels.return_value = mock_hist_child  # type: ignore[misc]
-        mock_counter.labels.return_value = mock_counter_child  # type: ignore[misc]
+        mock_hist.labels.return_value = mock_hist_child
+        mock_counter.labels.return_value = mock_counter_child
 
         recorder = MetricsRecorder(cli_duration_seconds=mock_hist, runs_total=mock_counter)
 
@@ -86,10 +89,10 @@ class TestMetricsRecorder:
             duration_seconds=1.5,
         )
 
-        mock_hist.labels.assert_called_once_with(command="check", status="success")  # type: ignore[misc]
-        mock_hist_child.observe.assert_called_once_with(1.5)  # type: ignore[misc]
-        mock_counter.labels.assert_called_once_with(status="success")  # type: ignore[misc]
-        mock_counter_child.inc.assert_called_once()  # type: ignore[misc]
+        mock_hist.labels.assert_called_once_with(command="check", status="success")
+        mock_hist_child.observe.assert_called_once_with(1.5)
+        mock_counter.labels.assert_called_once_with(status="success")
+        mock_counter_child.inc.assert_called_once()
 
 
 class TestErrorEnvelope:
@@ -126,7 +129,7 @@ class TestFileOutcomeTracking:
         assert outcome.ir == []
 
 
-@pytest.mark.parametrize(  # type: ignore[misc]
+@pytest.mark.parametrize(
     ("status", "label"),
     [
         (RunStatus.SUCCESS, "success"),
