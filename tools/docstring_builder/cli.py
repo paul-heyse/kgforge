@@ -25,7 +25,7 @@ import logging
 import sys
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import yaml
 
@@ -62,7 +62,7 @@ LOGGER = get_logger(__name__)
 CommandHandler = Callable[[argparse.Namespace], int]
 
 
-CLI_ARGUMENT_DEFINITIONS: tuple[tuple[tuple[str, ...], dict[str, object]], ...] = (
+CLI_ARGUMENT_DEFINITIONS: tuple[tuple[tuple[str, ...], dict[str, Any]], ...] = (
     (("--config",), {"dest": "config_path", "help": "Override the path to docstring_builder.toml"}),
     (("--module",), {"default": "", "help": "Restrict to module prefix"}),
     (("--since",), {"default": "", "help": "Only consider files changed since revision"}),
@@ -553,7 +553,7 @@ LEGACY_COMMAND_HANDLERS: dict[str, CommandHandler] = {
 
 def _apply_cli_arguments(parser: argparse.ArgumentParser) -> None:
     for option_names, options in CLI_ARGUMENT_DEFINITIONS:
-        parser.add_argument(*option_names, **options)  # type: ignore[arg-type]
+        parser.add_argument(*option_names, **options)
 
 
 def _add_llm_arguments(parser: argparse.ArgumentParser) -> None:

@@ -297,6 +297,11 @@ EOF
 ensure_uv
 ensure_python "${PY_VER_DEFAULT}"
 sync_env
+info "Installing project package in editable mode…"
+uv pip install -e .
+ok "Editable install complete"
+export PYTHONPATH="$(pwd)/src:${PYTHONPATH:-}"
+ok "PYTHONPATH includes src (current: ${PYTHONPATH})"
 generate_path_map
 activate_project_env
 print_summary

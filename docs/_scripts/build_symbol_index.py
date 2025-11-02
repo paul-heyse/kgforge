@@ -7,12 +7,11 @@ import logging
 import sys
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from functools import lru_cache
 from pathlib import Path
 from typing import Protocol, cast, runtime_checkable
 
-from docs.scripts import shared
-from docs.scripts.validation import validate_against_schema
+from docs._scripts import shared
+from docs._scripts.validation import validate_against_schema
 from tools import (
     StructuredLoggerAdapter,
     build_problem_details,
@@ -20,7 +19,7 @@ from tools import (
     observe_tool_run,
     render_problem,
 )
-from tools.shared.proc import ToolExecutionError
+from tools._shared.proc import ToolExecutionError
 
 from kgfoundry_common.errors import DeserializationError, SchemaValidationError, SerializationError
 
@@ -554,16 +553,27 @@ def generate_index(
     for package in packages:
         root = cast(GriffeNode, loader.load(package))
         rows.extend(_collect_rows(root, nav=nav_lookup, test_map=test_map))
-    rows_sorted = tuple(sorted(rows, key=lambda item: item.path))  # type: ignore[misc]
+
+    def get_row_path(row: SymbolIndexRow) -> str:
+        """Extract path for sorting."""
+        return row.path
+
+    rows_sorted = tuple(sorted(rows, key=get_row_path))
     by_file = _build_reverse_map(rows_sorted, "file")
     by_module = _build_reverse_map(rows_sorted, "module")
     return SymbolIndexArtifacts(rows=rows_sorted, by_file=by_file, by_module=by_module)
 
 
-@lru_cache(maxsize=1)  # type: ignore[misc]
+_GIT_SHA_CACHE: str | None = None
+
+
 def _git_sha() -> str:
     """Return the Git SHA for permalink construction."""
-    return shared.resolve_git_sha(ENV, SETTINGS, logger=BASE_LOGGER)  # type: ignore[arg-type]
+
+    global _GIT_SHA_CACHE
+    if _GIT_SHA_CACHE is None:
+        _GIT_SHA_CACHE = shared.resolve_git_sha(ENV, SETTINGS, logger=BASE_LOGGER)
+    return _GIT_SHA_CACHE
 
 
 def build_github_permalink(file: Path, span: LineSpan) -> str | None:

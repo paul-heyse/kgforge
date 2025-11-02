@@ -26,7 +26,6 @@ import numpy as np
 from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.search import (
     LEXICAL_FIELDS,
-    CatalogSearchError,
     EmbeddingModelProtocol,
     SearchDocument,
     SearchOptions,
@@ -34,9 +33,12 @@ from kgfoundry.agent_catalog.search import (
     SearchResult,
     VectorArray,
     build_default_search_options,
+    build_faceted_search_options,
     load_faiss,
 )
 from kgfoundry.agent_catalog.sqlite import write_sqlite_catalog
+from tools._shared.logging import get_logger, with_fields
+from tools._shared.proc import ToolExecutionError, run_tool
 from tools.docs.catalog_models import (
     AgentCatalog,
     AgentHints,
@@ -51,8 +53,6 @@ from tools.docs.catalog_models import (
     SymbolRecord,
 )
 from tools.docs.errors import CatalogBuildError
-from tools.shared.logging import get_logger, with_fields
-from tools.shared.proc import ToolExecutionError, run_tool
 
 type CatalogPayload = Mapping[
     str, bool | dict[str, object] | float | int | list[object] | str | None
@@ -1421,7 +1421,7 @@ def search_catalog(
     request = SearchRequest(repo_root=repo_root, query=query, k=k)
     try:
         return catalog_search.search_catalog(catalog, request=request, options=options)
-    except CatalogSearchError as exc:
+    except CatalogBuildError as exc:
         raise CatalogBuildError(str(exc)) from exc
 
 
@@ -1474,12 +1474,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.search_query:
         try:
             facets = _parse_facet_args(args.search_facet)
-            catalog_path = builder._resolve_artifact_path(args.output)
+            catalog_path = builder._resolve_artifact_path(args.output)  # pylint: disable=protected-access
             catalog_data = load_catalog(catalog_path, load_shards=True)
-            options = build_default_search_options(
-                alpha=float(args.search_alpha),
-                facets=facets,
-                candidate_pool=int(args.search_candidates),
+            options = (
+                build_faceted_search_options(
+                    facets=facets,
+                    alpha=float(args.search_alpha),
+                    candidate_pool=int(args.search_candidates),
+                )
+                if facets
+                else build_default_search_options(
+                    alpha=float(args.search_alpha),
+                    candidate_pool=int(args.search_candidates),
+                )
             )
             results = search_catalog(
                 catalog_data,

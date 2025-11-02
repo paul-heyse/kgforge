@@ -6,7 +6,7 @@ import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, cast
+from typing import TYPE_CHECKING, Final, TypeGuard, cast
 
 import duckdb
 import numpy as np
@@ -27,7 +27,7 @@ from search_api.faiss_gpu import (
     configure_search_parameters,
     detect_gpu_context,
 )
-from search_api.types import FaissModuleProtocol
+from search_api.types import FaissIndexProtocol, FaissModuleProtocol
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     import numpy.typing as npt
@@ -71,6 +71,20 @@ __navmap__: Final[NavMap] = {
 }
 
 logger = logging.getLogger(__name__)
+
+
+def _is_faiss_index(candidate: object) -> TypeGuard[FaissIndexProtocol]:
+    """Return True when ``candidate`` exposes the FAISS index protocol surface."""
+    if candidate is None:
+        return False
+
+    required_methods = ("search", "add", "train", "add_with_ids")
+    for method in required_methods:
+        attribute: object | None = getattr(candidate, method, None)
+        if attribute is None or not callable(attribute):
+            return False
+    return True
+
 
 MIN_FACTORY_DIMENSION: Final[int] = 64
 
@@ -122,7 +136,7 @@ class FaissAdapter:
         self.use_cuvs = use_cuvs
         self._gpu_devices = tuple(int(device) for device in (gpu_devices or (0,)))
 
-        self.index: object = None  # FaissIndexProtocol | None
+        self.index: FaissIndexProtocol | None = None
         self.idmap: list[str] | None = None
         self.vecs: DenseVecs | None = None
 
@@ -145,6 +159,7 @@ class FaissAdapter:
         module = faiss
         if not HAVE_FAISS or module is None:
             logger.debug("FAISS unavailable; CPU search fallback will be used")
+            self.index = None
             return
         faiss_module: FaissModuleProtocol = module
 
@@ -162,7 +177,7 @@ class FaissAdapter:
             cpu_index.add_with_ids(vectors.matrix, id_array)
 
             gpu_context = None
-            index = cpu_index
+            index: FaissIndexProtocol = cpu_index
             if self.use_gpu:
                 gpu_context = detect_gpu_context(
                     faiss_module,
@@ -178,12 +193,16 @@ class FaissAdapter:
                 nprobe=self.nprobe,
                 gpu_enabled=gpu_context is not None,
             )
-
-            self.index = index
-            self._gpu_context = gpu_context
         except Exception as exc:  # pragma: no cover - defensive
             msg = f"Failed to build FAISS index: {exc}"
             raise IndexBuildError(msg) from exc
+
+        if not _is_faiss_index(index):
+            msg = "FAISS index failed protocol validation"
+            raise IndexBuildError(msg)
+
+        self.index = index
+        self._gpu_context = gpu_context
 
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
         """Load an existing CPU index or fall back to rebuilding from vectors.
@@ -234,9 +253,14 @@ class FaissAdapter:
                         gpu_enabled=gpu_context is not None,
                     )
 
-                    self.index = cpu_index
-                    self._gpu_context = gpu_context
-                    return
+                    if not _is_faiss_index(cpu_index):
+                        logger.warning(
+                            "Loaded FAISS index failed protocol validation; rebuilding",
+                        )
+                    else:
+                        self.index = cpu_index
+                        self._gpu_context = gpu_context
+                        return
 
         self.build()
 
@@ -270,12 +294,17 @@ class FaissAdapter:
         normalized_query = normalize_l2(query_array, axis=1)
 
         module = faiss
-        if module is not None and self.index is not None and self.idmap is not None:
-            distances_array, indices_array = self.index.search(normalized_query, k)
-            index_array = cast(IntVector, indices_array[0].astype(np.int64, copy=False))
-            score_array = cast(FloatVector, distances_array[0].astype(np.float32, copy=False))
-            index_list = cast(list[int], index_array.tolist())
-            score_list = cast(list[float], score_array.tolist())
+        if module is not None and HAVE_FAISS:
+            index_candidate = self._require_index()
+            if self.idmap is None:
+                msg = "ID map not initialized"
+                raise RuntimeError(msg)
+
+            distances_array, indices_array = index_candidate.search(normalized_query, k)
+            distance_row = cast(FloatVector, distances_array[0])
+            index_row = cast(IntVector, indices_array[0])
+            index_list = cast(list[int], index_row.tolist())
+            score_list = cast(list[float], distance_row.tolist())
             results: list[tuple[str, float]] = []
             for idx, score in zip(index_list, score_list, strict=False):
                 if idx < 0 or idx >= len(self.idmap):
@@ -307,30 +336,55 @@ class FaissAdapter:
 
         idmap_path = Path(idmap_uri or f"{index_uri}.ids.npy")
         idmap_path.parent.mkdir(parents=True, exist_ok=True)
-        np.save(idmap_path, np.asarray(self.vecs.ids, dtype=np.str_))
+        idmap_array: StrArray = np.asarray(self.vecs.ids, dtype=np.str_)
+        np.save(idmap_path, idmap_array)
 
         module = faiss
-        if module is None or self.index is None:
-            logger.debug("FAISS index not available; saved ID map only")
-            return
+        if module is None or not HAVE_FAISS:
+            msg = "FAISS module not available; cannot save index"
+            raise RuntimeError(msg)
 
-        module.write_index(self.index, index_uri)
+        index_candidate = self._require_index()
+        module.write_index(index_candidate, index_uri)
 
     # Internal helpers -------------------------------------------------------
 
+    def _require_index(self) -> FaissIndexProtocol:
+        """Return the initialized FAISS index or raise."""
+        index_candidate = self.index
+        if index_candidate is None:
+            msg = "FAISS index not initialized"
+            raise RuntimeError(msg)
+
+        if not _is_faiss_index(index_candidate):
+            msg = "FAISS index failed protocol validation"
+            raise RuntimeError(msg)
+
+        return index_candidate
+
     def _cpu_search(self, query: FloatVector, k: int) -> list[tuple[str, float]]:
         """Search using CPU fallback (inner product)."""
-        if self._cpu_matrix is None or self.idmap is None:
+        cpu_matrix = self._cpu_matrix
+        idmap = self.idmap
+        if cpu_matrix is None or idmap is None:  # pragma: no cover - defensive fallback
             return []
 
-        scores_raw = self._cpu_matrix @ query.T
-        scores = cast(FloatVector, scores_raw.astype(np.float32, copy=False).ravel())
+        matrix: FloatMatrix = cpu_matrix
+        vector: FloatVector = query
+        scores_buffer: FloatVector = np.empty(matrix.shape[0], dtype=np.float32)
+        np.dot(matrix, vector, out=scores_buffer)
+        scores: FloatVector = scores_buffer
+        idmap_list: list[str] = idmap
+        score_list = cast(list[float], scores.tolist())
         limit = min(k, scores.size)
         if limit == 0:
             return []
 
         indices = topk_indices(scores, limit)
-        return [(self.idmap[idx], float(scores[idx])) for idx in indices if idx < len(self.idmap)]
+        index_list = cast(list[int], indices.tolist())
+        return [
+            (idmap_list[idx], float(score_list[idx])) for idx in index_list if idx < len(idmap_list)
+        ]
 
     def _resolve_metric(self, module: FaissModuleProtocol) -> int:
         """Resolve metric string to FAISS metric constant.

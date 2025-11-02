@@ -22,7 +22,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, cast
 
-from tools.shared.logging import get_logger
+from tools._shared.logging import get_logger
 
 if TYPE_CHECKING:
     pass

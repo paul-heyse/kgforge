@@ -8,9 +8,9 @@ from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
+from tools._shared.logging import get_logger
+from tools._shared.proc import run_tool
 from tools.detect_pkg import detect_primary
-from tools.shared.logging import get_logger
-from tools.shared.proc import run_tool
 
 LOGGER = get_logger(__name__)
 
@@ -97,14 +97,14 @@ def _build_template(root_package: str) -> str:
                 ("tools.docstring_builder.cli",),
                 ("tools.docstring_builder.orchestrator",),
                 tuple(docbuilder_domain),
-                ("tools.shared", "tools._shared"),
+                ("tools._shared",),
             ],
         ),
         _format_forbid_contract(
             "docstring_builder_adapters_no_shared",
             "Docstring builder adapters avoid shared internals",
             ("tools.docstring_builder.cli",),
-            ("tools.shared", "tools._shared"),
+            ("tools._shared",),
         ),
         _format_layers_contract(
             "docs_layers",
@@ -112,14 +112,14 @@ def _build_template(root_package: str) -> str:
             [
                 DOCS_ADAPTERS,
                 tuple(docs_domain),
-                ("tools.shared", "tools._shared"),
+                ("tools._shared",),
             ],
         ),
         _format_forbid_contract(
             "docs_adapters_no_shared",
             "Docs adapters avoid shared internals",
             DOCS_ADAPTERS,
-            ("tools.shared", "tools._shared"),
+            ("tools._shared",),
         ),
         _format_layers_contract(
             "navmap_layers",
@@ -127,14 +127,14 @@ def _build_template(root_package: str) -> str:
             [
                 NAVMAP_ADAPTERS,
                 tuple(navmap_domain),
-                ("tools.shared", "tools._shared"),
+                ("tools._shared",),
             ],
         ),
         _format_forbid_contract(
             "navmap_adapters_no_shared",
             "Navmap adapters avoid shared internals",
             NAVMAP_ADAPTERS,
-            ("tools.shared", "tools._shared"),
+            ("tools._shared",),
         ),
     ]
     sections = [f"[importlinter]\nroot_package = {root_package}"]

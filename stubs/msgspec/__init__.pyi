@@ -1,0 +1,26 @@
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any, Protocol, TypeVar
+
+T = TypeVar("T")
+S = TypeVar("S")
+
+class Struct: ...
+class UnsetType: ...
+
+UNSET: UnsetType
+
+class ValidationError(Exception): ...
+class DecodeError(Exception): ...
+
+def convert(obj: Any, *, type: type[T]) -> T: ...
+def to_builtins(obj: Any) -> dict[str, Any]: ...
+def field(*, default_factory: Callable[[], T]) -> T: ...
+
+class _StructsModule(Protocol):
+    def replace(self, obj: S, /, **changes: Any) -> S: ...
+
+structs: _StructsModule
+
+from . import json as json

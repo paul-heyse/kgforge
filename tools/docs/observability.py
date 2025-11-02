@@ -14,9 +14,11 @@ from __future__ import annotations
 import time
 import uuid
 from contextlib import contextmanager
-from typing import TYPE_CHECKING
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, cast
 
-from tools.shared.prometheus import (
+from tools._shared.logging import get_logger, with_fields
+from tools._shared.prometheus import (
     CollectorRegistry,
     CounterLike,
     HistogramLike,
@@ -27,6 +29,9 @@ from tools.shared.prometheus import (
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
+
+_LOGGER = get_logger(__name__)
 
 
 class DocumentationMetrics:
@@ -63,95 +68,104 @@ class DocumentationMetrics:
         registry : CollectorRegistry | None, optional
             Prometheus registry (defaults to default registry).
         """
-        resolved_registry = registry if registry is not None else get_default_registry()
-        self.registry = resolved_registry
+        resolved = (
+            registry if registry is not None else cast(CollectorRegistry, get_default_registry())
+        )
+        self.registry = resolved
 
         self.catalog_runs_total = build_counter(
             "docs_catalog_runs_total",
             "Total number of catalog build operations",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.graphs_runs_total = build_counter(
             "docs_graphs_runs_total",
             "Total number of graph build operations",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.test_map_runs_total = build_counter(
             "docs_test_map_runs_total",
             "Total number of test map build operations",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.schemas_runs_total = build_counter(
             "docs_schemas_runs_total",
             "Total number of schema export operations",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.portal_runs_total = build_counter(
             "docs_portal_runs_total",
             "Total number of portal render operations",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.analytics_runs_total = build_counter(
             "docs_analytics_runs_total",
             "Total number of analytics build operations",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.catalog_duration_seconds = build_histogram(
             "docs_catalog_duration_seconds",
             "Duration of catalog build operations in seconds",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.graphs_duration_seconds = build_histogram(
             "docs_graphs_duration_seconds",
             "Duration of graph build operations in seconds",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.test_map_duration_seconds = build_histogram(
             "docs_test_map_duration_seconds",
             "Duration of test map build operations in seconds",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.schemas_duration_seconds = build_histogram(
             "docs_schemas_duration_seconds",
             "Duration of schema export operations in seconds",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.portal_duration_seconds = build_histogram(
             "docs_portal_duration_seconds",
             "Duration of portal render operations in seconds",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
         self.analytics_duration_seconds = build_histogram(
             "docs_analytics_duration_seconds",
             "Duration of analytics build operations in seconds",
             ["status"],
-            registry=resolved_registry,
+            registry=self.registry,
         )
 
 
-_METRICS_REGISTRY: DocumentationMetrics | None = None
+@dataclass(slots=True)
+class _DocsMetricsCache:
+    """Singleton cache for documentation metrics."""
+
+    registry: DocumentationMetrics | None = None
+
+
+_DOCS_CACHE = _DocsMetricsCache()
 
 
 def get_metrics_registry() -> DocumentationMetrics:
@@ -167,10 +181,9 @@ def get_metrics_registry() -> DocumentationMetrics:
     >>> metrics = get_metrics_registry()
     >>> metrics.catalog_runs_total.labels(status="success").inc()
     """
-    global _METRICS_REGISTRY
-    if _METRICS_REGISTRY is None:
-        _METRICS_REGISTRY = DocumentationMetrics()
-    return _METRICS_REGISTRY
+    if _DOCS_CACHE.registry is None:
+        _DOCS_CACHE.registry = DocumentationMetrics()
+    return _DOCS_CACHE.registry
 
 
 def get_correlation_id() -> str:
@@ -232,6 +245,12 @@ def record_operation_metrics(
     if correlation_id is None:
         correlation_id = get_correlation_id()
 
+    log_adapter = with_fields(
+        _LOGGER,
+        operation=operation,
+        correlation_id=correlation_id,
+    )
+
     start_time = time.monotonic()
     final_status = status
 
@@ -261,6 +280,12 @@ def record_operation_metrics(
         elif operation == "analytics":
             metrics.analytics_runs_total.labels(status=final_status).inc()
             metrics.analytics_duration_seconds.labels(status=final_status).observe(duration)
+
+        with_fields(
+            log_adapter,
+            status=final_status,
+            duration_seconds=duration,
+        ).info("Documentation operation completed")
 
 
 __all__ = [

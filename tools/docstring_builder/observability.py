@@ -27,8 +27,10 @@ import sys
 import time
 import uuid
 from contextlib import contextmanager
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
+from tools._shared.logging import get_logger, with_fields
 from tools._shared.prometheus import (
     CollectorRegistry,
     CounterLike,
@@ -40,6 +42,9 @@ from tools._shared.prometheus import (
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
+
+_LOGGER = get_logger(__name__)
 
 
 class DocstringBuilderMetrics:
@@ -70,8 +75,10 @@ class DocstringBuilderMetrics:
         registry : CollectorRegistry | None, optional
             Prometheus registry (defaults to default registry).
         """
-        resolved_registry = registry if registry is not None else get_default_registry()
-        self.registry = cast(CollectorRegistry, resolved_registry)
+        resolved_registry = (
+            registry if registry is not None else cast(CollectorRegistry, get_default_registry())
+        )
+        self.registry = resolved_registry
 
         self.runs_total = build_counter(
             "docbuilder_runs_total",
@@ -116,7 +123,14 @@ class DocstringBuilderMetrics:
         )
 
 
-_METRICS_REGISTRY: DocstringBuilderMetrics | None = None
+@dataclass(slots=True)
+class _DocstringBuilderMetricsCache:
+    """Singleton cache for docstring builder metrics."""
+
+    registry: DocstringBuilderMetrics | None = None
+
+
+_METRICS_CACHE = _DocstringBuilderMetricsCache()
 
 
 def get_metrics_registry() -> DocstringBuilderMetrics:
@@ -132,10 +146,9 @@ def get_metrics_registry() -> DocstringBuilderMetrics:
     >>> metrics = get_metrics_registry()
     >>> metrics.runs_total.labels(status="success").inc()
     """
-    global _METRICS_REGISTRY  # noqa: PLW0603
-    if _METRICS_REGISTRY is None:
-        _METRICS_REGISTRY = DocstringBuilderMetrics()
-    return _METRICS_REGISTRY
+    if _METRICS_CACHE.registry is None:
+        _METRICS_CACHE.registry = DocstringBuilderMetrics()
+    return _METRICS_CACHE.registry
 
 
 def get_correlation_id() -> str:
@@ -197,6 +210,12 @@ def record_operation_metrics(
     if correlation_id is None:
         correlation_id = get_correlation_id()
 
+    log_adapter = with_fields(
+        _LOGGER,
+        operation=operation,
+        correlation_id=correlation_id,
+    )
+
     start_time = time.monotonic()
     final_status = status
 
@@ -220,6 +239,12 @@ def record_operation_metrics(
             metrics.cli_duration_seconds.labels(command="unknown", status=final_status).observe(
                 duration
             )
+
+        with_fields(
+            log_adapter,
+            status=final_status,
+            duration_seconds=duration,
+        ).info("Docstring builder operation completed")
 
 
 __all__ = [

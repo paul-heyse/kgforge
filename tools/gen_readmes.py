@@ -21,11 +21,11 @@ from pathlib import Path
 from typing import Final, NoReturn, Protocol, assert_never, cast
 from urllib.parse import urlparse
 
+from tools._shared.logging import get_logger, with_fields
+from tools._shared.problem_details import ProblemDetailsDict, build_problem_details
+from tools._shared.proc import ToolExecutionError, run_tool
 from tools.detect_pkg import detect_packages, detect_primary
 from tools.griffe_utils import GriffeAPI, resolve_griffe
-from tools.shared.logging import get_logger, with_fields
-from tools.shared.problem_details import ProblemDetailsDict, build_problem_details
-from tools.shared.proc import ToolExecutionError, run_tool
 
 ROOT = Path(__file__).resolve().parents[1]
 

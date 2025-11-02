@@ -146,7 +146,7 @@ class FixtureIndex:
         self.tf: list[dict[str, int]] = []
         self._load_from_duckdb()
 
-    def _load_from_duckdb(self) -> None:
+    def _load_from_duckdb(self) -> None:  # noqa: PLR0914
         """Describe  load from duckdb.
 
         <!-- auto:docstring-builder v1 -->

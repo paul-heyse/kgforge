@@ -1,5 +1,7 @@
 """Compatibility shim exposing legacy docstring generation utilities."""
 
+# pylint: disable=protected-access
+
 from pathlib import Path
 
 from tools.docstring_builder import legacy as _legacy
@@ -37,7 +39,7 @@ def normalize_qualified_name(name: str) -> str:
     return _legacy._normalize_qualified_name(name)
 
 
-def required_sections(
+def required_sections(  # noqa: PLR0913
     kind: str,
     parameters: list[DocstringIRParameter],
     returns: str | None,
@@ -47,6 +49,7 @@ def required_sections(
     is_public: bool,
 ) -> list[str]:
     """Return the ordered docstring sections required for the provided symbol metadata."""
+    _ = name  # Retained for compatibility with legacy signature
     context = _legacy._RequiredSectionsContext(
         kind=kind,
         parameters=parameters,

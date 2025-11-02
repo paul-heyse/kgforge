@@ -18,9 +18,10 @@ import json
 import logging
 import sys
 import time
-from collections.abc import Iterator, Mapping
-from contextlib import contextmanager
-from typing import Any, Final, TypedDict, cast
+from collections.abc import Mapping
+from contextlib import AbstractContextManager, contextmanager
+from types import TracebackType
+from typing import TYPE_CHECKING, Any, Final, TypedDict, cast
 
 from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.types import JsonValue
@@ -219,7 +220,16 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(data, default=str)
 
 
-class LoggerAdapter(logging.LoggerAdapter):
+if TYPE_CHECKING:
+
+    class _LoggerAdapterBase(logging.LoggerAdapter):  # pragma: no cover - typing helper
+        logger: logging.Logger
+        extra: Mapping[str, object] | None
+else:
+    _LoggerAdapterBase = logging.LoggerAdapter
+
+
+class LoggerAdapter(_LoggerAdapterBase):
     """Logger adapter that injects structured context fields.
 
     <!-- auto:docstring-builder v1 -->
@@ -243,6 +253,9 @@ class LoggerAdapter(logging.LoggerAdapter):
     >>> logger.info("Search started", extra={"operation": "search", "status": "started"})
     >>> # Correlation ID is automatically injected from context
     """
+
+    logger: logging.Logger
+    extra: Mapping[str, object] | None
 
     def process(self, msg: str, kwargs: Mapping[str, Any]) -> tuple[str, Any]:
         """Process log message and inject structured fields.
@@ -716,7 +729,7 @@ class CorrelationContext:
         self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
-        exc_tb: object,
+        exc_tb: TracebackType | None,
     ) -> None:
         """Exit correlation context and restore previous correlation ID.
 
@@ -733,11 +746,42 @@ class CorrelationContext:
             _correlation_id.reset(self._token)
 
 
-@contextmanager
+class _WithFieldsContext(AbstractContextManager[LoggerAdapter]):
+    """Context manager implementation for `with_fields`."""
+
+    def __init__(
+        self, logger: logging.Logger | LoggerAdapter, fields: Mapping[str, object]
+    ) -> None:
+        self._logger = logger
+        self._fields = dict(fields)
+        self._token: contextvars.Token[str | None] | None = None
+        self._adapter: LoggerAdapter | None = None
+
+    def __enter__(self) -> LoggerAdapter:
+        base_logger = (
+            self._logger.logger if isinstance(self._logger, LoggerAdapter) else self._logger
+        )
+        correlation_id = self._fields.get("correlation_id")
+        if isinstance(correlation_id, str):
+            self._token = _correlation_id.set(correlation_id)
+        self._adapter = LoggerAdapter(base_logger, dict(self._fields))
+        return self._adapter
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool | None:
+        if self._token is not None:
+            _correlation_id.reset(self._token)
+        return None
+
+
 def with_fields(
     logger: logging.Logger | LoggerAdapter,
     **fields: object,
-) -> Iterator[LoggerAdapter]:
+) -> AbstractContextManager[LoggerAdapter]:
     """Context manager for attaching structured fields to log entries.
 
     <!-- auto:docstring-builder v1 -->
@@ -754,47 +798,12 @@ def with_fields(
     **fields : object
         Structured fields to inject into all log entries (e.g., correlation_id, operation, status).
 
-    Yields
-    ------
-    LoggerAdapter
+    Returns
+    -------
+    ContextManager[LoggerAdapter]
         Logger adapter with bound fields and correlation_id in context.
-
-    Examples
-    --------
-    >>> from kgfoundry_common.logging import get_logger, with_fields
-    >>> logger = get_logger(__name__)
-    >>> with with_fields(logger, correlation_id="req-123", operation="build") as adapter:
-    ...     adapter.info("Processing files", extra={"file_count": 10})
-    ...     # correlation_id="req-123" and operation="build" are auto-injected
-    >>> # Correlation ID is automatically cleared when context exits
-
-    Notes
-    -----
-    - **Correlation ID propagation**: If `correlation_id` is provided in fields,
-      it is set in contextvars for async propagation, then restored when the
-      context exits.
-    - **Field merging**: Fields provided to `with_fields` are merged with
-      fields in `extra` dicts passed to log calls.
-    - **NullHandler**: Libraries should use `get_logger()` which adds NullHandler
-      to prevent duplicate handlers in applications.
     """
-    # Extract underlying logger if already wrapped
-    base_logger = logger.logger if isinstance(logger, LoggerAdapter) else logger
-
-    # Set correlation_id in context if provided
-    correlation_id = fields.get("correlation_id")
-    correlation_token: contextvars.Token[str | None] | None = None
-    if correlation_id is not None and isinstance(correlation_id, str):
-        correlation_token = _correlation_id.set(correlation_id)
-
-    try:
-        # Create adapter with fields in extra dict
-        adapter = LoggerAdapter(base_logger, dict(fields))
-        yield adapter
-    finally:
-        # Restore previous correlation_id when context exits
-        if correlation_token is not None:
-            _correlation_id.reset(correlation_token)
+    return _WithFieldsContext(logger, fields)
 
 
 def measure_duration() -> tuple[float, float]:

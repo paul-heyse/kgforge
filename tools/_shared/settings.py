@@ -10,13 +10,13 @@ required configuration is missing.
 
 from __future__ import annotations
 
-import inspect
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from fnmatch import fnmatch
 from pathlib import Path
-from typing import Final, TypeVar, cast
+from typing import Final, cast
 
 from pydantic import Field, ValidationError, field_validator
+from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from tools._shared.problem_details import JsonValue, ProblemDetailsDict, build_problem_details
@@ -44,14 +44,12 @@ class SettingsError(RuntimeError):
         self.errors: tuple[dict[str, JsonValue], ...] = tuple(errors)
 
 
-_SettingsT = TypeVar("_SettingsT", bound=BaseSettings)
-
 _SETTINGS_CACHE: dict[str, ToolRuntimeSettings] = {}
 
 
-def load_settings(
-    settings_factory: Callable[[], _SettingsT],
-) -> _SettingsT:
+def load_settings[SettingsT: BaseSettings](
+    settings_factory: Callable[[], SettingsT] | type[SettingsT],
+) -> SettingsT:
     """Instantiate settings via ``settings_factory`` with structured error handling.
 
     Parameters
@@ -72,14 +70,10 @@ def load_settings(
     try:
         return settings_factory()
     except ValidationError as exc:
-        if inspect.isclass(settings_factory):
-            class_factory = cast(type[BaseSettings], settings_factory)
-            settings_name = class_factory.__name__
-        else:
-            attr_name: object = getattr(settings_factory, "__name__", None)
-            settings_name = (
-                attr_name if isinstance(attr_name, str) else settings_factory.__class__.__name__
-            )
+        attr_name: object = getattr(settings_factory, "__name__", None)
+        settings_name = (
+            attr_name if isinstance(attr_name, str) else settings_factory.__class__.__name__
+        )
 
         raw_errors: Sequence[object] = exc.errors()
         error_dicts: tuple[dict[str, JsonValue], ...] = tuple(
@@ -138,7 +132,14 @@ class ToolRuntimeSettings(BaseSettings):
     @classmethod
     def _normalise_allowlist(cls, value: object) -> tuple[str, ...]:
         if value is None:
-            return cast(tuple[str, ...], cls.model_fields["exec_allowlist"].default)
+            fields = cast(Mapping[str, FieldInfo], cls.model_fields)
+            default_field = fields.get("exec_allowlist")
+            if default_field is None:
+                return ()
+            default_value: object = default_field.default
+            if isinstance(default_value, tuple):
+                return tuple(str(part) for part in default_value)
+            return ()
         if isinstance(value, str):
             tokens = [part.strip() for part in value.split(",") if part.strip()]
             return tuple(tokens)

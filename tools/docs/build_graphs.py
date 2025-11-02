@@ -21,6 +21,7 @@ import warnings
 from collections.abc import Iterator, Mapping, Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from types import ModuleType
@@ -1147,7 +1148,9 @@ def collapse_to_packages(dot_path: Path) -> DiGraph:
         pkg_dst = _pkg_of(module_names.get(target, str(target)))
         if pkg_src == pkg_dst:
             continue
-        weight = collapsed.get_edge_data(pkg_src, pkg_dst, {}).get("weight", 0) + 1
+        raw_weight = collapsed.get_edge_data(pkg_src, pkg_dst, {}).get("weight", 0)
+        existing_weight = int(raw_weight) if isinstance(raw_weight, (int, float)) else 0
+        weight = existing_weight + 1
         collapsed.add_edge(pkg_src, pkg_dst, weight=weight)
     return collapsed
 
@@ -1350,7 +1353,8 @@ def package_snapshot_digest(pkg: str) -> str:
 
         try:
             with entry.open("rb") as fh:
-                for chunk in iter(lambda: fh.read(8192), b""):
+                read_chunk = partial(fh.read, 8192)
+                for chunk in iter(read_chunk, b""):
                     h.update(chunk)
         except OSError:
             # Skip files we cannot read; treat as unchanged.
@@ -1988,7 +1992,7 @@ def _load_layers_config(path: str) -> LayerConfig:
         message = f"Layers config '{file_path}' must be a file"
         raise SharedValidationError(message)
     try:
-        data = yaml.safe_load(file_path.read_text())
+        data = yaml.safe_load(file_path.read_text(encoding="utf-8"))
     except YamlError as exc:
         message = f"Layers config '{file_path}' is not valid YAML"
         raise SharedValidationError(message) from exc
@@ -2028,7 +2032,7 @@ def _load_allowlist(path: str) -> dict[str, object]:
         message = f"Allowlist '{file_path}' must be a file"
         raise SharedValidationError(message)
     try:
-        data = json.loads(file_path.read_text())
+        data = json.loads(file_path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:  # pragma: no cover - malformed JSON
         message = f"Allowlist '{file_path}' is not valid JSON"
         raise SharedValidationError(message) from exc

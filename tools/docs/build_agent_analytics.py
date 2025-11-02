@@ -15,6 +15,7 @@ from msgspec import DecodeError
 from msgspec import json as msgspec_json
 
 from kgfoundry.agent_catalog.models import load_catalog_payload
+from tools._shared.schema import validate_tools_payload as _validate_tools_payload
 from tools.docs.analytics_models import (
     ANALYTICS_SCHEMA,
     AgentAnalyticsDocument,
@@ -25,7 +26,6 @@ from tools.docs.analytics_models import (
     PortalSessions,
     RepoInfo,
 )
-from tools.shared.schema import validate_tools_payload as _validate_tools_payload
 
 type JSONMapping = Mapping[str, object]
 
@@ -103,7 +103,8 @@ def _load_previous(path: Path) -> AgentAnalyticsDocument | None:
         return None
     raw = path.read_bytes()
     try:
-        decoded: AgentAnalyticsDocument = msgspec_json.decode(raw, type=AgentAnalyticsDocument)
+        document_type: type[AgentAnalyticsDocument] = AgentAnalyticsDocument
+        decoded: AgentAnalyticsDocument = msgspec_json.decode(raw, type=document_type)
     except DecodeError:
         try:
             legacy_raw: object = json.loads(raw.decode("utf-8"))

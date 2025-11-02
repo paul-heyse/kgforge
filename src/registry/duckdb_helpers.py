@@ -205,7 +205,7 @@ def connect(
     return conn
 
 
-def execute(
+def execute(  # noqa: PLR0913
     conn: DuckDBPyConnection,
     sql: str,
     params: Params = None,
@@ -293,7 +293,7 @@ def execute(
             return relation
 
 
-def fetch_all(
+def fetch_all(  # noqa: PLR0913
     conn: DuckDBPyConnection,
     sql: str,
     params: Params = None,
@@ -346,7 +346,7 @@ def fetch_all(
     return relation.fetchall()
 
 
-def fetch_one(
+def fetch_one(  # noqa: PLR0913
     conn: DuckDBPyConnection,
     sql: str,
     params: Params = None,

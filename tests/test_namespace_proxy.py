@@ -7,8 +7,14 @@ caching, and error handling without relying on Any types.
 from __future__ import annotations
 
 from collections.abc import Callable
+from types import ModuleType
 
 import pytest
+
+
+def _set_module_attr(module: ModuleType, name: str, value: object) -> None:
+    """Assign an attribute on a module while preserving static typing."""
+    setattr(module, name, value)
 
 
 class TestNamespaceRegistry:
@@ -164,33 +170,29 @@ class TestNamespaceHelpers:
 
     def test_namespace_exports_with_all_attribute(self) -> None:
         """Test that namespace_exports respects __all__ when present."""
-        import types
-
         from kgfoundry._namespace_proxy import namespace_exports
 
-        module = types.ModuleType("test_module")
+        module = ModuleType("test_module")
         all_exports: list[str] = ["public_func", "public_class"]
 
         def _public_func() -> None:
             return None
 
-        module.__all__ = all_exports
-        module.public_func = _public_func
-        module.public_class = type("PublicClass", (), {})
-        module._private = "should_not_appear"
+        _set_module_attr(module, "__all__", all_exports)
+        _set_module_attr(module, "public_func", _public_func)
+        _set_module_attr(module, "public_class", type("PublicClass", (), {}))
+        _set_module_attr(module, "_private", "should_not_appear")
 
         exports = namespace_exports(module)
         assert set(exports) == {"public_func", "public_class"}
 
     def test_namespace_exports_without_all_attribute(self) -> None:
         """Test that namespace_exports filters by convention when __all__ missing."""
-        import types
-
         from kgfoundry._namespace_proxy import namespace_exports
 
-        module = types.ModuleType("test_module")
-        module.public_attr = "public"
-        module._private_attr = "private"
+        module = ModuleType("test_module")
+        _set_module_attr(module, "public_attr", "public")
+        _set_module_attr(module, "_private_attr", "private")
 
         exports = namespace_exports(module)
         assert "public_attr" in exports
@@ -198,13 +200,11 @@ class TestNamespaceHelpers:
 
     def test_namespace_attach_populates_target(self) -> None:
         """Test that namespace_attach correctly populates target mapping."""
-        import types
-
         from kgfoundry._namespace_proxy import namespace_attach
 
-        module = types.ModuleType("test_module")
-        module.attr1 = "value1"
-        module.attr2 = "value2"
+        module = ModuleType("test_module")
+        _set_module_attr(module, "attr1", "value1")
+        _set_module_attr(module, "attr2", "value2")
 
         target: dict[str, object] = {}
         namespace_attach(module, target, ["attr1", "attr2"])
@@ -213,14 +213,12 @@ class TestNamespaceHelpers:
 
     def test_namespace_dir_combines_exports_and_module_attrs(self) -> None:
         """Test that namespace_dir combines exports with non-dunder module attrs."""
-        import types
-
         from kgfoundry._namespace_proxy import namespace_dir
 
-        module = types.ModuleType("test_module")
-        module.exported1 = "export1"
-        module.extra_attr = "extra"
-        module.__dunder__ = "ignored"
+        module = ModuleType("test_module")
+        _set_module_attr(module, "exported1", "export1")
+        _set_module_attr(module, "extra_attr", "extra")
+        _set_module_attr(module, "__dunder__", "ignored")
 
         dir_result = namespace_dir(module, ["exported1", "exported2"])
         assert "exported1" in dir_result
@@ -230,12 +228,10 @@ class TestNamespaceHelpers:
 
     def test_namespace_getattr_returns_attribute(self) -> None:
         """Test that namespace_getattr correctly retrieves attributes."""
-        import types
-
         from kgfoundry._namespace_proxy import namespace_getattr
 
-        module = types.ModuleType("test_module")
-        module.test_attr = "test_value"
+        module = ModuleType("test_module")
+        _set_module_attr(module, "test_attr", "test_value")
 
         result = namespace_getattr(module, "test_attr")
         assert result == "test_value"

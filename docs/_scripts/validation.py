@@ -45,15 +45,13 @@ import json
 import logging
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from jsonschema import Draft202012Validator
 from jsonschema import exceptions as jsonschema_exceptions
-from tools.shared.problem_details import (
-    ProblemDetailsDict,
-    build_schema_problem_details,
-)
-from tools.shared.proc import ToolExecutionError
+
+if TYPE_CHECKING:  # pragma: no cover - typing imports only
+    from tools._shared.problem_details import ProblemDetailsDict
 
 JsonPayload = Mapping[str, Any] | Sequence[Any] | str | int | float | bool | None
 
@@ -112,6 +110,8 @@ def _problem_for_validation(
     schema_path: Path,
     error: jsonschema_exceptions.ValidationError,
 ) -> ProblemDetailsDict:
+    from tools._shared.problem_details import build_schema_problem_details  # noqa: PLC0415
+
     return build_schema_problem_details(
         error=error,
         type="https://kgfoundry.dev/problems/docs-schema-validation",
@@ -147,6 +147,8 @@ def validate_against_schema(
     try:
         validator.validate(payload)
     except jsonschema_exceptions.ValidationError as exc:  # pragma: no cover - exercised in CLI
+        from tools._shared.proc import ToolExecutionError  # noqa: PLC0415
+
         problem = _problem_for_validation(artifact=artifact, schema_path=schema_path, error=exc)
         message = f"{artifact} failed schema validation"
         raise ToolExecutionError(

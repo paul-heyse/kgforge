@@ -48,12 +48,14 @@ trace_api: _TraceAPI | None
 Status: type[OTStatus] | None
 StatusCode: type[OTStatusCode] | None
 try:  # pragma: no cover - optional dependency guard
-    from opentelemetry import trace as trace_api
+    from opentelemetry import trace as _trace_module
     from opentelemetry.trace import Status, StatusCode
 except ImportError:  # pragma: no cover - optional dependency guard
     trace_api = None
     Status = None
     StatusCode = None
+else:
+    trace_api = cast(_TraceAPI, _trace_module)
 
 
 __all__ = [

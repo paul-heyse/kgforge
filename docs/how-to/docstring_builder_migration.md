@@ -148,7 +148,7 @@ Prometheus metrics are emitted for all operations:
 Logs include correlation IDs and structured fields:
 
 ```python
-from tools.shared.logging import with_fields, get_logger
+from tools._shared.logging import with_fields, get_logger
 
 logger = get_logger(__name__)
 logger = with_fields(logger, correlation_id=correlation_id, operation="harvest")

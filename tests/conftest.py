@@ -13,25 +13,45 @@ from __future__ import annotations
 import json
 import logging
 import sys
-from collections.abc import Generator
+from collections.abc import Callable, Iterable, Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any
+from types import ModuleType
+from typing import TYPE_CHECKING, ParamSpec, Protocol, TypeVar, cast
 
 import pytest
-from prometheus_client import CollectorRegistry
+from _pytest.logging import LogCaptureFixture
+from prometheus_client.metrics_core import Metric
+from prometheus_client.registry import CollectorRegistry
+from prometheus_client.samples import Sample
 
-# Set up path for src packages (after imports above)
 repo_root = Path(__file__).parent.parent
 src_path = repo_root / "src"
 if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
+from kgfoundry_common.problem_details import JsonValue
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+if TYPE_CHECKING:  # pragma: no cover - typing support only
+
+    def fixture(*args: object, **kwargs: object) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
+
+    class _TracerProviderProtocol(Protocol):
+        def add_span_processor(self, processor: object) -> None: ...
+
+    class _SpanExporterProtocol(Protocol):
+        def export(self, spans: list[object]) -> None: ...
+else:
+    fixture = pytest.fixture
+
 # Type aliases
-ProblemDetailsDict = dict[str, Any]
+ProblemDetailsDict = dict[str, JsonValue]
 
 
-def pytest_configure(config) -> None:  # type: ignore[no-untyped-def] - pytest hook signature
+def pytest_configure(config: pytest.Config) -> None:
     """Configure pytest by setting up Python path for src packages.
 
     Parameters
@@ -46,8 +66,8 @@ def pytest_configure(config) -> None:  # type: ignore[no-untyped-def] - pytest h
         sys.path.insert(0, str(src_path))
 
 
-@pytest.fixture
-def temp_index_dir() -> Generator[Path]:
+@fixture
+def temp_index_dir() -> Iterator[Path]:
     """Provide a temporary directory for index operations.
 
     Yields
@@ -59,8 +79,8 @@ def temp_index_dir() -> Generator[Path]:
         yield Path(tmpdir)
 
 
-@pytest.fixture
-def caplog_records(caplog) -> dict[str, list[logging.LogRecord]]:
+@fixture
+def caplog_records(caplog: LogCaptureFixture) -> dict[str, list[logging.LogRecord]]:
     """Capture logs by operation name for structured assertions.
 
     Returns
@@ -72,15 +92,18 @@ def caplog_records(caplog) -> dict[str, list[logging.LogRecord]]:
     def _collect_records() -> dict[str, list[logging.LogRecord]]:
         """Collect records grouped by operation."""
         records_by_op: dict[str, list[logging.LogRecord]] = {}
-        for record in caplog.records:
-            op = record.__dict__.get("operation", "unknown")
+        records = [record for record in caplog.records if isinstance(record, logging.LogRecord)]
+        for record in records:
+            record_dict = cast(dict[str, object], record.__dict__)
+            op_obj = record_dict.get("operation", "unknown")
+            op = op_obj if isinstance(op_obj, str) else "unknown"
             records_by_op.setdefault(op, []).append(record)
         return records_by_op
 
     return _collect_records()
 
 
-@pytest.fixture
+@fixture
 def prometheus_registry() -> CollectorRegistry:
     """Provide an isolated Prometheus registry for metrics capture.
 
@@ -92,18 +115,61 @@ def prometheus_registry() -> CollectorRegistry:
     return CollectorRegistry()
 
 
-# Optional OpenTelemetry imports
-try:
-    from opentelemetry import trace as otel_trace
-    from opentelemetry.sdk.trace import TracerProvider
-    from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+# Optional OpenTelemetry fixtures
 
-    HAVE_OTEL = True
-except ImportError:
-    HAVE_OTEL = False
-    otel_trace = None  # type: ignore[assignment]
-    TracerProvider = None  # type: ignore[assignment]
-    InMemorySpanExporter = None  # type: ignore[assignment]
+
+@fixture
+def otel_span_exporter() -> _SpanExporterProtocol:
+    """Provide an in-memory OpenTelemetry span exporter for testing.
+
+    Skips the depending tests when OpenTelemetry is not installed.
+
+    Returns
+    -------
+    InMemorySpanExporter
+        Span exporter for capturing traces.
+    """
+    exporter_mod = pytest.importorskip(
+        "opentelemetry.sdk.trace.export.in_memory_span_exporter",
+        reason="OpenTelemetry span exporter required for observability tests",
+    )
+    assert isinstance(exporter_mod, ModuleType)
+    exporter_cls = cast(type[object], exporter_mod.InMemorySpanExporter)
+    exporter = exporter_cls()
+    return cast(_SpanExporterProtocol, exporter)
+
+
+@fixture
+def otel_tracer_provider(
+    otel_span_exporter: _SpanExporterProtocol,
+) -> Iterator[_TracerProviderProtocol]:
+    """Provide an OpenTelemetry tracer provider configured with in-memory exporter."""
+    sdk_trace_mod = pytest.importorskip(
+        "opentelemetry.sdk.trace",
+        reason="OpenTelemetry SDK required for observability tests",
+    )
+    assert isinstance(sdk_trace_mod, ModuleType)
+    otel_trace_mod = pytest.importorskip(
+        "opentelemetry.trace",
+        reason="OpenTelemetry API required for observability tests",
+    )
+    assert isinstance(otel_trace_mod, ModuleType)
+
+    tracer_provider_cls = cast(type[object], sdk_trace_mod.TracerProvider)
+    provider = cast(_TracerProviderProtocol, tracer_provider_cls())
+    span_processor = _SimpleSpanProcessor(otel_span_exporter)
+    provider.add_span_processor(span_processor)
+    set_tracer_provider = cast(
+        Callable[[_TracerProviderProtocol], None], otel_trace_mod.set_tracer_provider
+    )
+    get_tracer_provider = cast(
+        Callable[[], _TracerProviderProtocol], otel_trace_mod.get_tracer_provider
+    )
+    set_tracer_provider(provider)
+    try:
+        yield provider
+    finally:
+        set_tracer_provider(get_tracer_provider())
 
 
 def load_problem_details_example(example_name: str) -> ProblemDetailsDict:
@@ -133,11 +199,11 @@ def load_problem_details_example(example_name: str) -> ProblemDetailsDict:
         msg = f"Problem Details example not found: {example_path}"
         raise FileNotFoundError(msg)
 
-    return json.loads(example_path.read_text(encoding="utf-8"))
+    return cast(ProblemDetailsDict, json.loads(example_path.read_text(encoding="utf-8")))
 
 
-@pytest.fixture
-def problem_details_loader():
+@fixture
+def problem_details_loader() -> Callable[[str], ProblemDetailsDict]:
     """Fixture providing access to Problem Details examples.
 
     Yields
@@ -148,8 +214,8 @@ def problem_details_loader():
     return load_problem_details_example
 
 
-@pytest.fixture
-def structured_log_asserter():
+@fixture
+def structured_log_asserter() -> Callable[[logging.LogRecord, set[str]], None]:
     """Provide helpers for asserting structured log fields.
 
     Yields
@@ -176,7 +242,7 @@ def structured_log_asserter():
         AssertionError
             If any required field is missing.
         """
-        record_dict = record.__dict__
+        record_dict = cast(dict[str, object], record.__dict__)
         missing = required_fields - set(record_dict.keys())
         if missing:
             msg = f"Missing fields in log record: {missing}"
@@ -185,8 +251,10 @@ def structured_log_asserter():
     return assert_log_has_fields
 
 
-@pytest.fixture
-def metrics_asserter(prometheus_registry):
+@fixture
+def metrics_asserter(
+    prometheus_registry: CollectorRegistry,
+) -> Callable[[str, int | float | None], None]:
     """Provide helpers for asserting Prometheus metrics.
 
     Yields
@@ -211,12 +279,19 @@ def metrics_asserter(prometheus_registry):
             If metric not found or value mismatch.
         """
         # Collect all families and samples
-        families = list(prometheus_registry.collect())
+        families_iter = cast(Iterable[Metric], prometheus_registry.collect())
+        families = list(families_iter)
         for family in families:
             if family.name == name:
-                samples = list(family.samples)
-                if samples and value is not None:
-                    actual = samples[0].value
+                samples_raw = list(family.samples)
+                if samples_raw and value is not None:
+                    first_sample = samples_raw[0]
+                    sample = (
+                        first_sample
+                        if isinstance(first_sample, Sample)
+                        else cast(Sample, first_sample)
+                    )
+                    actual = float(sample.value)
                     if actual != value:
                         msg = f"Metric {name}: expected {value}, got {actual}"
                         raise AssertionError(msg)
@@ -228,70 +303,25 @@ def metrics_asserter(prometheus_registry):
     return assert_metric
 
 
-@pytest.fixture
-def otel_span_exporter() -> Any:  # noqa: ANN401 - OTEL library typing
-    """Provide an in-memory OpenTelemetry span exporter for testing.
-
-    Yields
-    ------
-    InMemorySpanExporter | None
-        Span exporter for capturing traces (or None if OTEL unavailable).
-    """
-    if not HAVE_OTEL or InMemorySpanExporter is None:
-        yield None
-    else:
-        yield InMemorySpanExporter()
-
-
-@pytest.fixture
-def otel_tracer_provider(otel_span_exporter: Any) -> Any:  # noqa: ANN401 - OTEL library typing
-    """Provide an OpenTelemetry tracer provider configured with in-memory exporter.
-
-    Parameters
-    ----------
-    otel_span_exporter : Any
-        Span exporter fixture (passed through pytest injection).
-
-    Yields
-    ------
-    TracerProvider | None
-        Tracer provider for creating spans (or None if OTEL unavailable).
-    """
-    if not HAVE_OTEL or TracerProvider is None or otel_span_exporter is None:
-        yield None
-    else:
-        provider = TracerProvider()
-        provider.add_span_processor(
-            otel_trace.NoOpSpanProcessor() if otel_trace else None  # type: ignore[misc]
-        )
-        if otel_span_exporter:
-            provider.add_span_processor(
-                _SimpleSpanProcessor(otel_span_exporter)  # type: ignore[arg-type]
-            )
-        otel_trace.set_tracer_provider(provider)  # type: ignore[misc]
-        yield provider
-        otel_trace.set_tracer_provider(otel_trace.get_tracer_provider())  # type: ignore[misc]
-
-
 class _SimpleSpanProcessor:
     """Simple span processor for in-memory collection during tests."""
 
-    def __init__(self, exporter: Any) -> None:  # noqa: ANN401
+    def __init__(self, exporter: _SpanExporterProtocol) -> None:
         """Initialize with exporter.
 
         Parameters
         ----------
-        exporter : Any
+        exporter : _SpanExporterProtocol
             OTEL span exporter.
         """
         self.exporter = exporter
 
-    def on_end(self, span: Any) -> None:  # noqa: ANN401
+    def on_end(self, span: object) -> None:
         """Process ended span.
 
         Parameters
         ----------
-        span : Any
+        span : object
             The ended span.
         """
         self.exporter.export([span])

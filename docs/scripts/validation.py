@@ -1,22 +1,38 @@
-"""Public wrapper for :mod:`docs._scripts.validation`."""
+"""Public facade for :mod:`docs._scripts.validation` with lazy imports."""
 
 from __future__ import annotations
 
 from collections.abc import Iterable
 from importlib import import_module
-from typing import cast
+from types import ModuleType
+from typing import TYPE_CHECKING, cast
 
-_ORIGINAL = import_module("docs._scripts.validation")
+MODULE_PATH = "docs._scripts.validation"
 
-_PUBLIC_NAMES: tuple[str, ...]
-_original_all: object = getattr(_ORIGINAL, "__all__", None)
-if isinstance(_original_all, Iterable) and not isinstance(_original_all, (str, bytes)):
-    _PUBLIC_NAMES = tuple(str(name) for name in _original_all)
-else:
-    _PUBLIC_NAMES = tuple(name for name in dir(_ORIGINAL) if not name.startswith("_"))
+__all__: tuple[str, ...] = ("JsonPayload", "validate_against_schema")
 
-__all__ = _PUBLIC_NAMES
 
-_NAMESPACE: dict[str, object] = globals()
-for _name in __all__:
-    _NAMESPACE[_name] = cast(object, getattr(_ORIGINAL, _name))
+def _load_module() -> ModuleType:
+    return import_module(MODULE_PATH)
+
+
+def __getattr__(name: str) -> object:
+    if name in __all__:
+        module = _load_module()
+        return cast(object, getattr(module, name))
+    message = f"module '{__name__}' has no attribute '{name}'"
+    raise AttributeError(message)
+
+
+def __dir__() -> list[str]:
+    module = _load_module()
+    exports_obj: object | None = getattr(module, "__all__", None)
+    if isinstance(exports_obj, Iterable) and not isinstance(exports_obj, (str, bytes)):
+        export_names = [str(name) for name in exports_obj]
+    else:
+        export_names = [candidate for candidate in dir(module) if not candidate.startswith("_")]
+    return sorted(set(export_names))
+
+
+if TYPE_CHECKING:  # pragma: no cover - typing assistance only
+    from docs._scripts.validation import JsonPayload, validate_against_schema  # noqa: PLC2701

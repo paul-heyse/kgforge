@@ -11,8 +11,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-from docs.scripts import shared
-from docs.scripts.validation import validate_against_schema
+from docs._scripts import shared
+from docs._scripts.validation import validate_against_schema
 from docs.types.artifacts import (
     SymbolDeltaChange,
     symbol_delta_to_payload,
@@ -26,7 +26,7 @@ from tools import (
     render_problem,
     run_tool,
 )
-from tools.shared.proc import ToolExecutionError
+from tools._shared.proc import ToolExecutionError
 
 from kgfoundry_common.errors import DeserializationError, SchemaValidationError, SerializationError
 
