@@ -13,6 +13,7 @@ import pytest
 from docs.types.artifacts import (
     ArtifactValidationError,
     JsonPayload,
+    JsonValue,
     LineSpan,
     SymbolDeltaChange,
     SymbolDeltaPayload,
@@ -24,15 +25,69 @@ from docs.types.artifacts import (
     symbol_index_to_payload,
 )
 
+type JsonObject = dict[str, JsonValue]
+type JsonArray = list[JsonValue]
+type JsonObjectArray = list[JsonObject]
+
 
 def _empty_source_link() -> dict[str, str]:
     """Return a fresh, typed source link mapping."""
     return {}
 
 
+def _source_link(**pairs: str) -> dict[str, str]:
+    """Return a typed source link mapping populated with provided pairs."""
+    return dict(pairs)
+
+
 def _empty_reverse_map() -> dict[str, tuple[str, ...]]:
     """Return a fresh, typed reverse lookup mapping."""
     return {}
+
+
+def _symbol_payload(**overrides: JsonValue) -> dict[str, JsonValue]:
+    """Construct a canonical symbol payload with optional overrides."""
+    payload: dict[str, JsonValue] = {
+        "path": "pkg.func",
+        "kind": "function",
+        "doc": "doc",
+        "tested_by": [],
+        "source_link": cast(JsonValue, _empty_source_link()),
+    }
+    payload.update(overrides)
+    return payload
+
+
+def expect_json_string(value: JsonValue) -> str:
+    if not isinstance(value, str):
+        message = f"Expected str JSON value, got {type(value)!r}"
+        raise TypeError(message)
+    return value
+
+
+def expect_json_int(value: JsonValue) -> int:
+    if not isinstance(value, int):
+        message = f"Expected int JSON value, got {type(value)!r}"
+        raise TypeError(message)
+    return value
+
+
+def expect_json_mapping(value: JsonValue) -> dict[str, JsonValue]:
+    if not isinstance(value, dict):
+        message = f"Expected mapping JSON value, got {type(value)!r}"
+        raise TypeError(message)
+    return value
+
+
+def expect_json_sequence(value: JsonValue) -> list[JsonValue]:
+    if not isinstance(value, list):
+        message = f"Expected sequence JSON value, got {type(value)!r}"
+        raise TypeError(message)
+    return value
+
+
+def to_json_payload(rows: JsonObjectArray) -> JsonPayload:
+    return [cast(JsonValue, row) for row in rows]
 
 
 class TestLineSpan:
@@ -76,7 +131,7 @@ class TestSymbolIndexRow:
             kind="method",
             doc="A method documentation.",
             tested_by=("test_class.py::test_method",),
-            source_link={"github": "https://github.com/..."},
+            source_link=_source_link(github="https://github.com/..."),
             canonical_path="pkg.mod.alias",
             module="pkg.mod",
             package="pkg",
@@ -113,27 +168,26 @@ class TestSymbolIndexRoundTrip:
             package="pkg",
             file="pkg/__init__.py",
         )
-        artifacts = SymbolIndexArtifacts(
-            rows=(row,),
-            by_file={"pkg/__init__.py": ("pkg.func",)},
-            by_module={"pkg": ("pkg.func",)},
-        )
+        by_file: dict[str, tuple[str, ...]] = {"pkg/__init__.py": ("pkg.func",)}
+        by_module: dict[str, tuple[str, ...]] = {"pkg": ("pkg.func",)}
+        artifacts = SymbolIndexArtifacts(rows=(row,), by_file=by_file, by_module=by_module)
 
         # Serialize
-        payload = symbol_index_to_payload(artifacts)
-        assert isinstance(payload, list)
-        assert len(payload) == 1
-        assert payload[0]["path"] == "pkg.func"
+        payload_rows: JsonObjectArray = symbol_index_to_payload(artifacts)
+        assert len(payload_rows) == 1
+        first_row = expect_json_mapping(payload_rows[0])
+        path_value = expect_json_string(first_row["path"])
+        assert path_value == "pkg.func"
 
         # Deserialize
-        restored = symbol_index_from_json(cast(JsonPayload, payload))
+        restored = symbol_index_from_json(to_json_payload(payload_rows))
         assert len(restored.rows) == 1
         assert restored.rows[0].path == "pkg.func"
         assert restored.rows[0].kind == "function"
 
     def test_multiple_rows_round_trip(self) -> None:
         """Test round-trip with multiple rows."""
-        rows = [
+        rows: list[SymbolIndexRow] = [
             SymbolIndexRow(
                 path="pkg.mod1.func1",
                 kind="function",
@@ -156,14 +210,15 @@ class TestSymbolIndexRoundTrip:
                 source_link=_empty_source_link(),
             ),
         ]
+        rows_tuple: tuple[SymbolIndexRow, ...] = tuple(rows)
         artifacts = SymbolIndexArtifacts(
-            rows=tuple(rows),
+            rows=rows_tuple,
             by_file=_empty_reverse_map(),
             by_module=_empty_reverse_map(),
         )
 
-        payload = symbol_index_to_payload(artifacts)
-        restored = symbol_index_from_json(cast(JsonPayload, payload))
+        payload_rows: JsonObjectArray = symbol_index_to_payload(artifacts)
+        restored = symbol_index_from_json(to_json_payload(payload_rows))
 
         assert len(restored.rows) == 3
         paths = [r.path for r in restored.rows]
@@ -186,11 +241,12 @@ class TestSymbolIndexRoundTrip:
             by_module=_empty_reverse_map(),
         )
 
-        payload = symbol_index_to_payload(artifacts)
-        assert payload[0]["lineno"] == 42
-        assert payload[0]["endlineno"] == 100
+        payload_rows: JsonObjectArray = symbol_index_to_payload(artifacts)
+        first_row = expect_json_mapping(payload_rows[0])
+        assert expect_json_int(first_row["lineno"]) == 42
+        assert expect_json_int(first_row["endlineno"]) == 100
 
-        restored = symbol_index_from_json(cast(JsonPayload, payload))
+        restored = symbol_index_from_json(to_json_payload(payload_rows))
         assert restored.rows[0].span is not None
         assert restored.rows[0].span.start == 42
         assert restored.rows[0].span.end == 100
@@ -210,13 +266,14 @@ class TestSymbolIndexRoundTrip:
             by_module=_empty_reverse_map(),
         )
 
-        payload = symbol_index_to_payload(artifacts)
-        assert set(cast(list[str], payload[0]["tested_by"])) == {
+        payload_rows: JsonObjectArray = symbol_index_to_payload(artifacts)
+        tested_by_value = expect_json_sequence(payload_rows[0]["tested_by"])
+        assert {expect_json_string(entry) for entry in tested_by_value} == {
             "test_mod.py::test_func",
             "integration_tests.py::test_all",
         }
 
-        restored = symbol_index_from_json(cast(JsonPayload, payload))
+        restored = symbol_index_from_json(to_json_payload(payload_rows))
         assert restored.rows[0].tested_by == (
             "test_mod.py::test_func",
             "integration_tests.py::test_all",
@@ -242,10 +299,12 @@ class TestSymbolDeltaPayload:
 
     def test_delta_with_changes(self) -> None:
         """Test delta with added, removed, and changed symbols."""
+        before_payload: dict[str, JsonValue] = {"signature": "(x: int)"}
+        after_payload: dict[str, JsonValue] = {"signature": "(x: int, y: str)"}
         change = SymbolDeltaChange(
             path="pkg.mod.func",
-            before={"signature": "(x: int)"},
-            after={"signature": "(x: int, y: str)"},
+            before=before_payload,
+            after=after_payload,
             reasons=("signature_changed",),
         )
         delta = SymbolDeltaPayload(
@@ -266,10 +325,15 @@ class TestSymbolDeltaRoundTrip:
 
     def test_delta_round_trip(self) -> None:
         """Test round-trip serialization of delta."""
+        before_payload: dict[str, JsonValue] = {"kind": "function", "signature": "(x)"}
+        after_payload: dict[str, JsonValue] = {
+            "kind": "function",
+            "signature": "(x, y)",
+        }
         change = SymbolDeltaChange(
             path="pkg.func",
-            before={"kind": "function", "signature": "(x)"},
-            after={"kind": "function", "signature": "(x, y)"},
+            before=before_payload,
+            after=after_payload,
             reasons=("signature_changed", "doc_updated"),
         )
         delta = SymbolDeltaPayload(
@@ -281,16 +345,19 @@ class TestSymbolDeltaRoundTrip:
         )
 
         # Serialize
-        payload = symbol_delta_to_payload(delta)
-        assert isinstance(payload, dict)
-        assert payload["base_sha"] == "sha1"
-        assert payload["head_sha"] == "sha2"
-        assert payload["added"] == ["pkg.new_func"]
-        assert payload["removed"] == ["pkg.old_func"]
-        assert len(cast(list[str], payload["changed"])) == 1
+        payload_raw = symbol_delta_to_payload(delta)
+        assert isinstance(payload_raw, dict)
+        assert payload_raw["base_sha"] == "sha1"
+        assert payload_raw["head_sha"] == "sha2"
+        assert payload_raw["added"] == ["pkg.new_func"]
+        assert payload_raw["removed"] == ["pkg.old_func"]
+        changed_entries_value = expect_json_sequence(payload_raw["changed"])
+        changed_entries = [expect_json_mapping(entry) for entry in changed_entries_value]
+        assert len(changed_entries) == len(changed_entries_value)
+        assert len(changed_entries) == 1
 
         # Deserialize
-        restored = symbol_delta_from_json(cast(JsonPayload, payload))
+        restored = symbol_delta_from_json(payload_raw)
         assert restored.base_sha == "sha1"
         assert restored.head_sha == "sha2"
         assert restored.added == ("pkg.new_func",)
@@ -340,64 +407,38 @@ class TestArtifactCoercion:
 
     def test_tested_by_coercion_from_list(self) -> None:
         """Test that tested_by list is coerced to tuple."""
-        payload = [
-            {
-                "path": "pkg.func",
-                "kind": "function",
-                "doc": "doc",
-                "tested_by": ["test1.py", "test2.py"],
-                "source_link": {},
-            }
-        ]
-        artifacts = symbol_index_from_json(cast(JsonPayload, payload))
+        artifacts = symbol_index_from_json(
+            to_json_payload(
+                [
+                    _symbol_payload(tested_by=cast(JsonValue, ["test1.py", "test2.py"])),
+                ]
+            ),
+        )
         assert artifacts.rows[0].tested_by == ("test1.py", "test2.py")
 
     def test_tested_by_coercion_from_tuple(self) -> None:
         """Test that tested_by tuple stays as tuple."""
-        payload = [
-            {
-                "path": "pkg.func",
-                "kind": "function",
-                "doc": "doc",
-                "tested_by": ("test1.py", "test2.py"),
-                "source_link": {},
-            }
-        ]
-        artifacts = symbol_index_from_json(cast(JsonPayload, payload))
+        tuple_value = cast(JsonValue, ("test1.py", "test2.py"))
+        artifacts = symbol_index_from_json(
+            to_json_payload([_symbol_payload(tested_by=tuple_value)]),
+        )
         assert artifacts.rows[0].tested_by == ("test1.py", "test2.py")
 
     def test_tested_by_empty_when_missing(self) -> None:
         """Test that tested_by defaults to empty tuple."""
-        payload = [{"path": "pkg.func", "kind": "function", "doc": "doc", "source_link": {}}]
-        artifacts = symbol_index_from_json(cast(JsonPayload, payload))
+        artifacts = symbol_index_from_json(to_json_payload([_symbol_payload()]))
         assert artifacts.rows[0].tested_by == ()
 
     def test_is_async_coercion(self) -> None:
         """Test that is_async is coerced to bool."""
-        payload = [
-            {
-                "path": "pkg.func",
-                "kind": "function",
-                "doc": "doc",
-                "tested_by": [],
-                "source_link": {},
-                "is_async": 1,
-            }
-        ]
-        artifacts = symbol_index_from_json(cast(JsonPayload, payload))
+        artifacts = symbol_index_from_json(
+            to_json_payload([_symbol_payload(is_async=cast(JsonValue, 1))]),
+        )
         assert artifacts.rows[0].is_async is True
 
-        payload = [
-            {
-                "path": "pkg.func",
-                "kind": "function",
-                "doc": "doc",
-                "tested_by": [],
-                "source_link": {},
-                "is_async": 0,
-            }
-        ]
-        artifacts = symbol_index_from_json(cast(JsonPayload, payload))
+        artifacts = symbol_index_from_json(
+            to_json_payload([_symbol_payload(is_async=cast(JsonValue, 0))]),
+        )
         assert artifacts.rows[0].is_async is False
 
 
@@ -418,9 +459,8 @@ class TestArtifactJSONFormatting:
             by_file=_empty_reverse_map(),
             by_module=_empty_reverse_map(),
         )
-        payload = symbol_index_to_payload(artifacts)
-
-        json_str = json.dumps(payload, indent=2, ensure_ascii=False)
+        payload_raw = symbol_index_to_payload(artifacts)
+        json_str = json.dumps(payload_raw, indent=2, ensure_ascii=False)
         lines = json_str.split("\n")
         # Should have indentation
         assert any(line.startswith("  ") for line in lines)
@@ -440,7 +480,6 @@ class TestArtifactJSONFormatting:
             by_file=_empty_reverse_map(),
             by_module=_empty_reverse_map(),
         )
-        payload = symbol_index_to_payload(artifacts)
-
-        json_str = json.dumps(payload, indent=2, ensure_ascii=False)
+        payload_raw = symbol_index_to_payload(artifacts)
+        json_str = json.dumps(payload_raw, indent=2, ensure_ascii=False)
         assert "Ñoño API" in json_str  # Not escaped as \u...

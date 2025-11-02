@@ -22,7 +22,11 @@ from typing import Final, NoReturn, Protocol, assert_never, cast
 from urllib.parse import urlparse
 
 from tools._shared.logging import get_logger, with_fields
-from tools._shared.problem_details import ProblemDetailsDict, build_problem_details
+from tools._shared.problem_details import (
+    ProblemDetailsDict,
+    ProblemDetailsParams,
+    build_problem_details,
+)
 from tools._shared.proc import ToolExecutionError, run_tool
 from tools.detect_pkg import detect_packages, detect_primary
 from tools.griffe_utils import GriffeAPI, resolve_griffe
@@ -996,12 +1000,14 @@ def main(argv: Sequence[str] | None = None) -> None:
                 "symbols": cast(JsonValue, sorted(missing_meta)),
             }
             problem = build_problem_details(
-                type="https://kgfoundry.dev/problems/readme-metadata-missing",
-                title="Missing badge metadata",
-                status=422,
-                detail=detail,
-                instance="urn:tool:gen-readmes:missing-metadata",
-                extensions=extensions_payload,
+                ProblemDetailsParams(
+                    type="https://kgfoundry.dev/problems/readme-metadata-missing",
+                    title="Missing badge metadata",
+                    status=422,
+                    detail=detail,
+                    instance="urn:tool:gen-readmes:missing-metadata",
+                    extensions=extensions_payload,
+                )
             )
             _raise_missing_metadata(detail, problem)
 
@@ -1010,20 +1016,24 @@ def main(argv: Sequence[str] | None = None) -> None:
 
     except MissingMetadataError as exc:
         problem = exc.problem or build_problem_details(
-            type="https://kgfoundry.dev/problems/readme-metadata-missing",
-            title="Missing badge metadata",
-            status=422,
-            detail=str(exc),
-            instance="urn:tool:gen-readmes:missing-metadata",
+            ProblemDetailsParams(
+                type="https://kgfoundry.dev/problems/readme-metadata-missing",
+                title="Missing badge metadata",
+                status=422,
+                detail=str(exc),
+                instance="urn:tool:gen-readmes:missing-metadata",
+            )
         )
         _log_problem_and_exit(problem, exit_code=2)
     except ReadmeGenerationError as exc:
         problem = exc.problem or build_problem_details(
-            type="https://kgfoundry.dev/problems/readme-generation-error",
-            title="README generation failed",
-            status=500,
-            detail=str(exc),
-            instance="urn:tool:gen-readmes:failure",
+            ProblemDetailsParams(
+                type="https://kgfoundry.dev/problems/readme-generation-error",
+                title="README generation failed",
+                status=500,
+                detail=str(exc),
+                instance="urn:tool:gen-readmes:failure",
+            )
         )
         _log_problem_and_exit(problem, exit_code=1)
 

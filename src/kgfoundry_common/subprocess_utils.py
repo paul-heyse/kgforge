@@ -153,14 +153,16 @@ def run_subprocess(
     )
 
     try:
-        result: subprocess.CompletedProcess[str] = subprocess.run(  # noqa: S603 - inputs sanitized via Path.resolve and cmd list
-            cmd,
-            timeout=timeout,
-            cwd=cwd,
-            env=dict(env) if env else None,
-            check=True,
-            capture_output=True,
-            text=True,
+        result: subprocess.CompletedProcess[str] = (
+            subprocess.run(  # noqa: S603 - inputs sanitized via Path.resolve and cmd list
+                cmd,
+                timeout=timeout,
+                cwd=cwd,
+                env=dict(env) if env else None,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
         )
     except subprocess.TimeoutExpired as exc:
         msg = f"Subprocess exceeded timeout of {timeout} seconds: {' '.join(cmd)}"

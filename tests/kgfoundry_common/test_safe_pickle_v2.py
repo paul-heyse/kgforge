@@ -5,54 +5,61 @@ from __future__ import annotations
 import io
 import os
 import pickle  # noqa: S403 - legacy payloads required for regression tests
-from typing import cast
+from collections.abc import Callable
+from typing import TYPE_CHECKING, ParamSpec, TypeVar, cast
 
 import pytest
 
 from kgfoundry_common.safe_pickle_v2 import SignedPickleWrapper, UnsafeSerializationError
 
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+
+    def fixture(*args: object, **kwargs: object) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
+
+else:  # pragma: no cover - pytest provides runtime decorator
+    fixture = pytest.fixture
+
+
+@fixture
+def signing_key() -> bytes:
+    """Provide a valid signing key."""
+    return os.urandom(32)
+
+
+@fixture
+def wrapper(signing_key: bytes) -> SignedPickleWrapper:
+    """Provide a wrapper instance with a random signing key."""
+    return SignedPickleWrapper(signing_key)
+
 
 class TestSignedPickleWrapper:
     """Test suite for SignedPickleWrapper."""
 
-    @pytest.fixture
-    def signing_key(self) -> bytes:
-        """Provide a valid signing key."""
-        return os.urandom(32)
-
-    @pytest.fixture
-    def wrapper(self, signing_key: bytes) -> SignedPickleWrapper:
-        """Provide a wrapper instance."""
-        return SignedPickleWrapper(signing_key)
-
-    @pytest.mark.parametrize(
-        "data",
-        [
-            {"key": "value"},
-            {"nested": {"dict": ["list", 42, 3.14, True, None]}},
-            [1, 2, 3],
-            "string",
-            42,
-            3.14,
-            True,
-            None,
-            [],
-            {},
-        ],
+    ALLOWED_VALUES: tuple[object, ...] = (
+        {"key": "value"},
+        {"nested": {"dict": ["list", 42, 3.14, True, None]}},
+        [1, 2, 3],
+        "string",
+        42,
+        3.14,
+        True,
+        None,
+        [],
+        {},
     )
-    def test_dump_and_load_allowed_types(
-        self,
-        wrapper: SignedPickleWrapper,
-        data: object,
-    ) -> None:
+
+    def test_dump_and_load_allowed_types(self, wrapper: SignedPickleWrapper) -> None:
         """Test that allowed types round-trip correctly."""
-        buffer = io.BytesIO()
-        wrapper.dump(data, buffer)
-
-        buffer.seek(0)
-        loaded = wrapper.load(buffer)
-
-        assert loaded == data
+        for data in self.ALLOWED_VALUES:
+            buffer = io.BytesIO()
+            wrapper.dump(data, buffer)
+            buffer.seek(0)
+            loaded = wrapper.load(buffer)
+            assert loaded == data
 
     def test_signature_verification_success(self, wrapper: SignedPickleWrapper) -> None:
         """Test that valid signatures pass verification."""
@@ -184,11 +191,6 @@ class TestUnsafeSerializationError:
 
 class TestPickleRoundTrip:
     """Integration tests for pickle round-tripping."""
-
-    @pytest.fixture
-    def wrapper(self) -> SignedPickleWrapper:
-        """Provide a wrapper instance."""
-        return SignedPickleWrapper(os.urandom(32))
 
     def test_complex_nested_structure(self, wrapper: SignedPickleWrapper) -> None:
         """Test complex nested structures round-trip."""

@@ -31,7 +31,11 @@ from typing import Final, Literal, Protocol, TypedDict, cast
 
 from jsonschema import Draft202012Validator, ValidationError
 
-from tools._shared.problem_details import build_schema_problem_details
+from tools._shared.problem_details import (
+    ProblemDetailsParams,
+    SchemaProblemDetailsParams,
+    build_schema_problem_details,
+)
 
 JsonPrimitive = str | int | float | bool | None
 JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
@@ -490,12 +494,19 @@ def validate_docfacts_payload(payload: DocfactsDocumentPayload) -> None:
     except ValidationError as exc:
         schema_version = payload.get("docfactsVersion")
         problem = build_schema_problem_details(
-            error=exc,
-            type="https://kgfoundry.dev/problems/docbuilder/docfacts-schema-mismatch",
-            title="DocFacts schema validation failed",
-            status=422,
-            instance=f"urn:docbuilder:schema:docfacts:{datetime.now(tz=UTC).isoformat(timespec='seconds')}",
-            extensions={"schemaVersion": schema_version or ""},
+            SchemaProblemDetailsParams(
+                base=ProblemDetailsParams(
+                    type="https://kgfoundry.dev/problems/docbuilder/docfacts-schema-mismatch",
+                    title="DocFacts schema validation failed",
+                    status=422,
+                    detail="",
+                    instance=(
+                        f"urn:docbuilder:schema:docfacts:{datetime.now(tz=UTC).isoformat(timespec='seconds')}"
+                    ),
+                ),
+                error=exc,
+                extensions={"schemaVersion": schema_version or ""},
+            )
         )
         problem_payload = cast(ProblemDetails, problem)
         detail_message = str(problem_payload.get("detail", "DocFacts schema validation failed"))
@@ -510,12 +521,19 @@ def validate_cli_output(payload: CliResult) -> None:
     except ValidationError as exc:
         schema_version = payload.get("schemaVersion")
         problem = build_schema_problem_details(
-            error=exc,
-            type="https://kgfoundry.dev/problems/docbuilder/cli-schema-mismatch",
-            title="CLI schema validation failed",
-            status=422,
-            instance=f"urn:docbuilder:schema:cli:{datetime.now(tz=UTC).isoformat(timespec='seconds')}",
-            extensions={"schemaVersion": schema_version or ""},
+            SchemaProblemDetailsParams(
+                base=ProblemDetailsParams(
+                    type="https://kgfoundry.dev/problems/docbuilder/cli-schema-mismatch",
+                    title="CLI schema validation failed",
+                    status=422,
+                    detail="",
+                    instance=(
+                        f"urn:docbuilder:schema:cli:{datetime.now(tz=UTC).isoformat(timespec='seconds')}"
+                    ),
+                ),
+                error=exc,
+                extensions={"schemaVersion": schema_version or ""},
+            )
         )
         problem_payload = cast(ProblemDetails, problem)
         detail_message = str(problem_payload.get("detail", "CLI schema validation failed"))

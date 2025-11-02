@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Iterable, Mapping, Sequence
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Final
 
@@ -18,12 +19,24 @@ Params = Sequence[object] | Mapping[str, object] | None
 
 DEFAULT_TIMEOUT_S: Final[float] = 5.0
 DEFAULT_SLOW_QUERY_THRESHOLD_S: Final[float] = 0.5
-DEFAULT_THREADS: Final[int] = 14
+DEFAULT_THREADS: Final[int] = 4
 MAX_SQL_PREVIEW_CHARS: Final[int] = 160
+
+
+@dataclass(slots=True, frozen=True)
+class DuckDBQueryOptions:
+    """Configuration for DuckDB query execution helpers."""
+
+    timeout_s: float = DEFAULT_TIMEOUT_S
+    slow_query_threshold_s: float = DEFAULT_SLOW_QUERY_THRESHOLD_S
+    operation: str = "duckdb.execute"
+    require_parameterized: bool | None = None
+
 
 __all__ = [
     "DEFAULT_SLOW_QUERY_THRESHOLD_S",
     "DEFAULT_TIMEOUT_S",
+    "DuckDBQueryOptions",
     "connect",
     "execute",
     "fetch_all",
@@ -33,6 +46,31 @@ __all__ = [
 
 logger = get_logger(__name__)
 metrics = MetricsProvider.default()
+
+
+def connect(
+    db_path: Path | str,
+    *,
+    read_only: bool = False,
+    pragmas: Mapping[str, object] | None = None,
+) -> DuckDBPyConnection:
+    """Create a DuckDB connection with standard pragmas applied."""
+    database_path = Path(db_path)
+    if not read_only:
+        database_path.parent.mkdir(parents=True, exist_ok=True)
+    conn = duckdb.connect(str(database_path), read_only=read_only)
+    effective_pragmas: dict[str, object] = {"threads": DEFAULT_THREADS}
+    if pragmas:
+        effective_pragmas.update({key.lower(): value for key, value in pragmas.items()})
+    for pragma_key, value in effective_pragmas.items():
+        if isinstance(value, bool):
+            literal = "true" if value else "false"
+        elif isinstance(value, (int, float)):
+            literal = str(value)
+        else:
+            literal = f"'{value}'"
+        conn.execute(f"PRAGMA {pragma_key}={literal}")
+    return conn
 
 
 def _format_sql(sql: str) -> str:
@@ -164,56 +202,24 @@ def _set_timeout(conn: DuckDBPyConnection, timeout_s: float) -> None:
     conn.execute(f"PRAGMA statement_timeout='{timeout_ms}ms'")
 
 
-def connect(
-    db_path: str | Path,
+def _coerce_options(
+    options: DuckDBQueryOptions | None,
     *,
-    read_only: bool = False,
-    pragmas: Mapping[str, object] | None = None,
-) -> DuckDBPyConnection:
-    """Create a DuckDB connection with standard pragmas.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    db_path : str | Path
-        Describe ``db_path``.
-    read_only : bool, optional
-        Describe ``read_only``.
-        Defaults to ``False``.
-    pragmas : str | object | NoneType, optional
-        Describe ``pragmas``.
-        Defaults to ``None``.
-
-    Returns
-    -------
-    DuckDBPyConnection
-        Describe return value.
-    """
-    conn = duckdb.connect(str(db_path), read_only=read_only)
-    effective_pragmas: dict[str, object] = {"threads": DEFAULT_THREADS}
-    if pragmas:
-        effective_pragmas.update({key.lower(): value for key, value in pragmas.items()})
-    for key, value in effective_pragmas.items():
-        if isinstance(value, bool):
-            literal = "true" if value else "false"
-        elif isinstance(value, (int, float)):
-            literal = str(value)
-        else:
-            literal = f"'{value}'"
-        conn.execute(f"PRAGMA {key}={literal}")
-    return conn
+    operation: str,
+) -> DuckDBQueryOptions:
+    if options is None:
+        return DuckDBQueryOptions(operation=operation)
+    if options.operation == operation:
+        return options
+    return replace(options, operation=operation)
 
 
-def execute(  # noqa: PLR0913
+def execute(
     conn: DuckDBPyConnection,
     sql: str,
     params: Params = None,
     *,
-    timeout_s: float = DEFAULT_TIMEOUT_S,
-    slow_query_threshold_s: float = DEFAULT_SLOW_QUERY_THRESHOLD_S,
-    operation: str = "duckdb.execute",
-    require_parameterized: bool | None = None,
+    options: DuckDBQueryOptions | None = None,
 ) -> DuckDBPyRelation:
     """Execute a DuckDB query with parameter binding, logging, and metrics.
 
@@ -228,25 +234,19 @@ def execute(  # noqa: PLR0913
     params : object | str | object | NoneType, optional
         Describe ``params``.
         Defaults to ``None``.
-    timeout_s : float, optional
-        Describe ``timeout_s``.
-        Defaults to ``5.0``.
-    slow_query_threshold_s : float, optional
-        Describe ``slow_query_threshold_s``.
-        Defaults to ``0.5``.
-    operation : str, optional
-        Describe ``operation``.
-        Defaults to ``'duckdb.execute'``.
-    require_parameterized : bool | NoneType, optional
-        Describe ``require_parameterized``.
-        Defaults to ``None``.
+    options : DuckDBQueryOptions | None, optional
+        Query execution options including timeout, logging metadata, and parameter enforcement.
+        Defaults to ``None`` (uses module defaults).
 
     Returns
     -------
     DuckDBPyRelation
         Describe return value.
     """
-    require_flag = params is not None if require_parameterized is None else require_parameterized
+    opts = _coerce_options(options, operation="duckdb.execute")
+    require_flag = (
+        params is not None if opts.require_parameterized is None else opts.require_parameterized
+    )
     _ensure_parameterized(sql, require_parameterized=require_flag)
 
     sql_preview = _format_sql(sql)
@@ -256,14 +256,14 @@ def execute(  # noqa: PLR0913
         with_fields(
             logger,
             component="registry",
-            operation=operation,
+            operation=opts.operation,
             sql_preview=sql_preview,
         ) as log,
-        observe_duration(metrics, operation, component="registry") as observer,
+        observe_duration(metrics, opts.operation, component="registry") as observer,
     ):
         start = time.perf_counter()
         try:
-            _set_timeout(conn, timeout_s)
+            _set_timeout(conn, opts.timeout_s)
             relation = conn.execute(sql) if params is None else conn.execute(sql, params)
         except duckdb.Error as exc:
             observer.error()
@@ -280,7 +280,7 @@ def execute(  # noqa: PLR0913
         else:
             observer.success()
             duration = time.perf_counter() - start
-            if duration >= slow_query_threshold_s:
+            if duration >= opts.slow_query_threshold_s:
                 log.warning(
                     "Slow DuckDB query",
                     extra={"duration_ms": round(duration * 1000, 2), "params": query_params},
@@ -293,15 +293,12 @@ def execute(  # noqa: PLR0913
             return relation
 
 
-def fetch_all(  # noqa: PLR0913
+def fetch_all(
     conn: DuckDBPyConnection,
     sql: str,
     params: Params = None,
     *,
-    timeout_s: float = DEFAULT_TIMEOUT_S,
-    slow_query_threshold_s: float = DEFAULT_SLOW_QUERY_THRESHOLD_S,
-    operation: str = "duckdb.fetch_all",
-    require_parameterized: bool | None = None,
+    options: DuckDBQueryOptions | None = None,
 ) -> list[tuple[Any, ...]]:
     """Execute a query and return all rows as a list of tuples.
 
@@ -316,17 +313,8 @@ def fetch_all(  # noqa: PLR0913
     params : object | str | object | NoneType, optional
         Describe ``params``.
         Defaults to ``None``.
-    timeout_s : float, optional
-        Describe ``timeout_s``.
-        Defaults to ``5.0``.
-    slow_query_threshold_s : float, optional
-        Describe ``slow_query_threshold_s``.
-        Defaults to ``0.5``.
-    operation : str, optional
-        Describe ``operation``.
-        Defaults to ``'duckdb.fetch_all'``.
-    require_parameterized : bool | NoneType, optional
-        Describe ``require_parameterized``.
+    options : DuckDBQueryOptions | None, optional
+        Query execution options forwarded to :func:`execute`.
         Defaults to ``None``.
 
     Returns
@@ -338,23 +326,17 @@ def fetch_all(  # noqa: PLR0913
         conn,
         sql,
         params,
-        timeout_s=timeout_s,
-        slow_query_threshold_s=slow_query_threshold_s,
-        operation=operation,
-        require_parameterized=require_parameterized,
+        options=_coerce_options(options, operation="duckdb.fetch_all"),
     )
     return relation.fetchall()
 
 
-def fetch_one(  # noqa: PLR0913
+def fetch_one(
     conn: DuckDBPyConnection,
     sql: str,
     params: Params = None,
     *,
-    timeout_s: float = DEFAULT_TIMEOUT_S,
-    slow_query_threshold_s: float = DEFAULT_SLOW_QUERY_THRESHOLD_S,
-    operation: str = "duckdb.fetch_one",
-    require_parameterized: bool | None = None,
+    options: DuckDBQueryOptions | None = None,
 ) -> tuple[Any, ...] | None:
     """Execute a query and return the first row or None.
 
@@ -369,17 +351,8 @@ def fetch_one(  # noqa: PLR0913
     params : object | str | object | NoneType, optional
         Describe ``params``.
         Defaults to ``None``.
-    timeout_s : float, optional
-        Describe ``timeout_s``.
-        Defaults to ``5.0``.
-    slow_query_threshold_s : float, optional
-        Describe ``slow_query_threshold_s``.
-        Defaults to ``0.5``.
-    operation : str, optional
-        Describe ``operation``.
-        Defaults to ``'duckdb.fetch_one'``.
-    require_parameterized : bool | NoneType, optional
-        Describe ``require_parameterized``.
+    options : DuckDBQueryOptions | None, optional
+        Query execution options forwarded to :func:`execute`.
         Defaults to ``None``.
 
     Returns
@@ -391,10 +364,7 @@ def fetch_one(  # noqa: PLR0913
         conn,
         sql,
         params,
-        timeout_s=timeout_s,
-        slow_query_threshold_s=slow_query_threshold_s,
-        operation=operation,
-        require_parameterized=require_parameterized,
+        options=_coerce_options(options, operation="duckdb.fetch_one"),
     )
     return relation.fetchone()
 

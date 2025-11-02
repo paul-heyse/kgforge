@@ -13,7 +13,7 @@ from __future__ import annotations
 import json
 import logging
 import sys
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import ModuleType
@@ -21,9 +21,7 @@ from typing import TYPE_CHECKING, ParamSpec, Protocol, TypeVar, cast
 
 import pytest
 from _pytest.logging import LogCaptureFixture
-from prometheus_client.metrics_core import Metric
 from prometheus_client.registry import CollectorRegistry
-from prometheus_client.samples import Sample
 
 from kgfoundry_common.problem_details import JsonValue
 
@@ -41,11 +39,21 @@ if TYPE_CHECKING:  # pragma: no cover - typing support only
 
     class _SpanExporterProtocol(Protocol):
         def export(self, spans: list[object]) -> None: ...
+
 else:
     fixture = pytest.fixture
 
 # Type aliases
 ProblemDetailsDict = dict[str, JsonValue]
+
+
+class MetricSample(Protocol):
+    value: float
+
+
+class MetricFamily(Protocol):
+    name: str
+    samples: Sequence[MetricSample] | Iterable[MetricSample]
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -276,18 +284,12 @@ def metrics_asserter(
             If metric not found or value mismatch.
         """
         # Collect all families and samples
-        families_iter = cast(Iterable[Metric], prometheus_registry.collect())
-        families = list(families_iter)
+        families = [cast(MetricFamily, family) for family in prometheus_registry.collect()]
         for family in families:
             if family.name == name:
                 samples_raw = list(family.samples)
                 if samples_raw and value is not None:
-                    first_sample = samples_raw[0]
-                    sample = (
-                        first_sample
-                        if isinstance(first_sample, Sample)
-                        else cast(Sample, first_sample)
-                    )
+                    sample = samples_raw[0]
                     actual = float(sample.value)
                     if actual != value:
                         msg = f"Metric {name}: expected {value}, got {actual}"

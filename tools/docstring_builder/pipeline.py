@@ -95,6 +95,7 @@ if TYPE_CHECKING:
         ) -> ModelProblemDetails:
             """Return a Problem Details payload for the supplied context."""
             ...  # Protocol stub body (required for TYPE_CHECKING)
+
 else:
     ProblemDetailsBuilder = Callable
 

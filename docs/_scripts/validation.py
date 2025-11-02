@@ -110,18 +110,27 @@ def _problem_for_validation(
     schema_path: Path,
     error: jsonschema_exceptions.ValidationError,
 ) -> ProblemDetailsDict:
-    from tools._shared.problem_details import build_schema_problem_details  # noqa: PLC0415
+    from tools._shared.problem_details import (  # noqa: PLC0415
+        ProblemDetailsParams,
+        SchemaProblemDetailsParams,
+        build_schema_problem_details,
+    )
 
     return build_schema_problem_details(
-        error=error,
-        type="https://kgfoundry.dev/problems/docs-schema-validation",
-        title="Docs artifact failed schema validation",
-        status=422,
-        instance=f"urn:docs:{artifact}:schema-validation",
-        extensions={
-            "artifact": artifact,
-            "schema": str(schema_path),
-        },
+        SchemaProblemDetailsParams(
+            base=ProblemDetailsParams(
+                type="https://kgfoundry.dev/problems/docs-schema-validation",
+                title="Docs artifact failed schema validation",
+                status=422,
+                detail="",
+                instance=f"urn:docs:{artifact}:schema-validation",
+            ),
+            error=error,
+            extensions={
+                "artifact": artifact,
+                "schema": str(schema_path),
+            },
+        )
     )
 
 

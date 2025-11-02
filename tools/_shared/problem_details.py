@@ -5,14 +5,20 @@ payloads used across tooling CLIs and error responses.
 
 Examples
 --------
->>> from tools._shared.problem_details import build_problem_details, render_problem
+>>> from tools._shared.problem_details import (
+...     build_problem_details,
+...     render_problem,
+...     ProblemDetailsParams,
+... )
 >>> problem = build_problem_details(
-...     type="https://kgfoundry.dev/problems/tool-failure",
-...     title="Tool failed",
-...     status=500,
-...     detail="Command exited with code 1",
-...     instance="urn:tool:git:exit-1",
-...     extensions={"command": ["git", "status"], "returncode": 1},
+...     ProblemDetailsParams(
+...         type="https://kgfoundry.dev/problems/tool-failure",
+...         title="Tool failed",
+...         status=500,
+...         detail="Command exited with code 1",
+...         instance="urn:tool:git:exit-1",
+...         extensions={"command": ["git", "status"], "returncode": 1},
+...     )
 ... )
 >>> json_str = render_problem(problem)
 >>> assert "tool-failure" in json_str
@@ -24,12 +30,17 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 __all__ = [
+    "ExceptionProblemDetailsParams",
     "JsonPrimitive",
     "JsonValue",
     "ProblemDetailsDict",
+    "ProblemDetailsParams",
+    "SchemaProblemDetailsParams",
+    "ToolProblemDetailsParams",
     "build_problem_details",
     "build_schema_problem_details",
     "build_tool_problem_details",
@@ -48,34 +59,25 @@ JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
 ProblemDetailsDict = dict[str, JsonValue]
 
 
-def build_problem_details(  # noqa: PLR0913
-    *,
-    type: str,  # noqa: A002
-    title: str,
-    status: int,
-    detail: str,
-    instance: str,
-    extensions: Mapping[str, JsonValue] | None = None,
-) -> ProblemDetailsDict:
-    """Build an RFC 9457 Problem Details payload.
+@dataclass(frozen=True, slots=True)
+class ProblemDetailsParams:
+    """Core fields required to build a Problem Details payload."""
 
-    This function constructs a Problem Details dictionary conforming to
-    RFC 9457. All fields except extensions are required.
+    type: str
+    title: str
+    status: int
+    detail: str
+    instance: str
+    extensions: Mapping[str, JsonValue] | None = None
+
+
+def build_problem_details(params: ProblemDetailsParams) -> ProblemDetailsDict:
+    """Build an RFC 9457 Problem Details payload.
 
     Parameters
     ----------
-    type : str
-        Type URI identifying the problem (e.g., "https://kgfoundry.dev/problems/tool-failure").
-    title : str
-        Short summary of the problem.
-    status : int
-        HTTP status code (or equivalent for non-HTTP contexts).
-    detail : str
-        Human-readable explanation of the problem.
-    instance : str
-        URI reference identifying the specific occurrence (e.g., "urn:tool:git:exit-1").
-    extensions : Mapping[str, JsonValue] | None, optional
-        Additional problem-specific fields.
+    params : ProblemDetailsParams
+        Structured fields describing the Problem Details payload.
 
     Returns
     -------
@@ -84,7 +86,7 @@ def build_problem_details(  # noqa: PLR0913
 
     Examples
     --------
-    >>> problem = build_problem_details(
+    >>> params = ProblemDetailsParams(
     ...     type="https://kgfoundry.dev/problems/tool-timeout",
     ...     title="Tool execution timed out",
     ...     status=504,
@@ -92,18 +94,19 @@ def build_problem_details(  # noqa: PLR0913
     ...     instance="urn:tool:git:timeout",
     ...     extensions={"command": ["git", "status"], "timeout": 10.0},
     ... )
+    >>> problem = build_problem_details(params)
     >>> assert problem["type"] == "https://kgfoundry.dev/problems/tool-timeout"
     >>> assert problem["status"] == 504
     """
     payload: ProblemDetailsDict = {
-        "type": type,
-        "title": title,
-        "status": status,
-        "detail": detail,
-        "instance": instance,
+        "type": params.type,
+        "title": params.title,
+        "status": params.status,
+        "detail": params.detail,
+        "instance": params.instance,
     }
-    if extensions:
-        for key, value in extensions.items():
+    if params.extensions:
+        for key, value in params.extensions.items():
             payload[key] = value
     return payload
 
@@ -117,65 +120,65 @@ def _json_pointer_from(error: object) -> str | None:
     return None
 
 
-def build_schema_problem_details(  # noqa: PLR0913
-    *,
-    error: Exception,
-    type: str,  # noqa: A002
-    title: str,
-    status: int,
-    instance: str,
-    extensions: Mapping[str, JsonValue] | None = None,
-) -> ProblemDetailsDict:
+@dataclass(frozen=True, slots=True)
+class SchemaProblemDetailsParams:
+    """Inputs required to construct schema validation problem details."""
+
+    base: ProblemDetailsParams
+    error: Exception
+    extensions: Mapping[str, JsonValue] | None = None
+
+
+def build_schema_problem_details(params: SchemaProblemDetailsParams) -> ProblemDetailsDict:
     """Return Problem Details payload describing a schema validation failure."""
-    detail_attr = getattr(error, "message", None)
-    detail = str(detail_attr) if detail_attr is not None else str(error)
+    detail_attr = getattr(params.error, "message", None)
+    detail = str(detail_attr) if detail_attr is not None else str(params.error)
     extras: dict[str, JsonValue] = {}
-    pointer = _json_pointer_from(error)
+    pointer = _json_pointer_from(params.error)
     if pointer:
         extras["jsonPointer"] = pointer
-    validator_raw = getattr(error, "validator", None)
+    validator_raw = getattr(params.error, "validator", None)
     if validator_raw is not None:
         extras["validator"] = str(validator_raw)
-    additional = dict(extensions) if extensions else {}
+    additional = dict(params.extensions) if params.extensions else {}
     merged_extra = {**extras, **additional} if extras or additional else None
-    problem = build_problem_details(
-        type=type,
-        title=title,
-        status=status,
-        detail=detail,
-        instance=instance,
-        extensions=None,
-    )
+    base = replace(params.base, detail=detail, extensions=None)
+    problem = build_problem_details(base)
     if merged_extra:
         problem["extensions"] = merged_extra
     return problem
 
 
-def build_tool_problem_details(  # noqa: PLR0913
-    *,
-    category: str,
-    command: Sequence[str],
-    status: int,
-    title: str,
-    detail: str,
-    instance_suffix: str,
-    extensions: Mapping[str, JsonValue] | None = None,
-) -> ProblemDetailsDict:
+@dataclass(frozen=True, slots=True)
+class ToolProblemDetailsParams:
+    """Inputs describing a tooling-related failure."""
+
+    category: str
+    command: Sequence[str]
+    status: int
+    title: str
+    detail: str
+    instance_suffix: str
+    extensions: Mapping[str, JsonValue] | None = None
+
+
+def build_tool_problem_details(params: ToolProblemDetailsParams) -> ProblemDetailsDict:
     """Return a Problem Details payload describing a tooling subprocess failure."""
-    command_list = list(command)
+    command_list = list(params.command)
     tool_name = Path(command_list[0]).name if command_list else "<unknown>"
     command_extension: JsonValue = [str(part) for part in command_list]
     merged_extensions: dict[str, JsonValue] = {"command": command_extension}
-    if extensions:
-        merged_extensions.update(dict(extensions))
-    return build_problem_details(
-        type=f"https://kgfoundry.dev/problems/{category}",
-        title=title,
-        status=status,
-        detail=detail,
-        instance=f"urn:tool:{tool_name}:{instance_suffix}",
+    if params.extensions:
+        merged_extensions.update(dict(params.extensions))
+    base = ProblemDetailsParams(
+        type=f"https://kgfoundry.dev/problems/{params.category}",
+        title=params.title,
+        status=params.status,
+        detail=params.detail,
+        instance=f"urn:tool:{tool_name}:{params.instance_suffix}",
         extensions=merged_extensions,
     )
+    return build_problem_details(base)
 
 
 def tool_timeout_problem_details(
@@ -193,13 +196,15 @@ def tool_timeout_problem_details(
     if timeout is not None:
         extensions["timeout"] = timeout
     return build_tool_problem_details(
-        category="tool-timeout",
-        command=command,
-        status=504,
-        title="Tool execution timed out",
-        detail=detail,
-        instance_suffix="timeout",
-        extensions=extensions,
+        ToolProblemDetailsParams(
+            category="tool-timeout",
+            command=command,
+            status=504,
+            title="Tool execution timed out",
+            detail=detail,
+            instance_suffix="timeout",
+            extensions=extensions or None,
+        )
     )
 
 
@@ -211,12 +216,14 @@ def tool_missing_problem_details(
 ) -> ProblemDetailsDict:
     """Return Problem Details describing a missing executable."""
     return build_tool_problem_details(
-        category="tool-missing",
-        command=command or [executable],
-        status=500,
-        title="Executable not found",
-        detail=detail,
-        instance_suffix="missing",
+        ToolProblemDetailsParams(
+            category="tool-missing",
+            command=command or [executable],
+            status=500,
+            title="Executable not found",
+            detail=detail,
+            instance_suffix="missing",
+        )
     )
 
 
@@ -228,18 +235,20 @@ def tool_disallowed_problem_details(
 ) -> ProblemDetailsDict:
     """Return Problem Details describing an allowlisted executable violation."""
     return build_tool_problem_details(
-        category="tool-exec-disallowed",
-        command=command,
-        status=403,
-        title="Executable not allowed",
-        detail=(
-            f"Executable '{executable.name}' is not permitted by the TOOLS_EXEC_ALLOWLIST setting"
-        ),
-        instance_suffix="disallowed",
-        extensions={
-            "executable": str(executable),
-            "allowlist": list(allowlist),
-        },
+        ToolProblemDetailsParams(
+            category="tool-exec-disallowed",
+            command=command,
+            status=403,
+            title="Executable not allowed",
+            detail=(
+                f"Executable '{executable.name}' is not permitted by the TOOLS_EXEC_ALLOWLIST setting"
+            ),
+            instance_suffix="disallowed",
+            extensions={
+                "executable": str(executable),
+                "allowlist": list(allowlist),
+            },
+        )
     )
 
 
@@ -251,44 +260,34 @@ def tool_failure_problem_details(
 ) -> ProblemDetailsDict:
     """Return Problem Details describing a non-zero tooling exit code."""
     return build_tool_problem_details(
-        category="tool-failure",
-        command=command,
-        status=500,
-        title="Tool returned a non-zero exit code",
-        detail=detail,
-        instance_suffix=f"exit-{returncode}",
-        extensions={"returncode": returncode},
+        ToolProblemDetailsParams(
+            category="tool-failure",
+            command=command,
+            status=500,
+            title="Tool returned a non-zero exit code",
+            detail=detail,
+            instance_suffix=f"exit-{returncode}",
+            extensions={"returncode": returncode},
+        )
     )
 
 
-def problem_from_exception(  # noqa: PLR0913
-    exc: Exception,
-    *,
-    type: str,  # noqa: A002
-    title: str,
-    status: int,
-    instance: str,
-    extensions: Mapping[str, JsonValue] | None = None,
-) -> ProblemDetailsDict:
-    """Build Problem Details from an exception.
+@dataclass(frozen=True, slots=True)
+class ExceptionProblemDetailsParams:
+    """Inputs describing a generic exception converted to Problem Details."""
 
-    This function extracts detail from the exception message and optionally
-    includes exception type and traceback information in extensions.
+    base: ProblemDetailsParams
+    exception: Exception
+    extensions: Mapping[str, JsonValue] | None = None
+
+
+def problem_from_exception(params: ExceptionProblemDetailsParams) -> ProblemDetailsDict:
+    """Build Problem Details from an exception.
 
     Parameters
     ----------
-    exc : Exception
-        Exception to convert.
-    type : str
-        Type URI identifying the problem.
-    title : str
-        Short summary of the problem.
-    status : int
-        HTTP status code.
-    instance : str
-        URI reference identifying the specific occurrence.
-    extensions : Mapping[str, JsonValue] | None, optional
-        Additional problem-specific fields.
+    params : ExceptionProblemDetailsParams
+        Structured context describing the exception and base problem fields.
 
     Returns
     -------
@@ -299,30 +298,29 @@ def problem_from_exception(  # noqa: PLR0913
     --------
     >>> try:
     ...     raise ValueError("Invalid input")
-    ... except ValueError as e:
+    ... except ValueError as exc:
     ...     problem = problem_from_exception(
-    ...         e,
-    ...         type="https://kgfoundry.dev/problems/invalid-input",
-    ...         title="Invalid input",
-    ...         status=400,
-    ...         instance="urn:validation:input",
+    ...         ExceptionProblemDetailsParams(
+    ...             base=ProblemDetailsParams(
+    ...                 type="https://kgfoundry.dev/problems/invalid-input",
+    ...                 title="Invalid input",
+    ...                 status=400,
+    ...                 detail="",
+    ...                 instance="urn:validation:input",
+    ...             ),
+    ...             exception=exc,
+    ...         )
     ...     )
     >>> assert "Invalid input" in problem["detail"]
     """
-    detail = str(exc)
-    exc_type_name = exc.__class__.__name__
+    detail = str(params.exception)
+    exc_type_name = params.exception.__class__.__name__
     merged_extensions: dict[str, JsonValue] = {"exception_type": exc_type_name}
-    if extensions:
-        for key, value in extensions.items():
+    if params.extensions:
+        for key, value in params.extensions.items():
             merged_extensions[key] = value
-    return build_problem_details(
-        type=type,
-        title=title,
-        status=status,
-        detail=detail,
-        instance=instance,
-        extensions=merged_extensions if merged_extensions else None,
-    )
+    base = replace(params.base, detail=detail, extensions=merged_extensions)
+    return build_problem_details(base)
 
 
 def render_problem(problem: ProblemDetailsDict) -> str:
@@ -344,11 +342,13 @@ def render_problem(problem: ProblemDetailsDict) -> str:
     Examples
     --------
     >>> problem = build_problem_details(
-    ...     type="https://kgfoundry.dev/problems/tool-failure",
-    ...     title="Tool failed",
-    ...     status=500,
-    ...     detail="Command failed",
-    ...     instance="urn:tool:git:exit-1",
+    ...     ProblemDetailsParams(
+    ...         type="https://kgfoundry.dev/problems/tool-failure",
+    ...         title="Tool failed",
+    ...         status=500,
+    ...         detail="Command failed",
+    ...         instance="urn:tool:git:exit-1",
+    ...     )
     ... )
     >>> json_str = render_problem(problem)
     >>> assert json_str.startswith("{")

@@ -40,8 +40,11 @@ from docs._scripts import shared as docs_shared  # noqa: PLC2701
 from docutils import nodes
 from docutils.parsers.rst import Directive
 from sphinx.application import Sphinx
-from tools import get_logger
-from tools._shared.problem_details import build_problem_details  # noqa: PLC2701
+from tools import (
+    ProblemDetailsParams,
+    build_problem_details,
+    get_logger,
+)
 from tools.griffe_utils import resolve_griffe
 
 ENV = docs_shared.detect_environment()
@@ -49,7 +52,7 @@ docs_shared.ensure_sys_paths(ENV)
 DOCS_SETTINGS = docs_shared.load_settings()
 
 LOGGER = get_logger(__name__)
-LOGGER.addHandler(logging.NullHandler())
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 LINKCODE_LOG = docs_shared.make_logger("docs_conf", artifact="linkcode", logger=LOGGER)
 
 
@@ -191,17 +194,15 @@ try:
 except ModuleNotFoundError:  # pragma: no cover - optional dependency
     _auto_docstrings = None
 
-GriffeLoadingError: type[Exception]
+GriffeLoadingError: type[Exception] = RuntimeError
 try:
     griffe_exceptions = importlib.import_module("griffe.exceptions")
 except ModuleNotFoundError:  # pragma: no cover - griffe < 0.32
-    GriffeLoadingError = RuntimeError
+    pass
 else:
     loading_error: object = getattr(griffe_exceptions, "LoadingError", RuntimeError)
     if isinstance(loading_error, type) and issubclass(loading_error, Exception):
-        GriffeLoadingError = loading_error
-    else:
-        GriffeLoadingError = RuntimeError
+        GriffeLoadingError = cast(type[Exception], loading_error)
 
 astroid_builder = _import_required_module("astroid.builder")
 astroid_manager = _import_required_module("astroid.manager")
@@ -209,12 +210,8 @@ autoapi_parser = _import_required_module("autoapi._parser")
 jsonimpl = _import_required_module("sphinxcontrib.serializinghtml.jsonimpl")
 json_module = cast(ModuleType, _require_attr(jsonimpl, "json"))
 
-AstroidManagerCls = cast(
-    type[_AstroidManagerProto], _require_attr(astroid_manager, "AstroidManager")
-)
-AstroidBuilderCls = cast(
-    type[_AstroidBuilderProto], _require_attr(astroid_builder, "AstroidBuilder")
-)
+AstroidManagerCls = cast(type[object], _require_attr(astroid_manager, "AstroidManager"))
+AstroidBuilderCls = cast(type[object], _require_attr(astroid_builder, "AstroidBuilder"))
 AutoapiParserCls = cast(type[_AutoapiParserProto], _require_attr(autoapi_parser, "Parser"))
 
 
@@ -495,8 +492,12 @@ def _autoapi_parse_file(
         parent = parent.parent
 
     module_name = ".".join(module_parts)
-    manager = cast(_AstroidManagerProto, AstroidManagerCls())
-    builder = cast(_AstroidBuilderProto, AstroidBuilderCls(manager))
+    manager = cast(_AstroidManagerProto, cast(Any, AstroidManagerCls)())
+    builder_obj = cast(Any, AstroidBuilderCls)
+    try:
+        builder = cast(_AstroidBuilderProto, builder_obj(manager))
+    except TypeError:
+        builder = cast(_AstroidBuilderProto, builder_obj())
     node = builder.file_build(file_path, module_name)
     return self.parse(node)
 
@@ -598,12 +599,14 @@ def _get_root(module: str | None) -> GriffeNode | None:
             _MODULE_CACHE[top] = _loader.load(top)
         except (GriffeLoadingError, ModuleNotFoundError, FileNotFoundError, OSError) as exc:
             problem_details = build_problem_details(
-                type="https://kgfoundry.dev/problems/docs-linkcode-loader",
-                title="Failed to load module for linkcode lookup",
-                status=500,
-                detail=f"Griffe failed to load module '{top}': {exc}",
-                instance=f"urn:docs:linkcode:loader:{top}",
-                extensions={"module": top},
+                ProblemDetailsParams(
+                    type="https://kgfoundry.dev/problems/docs-linkcode-loader",
+                    title="Failed to load module for linkcode lookup",
+                    status=500,
+                    detail=f"Griffe failed to load module '{top}': {exc}",
+                    instance=f"urn:docs:linkcode:loader:{top}",
+                    extensions={"module": top},
+                )
             )
             LINKCODE_LOG.warning(
                 "Failed to load module for linkcode lookup",
@@ -705,12 +708,14 @@ def linkcode_resolve(domain: str, info: Mapping[str, str | None]) -> str | None:
     res = _lookup(module_name, fullname)
     if not res:
         problem_details = build_problem_details(
-            type="https://kgfoundry.dev/problems/docs-linkcode-resolution",
-            title="Unable to resolve symbol location",
-            status=404,
-            detail=f"Unable to resolve {module_name}.{fullname}",
-            instance=f"urn:docs:linkcode:missing:{module_name}.{fullname}",
-            extensions={"module": module_name, "fullname": fullname},
+            ProblemDetailsParams(
+                type="https://kgfoundry.dev/problems/docs-linkcode-resolution",
+                title="Unable to resolve symbol location",
+                status=404,
+                detail=f"Unable to resolve {module_name}.{fullname}",
+                instance=f"urn:docs:linkcode:missing:{module_name}.{fullname}",
+                extensions={"module": module_name, "fullname": fullname},
+            )
         )
         LINKCODE_LOG.debug(
             "linkcode resolution failed",

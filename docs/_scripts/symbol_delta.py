@@ -19,6 +19,7 @@ from docs.types.artifacts import (
 )
 from docs.types.artifacts import SymbolDeltaPayload as TypedSymbolDeltaPayload
 from tools import (
+    ProblemDetailsParams,
     ToolRunResult,
     build_problem_details,
     get_logger,
@@ -402,11 +403,13 @@ def write_delta(delta_path: Path, payload: TypedSymbolDeltaPayload) -> bool:
 
 def _emit_problem(problem: ProblemDetailsDict | None, *, default_message: str) -> None:
     payload = problem or build_problem_details(
-        type="https://kgfoundry.dev/problems/docs-symbol-delta",
-        title="Symbol delta computation failed",
-        status=500,
-        detail=default_message,
-        instance="urn:docs:symbol-delta:unknown",
+        ProblemDetailsParams(
+            type="https://kgfoundry.dev/problems/docs-symbol-delta",
+            title="Symbol delta computation failed",
+            status=500,
+            detail=default_message,
+            instance="urn:docs:symbol-delta:unknown",
+        )
     )
     sys.stderr.write(render_problem(payload) + "\n")
 
@@ -446,11 +449,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         message = f"Missing current snapshot: {SYMBOLS_PATH}"
         _emit_problem(
             build_problem_details(
-                type="https://kgfoundry.dev/problems/docs-symbol-delta",
-                title="Symbol delta computation failed",
-                status=404,
-                detail=message,
-                instance="urn:docs:symbol-delta:missing-current",
+                ProblemDetailsParams(
+                    type="https://kgfoundry.dev/problems/docs-symbol-delta",
+                    title="Symbol delta computation failed",
+                    status=404,
+                    detail=message,
+                    instance="urn:docs:symbol-delta:missing-current",
+                )
             ),
             default_message=message,
         )
@@ -485,11 +490,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         ) as exc:
             observation.failure("exception", returncode=1)
             problem = build_problem_details(
-                type="https://kgfoundry.dev/problems/docs-symbol-delta",
-                title="Symbol delta computation failed",
-                status=500,
-                detail=str(exc),
-                instance="urn:docs:symbol-delta:unexpected-error",
+                ProblemDetailsParams(
+                    type="https://kgfoundry.dev/problems/docs-symbol-delta",
+                    title="Symbol delta computation failed",
+                    status=500,
+                    detail=str(exc),
+                    instance="urn:docs:symbol-delta:unexpected-error",
+                )
             )
             _emit_problem(problem, default_message=str(exc))
             return 1

@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import TypeAlias, cast
 
 from kgfoundry_common.logging import LoggerAdapter
-from tools._shared.problem_details import build_problem_details as _build_problem_details
+from tools._shared.problem_details import ProblemDetailsParams, build_problem_details as _build_problem_details
 from tools.docstring_builder.config import ConfigSelection
 from tools.docstring_builder.models import (
     CliResult,
@@ -151,7 +151,7 @@ def build_problem_details(
     """Create an RFC 9457 Problem Details payload for CLI failures."""
     command = request.command or "unknown"
     subcommand = request.invoked_subcommand or request.subcommand or command
-    problem_dict = _build_problem_details(
+    params = ProblemDetailsParams(
         type="https://kgfoundry.dev/problems/docbuilder/run-failed",
         title="Docstring builder run failed",
         status=http_status_for_exit(status),
@@ -159,6 +159,7 @@ def build_problem_details(
         instance=instance or "",
         extensions=None,
     )
+    problem_dict = _build_problem_details(params)
     problem_dict["extensions"] = {
         "command": command,
         "subcommand": subcommand,
