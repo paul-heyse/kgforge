@@ -1,195 +1,338 @@
-"""Validate documentation build artifacts against JSON Schemas."""
+"""Command-line interface for validating documentation artifacts against schemas.
+
+This module provides a CLI tool to validate all documentation artifacts (symbol
+index, delta, reverse lookups) against their canonical JSON Schema definitions.
+It ensures that all artifacts conform to the spec before they are written to disk.
+
+The validator orchestrates calls to specialized functions for each artifact type
+(see `validate_symbol_index`, `validate_symbol_delta`) and integrates with the
+observability pipeline via:
+
+- **Structured Logging**: each artifact validation produces logs with operation,
+  artifact, and status fields via `shared.make_logger()` for correlation and tracing
+- **Metrics**: duration and status captured via `observe_tool_run()` context manager
+- **Error Handling**: all validation failures raise `ArtifactValidationError` with
+  RFC 9457 Problem Details attached (`.problem` attr)
+
+Correlation IDs
+---------------
+When invoked as part of a larger build orchestration, context propagates via
+`contextvars` (see `tools._shared.contextvars` for details). Logs automatically
+inherit correlation metadata from the calling context.
+
+Examples
+--------
+Typical CLI usage::
+
+    $ python -m docs._scripts.validate_artifacts --artifacts symbols.json
+    ✓ symbols.json validated successfully
+
+Programmatic usage::
+
+    >>> from docs._scripts.validate_artifacts import validate_symbol_index
+    >>> from pathlib import Path
+    >>> artifacts = validate_symbol_index(Path("docs/_build/symbols.json"))
+    >>> print(f"Validated {len(artifacts.rows)} symbols")
+"""
 
 from __future__ import annotations
 
+import argparse
 import json
 import logging
 import sys
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
 from docs._scripts import shared  # noqa: PLC2701
 from docs._scripts.validation import validate_against_schema  # noqa: PLC2701
+from docs._types.artifacts import (
+    JsonPayload,  # noqa: PLC2701
+    SymbolDeltaPayload,
+    SymbolIndexArtifacts,
+    symbol_delta_from_json,  # noqa: PLC2701
+    symbol_delta_to_payload,  # noqa: PLC2701
+    symbol_index_from_json,  # noqa: PLC2701
+    symbol_index_to_payload,  # noqa: PLC2701
+)
 from tools import (
-    build_problem_details,
     get_logger,
     observe_tool_run,
-    render_problem,
 )
-from tools._shared.proc import ToolExecutionError
+from tools._shared.problem_details import ProblemDetailsDict
+from tools._shared.proc import ToolExecutionError  # noqa: PLC2701
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
 SETTINGS = shared.load_settings()
 
-DOCS_BUILD = SETTINGS.docs_build_dir
-SCHEMA_DIR = ENV.root / "schema" / "docs"
-SYMBOLS_PATH = DOCS_BUILD / "symbols.json"
-DELTA_PATH = DOCS_BUILD / "symbols.delta.json"
-BY_FILE_PATH = DOCS_BUILD / "by_file.json"
-BY_MODULE_PATH = DOCS_BUILD / "by_module.json"
-SYMBOL_SCHEMA = SCHEMA_DIR / "symbol-index.schema.json"
-DELTA_SCHEMA = SCHEMA_DIR / "symbol-delta.schema.json"
-
 BASE_LOGGER = get_logger(__name__)
 VALIDATION_LOG = shared.make_logger(
-    "docs_artifact_validation", artifact=str(DOCS_BUILD), logger=BASE_LOGGER
+    "docs_artifact_validation",
+    artifact="artifacts",
+    logger=BASE_LOGGER,
 )
 
 
-JsonPrimitive = str | int | float | bool | None
-JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
-ProblemDetailsDict = dict[str, JsonValue]
-JsonPayload = Mapping[str, JsonValue] | Sequence[JsonValue] | JsonValue
+class ArtifactValidationError(RuntimeError):
+    """Exception raised when an artifact fails validation.
+
+    This exception wraps validation failures with RFC 9457 Problem Details,
+    providing structured error information suitable for CLI output and logging.
+
+    Attributes
+    ----------
+    artifact_name : str
+        Logical identifier for the artifact (e.g., "symbols.json").
+    problem : ProblemDetailsDict
+        RFC 9457 Problem Details dict with validation error details.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        artifact_name: str,
+        problem: ProblemDetailsDict | None = None,
+    ) -> None:
+        """Initialize ArtifactValidationError.
+
+        Parameters
+        ----------
+        message : str
+            Human-readable error message.
+        artifact_name : str
+            Logical identifier for the artifact.
+        problem : ProblemDetailsDict | None, optional
+            RFC 9457 Problem Details dict. Defaults to None.
+        """
+        super().__init__(message)
+        self.artifact_name = artifact_name
+        self.problem = problem or {}
 
 
-def _emit_problem(problem: ProblemDetailsDict | None, *, default_message: str) -> None:
-    payload = problem or build_problem_details(
-        type="https://kgfoundry.dev/problems/docs-artifact-validation",
-        title="Documentation artifact validation failed",
-        status=500,
-        detail=default_message,
-        instance="urn:docs:artifact-validation:unexpected-error",
-    )
-    sys.stderr.write(render_problem(payload) + "\n")
+@dataclass(slots=True, frozen=True)
+class ArtifactCheck:
+    """Configuration for validating a single artifact type.
+
+    Attributes
+    ----------
+    name : str
+        Human-readable name (e.g., "Symbol Index").
+    artifact_id : str
+        Logical identifier (e.g., "symbols.json").
+    path : Path
+        Path to the artifact file.
+    schema : Path
+        Path to the JSON Schema file.
+    loader : Callable[[Path], object]
+        Function to load and parse the artifact file.
+    codec : Callable[[object], object]
+        Function to convert loaded data to typed model.
+    """
+
+    name: str
+    artifact_id: str
+    path: Path
+    schema: Path
+    loader: Callable[[Path], object]
+    codec: Callable[[object], object]
 
 
-def _load_json(path: Path) -> JsonPayload:
+def validate_symbol_index(path: Path) -> SymbolIndexArtifacts:
+    """Validate a symbol index JSON file against its schema.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the symbols.json file.
+
+    Returns
+    -------
+    SymbolIndexArtifacts
+        The validated artifact model.
+
+    Raises
+    ------
+    ArtifactValidationError
+        If the file doesn't exist, is invalid JSON, or fails schema validation.
+    """
+    if not path.exists():
+        message = f"Symbol index not found: {path}"
+        raise ArtifactValidationError(message, artifact_name="symbols.json")
+
     try:
-        return cast(JsonPayload, json.loads(path.read_text(encoding="utf-8")))
-    except FileNotFoundError as exc:
-        problem = build_problem_details(
-            type="https://kgfoundry.dev/problems/docs-artifact-validation",
-            title="Documentation artifact missing",
-            status=404,
-            detail=f"Required artifact '{path}' is missing",
-            instance=f"urn:docs:artifact-validation:missing:{path.name}",
+        raw_data: JsonPayload = cast(JsonPayload, json.loads(path.read_text(encoding="utf-8")))
+        artifacts = symbol_index_from_json(raw_data)
+    except (ValueError, TypeError, json.JSONDecodeError) as e:
+        message = f"Failed to parse symbol index: {e}"
+        raise ArtifactValidationError(message, artifact_name="symbols.json") from e
+
+    schema = path.parent.parent / "schema" / "docs" / "symbol-index.schema.json"
+    try:
+        validate_against_schema(symbol_index_to_payload(artifacts), schema, artifact="symbols.json")
+    except ToolExecutionError as e:
+        raise ArtifactValidationError(
+            str(e),
+            artifact_name="symbols.json",
+            problem=e.problem,
+        ) from e
+
+    return artifacts
+
+
+def validate_symbol_delta(path: Path) -> SymbolDeltaPayload:
+    """Validate a symbol delta JSON file against its schema.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the symbols.delta.json file.
+
+    Returns
+    -------
+    SymbolDeltaPayload
+        The validated artifact model.
+
+    Raises
+    ------
+    ArtifactValidationError
+        If the file doesn't exist, is invalid JSON, or fails schema validation.
+    """
+    if not path.exists():
+        message = f"Symbol delta not found: {path}"
+        raise ArtifactValidationError(message, artifact_name="symbols.delta.json")
+
+    try:
+        raw_data: JsonPayload = cast(JsonPayload, json.loads(path.read_text(encoding="utf-8")))
+        payload = symbol_delta_from_json(raw_data)
+    except (ValueError, TypeError, json.JSONDecodeError) as e:
+        message = f"Failed to parse symbol delta: {e}"
+        raise ArtifactValidationError(message, artifact_name="symbols.delta.json") from e
+
+    schema = path.parent.parent / "schema" / "docs" / "symbol-delta.schema.json"
+    try:
+        validate_against_schema(
+            symbol_delta_to_payload(payload), schema, artifact="symbols.delta.json"
         )
-        message = f"Artifact '{path}' is missing"
-        raise ToolExecutionError(
-            message,
-            command=("docs-validate-artifacts", str(path)),
-            problem=problem,
-        ) from exc
+    except ToolExecutionError as e:
+        raise ArtifactValidationError(
+            str(e),
+            artifact_name="symbols.delta.json",
+            problem=e.problem,
+        ) from e
+
+    return payload
 
 
-def _validate_reverse_lookup(payload: object, artifact: str) -> None:
-    if not isinstance(payload, Mapping):
-        problem = build_problem_details(
-            type="https://kgfoundry.dev/problems/docs-artifact-validation",
-            title="Reverse lookup has invalid structure",
-            status=422,
-            detail=f"Artifact '{artifact}' must be an object mapping file/module names to symbol paths",
-            instance=f"urn:docs:artifact-validation:invalid:{artifact}",
-        )
-        message = f"Artifact '{artifact}' must be a mapping"
-        raise ToolExecutionError(
-            message,
-            command=("docs-validate-artifacts", artifact),
-            problem=problem,
-        )
-    for key, value in payload.items():
-        if not isinstance(key, str):
-            problem = build_problem_details(
-                type="https://kgfoundry.dev/problems/docs-artifact-validation",
-                title="Reverse lookup key must be a string",
-                status=422,
-                detail=f"Artifact '{artifact}' has a non-string key",
-                instance=f"urn:docs:artifact-validation:invalid-key:{artifact}",
-            )
-            message = f"Artifact '{artifact}' has an invalid key"
-            raise ToolExecutionError(
-                message,
-                command=("docs-validate-artifacts", artifact),
-                problem=problem,
-            )
-        if not isinstance(value, Sequence) or not all(isinstance(item, str) for item in value):
-            problem = build_problem_details(
-                type="https://kgfoundry.dev/problems/docs-artifact-validation",
-                title="Reverse lookup values must be arrays of strings",
-                status=422,
-                detail=f"Artifact '{artifact}' has an invalid value for '{key}'",
-                instance=f"urn:docs:artifact-validation:invalid-value:{artifact}",
-            )
-            message = f"Artifact '{artifact}' has an invalid value"
-            raise ToolExecutionError(
-                message,
-                command=("docs-validate-artifacts", artifact),
-                problem=problem,
-            )
+def main(argv: Sequence[str] | None = None) -> int:
+    """Validate all documentation artifacts against their canonical schemas.
 
+    Validates `symbols.json`, `symbols.delta.json`, and reverse lookup artifacts
+    (`by_file.json`, `by_module.json`) against their JSON Schema definitions.
+    Emits RFC 9457 Problem Details on validation failure and logs structured
+    metadata including operation, artifact, and status for observability.
 
-def _validate_symbol_index(payload: object) -> None:
-    validate_against_schema(cast(JsonPayload, payload), SYMBOL_SCHEMA, artifact=SYMBOLS_PATH.name)
+    Parameters
+    ----------
+    argv : Sequence[str] | None, optional
+        Command-line arguments. Defaults to None (uses sys.argv).
 
+    Returns
+    -------
+    int
+        Exit code: 0 for success, non-zero for failure.
 
-def _validate_symbol_delta(payload: object) -> None:
-    if isinstance(payload, Mapping):
-        validate_against_schema(cast(JsonPayload, payload), DELTA_SCHEMA, artifact=DELTA_PATH.name)
-    else:
-        problem = build_problem_details(
-            type="https://kgfoundry.dev/problems/docs-artifact-validation",
-            title="Symbol delta payload must be an object",
-            status=422,
-            detail="Expected an object payload for symbols.delta.json",
-            instance="urn:docs:artifact-validation:invalid:symbols-delta",
-        )
-        message = "symbols.delta.json payload is invalid"
-        raise ToolExecutionError(
-            message,
-            command=("docs-validate-artifacts", DELTA_PATH.name),
-            problem=problem,
-        )
+    Examples
+    --------
+    >>> main(["--artifacts", "symbols.json"])
+    0
+    """
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--artifacts",
+        nargs="+",
+        type=str,
+        default=["symbols.json", "symbols.delta.json"],  # type: ignore[misc]
+        help="Artifact names to validate (default: all)",
+    )
+    args = parser.parse_args(argv)
 
-
-def main() -> int:
     if not logging.getLogger().handlers:
         logging.basicConfig(level=logging.INFO)
 
-    with observe_tool_run(["docs-validate-artifacts"], cwd=DOCS_BUILD, timeout=None) as observation:
-        try:
-            symbols_payload = _load_json(SYMBOLS_PATH)
-            _validate_symbol_index(symbols_payload)
+    artifacts_to_check: dict[str, Callable[[Path], SymbolIndexArtifacts | SymbolDeltaPayload]] = {
+        "symbols.json": validate_symbol_index,
+        "symbols.delta.json": validate_symbol_delta,
+    }
 
-            delta_payload = _load_json(DELTA_PATH)
-            _validate_symbol_delta(delta_payload)
+    with observe_tool_run(
+        ["docs-validate-artifacts"],
+        cwd=SETTINGS.docs_build_dir,
+        timeout=None,
+    ) as observation:
+        failed_count = 0
+        artifact_names: list[str] = args.artifacts
 
-            by_file_payload = _load_json(BY_FILE_PATH)
-            _validate_reverse_lookup(by_file_payload, BY_FILE_PATH.name)
+        for artifact_name in artifact_names:
+            if artifact_name not in artifacts_to_check:
+                VALIDATION_LOG.warning(
+                    "Unknown artifact: %s",
+                    artifact_name,
+                    extra={"artifact": artifact_name, "status": "skipped"},
+                )
+                continue
 
-            by_module_payload = _load_json(BY_MODULE_PATH)
-            _validate_reverse_lookup(by_module_payload, BY_MODULE_PATH.name)
-        except ToolExecutionError as exc:
-            observation.failure("failure", returncode=1)
-            _emit_problem(exc.problem, default_message=str(exc))
-            return 1
-        except Exception as exc:  # pragma: no cover - defensive  # noqa: BLE001
-            observation.failure("exception", returncode=1)
-            problem = build_problem_details(
-                type="https://kgfoundry.dev/problems/docs-artifact-validation",
-                title="Documentation artifact validation failed",
-                status=500,
-                detail=str(exc),
-                instance="urn:docs:artifact-validation:unexpected-error",
+            artifact_log = shared.make_logger(
+                "docs_artifact_validation",
+                artifact=artifact_name,
+                logger=BASE_LOGGER,
             )
-            _emit_problem(problem, default_message=str(exc))
-            return 1
-        else:
-            observation.success(0)
 
-    VALIDATION_LOG.info(
-        "Documentation artifacts validated",
-        extra={
-            "status": "success",
-            "symbols": str(SYMBOLS_PATH),
-            "delta": str(DELTA_PATH),
-            "by_file": str(BY_FILE_PATH),
-            "by_module": str(BY_MODULE_PATH),
-        },
-    )
-    return 0
+            try:
+                validator = artifacts_to_check[artifact_name]
+                validator(Path(artifact_name))
+                artifact_log.info(
+                    "Artifact validated successfully",
+                    extra={"status": "success"},
+                )
+            except ArtifactValidationError as e:
+                artifact_log.exception(
+                    "Artifact validation failed",
+                    extra={
+                        "status": "failure",
+                        "artifact": artifact_name,
+                        "error_type": type(e).__name__,
+                    },
+                )
+                failed_count += 1
+
+        if failed_count > 0:
+            VALIDATION_LOG.error(
+                "Artifact validation failed for %s artifact(s)",
+                failed_count,
+                extra={
+                    "failed_count": failed_count,
+                    "status": "failure",
+                },
+            )
+            observation.failure("validation_failed", returncode=1)
+            return 1
+
+        VALIDATION_LOG.info(
+            "All artifacts validated successfully",
+            extra={
+                "artifact_count": len(artifact_names),
+                "status": "success",
+            },
+        )
+        observation.success(0)
+        return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())

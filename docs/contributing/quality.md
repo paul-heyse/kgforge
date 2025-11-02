@@ -49,6 +49,74 @@ an error.
 | Docs symbol index/delta outputs                    | Rebuilds `docs/_build/symbols*.json` with schema validation | Review `docs/_scripts/validate_artifacts.py` for failure details |
 | Pydantic models / schema exports                   | Writes JSON schema artefacts and drift reports       | Inspect `docs/_build/schema_drift.json` when it changes |
 
+### Typed artifact validation
+
+Documentation artifacts (symbol index, delta, reverse lookups) are now produced and validated through typed models in `docs._types.artifacts`. The typed pipeline ensures schema compliance and provides structured error reporting via RFC 9457 Problem Details.
+
+**Key modules:**
+
+- `docs._types.artifacts` — authoritative msgspec.Struct models for all artifacts
+- `docs._types.griffe` — typed loader facade for Griffe integration
+- `docs._types.sphinx_optional` — typed facades for optional Sphinx dependencies
+- `docs._scripts.validate_artifacts` — validation CLI with Problem Details error reporting
+
+**Validation workflow:**
+
+When you run `make artifacts`, the build pipeline automatically validates all outputs:
+
+```bash
+# Validate all artifacts (called automatically by make artifacts)
+uv run python -m docs._scripts.validate_artifacts
+
+# Validate specific artifacts
+uv run python -m docs._scripts.validate_artifacts --artifacts symbols.json symbols.delta.json
+```
+
+**Example: Handling validation errors**
+
+If a symbol index fails validation, the CLI emits RFC 9457 Problem Details:
+
+```json
+{
+  "type": "https://kgfoundry.dev/problems/docs-schema-validation",
+  "title": "Docs artifact failed schema validation",
+  "status": 422,
+  "instance": "urn:docs:symbols.json:schema-validation",
+  "detail": "symbols.json failed schema validation",
+  "schema": "/home/paul/kgfoundry/schema/docs/symbol-index.schema.json",
+  "artifact": "symbols.json"
+}
+```
+
+The error includes:
+- `artifact` — logical name (e.g., "symbols.json")
+- `schema` — path to the JSON Schema that failed
+- `status` — HTTP status code (422 for unprocessable entity)
+- `instance` — unique URN for the error instance
+
+**Using typed models in custom scripts:**
+
+If you extend the documentation pipeline, import the typed models to ensure schema compliance:
+
+```python
+from docs._types.artifacts import (
+    SymbolIndexArtifacts,
+    SymbolDeltaPayload,
+    symbol_index_from_json,
+    symbol_index_to_payload,
+)
+from pathlib import Path
+
+# Load and validate a symbol index
+raw_data = json.loads(Path("docs/_build/symbols.json").read_text(encoding="utf-8"))
+artifacts: SymbolIndexArtifacts = symbol_index_from_json(raw_data)
+
+# Serialize back through the typed model to guarantee schema compliance
+output_payload = symbol_index_to_payload(artifacts)
+```
+
+All conversion functions validate types and coerce fields (e.g., lists → tuples) transparently, raising `ArtifactValidationError` with structured details on failure.
+
 ### Artefact FAQ
 
 - **DocFacts still drift after running `make artifacts`?** Ensure you committed

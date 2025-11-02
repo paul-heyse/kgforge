@@ -26,8 +26,11 @@ class SymbolIndexRow:
     """A single symbol entry in the index."""
 
     path: str
+    kind: str
+    doc: str
+    tested_by: tuple[str, ...]
+    source_link: dict[str, str]
     canonical_path: str | None
-    kind: str | None
     module: str | None
     package: str | None
     file: str | None
@@ -38,7 +41,6 @@ class SymbolIndexRow:
     since: str | None
     deprecated_in: str | None
     section: str | None
-    tested_by: tuple[str, ...]
     is_async: bool
     is_property: bool
 
@@ -46,8 +48,11 @@ class SymbolIndexRow:
         self,
         *,
         path: str,
+        kind: str,
+        doc: str,
+        tested_by: tuple[str, ...],
+        source_link: dict[str, str],
         canonical_path: str | None = None,
-        kind: str | None = None,
         module: str | None = None,
         package: str | None = None,
         file: str | None = None,
@@ -58,7 +63,6 @@ class SymbolIndexRow:
         since: str | None = None,
         deprecated_in: str | None = None,
         section: str | None = None,
-        tested_by: tuple[str, ...] = ...,
         is_async: bool = ...,
         is_property: bool = ...,
     ) -> None: ...
@@ -126,11 +130,6 @@ class ArtifactValidationError(RuntimeError):
         artifact_name: str | None = None,
         problem_details: dict[str, JsonValue] | None = None,
     ) -> None: ...
-
-class ArtifactCodec:
-    """JSON codec with repository-specific defaults for artifact serialization."""
-
-    pass
 
 def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts: ...
 def symbol_index_to_payload(

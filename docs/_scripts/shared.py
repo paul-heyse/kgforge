@@ -74,7 +74,7 @@ class WarningLogger(Protocol):
 _LOADER_FACTORY = cast(Callable[[Sequence[str]], GriffeLoader], resolve_griffe().loader_type)
 
 
-@lru_cache(maxsize=1)
+@lru_cache(maxsize=1)  # type: ignore[misc]
 def _detect_environment_cached() -> BuildEnvironment:
     root = Path(__file__).resolve().parents[2]
     src = root / "src"
@@ -95,7 +95,7 @@ def ensure_sys_paths(env: BuildEnvironment) -> None:
             sys.path.insert(0, path_str)
 
 
-@lru_cache(maxsize=1)
+@lru_cache(maxsize=1)  # type: ignore[misc]
 def _load_settings_cached() -> DocsSettings:
     env = detect_environment()
 
@@ -193,3 +193,36 @@ def make_logger(
     if artifact is not None:
         fields["artifact"] = artifact
     return with_fields(base_logger, **fields)
+
+
+def build_warning_logger(
+    operation: str,
+    *,
+    artifact: str | None = None,
+) -> WarningLogger:
+    """Return a logger satisfying the WarningLogger protocol for type safety.
+
+    This helper creates a structured logger adapter that can be used wherever
+    a WarningLogger protocol is required, ensuring type-safe logging throughout
+    the documentation build pipeline.
+
+    Parameters
+    ----------
+    operation : str
+        The operation name for structured logging context.
+    artifact : str | None, optional
+        Optional artifact name to include in logging context.
+        Defaults to None.
+
+    Returns
+    -------
+    WarningLogger
+        A logger satisfying the WarningLogger protocol with a warning() method.
+
+    Examples
+    --------
+    >>> logger = build_warning_logger("symbol_index")
+    >>> logger.warning("Operation started", extra={"status": "pending"})
+    """
+    logger = make_logger(operation, artifact=artifact)
+    return cast(WarningLogger, logger)

@@ -1,16 +1,17 @@
 """Authoritative typed models for documentation artifacts.
 
-This module provides msgspec-backed data structures and conversion helpers for all
+This module provides Pydantic V2-backed data structures and conversion helpers for all
 documentation pipeline artifacts (symbol index, delta, reverse lookups). Models
 serialize to payloads that validate against the canonical JSON Schemas under
 `schema/docs/`.
 
 The module owns the JSON contract and encapsulates all transformations, ensuring:
 
-- Deterministic serialization (stable field order, tuple use for arrays)
+- Deterministic serialization (stable field order, sorted keys in JSON)
 - Schema compliance (all payloads validate via jsonschema)
 - Type safety (no Any-typed access in public functions)
 - Defensive validation (field coercion, missing-key handling)
+- Self-documenting schemas (generated from model definitions)
 
 Examples
 --------
@@ -54,12 +55,10 @@ Examples
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Annotated
 
-import msgspec
+from pydantic import BaseModel, Field, field_validator
 
 # Type aliases matching RFC 7159 JSON structure
 type JsonPrimitive = str | int | float | bool | None
@@ -68,10 +67,9 @@ if TYPE_CHECKING:
 else:
     JsonValue = object  # type: ignore[assignment, misc]
 
-type JsonPayload = Mapping[str, JsonValue] | Sequence[JsonValue] | JsonValue
+type JsonPayload = dict[str, JsonValue] | list[JsonValue]
 
 __all__ = [
-    "ArtifactCodec",
     "ArtifactValidationError",
     "JsonPayload",
     "JsonPrimitive",
@@ -92,8 +90,7 @@ __all__ = [
 ]
 
 
-@dataclass(frozen=True, slots=True)
-class LineSpan:
+class LineSpan(BaseModel):
     """Start/end line numbers for a symbol.
 
     Parameters
@@ -104,12 +101,13 @@ class LineSpan:
         Ending line number (1-indexed, inclusive), or None if unknown.
     """
 
-    start: int | None
-    end: int | None
+    start: int | None = Field(None, ge=0, description="Start line (1-indexed)")
+    end: int | None = Field(None, ge=0, description="End line (1-indexed, inclusive)")
+
+    model_config = {"frozen": True}
 
 
-@msgspec.struct(omit_defaults=True, slots=True)
-class SymbolIndexRow:
+class SymbolIndexRow(BaseModel):
     """A single symbol entry in the index.
 
     Each row represents one documented symbol (function, class, module, etc.) with
@@ -119,11 +117,16 @@ class SymbolIndexRow:
     ----------
     path : str
         Fully qualified symbol path (e.g., "pkg.mod.ClassName.method_name").
+    kind : str
+        Symbol kind: "module", "class", "function", "method", etc.
+    doc : str
+        Documentation string/docstring for this symbol.
+    tested_by : tuple[str, ...] | list[str]
+        Test paths (relative to tests/) that cover this symbol.
+    source_link : dict[str, str]
+        Links to source code (e.g., GitHub, local paths).
     canonical_path : str | None, optional
         If this symbol is an alias, canonical_path points to the real definition.
-        Defaults to None.
-    kind : str | None, optional
-        Symbol kind: "module", "class", "function", "method", etc.
         Defaults to None.
     module : str | None, optional
         Module containing this symbol (e.g., "pkg.mod").
@@ -155,9 +158,6 @@ class SymbolIndexRow:
     section : str | None, optional
         Documentation section or category.
         Defaults to None.
-    tested_by : tuple[str, ...], optional
-        Test paths (relative to tests/) that cover this symbol.
-        Defaults to empty tuple.
     is_async : bool, optional
         True if this is an async function/method.
         Defaults to False.
@@ -166,31 +166,80 @@ class SymbolIndexRow:
         Defaults to False.
     """
 
-    path: str
-    canonical_path: str | None = None
-    kind: str | None = None
-    module: str | None = None
-    package: str | None = None
-    file: str | None = None
-    span: LineSpan | None = None
-    signature: str | None = None
-    owner: str | None = None
-    stability: str | None = None
-    since: str | None = None
-    deprecated_in: str | None = None
-    section: str | None = None
-    tested_by: tuple[str, ...] = ()
-    is_async: bool = False
-    is_property: bool = False
+    path: str = Field(..., description="Fully qualified symbol path")
+    kind: str = Field(..., description="Symbol kind (module, class, function, etc.)")
+    doc: str = Field(..., description="Documentation/docstring for this symbol")
+    tested_by: Annotated[tuple[str, ...], Field(description="Test paths covering this symbol")] = ()
+    source_link: Annotated[
+        dict[str, str], Field(description="Links to source code (GitHub, etc.)")
+    ] = Field(default_factory=dict)
+    canonical_path: str | None = Field(None, description="Canonical path if this is an alias")
+    module: str | None = Field(None, description="Module containing this symbol")
+    package: str | None = Field(None, description="Top-level package name")
+    file: str | None = Field(None, description="Relative path to source file")
+    span: LineSpan | None = Field(None, description="Start/end line numbers")
+    signature: str | None = Field(None, description="Function/method signature")
+    owner: str | None = Field(None, description="Owner class (for methods)")
+    stability: str | None = Field(None, description="Stability tag")
+    since: str | None = Field(None, description="Version when introduced")
+    deprecated_in: str | None = Field(None, description="Version when deprecated")
+    section: str | None = Field(None, description="Documentation section")
+    is_async: bool = Field(False, description="True if async function/method")
+    is_property: bool = Field(False, description="True if @property")
+
+    @field_validator("path", mode="before")
+    @classmethod
+    def path_not_empty(cls, v: object) -> str:
+        """Ensure path is a non-empty string."""
+        if not isinstance(v, str) or not v.strip():
+            raise ValueError("path must be a non-empty string")
+        return v
+
+    @field_validator("kind", mode="before")
+    @classmethod
+    def kind_not_empty(cls, v: object) -> str:
+        """Ensure kind is a non-empty string."""
+        if not isinstance(v, str) or not v.strip():
+            raise ValueError("kind must be a non-empty string")
+        return v
+
+    @field_validator("doc", mode="before")
+    @classmethod
+    def doc_not_empty(cls, v: object) -> str:
+        """Ensure doc is a non-empty string."""
+        if not isinstance(v, str) or not v.strip():
+            raise ValueError("doc must be a non-empty string")
+        return v
+
+    @field_validator("tested_by", mode="before")
+    @classmethod
+    def coerce_tested_by(cls, v: object) -> tuple[str, ...]:
+        """Coerce tested_by to tuple, defaulting to empty."""
+        if v is None:
+            return ()
+        if isinstance(v, (list, tuple)):
+            return tuple(str(item) for item in v)
+        return ()
+
+    @field_validator("source_link", mode="before")
+    @classmethod
+    def coerce_source_link(cls, v: object) -> dict[str, str]:
+        """Coerce source_link to dict, defaulting to empty."""
+        if v is None:
+            return {}
+        if isinstance(v, dict):
+            return {str(k): str(val) for k, val in v.items()}
+        return {}
+
+    model_config = {"frozen": True}
 
 
-@msgspec.struct(slots=True)
-class SymbolIndexArtifacts:
+class SymbolIndexArtifacts(BaseModel):
     """Complete symbol index payload with forward and reverse lookups.
 
     Parameters
     ----------
-    rows : tuple[SymbolIndexRow, ...]
+    rows : tuple[SymbolIndexRow, ...] | list[SymbolIndexRow]
         All symbol entries, sorted by path.
     by_file : dict[str, tuple[str, ...]]
         Reverse lookup: file path -> sorted tuple of symbol paths.
@@ -198,13 +247,33 @@ class SymbolIndexArtifacts:
         Reverse lookup: module name -> sorted tuple of symbol paths.
     """
 
-    rows: tuple[SymbolIndexRow, ...]
-    by_file: dict[str, tuple[str, ...]]
-    by_module: dict[str, tuple[str, ...]]
+    rows: Annotated[
+        tuple[SymbolIndexRow, ...],
+        Field(description="All symbol entries (sorted by path)"),
+    ] = ()
+    by_file: Annotated[
+        dict[str, tuple[str, ...]],
+        Field(description="Reverse lookup: file -> symbol paths"),
+    ] = Field(default_factory=dict)
+    by_module: Annotated[
+        dict[str, tuple[str, ...]],
+        Field(description="Reverse lookup: module -> symbol paths"),
+    ] = Field(default_factory=dict)
+
+    @field_validator("rows", mode="before")
+    @classmethod
+    def coerce_rows(cls, v: object) -> tuple[SymbolIndexRow, ...]:
+        """Coerce rows to tuple."""
+        if v is None:
+            return ()
+        if isinstance(v, (list, tuple)):
+            return tuple(v)  # type: ignore[arg-type]
+        return ()
+
+    model_config = {"frozen": True}
 
 
-@msgspec.struct(slots=True)
-class SymbolDeltaChange:
+class SymbolDeltaChange(BaseModel):
     """A single changed symbol between two versions.
 
     Parameters
@@ -215,18 +284,41 @@ class SymbolDeltaChange:
         Previous version of the row (serialized).
     after : dict[str, JsonValue]
         New version of the row (serialized).
-    reasons : tuple[str, ...]
-        List of reasons why the symbol changed (e.g., ["signature_changed", "doc_updated"]).
+    reasons : tuple[str, ...] | list[str]
+        List of reasons why the symbol changed (e.g., ["signature_changed"]).
     """
 
-    path: str
-    before: dict[str, JsonValue]
-    after: dict[str, JsonValue]
-    reasons: tuple[str, ...]
+    path: str = Field(..., description="Symbol path that changed")
+    before: Annotated[dict[str, JsonValue], Field(description="Previous row (serialized)")] = Field(
+        default_factory=dict
+    )
+    after: Annotated[dict[str, JsonValue], Field(description="New row (serialized)")] = Field(
+        default_factory=dict
+    )
+    reasons: Annotated[tuple[str, ...], Field(description="Reasons for the change")] = ()
+
+    @field_validator("path", mode="before")
+    @classmethod
+    def path_not_empty(cls, v: object) -> str:
+        """Ensure path is a non-empty string."""
+        if not isinstance(v, str) or not v.strip():
+            raise ValueError("path must be a non-empty string")
+        return v
+
+    @field_validator("reasons", mode="before")
+    @classmethod
+    def coerce_reasons(cls, v: object) -> tuple[str, ...]:
+        """Coerce reasons to tuple."""
+        if v is None:
+            return ()
+        if isinstance(v, (list, tuple)):
+            return tuple(str(item) for item in v)
+        return ()
+
+    model_config = {"frozen": True}
 
 
-@msgspec.struct(slots=True)
-class SymbolDeltaPayload:
+class SymbolDeltaPayload(BaseModel):
     """Delta (diff) of symbols between two git commits or documentation builds.
 
     Parameters
@@ -235,19 +327,51 @@ class SymbolDeltaPayload:
         Git SHA or build identifier for the baseline.
     head_sha : str | None
         Git SHA or build identifier for the current state.
-    added : tuple[str, ...]
+    added : tuple[str, ...] | list[str]
         Sorted tuple of newly added symbol paths.
-    removed : tuple[str, ...]
+    removed : tuple[str, ...] | list[str]
         Sorted tuple of removed symbol paths.
-    changed : tuple[SymbolDeltaChange, ...]
+    changed : tuple[SymbolDeltaChange, ...] | list[SymbolDeltaChange]
         List of symbols that changed (sorted by path).
     """
 
-    base_sha: str | None
-    head_sha: str | None
-    added: tuple[str, ...]
-    removed: tuple[str, ...]
-    changed: tuple[SymbolDeltaChange, ...]
+    base_sha: str | None = Field(None, description="Baseline git SHA or build ID")
+    head_sha: str | None = Field(None, description="Current git SHA or build ID")
+    added: Annotated[tuple[str, ...], Field(description="Newly added symbol paths")] = ()
+    removed: Annotated[tuple[str, ...], Field(description="Removed symbol paths")] = ()
+    changed: Annotated[tuple[SymbolDeltaChange, ...], Field(description="Changed symbols")] = ()
+
+    @field_validator("added", mode="before")
+    @classmethod
+    def coerce_added(cls, v: object) -> tuple[str, ...]:
+        """Coerce added to tuple."""
+        if v is None:
+            return ()
+        if isinstance(v, (list, tuple)):
+            return tuple(str(item) for item in v)
+        return ()
+
+    @field_validator("removed", mode="before")
+    @classmethod
+    def coerce_removed(cls, v: object) -> tuple[str, ...]:
+        """Coerce removed to tuple."""
+        if v is None:
+            return ()
+        if isinstance(v, (list, tuple)):
+            return tuple(str(item) for item in v)
+        return ()
+
+    @field_validator("changed", mode="before")
+    @classmethod
+    def coerce_changed(cls, v: object) -> tuple[SymbolDeltaChange, ...]:
+        """Coerce changed to tuple."""
+        if v is None:
+            return ()
+        if isinstance(v, (list, tuple)):
+            return tuple(v)  # type: ignore[arg-type]
+        return ()
+
+    model_config = {"frozen": True}
 
 
 class ArtifactValidationError(RuntimeError):
@@ -270,6 +394,23 @@ class ArtifactValidationError(RuntimeError):
         Logical name of the artifact, if provided.
     problem_details : dict[str, JsonValue] | None
         RFC 9457 Problem Details, if provided.
+
+    Examples
+    --------
+    >>> from docs._types.artifacts import ArtifactValidationError
+    >>> try:
+    ...     raise ArtifactValidationError(
+    ...         "Missing required field: path",
+    ...         artifact_name="symbols.json",
+    ...         problem_details={
+    ...             "type": "urn:kgfoundry:validation-error",
+    ...             "title": "Validation Error",
+    ...             "detail": "Missing required field: path",
+    ...             "instance": "symbols.json",
+    ...         },
+    ...     )
+    ... except ArtifactValidationError as e:
+    ...     assert e.artifact_name == "symbols.json"
     """
 
     def __init__(
@@ -282,16 +423,6 @@ class ArtifactValidationError(RuntimeError):
         super().__init__(message)
         self.artifact_name = artifact_name
         self.problem_details = problem_details
-
-
-class ArtifactCodec(msgspec.json.Codec):
-    """JSON codec with repository-specific defaults for artifact serialization.
-
-    Configured for:
-    - Deterministic serialization (sorted keys, stable field order)
-    - Round-trip fidelity with msgspec structs
-    - UTF-8 encoding
-    """
 
 
 def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
@@ -320,6 +451,7 @@ def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
     ...         "path": "mod.func",
     ...         "canonical_path": None,
     ...         "kind": "function",
+    ...         "doc": "A function.",
     ...         "module": "mod",
     ...         "package": "pkg",
     ...         "file": "mod.py",
@@ -360,14 +492,14 @@ def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
                     end=int(endlineno) if endlineno is not None else None,
                 )
 
-            # Coerce tested_by to tuple
-            tested_by_list = item.get("tested_by", [])
-            tested_by = tuple(tested_by_list) if isinstance(tested_by_list, (list, tuple)) else ()
-
+            # Create row with Pydantic validation
             row = SymbolIndexRow(
                 path=str(item["path"]),
+                kind=str(item["kind"]),
+                doc=str(item["doc"]),
+                tested_by=item.get("tested_by", []),
+                source_link=item.get("source_link", {}),
                 canonical_path=item.get("canonical_path"),
-                kind=item.get("kind"),
                 module=item.get("module"),
                 package=item.get("package"),
                 file=item.get("file"),
@@ -378,7 +510,6 @@ def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
                 since=item.get("since"),
                 deprecated_in=item.get("deprecated_in"),
                 section=item.get("section"),
-                tested_by=tested_by,
                 is_async=bool(item.get("is_async", False)),
                 is_property=bool(item.get("is_property", False)),
             )
@@ -411,7 +542,7 @@ def symbol_index_to_payload(model: SymbolIndexArtifacts) -> list[dict[str, JsonV
     ...     SymbolIndexArtifacts,
     ...     symbol_index_to_payload,
     ... )
-    >>> row = SymbolIndexRow(path="mod.func", kind="function")
+    >>> row = SymbolIndexRow(path="mod.func", kind="function", doc="A function.")
     >>> artifacts = SymbolIndexArtifacts(
     ...     rows=(row,),
     ...     by_file={},
@@ -426,6 +557,8 @@ def symbol_index_to_payload(model: SymbolIndexArtifacts) -> list[dict[str, JsonV
             "path": row.path,
             "canonical_path": row.canonical_path,
             "kind": row.kind,
+            "doc": row.doc,
+            "source_link": row.source_link,
             "module": row.module,
             "package": row.package,
             "file": row.file,
@@ -463,40 +596,33 @@ def symbol_delta_from_json(raw: JsonPayload) -> SymbolDeltaPayload:
     ------
     ArtifactValidationError
         If the payload is malformed or missing required fields.
+
+    Examples
+    --------
+    >>> from docs._types.artifacts import symbol_delta_from_json
+    >>> payload = {
+    ...     "base_sha": "abc123",
+    ...     "head_sha": "def456",
+    ...     "added": ["new.symbol"],
+    ...     "removed": [],
+    ...     "changed": [],
+    ... }
+    >>> delta = symbol_delta_from_json(payload)
+    >>> assert delta.base_sha == "abc123"
     """
     if not isinstance(raw, dict):
         msg = f"Expected dict, got {type(raw).__name__}"
         raise ArtifactValidationError(msg, artifact_name="symbol-delta")
 
     try:
-        # Coerce added/removed to tuples
-        added = tuple(raw.get("added", []))
-        removed = tuple(raw.get("removed", []))
-
-        # Parse changed list
-        changed_list: list[SymbolDeltaChange] = []
-        for change_item in raw.get("changed", []):
-            if not isinstance(change_item, dict):
-                msg = f"Expected changed item to be dict, got {type(change_item).__name__}"
-                raise ArtifactValidationError(msg, artifact_name="symbol-delta")
-
-            reasons = tuple(change_item.get("reasons", []))
-            delta_change = SymbolDeltaChange(
-                path=str(change_item["path"]),
-                before=change_item.get("before", {}),
-                after=change_item.get("after", {}),
-                reasons=reasons,
-            )
-            changed_list.append(delta_change)
-
         return SymbolDeltaPayload(
             base_sha=raw.get("base_sha"),
             head_sha=raw.get("head_sha"),
-            added=added,
-            removed=removed,
-            changed=tuple(changed_list),
+            added=raw.get("added", []),
+            removed=raw.get("removed", []),
+            changed=raw.get("changed", []),
         )
-    except (KeyError, ValueError, TypeError) as e:
+    except (ValueError, TypeError) as e:
         msg = f"Failed to construct SymbolDeltaPayload: {e}"
         raise ArtifactValidationError(msg, artifact_name="symbol-delta") from e
 
@@ -513,6 +639,20 @@ def symbol_delta_to_payload(model: SymbolDeltaPayload) -> dict[str, JsonValue]:
     -------
     dict[str, JsonValue]
         JSON payload ready for writing to disk or validation.
+
+    Examples
+    --------
+    >>> from docs._types.artifacts import (
+    ...     SymbolDeltaChange,
+    ...     SymbolDeltaPayload,
+    ...     symbol_delta_to_payload,
+    ... )
+    >>> delta = SymbolDeltaPayload(
+    ...     base_sha="abc123",
+    ...     head_sha="def456",
+    ... )
+    >>> payload = symbol_delta_to_payload(delta)
+    >>> assert payload["base_sha"] == "abc123"
     """
     changed_list: list[dict[str, JsonValue]] = []
     for change in model.changed:
@@ -581,6 +721,18 @@ def dump_symbol_index(path: Path, model: SymbolIndexArtifacts) -> None:
     ------
     ArtifactValidationError
         If the file cannot be written.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> from docs._types.artifacts import (
+    ...     SymbolIndexRow,
+    ...     SymbolIndexArtifacts,
+    ...     dump_symbol_index,
+    ... )
+    >>> row = SymbolIndexRow(path="mod.func", kind="function", doc="A function.")
+    >>> artifacts = SymbolIndexArtifacts(rows=(row,))
+    >>> # dump_symbol_index(Path("output.json"), artifacts)
     """
     try:
         payload = symbol_index_to_payload(model)
@@ -608,6 +760,12 @@ def load_symbol_delta(path: Path) -> SymbolDeltaPayload:
     ------
     ArtifactValidationError
         If the file cannot be read or the payload is invalid.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> from docs._types.artifacts import load_symbol_delta
+    >>> # delta = load_symbol_delta(Path("docs/_build/symbols.delta.json"))
     """
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -632,6 +790,16 @@ def dump_symbol_delta(path: Path, model: SymbolDeltaPayload) -> None:
     ------
     ArtifactValidationError
         If the file cannot be written.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> from docs._types.artifacts import (
+    ...     SymbolDeltaPayload,
+    ...     dump_symbol_delta,
+    ... )
+    >>> delta = SymbolDeltaPayload(base_sha="abc123", head_sha="def456")
+    >>> # dump_symbol_delta(Path("output.delta.json"), delta)
     """
     try:
         payload = symbol_delta_to_payload(model)

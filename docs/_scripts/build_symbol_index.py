@@ -20,7 +20,7 @@ from tools import (
     observe_tool_run,
     render_problem,
 )
-from tools._shared.proc import ToolExecutionError
+from tools._shared.proc import ToolExecutionError  # noqa: PLC2701
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
@@ -443,10 +443,7 @@ def load_test_map() -> dict[str, JsonValue]:
         )
         return {}
     if isinstance(payload, Mapping):
-        return {
-            str(key): value
-            for key, value in payload.items()
-        }
+        return {str(key): value for key, value in payload.items()}
     return {}
 
 
@@ -548,4 +545,160 @@ def generate_index(
     packages: Sequence[str],
     loader: shared.GriffeLoader,
 ) -> SymbolIndexArtifacts:
-    """Produce typed symbol index artifacts for ``
+    """Produce typed symbol index artifacts for ``packages``."""
+    nav_lookup = load_nav_lookup()
+    test_map = load_test_map()
+    rows: list[SymbolIndexRow] = []
+    for package in packages:
+        root = cast(GriffeNode, loader.load(package))
+        rows.extend(_collect_rows(root, nav=nav_lookup, test_map=test_map))
+    rows_sorted = tuple(sorted(rows, key=lambda item: item.path))  # type: ignore[misc]
+    by_file = _build_reverse_map(rows_sorted, "file")
+    by_module = _build_reverse_map(rows_sorted, "module")
+    return SymbolIndexArtifacts(rows=rows_sorted, by_file=by_file, by_module=by_module)
+
+
+@lru_cache(maxsize=1)  # type: ignore[misc]
+def _git_sha() -> str:
+    """Return the Git SHA for permalink construction."""
+    return shared.resolve_git_sha(ENV, SETTINGS, logger=BASE_LOGGER)  # type: ignore[arg-type]
+
+
+def build_github_permalink(file: Path, span: LineSpan) -> str | None:
+    """Return a commit-stable GitHub permalink for ``file`` when configured."""
+    if not (SETTINGS.github_org and SETTINGS.github_repo):
+        return None
+    sha = _git_sha()
+    fragment = ""
+    if span.start is not None and span.end is not None and span.end >= span.start:
+        fragment = f"#L{span.start}-L{span.end}"
+    elif span.start is not None:
+        fragment = f"#L{span.start}"
+    relative = file.as_posix()
+    return (
+        "https://github.com/"
+        f"{SETTINGS.github_org}/{SETTINGS.github_repo}/blob/{sha}/{relative}{fragment}"
+    )
+
+
+def write_artifact(
+    path: Path,
+    payload: object,
+    *,
+    logger: StructuredLoggerAdapter,
+    artifact: str,
+    validation: SchemaValidation | None = None,
+) -> bool:
+    """Validate (when configured) and write ``payload`` to ``path`` if it changed."""
+    if validation is not None:
+        validate_against_schema(
+            cast(JsonPayload, payload),
+            validation.schema,
+            artifact=artifact,
+        )
+    serialized = json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
+    if path.exists():
+        existing = path.read_text(encoding="utf-8")
+        if existing == serialized:
+            logger.info(
+                "Artifact already up-to-date",
+                extra={"status": "unchanged", "path": str(path)},
+            )
+            return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(serialized, encoding="utf-8")
+    logger.info(
+        "Artifact written",
+        extra={"status": "updated", "path": str(path)},
+    )
+    return True
+
+
+def iter_packages() -> list[str]:
+    """Return packages configured for documentation builds (compatibility helper)."""
+    return list(SETTINGS.packages)
+
+
+def safe_attr(node: object, attr: str, default: object | None = None) -> object | None:
+    """Compatibility wrapper delegating to :func:`safe_getattr`."""
+    return safe_getattr(node, attr, default)
+
+
+def _emit_problem(problem: ProblemDetailsDict | None, *, default_message: str) -> None:
+    payload = problem or build_problem_details(
+        type="https://kgfoundry.dev/problems/docs-symbol-index",
+        title="Symbol index build failed",
+        status=500,
+        detail=default_message,
+        instance="urn:docs:symbol-index:unknown",
+    )
+    sys.stderr.write(render_problem(payload) + "\n")
+
+
+def main() -> int:
+    """Entry point for the symbol index builder."""
+    if not logging.getLogger().handlers:
+        logging.basicConfig(level=logging.INFO)
+
+    packages = list(SETTINGS.packages or ())
+    with observe_tool_run(["docs-symbol-index"], cwd=DOCS_BUILD, timeout=None) as observation:
+        try:
+            artifacts = generate_index(packages, LOADER)
+            rows_payload = artifacts.rows_payload()
+            wrote_symbols = write_artifact(
+                SYMBOLS_PATH,
+                rows_payload,
+                logger=SYMBOL_LOG,
+                artifact="symbols.json",
+                validation=SchemaValidation(schema=SYMBOL_INDEX_SCHEMA),
+            )
+            wrote_by_file = write_artifact(
+                BY_FILE_PATH,
+                artifacts.by_file_payload(),
+                logger=BY_FILE_LOG,
+                artifact="by_file.json",
+            )
+            wrote_by_module = write_artifact(
+                BY_MODULE_PATH,
+                artifacts.by_module_payload(),
+                logger=BY_MODULE_LOG,
+                artifact="by_module.json",
+            )
+        except ToolExecutionError as exc:  # pragma: no cover - exercised in CLI
+            observation.failure("failure", returncode=1)
+            _emit_problem(exc.problem, default_message=str(exc))
+            return 1
+        except Exception as exc:  # pragma: no cover - defensive guard  # noqa: BLE001
+            # Defensive catch ensures we emit structured Problem Details for unexpected failures.
+            observation.failure("exception", returncode=1)
+            problem = build_problem_details(
+                type="https://kgfoundry.dev/problems/docs-symbol-index",
+                title="Symbol index build failed",
+                status=500,
+                detail=str(exc),
+                instance="urn:docs:symbol-index:unexpected-error",
+                extensions={"packages": list(packages)},
+            )
+            _emit_problem(problem, default_message=str(exc))
+            return 1
+        else:
+            observation.success(0)
+
+    SYMBOL_LOG.info(
+        "Symbol index build complete",
+        extra={
+            "status": "success",
+            "symbols_entries": artifacts.symbol_count,
+            "symbols_updated": wrote_symbols,
+            "by_file_updated": wrote_by_file,
+            "by_module_updated": wrote_by_module,
+            "symbols_path": str(SYMBOLS_PATH),
+            "by_file_path": str(BY_FILE_PATH),
+            "by_module_path": str(BY_MODULE_PATH),
+        },
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

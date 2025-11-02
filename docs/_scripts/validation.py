@@ -1,4 +1,43 @@
-"""Schema validation helpers for documentation tooling artifacts."""
+"""Schema validation helpers for documentation tooling artifacts.
+
+This module provides validation utilities for docs artifacts (symbol index, delta,
+reverse lookups) against their canonical JSON Schema definitions. Validation failures
+are surfaced as `ToolExecutionError` with RFC 9457 Problem Details payloads,
+enabling structured error handling and observability hooks downstream.
+
+The validator cache improves performance across multiple invocations by avoiding
+repeated schema parsing and compilation.
+
+Error Handling & Observability
+-------------------------------
+All validation failures raise `ToolExecutionError` with:
+- Problem Details dict attached (`error.problem`) per RFC 9457
+- Command tuple identifying the validation operation
+- Optional stdout/stderr for diagnostic output
+- Full exception chain preserved via `raise ... from`
+
+Callers can log the `problem` field directly or render it to JSON for structured
+error reporting. See `schema/examples/problem_details/docs-schema-validation.json`
+for a canonical example.
+
+Examples
+--------
+Typical usage in a docs build script::
+
+    from docs._scripts.validation import validate_against_schema
+    from pathlib import Path
+    import json
+
+    schema_path = Path("schema/docs/symbol-index.schema.json")
+    payload = json.loads(Path("docs/_build/symbols.json").read_text())
+
+    try:
+        validate_against_schema(payload, schema_path, artifact="symbols.json")
+    except ToolExecutionError as e:
+        # Problem Details payload is ready for HTTP or CLI output
+        print(json.dumps(e.problem, indent=2))
+        raise
+"""
 
 from __future__ import annotations
 
@@ -9,11 +48,11 @@ from typing import Any, cast
 
 from jsonschema import Draft202012Validator
 from jsonschema import exceptions as jsonschema_exceptions
-from tools._shared.problem_details import (  # noqa: PLC2701
+from tools._shared.problem_details import (
     ProblemDetailsDict,
-    build_schema_problem_details,
+    build_schema_problem_details,  # noqa: PLC2701
 )
-from tools._shared.proc import ToolExecutionError
+from tools._shared.proc import ToolExecutionError  # noqa: PLC2701
 
 JsonPayload = Mapping[str, Any] | Sequence[Any] | str | int | float | bool | None
 
@@ -79,6 +118,6 @@ def validate_against_schema(
         message = f"{artifact} failed schema validation"
         raise ToolExecutionError(
             message,
-            command=("docs-schema-validate", artifact),
+            command=["docs-schema-validate", artifact],
             problem=problem,
         ) from exc
