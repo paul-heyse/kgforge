@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Mapping
 from io import StringIO
-from typing import cast
+from typing import Final, cast
 
-import pytest
+from _pytest.logging import LogCaptureFixture
 
 from kgfoundry_common.logging import (
     CorrelationContext,
@@ -19,6 +20,12 @@ from kgfoundry_common.logging import (
     set_correlation_id,
     with_fields,
 )
+
+def expect_str(mapping: Mapping[str, object], key: str) -> str:
+    value = mapping[key]
+    if not isinstance(value, str):
+        raise AssertionError(f"Expected str for {key}, got {type(value)!r}")
+    return value
 
 
 def test_format_with_structured_fields() -> None:
@@ -43,12 +50,21 @@ def test_format_with_structured_fields() -> None:
     )
     formatted = formatter.format(record)
 
-    # Parse JSON and verify fields
-    data = json.loads(formatted)
-    assert data["message"] == "Test message"
-    assert data["operation"] == "test_op"
-    assert data["status"] == "success"
-    assert data["level"] == "INFO"
+    parsed = json.loads(formatted)
+    assert isinstance(parsed, dict)
+    message = parsed.get("message")
+    operation = parsed.get("operation")
+    status = parsed.get("status")
+    level = parsed.get("level")
+
+    assert isinstance(message, str)
+    assert isinstance(operation, str)
+    assert isinstance(status, str)
+    assert isinstance(level, str)
+    assert message == "Test message"
+    assert operation == "test_op"
+    assert status == "success"
+    assert level == "INFO"
 
 
 def test_correlation_id_from_context() -> None:
@@ -69,22 +85,24 @@ def test_correlation_id_from_context() -> None:
             None,
         )
         formatted = formatter.format(record)
-        data = json.loads(formatted)
-        assert data["correlation_id"] == "req-123"
+        parsed = json.loads(formatted)
+        assert isinstance(parsed, dict)
+        correlation_value = parsed.get("correlation_id")
+        assert isinstance(correlation_value, str)
+        assert correlation_value == "req-123"
     finally:
         set_correlation_id(None)
 
 
 def test_get_logger_attaches_null_handler() -> None:
     """Test that get_logger attaches a NullHandler."""
-    logger = get_logger("test.module")
-    assert isinstance(logger, LoggerAdapter)
+    logger: LoggerAdapter = get_logger("test.module")
     # Get the underlying logger
     base_logger = logger.logger
     assert any(isinstance(h, logging.NullHandler) for h in base_logger.handlers)
 
 
-def test_log_success_method(caplog: pytest.LogCaptureFixture) -> None:
+def test_log_success_method(caplog: LogCaptureFixture) -> None:
     """Test log_success helper method."""
     logger = get_logger("test.success")
     caplog.set_level(logging.INFO)
@@ -101,7 +119,7 @@ def test_log_success_method(caplog: pytest.LogCaptureFixture) -> None:
     assert record["operation"] == "build_index"
 
 
-def test_log_failure_method(caplog: pytest.LogCaptureFixture) -> None:
+def test_log_failure_method(caplog: LogCaptureFixture) -> None:
     """Test log_failure helper method."""
     logger = get_logger("test.failure")
     caplog.set_level(logging.ERROR)
@@ -119,7 +137,7 @@ def test_log_failure_method(caplog: pytest.LogCaptureFixture) -> None:
     assert record["operation"] == "save_data"
 
 
-def test_log_io_method(caplog: pytest.LogCaptureFixture) -> None:
+def test_log_io_method(caplog: LogCaptureFixture) -> None:
     """Test log_io helper method."""
     logger = get_logger("test.io")
     caplog.set_level(logging.INFO)
@@ -137,28 +155,23 @@ def test_log_io_method(caplog: pytest.LogCaptureFixture) -> None:
     assert record["duration_ms"] == 500.0
 
 
-@pytest.mark.parametrize(
-    ("log_level", "expected_status"),
-    [
-        (logging.INFO, "success"),
-        (logging.WARNING, "warning"),
-        (logging.ERROR, "error"),
-    ],
+STATUS_CASES: Final[tuple[tuple[int, str], ...]] = (
+    (logging.INFO, "success"),
+    (logging.WARNING, "warning"),
+    (logging.ERROR, "error"),
 )
-def test_status_inferred_from_level(
-    log_level: int,
-    expected_status: str,
-    caplog: pytest.LogCaptureFixture,
-) -> None:
+
+
+def test_status_inferred_from_level(caplog: LogCaptureFixture) -> None:
     """Test that status is inferred from log level."""
     logger = get_logger("test.status")
-    caplog.set_level(log_level)
-
-    logger.log(log_level, "Test message")
-
-    assert len(caplog.records) == 1
-    record = cast(LogContextExtra, caplog.records[0].__dict__)
-    assert record["status"] == expected_status
+    for log_level, expected_status in STATUS_CASES:
+        caplog.clear()
+        caplog.set_level(log_level)
+        logger.log(log_level, "Test message")
+        assert len(caplog.records) == 1
+        record = cast(LogContextExtra, caplog.records[0].__dict__)
+        assert record["status"] == expected_status
 
 
 def test_correlation_context_sets_and_clears_id() -> None:
@@ -184,7 +197,7 @@ def test_correlation_context_nesting() -> None:
     assert get_correlation_id() is None
 
 
-def test_with_fields_context_manager(caplog: pytest.LogCaptureFixture) -> None:
+def test_with_fields_context_manager(caplog: LogCaptureFixture) -> None:
     """Test with_fields context manager for temporary field injection."""
     logger = get_logger("test.fields")
     caplog.set_level(logging.INFO)
@@ -199,7 +212,7 @@ def test_with_fields_context_manager(caplog: pytest.LogCaptureFixture) -> None:
 
 
 def test_correlation_id_propagates_through_logger(
-    caplog: pytest.LogCaptureFixture,
+    caplog: LogCaptureFixture,
 ) -> None:
     """Test that correlation ID from context is automatically injected."""
     logger = get_logger("test.propagate")
@@ -214,7 +227,7 @@ def test_correlation_id_propagates_through_logger(
         set_correlation_id(None)
 
 
-def test_adapter_merges_extra_fields(caplog: pytest.LogCaptureFixture) -> None:
+def test_adapter_merges_extra_fields(caplog: LogCaptureFixture) -> None:
     """Test that adapter merges bound fields with runtime extra."""
     logger = get_logger("test.merge")
     caplog.set_level(logging.INFO)

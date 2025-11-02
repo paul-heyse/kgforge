@@ -90,14 +90,14 @@ class Item:
 
 def skip(reason: str = ..., *, allow_module_level: bool = ...) -> None: ...
 @overload
-def fixture[T](func: Callable[..., T]) -> Callable[..., T]: ...
+def fixture[P, T](func: Callable[P, T]) -> Callable[P, T]: ...
 @overload
-def fixture[T](
+def fixture[P, T](
     *,
     name: str | None = None,
     scope: str | None = None,
     params: Sequence[object] | None = None,
-) -> Callable[[Callable[..., T]], Callable[..., T]]: ...
+) -> Callable[[Callable[P, T]], Callable[P, T]]: ...
 
 P = ParamSpec("P")
 
