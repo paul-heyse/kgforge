@@ -1,4 +1,11 @@
-"""Hybrid search utilities for the agent catalog."""
+"""Hybrid search utilities for the agent catalog.
+
+This module orchestrates lexical and vector search across the catalog payload.
+Vector operations rely on the typed helpers in
+``kgfoundry_common.numpy_typing`` so that downstream consumers (and mypy) can
+reason about the ndarray shapes involved. The resulting scores conform to the
+``schema/models/search_result.v1.json`` schema.
+"""
 
 from __future__ import annotations
 
@@ -16,13 +23,14 @@ from pathlib import Path
 from typing import Protocol, cast
 
 import numpy as np
-import numpy.typing as npt
 
 from kgfoundry_common.errors import AgentCatalogSearchError
-
-# Backwards compatibility alias for tooling modules that still import the legacy name.
-CatalogSearchError = AgentCatalogSearchError
 from kgfoundry_common.logging import get_logger, with_fields
+from kgfoundry_common.numpy_typing import (
+    FloatMatrix,
+    IntVector,
+    topk_indices,
+)
 from kgfoundry_common.observability import MetricsProvider, observe_duration
 from search_api.types import (
     FaissIndexProtocol,
@@ -32,6 +40,13 @@ from search_api.types import (
 )
 
 logger = get_logger(__name__)
+
+__all__ = [
+    "SearchOptions",
+    "SearchRequest",
+    "compute_vector_scores",
+    "search_catalog",
+]
 
 
 EMBEDDING_MATRIX_RANK = 2
@@ -318,7 +333,7 @@ class _SimpleFaissIndex(FaissIndexProtocol):
             Configure the dimension.
         """
         self.dimension = dimension
-        self._vectors: VectorArray = np.empty((0, dimension), dtype=np.float32)
+        self._vectors: FloatMatrix = np.empty((0, dimension), dtype=np.float32, order="C")
 
     def add(self, vectors: VectorArray) -> None:
         """Document add.
@@ -339,14 +354,15 @@ class _SimpleFaissIndex(FaissIndexProtocol):
         AgentCatalogSearchError
             Raised when message.
         """
-        array = np.asarray(vectors, dtype=np.float32)
+        array = np.asarray(vectors, dtype=np.float32, order="C")
         if array.ndim != EMBEDDING_MATRIX_RANK or array.shape[1] != self.dimension:
             message = "Vector dimension does not match index configuration"
             raise AgentCatalogSearchError(message)
-        if self._vectors.size == 0:
-            self._vectors = np.ascontiguousarray(array)
-        else:
-            self._vectors = np.vstack((self._vectors, np.ascontiguousarray(array)))
+        self._vectors = (
+            array
+            if self._vectors.size == 0
+            else np.vstack((self._vectors, array.astype(np.float32, copy=False)))
+        )
 
     def train(self, vectors: VectorArray) -> None:
         """Train the index (no-op for simple flat index).
@@ -375,9 +391,7 @@ class _SimpleFaissIndex(FaissIndexProtocol):
         # Simple index doesn't support ID mapping, fall back to regular add
         self.add(vectors)
 
-    def search(
-        self, vectors: VectorArray, k: int
-    ) -> tuple[npt.NDArray[np.float32], npt.NDArray[np.int64]]:
+    def search(self, vectors: VectorArray, k: int) -> tuple[FloatMatrix, IntVector]:
         """Document search.
 
         <!-- auto:docstring-builder v1 -->
@@ -403,7 +417,7 @@ class _SimpleFaissIndex(FaissIndexProtocol):
         AgentCatalogSearchError
             Raised when message.
         """
-        queries = np.asarray(vectors, dtype=np.float32)
+        queries = np.asarray(vectors, dtype=np.float32, order="C")
         if queries.ndim != EMBEDDING_MATRIX_RANK or queries.shape[1] != self.dimension:
             message = "Query vector dimension does not match index configuration"
             raise AgentCatalogSearchError(message)
@@ -412,20 +426,16 @@ class _SimpleFaissIndex(FaissIndexProtocol):
         indices = -np.ones((query_count, k), dtype=np.int64)
         if self._vectors.size == 0:
             return distances, indices
-        similarity = np.matmul(queries, self._vectors.T)  # type: ignore[misc]
-        if similarity.ndim != EMBEDDING_MATRIX_RANK:  # type: ignore[misc]
+        similarity = (queries @ self._vectors.T).astype(np.float32, copy=False)
+        if similarity.ndim != EMBEDDING_MATRIX_RANK:
             message = "Unexpected similarity matrix shape"
             raise AgentCatalogSearchError(message)
-        top_k = min(k, similarity.shape[1])  # type: ignore[misc]
-        order = np.argpartition(similarity, -top_k, axis=1)  # type: ignore[misc]
-        top_indices = order[:, -top_k:]  # type: ignore[misc,index]
-        top_scores = np.take_along_axis(similarity, top_indices, axis=1)  # type: ignore[misc]
-        sorted_order = np.argsort(top_scores, axis=1)[:, ::-1]  # type: ignore[misc]
-        distances[:, :top_k] = np.take_along_axis(top_scores, sorted_order, axis=1).astype(  # type: ignore[misc]
-            np.float32
-        )
-        indices[:, :top_k] = np.take_along_axis(top_indices, sorted_order, axis=1).astype(np.int64)  # type: ignore[misc]
-        return distances, indices
+        top_k = min(k, similarity.shape[1])
+        for row_idx, row in enumerate(similarity):
+            top_indices = topk_indices(row, top_k)
+            distances[row_idx, :top_k] = row[top_indices].astype(np.float32, copy=False)
+            indices[row_idx, :top_k] = top_indices.astype(np.int64, copy=False)
+        return cast(FloatMatrix, distances), cast(IntVector, indices)
 
 
 class _SimpleFaissModule:
@@ -585,12 +595,11 @@ class _SimpleFaissModule:
         vectors : tuple[int, ...] | np.float32
             Array to normalize (modified in-place).
         """
-        norms = np.linalg.norm(vectors, axis=1, keepdims=True)  # type: ignore[misc]
-        norms[norms == 0] = 1.0  # type: ignore[misc]
-        vectors /= norms  # type: ignore[misc]
+        normalized = normalize_l2(np.asarray(vectors, dtype=np.float32, order="C"), axis=1)
+        np.copyto(vectors, normalized)
 
 
-@cache  # type: ignore[misc]
+@cache
 def _simple_faiss_module() -> FaissModuleProtocol:
     """Return a cached NumPy-based FAISS shim for local usage.
 
@@ -1343,7 +1352,7 @@ def _encode_query(
     query: str,
     *,
     batch_size: int,
-) -> VectorArray:
+) -> FloatMatrix:
     """Return normalized embeddings for ``query`` using ``model``.
 
     <!-- auto:docstring-builder v1 -->
@@ -1373,12 +1382,13 @@ def _encode_query(
     except Exception as exc:  # pragma: no cover - defensive guard
         message = f"Embedding model failed to encode query: {exc}"
         raise AgentCatalogSearchError(message, cause=exc) from exc
-    return np.asarray(encoded, dtype=np.float32)
+    encoded_array = np.asarray(encoded, dtype=np.float32, order="C")
+    return normalize_l2(encoded_array, axis=1)
 
 
 def _scores_from_index(
     distances: VectorArray,
-    indices: npt.NDArray[np.int64],
+    indices: IndexArray,
     context: VectorSearchContext,
 ) -> dict[str, float]:
     """Map FAISS search outputs to candidate symbol scores.
@@ -1399,10 +1409,11 @@ def _scores_from_index(
     dict[str, float]
         Describe return value.
     """
-    vector_scores: dict[str, float] = {}
-    for idx, distance_row in enumerate(distances):  # type: ignore[misc]
-        for rank, score in enumerate(distance_row):  # type: ignore[misc]
-            row_index = int(indices[idx, rank])  # type: ignore[misc]
+    distance_matrix = np.asarray(distances, dtype=np.float32, order="C")
+    index_matrix = np.asarray(indices, dtype=np.int64, order="C")
+    for idx, distance_row in enumerate(distance_matrix):
+        for rank, score in enumerate(distance_row):
+            row_index = int(index_matrix[idx, rank])
             if row_index < 0:
                 continue
             document = context.row_to_document.get(row_index)

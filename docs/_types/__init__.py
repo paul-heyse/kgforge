@@ -19,7 +19,6 @@ from docs._types import artifacts as artifacts
 from docs._types import griffe as griffe
 from docs._types import sphinx_optional as sphinx_optional
 from docs._types.artifacts import (
-    ArtifactCodec,
     ArtifactValidationError,
     JsonPayload,
     JsonPrimitive,
@@ -54,7 +53,6 @@ from docs._types.sphinx_optional import (
 )
 
 __all__ = [
-    "ArtifactCodec",
     "ArtifactValidationError",
     "AstroidManagerFacade",
     "AutoapiParserFacade",

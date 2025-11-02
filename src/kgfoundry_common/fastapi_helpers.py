@@ -10,7 +10,6 @@ timeout to prevent runaway tasks inside the request lifecycle.
 from __future__ import annotations
 
 import asyncio
-import inspect
 import time
 from collections.abc import Awaitable, Callable
 from typing import TypeVar, cast
@@ -45,24 +44,8 @@ async def _await_with_timeout[T](coro: Awaitable[T], timeout: float | None) -> T
     return await asyncio.wait_for(coro, timeout)
 
 
-async def _run_callable(
-    fn: Callable[..., Awaitable[T] | T],
-    timeout: float | None,
-    /,
-    *args: object,
-    **kwargs: object,
-) -> T:
-    coroutine_function = cast(Callable[..., object], fn)
-    if inspect.iscoroutinefunction(coroutine_function):
-        async_fn = cast(Callable[..., Awaitable[T]], fn)
-        return await _await_with_timeout(async_fn(*args, **kwargs), timeout)
-
-    sync_fn = cast(Callable[..., T], fn)
-    return await _await_with_timeout(asyncio.to_thread(sync_fn, *args, **kwargs), timeout)
-
-
-def typed_dependency(
-    dependency: Callable[..., Awaitable[T] | T],
+def typed_dependency[T](
+    dependency: Callable[..., Awaitable[T]],
     *,
     name: str,
     timeout: float | None = DEFAULT_TIMEOUT_SECONDS,
@@ -79,7 +62,10 @@ def typed_dependency(
             start = time.perf_counter()
             log.info("dependency.start", extra={"status": "started"})
             try:
-                result = await _run_callable(dependency, timeout, *args, **kwargs)
+                result = await _await_with_timeout(
+                    dependency(*args, **kwargs),
+                    timeout,
+                )
             except Exception:  # pragma: no cover - propagated to caller
                 duration_ms = (time.perf_counter() - start) * 1000.0
                 log.exception(
@@ -94,14 +80,14 @@ def typed_dependency(
             )
             return result
 
-    dependency_callable = cast(Callable[..., Awaitable[T]], _instrumented)
-    return Depends(dependency_callable)
+    marker: Depends[T] = Depends(_instrumented)
+    return cast(object, marker)
 
 
 def typed_exception_handler(
     app: FastAPI,
     exception_type: type[E],
-    handler: Callable[[Request, E], Awaitable[Response] | Response],
+    handler: Callable[[Request, E], Awaitable[Response]],
     *,
     name: str,
     timeout: float | None = DEFAULT_TIMEOUT_SECONDS,
@@ -121,7 +107,10 @@ def typed_exception_handler(
                 extra={"status": "started", "exception_type": exception_name},
             )
             try:
-                result = await _run_callable(handler, timeout, request, exc)
+                result = await _await_with_timeout(
+                    handler(request, exc),
+                    timeout,
+                )
             except Exception:  # pragma: no cover - FastAPI surfaces this
                 duration_ms = (time.perf_counter() - start) * 1000.0
                 log.exception(
@@ -156,7 +145,7 @@ def typed_middleware(
             self._delegate = middleware_class(app, **options_copy)
             super().__init__(app)
 
-        async def dispatch(  # type: ignore[override]
+        async def dispatch(
             self,
             request: StarletteRequest,
             call_next: Callable[[StarletteRequest], Awaitable[Response]],

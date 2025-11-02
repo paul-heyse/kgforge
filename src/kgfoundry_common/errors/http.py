@@ -13,6 +13,8 @@ Examples
 
 from __future__ import annotations
 
+import asyncio
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
@@ -79,8 +81,8 @@ def problem_details_response(
 def register_problem_details_handler(app: FastAPI) -> None:
     """Register FastAPI exception handler for KgFoundryError."""
 
-    def _handler(request: Request, exc: KgFoundryError) -> JSONResponse:
-        return problem_details_response(exc, request=request)
+    async def _handler(request: Request, exc: KgFoundryError) -> JSONResponse:
+        return await asyncio.to_thread(problem_details_response, exc, request)
 
     typed_exception_handler(
         app,

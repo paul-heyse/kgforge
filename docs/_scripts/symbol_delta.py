@@ -13,6 +13,11 @@ from typing import cast
 
 from docs._scripts import shared  # noqa: PLC2701
 from docs._scripts.validation import validate_against_schema  # noqa: PLC2701
+from docs._types.artifacts import (
+    SymbolDeltaChange,  # noqa: PLC2701
+    symbol_delta_to_payload,  # noqa: PLC2701
+)
+from docs._types.artifacts import SymbolDeltaPayload as TypedSymbolDeltaPayload  # noqa: PLC2701
 from tools import (
     ToolRunResult,
     build_problem_details,
@@ -21,7 +26,7 @@ from tools import (
     render_problem,
     run_tool,
 )
-from tools._shared.proc import ToolExecutionError
+from tools._shared.proc import ToolExecutionError  # noqa: PLC2701
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
@@ -171,44 +176,6 @@ class SymbolRow:
         )
 
 
-@dataclass(frozen=True, slots=True)
-class ChangeEntry:
-    """Difference for a single symbol between two snapshots."""
-
-    path: str
-    before: dict[str, JsonValue]
-    after: dict[str, JsonValue]
-    reasons: tuple[str, ...]
-
-    def to_payload(self) -> dict[str, JsonValue]:
-        return {
-            "path": self.path,
-            "before": dict(self.before),
-            "after": dict(self.after),
-            "reasons": list(self.reasons),
-        }
-
-
-@dataclass(frozen=True, slots=True)
-class SymbolDeltaPayload:
-    """Structured representation of the symbol delta payload."""
-
-    base_sha: str | None
-    head_sha: str | None
-    added: tuple[str, ...]
-    removed: tuple[str, ...]
-    changed: tuple[ChangeEntry, ...]
-
-    def to_payload(self) -> dict[str, JsonValue]:
-        return {
-            "base_sha": self.base_sha,
-            "head_sha": self.head_sha,
-            "added": list(self.added),
-            "removed": list(self.removed),
-            "changed": [entry.to_payload() for entry in self.changed],
-        }
-
-
 def _coerce_json_value(value: object) -> JsonValue:
     if value is None:
         return None
@@ -305,14 +272,14 @@ def _index_rows(rows: list[SymbolRow]) -> dict[str, SymbolRow]:
 def _diff_rows(
     base: dict[str, SymbolRow],
     head: dict[str, SymbolRow],
-) -> tuple[tuple[str, ...], tuple[str, ...], tuple[ChangeEntry, ...]]:
+) -> tuple[tuple[str, ...], tuple[str, ...], tuple[SymbolDeltaChange, ...]]:
     base_paths = set(base)
     head_paths = set(head)
 
     added = tuple(sorted(head_paths - base_paths))
     removed = tuple(sorted(base_paths - head_paths))
 
-    changes: list[ChangeEntry] = []
+    changes: list[SymbolDeltaChange] = []
     for path in sorted(base_paths & head_paths):
         before_row = base[path]
         after_row = head[path]
@@ -332,7 +299,7 @@ def _diff_rows(
                     after_subset[key] = _coerce_json_value(after_payload[key])
         if reasons:
             changes.append(
-                ChangeEntry(
+                SymbolDeltaChange(
                     path=path,
                     before=before_subset,
                     after=after_subset,
@@ -349,9 +316,9 @@ def _build_delta(
     head_rows: list[SymbolRow],
     base_sha: str | None,
     head_sha: str | None,
-) -> SymbolDeltaPayload:
+) -> TypedSymbolDeltaPayload:
     added, removed, changed = _diff_rows(_index_rows(base_rows), _index_rows(head_rows))
-    return SymbolDeltaPayload(
+    return TypedSymbolDeltaPayload(
         base_sha=base_sha,
         head_sha=head_sha,
         added=added,
@@ -360,8 +327,8 @@ def _build_delta(
     )
 
 
-def write_delta(delta_path: Path, payload: SymbolDeltaPayload) -> bool:
-    builtins_payload = payload.to_payload()
+def write_delta(delta_path: Path, payload: TypedSymbolDeltaPayload) -> bool:
+    builtins_payload = symbol_delta_to_payload(payload)
     validate_against_schema(
         cast(JsonPayload, builtins_payload),
         SYMBOL_DELTA_SCHEMA,
@@ -459,10 +426,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 head_sha=head_sha,
             )
             write_delta(delta_path, payload)
-        except ToolExecutionError as exc:
-            observation.failure("failure", returncode=1)
-            _emit_problem(cast(ProblemDetailsDict | None, exc.problem), default_message=str(exc))
-            return 1
+        except ToolExecutionError as e:
+            _emit_problem(e.problem, default_message=str(e))
+            raise
         except Exception as exc:  # pragma: no cover - defensive  # noqa: BLE001
             observation.failure("exception", returncode=1)
             problem = build_problem_details(

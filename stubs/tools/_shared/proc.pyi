@@ -3,7 +3,10 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from tools._shared.problem_details import ProblemDetailsDict
 
 @dataclass
 class ToolRunResult:
@@ -19,7 +22,17 @@ class ToolExecutionError(RuntimeError):
     returncode: int | None
     stdout: str
     stderr: str
-    problem: Any
+    problem: ProblemDetailsDict | None
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        command: Sequence[str],
+        returncode: int | None = ...,
+        streams: tuple[str, str] | None = ...,
+        problem: ProblemDetailsDict | None = ...,
+    ) -> None: ...
 
 def run_tool(
     command: Sequence[str],

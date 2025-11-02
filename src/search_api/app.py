@@ -27,6 +27,7 @@ See Also
 
 from __future__ import annotations
 
+import asyncio
 import json
 import uuid
 from collections.abc import Awaitable, Callable, Mapping
@@ -380,28 +381,18 @@ except Exception as exc:  # noqa: BLE001 - defensive guard for SPLADE loading
 
 
 # [nav:anchor auth]
-def auth(authorization: AuthorizationHeader) -> None:
-    """Validate bearer token authentication.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    authorization : str | NoneType, optional
-        Authorization header value (Bearer token).
-        Defaults to None.
-        Defaults to ``Header(None)``.
-
-    Raises
-    ------
-    HTTPException
-        Returns 401 if token is invalid or missing.
-    """
+def _validate_authorization_header(authorization: str | None) -> None:
+    """Validate bearer token authentication."""
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing or invalid Bearer token")
     token = authorization.split(" ", 1)[1]
     if token not in API_KEYS:
         raise HTTPException(status_code=401, detail="Invalid API key")
+
+
+async def auth(authorization: AuthorizationHeader) -> None:
+    """Validate bearer token authentication."""
+    await asyncio.to_thread(_validate_authorization_header, authorization)
 
 
 # Typed dependency markers -------------------------------------------------
