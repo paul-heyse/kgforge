@@ -11,16 +11,11 @@ class NormalizeNumpyParamsPlugin(TransformerPlugin):
     stage: PluginStage
 
     def on_start(self, context: PluginContext, /) -> None: ...
-
     def on_finish(self, context: PluginContext, /) -> None: ...
-
     def apply(self, context: PluginContext, result: SemanticResult, /) -> SemanticResult: ...
-
     @staticmethod
     def _normalize_parameter(parameter: ParameterDoc, /) -> ParameterDoc: ...
-
     @staticmethod
     def _normalize_return(entry: ReturnDoc, /) -> ReturnDoc: ...
-
 
 __all__ = ["NormalizeNumpyParamsPlugin"]

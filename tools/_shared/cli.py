@@ -58,7 +58,6 @@ if TYPE_CHECKING:
         errors: list[CliErrorEntry] = field(default_factory=list)
         problem: ProblemDetailsDict | UnsetType = UNSET
 
-
 else:
 
     class CliFileResult(Struct, kw_only=True):

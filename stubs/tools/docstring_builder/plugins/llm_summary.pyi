@@ -10,10 +10,7 @@ class LLMSummaryRewritePlugin(TransformerPlugin):
     stage: PluginStage
 
     def on_start(self, context: PluginContext, /) -> None: ...
-
     def on_finish(self, context: PluginContext, /) -> None: ...
-
     def apply(self, context: PluginContext, result: SemanticResult, /) -> SemanticResult: ...
-
 
 __all__ = ["LLMSummaryRewritePlugin"]

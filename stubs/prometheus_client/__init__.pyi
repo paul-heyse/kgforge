@@ -7,7 +7,6 @@ from prometheus_client.registry import CollectorRegistry
 class _MetricBase:
     def labels(self, *labelvalues: str, **labelkwargs: str) -> _MetricBase: ...
 
-
 class Counter(_MetricBase):
     """Prometheus counter metric."""
 
@@ -22,13 +21,9 @@ class Counter(_MetricBase):
         unit: str | None = ...,
         registry: CollectorRegistry | None = ...,
         **kwargs: object,
-    ) -> None:
-        ...
-
+    ) -> None: ...
     def labels(self, *labelvalues: str, **labelkwargs: str) -> Counter: ...
-
     def inc(self, amount: float = ...) -> None: ...
-
 
 class Gauge(_MetricBase):
     """Prometheus gauge metric."""
@@ -44,13 +39,9 @@ class Gauge(_MetricBase):
         unit: str | None = ...,
         registry: CollectorRegistry | None = ...,
         **kwargs: object,
-    ) -> None:
-        ...
-
+    ) -> None: ...
     def labels(self, *labelvalues: str, **labelkwargs: str) -> Gauge: ...
-
     def set(self, value: float) -> None: ...
-
 
 class Histogram(_MetricBase):
     """Prometheus histogram metric."""
@@ -67,19 +58,13 @@ class Histogram(_MetricBase):
         unit: str | None = ...,
         registry: CollectorRegistry | None = ...,
         **kwargs: object,
-    ) -> None:
-        ...
-
+    ) -> None: ...
     def labels(self, *labelvalues: str, **labelkwargs: str) -> Histogram: ...
-
     def observe(self, amount: float) -> None: ...
 
-
-def start_http_server(port: int, addr: str = ..., registry: CollectorRegistry | None = ...) -> None:
-    ...
-
-
+def start_http_server(
+    port: int, addr: str = ..., registry: CollectorRegistry | None = ...
+) -> None: ...
 def generate_latest(registry: CollectorRegistry | None = ...) -> bytes: ...
-
 
 REGISTRY: CollectorRegistry
