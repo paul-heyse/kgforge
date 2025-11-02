@@ -26,7 +26,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Final, Protocol, TypedDict
+from typing import TYPE_CHECKING, Final, Protocol, TypedDict
 
 import numpy as np
 from numpy.typing import NDArray
@@ -76,20 +76,27 @@ __navmap__: Final[NavMap] = {
 }
 
 # Type aliases for numpy arrays
-VectorArray = NDArray[np.float32]  # type: ignore[misc]  # numpy dtype contains Any
-"""Type alias for float32 vector arrays used in FAISS operations.
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
-All vectors must be normalized to unit length for inner-product search.
-Dimensions are typically 2560 for dense embeddings or configurable for
-sparse representations.
-"""
+    type VectorArray = npt.NDArray[np.float32]
+    type IndexArray = npt.NDArray[np.int64]
+else:  # pragma: no cover - runtime fallback for doc generation
+    VectorArray = np.ndarray
+    IndexArray = np.ndarray
 
-IndexArray = NDArray[np.int64]  # type: ignore[misc]  # numpy dtype contains Any
-"""Type alias for int64 index arrays used in FAISS search results.
+VectorArray.__doc__ = (
+    "Type alias for float32 vector arrays used in FAISS operations.\n\n"
+    "All vectors must be normalized to unit length for inner-product search.\n"
+    "Dimensions are typically 2560 for dense embeddings or configurable for\n"
+    "sparse representations."
+)
 
-Index arrays contain row indices into the vector store, typically returned
-from search operations alongside distance/similarity scores.
-"""
+IndexArray.__doc__ = (
+    "Type alias for int64 index arrays used in FAISS search results.\n\n"
+    "Index arrays contain row indices into the vector store, typically returned\n"
+    "from search operations alongside distance/similarity scores."
+)
 
 
 class FaissIndexProtocol(Protocol):
@@ -274,7 +281,7 @@ class FaissModuleProtocol(Protocol):
     METRIC_L2: int
     """Constant for L2 distance metric (used with index_factory)."""
 
-    def IndexFlatIP(self, dimension: int) -> FaissIndexProtocol:
+    def IndexFlatIP(self, dimension: int) -> FaissIndexProtocol:  # noqa: N802
         """Create a flat inner-product index.
 
         <!-- auto:docstring-builder v1 -->
@@ -323,7 +330,7 @@ class FaissModuleProtocol(Protocol):
         """
         ...
 
-    def IndexIDMap2(self, index: FaissIndexProtocol) -> FaissIndexProtocol:
+    def IndexIDMap2(self, index: FaissIndexProtocol) -> FaissIndexProtocol:  # noqa: N802
         """Wrap an index with 64-bit ID mapping.
 
         <!-- auto:docstring-builder v1 -->
@@ -388,7 +395,7 @@ class FaissModuleProtocol(Protocol):
         """
         ...
 
-    def normalize_L2(self, vectors: VectorArray) -> None:
+    def normalize_L2(self, vectors: VectorArray) -> None:  # noqa: N802
         """Normalize vectors to unit length in-place.
 
         <!-- auto:docstring-builder v1 -->

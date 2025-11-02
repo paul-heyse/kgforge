@@ -23,12 +23,13 @@ Examples
 
 from __future__ import annotations
 
+import sys
 import time
 import uuid
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
-from tools._shared.prometheus import (
+from tools.shared.prometheus import (
     CollectorRegistry,
     CounterLike,
     HistogramLike,
@@ -201,10 +202,10 @@ def record_operation_metrics(
 
     try:
         yield
-    except Exception:
-        final_status = "error"
-        raise
     finally:
+        exc_type, _, _ = sys.exc_info()
+        if exc_type is not None and issubclass(exc_type, Exception):
+            final_status = "error"
         duration = time.monotonic() - start_time
 
         if operation == "harvest":

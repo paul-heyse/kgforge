@@ -14,7 +14,7 @@ Examples
 
 from __future__ import annotations
 
-from typing import Final
+from typing import Any, Final, cast
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -160,7 +160,10 @@ class RuntimeSettings(BaseSettings):
     def __init__(self, **overrides: object) -> None:
         """Initialise settings with fail-fast validation."""
         try:
-            super().__init__(**overrides)  # type: ignore[arg-type]  # BaseSettings.__init__ accepts Any kwargs, mypy can't infer overloads
+            cast_overrides: dict[str, Any] = {
+                key: cast(Any, value) for key, value in overrides.items()
+            }
+            super().__init__(**cast_overrides)
         except Exception as exc:
             # Convert Pydantic validation errors to SettingsError with Problem Details
             msg = f"Configuration validation failed: {exc}"

@@ -166,7 +166,7 @@ class KgFoundryError(Exception):
         >>> assert details["code"] == "resource-unavailable"
         """
         return build_problem_details(
-            type=get_type_uri(self.code),
+            problem_type=get_type_uri(self.code),
             title=title or self.__class__.__name__,
             status=self.http_status,
             detail=self.message,
@@ -1181,7 +1181,7 @@ class RetryExhaustedError(KgFoundryError):
             extensions["retry_after_seconds"] = self.retry_after_seconds
 
         return build_problem_details(
-            type=get_type_uri(self.code),
+            problem_type=get_type_uri(self.code),
             title=title or self.__class__.__name__,
             status=self.http_status,
             detail=self.message,

@@ -6,7 +6,7 @@ from __future__ import annotations
 import pathlib
 import re
 
-from tools._shared.logging import get_logger
+from tools.shared.logging import get_logger
 
 LOGGER = get_logger(__name__)
 

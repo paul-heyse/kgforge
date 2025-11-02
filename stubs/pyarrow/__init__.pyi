@@ -29,7 +29,7 @@ class Table:
     @property
     def num_rows(self) -> int: ...
 
-def field(name: str, type: DataType, nullable: bool = ...) -> Field: ...  # noqa: A002 - public API uses `type`
+def field(name: str, type: DataType, nullable: bool = ...) -> Field: ...  # noqa: A002
 def schema(
     fields: Iterable[Field] | Iterable[tuple[str, DataType]] | Mapping[str, DataType],
 ) -> Schema: ...

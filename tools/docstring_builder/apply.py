@@ -100,11 +100,11 @@ class _DocstringTransformer(cst.CSTTransformer):
             return updated_node
         return updated_node
 
-    def visit_ClassDef(self, node: cst.ClassDef) -> bool:
+    def visit_ClassDef(self, node: cst.ClassDef) -> bool:  # noqa: N802
         self.namespace.append(node.name.value)
         return True
 
-    def leave_ClassDef(
+    def leave_ClassDef(  # noqa: N802
         self, original_node: cst.ClassDef, updated_node: cst.ClassDef
     ) -> cst.ClassDef:
         qname = self._qualify(original_node.name.value)
@@ -112,11 +112,11 @@ class _DocstringTransformer(cst.CSTTransformer):
         self.namespace.pop()
         return updated
 
-    def visit_FunctionDef(self, node: cst.FunctionDef) -> bool:
+    def visit_FunctionDef(self, node: cst.FunctionDef) -> bool:  # noqa: N802
         self.namespace.append(node.name.value)
         return True
 
-    def leave_FunctionDef(
+    def leave_FunctionDef(  # noqa: N802
         self, original_node: cst.FunctionDef, updated_node: cst.FunctionDef
     ) -> cst.FunctionDef:
         qname = self._qualify(original_node.name.value)

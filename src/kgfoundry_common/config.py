@@ -13,6 +13,7 @@ Examples
 
 from __future__ import annotations
 
+import base64
 import functools
 from functools import lru_cache
 from typing import Final
@@ -27,6 +28,9 @@ from kgfoundry_common.types import JsonPrimitive, JsonValue
 __all__ = ["AppSettings", "JsonPrimitive", "JsonValue", "load_config"]
 
 logger = get_logger(__name__)
+
+# Security constants
+_MIN_SIGNING_KEY_BYTES: Final[int] = 32  # Minimum recommended key length
 
 __navmap__: Final[NavMap] = {
     "title": "kgfoundry_common.config",
@@ -76,6 +80,9 @@ class AppSettings(BaseSettings):
     from environment variables. All fields are immutable (frozen=True) and
     self-documenting via Field descriptions.
 
+    Security fields (HMAC signing key, subprocess/network timeouts) are
+    optional but recommended. When provided, they enforce strict validation.
+
     Examples
     --------
     >>> import os
@@ -91,6 +98,11 @@ class AppSettings(BaseSettings):
     ...     AppSettings()  # doctest: +SKIP
     ... except Exception:
     ...     print("Validation failed for invalid log level")
+
+    >>> # Security configuration with timeouts
+    >>> os.environ["SUBPROCESS_TIMEOUT"] = "300"
+    >>> os.environ["REQUEST_TIMEOUT"] = "30"
+    >>> settings = AppSettings()  # doctest: +SKIP
     """
 
     log_level: str = Field(
@@ -103,6 +115,28 @@ class AppSettings(BaseSettings):
         default="json",
         description="Logging format ('json' or 'text')",
         validation_alias="LOG_FORMAT",
+    )
+
+    signing_key: str | None = Field(
+        default=None,
+        description="HMAC signing key for secure pickle (base64-encoded, ≥32 bytes recommended)",
+        validation_alias="SIGNING_KEY",
+    )
+
+    subprocess_timeout: int = Field(
+        default=300,
+        description="Default timeout for subprocess operations in seconds",
+        validation_alias="SUBPROCESS_TIMEOUT",
+        ge=1,
+        le=3600,
+    )
+
+    request_timeout: int = Field(
+        default=30,
+        description="Default timeout for network requests in seconds",
+        validation_alias="REQUEST_TIMEOUT",
+        ge=1,
+        le=3600,
     )
 
     model_config = {"frozen": True, "case_sensitive": False}
@@ -161,6 +195,45 @@ class AppSettings(BaseSettings):
             raise ValueError(msg)
         return format_lower
 
+    @field_validator("signing_key")
+    @classmethod
+    def validate_signing_key(cls, value: str | None) -> str | None:
+        """Validate signing key is properly formatted and sufficiently long.
+
+        Parameters
+        ----------
+        value : str | None
+            Base64-encoded signing key.
+
+        Returns
+        -------
+        str | None
+            Validated signing key (unchanged if valid).
+
+        Raises
+        ------
+        ValueError
+            If key is invalid, not base64-decodable, or too short.
+        """
+        if value is None:
+            return None
+
+        if not value.strip():
+            msg = "Signing key cannot be empty"
+            raise ValueError(msg)
+
+        try:
+            decoded_key = base64.b64decode(value)
+        except Exception as exc:
+            msg = f"Signing key must be valid base64: {exc}"
+            raise ValueError(msg) from exc
+
+        if len(decoded_key) < _MIN_SIGNING_KEY_BYTES:
+            msg = f"Signing key must be ≥{_MIN_SIGNING_KEY_BYTES} bytes when decoded (got {len(decoded_key)})"
+            raise ValueError(msg)
+
+        return value
+
 
 def _load_config_impl() -> AppSettings:
     """Load and validate application configuration from environment.
@@ -180,7 +253,13 @@ def _load_config_impl() -> AppSettings:
         logger.log_success(
             "Configuration loaded",
             operation="config.load",
-            extra={"log_level": settings.log_level, "log_format": settings.log_format},
+            extra={
+                "log_level": settings.log_level,
+                "log_format": settings.log_format,
+                "signing_key_present": settings.signing_key is not None,
+                "subprocess_timeout": settings.subprocess_timeout,
+                "request_timeout": settings.request_timeout,
+            },
         )
     except ValueError as exc:
         logger.log_failure(

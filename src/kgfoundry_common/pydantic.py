@@ -10,12 +10,10 @@ if TYPE_CHECKING:
     class BaseModel:
         """Typing-friendly stub that mirrors Pydantic's ``BaseModel``.
 
-        <!-- auto:docstring-builder v1 -->
-
         Parameters
         ----------
         **data : Any
-        Describe ``data``.
+            Keyword arguments accepted by the Pydantic model.
         """
 
         model_config: ClassVar[object]
@@ -23,12 +21,11 @@ if TYPE_CHECKING:
         def __init__(self, **data: object) -> None:
             """Populate the model from keyword arguments.
 
-            <!-- auto:docstring-builder v1 -->
-
             Parameters
             ----------
             **data : Any
-            Describe ``data``.
+                Keyword arguments forwarded to the underlying Pydantic model
+                constructor.
             """
             raise NotImplementedError
 
@@ -36,35 +33,33 @@ if TYPE_CHECKING:
         def model_validate(cls, obj: object, /) -> Self:
             """Validate ``obj`` using the underlying Pydantic implementation.
 
-            <!-- auto:docstring-builder v1 -->
-
             Parameters
             ----------
             obj : Any
-            Describe ``obj``.
+                Instance or mapping to validate.
             strict : bool | None, optional
-            Describe ``strict``.
-            Defaults to ``None``.
+                Whether to forbid coercion during validation.
+                Defaults to ``None`` (defer to Pydantic).
             extra : ExtraValues | None, optional
-            Describe ``extra``.
-            Defaults to ``None``.
+                Strategy for handling extra keys.
+                Defaults to ``None`` (use model configuration).
             from_attributes : bool | None, optional
-            Describe ``from_attributes``.
-            Defaults to ``None``.
+                Allow attribute-based population when ``obj`` is not a mapping.
+                Defaults to ``None`` (follow model configuration).
             context : Any | None, optional
-            Describe ``context``.
-            Defaults to ``None``.
+                Context data available to validators.
+                Defaults to ``None``.
             by_alias : bool | None, optional
-            Describe ``by_alias``.
-            Defaults to ``None``.
+                Interpret alias names when reading ``obj``.
+                Defaults to ``None`` (inherit from configuration).
             by_name : bool | None, optional
-            Describe ``by_name``.
-            Defaults to ``None``.
+                Permit field-name based population alongside aliases.
+                Defaults to ``None``.
 
             Returns
             -------
             Self
-            Describe return value.
+                A validated model instance.
             """
             raise NotImplementedError
 
@@ -87,54 +82,52 @@ if TYPE_CHECKING:
         ) -> dict[str, object]:
             """Return the dictionary representation produced by Pydantic.
 
-            <!-- auto:docstring-builder v1 -->
-
             Parameters
             ----------
             mode : Literal['json', 'python'] | str, optional
-            Describe ``mode``.
-            Defaults to ``'python'``.
+                Rendering mode for the serialized output.
+                Defaults to ``'python'``.
             include : IncEx | None, optional
-            Describe ``include``.
-            Defaults to ``None``.
+                Fields to include explicitly.
+                Defaults to ``None`` (include everything).
             exclude : IncEx | None, optional
-            Describe ``exclude``.
-            Defaults to ``None``.
+                Fields to omit from the output.
+                Defaults to ``None``.
             context : Any | None, optional
-            Describe ``context``.
-            Defaults to ``None``.
+                Additional context available to custom serializers.
+                Defaults to ``None``.
             by_alias : bool | None, optional
-            Describe ``by_alias``.
-            Defaults to ``None``.
+                If ``True``, use field aliases instead of field names.
+                Defaults to ``None`` (inherit from configuration).
             exclude_unset : bool, optional
-            Describe ``exclude_unset``.
-            Defaults to ``False``.
+                Omit fields that were not explicitly set.
+                Defaults to ``False``.
             exclude_defaults : bool, optional
-            Describe ``exclude_defaults``.
-            Defaults to ``False``.
+                Remove fields equal to their default values.
+                Defaults to ``False``.
             exclude_none : bool, optional
-            Describe ``exclude_none``.
-            Defaults to ``False``.
+                Exclude ``None`` values from the output.
+                Defaults to ``False``.
             exclude_computed_fields : bool, optional
-            Describe ``exclude_computed_fields``.
-            Defaults to ``False``.
+                Skip fields tagged as computed.
+                Defaults to ``False``.
             round_trip : bool, optional
-            Describe ``round_trip``.
-            Defaults to ``False``.
+                Preserve types that can survive a full serialization round trip.
+                Defaults to ``False``.
             warnings : bool | Literal['none', 'warn', 'error'], optional
-            Describe ``warnings``.
-            Defaults to ``True``.
+                Configure how serialization warnings are surfaced.
+                Defaults to ``True`` (emit warnings).
             fallback : Callable[[Any], Any] | None, optional
-            Describe ``fallback``.
-            Defaults to ``None``.
+                Serializer invoked when a value cannot be encoded natively.
+                Defaults to ``None``.
             serialize_as_any : bool, optional
-            Describe ``serialize_as_any``.
-            Defaults to ``False``.
+                Treat values as ``Any`` to bypass strict type enforcement.
+                Defaults to ``False``.
 
             Returns
             -------
             dict[str, Any]
-            Describe return value.
+                Dictionary representation of the model.
             """
             raise NotImplementedError
 
@@ -158,57 +151,56 @@ if TYPE_CHECKING:
         ) -> str:
             """Return the JSON representation produced by Pydantic.
 
-            <!-- auto:docstring-builder v1 -->
-
             Parameters
             ----------
             indent : int | None, optional
-            Describe ``indent``.
-            Defaults to ``None``.
+                Number of spaces used to indent JSON output.
+                Defaults to ``None`` (compact output).
             ensure_ascii : bool, optional
-            Describe ``ensure_ascii``.
-            Defaults to ``False``.
+                Escape non-ASCII characters when ``True``.
+                Defaults to ``False``.
             include : IncEx | None, optional
-            Describe ``include``.
-            Defaults to ``None``.
+                Fields to include explicitly in the serialized payload.
+                Defaults to ``None`` (include everything).
             exclude : IncEx | None, optional
-            Describe ``exclude``.
-            Defaults to ``None``.
+                Fields to omit from the payload.
+                Defaults to ``None``.
             context : Any | None, optional
-            Describe ``context``.
-            Defaults to ``None``.
+                Supplemental context available to custom serializers.
+                Defaults to ``None``.
             by_alias : bool | None, optional
-            Describe ``by_alias``.
-            Defaults to ``None``.
+                Output field aliases instead of field names when ``True``.
+                Defaults to ``None`` (inherit from configuration).
             exclude_unset : bool, optional
-            Describe ``exclude_unset``.
-            Defaults to ``False``.
+                Omit fields that were never set on the model instance.
+                Defaults to ``False``.
             exclude_defaults : bool, optional
-            Describe ``exclude_defaults``.
-            Defaults to ``False``.
+                Remove fields that are set to their default values.
+                Defaults to ``False``.
             exclude_none : bool, optional
-            Describe ``exclude_none``.
-            Defaults to ``False``.
+                Skip ``None`` values in the generated JSON.
+                Defaults to ``False``.
             exclude_computed_fields : bool, optional
-            Describe ``exclude_computed_fields``.
-            Defaults to ``False``.
+                Exclude computed fields from the serialized output.
+                Defaults to ``False``.
             round_trip : bool, optional
-            Describe ``round_trip``.
-            Defaults to ``False``.
+                Preserve Python types that can be reconstructed from JSON.
+                Defaults to ``False``.
             warnings : bool | Literal['none', 'warn', 'error'], optional
-            Describe ``warnings``.
-            Defaults to ``True``.
+                Controls how serialization warnings are emitted.
+                Defaults to ``True`` (emit warnings).
             fallback : Callable[[Any], Any] | None, optional
-            Describe ``fallback``.
-            Defaults to ``None``.
+                Serializer for values unsupported by default encoders.
+                Defaults to ``None``.
             serialize_as_any : bool, optional
-            Describe ``serialize_as_any``.
-            Defaults to ``False``.
+                Relax type checking by treating values as ``Any`` during
+                serialization.
+                Defaults to ``False``.
 
             Returns
             -------
             str
-            Describe return value.
+                JSON string representation of the model.
             """
             raise NotImplementedError
 

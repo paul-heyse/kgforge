@@ -25,7 +25,7 @@ import json
 from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
-from typing import TypedDict
+from typing import TypedDict, cast
 
 import jsonschema
 from jsonschema.exceptions import SchemaError, ValidationError
@@ -108,7 +108,7 @@ class ProblemDetailsValidationError(Exception):
         self.validation_errors = validation_errors or []
 
 
-@lru_cache(maxsize=1)  # type: ignore[misc]  # lru_cache is a descriptor; mypy handles its type correctly
+@lru_cache(maxsize=1)
 def _load_schema() -> JsonSchema:
     """Load and cache the Problem Details schema.
 
@@ -145,7 +145,7 @@ def _load_schema() -> JsonSchema:
     return schema_obj
 
 
-def validate_problem_details(payload: dict[str, object]) -> None:
+def validate_problem_details(payload: Mapping[str, JsonValue]) -> None:
     """Validate Problem Details payload against canonical schema.
 
     <!-- auto:docstring-builder v1 -->
@@ -186,13 +186,13 @@ def validate_problem_details(payload: dict[str, object]) -> None:
         raise ProblemDetailsValidationError(msg) from exc
 
 
-def build_problem_details(
-    *,
-    type: str,
+def build_problem_details(  # noqa: PLR0913
+    problem_type: str,
     title: str,
     status: int,
     detail: str,
     instance: str,
+    *,
     code: str | None = None,
     extensions: Mapping[str, JsonValue] | None = None,
 ) -> ProblemDetails:
@@ -205,8 +205,9 @@ def build_problem_details(
 
     Parameters
     ----------
-    type : str
+    problem_type : str
         Type URI identifying the problem (e.g., "https://kgfoundry.dev/problems/tool-failure").
+        Required. Conforms to RFC 3986 URI format.
     title : str
         Short summary of the problem.
     status : int
@@ -215,12 +216,12 @@ def build_problem_details(
         Human-readable explanation of the problem.
     instance : str
         URI reference identifying the specific occurrence (e.g., "urn:tool:git:exit-1").
-    code : str | NoneType, optional
-        Machine-readable error code (kgfoundry extension). Defaults to None.
-        Defaults to ``None``.
-    extensions : str | object | NoneType, optional
-        Additional problem-specific fields. Defaults to None.
-        Defaults to ``None``.
+    code : str | None, optional
+        Machine-readable error code (kgfoundry extension).
+        Defaults to None.
+    extensions : Mapping[str, JsonValue] | None, optional
+        Additional problem-specific fields.
+        Defaults to None.
 
     Returns
     -------
@@ -235,7 +236,7 @@ def build_problem_details(
     Examples
     --------
     >>> problem = build_problem_details(
-    ...     type="https://kgfoundry.dev/problems/tool-timeout",
+    ...     problem_type="https://kgfoundry.dev/problems/tool-timeout",
     ...     title="Tool execution timed out",
     ...     status=504,
     ...     detail="Command 'git' timed out after 10.0 seconds",
@@ -246,7 +247,7 @@ def build_problem_details(
     >>> assert problem["status"] == 504
     """
     payload: dict[str, object] = {
-        "type": type,
+        "type": problem_type,
         "title": title,
         "status": status,
         "detail": detail,
@@ -257,19 +258,19 @@ def build_problem_details(
     if extensions:
         payload["errors"] = dict(extensions)
 
-    # Validate against schema
-    validate_problem_details(payload)
+    # Validate against schema (cast since dict[str, object] ⊇ Mapping[str, JsonValue])
+    validate_problem_details(cast(Mapping[str, JsonValue], payload))
 
-    return payload  # type: ignore[return-value]
+    return cast(ProblemDetails, payload)
 
 
-def problem_from_exception(
+def problem_from_exception(  # noqa: PLR0913
     exc: Exception,
-    *,
-    type: str,
+    problem_type: str,
     title: str,
     status: int,
     instance: str,
+    *,
     code: str | None = None,
     extensions: Mapping[str, JsonValue] | None = None,
 ) -> ProblemDetails:
@@ -284,7 +285,7 @@ def problem_from_exception(
     ----------
     exc : Exception
         Exception to convert.
-    type : str
+    problem_type : str
         Type URI identifying the problem.
     title : str
         Short summary of the problem.
@@ -292,12 +293,12 @@ def problem_from_exception(
         HTTP status code.
     instance : str
         URI reference identifying the specific occurrence.
-    code : str | NoneType, optional
-        Machine-readable error code. Defaults to None.
-        Defaults to ``None``.
-    extensions : str | object | NoneType, optional
-        Additional problem-specific fields. Defaults to None.
-        Defaults to ``None``.
+    code : str | None, optional
+        Machine-readable error code.
+        Defaults to None.
+    extensions : Mapping[str, JsonValue] | None, optional
+        Additional problem-specific fields.
+        Defaults to None.
 
     Returns
     -------
@@ -311,7 +312,7 @@ def problem_from_exception(
     ... except ValueError as e:
     ...     problem = problem_from_exception(
     ...         e,
-    ...         type="https://kgfoundry.dev/problems/invalid-input",
+    ...         problem_type="https://kgfoundry.dev/problems/invalid-input",
     ...         title="Invalid input",
     ...         status=400,
     ...         instance="urn:validation:input",
@@ -331,7 +332,7 @@ def problem_from_exception(
         merged_extensions["caused_by"] = exc.__cause__.__class__.__name__
 
     return build_problem_details(
-        type=type,
+        problem_type=problem_type,
         title=title,
         status=status,
         detail=detail,

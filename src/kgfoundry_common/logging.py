@@ -20,7 +20,7 @@ import sys
 import time
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
-from typing import Any, Final, cast
+from typing import Any, Final, TypedDict, cast
 
 from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.types import JsonValue
@@ -28,6 +28,7 @@ from kgfoundry_common.types import JsonValue
 __all__ = [
     "CorrelationContext",
     "JsonFormatter",
+    "LogContextExtra",
     "LoggerAdapter",
     "get_correlation_id",
     "get_logger",
@@ -62,6 +63,37 @@ __navmap__: Final[NavMap] = {
         for name in __all__
     },
 }
+
+
+class LogContextExtra(TypedDict, total=False):
+    """TypedDict for structured logging extra fields.
+
+    Fields added to logging records via the 'extra' parameter to enable
+    proper type checking when accessing LogRecord attributes.
+
+    Attributes
+    ----------
+    correlation_id : str, optional
+        Request or correlation ID for tracing across services.
+    operation : str, optional
+        Name of the operation being logged (e.g., "search", "index_build").
+    status : str, optional
+        Operation status ("success", "error", "started", "in_progress").
+    duration_ms : float, optional
+        Operation duration in milliseconds.
+    service : str, optional
+        Name of the service producing the log.
+    endpoint : str, optional
+        HTTP endpoint or internal method being executed.
+    """
+
+    correlation_id: str
+    operation: str
+    status: str
+    duration_ms: float
+    service: str
+    endpoint: str
+
 
 # Context variable for correlation ID propagation (async-safe)
 _correlation_id: contextvars.ContextVar[str | None] = contextvars.ContextVar(
@@ -187,7 +219,7 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(data, default=str)
 
 
-class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]
+class LoggerAdapter(logging.LoggerAdapter):
     """Logger adapter that injects structured context fields.
 
     <!-- auto:docstring-builder v1 -->

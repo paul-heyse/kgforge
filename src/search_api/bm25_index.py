@@ -19,6 +19,7 @@ import duckdb
 from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.problem_details import JsonValue
+from kgfoundry_common.safe_pickle_v2 import UnsafeSerializationError, load_unsigned_legacy
 from kgfoundry_common.serialization import deserialize_json, serialize_json
 
 __all__ = ["BM25Doc", "BM25Index", "toks"]
@@ -419,12 +420,12 @@ class BM25Index:
         except DeserializationError:
             # Try legacy pickle format for backward compatibility
             if path_obj.suffix == ".pkl":
-                import pickle
-
                 with path_obj.open("rb") as handle:
-                    # pickle.load returns object - unavoidable for legacy format support
-                    # Use cast to satisfy mypy while maintaining runtime safety via isinstance check
-                    legacy_payload_raw: object = cast(object, pickle.load(handle))  # noqa: S301
+                    try:
+                        legacy_payload_raw: object = load_unsigned_legacy(handle)
+                    except UnsafeSerializationError as legacy_exc:
+                        message = f"Legacy BM25 pickle failed validation: {legacy_exc}"
+                        raise DeserializationError(message) from legacy_exc
                     if not isinstance(legacy_payload_raw, dict):
                         payload = {}
                     else:
@@ -453,15 +454,11 @@ class BM25Index:
             index.df = {}
         # Convert docs data back to BM25Doc objects
         docs_data_raw = payload.get("docs", [])
-        if not isinstance(docs_data_raw, list):
-            docs_data: list[dict[str, JsonValue]] = []
-        else:
-            # Narrow to list[dict[str, JsonValue]]
-            # isinstance check filters to dict - mypy understands this narrowing
-            docs_data = [doc for doc in docs_data_raw if isinstance(doc, dict)]
-            # Type annotation for mypy - isinstance in comprehension narrows to dict[str, JsonValue]
-            # Cast is needed because list comprehension doesn't preserve type narrowing
-            docs_data = cast(list[dict[str, JsonValue]], docs_data)  # type: ignore[redundant-cast]
+        docs_data: list[dict[str, JsonValue]] = []
+        if isinstance(docs_data_raw, list):
+            for doc in docs_data_raw:
+                if isinstance(doc, dict):
+                    docs_data.append(doc)
         # Build BM25Doc objects with type narrowing for each field
         index.docs = [
             BM25Doc(

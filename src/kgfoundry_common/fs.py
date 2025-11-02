@@ -16,6 +16,7 @@ Examples
 
 from __future__ import annotations
 
+import sys
 import tempfile
 from pathlib import Path
 from typing import Literal
@@ -229,7 +230,6 @@ def atomic_write(
             temp_file.flush()
         if tmp_path is not None:
             tmp_path.replace(path)
-    except Exception:
-        if tmp_path is not None:
+    finally:
+        if tmp_path is not None and sys.exc_info()[0] is not None:
             tmp_path.unlink(missing_ok=True)
-        raise

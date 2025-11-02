@@ -29,7 +29,6 @@ from typing import cast
 
 import yaml
 
-from tools._shared.logging import get_logger
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.harvest import harvest_file
 from tools.docstring_builder.io import (
@@ -37,6 +36,7 @@ from tools.docstring_builder.io import (
     select_files,
 )
 from tools.docstring_builder.ir import write_schema
+from tools.docstring_builder.models import DocstringBuilderError
 from tools.docstring_builder.orchestrator import (
     DocstringBuildRequest,
     DocstringBuildResult,
@@ -54,6 +54,7 @@ from tools.docstring_builder.paths import (
     REQUIRED_PYTHON_MINOR,
 )
 from tools.docstring_builder.policy import PolicyConfigurationError, load_policy_settings
+from tools.shared.logging import get_logger
 from tools.stubs.drift_check import run as run_stub_drift
 
 LOGGER = get_logger(__name__)
@@ -370,7 +371,13 @@ def _command_doctor(args: argparse.Namespace) -> int:
                         exception.expires_on.isoformat(),
                         exception.justification or "no justification provided",
                     )
-    except Exception:  # pragma: no cover
+    except (
+        OSError,
+        UnicodeDecodeError,
+        ValueError,
+        yaml.YAMLError,
+        DocstringBuilderError,
+    ):  # pragma: no cover - defensive doctor safeguard
         LOGGER.exception("Doctor encountered an unexpected error.")
         return int(ExitStatus.ERROR)
 

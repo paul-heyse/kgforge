@@ -77,8 +77,12 @@ def test_frozen() -> None:
     """Test that AppSettings is frozen (immutable)."""
     settings = AppSettings()
 
+    def mutate_settings(s: AppSettings) -> None:
+        """Attempt to mutate settings (will raise ValidationError)."""
+        s.log_level = "WARNING"  # type: ignore[assignment,readonly-property]
+
     with pytest.raises(ValidationError):
-        settings.log_level = "WARNING"  # type: ignore[misc]
+        mutate_settings(settings)
 
 
 def test_load_config_caching() -> None:

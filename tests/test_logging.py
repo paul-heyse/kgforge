@@ -5,12 +5,14 @@ from __future__ import annotations
 import json
 import logging
 from io import StringIO
+from typing import cast
 
 import pytest
 
 from kgfoundry_common.logging import (
     CorrelationContext,
     JsonFormatter,
+    LogContextExtra,
     LoggerAdapter,
     get_correlation_id,
     get_logger,
@@ -94,9 +96,9 @@ def test_log_success_method(caplog: pytest.LogCaptureFixture) -> None:
     )
 
     assert len(caplog.records) == 1
-    record = caplog.records[0]
-    assert record.status == "success"  # type: ignore[attr-defined]
-    assert record.operation == "build_index"  # type: ignore[attr-defined]
+    record = cast(LogContextExtra, caplog.records[0].__dict__)
+    assert record["status"] == "success"
+    assert record["operation"] == "build_index"
 
 
 def test_log_failure_method(caplog: pytest.LogCaptureFixture) -> None:
@@ -112,9 +114,9 @@ def test_log_failure_method(caplog: pytest.LogCaptureFixture) -> None:
     )
 
     assert len(caplog.records) == 1
-    record = caplog.records[0]
-    assert record.status == "error"  # type: ignore[attr-defined]
-    assert record.operation == "save_data"  # type: ignore[attr-defined]
+    record = cast(LogContextExtra, caplog.records[0].__dict__)
+    assert record["status"] == "error"
+    assert record["operation"] == "save_data"
 
 
 def test_log_io_method(caplog: pytest.LogCaptureFixture) -> None:
@@ -131,8 +133,8 @@ def test_log_io_method(caplog: pytest.LogCaptureFixture) -> None:
     )
 
     assert len(caplog.records) == 1
-    record = caplog.records[0]
-    assert record.duration_ms == 500.0  # type: ignore[attr-defined]
+    record = cast(LogContextExtra, caplog.records[0].__dict__)
+    assert record["duration_ms"] == 500.0
 
 
 @pytest.mark.parametrize(
@@ -155,8 +157,8 @@ def test_status_inferred_from_level(
     logger.log(log_level, "Test message")
 
     assert len(caplog.records) == 1
-    record = caplog.records[0]
-    assert record.status == expected_status  # type: ignore[attr-defined]
+    record = cast(LogContextExtra, caplog.records[0].__dict__)
+    assert record["status"] == expected_status
 
 
 def test_correlation_context_sets_and_clears_id() -> None:
@@ -191,9 +193,9 @@ def test_with_fields_context_manager(caplog: pytest.LogCaptureFixture) -> None:
         adapter.info("Inside context")
 
     assert len(caplog.records) == 1
-    record = caplog.records[0]
-    assert record.correlation_id == "req789"  # type: ignore[attr-defined]
-    assert record.operation == "search"  # type: ignore[attr-defined]
+    record = cast(LogContextExtra, caplog.records[0].__dict__)
+    assert record["correlation_id"] == "req789"
+    assert record["operation"] == "search"
 
 
 def test_correlation_id_propagates_through_logger(
@@ -206,8 +208,8 @@ def test_correlation_id_propagates_through_logger(
     set_correlation_id("req-prop-123")
     try:
         logger.info("Test message")
-        record = caplog.records[0]
-        assert record.correlation_id == "req-prop-123"  # type: ignore[attr-defined]
+        record = cast(LogContextExtra, caplog.records[0].__dict__)
+        assert record["correlation_id"] == "req-prop-123"
     finally:
         set_correlation_id(None)
 
@@ -219,6 +221,6 @@ def test_adapter_merges_extra_fields(caplog: pytest.LogCaptureFixture) -> None:
 
     logger.info("Test", extra={"service": "api", "endpoint": "/search"})
 
-    record = caplog.records[0]
-    assert record.service == "api"  # type: ignore[attr-defined]
-    assert record.endpoint == "/search"  # type: ignore[attr-defined]
+    record = cast(LogContextExtra, caplog.records[0].__dict__)
+    assert record["service"] == "api"
+    assert record["endpoint"] == "/search"

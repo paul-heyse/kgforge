@@ -27,4 +27,6 @@ Constraints
 
 from __future__ import annotations
 
+from examples import _utils as _utils
+
 __all__ = ["_utils"]

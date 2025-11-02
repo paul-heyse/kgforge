@@ -19,6 +19,8 @@ from __future__ import annotations
 from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
+from docs.scripts import shared
+
 if TYPE_CHECKING:
     from docs._scripts.shared import BuildEnvironment
 
@@ -182,28 +184,25 @@ class _TypedGriffeFacade:
 
 
 def build_facade(env: BuildEnvironment) -> GriffeFacade:
-    """Build a typed Griffe facade from the repository environment.
+    """Return a typed facade for Griffe accessing environment metadata.
 
     Parameters
     ----------
     env : BuildEnvironment
-        Repository build environment with paths and configuration.
+        Configuration object describing the build context.
 
     Returns
     -------
     GriffeFacade
-        Typed facade combining loader and member iterator.
+        Runtime-checkable protocol providing typed access to Griffe loaders.
 
     Examples
     --------
-    >>> from docs._scripts.shared import detect_environment
     >>> from docs._types.griffe import build_facade
     >>> env = detect_environment()
     >>> facade = build_facade(env)
     >>> node = facade.loader.load("kgfoundry")
     """
-    from docs._scripts import shared
-
     griffe_loader = shared.make_loader(env)
     adapter = _GriffeLoaderAdapter(griffe_loader)
     return _TypedGriffeFacade(adapter)

@@ -96,48 +96,22 @@ class OntologyCatalog:
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
-        """Describe neighbors.
-
-        <!-- auto:docstring-builder v1 -->
-
-            Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-
-        Parameters
-        ----------
-        concept_id : str
-                Describe ``concept_id``.
-            depth : int, optional
-                Describe ``depth``.
-                Defaults to ``1``.
-        depth : int, optional
-            Describe ``depth``.
-            Defaults to ``1``.
-
-        Returns
-        -------
-        set[str]
-            Describe return value.
-        """
-        del concept_id, depth
-        # NOTE: return neighbor concept IDs up to depth when ontology data is wired
-        return set()
+        """Return related concept identifiers up to the requested depth."""
+        if depth < 1:
+            return set()
+        concept = self.by_id.get(concept_id)
+        if concept is None:
+            return set()
+        # Relationship edges are not yet modelled; return the seed concept for now so the
+        # method remains total while we flesh out the backing data.
+        return {concept.id}
 
     def hydrate(self, concept_id: str) -> dict[str, JsonValue]:
-        """Describe hydrate.
-
-        <!-- auto:docstring-builder v1 -->
-
-            Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-
-        Parameters
-        ----------
-        concept_id : str
-                Describe ``concept_id``.
-
-        Returns
-        -------
-        dict[str, object]
-            Describe return value.
-        """
-        del concept_id
-        return {}
+        """Return a JSON-serialisable view of the concept metadata."""
+        concept = self.by_id.get(concept_id)
+        if concept is None:
+            return {}
+        payload: dict[str, JsonValue] = {"id": concept.id}
+        if concept.label is not None:
+            payload["label"] = concept.label
+        return payload

@@ -15,7 +15,7 @@ try:  # Python 3.11+
 except ModuleNotFoundError:  # pragma: no cover - fallback for environments without tomllib
     import tomli as tomllib  # type: ignore[import-not-found, no-redef]
 
-from tools._shared.logging import get_logger
+from tools.shared.logging import get_logger
 
 LOGGER = get_logger(__name__)
 

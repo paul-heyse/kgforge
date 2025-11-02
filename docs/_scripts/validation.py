@@ -49,11 +49,11 @@ from typing import Any, cast
 
 from jsonschema import Draft202012Validator
 from jsonschema import exceptions as jsonschema_exceptions
-from tools._shared.problem_details import (
+from tools.shared.problem_details import (
     ProblemDetailsDict,
     build_schema_problem_details,
 )
-from tools._shared.proc import ToolExecutionError
+from tools.shared.proc import ToolExecutionError
 
 JsonPayload = Mapping[str, Any] | Sequence[Any] | str | int | float | bool | None
 

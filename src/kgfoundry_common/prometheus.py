@@ -227,9 +227,7 @@ try:  # pragma: no cover - exercised in environments with Prometheus installed
     from prometheus_client import Counter as _PromCounter
     from prometheus_client import Gauge as _PromGauge
     from prometheus_client import Histogram as _PromHistogram
-    from prometheus_client.registry import (
-        CollectorRegistry as _RuntimeCollectorRegistry,
-    )
+    from prometheus_client.registry import CollectorRegistry
 
 except ImportError:  # pragma: no cover - handled by fallback
     HAVE_PROMETHEUS = False

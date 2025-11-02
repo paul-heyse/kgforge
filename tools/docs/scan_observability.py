@@ -20,8 +20,8 @@ from pathlib import Path
 from types import ModuleType
 from typing import Literal, cast
 
-from tools._shared.logging import StructuredLoggerAdapter, get_logger, with_fields
-from tools._shared.proc import ToolExecutionError, run_tool
+from tools.shared.logging import StructuredLoggerAdapter, get_logger, with_fields
+from tools.shared.proc import ToolExecutionError, run_tool
 
 LOGGER: StructuredLoggerAdapter = get_logger(__name__)
 

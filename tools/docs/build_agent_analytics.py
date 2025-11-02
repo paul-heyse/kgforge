@@ -15,7 +15,6 @@ from msgspec import DecodeError
 from msgspec import json as msgspec_json
 
 from kgfoundry.agent_catalog.models import load_catalog_payload
-from tools._shared.schema import validate_tools_payload as _validate_tools_payload
 from tools.docs.analytics_models import (
     ANALYTICS_SCHEMA,
     AgentAnalyticsDocument,
@@ -26,6 +25,7 @@ from tools.docs.analytics_models import (
     PortalSessions,
     RepoInfo,
 )
+from tools.shared.schema import validate_tools_payload as _validate_tools_payload
 
 type JSONMapping = Mapping[str, object]
 

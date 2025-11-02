@@ -291,7 +291,7 @@ doc_common: DocstringCommonModuleProto | None = None
 
 try:  # pragma: no cover - best effort compatibility shim
     from docstring_parser import common as _imported_common
-except Exception:  # pragma: no cover - the library is optional at runtime
+except ImportError:  # pragma: no cover - the library is optional at runtime
     logger.debug("docstring_parser.common unavailable; skipping compatibility shim")
 else:
     doc_common = cast(DocstringCommonModuleProto, _imported_common)

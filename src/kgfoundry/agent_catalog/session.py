@@ -16,7 +16,7 @@ high-level API for invoking catalog operations.
 from __future__ import annotations
 
 import json
-import subprocess
+import subprocess  # noqa: S404 - trusted command executed without shell
 import sys
 from collections.abc import Iterable
 from pathlib import Path
@@ -143,7 +143,8 @@ class CatalogSession:
                     ) from exc
         return self._process
 
-    def _write_payload(self, process: subprocess.Popen[str], payload: JsonObject) -> None:
+    @staticmethod
+    def _write_payload(process: subprocess.Popen[str], payload: JsonObject) -> None:
         """Write a JSON payload to the process stdin.
 
         <!-- auto:docstring-builder v1 -->
@@ -162,7 +163,8 @@ class CatalogSession:
         stdin.write(json.dumps(payload) + "\n")
         stdin.flush()
 
-    def _read_response(self, process: subprocess.Popen[str]) -> JsonObject:
+    @staticmethod
+    def _read_response(process: subprocess.Popen[str]) -> JsonObject:
         """Read and decode a JSON-RPC response from stdout.
 
         <!-- auto:docstring-builder v1 -->
@@ -187,16 +189,6 @@ class CatalogSession:
             raise CatalogSessionError(message, context={"operation": "read_response"})
         try:
             parsed_raw: object = json.loads(line)
-            if not isinstance(parsed_raw, dict):
-                message = "Invalid JSON-RPC response: expected object"
-                parsed_type_name = type(parsed_raw).__name__
-                raise CatalogSessionError(
-                    message,
-                    context={"operation": "read_response", "parsed_type": parsed_type_name},
-                )
-            # isinstance check narrows type - mypy understands this
-            parsed: dict[str, JsonValue] = parsed_raw
-            return parsed
         except json.JSONDecodeError as exc:
             message = f"Received invalid JSON payload: {exc}"
             raise CatalogSessionError(
@@ -204,8 +196,19 @@ class CatalogSession:
                 cause=exc,
                 context={"operation": "read_response"},
             ) from exc
+        else:
+            if not isinstance(parsed_raw, dict):
+                message = "Invalid JSON-RPC response: expected object"
+                parsed_type_name = type(parsed_raw).__name__
+                raise CatalogSessionError(
+                    message,
+                    context={"operation": "read_response", "parsed_type": parsed_type_name},
+                )
+            parsed: dict[str, JsonValue] = parsed_raw
+            return parsed
 
-    def _validate_jsonrpc_id(self, value: JsonValue) -> int | str:
+    @staticmethod
+    def _validate_jsonrpc_id(value: JsonValue) -> int | str:
         """Validate and return a JSON-RPC ID (must be string or number).
 
         <!-- auto:docstring-builder v1 -->
@@ -228,7 +231,8 @@ class CatalogSession:
             context={"id_value": str(value), "id_type": type(value).__name__},
         )
 
-    def _validate_status_code(self, value: JsonValue) -> int:
+    @staticmethod
+    def _validate_status_code(value: JsonValue) -> int:
         """Validate and return an HTTP status code.
 
         <!-- auto:docstring-builder v1 -->

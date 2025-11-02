@@ -23,11 +23,21 @@ if TYPE_CHECKING:
 from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.problem_details import JsonValue
+from kgfoundry_common.safe_pickle_v2 import UnsafeSerializationError, load_unsigned_legacy
 from kgfoundry_common.serialization import deserialize_json, serialize_json
 
 logger = logging.getLogger(__name__)
 
 __all__ = ["BM25Doc", "LuceneBM25", "PurePythonBM25", "get_bm25"]
+
+
+def _load_json_metadata(metadata_path: Path, schema_path: Path) -> dict[str, JsonValue]:
+    data_raw = deserialize_json(metadata_path, schema_path)
+    if not isinstance(data_raw, dict):
+        msg = f"Invalid index data format: expected dict, got {type(data_raw)}"
+        raise DeserializationError(msg)
+    return cast(dict[str, JsonValue], data_raw)
+
 
 __navmap__: Final[NavMap] = {
     "title": "kgfoundry.embeddings_sparse.bm25",
@@ -275,20 +285,11 @@ class PurePythonBM25:
         serialize_json(payload, schema_path, metadata_path)
 
     def load(self) -> None:
-        """Load an existing BM25 index from disk with schema validation and checksum verification.
+        """Load an existing BM25 index from disk with schema validation and checksum verification."""
+        payload = self._read_metadata()
+        self._initialize_from_payload(payload)
 
-        <!-- auto:docstring-builder v1 -->
-
-        Deserializes index metadata from JSON, verifying checksum and validating
-        against the schema. Falls back to legacy pickle format for backward compatibility.
-
-        Raises
-        ------
-        DeserializationError
-            If deserialization, schema validation, or checksum verification fails.
-        FileNotFoundError
-            If metadata or schema file is missing.
-        """
+    def _read_metadata(self) -> dict[str, JsonValue]:
         metadata_path = Path(self.index_dir) / "pure_bm25.json"
         schema_path = (
             Path(__file__).parent.parent.parent / "schema" / "models" / "bm25_metadata.v1.json"
@@ -297,49 +298,42 @@ class PurePythonBM25:
 
         if metadata_path.exists():
             try:
-                data_raw = deserialize_json(metadata_path, schema_path)
-                # deserialize_json returns object (JsonValue at runtime)
-                # Narrow to dict[str, JsonValue] since we know the schema structure
-                if not isinstance(data_raw, dict):
-                    msg = f"Invalid index data format: expected dict, got {type(data_raw)}"
-                    raise DeserializationError(msg)
-                data: dict[str, JsonValue] = data_raw
+                return _load_json_metadata(metadata_path, schema_path)
             except DeserializationError as exc:
                 logger.warning("Failed to load JSON index, trying legacy pickle: %s", exc)
-                # Fall back to legacy pickle
                 if legacy_path.exists():
-                    import pickle
+                    return self._load_legacy_payload(legacy_path)
+                raise
 
-                    with legacy_path.open("rb") as f:
-                        # pickle.load returns object - unavoidable for legacy format support
-                        pickle_data_raw: object = cast(object, pickle.load(f))  # noqa: S301
-                        if not isinstance(pickle_data_raw, dict):
-                            msg = f"Invalid pickle data format: expected dict, got {type(pickle_data_raw)}"
-                            raise DeserializationError(msg)
-                        # Cast to JsonValue dict since pickle payload structure matches JSON
-                        data = cast(dict[str, JsonValue], pickle_data_raw)
-                else:
-                    raise
-        elif legacy_path.exists():
-            # Legacy pickle format
-            import pickle
-
-            with legacy_path.open("rb") as f:
-                # pickle.load returns object - unavoidable for legacy format support
-                legacy_pickle_data: object = cast(object, pickle.load(f))  # noqa: S301
-                if not isinstance(legacy_pickle_data, dict):
-                    msg = (
-                        f"Invalid pickle data format: expected dict, got {type(legacy_pickle_data)}"
-                    )
-                    raise DeserializationError(msg)
-                # Cast to JsonValue dict since pickle payload structure matches JSON
-                data = cast(dict[str, JsonValue], legacy_pickle_data)
+        if legacy_path.exists():
+            payload = self._load_legacy_payload(legacy_path)
             logger.warning("Loaded legacy pickle index. Consider migrating to JSON format.")
-        else:
-            msg = f"Index metadata not found at {metadata_path} or {legacy_path}"
-            raise FileNotFoundError(msg)
+            return payload
 
-        # Extract values with proper type narrowing
+        msg = f"Index metadata not found at {metadata_path} or {legacy_path}"
+        raise FileNotFoundError(msg)
+
+    def _load_legacy_payload(self, legacy_path: Path) -> dict[str, JsonValue]:
+        with legacy_path.open("rb") as handle:
+            try:
+                payload = load_unsigned_legacy(handle)
+            except UnsafeSerializationError as legacy_exc:
+                msg = f"Legacy pickle data failed allow-list validation: {legacy_exc}"
+                raise DeserializationError(msg) from legacy_exc
+        if not isinstance(payload, dict):
+            msg = f"Invalid pickle data format: expected dict, got {type(payload)}"
+            raise DeserializationError(msg)
+        return cast(dict[str, JsonValue], payload)
+
+    def _initialize_from_payload(self, data: Mapping[str, JsonValue]) -> None:
+        self._apply_scalar_metadata(data)
+        self.docs = self._build_docs_from_metadata(data)
+        postings_val = data.get("postings", {})
+        self.postings = (
+            cast(dict[str, dict[str, int]], postings_val) if isinstance(postings_val, dict) else {}
+        )
+
+    def _apply_scalar_metadata(self, data: Mapping[str, JsonValue]) -> None:
         k1_val = data.get("k1", 0.9)
         b_val = data.get("b", 0.4)
         self.k1 = float(k1_val) if isinstance(k1_val, (int, float)) else 0.9
@@ -352,39 +346,28 @@ class PurePythonBM25:
         )
         df_val = data.get("df", {})
         self.df = cast(dict[str, int], df_val) if isinstance(df_val, dict) else {}
-        postings_val = data.get("postings", {})
-        self.postings = (
-            cast(dict[str, dict[str, int]], postings_val) if isinstance(postings_val, dict) else {}
-        )
-        # Convert docs data back to BM25Doc objects if needed
-        docs_data_raw = data.get("docs", [])
-        if docs_data_raw and isinstance(docs_data_raw, list):
-            # JSON format: reconstruct docs from metadata
-            self.docs = {
-                str(doc.get("doc_id", "")): BM25Doc(
-                    doc_id=str(doc.get("doc_id", "")),
-                    length=(
-                        int(length_val)
-                        if isinstance(length_val := doc.get("length", 0), (int, float))
-                        else 0
-                    ),
-                    fields={},  # Fields not persisted in metadata
-                )
-                for doc in docs_data_raw
-                if isinstance(doc, dict)
-            }
-        else:
-            # Legacy pickle format: docs already objects (untyped, but we handle gracefully)
-            docs_val = data.get("docs", {})
-            if isinstance(docs_val, dict):
-                # Type narrowing: assume dict[str, BM25Doc] for legacy format
-                self.docs = cast(dict[str, BM25Doc], docs_val)
-            else:
-                self.docs = {}
         n_val = data.get("N", 0)
         avgdl_val = data.get("avgdl", 0.0)
         self.N = int(n_val) if isinstance(n_val, (int, float)) else 0
         self.avgdl = float(avgdl_val) if isinstance(avgdl_val, (int, float)) else 0.0
+
+    def _build_docs_from_metadata(self, data: Mapping[str, JsonValue]) -> dict[str, BM25Doc]:
+        docs_data_raw = data.get("docs", [])
+        if isinstance(docs_data_raw, list) and docs_data_raw:
+            docs: dict[str, BM25Doc] = {}
+            for doc_value in docs_data_raw:
+                if not isinstance(doc_value, dict):
+                    continue
+                doc_id = str(doc_value.get("doc_id", ""))
+                length_val = doc_value.get("length", 0)
+                length = int(length_val) if isinstance(length_val, (int, float)) else 0
+                docs[doc_id] = BM25Doc(doc_id=doc_id, length=length, fields={})
+            return docs
+
+        docs_val = data.get("docs", {})
+        if isinstance(docs_val, dict):
+            return cast(dict[str, BM25Doc], docs_val)
+        return {}
 
     def _idf(self, term: str) -> float:
         """Compute the inverse document frequency for a given term.
@@ -434,6 +417,9 @@ class PurePythonBM25:
         """
         # naive field weighting at score aggregation (title/section/body contributions)
         tokens = self._tokenize(query)
+        if fields:
+            for text in fields.values():
+                tokens.extend(self._tokenize(text))
         scores: defaultdict[str, float] = defaultdict(float)
         for term in tokens:
             idf = self._idf(term)
@@ -526,8 +512,8 @@ class LuceneBM25:
         Raised when Pyserini or Lucene is unavailable.
         """
         try:
-            from pyserini.index.lucene import LuceneIndexer
-        except Exception as exc:
+            from pyserini.index.lucene import LuceneIndexer  # noqa: PLC0415
+        except ImportError as exc:
             message = "Pyserini/Lucene not available"
             logger.exception("Failed to import LuceneIndexer")
             raise RuntimeError(message) from exc
@@ -555,7 +541,12 @@ class LuceneBM25:
         """
         if self._searcher is not None:
             return
-        from pyserini.search.lucene import LuceneSearcher
+        try:
+            from pyserini.search.lucene import LuceneSearcher  # noqa: PLC0415
+        except ImportError as exc:  # pragma: no cover - defensive for optional dep
+            message = "Pyserini not available for BM25 search"
+            logger.exception("Failed to import LuceneSearcher")
+            raise RuntimeError(message) from exc
 
         searcher = cast(LuceneSearcherProtocol, LuceneSearcher(self.index_dir))
         searcher.set_bm25(self.k1, self.b)
@@ -595,7 +586,10 @@ class LuceneBM25:
         if self._searcher is None:
             message = "Lucene searcher not initialized"
             raise RuntimeError(message)
-        hits = self._searcher.search(query, k)
+        combined_query = query
+        if fields:
+            combined_query = " ".join([query, *fields.values()])
+        hits = self._searcher.search(combined_query, k)
         results: list[tuple[str, float]] = []
         for hit in hits:
             results.append((str(hit.docid), float(hit.score)))
@@ -639,7 +633,7 @@ def get_bm25(
     if backend == "lucene":
         try:
             return LuceneBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)
-        except Exception as exc:
+        except RuntimeError as exc:
             logger.warning(
                 "Failed to create LuceneBM25 backend, falling back to PurePythonBM25: %s",
                 exc,

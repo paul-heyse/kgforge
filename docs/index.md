@@ -22,6 +22,7 @@ explanations/index
 autoapi/index
 architecture/index
 reference/test-matrix
+reference/vector-ingestion
 reference/observability/metrics
 reference/observability/logs
 reference/observability/traces

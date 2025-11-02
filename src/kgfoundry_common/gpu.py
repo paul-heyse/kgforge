@@ -64,7 +64,7 @@ def has_gpu_stack(*, allow_without_cuda_env: str = "ALLOW_GPU_TESTS_WITHOUT_CUDA
         return True
     try:
         torch_module = importlib.import_module("torch")
-    except Exception:  # pragma: no cover - import guard
+    except ImportError:  # pragma: no cover - import guard
         return False
     cuda_module: object = getattr(torch_module, "cuda", None)
     if not isinstance(cuda_module, ModuleType):

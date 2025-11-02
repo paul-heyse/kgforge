@@ -16,7 +16,7 @@ import uuid
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
-from tools._shared.prometheus import (
+from tools.shared.prometheus import (
     CollectorRegistry,
     CounterLike,
     HistogramLike,

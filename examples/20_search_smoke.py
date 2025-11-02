@@ -1,3 +1,5 @@
+# ruff: noqa: N999
+
 """Search - tiny corpus smoke (no GPU).
 ===================================
 

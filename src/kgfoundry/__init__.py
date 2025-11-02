@@ -9,40 +9,41 @@ from __future__ import annotations
 
 import sys
 from importlib import import_module
-from typing import TYPE_CHECKING, Dict, List
+from types import ModuleType
+from typing import TYPE_CHECKING
 
 _ALIASES: dict[str, str] = {
-    "docling": "docling",
-    "download": "download",
-    "embeddings_dense": "embeddings_dense",
-    "embeddings_sparse": "embeddings_sparse",
-    "kg_builder": "kg_builder",
+    "docling": "kgfoundry.docling",
+    "download": "kgfoundry.download",
+    "embeddings_dense": "kgfoundry.embeddings_dense",
+    "embeddings_sparse": "kgfoundry.embeddings_sparse",
+    "kg_builder": "kgfoundry.kg_builder",
     "kgfoundry_common": "kgfoundry_common",
-    "linking": "linking",
-    "observability": "observability",
-    "ontology": "ontology",
-    "orchestration": "orchestration",
-    "registry": "registry",
-    "search_api": "search_api",
-    "search_client": "search_client",
-    "vectorstore_faiss": "vectorstore_faiss",
+    "linking": "kgfoundry.linking",
+    "observability": "kgfoundry.observability",
+    "ontology": "kgfoundry.ontology",
+    "orchestration": "kgfoundry.orchestration",
+    "registry": "kgfoundry.registry",
+    "search_api": "kgfoundry.search_api",
+    "search_client": "kgfoundry.search_client",
+    "vectorstore_faiss": "kgfoundry.vectorstore_faiss",
 }
 
 if TYPE_CHECKING:
-    from . import docling as docling
-    from . import download as download
-    from . import embeddings_dense as embeddings_dense
-    from . import embeddings_sparse as embeddings_sparse
-    from . import kg_builder as kg_builder
-    from . import kgfoundry_common as kgfoundry_common
-    from . import linking as linking
-    from . import observability as observability
-    from . import ontology as ontology
-    from . import orchestration as orchestration
-    from . import registry as registry
-    from . import search_api as search_api
-    from . import search_client as search_client
-    from . import vectorstore_faiss as vectorstore_faiss
+    kgfoundry_common: ModuleType = import_module("kgfoundry_common")
+    docling: ModuleType = import_module("kgfoundry.docling")
+    download: ModuleType = import_module("kgfoundry.download")
+    embeddings_dense: ModuleType = import_module("kgfoundry.embeddings_dense")
+    embeddings_sparse: ModuleType = import_module("kgfoundry.embeddings_sparse")
+    kg_builder: ModuleType = import_module("kgfoundry.kg_builder")
+    linking: ModuleType = import_module("kgfoundry.linking")
+    observability: ModuleType = import_module("kgfoundry.observability")
+    ontology: ModuleType = import_module("kgfoundry.ontology")
+    orchestration: ModuleType = import_module("kgfoundry.orchestration")
+    registry: ModuleType = import_module("kgfoundry.registry")
+    search_api: ModuleType = import_module("kgfoundry.search_api")
+    search_client: ModuleType = import_module("kgfoundry.search_client")
+    vectorstore_faiss: ModuleType = import_module("kgfoundry.vectorstore_faiss")
 
 __all__: list[str] = sorted(_ALIASES)
 
