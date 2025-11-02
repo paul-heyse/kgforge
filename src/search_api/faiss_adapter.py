@@ -211,9 +211,8 @@ class FaissAdapter:
             ids.append(str(chunk_id))
             vectors_list.append(np.asarray(vector_data, dtype=np.float32))
         mat: NDArray[np.float32] = np.stack(vectors_list).astype(np.float32, copy=False)
-        norm_result: NDArray[np.float32] = np.linalg.norm(mat, axis=1, keepdims=True).astype(  # type: ignore[misc]
-            np.float32
-        )
+        norm_raw = np.linalg.norm(mat, axis=1, keepdims=True)
+        norm_result = cast(NDArray[np.float32], norm_raw.astype(np.float32, copy=False))
         epsilon: np.float32 = np.float32(1e-9)
         norms: NDArray[np.float32] = norm_result + epsilon
         normalized: VecArray = cast(VecArray, mat / norms)
@@ -279,9 +278,8 @@ class FaissAdapter:
             ids.append(str(chunk_id))
             vectors_list.append(np.asarray(vector_data, dtype=np.float32))
         mat: NDArray[np.float32] = np.stack(vectors_list).astype(np.float32, copy=False)
-        norm_result: NDArray[np.float32] = np.linalg.norm(mat, axis=1, keepdims=True).astype(  # type: ignore[misc]
-            np.float32
-        )
+        norm_raw = np.linalg.norm(mat, axis=1, keepdims=True)
+        norm_result = cast(NDArray[np.float32], norm_raw.astype(np.float32, copy=False))
         epsilon: np.float32 = np.float32(1e-9)
         norms: NDArray[np.float32] = norm_result + epsilon
         normalized: VecArray = cast(VecArray, mat / norms)
@@ -561,7 +559,7 @@ class FaissAdapter:
         for query_idx in range(n_queries):
             row: VectorArray = queries[query_idx]
             normalised: VectorArray = row.copy()
-            norm_result_scalar: float = float(np.linalg.norm(normalised).item())  # type: ignore[misc]  # numpy.linalg.norm returns floating[Any]
+        norm_result_scalar = float(cast(float, np.linalg.norm(normalised).item()))
             normalized_divisor: float = norm_result_scalar + 1e-9
             normalised = cast(VectorArray, normalised / normalized_divisor)
             sims_raw: NDArray[np.float32] = matrix @ normalised

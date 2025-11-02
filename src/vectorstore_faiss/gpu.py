@@ -10,37 +10,33 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Final, cast
+from typing import Any, Final, cast
 
 import numpy as np
 from numpy.typing import NDArray
 
 from kgfoundry_common.navmap_types import NavMap
+from search_api.types import (
+    FaissIndexProtocol,
+    FaissModuleProtocol,
+    GpuClonerOptionsProtocol,
+    GpuResourcesProtocol,
+)
 
 logger = logging.getLogger(__name__)
 
 # Try importing FAISS at module level - handle gracefully if unavailable
+faiss: FaissModuleProtocol | None
+FaissIndexIDMap2: type[Any] | None
 try:
-    import faiss
+    import faiss as _faiss_module  # pragma: no cover - optional dependency
 except Exception as exc:  # pragma: no cover - optional dependency
     logger.debug("FAISS import failed: %s", exc)
-    faiss = None  # type: ignore[assignment]
-
-if TYPE_CHECKING:
-    from faiss import IndexIDMap2 as FaissIndexIDMap2
-
-    from search_api.types import (
-        FaissIndexProtocol,
-        FaissModuleProtocol,
-        GpuClonerOptionsProtocol,
-        GpuResourcesProtocol,
-    )
-else:  # pragma: no cover - faiss may be missing at runtime
-    FaissIndexIDMap2 = Any
-    FaissIndexProtocol = object  # type: ignore[assignment, misc]
-    FaissModuleProtocol = object  # type: ignore[assignment, misc]
-    GpuClonerOptionsProtocol = object  # type: ignore[assignment, misc]
-    GpuResourcesProtocol = object  # type: ignore[assignment, misc]
+    faiss = None
+    FaissIndexIDMap2 = None
+else:
+    faiss = cast(FaissModuleProtocol, _faiss_module)
+    FaissIndexIDMap2 = getattr(_faiss_module, "IndexIDMap2", None)
 
 __all__ = ["FaissGpuIndex", "FloatArray", "IntArray", "StrArray"]
 
@@ -307,7 +303,7 @@ class FaissGpuIndex:
             norms_result: NDArray[np.floating[Any]] = np.linalg.norm(
                 self._xb, axis=1, keepdims=True
             )
-            norms: FloatArray = (norms_result + 1e-12).astype(np.float32)  # type: ignore[misc]
+            norms = cast(FloatArray, (norms_result + 1e-12).astype(np.float32, copy=False))
             self._xb /= norms
             return
         faiss_module: FaissModuleProtocol = self._faiss
@@ -316,7 +312,7 @@ class FaissGpuIndex:
             raise RuntimeError(message)
         faiss_module.normalize_L2(vec_array)
         idmap_array: IntArray = np.asarray(keys, dtype=np.int64)
-        if isinstance(self._index, FaissIndexIDMap2):
+        if FaissIndexIDMap2 is not None and isinstance(self._index, FaissIndexIDMap2):
             self._index.add_with_ids(vec_array, idmap_array)
         else:
             index_idmap2_constructor_raw: object = getattr(faiss_module, "IndexIDMap2", None)
@@ -358,21 +354,22 @@ class FaissGpuIndex:
         q: FloatArray = np.asarray(query, dtype=np.float32, order="C")
         # np.linalg.norm returns floating[Any] due to numpy typing limitations
         norm_result: NDArray[np.floating[Any]] = np.linalg.norm(q, axis=-1, keepdims=True)
-        norm_float32: FloatArray = (norm_result + 1e-12).astype(np.float32)  # type: ignore[misc]
+        norm_float32 = cast(FloatArray, (norm_result + 1e-12).astype(np.float32, copy=False))
         q /= norm_float32
         if self._faiss is None or self._index is None:
             if self._xb is None or self._idmap is None:
                 return []
             # Matrix multiplication returns floating[Any] due to numpy typing limitations
             sims_matrix_result: NDArray[np.floating[Any]] = self._xb @ q.T
-            sims_matrix: FloatArray = cast(FloatArray, sims_matrix_result.astype(np.float32))  # type: ignore[misc]
+            sims_matrix = cast(FloatArray, sims_matrix_result.astype(np.float32, copy=False))
             sims: FloatArray = np.asarray(sims_matrix, dtype=np.float32).squeeze()
             indices: NDArray[np.int64] = np.argsort(-sims)[:k]
             # numpy tolist() returns list[Any] but can be narrowed based on dtype
             # For int64 arrays, tolist() returns list[int] at runtime
             indices_list: list[int] = cast(list[int], indices.tolist())
             # Index sims explicitly - numpy indexing returns Any
-            return [(str(self._idmap[i]), float(sims[i])) for i in indices_list]  # type: ignore[misc]
+            idmap = cast(StrArray, self._idmap)
+            return [(str(idmap[i]), float(sims[i])) for i in indices_list]
         if self._idmap is None:
             message = "ID map not loaded; cannot resolve FAISS results."
             raise RuntimeError(message)
@@ -464,11 +461,11 @@ class FaissGpuIndex:
                 # np.load returns dict[str, NDArray[Any]] with allow_pickle=True
                 # numpy typing limitations require explicit casts
                 data_untyped: object = np.load(index_uri + ".npz", allow_pickle=True)
-                data: dict[str, NDArray[Any]] = cast(dict[str, NDArray[Any]], data_untyped)  # type: ignore[misc]
-                xb_data_raw: NDArray[Any] = data["xb"]  # type: ignore[misc]
-                ids_data_raw: NDArray[Any] = data["ids"]  # type: ignore[misc]
-                self._xb = cast(FloatArray, xb_data_raw.astype(np.float32))  # type: ignore[misc]
-                self._idmap = cast(StrArray, ids_data_raw.astype(np.str_))  # type: ignore[misc]
+                data = cast(dict[str, NDArray[Any]], data_untyped)
+                xb_data_raw: NDArray[Any] = data["xb"]
+                ids_data_raw: NDArray[Any] = data["ids"]
+                self._xb = cast(FloatArray, xb_data_raw.astype(np.float32, copy=False))
+                self._idmap = cast(StrArray, ids_data_raw.astype(np.str_, copy=False))
             return
         faiss_module: FaissModuleProtocol | None = self._faiss
         if faiss_module is None:

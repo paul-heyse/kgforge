@@ -2,85 +2,80 @@
 
 from __future__ import annotations
 
-import importlib
 import logging
-import sys
 from collections.abc import Iterable, Mapping, Sequence
+from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol, cast
+from typing import Protocol, cast, runtime_checkable
 
 import mkdocs_gen_files
-from tools import get_logger, with_fields
+from docs._scripts import shared
+from tools import get_logger
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+ENV = shared.detect_environment()
+shared.ensure_sys_paths(ENV)
+SETTINGS = shared.load_settings()
+LOADER = shared.make_loader(ENV)
 
-if TYPE_CHECKING:
-    from docs._scripts import shared as shared_module
-else:
-    shared_module = importlib.import_module("docs._scripts.shared")
+ROOT = ENV.root
 
-DocsSettings = shared_module.DocsSettings
-GriffeLoader = shared_module.GriffeLoader
-detect_environment = shared_module.detect_environment
-ensure_sys_paths = shared_module.ensure_sys_paths
-load_settings = shared_module.load_settings
-make_loader = shared_module.make_loader
+BASE_LOGGER = get_logger(__name__)
+LOG = shared.make_logger("mkdocs_api", logger=BASE_LOGGER, artifact="api")
 
 
-class GriffeNode(Protocol):
-    """Protocol representing the subset of Griffe objects we rely on."""
+@dataclass(frozen=True, slots=True)
+class RenderedPage:
+    """Renderer output for a single MkDocs API page."""
+
+    output_path: Path
+    content: str
+
+
+@runtime_checkable
+class DocumentableNode(Protocol):
+    """Protocol capturing the Griffe attributes used for MkDocs generation."""
 
     path: str
-    members: Mapping[str, GriffeNode]
+    members: Mapping[str, DocumentableNode]
     is_package: bool
     is_module: bool
 
 
-ENV = detect_environment()
-ensure_sys_paths(ENV)
-ROOT = ENV.root
+@runtime_checkable
+class GriffeLoader(Protocol):
+    """Subset of the Griffe loader API consumed by the generator."""
 
-LOGGER = get_logger(__name__)
-LOG = with_fields(LOGGER, operation="mkdocs_api")
-
-SETTINGS: DocsSettings = load_settings()
-LOADER: GriffeLoader = make_loader(ENV)
+    def load(self, package: str) -> DocumentableNode:  # pragma: no cover - runtime protocol
+        ...
 
 
-def iter_packages() -> list[str]:
+def iter_packages() -> Sequence[str]:
     """Return the packages that should receive API documentation pages."""
-    return list(SETTINGS.packages)
+    return SETTINGS.packages
 
 
-def _write_index(destination: Path) -> None:
-    """Write the API reference landing page."""
-    with mkdocs_gen_files.open(destination / "index.md", "w") as handle:
-        handle.write("# API Reference\n")
+def _render_index(destination: Path) -> RenderedPage:
+    content = "# API Reference\n"
+    return RenderedPage(output_path=destination / "index.md", content=content)
 
 
-def _write_node(destination: Path, node: GriffeNode) -> None:
-    """Render a single MkDocs page for ``node``."""
+def _render_node(node: DocumentableNode, destination: Path) -> RenderedPage:
     rel = node.path.replace(".", "/")
-    page = destination / rel / "index.md"
-    with mkdocs_gen_files.open(page, "w") as handle:
-        handle.write(f"# `{node.path}`\n\n::: {node.path}\n")
+    page_path = destination / rel / "index.md"
+    content = f"# `{node.path}`\n\n::: {node.path}\n"
+    return RenderedPage(output_path=page_path, content=content)
 
 
-def _documentable_members(node: GriffeNode) -> Iterable[GriffeNode]:
-    """Yield child modules/packages that should receive dedicated pages."""
-    members_attr: object | None = getattr(node, "members", None)
+def _documentable_members(node: DocumentableNode) -> Iterable[DocumentableNode]:
+    members_attr = getattr(node, "members", None)
     if not isinstance(members_attr, Mapping):
         return ()
-    members_mapping = cast(Mapping[str, GriffeNode], members_attr)
-    members: list[GriffeNode] = []
-    for member_node in members_mapping.values():
-        is_package = bool(member_node.is_package)
-        is_module = bool(member_node.is_module)
-        if is_package or is_module:
-            members.append(member_node)
-    return tuple(members)
+    members = cast(Mapping[str, DocumentableNode], members_attr)
+    filtered: list[DocumentableNode] = []
+    for member in members.values():
+        if bool(getattr(member, "is_package", False)) or bool(getattr(member, "is_module", False)):
+            filtered.append(member)
+    return tuple(filtered)
 
 
 def generate_api_reference(
@@ -88,25 +83,35 @@ def generate_api_reference(
     packages: Sequence[str],
     *,
     destination: Path | None = None,
-) -> None:
+) -> list[RenderedPage]:
     """Generate MkDocs API reference pages for ``packages``."""
     target = destination if destination is not None else Path("api")
-    _write_index(target)
+    pages: list[RenderedPage] = [_render_index(target)]
 
     for package in packages:
-        module = cast(GriffeNode, loader.load(package))
-        _write_node(target, module)
+        module = loader.load(package)
+        pages.append(_render_node(module, target))
         for member in _documentable_members(module):
-            _write_node(target, member)
+            pages.append(_render_node(member, target))
+
+    return pages
+
+
+def write_api_page(page: RenderedPage) -> None:
+    """Persist a rendered page to disk via mkdocs_gen_files."""
+    page.output_path.parent.mkdir(parents=True, exist_ok=True)
+    with mkdocs_gen_files.open(page.output_path, "w") as handle:
+        handle.write(page.content)
 
 
 def main(packages: Sequence[str] | None = None) -> int:
-    """Entry point for the MkDocs API generator."""
     if not logging.getLogger().handlers:
         logging.basicConfig(level=logging.INFO)
 
     resolved_packages = list(packages or iter_packages())
-    generate_api_reference(LOADER, resolved_packages)
+    pages = generate_api_reference(LOADER, resolved_packages)
+    for page in pages:
+        write_api_page(page)
 
     LOG.info(
         "Generated MkDocs API reference",
@@ -114,6 +119,7 @@ def main(packages: Sequence[str] | None = None) -> int:
             "status": "success",
             "package_count": len(resolved_packages),
             "destination": "api",
+            "page_count": len(pages),
         },
     )
     return 0
